@@ -1,15 +1,102 @@
 function h2_generation_commit(EP::Model, inputs::Dict, Reserves::Int)
+
+	#Rename H2Gen dataframe
+	dfH2Gen = inputs["dfH2Gen"]
+
+	T = inputs["T"]     # Number of time steps (hours)
+	Z = inputs["Z"]     # Number of zones
+	H = inputs["H"]		#NUmber of hydrogen generation units 
 	
-	#H2 Gen resources started in time t (units?)
-	#YS Question - (units?)
-	#Remove for no commit Dharik confirmed
-	@variable(EP, vn_start[k in H2_GEN_NO_COMMIT, t = 1:T] >= 0 ) 
-	#H2 Gen resources  shutdown in time t (units?)
-	@variable(EP, vn_shut[k in H2_GEN_NO_COMMIT, t = 1:T] >= 0 ) 
-		#Number of H2 Gen units committed or on, number of units running
-	#YS Units?
-	#Do not need this
-	@variable(EP, vn[k in H2_GEN_NO_COMMIT, t = 1:T] >= 0 )
+	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+	
+	#Define start subperiods and interior subperiods
+	START_SUBPERIODS = inputs["START_SUBPERIODS"]
+	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
+	hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
+
+
+	# commitment state variable
+	@variable(EP, vH2GenCOMMIT[k in H2_GEN_COMMIT, t=1:T] >= 0)
+	# Start up variable
+	@variable(EP, vH2GenStart[k in H2_GEN_COMMIT, t=1:T] >= 0)
+	# Shutdown Variable
+	@variable(EP, vH2GenShut[k in H2_GEN_COMMIT, t=1:T] >= 0)
+
+	###Expressions###
+
+	#Objective function expressions
+
+	#H2 Balance expressions
+	@expression(EP, eH2GenCommit[t=1:T, z=1:Z],
+	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+
+	EP[:eH2Balance] += eH2GenCommit
+
+	#Power Consumption H2 Generation balance
+	#Add more comments to make this more descriptive
+	@expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
+	sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+
+	EP[:ePowerBalance] += ePowerBalanceH2GenCommit
+
+	# Carbon emission balance
+	#need to update CO2
+	#Where do I add this to total CO2 consumption?
+	@expression(EP, eH2BalanceH2GenCommit,
+	sum(weights[t] * vH2Gen[k,t] * dfH2Gen[!,:Inv_Cost_per_tonnehr] for k in H2_GEN_COMMIT ,t=1:T))
+
+	### Capacitated limits on unit commitment decision variables (Constraints #1-3)
+	@constraints(EP, begin
+	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2GenCOMMIT][k,t] <= EP[:vH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size][k]
+		[k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenStart][k,t] <= EP[:vH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size][k]
+		[k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenShut][k,t] <= EP[:vH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size][k]
+	end)
+
+	# Commitment state constraint linking startup and shutdown decisions (Constraint #4)
+	@constraints(EP, begin
+	# For Start Hours, links first time step with last time step in subperiod
+	[k in H2_GEN_COMMIT, t in START_SUBPERIODS], EP[:vH2GenCOMMIT][k,t] == EP[:vH2GenCOMMIT][k,(t+hours_per_subperiod-1)] + EP[:vH2GenStart][k,t] - EP[:vH2GenShut][k,t]
+	# For all other hours, links commitment state in hour t with commitment state in prior hour + sum of start up and shut down in current hour
+	[k in H2_GEN_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vH2GenCOMMIT][k,t] == EP[:vH2GenCOMMIT][k,t-1] + EP[:vH2GenStart][k,t] - EP[:vH2GenShut][k,t]
+	end)
+
+
+	### Maximum ramp up and down between consecutive hours (Constraints #5-6)
+
+	## For Start Hours
+	# Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
+	# rampup constraints
+	@constraint(EP,[k in H2_GEN_COMMIT, t in START_SUBPERIODS],
+	EP[:vH2Gen][k,t]-EP[:vH2Gen][k,(t+hours_per_subperiod-1)] <= dfH2Gen[!,:Ramp_Up_Percentage][k] * dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+	+ min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
+	- dfH2Gen[!,:Min_Cap_Tonne_Hr][k] * dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenShut][k,t])
+
+	# rampdown constraints
+	@constraint(EP,[k in H2_GEN_COMMIT, t in START_SUBPERIODS],
+	EP[:vH2Gen][k,(t+hours_per_subperiod-1)]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+	- dfH2Gen[!,:Min_Cap_Tonne_Hr][k]*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
+	+ min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
+
+	## For Interior Hours
+	# rampup constraints
+	@constraint(EP,[k in H2_GEN_COMMIT t in INTERIOR_SUBPERIODS],
+	EP[:vH2Gen][k,t]-EP[:vH2Gen][k,t-1] <= dfH2Gen[!,:Ramp_Up_Percentage][k]*dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+	+ min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
+	-dfH2Gen[!,:Min_Cap_Tonne_Hr][k]*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
+
+	# rampdown constraints
+	@constraint(EP,[k in H2_GEN_COMMIT, t in INTERIOR_SUBPERIODS],
+	EP[:vH2Gen][k,t-1]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+	-dfH2Gen[!,:Min_Cap_Tonne_Hr][k]*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
+	+min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
+
+	@constraints(EP, begin
+	# Minimum stable power generated per technology "k" at hour "t" > Min power
+	[k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= dfH2Gen[!,:Min_Cap_Tonne_Hr][k] * dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenCOMMIT][k,t]
+	# Maximum power generated per technology "k" at hour "t" < Max power
+	[k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= dfH2Gen[!,:Max_Cap_Tonne_Hr][k] * dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenCOMMIT][k,t]
+	end)
+	
 
 end
 
@@ -21,6 +108,7 @@ function h2_generation_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+	H = inputs["H"]		#NUmber of hydrogen generation units 
 	
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
 	
@@ -63,6 +151,11 @@ function h2_generation_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:,vH2Gen][k,t] <= vH2TotalCap[k]
 	end)
 	
+	@constraints(EP, begin
+	# Maximum power generated per technology "k" at hour "t"
+	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:,vH2Gen][k,t] <= vH2GenTotalCap[k]
+	end)
+
 	#Ramping cosntraints 
 	@constraints(EP, begin
 
@@ -125,6 +218,7 @@ function h2_generation(EP::Model, inputs::Dict, Reserves::Int)
 	# Cap_Size is set to 1 for all variables when unit UCommit == 0
 	# When UCommit > 0, Cap_Size is set to 1 for all variables except those where THERM == 1
 	@expression(EP, eH2GenTotalCap[k in 1:H],
+	begin
 		if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
 			if k in H2_GEN_COMMIT
 				dfH2Gen[!,:Existing_Cap_Tonne_hr][k] + dfH2Gen[!,:Cap_Size][k] * (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
@@ -146,7 +240,7 @@ function h2_generation(EP::Model, inputs::Dict, Reserves::Int)
 		else # Resources not eligible for new capacity or retirements
 			dfH2Gen[!,:Existing_Cap_Tonne_hr][k] 
 		end
-	)
+	end)
 
 	## Objective Function Expressions ##
 
@@ -190,14 +284,12 @@ function h2_generation(EP::Model, inputs::Dict, Reserves::Int)
 	## Constraints on new built capacity
 	# Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is >= Max_Cap_MW and lead to infeasabilty
-	@constraint(EP, cH2GenMaxCap[y in intersect(dfH2Gen[dfH2Gen.Max_Cap_Tonne_Hr.>0,:R_ID], 1:H)], eTotalH2GenCap[k] <= dfH2Gen[!,:Max_Cap_Tonne_Hr][k])
+	@constraint(EP, cH2GenMaxCap[k in intersect(dfH2Gen[dfH2Gen.Max_Cap_Tonne_Hr.>0,:R_ID], 1:H)], eTotalH2GenCap[k] <= dfH2Gen[!,:Max_Cap_Tonne_Hr][k])
 
 	# Constraint on minimum capacity (if applicable) [set input to -1 if no constraint on minimum capacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is <= Min_Cap_MW and lead to infeasabilty
-	@constraint(EP, cH2GenMinCap[y in intersect(dfH2Gen[dfH2Gen.Min_Cap_Tonne_Hr.>0,:R_ID], 1:H)], eTotalH2GenCap[k] >= dfH2Gen[!,:Min_Cap_Tonne_Hr][k])
+	@constraint(EP, cH2GenMinCap[k in intersect(dfH2Gen[dfH2Gen.Min_Cap_Tonne_Hr.>0,:R_ID], 1:H)], eTotalH2GenCap[k] >= dfH2Gen[!,:Min_Cap_Tonne_Hr][k])
 
-
-	
 	if !isempty(H2_GEN_COMMIT)
 		EP = h2_generation_commit(EP::Model, inputs::Dict, Reserves::Int)
 	end
