@@ -1,0 +1,10 @@
+,zone,etaP2G_MWh_per_tonne,etaGas_MMBtu_per_tonne,rhoH2Gen_min,rhoH2Gen_max,H2GenSize_tonne_per_hour,P2GenUnitCapex_per_unit,P2GenOPEX,start_up_cost,tau_up_hour,tau_down_hour,min_up_ratio,generation_emission_rate_tonne_per_tonne,Cost_percentage,lifetime,unit_commit,Inv_Cost_per_tonnehr,Fixed_OM_Cost_per_tonnehr,Var_OM_Cost_per_tonne,fuel_type,New_Build,Max_Cap_Tonne_Hr,Min_Cap_Tonne_Hr,Existing_Cap_Tonne_Hr,,Cap_Size,Ramp_Up_Percentage,Ramp_Down_Percentage
+Small Electrolyzer,1,45,0,0.1,1,0.06,1220000,0.015,0,1,1,0,0,1,10,1,Fill these,,,None,,,,,,,,
+Large Electrolyzer,1,45,0,0.1,1,1.9,38500000,0.015,0,1,1,0,0,1,15,1,,,,None,,,,,,,,
+Small SMR,1,0,174.8,0.9,1,0.06,1960000,0.047,0,1,1,0,8.9,1,25,1,,,,NG,,,,,,,,
+Large SMR,1,0,149.8,0.9,1,9.167,278000000,0.047,0,3,1,0,8.9,1,25,0,,,,NG,,,,,,,,
+Large SMR with CCS 90%,1,0,165,0.9,1,9.167,391000000,0.03,0,3,1,0,1,1,25,0,,,,NG,,,,,,,,
+Large SMR with CCS 56%,1,0,152,0.9,1,9.167,246000000,0.03,0,3,1,0,4.4,1,25,0,,,,NG,,,,,,,,
+ATR,1,0,124,0.9,1,20.83,578160000,0.047,0,3,1,0,8.3,1,25,0,,,,NG,,,,,,,,
+ATR with CCS,1,0,136.4,0.9,1,20.83,1069640000,0.03,0,3,1,0,0.83,1,25,0,,,,NG,,,,,,,,
+ATR with CCS 95%,1,0,144.6,0.9,1,23.6,695000000,0.03,0,3,1,0,0.5,1,25,1,,,,NG,,,,,,,,
