@@ -16,10 +16,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 cd(dirname(@__FILE__))
 settings_path = joinpath(pwd(), "Settings")
-#=
+#
 environment_path = "../../../package_activate.jl"
-include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
-=#
+#include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+#
 ### Set relevant directory paths
 src_path = "../../../src/"
 
@@ -62,18 +62,19 @@ myinputs = load_inputs(mysetup, inpath)
 println("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
-### Solve model
-println("Solving Model")
-EP, solve_time = solve_model(EP, mysetup)
-myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
-### Write output
-# Run MGA if the MGA flag is set to 1 else only save the least cost solution
-println("Writing Output")
-outpath = "$inpath/Results"
-write_outputs(EP, outpath, mysetup, myinputs)
-#println(@btime write_outputs(EP, outpath, mysetup, myinputs))
-if mysetup["ModelingToGenerateAlternatives"] == 1
-    println("Starting Model to Generate Alternatives (MGA) Iterations")
-    mga(EP,inpath,mysetup,myinputs,outpath)
-end
+# ### Solve model
+# println("Solving Model")
+# EP, solve_time = solve_model(EP, mysetup)
+# myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
+
+# ### Write output
+# # Run MGA if the MGA flag is set to 1 else only save the least cost solution
+# println("Writing Output")
+# outpath = "$inpath/Results"
+# write_outputs(EP, outpath, mysetup, myinputs)
+# #println(@btime write_outputs(EP, outpath, mysetup, myinputs))
+# if mysetup["ModelingToGenerateAlternatives"] == 1
+#     println("Starting Model to Generate Alternatives (MGA) Iterations")
+#     mga(EP,inpath,mysetup,myinputs,outpath)
+# end
