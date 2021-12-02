@@ -88,6 +88,11 @@ function load_inputs(setup::Dict,path::AbstractString)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
 
+	if setup["ModelH2"] == 1
+		inputs = load_h2_gen(setup, path, sep, inputs)
+		inputs = load_h2_demand(setup, path, sep, inputs)
+	end 
+
 	println("CSV Files Successfully Read In From $path$sep")
 
 	return inputs

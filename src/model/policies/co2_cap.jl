@@ -63,10 +63,12 @@ function co2_cap(EP::Model, inputs::Dict, setup::Dict)
 	println("C02 Policies Module")
 
 	dfGen = inputs["dfGen"]
+	dfH2Gen = inputs["dfH2Gen"]
 	SEG = inputs["SEG"]  # Number of lines
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+	H = inputs["H2_GEN"]
 
 	### Expressions ###
 
@@ -80,8 +82,17 @@ function co2_cap(EP::Model, inputs::Dict, setup::Dict)
 		end
 	)
 
+	# CO2 emissions for resources "k" during hour "t" [tons]
+	@expression(EP, eH2EmissionsByPlant[y=1:H,t=1:T],
+		if y in inputs["H2_GEN_COMMIT"]
+			dfH2Gen[!,:CO2_per_Tonne][y]*EP[:vH2Gen][y,t] + dfH2Gen[!,:CO2_per_Start][y]*EP[:vH2GenStart][y,t]
+		else
+			dfH2Gen[!,:CO2_per_Tonne][y]*EP[:vH2Gen][y,t]
+		end
+	)
+
 	# Emissions per zone = sum of emissions from each generator
-	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
+	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]) + sum(eH2EmissionsByPlant[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
 
 	if setup["CO2Cap"] == 2
 		@expression(EP, eELOSSByZone[z=1:Z],

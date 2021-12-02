@@ -40,7 +40,7 @@ using Distances
 using Combinatorics
 using Documenter
 # Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
-#using Gurobi
+using Gurobi
 #using CPLEX
 
 using Clp
@@ -80,25 +80,21 @@ include("load_inputs/load_inputs.jl")
 
 include("time_domain_reduction/time_domain_reduction.jl")
 
+#Load H2 Inputs
+include("H2/load_data/load_h2_gen.jl")
+include("H2/load_data/load_h2_demand.jl")
+
 #Core GenX Features
 include("model/core/discharge/discharge.jl")
 include("model/core/discharge/investment_discharge.jl")
-
 include("model/core/non_served_energy.jl")
 include("model/core/ucommit.jl")
-
 include("model/core/reserves.jl")
-
 include("model/core/transmission.jl")
-
 include("model/resources/curtailable_variable_renewable/curtailable_variable_renewable.jl")
-
 include("model/resources/flexible_demand/flexible_demand.jl")
-
 include("model/resources/hydro/hydro_res.jl")
-
 include("model/resources/must_run/must_run.jl")
-
 include("model/resources/storage/storage.jl")
 include("model/resources/storage/investment_energy.jl")
 include("model/resources/storage/storage_all.jl")
@@ -118,6 +114,14 @@ include("model/policies/minimum_capacity_requirement.jl")
 
 include("model/generate_model.jl")
 include("model/solve_model.jl")
+
+#Load H2 Modelling Features
+include("H2/model/h2_demand.jl")
+include("H2/model/h2_flexible_demand.jl")
+include("H2/model/h2_generation.jl")
+include("H2/model/h2_non_served_energy.jl")
+
+#Write Outputs
 
 include("write_outputs/dftranspose.jl")
 include("write_outputs/write_capacity.jl")
@@ -163,6 +167,12 @@ include("write_outputs/ucommit/write_shutdown.jl")
 include("write_outputs/ucommit/write_start.jl")
 
 include("write_outputs/write_outputs.jl")
+
+#H2 Write Outputs
+include("H2/write_outputs/write_h2_gen.jl")
+include("H2/write_outputs/write_h2_capacity.jl")
+include("H2/write_outputs/write_h2_nse.jl")
+
 
 #Just for unit testing; Under active development
 include("simple_operation.jl")

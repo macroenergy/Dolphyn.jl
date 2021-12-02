@@ -1,4 +1,4 @@
-function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
+function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     
     H2_load_in = DataFrame(CSV.File(string(path,sep,"H2_Load_data.csv"), header=true), copycols=true)
 
@@ -52,7 +52,9 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 	# # Set of all resources eligible for capacity retirements
 	# inputs_gen["H2_GEN_RET_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_Tonne_Hr.>=0,:R_ID])
 
-    return inputs_gen
+	println("H2_demand.csv Successfully Read!")
+
+    return inputs_load
 
 end
 

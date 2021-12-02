@@ -59,7 +59,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 ```
 
 """
-function H2_non_served_energy(EP::Model, inputs::Dict)
+function h2_non_served_energy(EP::Model, inputs::Dict)
 
 	println("H2 Non-served Energy Module")
 
@@ -89,19 +89,19 @@ function H2_non_served_energy(EP::Model, inputs::Dict)
 	EP[:eObj] += eTotalH2CNSE
 
 	## Power Balance Expressions ##
-	@expression(EP, ePowerBalanceH2Nse[t=1:T, z=1:Z],
+	@expression(EP, eH2BalanceNse[t=1:T, z=1:Z],
 	sum(vH2NSE[s,t,z] for s=1:H2_SEG))
 
 	# Add non-served energy/curtailed demand contribution to power balance expression
-	EP[:eH2PowerBalance] += ePowerBalanceH2Nse
+	EP[:eH2Balance] += eH2BalanceNse
 
 	### Constratints ###
 
 	# Demand curtailed in each segment of curtailable demands cannot exceed maximum allowable share of demand
-	@constraint(EP, cH2NSEPerSeg[s=1:SEG, t=1:T, z=1:Z], vH2NSE[s,t,z] <= inputs["pMax_H2_D_Curtail"][s]*inputs["H2_pD"][t,z])
+	@constraint(EP, cH2NSEPerSeg[s=1:H2_SEG, t=1:T, z=1:Z], vH2NSE[s,t,z] <= inputs["pMax_H2_D_Curtail"][s]*inputs["H2_D"][t,z])
 
 	# Total demand curtailed in each time step (hourly) cannot exceed total demand
-	@constraint(EP, cMaxH2NSE[t=1:T, z=1:Z], sum(vH2NSE[s,t,z] for s=1:SEG) <= inputs["H2_pD"][t,z])
+	@constraint(EP, cMaxH2NSE[t=1:T, z=1:Z], sum(vH2NSE[s,t,z] for s=1:H2_SEG) <= inputs["H2_D"][t,z])
 
 	return EP
 end

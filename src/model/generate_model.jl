@@ -106,6 +106,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" power balance constraint
 	@expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
 
+	# Initialize Hydrogen Balance Expression
+	# Expression for "baseline" H2 balance constraint
+	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -159,10 +163,26 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
 	end
 
+	if setup["ModelH2"] == 1 && !isempty(inputs["H2_GEN"])
+		#model H2 generation
+		EP = h2_generation(EP, inputs, setup)
+	end
+
+	if setup["ModelH2"] == 1
+		#model H2 non-served energy
+		EP = h2_non_served_energy(EP, inputs)
+	end
+
+	# if setup["ModelH2"] == 1
+	# 	if !isempty(inputs["H2_FLEX"])
+	# 		#model H2 flexible demand resources
+	# 		EP = h2_flexible_demand(EP, inputs)
+	# 	end
+	# end
+
 	# Policies
 	# CO2 emissions limits
 	EP = co2_cap(EP, inputs, setup)
-
 
 	# Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
@@ -186,6 +206,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	#          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
 	@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
 
+	if setup["ModelH2"] == 1
+		###Hydrogen Balanace constraints
+		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+	end
+	
 	## Record pre-solver time
 	presolver_time = time() - presolver_start_time
     	#### Question - What do we do with this time now that we've split this function into 2?
