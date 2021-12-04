@@ -173,12 +173,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = h2_non_served_energy(EP, inputs)
 	end
 
-	# if setup["ModelH2"] == 1
-	# 	if !isempty(inputs["H2_FLEX"])
-	# 		#model H2 flexible demand resources
-	# 		EP = h2_flexible_demand(EP, inputs)
-	# 	end
-	# end
+	if setup["ModelH2"] == 1
+		if !isempty(inputs["H2_FLEX"])
+			#model H2 flexible demand resources
+			EP = h2_flexible_demand(EP, inputs)
+		end
+	end
 
 	# Policies
 	# CO2 emissions limits

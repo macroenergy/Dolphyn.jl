@@ -137,9 +137,11 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 
 
 	if setup["ModelH2"] == 1
-		dfH2Cap = write_H2_capacity(path, sep, inputs, setup, EP)
-		dfH2GenOut = write_H2_gen(path, sep, inputs, setup, EP)
-		dfH2NSE = write_h2_nse(path, sep, inputs, setup, EP)
+		write_H2_capacity(path, sep, inputs, setup, EP)
+		write_H2_gen(path, sep, inputs, setup, EP)
+		write_h2_nse(path, sep, inputs, setup, EP)
+		write_h2_costs(path, sep, inputs, setup, EP)
+		write_h2_balance(path,sep,inputs, setup, EP)
 	end
 
 	## Print confirmation

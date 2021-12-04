@@ -1,0 +1,10 @@
+H2_Resource,Zone,etaP2G_MWh_per_tonne,etaGas_MMBtu_per_tonne,rhoH2Gen_min,unit_commit,Inv_Cost_per_tonnehr,Inv_Cost_per_tonne,Fixed_OM_Cost_per_tonnehr,Var_OM_Cost_per_tonne,Fuel,New_Build,Max_Cap_Tonne_Hr,Min_Cap_Tonne_Hr,Existing_Cap_Tonne_Hr,Cap_Size,Ramp_Up_Percentage,Ramp_Down_Percentage,H2_FLEX,Existing_Charge_Cap_H2,Flexible_Demand_Energy_Eff,Max_Flexible_Demand_Delay,Max_Flexible_Demand_Advance,CO2_per_Tonne,Start_Cost_per_tonne_hr,CO2_per_Start
+Small Electrolyzer,1,0,0,0.1,1,500,0,0,0,None,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+Large Electrolyzer,1,0,0,0.1,0,1000,0,0,0,None,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+Small SMR,1,50,174.8,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+Large SMR,1,50,149.8,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+Large SMR with CCS 90%,1,50,165,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+Large SMR with CCS 56%,1,50,152,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+ATR,1,50,124,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+ATR with CCS,1,50,136.4,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0
+ATR with CCS 95%,1,50,144.6,0.9,0,1000,1000,1000,1000,NG,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0,0

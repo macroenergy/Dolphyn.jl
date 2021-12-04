@@ -46,7 +46,7 @@ function h2_generation_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	#Objective function expressions
 	# Startup costs of "generation" for resource "y" during hour "t"
-	@expression(EP, eH2GenCStart[k in H2_GEN_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_Start"][k]*vH2GenStart[k,t]))
+	@expression(EP, eH2GenCStart[k in H2_GEN_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_H2_Start"][k]*vH2GenStart[k,t]))
 
 	# Julia is fastest when summing over one row one column at a time
 	@expression(EP, eTotalH2GenCStartT[t=1:T], sum(eH2GenCStart[k,t] for k in H2_GEN_COMMIT))
@@ -90,33 +90,33 @@ function h2_generation_commit(EP::Model, inputs::Dict, setup::Dict)
 	# rampup constraints
 	@constraint(EP,[k in H2_GEN_COMMIT, t in START_SUBPERIODS],
 	EP[:vH2Gen][k,t]-EP[:vH2Gen][k,(t+hours_per_subperiod-1)] <= dfH2Gen[!,:Ramp_Up_Percentage][k] * dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
-	+ min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
+	+ min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
 	- dfH2Gen[!,:Min_Cap_Tonne_Hr][k] * dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenShut][k,t])
 
 	# rampdown constraints
 	@constraint(EP,[k in H2_GEN_COMMIT, t in START_SUBPERIODS],
 	EP[:vH2Gen][k,(t+hours_per_subperiod-1)]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
 	- dfH2Gen[!,:Min_Cap_Tonne_Hr][k]*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
-	+ min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
+	+ min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
 
 	## For Interior Hours
 	# rampup constraints
 	@constraint(EP,[k in H2_GEN_COMMIT, t in INTERIOR_SUBPERIODS],
 		EP[:vH2Gen][k,t]-EP[:vH2Gen][k,t-1] <= dfH2Gen[!,:Ramp_Up_Percentage][k]*dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
-			+ min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
+			+ min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
 			-dfH2Gen[!,:Min_Cap_Tonne_Hr][k]*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
 
 	# rampdown constraints
 	@constraint(EP,[k in H2_GEN_COMMIT, t in INTERIOR_SUBPERIODS],
 	EP[:vH2Gen][k,t-1]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
 	-dfH2Gen[!,:Min_Cap_Tonne_Hr][k]*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenStart][k,t]
-	+min(dfH2Gen[!,:Max_Cap_Tonne_Hr][k],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
+	+min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:Min_Cap_Tonne_Hr][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size][k]*EP[:vH2GenShut][k,t])
 
 	@constraints(EP, begin
 	# Minimum stable power generated per technology "k" at hour "t" > Min power
 	[k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenCOMMIT][k,t]
 	# Maximum power generated per technology "k" at hour "t" < Max power
-	[k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenCOMMIT][k,t]
+	[k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenCOMMIT][k,t] * inputs["pH2_Max"][k,t]
 	end)
 	return EP
 
@@ -130,7 +130,7 @@ function h2_generation_no_commit(EP::Model, inputs::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H"]		#NUmber of hydrogen generation units 
+	H = inputs["H2_GEN"]		#NUmber of hydrogen generation units 
 	
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
 	
@@ -140,8 +140,6 @@ function h2_generation_no_commit(EP::Model, inputs::Dict)
 	hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
 	###Expressions###
-
-	#Objective function expressions
 
 	#H2 Balance expressions
 	@expression(EP, eH2GenNoCommit[t=1:T, z=1:Z],
@@ -163,8 +161,7 @@ function h2_generation_no_commit(EP::Model, inputs::Dict)
 		#Gas Balance
 		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vGas][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaGas_MMBtu_per_tonne][k]
 		#Output must not exceed units capacity 
-		#YS Question- Do we want to add generator variability?
-		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k]
+		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k] * inputs["pH2_Max"][k,t]
 	end)
 	
 	@constraints(EP, begin

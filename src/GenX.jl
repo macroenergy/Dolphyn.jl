@@ -83,6 +83,7 @@ include("time_domain_reduction/time_domain_reduction.jl")
 #Load H2 Inputs
 include("H2/load_data/load_h2_gen.jl")
 include("H2/load_data/load_h2_demand.jl")
+include("H2/load_data/load_h2_generators_variability.jl")
 
 #Core GenX Features
 include("model/core/discharge/discharge.jl")
@@ -172,6 +173,8 @@ include("write_outputs/write_outputs.jl")
 include("H2/write_outputs/write_h2_gen.jl")
 include("H2/write_outputs/write_h2_capacity.jl")
 include("H2/write_outputs/write_h2_nse.jl")
+include("H2/write_outputs/write_h2_costs.jl")
+include("H2/write_outputs/write_h2_balance.jl")
 
 
 #Just for unit testing; Under active development
