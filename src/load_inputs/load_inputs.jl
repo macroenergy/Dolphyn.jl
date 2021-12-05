@@ -94,6 +94,13 @@ function load_inputs(setup::Dict,path::AbstractString)
 		inputs = load_h2_generators_variability(setup, path, sep, inputs)
 	end 
 
+	# Read input data about power network topology, operating and expansion attributes
+    if isfile(string(path,sep,"H2_pipelines.csv"))
+		inputs, pipelines_var = load_h2_pipeline_data(setup, path, sep, inputs)
+	else
+		inputs["H2_P"] = 0
+	end
+
 	println("CSV Files Successfully Read In From $path$sep")
 
 	return inputs

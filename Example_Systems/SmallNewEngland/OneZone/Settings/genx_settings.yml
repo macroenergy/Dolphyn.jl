@@ -21,3 +21,5 @@ ModelingToGenerateAlternatives: 0 # Modeling to generate alternatives; 0 = not a
 ModelingtoGenerateAlternativeSlack: 0.1 # Slack value as a fraction of least-cost objective in budget constraint used for evaluating alternative model solutions; positive float value
 #HSC Modelling
 ModelH2: 1 #Turn on Hydrogen Supply Chain modelling capabilities
+H2PipelineExpansion: 0
+ModelH2Pipelines: 0

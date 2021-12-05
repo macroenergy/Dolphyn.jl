@@ -84,6 +84,7 @@ include("time_domain_reduction/time_domain_reduction.jl")
 include("H2/load_data/load_h2_gen.jl")
 include("H2/load_data/load_h2_demand.jl")
 include("H2/load_data/load_h2_generators_variability.jl")
+include("H2/load_data/load_h2_pipeline_data.jl")
 
 #Core GenX Features
 include("model/core/discharge/discharge.jl")
