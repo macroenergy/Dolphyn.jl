@@ -142,6 +142,7 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 		write_h2_nse(path, sep, inputs, setup, EP)
 		write_h2_costs(path, sep, inputs, setup, EP)
 		write_h2_balance(path,sep,inputs, setup, EP)
+		write_h2_pipelines(path, sep, inputs, setup, EP)
 	end
 
 	## Print confirmation

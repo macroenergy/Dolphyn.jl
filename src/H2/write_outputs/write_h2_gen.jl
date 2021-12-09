@@ -63,8 +63,8 @@ function write_H2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 
 	rename!(dfH2GenOut_hourly, [Symbol("t$t") for t in 1:T])
 
- 	CSV.write(string(path,sep,"h2_power_annual.csv"), dftranspose(dfH2GenOut_annual, false), writeheader=false)
-	CSV.write(string(path,sep,"h2_power_hourly.csv"), dfH2GenOut_hourly, writeheader=false)
+ 	CSV.write(string(path,sep,"h2_gen_annual.csv"), dftranspose(dfH2GenOut_annual, false), writeheader=false)
+	CSV.write(string(path,sep,"h2_gen_hourly.csv"), dfH2GenOut_hourly, writeheader=false)
 	return dfH2GenOut_hourly
 
 

@@ -26,11 +26,11 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	dfPowerBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 7)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
                "Nonserved_Energy",
-			   "Transmission_NetExport", "Transmission_Losses",
+			   "H2_Pipeline_Import/Export",
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -43,14 +43,19 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	     	end
 	     	
 	     	dfTemp1[t+rowoffset,4] = value(EP[:vH2NSE][1,t,z])
-	     	dfTemp1[t+rowoffset,5] = 0
-	     	dfTemp1[t+rowoffset,6] = 0
+	     	
+			if setup["ModelH2Pipelines"] == 1
+			 	dfTemp1[t+rowoffset,5] = value.(EP[:ePipeZoneDemand][t,z])
+			else
+				dfTemp1[t+rowoffset,5] = 0
+			end
+
 		
 		# if Z>=2
 		# 	dfTemp1[t+rowoffset,5] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 		# 	dfTemp1[t+rowoffset,6] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 		# end
-	     	dfTemp1[t+rowoffset,7] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,6] = -inputs["H2_D"][t,z]
 
 			
 	   	end
@@ -64,5 +69,5 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	   	dfPowerBalance[rowoffset,c]=sum(inputs["omega"].*dfPowerBalance[(rowoffset+1):size(dfPowerBalance,1),c])
 	end
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"h2_balance.csv"), dfPowerBalance, writeheader=false)
+	CSV.write(string(path,sep,"H2_Balance.csv"), dfPowerBalance, writeheader=false)
 end

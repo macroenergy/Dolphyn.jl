@@ -95,8 +95,8 @@ function load_inputs(setup::Dict,path::AbstractString)
 	end 
 
 	# Read input data about power network topology, operating and expansion attributes
-    if isfile(string(path,sep,"H2_pipelines.csv"))
-		inputs, pipelines_var = load_h2_pipeline_data(setup, path, sep, inputs)
+    if isfile(string(path,sep,"H2_Pipelines.csv")) && setup["ModelH2Pipelines"] == 1
+		inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
 	else
 		inputs["H2_P"] = 0
 	end

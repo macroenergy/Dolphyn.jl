@@ -19,64 +19,65 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to the electricity transmission network
 """
-#DEV NOTE:  add DC power flow related parameter inputs in a subsequent commit
 function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
     # Network zones inputs and Network topology inputs
-    pipeline_var = DataFrame(CSV.File(string(path,sep,"H2_pipelines.csv"), header=true), copycols=true)
+    pipeline_var = DataFrame(CSV.File(string(path,sep,"H2_Pipelines.csv"), header=true), copycols=true)
 
-    # Number of lines in the network
+    #Number of H2 Pipelines
     inputs_nw["H2_P"]=size(collect(skipmissing(pipeline_var[!,:H2_Pipelines])),1)
 
-    # Topology of the network source-sink matrix
+    #Find first column of pipe map table
     start = findall(s -> s == "z1", names(pipeline_var))[1]
-    inputs_nw["pH2_Pipe_Map"] = Matrix{Float64}(pipeline_var[1:inputs_nw["H2_P"],start:start+inputs_nw["Z"]-1])
 
-    inputs_nw["pH2_Pipe_Max"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_No_Pipe])))
+    #Select pipe map
+    pipe_map = pipeline_var[1:inputs_nw["H2_P"], start:start+inputs_nw["Z"]-1]
 
-    inputs_nw["pH2PipeCap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Tonne_Hr_Per_Pipe])))
+    #Create pipe number column
+    pipe_map[!,:pipe_no] = 1:size(pipe_map,1)
+    #Pivot table
+    pipe_map = stack(pipe_map, 1:inputs_nw["Z"])
+    #Create zone column
+    pipe_map[!,:Zone] = parse.(Float64,SubString.(pipe_map[!,:variable],2))
+    #Remove redundant rows
+    pipe_map = pipe_map[pipe_map[!,:value].!=0,:]
 
-    # Line percentage Loss - valid for case when modeling losses as a fixed percent of absolute value of power flows
-    inputs_nw["pH2Pipe_Distance"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:distance_mile])))
+    #Rename column
+    colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
+    rename!(pipe_map, Symbol.(colnames_pipe_map))
 
-    # Number of compressors in a pipe
-    inputs_nw["pH2Pipe_Comp_Per_Mile"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:compressor_per_mile])))
+    inputs_nw["H2_Pipe_Map"] = pipe_map
+    
+    #pipe_to_zone_map = unstack(pipe_map, :pipe_no, :value, :Zone)
 
-    # Compressor cost $/compressor / tonne /hr
-    inputs_nw["pCH2Pipe_Comp_Per_Comp_Tonne_Hr"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompCapex_per_tonne_hr])))
+    # Number of pipelines routes in the network
+    inputs_nw["H2_P"]=size(collect(skipmissing(pipeline_var[!,:H2_Pipelines])),1)
 
-    # Compressor energy consumption / comp / tonne/hr
-    inputs_nw["pH2Pipe_MWh_Per_Comp_Tonne_Hr"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompEnergy_MWh_per_tonne])))
+    #Maximum number of pipelines
+    inputs_nw["pH2_Pipe_No_Max"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_No_Pipe])))
 
-    # #Max pipeline capacity
-    # inputs_nw["p_H2_Pipe_Max_Possible"] = zeros(Float64, inputs_nw["H2_P"])
-        
-    # if setup["H2PipelineExpansion"]==1
+    #Current number of pipelines
+    inputs_nw["pH2_Pipe_No_Curr"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Curr_No_Pipe])))
 
-    #         # Read between zone network reinforcement costs per peak MW of capacity added
-    #         inputs_nw["pC_H2_Pipe_Expansion"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Pipe_Expansion_Cost_per_Tonne_Hryr])))
-    #         # Maximum reinforcement allowed in MW
-    #         #NOTE: values <0 indicate no expansion possible
-    #         inputs_nw["pMax_H2_Pipe_Expansion"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Pipe_Max_Expansion_Tonne_Hr])))
+    #Maxiumum Pipe Flow per Pipe
+    inputs_nw["pH2_Pipe_Max_Flow"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_Flow_Tonne_Hr_Per_Pipe])))
 
-    #     for l in 1:inputs_nw["H2_P"]
-    #         if inputs_nw["pMax_H2_Pipe_Expansion"][l] > 0
-    #             inputs_nw["p_H2_Pipe_Max_Possible"][l] = inputs_nw["pH2_Pipe_Max"][l] + inputs_nw["pMax_H2_Pipe_Expansion"][l]
-    #         else
-    #             inputs_nw["p_H2_Pipe_Max_Possible"][l] = inputs_nw["pH2_Pipe_Max"][l]
-    #         end
-    #     end
-    # else
-    #     inputs_nw["p_H2_Pipe_Max_Possible"] = inputs_nw["pH2_Pipe_Max"]
-    # end
+    #Maximum Pipe Cpacity 
+    inputs_nw["pH2_Pipe_Max_Cap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_Cap_Per_Pipe])))
 
-    # if setup["H2PipelineExpansion"] == 1
-    #     # Network lines and zones that are expandable have non-negative maximum reinforcement inputs
-    #     inputs_nw["EXPANSION_H2_Pipes"] = findall(inputs_nw["pMax_H2_Pipe_Expansion"].>=0)
-    #     inputs_nw["NO_EXPANSION_H2_Pipes"] = findall(inputs_nw["pMax_H2_Pipe_Expansion"].<0)
-    #end
+    #Minimum Pipe Capacity
+    inputs_nw["pH2_Pipe_Min_Cap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Min_Cap_Per_pipe])))
+
+    #Cost Per Pipe
+    inputs_nw["pH2_Comp_MWh_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Comp_MWh_Per_Pipe])))
+
+    #Cost Per Pipe
+    inputs_nw["pCH2_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Pipe_Cost_Per_Pipe])))
+
+    #Cost Per Compressor
+    inputs_nw["pCH2_PipeComp"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Comp_Cost_Per_Pipe])))
 
     println("H2_pipelines.csv Successfully Read!")
 
-    return inputs_nw, pipeline_var
+    return inputs_nw
 end

@@ -122,6 +122,7 @@ include("H2/model/h2_demand.jl")
 include("H2/model/h2_flexible_demand.jl")
 include("H2/model/h2_generation.jl")
 include("H2/model/h2_non_served_energy.jl")
+include("H2/model/h2_pipeline.jl")
 
 #Write Outputs
 
@@ -176,6 +177,7 @@ include("H2/write_outputs/write_h2_capacity.jl")
 include("H2/write_outputs/write_h2_nse.jl")
 include("H2/write_outputs/write_h2_costs.jl")
 include("H2/write_outputs/write_h2_balance.jl")
+include("H2/write_outputs/write_h2_pipelines.jl")
 
 
 #Just for unit testing; Under active development
