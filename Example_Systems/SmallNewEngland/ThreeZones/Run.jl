@@ -57,6 +57,11 @@ println("Loading Inputs")
 myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
 myinputs = load_inputs(mysetup, inpath)
 
+### Load H2 inputs
+if setup["ModelH2"] == 1
+    myinputs = load_H2_inputs(myinputs, mysetup, inpath)
+end
+
 ### Generate model
 println("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)

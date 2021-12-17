@@ -31,7 +31,7 @@ function load_h2_generators_variability(setup::Dict, path::AbstractString, sep::
 	end
 
 	# Reorder DataFrame to R_ID order (order provided in Generators_data.csv)
-	select!(gen_var, [:Time_Index; Symbol.(inputs_genvar["H2_RESOURCES"]) ])
+	select!(gen_var, [:Time_Index; Symbol.(inputs_genvar["H2_RESOURCES_NAME"]) ])
 
 	# Maximum power output and variability of each energy resource
 	inputs_genvar["pH2_Max"] = transpose(Matrix{Float64}(gen_var[1:inputs_genvar["T"],2:(inputs_genvar["H2_GEN"]+1)]))

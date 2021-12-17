@@ -25,7 +25,7 @@ function write_H2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	T = inputs["T"]     # Number of time steps (hours)
 
 	# # Power injected by each resource in each time step
-	# dfH2GenOut = DataFrame(Resource = inputs["H2_RESOURCES"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
+	# dfH2GenOut = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
 	# for i in 1:H
 	# 	dfH2GenOut[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2Gen])[i,:]))
@@ -51,7 +51,7 @@ function write_H2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 
 
 	# Power injected by each resource in each time step
-	dfH2GenOut_annual = DataFrame(Resource = inputs["H2_RESOURCES"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
+	dfH2GenOut_annual = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
 	for i in 1:H
 		dfH2GenOut_annual[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2Gen])[i,:]))

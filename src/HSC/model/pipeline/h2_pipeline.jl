@@ -22,9 +22,6 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vH2PipeFlow_pos[p=1:H2_P, t = 1:T, d = [1,-1]] >= 0) #positive pipeflow
     @variable(EP, vH2PipeFlow_neg[p=1:H2_P, t = 1:T, d = [1,-1]] >= 0) #negative pipeflow
 
-	if setup["H2PipeInteger"] == 1
-		set_integer.(vH2NPipe)
-	end
 
 	### Expressions ###
     #Calculate the number of new pipes
@@ -35,12 +32,13 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
 	## Objective Function Expressions ##
 	# Capital cost of pipelines 
-	@expression(EP, eCH2Pipe,  sum(eH2NPipeNew[p] * inputs["pCH2_Pipe"][p] for p = 1:H2_P))
+    # DEV NOTE: To add fixed cost of existing + new pipelines
+	@expression(EP, eCH2Pipe,  sum(eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p] for p = 1:H2_P))
     EP[:eObj] += eCH2Pipe
 
 	# Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
     #YS Formula doesn't make sense to me
-	@expression(EP, eCH2CompPipe, sum(eH2NPipeNew[p] * inputs["pCH2_PipeComp"][p] for p = 1:H2_P))
+	@expression(EP, eCH2CompPipe, sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P))
 
     EP[:eObj] += eCH2CompPipe
 
@@ -50,8 +48,9 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	# H2 Power Consumption balance
 	# Electrical energy requirement for booster compression - 
     #sum( (vH2PipeFlow_neg[z,zz,p,t] * (H2PipeCompressionEnergy[p] + Number_online_compression[z,zz] * H2PipeCompressionOnlineEnergy[p]) ) for zz = 1:Z,p = 1:PT if zz != z))
+    # Whats going on here - why is only negative flow included here?
 	@expression(EP, ePowerBalanceH2PipeCompression[t=1:T, z=1:Z],
-	sum(vH2PipeFlow_neg[p,t,H2_Pipe_Map[(H2_Pipe_Map[!,:Zone] .== z) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pH2_Comp_MWh_Pipe"][p] for  p in H2_Pipe_Map[H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+	sum(vH2PipeFlow_neg[p,t,H2_Pipe_Map[(H2_Pipe_Map[!,:Zone] .== z) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_Pipe"][p] for  p in H2_Pipe_Map[H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
 	
     EP[:ePowerBalance] += ePowerBalanceH2PipeCompression
 
@@ -65,6 +64,12 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	### End Expressions ###
 
 	### Constraints ###
+
+    # Constraints
+	if setup["H2PipeInteger"] == 1
+		set_integer.(vH2NPipe)
+	end
+
     @constraints(EP, begin
     [p in 1:H2_P], EP[:eH2NPipeNew][p] >= 0 
     end)

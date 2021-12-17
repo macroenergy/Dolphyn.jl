@@ -163,12 +163,18 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
 	end
 
-	if setup["ModelH2"] == 1 && !isempty(inputs["H2_GEN"])
-		#model H2 generation
-		EP = h2_generation(EP, inputs, setup)
-	end
-
+	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE ###############
 	if setup["ModelH2"] == 1
+	# Infrastructure
+		EP = h2_discharge(EP, inputs)
+
+		EP = h2_investment(EP, inputs)
+
+		if !isempty(inputs["H2_PROD"])
+			#model H2 generation
+			EP = h2_production(EP, inputs, setup)
+		end
+
 		#model H2 non-served energy
 		EP = h2_non_served_energy(EP, inputs)
 
@@ -180,8 +186,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		if setup["ModelH2Pipelines"] == 1
 			EP = h2_pipeline(EP, inputs, setup)
 		end
-	end
 
+
+	################### 
 	# Policies
 	# CO2 emissions limits
 	EP = co2_cap(EP, inputs, setup)

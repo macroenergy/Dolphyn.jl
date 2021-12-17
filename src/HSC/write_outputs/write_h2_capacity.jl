@@ -22,7 +22,7 @@ Function for writing the diferent capacities for the different generation techno
 function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2Gen = inputs["dfH2Gen"]
-	capdischarge = zeros(size(inputs["H2_RESOURCES"]))
+	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_NEW_CAP"]
 		if i in inputs["H2_GEN_COMMIT"]
 			capdischarge[i] = value(EP[:vH2GenNewCap][i]) * dfH2Gen[!,:Cap_Size][i]
@@ -31,7 +31,7 @@ function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		end
 	end
 
-	retcapdischarge = zeros(size(inputs["H2_RESOURCES"]))
+	retcapdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_RET_CAP"]
 		if i in inputs["H2_GEN_COMMIT"]
 			retcapdischarge[i] = first(value.(EP[:vH2GenRetCap][i])) * dfH2Gen[!,:Cap_Size][i]
@@ -41,7 +41,7 @@ function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	end
 
 	dfCap = DataFrame(
-		Resource = inputs["H2_RESOURCES"], Zone = dfH2Gen[!,:Zone],
+		Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
 		StartCap = dfH2Gen[!,:Existing_Cap_Tonne_Hr],
 		RetCap = retcapdischarge[:],
 		NewCap = capdischarge[:],

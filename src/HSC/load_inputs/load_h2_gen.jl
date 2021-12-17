@@ -9,14 +9,16 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     # Store DataFrame of generators/resources input data for use in model
 	inputs_gen["dfH2Gen"] = h2_gen_in
 
-    # Number of H2 Generation resources
-	inputs_gen["H2_GEN"] = size(collect(skipmissing(h2_gen_in[!,:R_ID])),1)
+    # Index of H2 resources - can be either commit, no_commit production technologies, demand side or storage resources
+	inputs_gen["H2_RES_ALL"] = size(collect(skipmissing(h2_gen_in[!,:R_ID])),1)
 
-	# Number of H2 Generation resources
-	inputs_gen["H2_RESOURCES"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs_gen["H2_GEN"]]))
+	# Name of H2 Generation resources
+	inputs_gen["H2_RESOURCES_NAME"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs_gen["H2_GEN"]]))
 
 	# Set of flexible demand-side resources
 	inputs_gen["H2_FLEX"] = h2_gen_in[h2_gen_in.H2_FLEX.==1,:R_ID]
+
+	# To do - will add a list of storage resources or we can keep them separate
 
     # Set of thermal generator resources
 	if setup["UCommit"]>=1
@@ -29,12 +31,14 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 		inputs_gen["H2_GEN_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID]
 	end
 	
-    #Set of all H2 Generation Units
-    inputs_gen["H2_GEN_ALL"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"], inputs_gen["H2_FLEX"])
+    #Set of all H2 production Units - can be either commit or new commit
+    inputs_gen["H2_PROD"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
 
     # Set of all resources eligible for new capacity
+	# Dharik Qn: why do we need to check for H2_FLEX in all cases?
 	inputs_gen["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_Tonne_Hr.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID]) 
 	# Set of all resources eligible for capacity retirements
+	# Dharik Qn: why do we need to check for H2_FLEX in all cases?
 	inputs_gen["H2_GEN_RET_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_Tonne_Hr.>=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1,:R_ID])
 
 	if setup["UCommit"]>=1
@@ -51,10 +55,6 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
 			inputs_gen["C_H2_Start"][k,:] .= inputs_gen["dfH2Gen"][!,:Cap_Size][k] * start_cost[k]
 			
-			# Setup[ParameterScale] =1, inputs_gen["dfGen"][!,:Cap_Size][g] is GW, fuel_CO2[fuel_type[g]] is ktons/MMBTU, start_fuel is MMBTU/MW,
-			#   thus the overall is MTons/GW, and thus inputs_gen["dfGen"][!,:CO2_per_Start][g] is Mton, to get kton, change we need to multiply 1000
-			# Setup[ParameterScale] =0, inputs_gen["dfGen"][!,:Cap_Size][g] is MW, fuel_CO2[fuel_type[g]] is tons/MMBTU, start_fuel is MMBTU/MW,
-			#   thus the overall is MTons/GW, and thus inputs_gen["dfGen"][!,:CO2_per_Start][g] is ton
 		end
 	end
 
