@@ -53,14 +53,14 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_nw["H2_P"]=size(collect(skipmissing(pipeline_var[!,:H2_Pipelines])),1)
 
     # Length in miles of each pipeline
-    input_nw["pPipe_length_miles"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Pipe_length_miles])))
+    inputs_nw["pPipe_length_miles"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Pipe_length_miles])))
 
     # Length between two booster compressor stations in miles
-    input_nw["len_bw_comp_mile"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:len_bw_comp_mile])))
+    inputs_nw["len_bw_comp_mile"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:len_bw_comp_mile])))
 
     # Number of booster compressors between source and sink
     # DEV NOTE: we should make the total number of compressors if the ratio is less than 1 for a particular line
-    input_nw["no_booster_comp_stations"] = Int(floor(input_nw["pPipe_length_miles"]/input_nw["len_bw_comp_mile"]))
+    inputs_nw["no_booster_comp_stations"] = floor.(inputs_nw["pPipe_length_miles"]/inputs_nw["len_bw_comp_mile"])
     #Maximum number of pipelines
     inputs_nw["pH2_Pipe_No_Max"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_No_Pipe])))
 
@@ -71,19 +71,19 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_nw["pH2_Pipe_Max_Flow"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_Flow_Tonne_Hr_Per_Pipe])))
 
     #Maximum Pipeline storage capacity in tonnes per pipe
-    inputs_nw["pH2_Pipe_Max_Cap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:H2PipeCap_tonne_per_mile])))* input_nw["pPipe_length_miles"]
+    inputs_nw["pH2_Pipe_Max_Cap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:H2PipeCap_tonne_per_mile]))) .* inputs_nw["pPipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
-    inputs_nw["pH2_Pipe_Min_Cap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Min_pipecap_stor_frac]))) * inputs_nw["pH2_Pipe_Max_Cap"]
+    inputs_nw["pH2_Pipe_Min_Cap"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Min_pipecap_stor_frac]))) .* inputs_nw["pH2_Pipe_Max_Cap"]
 
     #Capital Cost Per Pipe
-    inputs_nw["pCAPEX_H2_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:H2PipeUnitCapex_per_mile]))) * input_nw["pPipe_length_miles"]
+    inputs_nw["pCAPEX_H2_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:H2PipeUnitCapex_per_mile]))) .* inputs_nw["pPipe_length_miles"]
 
     #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
-    inputs_nw["pCAPEX_Comp_H2_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompCapex_per_tonne_hr])))*inputs_nw["pH2_Pipe_Max_Flow"]*input_nw["no_booster_comp_stations"] 
+    inputs_nw["pCAPEX_Comp_H2_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompCapex_per_tonne_hr]))).* inputs_nw["pH2_Pipe_Max_Flow"].*inputs_nw["no_booster_comp_stations"] 
 
     #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
-    inputs_nw["pComp_MWh_per_tonne_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompEnergy_MWh_per_tonne]))) *input_nw["no_booster_comp_stations"] 
+    inputs_nw["pComp_MWh_per_tonne_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompEnergy_MWh_per_tonne]))).* inputs_nw["no_booster_comp_stations"] 
 
 
     println("H2_pipelines.csv Successfully Read!")

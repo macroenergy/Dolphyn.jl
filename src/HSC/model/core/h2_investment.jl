@@ -1,5 +1,5 @@
 
-function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
+function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2Gen = inputs["dfH2Gen"]
 

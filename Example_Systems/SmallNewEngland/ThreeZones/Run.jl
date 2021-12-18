@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,8 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 cd(dirname(@__FILE__))
 settings_path = joinpath(pwd(), "Settings")
 
-environment_path = "../../../package_activate.jl"
-include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+#environment_path = "../../../package_activate.jl"
+#include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 
 ### Set relevant directory paths
 src_path = "../../../src/"
@@ -29,11 +29,17 @@ inpath = pwd()
 println("Loading packages")
 push!(LOAD_PATH, src_path)
 
-using GenX
+using DOLPHYN
 using YAML
 
+
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path
-mysetup = YAML.load(open(genx_settings)) # mysetup dictionary stores settings and GenX-specific parameters
+hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path
+mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores settings and GenX-specific parameters
+mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores settings and H2 supply chain-specific parameters
+mysetup = Dict()
+mysetup = merge(+, mysetup_hsc, mysetup_genx) # Merge GenX and HSC settings dict
+
 
 ### Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
@@ -58,8 +64,8 @@ myinputs = Dict() # myinputs dictionary will store read-in data and computed par
 myinputs = load_inputs(mysetup, inpath)
 
 ### Load H2 inputs
-if setup["ModelH2"] == 1
-    myinputs = load_H2_inputs(myinputs, mysetup, inpath)
+if mysetup["ModelH2"] == 1
+    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end
 
 ### Generate model

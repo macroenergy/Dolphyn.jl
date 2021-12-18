@@ -23,10 +23,10 @@ This module uses the following 'helper' functions in separate files: ```h2_gener
 """
 function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
-	
 	if !isempty(inputs["H2_PROD"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies
-	EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)
+		EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)
+	end
 
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]

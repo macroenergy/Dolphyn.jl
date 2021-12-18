@@ -13,7 +13,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	inputs_gen["H2_RES_ALL"] = size(collect(skipmissing(h2_gen_in[!,:R_ID])),1)
 
 	# Name of H2 Generation resources
-	inputs_gen["H2_RESOURCES_NAME"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs_gen["H2_GEN"]]))
+	inputs_gen["H2_RESOURCES_NAME"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs_gen["H2_RES_ALL"]]))
 
 	# Set of flexible demand-side resources
 	inputs_gen["H2_FLEX"] = h2_gen_in[h2_gen_in.H2_FLEX.==1,:R_ID]
@@ -46,8 +46,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 		start_cost = convert(Array{Float64}, collect(skipmissing(inputs_gen["dfH2Gen"][!,:Start_Cost_per_tonne_hr])))
 		inputs_gen["C_H2_Start"] = zeros(Float64, inputs_gen["H2_GEN"], inputs_gen["T"])
 	end
-
-	for k in 1:inputs_gen["H2_GEN"]
+	println(inputs_gen["H2_PROD"])
+	for k in inputs_gen["H2_PROD"]
 
 		# kton/MMBTU * MMBTU/MWh = kton/MWh, to get kton/GWh, we need to mutiply 1000
 		if k in inputs_gen["H2_GEN_COMMIT"]

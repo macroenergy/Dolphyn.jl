@@ -187,6 +187,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_pipeline(EP, inputs, setup)
 		end
 
+	end
+
 
 	################### 
 	# Policies
@@ -232,7 +234,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			JuMP.write_to_file(EP, filepath)
 		end
 		println("Model Printed")
-    	end
+    end
 
     return EP
 end

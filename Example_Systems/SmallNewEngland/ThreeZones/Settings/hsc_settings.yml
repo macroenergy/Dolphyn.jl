@@ -1,0 +1,2 @@
+ModelH2: 1 #Turn on Hydrogen Supply Chain modelling capabilities
+H2PipeInteger: 1 # Whether to model pipeline capacity as discrete or integer - 0 - continuous capacity, 1- discrete capacity
