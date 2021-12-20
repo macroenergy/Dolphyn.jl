@@ -169,8 +169,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = h2_discharge(EP, inputs)
 
 		EP = h2_investment(EP, inputs)
+	
 
-		if !isempty(inputs["H2_PROD"])
+		if !isempty(inputs["H2_GEN"])
 			#model H2 generation
 			EP = h2_production(EP, inputs, setup)
 		end

@@ -32,7 +32,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	end
 	
     #Set of all H2 production Units - can be either commit or new commit
-    inputs_gen["H2_PROD"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
+    inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
 
     # Set of all resources eligible for new capacity
 	# Dharik Qn: why do we need to check for H2_FLEX in all cases?
@@ -46,8 +46,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 		start_cost = convert(Array{Float64}, collect(skipmissing(inputs_gen["dfH2Gen"][!,:Start_Cost_per_tonne_hr])))
 		inputs_gen["C_H2_Start"] = zeros(Float64, inputs_gen["H2_GEN"], inputs_gen["T"])
 	end
-	println(inputs_gen["H2_PROD"])
-	for k in inputs_gen["H2_PROD"]
+	println(inputs_gen["H2_GEN"])
+	for k in inputs_gen["H2_GEN"]
 
 		# kton/MMBTU * MMBTU/MWh = kton/MWh, to get kton/GWh, we need to mutiply 1000
 		if k in inputs_gen["H2_GEN_COMMIT"]

@@ -26,7 +26,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
 	#Define sets
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
-	H2_PROD = inputs["H2_PROD"]
+	H2_PROD = inputs["H2_GEN"]
 
 	H = inputs["H2_GEN"] #Number of Hydrogen gen units
 	T = inputs["T"]     # Number of time steps (hours)

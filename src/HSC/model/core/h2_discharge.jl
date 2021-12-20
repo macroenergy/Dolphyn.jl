@@ -37,7 +37,7 @@ function h2_discharge(EP::Model, inputs::Dict)
 	### Variables ###
 
     #H2 injected to hydrogen grid from hydrogen generation resource k (tonnes of H2/hr) in time t
-	@variable(EP, vH2Gen[k in H2_RES_ALL, t = 1:T] >= 0 )
+	@variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0 )
 
 	### Expressions ###
 
