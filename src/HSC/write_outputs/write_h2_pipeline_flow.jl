@@ -14,7 +14,7 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_h2_pipelines(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_pipeline_flow(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -48,5 +48,5 @@ function write_h2_pipelines(path::AbstractString, sep::AbstractString, inputs::D
 	end
 
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"H2_Pipeline_Flow.csv"), dfPowerBalance, writeheader=false)
+	CSV.write(string(path,sep,"HSC_h2_pipeline_flow.csv"), dfPowerBalance, writeheader=false)
 end

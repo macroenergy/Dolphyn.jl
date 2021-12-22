@@ -7,8 +7,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Hydrogen Pipeline Module")
 
-    T = inputs["T"]
-    Z = inputs["Z"]
+    T = inputs["T"] # Model operating time steps
+    Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
     hours_per_subperiod = inputs["hours_per_subperiod"]
@@ -49,10 +49,17 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	# Electrical energy requirement for booster compression - 
     #sum( (vH2PipeFlow_neg[z,zz,p,t] * (H2PipeCompressionEnergy[p] + Number_online_compression[z,zz] * H2PipeCompressionOnlineEnergy[p]) ) for zz = 1:Z,p = 1:PT if zz != z))
     # Whats going on here - why is only negative flow included here?
-	@expression(EP, ePowerBalanceH2PipeCompression[t=1:T, z=1:Z],
-	sum(vH2PipeFlow_neg[p,t,H2_Pipe_Map[(H2_Pipe_Map[!,:Zone] .== z) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_Pipe"][p] for  p in H2_Pipe_Map[H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+
+    if setup["ParameterScale"]==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    	@expression(EP, ePowerBalanceH2PipeCompression[t=1:T, z=1:Z],
+	    sum(vH2PipeFlow_neg[p,t,H2_Pipe_Map[(H2_Pipe_Map[!,:Zone] .== z) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_Pipe"][p] for  p in H2_Pipe_Map[H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no])*1/ModelScalingFactor )
 	
-    EP[:ePowerBalance] += ePowerBalanceH2PipeCompression
+    else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+        @expression(EP, ePowerBalanceH2PipeCompression[t=1:T, z=1:Z],
+        sum(vH2PipeFlow_neg[p,t,H2_Pipe_Map[(H2_Pipe_Map[!,:Zone] .== z) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_Pipe"][p] for  p in H2_Pipe_Map[H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+    end
+
+    EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
 
 	# H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
 	@expression(EP, ePipeZoneDemand[t=1:T,z=1:Z],
@@ -67,13 +74,21 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     # Constraints
 	if setup["H2PipeInteger"] == 1
-		set_integer.(vH2NPipe)
+        for p=1:H2_P
+		    set_integer.(vH2NPipe[p])
+        end
 	end
 
-    @constraints(EP, begin
-    [p in 1:H2_P], EP[:eH2NPipeNew][p] >= 0 
-    end)
-
+    # Modeling expansion of the pipleline network
+    if setup["H2NetworkExpansion"]==1
+        # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe 
+        @constraints(EP, begin
+        [p in 1:H2_P], EP[:eH2NPipeNew][p] >= 0   end)
+    else
+        # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe 
+        @constraints(EP, begin
+        [p in 1:H2_P], EP[:eH2NPipeNew][p] == 0   end)
+    end
 
     #Constraint maximum pipe flow
     @constraints(EP, begin

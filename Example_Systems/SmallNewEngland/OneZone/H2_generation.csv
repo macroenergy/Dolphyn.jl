@@ -1,4 +1,0 @@
-H2_Resource,Zone,etaP2G_MWh_per_tonne,etaGas_MMBtu_per_tonne,rhoH2Gen_min,unit_commit,Inv_Cost_per_tonnehr,Inv_Cost_per_tonne,Fixed_OM_Cost_per_tonnehr,Var_OM_Cost_per_tonne,Fuel,New_Build,Max_Cap_Tonne_Hr,Min_H2Gen,Existing_Cap_Tonne_Hr,Cap_Size,Ramp_Up_Percentage,Ramp_Down_Percentage,CO2_per_Tonne,Start_Cost_per_tonne_hr,CO2_per_Start,H2_FLEX,Flexible_Demand_Energy_Eff,Max_Flexible_Demand_Delay,Max_Flexible_Demand_Advance
-Small_Electrolyzer,1,5,0,0.1,0,500,0,0,0,None,1,10000000,0,0,10000,0.5,0.5,0,5,0,0,0,0,0
-Large_Electrolyzer,1,5,0,0.1,0,1000,0,0,0,None,1,10000000,0,0,10000,0.5,0.5,0,0,0,0,0,0,0
-Flex_Demand,1,0,0,0,0,0,0,0,10,NG,0,10000000,0,1000,0,0,0,0,0,0,1,0.9,3,3

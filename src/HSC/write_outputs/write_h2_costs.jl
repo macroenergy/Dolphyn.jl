@@ -25,21 +25,28 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
+	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
 
-	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start"])
+	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
 	
 	cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))
 	cH2Fix = value(EP[:eTotalH2GenCFix]) 
 
-	if setup["UCommit"]>=1 && !isempty(inputs["H2_GEN_COMMIT"])
+	if !isempty(inputs["H2_GEN_COMMIT"])
 	    cH2Start = value(EP[:eTotalH2GenCStart])
 	else
 		cH2Start = 0
 	end
-	
-    cH2Total = cH2Var + cH2Fix + cH2Start + value(EP[:eTotalH2CNSE])
 
-    dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix, cH2Var, value(EP[:eTotalH2CNSE]), cH2Start]
+	if Z >1
+		cH2NetworkExpCost = value(EP[:eCH2Pipe])
+	end
+
+	
+    cH2Total = cH2Var + cH2Fix + cH2Start + value(EP[:eTotalH2CNSE]) +cH2NetworkExpCost
+
+    dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix, cH2Var, value(EP[:eTotalH2CNSE]), cH2Start,cH2NetworkExpCost]
+
 
 	for z in 1:Z
 		tempCTotal = 0
@@ -51,7 +58,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 				value.(EP[:eH2GenCFix])[y]
 			tempCVar = tempCVar +
 				sum(value.(EP[:eCH2GenVar_out])[y,:])
-			if setup["UCommit"]>=1
+			if !isempty(H2_GEN_COMMIT)
 				tempCTotal = tempCTotal +
 					value.(EP[:eH2GenCFix])[y] +
 					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
@@ -71,7 +78,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		
 			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])
 		
-		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart]
+		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart,"-"]
 	end
-	CSV.write(string(path,sep,"h2_costs.csv"), dfH2Cost)
+	CSV.write(string(path,sep,"HSC_costs.csv"), dfH2Cost)
 end

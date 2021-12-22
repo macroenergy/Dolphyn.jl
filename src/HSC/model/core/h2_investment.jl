@@ -47,25 +47,25 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eH2GenTotalCap[k in 1:H],
 		if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
 			if k in H2_GEN_COMMIT
-				dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] + dfH2Gen[!,:Cap_Size][k] * (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
+				dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] + dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
 			else
-				dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] + EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k]
+				dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] + EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k]
 			end
 		elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
 			if k in H2_GEN_COMMIT
-				dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] + dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenNewCap][k]
+				dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] + dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
 			else
-				dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] + EP[:vH2GenNewCap][k]
+				dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] + EP[:vH2GenNewCap][k]
 			end
 		elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
 			if k in H2_GEN_COMMIT
-				dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] - dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenRetCap][k]
+				dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] - dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
 			else
-				dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] - EP[:vH2GenRetCap][k]
+				dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] - EP[:vH2GenRetCap][k]
 			end
 		else 
 			# Resources not eligible for new capacity or retirements
-			dfH2Gen[!,:Existing_Cap_Tonne_Hr][k] 
+			dfH2Gen[!,:Existing_Cap_Tonne_p_Hr][k] 
 		end
 	)
 
@@ -76,12 +76,12 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eH2GenCFix[k in 1:H],
 		if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
 			if k in H2_GEN_COMMIT
-				dfH2Gen[!,:Inv_Cost_per_tonnehr][k] * dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
+				dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
 			else
-				dfH2Gen[!,:Inv_Cost_per_tonnehr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
+				dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
 			end
 		else
-			dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
+			dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
 		end
 	)
 

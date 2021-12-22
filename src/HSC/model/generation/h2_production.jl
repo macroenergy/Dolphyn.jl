@@ -30,14 +30,23 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+	dfH2Gen = inputs["dfH2Gen"]  # Input H2 generation and storage data
+	Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
+	T = inputs["T"]	 # Model operating time steps
 
 	if !isempty(H2_GEN_COMMIT)
 		EP = h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	if !isempty(H2_GEN_NO_COMMIT)
-		EP = h2_production_no_commit(EP::Model, inputs::Dict)
+		EP = h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
+
+	##For CO2 Polcy constraint right hand side development - H2 Generation by zone and each time step
+		@expression(EP, eH2GenerationByAll[z=1:Z, t=1:T], # the unit is tonne/hour
+		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
+	)
+	EP[:eH2GenerationByZone] += eH2GenerationByAll
 
 	return EP
 end

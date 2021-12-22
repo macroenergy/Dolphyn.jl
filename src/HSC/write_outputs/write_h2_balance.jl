@@ -69,5 +69,5 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	   	dfPowerBalance[rowoffset,c]=sum(inputs["omega"].*dfPowerBalance[(rowoffset+1):size(dfPowerBalance,1),c])
 	end
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"H2_Balance.csv"), dfPowerBalance, writeheader=false)
+	CSV.write(string(path,sep,"HSC_h2_balance.csv"), dfPowerBalance, writeheader=false)
 end

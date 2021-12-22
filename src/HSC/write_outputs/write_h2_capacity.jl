@@ -19,13 +19,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing the diferent capacities for the different generation technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
-function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2Gen = inputs["dfH2Gen"]
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_NEW_CAP"]
 		if i in inputs["H2_GEN_COMMIT"]
-			capdischarge[i] = value(EP[:vH2GenNewCap][i]) * dfH2Gen[!,:Cap_Size][i]
+			capdischarge[i] = value(EP[:vH2GenNewCap][i]) * dfH2Gen[!,:Cap_Size_tonne_p_hr][i]
 		else
 			capdischarge[i] = value(EP[:vH2GenNewCap][i])
 		end
@@ -34,7 +34,7 @@ function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	retcapdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_RET_CAP"]
 		if i in inputs["H2_GEN_COMMIT"]
-			retcapdischarge[i] = first(value.(EP[:vH2GenRetCap][i])) * dfH2Gen[!,:Cap_Size][i]
+			retcapdischarge[i] = first(value.(EP[:vH2GenRetCap][i])) * dfH2Gen[!,:Cap_Size_tonne_p_hr][i]
 		else
 			retcapdischarge[i] = first(value.(EP[:vH2GenRetCap][i]))
 		end
@@ -42,7 +42,7 @@ function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 	dfCap = DataFrame(
 		Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
-		StartCap = dfH2Gen[!,:Existing_Cap_Tonne_Hr],
+		StartCap = dfH2Gen[!,:Existing_Cap_Tonne_p_Hr],
 		RetCap = retcapdischarge[:],
 		NewCap = capdischarge[:],
 		EndCap = value.(EP[:eH2GenTotalCap])
@@ -56,6 +56,6 @@ function write_H2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		)
 
 	dfCap = vcat(dfCap, total)
-	CSV.write(string(path,sep,"H2_capacity.csv"), dfCap)
+	CSV.write(string(path,sep,"HSC_generation_storage_capacity.csv"), dfCap)
 	return dfCap
 end

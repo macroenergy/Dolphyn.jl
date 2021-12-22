@@ -58,7 +58,7 @@ Similarly, a generation based emission constraint is defined by setting the emis
 
 Note that the generator-side rate-based constraint can be used to represent a fee-rebate (``feebate'') system: the dirty generators that emit above the bar ($\epsilon_{z,p,gen}^{maxCO_2}$) have to buy emission allowances from the emission regulator in the region $z$ where they are located; in the same vein, the clean generators get rebates from the emission regulator at an emission allowance price being the dual variable of the emissions rate constraint.
 """
-function co2_cap(EP::Model, inputs::Dict, setup::Dict)
+function system_co2_cap(EP::Model, inputs::Dict, setup::Dict)
 
 	println("C02 Policies Module")
 
@@ -67,6 +67,7 @@ function co2_cap(EP::Model, inputs::Dict, setup::Dict)
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+	H = inputs["H2_RES_ALL"]
 
 	### Expressions ###
 

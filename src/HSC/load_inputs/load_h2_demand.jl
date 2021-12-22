@@ -23,7 +23,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 
     # Demand in tonnes per hour for each zone
 	#println(names(load_in))
-	start = findall(s -> s == "Load_H2_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
+	start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
 	
 	# Max value of non-served energy in $/(tonne)
 	inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))

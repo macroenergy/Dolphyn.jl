@@ -14,22 +14,18 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_opwrap_lds_stor_init(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	## Extract data frames from input dictionary
-	dfGen = inputs["dfGen"]
-	G = inputs["G"]
+function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	L = inputs["H2_P"]     # Number of H2 pipelines
+    
+	
+	transcap = zeros(L) # Transmission network reinforcements in tonne/hour
+	for i in 1:L
+		transcap[i] = (value.(EP[:vH2NPipe][i]) -inputs["pH2_Pipe_No_Curr"][i]).*inputs["pH2_Pipe_Max_Flow"][i]
 
-	# Initial level of storage in each modeled period
-	NPeriods = size(inputs["Period_Map"])[1]
-	dfStorageInit = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone])
-	socw = zeros(G,NPeriods)
-	for i in 1:G
-		if i in inputs["STOR_LONG_DURATION"]
-			socw[i,:] = value.(EP[:vSOCw])[i,:]
-		end
 	end
-	dfStorageInit = hcat(dfStorageInit, DataFrame(socw, :auto))
-	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("n$t") for t in 1:NPeriods]]
-	rename!(dfStorageInit,auxNew_Names)
-	CSV.write(string(path,sep,"StorageInit.csv"), dftranspose(dfStorageInit, false), writeheader=false)
+	dfTransCap = DataFrame(
+	Line = 1:L, Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"].*inputs["pH2_Pipe_No_Curr"], 
+    New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap)
+	)
+	CSV.write(string(path,sep,"HSC_pipeline_expansion.csv"), dfTransCap)
 end

@@ -24,6 +24,9 @@ Pkg.add(Pkg.PackageSpec(name="Dates"))
 Pkg.add(Pkg.PackageSpec(name="GLPK", version="0.14.12"))
 Pkg.add(Pkg.PackageSpec(name="Ipopt", version="0.7.0"))
 Pkg.add(Pkg.PackageSpec(name="JuMP", version="0.21.8"))
+Pkg.add("MathOptInterface")
+Pkg.add(Pkg.PackageSpec(name="SCIP"))
+Pkg.build("SCIP")
 #Pkg.add(Pkg.PackageSpec(name="CPLEX", version="0.7.7"))
 Pkg.add(Pkg.PackageSpec(name="CSV", version="0.8.5"))
 Pkg.add(Pkg.PackageSpec(name="Clustering", version="0.14.2"))
@@ -46,28 +49,3 @@ Pkg.add(Pkg.PackageSpec(name="StatsBase", version="0.33.8"))
 Pkg.add(Pkg.PackageSpec(name="YAML", version="0.4.7"))
 Pkg.add(Pkg.PackageSpec(name="LinearAlgebra"))
 Pkg.add(Pkg.PackageSpec(name="Revise"))
-#=
-[336ed68f] CSV v0.8.5
-[9961bab8] Cbc v0.8.0
-[e2554f3b] Clp v0.8.4
-[aaaa29a8] Clustering v0.14.2
-[861a8166] Combinatorics v1.0.2
-[a93c6f00] DataFrames v1.0.0
-[864edb3b] DataStructures v0.18.9
-[41bf760c] DiffEqSensitivity v6.52.1
-[b4f34e82] Distances v0.10.3
-[e30172f5] Documenter v0.27.3
-[35a29f4d] DocumenterTools v0.1.13
-[60bf3e95] GLPK v0.14.12
-[2e9cd046] Gurobi v0.9.14
-[b6b21f68] Ipopt v0.7.0
-[4076af6c] JuMP v0.21.8
-[fdba3010] MathProgBase v0.7.8
-[1dea7af3] OrdinaryDiffEq v5.60.1
-[8a4e6c94] QuasiMonteCarlo v0.2.3
-[2913bbd2] StatsBase v0.33.8
-[ddb6d928] YAML v0.4.7
-[ade2ca70] Dates
-[37e2e46d] LinearAlgebra
-[10745b16] Statistics
-=#

@@ -57,8 +57,6 @@ function configure_settings(settings_path::String)
     if(!haskey(settings, "ModelingToGenerateAlternatives")) settings["ModelingToGenerateAlternatives"] = 0 end
     # Slack value as a fraction of least-cost objective in budget constraint used for evaluating alternative model solutions; positive float value
     if(!haskey(settings, "ModelingtoGenerateAlternativeSlack")) settings["ModelingtoGenerateAlternativeSlack"] = 0.1 end
-    # Modeling H2 Supply Chain; 0 = not active; 1 = active. Note: produces a single solution as output
-    if(!haskey(settings, "ModelH2")) settings["ModelH2"] = 0 end
-    
+
 return settings
 end

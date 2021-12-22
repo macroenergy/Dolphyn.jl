@@ -24,6 +24,7 @@ export load_h2_inputs
 export generate_model
 export solve_model
 export write_outputs
+export write_HSC_outputs
 export cluster_inputs
 export mga
 
@@ -96,6 +97,7 @@ include("GenX/model/core/non_served_energy.jl")
 include("GenX/model/core/ucommit.jl")
 include("GenX/model/core/reserves.jl")
 include("GenX/model/core/transmission.jl")
+include("GenX/model/core/emissions_power.jl")
 include("GenX/model/resources/curtailable_variable_renewable/curtailable_variable_renewable.jl")
 include("GenX/model/resources/flexible_demand/flexible_demand.jl")
 include("GenX/model/resources/hydro/hydro_res.jl")
@@ -187,7 +189,9 @@ include("HSC/write_outputs/write_h2_capacity.jl")
 include("HSC/write_outputs/write_h2_nse.jl")
 include("HSC/write_outputs/write_h2_costs.jl")
 include("HSC/write_outputs/write_h2_balance.jl")
-include("HSC/write_outputs/write_h2_pipelines.jl")
+include("HSC/write_outputs/write_h2_pipeline_flow.jl")
+include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
+include("HSC/write_outputs/write_HSC_outputs.jl")
 
 
 # Modeling to generator alternatives

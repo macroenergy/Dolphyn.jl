@@ -57,6 +57,6 @@ function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	rename!(total,auxNew_Names)
 	dfNse = vcat(dfNse, total)
 
-	CSV.write(string(path,sep,"h2_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
+	CSV.write(string(path,sep,"HSC_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
 	return dfTemp
 end

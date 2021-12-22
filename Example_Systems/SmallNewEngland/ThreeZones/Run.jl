@@ -77,11 +77,20 @@ println("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
-### Write output
-# Run MGA if the MGA flag is set to 1 else only save the least cost solution
+### Write power system output
+
 println("Writing Output")
 outpath = "$inpath/Results"
-write_outputs(EP, outpath, mysetup, myinputs)
+outpath=write_outputs(EP, outpath, mysetup, myinputs)
+
+# Write hydrogen supply chain outputs
+if mysetup["ModelH2"] == 1
+    outpath_H2 = "$outpath/Results_HSC"
+    write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
+end
+
+# Run MGA if the MGA flag is set to 1 else only save the least cost solution
+# Only valid for power system analysis at this point
 if mysetup["ModelingToGenerateAlternatives"] == 1
     println("Starting Model to Generate Alternatives (MGA) Iterations")
     mga(EP,inpath,mysetup,myinputs,outpath)

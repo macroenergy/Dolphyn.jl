@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+GenX: An Configurable Capacity Expansion Model
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -13,7 +13,6 @@ A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 
 @doc raw"""
 	load_inputs(setup::Dict,path::AbstractString)
@@ -85,29 +84,9 @@ function load_inputs(setup::Dict,path::AbstractString)
 	end
 
 	# Read in mapping of modeled periods to representative periods
-	if setup["OperationWrapping"]==1 && setup["LongDurationStorage"]==1 && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv"))))) # Use Time Domain Reduced data for GenX)
+	if setup["OperationWrapping"]==1 && !isempty(inputs["STOR_LONG_DURATION"]) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv"))))) # Use Time Domain Reduced data for GenX)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
-
-	# println(setup["ModelH2"])
-	# if setup["ModelH2"]==1
-	# 	## Read input files
-	# 	println("Reading H2 Input CSV Files")
-	# 	## Declare Dict (dictionary) object used to store parameters
-	# 	inputs = load_h2_gen(setup, path, sep, inputs)
-	# 	inputs = load_h2_demand(setup, path, sep, inputs)
-	# 	inputs = load_h2_generators_variability(setup, path, sep, inputs)
-
-	# 	# Read input data about power network topology, operating and expansion attributes
-	# 	if isfile(string(path,sep,"H2_Pipelines.csv")) 
-	# 		# Creating flag for other parts of the code
-	# 		setup["ModelH2Pipelines"] = 1
-	# 		inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
-	# 	else
-	# 		inputs["H2_P"] = 0
-	# 	end
-	# end
-
 
 	println("CSV Files Successfully Read In From $path$sep")
 

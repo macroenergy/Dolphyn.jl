@@ -21,7 +21,7 @@ The h2_generation module creates decision variables, expressions, and constraint
 
 """
 
-function h2_production_no_commit(EP::Model, inputs::Dict)
+function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]
@@ -46,19 +46,26 @@ function h2_production_no_commit(EP::Model, inputs::Dict)
 	EP[:eH2Balance] += eH2GenNoCommit
 
 	#Power Consumption for H2 Generation
-	#Add more comments to make this more descriptive
-	@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-	sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+	#Power Consumption for H2 Generation
+	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
+		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
 
-	EP[:ePowerBalance] += ePowerBalanceH2GenNoCommit
-	
+	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
+		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+	end
+
+	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
+
+
 	###Constraints###
 	# Power and natural gas consumption associated with H2 generation in each time step
 	@constraints(EP, begin
 		#Power Balance
 		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_per_tonne][k]
 		#Gas Balance
-		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vGas][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaGas_MMBtu_per_tonne][k]
+		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vGas][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaFuel_MMBtu_per_tonne][k]
 	end)
 	
 	@constraints(EP, begin
