@@ -36,7 +36,7 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	if !isempty(H2_GEN_NO_COMMIT)
-		EP = h2_production_no_commit(EP::Model, inputs::Dict, setup::Dict)
+		EP = h2_production_no_commit(EP::Model, inputs::Dict)
 	end
 
 	return EP

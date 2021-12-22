@@ -23,7 +23,7 @@ This module additionally defines contributions to the objective function from va
 
 """
 
-function h2_discharge(EP::Model, inputs::Dict)
+function h2_outputs(EP::Model, inputs::Dict)
 
 	println("H2 Discharge Module")
 

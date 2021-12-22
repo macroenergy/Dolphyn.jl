@@ -166,11 +166,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE ###############
 	if setup["ModelH2"] == 1
 	# Infrastructure
-		EP = h2_discharge(EP, inputs)
+		EP = h2_outputs(EP, inputs)
 
-		EP = h2_investment(EP, inputs)
+		EP = h2_investment(EP, inputs, setup)
 	
-
 		if !isempty(inputs["H2_GEN"])
 			#model H2 generation
 			EP = h2_production(EP, inputs, setup)

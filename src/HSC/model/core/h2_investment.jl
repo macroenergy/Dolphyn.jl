@@ -22,7 +22,6 @@ This module defines the production decision variable  representing hydrogen inje
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
 """
-
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2Gen = inputs["dfH2Gen"]
@@ -35,15 +34,12 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 	H =inputs["H2_RES_ALL"]
 
 
-    #Capacity of Existing H2 Gen units (tonnes/hr)
-    #For generation with unit commitment, this variable refers to the number of units, not capacity. 
-	@variable(EP, vH2GenExistingCap[k in 1:H] >= 0)
 	#Capacity of New H2 Gen units (tonnes/hr)
 	#For generation with unit commitment, this variable refers to the number of units, not capacity. 
-	@variable(EP, vH2GenNewCap[k in 1:H] >= 0)
+	@variable(EP, vH2GenNewCap[k in H2_GEN_NEW_CAP] >= 0)
 	#Capacity of Retired H2 Gen units bui(tonnes/hr)
     #For generation with unit commitment, this variable refers to the number of units, not capacity. 
-	@variable(EP, vH2GenRetCap[k in 1:H] >= 0)
+	@variable(EP, vH2GenRetCap[k in H2_GEN_RET_CAP] >= 0)
 	
 	### Expressions ###
 	# Cap_Size is set to 1 for all variables when unit UCommit == 0
@@ -80,9 +76,9 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eH2GenCFix[k in 1:H],
 		if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
 			if k in H2_GEN_COMMIT
-				dfH2Gen[!,:Inv_Cost_per_tonnehr][k] * dfH2Gen[!,:Cap_Size][k] * vH2GenNewCap[k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
+				dfH2Gen[!,:Inv_Cost_per_tonnehr][k] * dfH2Gen[!,:Cap_Size][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
 			else
-				dfH2Gen[!,:Inv_Cost_per_tonnehr][k] * vH2GenNewCap[k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
+				dfH2Gen[!,:Inv_Cost_per_tonnehr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]
 			end
 		else
 			dfH2Gen[!,:Fixed_OM_Cost_per_tonnehr][k] * eH2GenTotalCap[k]

@@ -21,7 +21,7 @@ The h2_generation module creates decision variables, expressions, and constraint
 
 """
 
-function h2_generation_no_commit(EP::Model, inputs::Dict)
+function h2_production_no_commit(EP::Model, inputs::Dict)
 
 	#Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]

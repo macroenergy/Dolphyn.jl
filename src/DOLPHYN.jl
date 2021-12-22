@@ -40,6 +40,7 @@ using Clustering
 using Distances
 using Combinatorics
 using Documenter
+using Revise
 # Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
 using Gurobi
 #using CPLEX
@@ -118,7 +119,7 @@ include("GenX/model/policies/minimum_capacity_requirement.jl")
 
 #Load H2 Modelling Features
 include("HSC/model/core/h2_investment.jl")
-include("HSC/model/core/h2_discharge.jl")
+include("HSC/model/core/h2_outputs.jl")
 include("HSC/model/core/h2_non_served_energy.jl")
 include("HSC/model/flexible_demand/h2_flexible_demand.jl")
 

@@ -45,6 +45,7 @@ Pkg.add(Pkg.PackageSpec(name="MathProgBase", version="0.7.8"))
 Pkg.add(Pkg.PackageSpec(name="StatsBase", version="0.33.8"))
 Pkg.add(Pkg.PackageSpec(name="YAML", version="0.4.7"))
 Pkg.add(Pkg.PackageSpec(name="LinearAlgebra"))
+Pkg.add(Pkg.PackageSpec(name="Revise"))
 #=
 [336ed68f] CSV v0.8.5
 [9961bab8] Cbc v0.8.0

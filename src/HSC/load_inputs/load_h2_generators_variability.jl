@@ -36,7 +36,7 @@ function load_h2_generators_variability(setup::Dict, path::AbstractString, sep::
 	# Maximum power output and variability of each energy resource
 	inputs_genvar["pH2_Max"] = transpose(Matrix{Float64}(gen_var[1:inputs_genvar["T"],2:(inputs_genvar["H2_RES_ALL"]+1)]))
 
-	println("H2_Generators_variability.csv Successfully Read!")
+	println("H2_generators_variability.csv Successfully Read!")
 
 	return inputs_genvar
 end

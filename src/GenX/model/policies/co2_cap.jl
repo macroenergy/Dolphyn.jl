@@ -68,7 +68,7 @@ function co2_cap(EP::Model, inputs::Dict, setup::Dict)
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H2_GEN"]
+	H = inputs["H2_RES_ALL"] # Number of H2 resources
 
 	### Expressions ###
 
