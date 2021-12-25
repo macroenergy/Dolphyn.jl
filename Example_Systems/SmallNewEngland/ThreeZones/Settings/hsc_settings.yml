@@ -1,4 +1,4 @@
 ModelH2: 1 #Turn on Hydrogen Supply Chain modelling capabilities
 H2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer - 0 - continuous capacity, 1- discrete capacity
 H2GenCommit: 0 # Continuous or discrete capacity representaiton of H2 production technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as integer variables;
-H2NetworkExpansion: 0 # Transmission network expansionl; 0 = not active; 1 = active systemwide
+H2NetworkExpansion: 1 # Transmission network expansionl; 0 = not active; 1 = active systemwide

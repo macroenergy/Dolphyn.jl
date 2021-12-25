@@ -64,8 +64,6 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	@constraints(EP, begin
 		#Power Balance
 		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_per_tonne][k]
-		#Gas Balance
-		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vGas][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaFuel_MMBtu_per_tonne][k]
 	end)
 	
 	@constraints(EP, begin

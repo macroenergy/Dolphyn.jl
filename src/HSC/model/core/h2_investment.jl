@@ -71,24 +71,52 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	## Objective Function Expressions ##
 
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
-	# If resource is not eligible for new capacity, fixed costs are only O&M costs
-	@expression(EP, eH2GenCFix[k in 1:H],
-		if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-			if k in H2_GEN_COMMIT
-				dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+		# Sum individual resource contributions to fixed costs to get total fixed costs
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 0 --> objective function is in $
+	if setup["ParameterScale"] ==1 
+		# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+		# If resource is not eligible for new capacity, fixed costs are only O&M costs
+		@expression(EP, eH2GenCFix[k in 1:H],
+			if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
+				if k in H2_GEN_COMMIT
+					1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k])
+				else
+					1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k])
+				end
 			else
-				dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+				(dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k])/ModelScalingFactor^2
 			end
-		else
-			dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
-		end
-	)
+		)
+	else
+		# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+		# If resource is not eligible for new capacity, fixed costs are only O&M costs
+		@expression(EP, eH2GenCFix[k in 1:H],
+			if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
+				if k in H2_GEN_COMMIT
+					dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+				else
+					dfH2Gen[!,:Inv_Cost_per_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] + dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+				end
+			else
+				dfH2Gen[!,:Fixed_OM_Cost_per_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+			end
+		)
 
+	end
 
-
-	# Sum individual resource contributions to fixed costs to get total fixed costs
 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
+
+
+	# # Sum individual resource contributions to fixed costs to get total fixed costs
+	# #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	# #  ParameterScale = 0 --> objective function is in $
+	# if setup["ParameterScale"] ==1 
+	# 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k]/(ModelScalingFactor)^2 for k in 1:H))
+	# else
+	# 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
+	# end
+
 
 	# Add term to objective function expression
 	EP[:eObj] += eTotalH2GenCFix

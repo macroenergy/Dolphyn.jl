@@ -28,21 +28,34 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
 
 	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
-	
-	cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))
-	cH2Fix = value(EP[:eTotalH2GenCFix]) 
+	if setup["ParameterScale"]==1 # Convert costs in millions to $
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))* (ModelScalingFactor^2)
+		cH2Fix = value(EP[:eTotalH2GenCFix])*ModelScalingFactor^2
+	else
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))
+		cH2Fix = value(EP[:eTotalH2GenCFix]) 
+	end
 
 	if !isempty(inputs["H2_GEN_COMMIT"])
-	    cH2Start = value(EP[:eTotalH2GenCStart])
+		if setup["ParameterScale"]==1 # Convert costs in millions to $
+			cH2Start = value(EP[:eTotalH2GenCStart])*ModelScalingFactor^2
+		else
+	    	cH2Start = value(EP[:eTotalH2GenCStart])
+		end
 	else
 		cH2Start = 0
 	end
 
 	if Z >1
-		cH2NetworkExpCost = value(EP[:eCH2Pipe])
+		if setup["ParameterScale"]==1 # Convert costs in millions to $
+			cH2NetworkExpCost = value(EP[:eCH2Pipe])*ModelScalingFactor^2
+		else
+			cH2NetworkExpCost = value(EP[:eCH2Pipe])
+		end
+		cH2NetworkExpCost=0
 	end
 
-	
+	 
     cH2Total = cH2Var + cH2Fix + cH2Start + value(EP[:eTotalH2CNSE]) +cH2NetworkExpCost
 
     dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix, cH2Var, value(EP[:eTotalH2CNSE]), cH2Start,cH2NetworkExpCost]
@@ -74,10 +87,19 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			end
 		end
 
+		if setup["ParameterScale"] == 1 # Convert costs in millions to $
+			tempCFix = tempCFix * (ModelScalingFactor^2)
+			tempCVar = tempCVar * (ModelScalingFactor^2)
+			tempCTotal = tempCTotal * (ModelScalingFactor^2)
+			tempCStart = tempCStart * (ModelScalingFactor^2)
+		end
 		
-		
+		if setup["ParameterScale"] == 1 # Convert costs in millions to $
+			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])* (ModelScalingFactor^2)
+		else
 			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])
-		
+		end
+
 		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart,"-"]
 	end
 	CSV.write(string(path,sep,"HSC_costs.csv"), dfH2Cost)

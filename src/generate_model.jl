@@ -180,7 +180,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE ###############
 	if setup["ModelH2"] == 1
 	# Infrastructure
-		EP = h2_outputs(EP, inputs)
+		EP = h2_outputs(EP, inputs, setup)
 
 		EP = h2_investment(EP, inputs, setup)
 	
@@ -190,11 +190,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 
 		#model H2 non-served energy
-		EP = h2_non_served_energy(EP, inputs)
+		EP = h2_non_served_energy(EP, inputs,setup)
 
 		if !isempty(inputs["H2_FLEX"])
 			#model H2 flexible demand resources
-			EP = h2_flexible_demand(EP, inputs)
+			EP = h2_flexible_demand(EP, inputs, setup)
 		end
 
 		if setup["ModelH2Pipelines"] == 1

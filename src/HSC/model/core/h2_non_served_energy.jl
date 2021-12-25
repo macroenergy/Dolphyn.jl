@@ -59,7 +59,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 ```
 
 """
-function h2_non_served_energy(EP::Model, inputs::Dict)
+function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 
 	println("H2 Non-served Energy Module")
 
@@ -83,7 +83,15 @@ function h2_non_served_energy(EP::Model, inputs::Dict)
 	# Julia is fastest when summing over one row one column at a time
 	@expression(EP, eTotalH2CNSETS[t=1:T,z=1:Z], sum(eH2CNSE[s,t,z] for s in 1:H2_SEG))
 	@expression(EP, eTotalH2CNSET[t=1:T], sum(eTotalH2CNSETS[t,z] for z in 1:Z))
-	@expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t] for t in 1:T))
+
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 0 --> objective function is in $
+	if setup["ParameterScale"] ==1 
+		@expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t]/(ModelScalingFactor)^2 for t in 1:T))
+	else
+		@expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t] for t in 1:T))
+	end
+
 
 	# Add total cost contribution of non-served energy/curtailed demand to the objective function
 	EP[:eObj] += eTotalH2CNSE

@@ -30,12 +30,16 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	if setup["ParameterScale"] == 1
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)) * (ModelScalingFactor^2)
 		cFix = (value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)) * (ModelScalingFactor^2)
-		dfCost[!,Symbol("Total")] = [objective_value(EP) * (ModelScalingFactor^2), cFix, cVar, value(EP[:eTotalCNSE]) * (ModelScalingFactor^2), 0, 0, 0]
+		cNSE =  value(EP[:eTotalCNSE]) * (ModelScalingFactor^2)
+		cTotal = cVar + cFix + cNSE
+		dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, 0, 0, 0]
 	else
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0))
 		#cVar = value(EP[:eTotalCVarOut])+(!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)
 		cFix = value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)
-		dfCost[!,Symbol("Total")] = [objective_value(EP), cFix, cVar, value(EP[:eTotalCNSE]), 0, 0, 0]
+		cNSE = value(EP[:eTotalCNSE])
+		cTotal = cVar + cFix + cNSE
+		dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, value(EP[:eTotalCNSE]), 0, 0, 0]
 	end
 
 	if setup["UCommit"]>=1
@@ -44,6 +48,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		else
 			dfCost[!,2][5] = value(EP[:eTotalCStart])
 		end
+		cTotal += dfCost[!,2][5]
 	end
 	if setup["Reserves"]==1
 		if setup["ParameterScale"] == 1
@@ -51,6 +56,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		else
 			dfCost[!,2][6] = value(EP[:eTotalCRsvPen])
 		end
+		cTotal += dfCost[!,2][6]
 	end
 	if setup["NetworkExpansion"] == 1 && Z > 1
 		if setup["ParameterScale"] == 1
@@ -58,7 +64,11 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		else
 			dfCost[!,2][7] = value(EP[:eTotalCNetworkExp])
 		end
+		cTotal += dfCost[!,2][7]
 	end
+
+	# Report updated power system total cost column depending on the case
+	dfCost[!,2][1] = cTotal
 
 	for z in 1:Z
 		tempCTotal = 0

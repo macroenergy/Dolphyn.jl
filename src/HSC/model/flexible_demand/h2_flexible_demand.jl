@@ -65,7 +65,7 @@ A similar constraints maximum time steps of demand advancement. This is done by 
 If $t$ is first time step of the year (or the first time step of the representative period), then the above two constraints are implemented to look back over the last n time steps, starting with the last time step of the year (or the last time step of the representative period). This time-wrapping implementation is similar to the time-wrapping implementations used for defining the storage balance constraints for hydropower reservoir resources and energy storage resources.
 
 """
-function h2_flexible_demand(EP::Model, inputs::Dict)
+function h2_flexible_demand(EP::Model, inputs::Dict, setup::Dict)
 ## Flexible demand resources available during all hours and can be either delayed or advanced (virtual storage-shiftable demand) - DR ==1
 
 println("H2 Flexible Demand Resources Module")
@@ -103,8 +103,16 @@ EP[:eH2Balance] += eH2BalanceDemandFlex
 
 ## Objective Function Expressions ##
 
+
 # Variable costs of "charging" for technologies "k" during hour "t" in zone "z"
-@expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_per_tonne][k]*vH2_CHARGE_FLEX[k,t])
+#  ParameterScale = 1 --> objective function is in million $
+#  ParameterScale = 0 --> objective function is in $
+if setup["ParameterScale"] ==1 
+    @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_per_tonne][k]*vH2_CHARGE_FLEX[k,t]/ModelScalingFactor^2)
+else
+    @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_per_tonne][k]*vH2_CHARGE_FLEX[k,t])
+end
+
 
 # Sum individual resource contributions to variable charging costs to get total variable charging costs
 @expression(EP, eTotalCH2VarFlexInT[t=1:T], sum(eCH2VarFlex_in[k,t] for k in H2_FLEX))

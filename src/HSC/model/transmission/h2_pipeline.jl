@@ -5,7 +5,7 @@
 
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Hydrogen Pipeline Module")
+	println("H2 Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
@@ -33,12 +33,27 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	## Objective Function Expressions ##
 	# Capital cost of pipelines 
     # DEV NOTE: To add fixed cost of existing + new pipelines
-	@expression(EP, eCH2Pipe,  sum(eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p] for p = 1:H2_P))
+    #  ParameterScale = 1 --> objective function is in million $
+	#  ParameterScale = 0 --> objective function is in $
+	if setup["ParameterScale"] ==1 
+		@expression(EP, eCH2Pipe,  sum(eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:H2_P))
+	else
+		@expression(EP, eCH2Pipe,  sum(eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p] for p = 1:H2_P))
+	end
+	
     EP[:eObj] += eCH2Pipe
 
-	# Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
+    	# Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
     #YS Formula doesn't make sense to me
-	@expression(EP, eCH2CompPipe, sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P))
+   #  ParameterScale = 1 --> objective function is in million $
+	#  ParameterScale = 0 --> objective function is in $
+	if setup["ParameterScale"] ==1 
+        @expression(EP, eCH2CompPipe, sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:H2_P))
+
+	else
+        @expression(EP, eCH2CompPipe, sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P))
+	end
+	
 
     EP[:eObj] += eCH2CompPipe
 

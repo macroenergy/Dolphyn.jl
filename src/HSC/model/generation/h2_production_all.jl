@@ -25,6 +25,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 	dfH2Gen = inputs["dfH2Gen"]
 
 	#Define sets
+	H2_GEN_NO_COMMIT= inputs["H2_GEN_NO_COMMIT"]
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
 	H2_GEN = inputs["H2_GEN"]
 	H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
@@ -37,9 +38,6 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
     #Power required by hydrogen generation resource k to make hydrogen (MW)
 	@variable(EP, vP2G[k in H2_GEN, t = 1:T] >= 0 )
-	#Gas required by hydrogen generation resource k to make hydrogen (MMBtu/hr)
-    @variable(EP, vGas[k in H2_GEN, t = 1:T] >= 0 )
-
 
 	### Constratints ###
 
