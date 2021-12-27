@@ -16,7 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     
-    H2_load_in = DataFrame(CSV.File(string(path,sep,"H2_load_data.csv"), header=true), copycols=true)
+    H2_load_in = DataFrame(CSV.File(string(path,sep,"HSC_load_data.csv"), header=true), copycols=true)
 
     # Number of demand curtailment/lost load segments
 	inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
@@ -42,7 +42,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 		inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
 	end
     
-	println("H2_load_data.csv Successfully Read!")
+	println("HSC_load_data.csv Successfully Read!")
 
     return inputs_load
 

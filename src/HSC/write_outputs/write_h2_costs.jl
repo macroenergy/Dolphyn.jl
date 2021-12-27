@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,6 +34,12 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	else
 		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))
 		cH2Fix = value(EP[:eTotalH2GenCFix]) 
+	end
+
+	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
+	# Emissions penalty is already scaled by adjusting the value of carbon price used in emissions_HSC.jl
+	if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
+		cH2Var  = cH2Var + value(EP[:eCH2GenTotalEmissionsPenalty])
 	end
 
 	if !isempty(inputs["H2_GEN_COMMIT"])
@@ -92,6 +98,13 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCVar = tempCVar * (ModelScalingFactor^2)
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 			tempCStart = tempCStart * (ModelScalingFactor^2)
+		end
+
+		# Add emisions penalty related costs if the constraints are active
+		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
+		if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
+			tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
+			tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		end
 		
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $

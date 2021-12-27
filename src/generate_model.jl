@@ -90,7 +90,7 @@ The power balance constraint of the model ensures that electricity demand is met
 function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAttributes,modeloutput = nothing)
 
 	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
 
 	## Start pre-solve timer
 	presolver_start_time = time()
@@ -113,13 +113,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
-
-	#@expression(EP, :eCO2Cap[cap=1:inputs["NCO2Cap"]], 0)
+	# Power supply by z and timestep - used in emissions constraints
 	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)	
 
-	@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], 0)	
-
-	# Infrastructure
+	##### Power System related modules ############
 	EP = discharge(EP, inputs)
 
 	EP = non_served_energy(EP, inputs)
@@ -130,7 +127,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = ucommit(EP, inputs, setup["UCommit"])
 	end
 
-	EP = emissions_power(EP, inputs)
+	# Emissions of various power sector resources
+	EP = emissions_power(EP, inputs,setup)
 
 	if setup["Reserves"] > 0
 		EP = reserves(EP, inputs, setup["UCommit"])
@@ -177,17 +175,25 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
 	end
 
-	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE ###############
+	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
+
+		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
+		@expression(EP, eH2NetpowerConsumptionByAll[z=1:Z, t=1:T], 0)	
+
 	# Infrastructure
 		EP = h2_outputs(EP, inputs, setup)
 
+		# Investment cost of various hydrogen generation sources
 		EP = h2_investment(EP, inputs, setup)
 	
 		if !isempty(inputs["H2_GEN"])
 			#model H2 generation
 			EP = h2_production(EP, inputs, setup)
 		end
+
+		# Direct emissions of various hydrogen sector resources
+		EP = emissions_hsc(EP, inputs,setup::Dict)
 
 		#model H2 non-served energy
 		EP = h2_non_served_energy(EP, inputs,setup)
@@ -198,16 +204,21 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 
 		if setup["ModelH2Pipelines"] == 1
+			# model hydrogen transmission via pipelines
 			EP = h2_pipeline(EP, inputs, setup)
 		end
 
 	end
 
 
-	################### 
-	# Policies
-	# CO2 emissions limits
-	EP = co2_cap(EP, inputs, setup)
+	################  Policies #####################3
+	# CO2 emissions limits for the power sector only
+	if setup["ModelH2"] ==0
+		EP = co2_cap_power(EP, inputs, setup)
+	elseif setup["ModelH2"]==1
+		EP = co2_cap_power_hsc(EP, inputs, setup)
+	end
+
 
 	# Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1

@@ -48,6 +48,8 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_balance(path,sep,inputs, setup, EP)
     write_h2_pipeline_flow(path, sep, inputs, setup, EP)
     write_h2_pipeline_expansion(path, sep, inputs, setup, EP)
+    write_h2_emissions(path, sep, inputs, setup, EP)
+    
 
   ## Print confirmation
   println("Wrote outputs HSC outputs to $path$sep")

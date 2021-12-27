@@ -22,7 +22,7 @@ Function for reading input parameters related to the electricity transmission ne
 function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
     # Network zones inputs and Network topology inputs
-    pipeline_var = DataFrame(CSV.File(string(path,sep,"H2_pipelines.csv"), header=true), copycols=true)
+    pipeline_var = DataFrame(CSV.File(string(path,sep,"HSC_pipelines.csv"), header=true), copycols=true)
 
     #Number of H2 Pipelines = L
     inputs_nw["H2_P"]=size(collect(skipmissing(pipeline_var[!,:H2_Pipelines])),1)

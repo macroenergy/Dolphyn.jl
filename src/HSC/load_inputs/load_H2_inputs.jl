@@ -48,7 +48,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     inputs = load_h2_generators_variability(setup, path, sep, inputs)
 
 	# Read input data about power network topology, operating and expansion attributes
-    if isfile(string(path,sep,"H2_Pipelines.csv")) 
+    if isfile(string(path,sep,"HSC_Pipelines.csv")) 
 		# Creating flag for other parts of the code
 		setup["ModelH2Pipelines"] = 1
 		inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
@@ -56,7 +56,12 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 		inputs["H2_P"] = 0
 	end
 
-	println("H2 Input CSV Files Successfully Read In From $path$sep")
+	# If emissions flag is on, read in emissions related inputs
+	if setup["H2CO2Cap"]>=1
+		inputs = load_co2_cap_hsc(setup, path, sep, inputs)
+	end
+
+	println("HSC Input CSV Files Successfully Read In From $path$sep")
 
 	return inputs
 end

@@ -1,7 +1,7 @@
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
 	#Read in H2 generation related inputs
-    h2_gen_in = DataFrame(CSV.File(string(path,sep,"h2_generation.csv"), header=true), copycols=true)
+    h2_gen_in = DataFrame(CSV.File(string(path,sep,"HSC_generation.csv"), header=true), copycols=true)
 
     # Add Resource IDs after reading to prevent user errors
 	h2_gen_in[!,:R_ID] = 1:size(collect(skipmissing(h2_gen_in[!,1])),1)
@@ -57,7 +57,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
 	# end
 
-	println("H2_generation.csv Successfully Read!")
+	println("HSC_generation.csv Successfully Read!")
 
     return inputs_gen
 

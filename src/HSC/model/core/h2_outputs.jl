@@ -25,7 +25,7 @@ This module additionally defines contributions to the objective function from va
 
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 Discharge Module")
+	println("H2 generation and storage discharge module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

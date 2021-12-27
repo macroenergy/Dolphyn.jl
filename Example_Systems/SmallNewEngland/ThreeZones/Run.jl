@@ -32,13 +32,15 @@ push!(LOAD_PATH, src_path)
 using DOLPHYN
 using YAML
 
-
-genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path
-hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path
-mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores settings and GenX-specific parameters
-mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores settings and H2 supply chain-specific parameters
+genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
+hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
+mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
+mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
+global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
+mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
 mysetup = Dict()
-mysetup = merge(+, mysetup_hsc, mysetup_genx) # Merge GenX and HSC settings dict
+mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+
 
 
 ### Cluster time series inputs if necessary and if specified by the user
@@ -63,7 +65,7 @@ println("Loading Inputs")
 myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
 myinputs = load_inputs(mysetup, inpath)
 
-### Load H2 inputs
+### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end

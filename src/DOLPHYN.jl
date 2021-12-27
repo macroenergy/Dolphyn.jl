@@ -56,6 +56,10 @@ using Cbc
 # To translate $/MWh to $M/GWh, multiply by ModelScalingFactor
 ModelScalingFactor = 1e+3
 
+# Lower heating value of Hydrogen
+# LHV is used when defining a system-wide CO2 constraint for the joint hydrogen and electricity infrastructures (SystemCO2Constraint =2)
+H2_LHV = 33.33 # MWh per tonne
+
 # Configure settings
 include("configure_settings/configure_settings.jl")
 
@@ -66,7 +70,7 @@ include("configure_solver/configure_clp.jl")
 include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
 
-# Load input data
+# Load input data - GenX
 include("GenX/load_inputs/load_generators_data.jl")
 include("GenX/load_inputs/load_generators_variability.jl")
 include("GenX/load_inputs/load_network_data.jl")
@@ -80,14 +84,16 @@ include("GenX/load_inputs/load_load_data.jl")
 include("GenX/load_inputs/load_fuels_data.jl")
 include("GenX/load_inputs/load_inputs.jl")
 
+# Load time domain reduction related scripts
 include("time_domain_reduction/time_domain_reduction.jl")
 
-#Load H2 Inputs
+#Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_inputs.jl")
+include("HSC/load_inputs/load_co2_cap_hsc.jl")
 
 
 #Core GenX Features
@@ -114,16 +120,17 @@ include("GenX/model/resources/thermal/thermal.jl")
 include("GenX/model/resources/thermal/thermal_commit.jl")
 include("GenX/model/resources/thermal/thermal_no_commit.jl")
 
-include("GenX/model/policies/co2_cap.jl")
+include("GenX/model/policies/co2_cap_power.jl")
 include("GenX/model/policies/energy_share_requirement.jl")
 include("GenX/model/policies/cap_reserve_margin.jl")
 include("GenX/model/policies/minimum_capacity_requirement.jl")
 
-#Load H2 Modelling Features
+#Core HSC Modelling Features
 include("HSC/model/core/h2_investment.jl")
 include("HSC/model/core/h2_outputs.jl")
 include("HSC/model/core/h2_non_served_energy.jl")
 include("HSC/model/flexible_demand/h2_flexible_demand.jl")
+include("HSC/model/core/emissions_hsc.jl")
 
 # H2 production
 include("HSC/model/generation/h2_production_commit.jl")
@@ -132,7 +139,12 @@ include("HSC/model/generation/h2_production_all.jl")
 include("HSC/model/generation/h2_production.jl")
 include("HSC/model/transmission/h2_pipeline.jl")
 
+# Policies
+include("HSC/model/policies/co2_cap_hsc.jl")
+
+
 # Load model generation and solving scripts
+include("co2_cap_power_hsc.jl")
 include("generate_model.jl")
 include("solve_model.jl")
 
@@ -191,6 +203,7 @@ include("HSC/write_outputs/write_h2_costs.jl")
 include("HSC/write_outputs/write_h2_balance.jl")
 include("HSC/write_outputs/write_h2_pipeline_flow.jl")
 include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
+include("HSC/write_outputs/write_h2_emissions.jl")
 include("HSC/write_outputs/write_HSC_outputs.jl")
 
 

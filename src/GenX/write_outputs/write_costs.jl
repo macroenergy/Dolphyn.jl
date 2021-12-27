@@ -31,45 +31,66 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)) * (ModelScalingFactor^2)
 		cFix = (value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)) * (ModelScalingFactor^2)
 		cNSE =  value(EP[:eTotalCNSE]) * (ModelScalingFactor^2)
-		cTotal = cVar + cFix + cNSE
-		dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, 0, 0, 0]
+		#cTotal = cVar + cFix + cNSE
+		#dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, 0, 0, 0]
 	else
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0))
 		#cVar = value(EP[:eTotalCVarOut])+(!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)
 		cFix = value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)
 		cNSE = value(EP[:eTotalCNSE])
-		cTotal = cVar + cFix + cNSE
-		dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, value(EP[:eTotalCNSE]), 0, 0, 0]
+		#cTotal = cVar + cFix + cNSE
 	end
 
+	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
+	# Emissions penalty is already scaled by adjusting the value of carbon price used in emissions_HSC.jl
+	if setup["CO2Cap"]==4
+		cVar  = cVar + value(EP[:eCGenTotalEmissionsPenalty])
+	end
+
+	# Start cost
 	if setup["UCommit"]>=1
 		if setup["ParameterScale"] == 1
-			dfCost[!,2][5] = value(EP[:eTotalCStart]) * (ModelScalingFactor^2)
+			cStartCost = value(EP[:eTotalCStart]) * (ModelScalingFactor^2)
 		else
-			dfCost[!,2][5] = value(EP[:eTotalCStart])
+			cStartCost = value(EP[:eTotalCStart])
 		end
-		cTotal += dfCost[!,2][5]
+	else
+		cStartCost =0
+		#cTotal += dfCost[!,2][5]
 	end
+
+	# Reserve cost
 	if setup["Reserves"]==1
 		if setup["ParameterScale"] == 1
-			dfCost[!,2][6] = value(EP[:eTotalCRsvPen]) * (ModelScalingFactor^2)
+			cRsvCost = value(EP[:eTotalCRsvPen]) * (ModelScalingFactor^2)
 		else
-			dfCost[!,2][6] = value(EP[:eTotalCRsvPen])
+			cRsvCost = value(EP[:eTotalCRsvPen])
 		end
-		cTotal += dfCost[!,2][6]
+	else
+		cRsvCost = 0
+		#cTotal += dfCost[!,2][6]
 	end
+
+	# Network expansion cost
 	if setup["NetworkExpansion"] == 1 && Z > 1
 		if setup["ParameterScale"] == 1
-			dfCost[!,2][7] = value(EP[:eTotalCNetworkExp]) * (ModelScalingFactor^2)
+			cNetworkExpansionCost = value(EP[:eTotalCNetworkExp]) * (ModelScalingFactor^2)
 		else
-			dfCost[!,2][7] = value(EP[:eTotalCNetworkExp])
+			cNetworkExpansionCost = value(EP[:eTotalCNetworkExp])
 		end
-		cTotal += dfCost[!,2][7]
+
+	else
+		cNetworkExpansionCost =0
+		#cTotal += dfCost[!,2][7]
 	end
 
-	# Report updated power system total cost column depending on the case
-	dfCost[!,2][1] = cTotal
+	# Define total costs
+	cTotal = cFix + cVar + cNSE + cStartCost+ cRsvCost+cNetworkExpansionCost
 
+	# Define total column, i.e. column 2
+	dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, cStartCost, cRsvCost, cNetworkExpansionCost]
+
+	# Computing zonal cost breakdown by cost category
 	for z in 1:Z
 		tempCTotal = 0
 		tempCFix = 0
@@ -87,15 +108,20 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 			if setup["UCommit"]>=1
 				tempCTotal = tempCTotal +
 					value.(EP[:eCFix])[y] +
+					(y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) +
+					(y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0) +
 					(y in inputs["STOR_ALL"] ? sum(value.(EP[:eCVar_in])[y,:]) : 0) +
 					(y in inputs["FLEX"] ? sum(value.(EP[:eCVarFlex_in])[y,:]) : 0) +
-					sum(value.(EP[:eCVar_out])[y,:])
+					sum(value.(EP[:eCVar_out])[y,:]) +
 					(y in inputs["COMMIT"] ? sum(value.(EP[:eCStart])[y,:]) : 0)
+					#
 				tempCStart = tempCStart +
 					(y in inputs["COMMIT"] ? sum(value.(EP[:eCStart])[y,:]) : 0)
 			else
 				tempCTotal = tempCTotal +
 					value.(EP[:eCFix])[y] +
+					(y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) +
+					(y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0) +
 					(y in inputs["STOR_ALL"] ? sum(value.(EP[:eCVar_in])[y,:]) : 0) +
 					(y in inputs["FLEX"] ? sum(value.(EP[:eCVarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCVar_out])[y,:])
@@ -108,11 +134,22 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 			tempCStart = tempCStart * (ModelScalingFactor^2)
 		end
+
+		# Add emisions penalty related costs if the constraints are active to variable and total costs
+		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
+		if setup["CO2Cap"]==4
+			tempCVar  = tempCVar + value.(EP[:eCEmissionsPenaltybyZone])[z]
+			tempCTotal=tempCTotal + value.(EP[:eCEmissionsPenaltybyZone])[z]
+		end
+
 		if setup["ParameterScale"] == 1
 			tempCNSE = sum(value.(EP[:eCNSE])[:,:,z]) * (ModelScalingFactor^2)
 		else
 			tempCNSE = sum(value.(EP[:eCNSE])[:,:,z])
 		end
+		# Update non-served energy cost for each zone
+		tempCTotal = tempCTotal +tempCNSE
+
 		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
 	end
 	CSV.write(string(path,sep,"costs.csv"), dfCost)
