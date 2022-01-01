@@ -52,10 +52,10 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 	if setup["ParameterScale"] ==1
 		@expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
-		(inputs["omega"][t] * (dfH2Gen[!,:Var_OM_Cost_per_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_per_tonne][k]/ModelScalingFactor) * vH2Gen[k,t]))
+		(inputs["omega"][t] * (dfH2Gen[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vH2Gen[k,t]))
 	else
 		@expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
-		(inputs["omega"][t] * ((dfH2Gen[!,:Var_OM_Cost_per_tonne][k] + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_per_tonne][k])) * vH2Gen[k,t]))
+		(inputs["omega"][t] * ((dfH2Gen[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k])) * vH2Gen[k,t]))
 	end
 
 	@expression(EP, eTotalCH2GenVarOutT[t=1:T], sum(eCH2GenVar_out[k,t] for k in 1:H))

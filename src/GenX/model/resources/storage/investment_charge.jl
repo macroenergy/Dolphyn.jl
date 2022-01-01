@@ -60,8 +60,6 @@ function investment_charge(EP::Model, inputs::Dict)
 
 	dfGen = inputs["dfGen"]
 
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-
 	STOR_ASYMMETRIC = inputs["STOR_ASYMMETRIC"] # Set of storage resources with asymmetric (separte) charge/discharge capacity components
 
 	NEW_CAP_CHARGE = inputs["NEW_CAP_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity

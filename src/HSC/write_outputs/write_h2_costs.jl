@@ -29,11 +29,11 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))* (ModelScalingFactor^2)
-		cH2Fix = value(EP[:eTotalH2GenCFix])*ModelScalingFactor^2
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))* (ModelScalingFactor^2)
+		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0))*ModelScalingFactor^2
 	else
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0))
-		cH2Fix = value(EP[:eTotalH2GenCFix]) 
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))
+		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0))
 	end
 
 	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
@@ -74,20 +74,30 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		tempCStart = 0
 		for y in dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
 			tempCFix = tempCFix +
+				(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
+				(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
 				value.(EP[:eH2GenCFix])[y]
 			tempCVar = tempCVar +
+				(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
+				(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 				sum(value.(EP[:eCH2GenVar_out])[y,:])
 			if !isempty(H2_GEN_COMMIT)
 				tempCTotal = tempCTotal +
 					value.(EP[:eH2GenCFix])[y] +
+					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
+					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
+					(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
 					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
-					sum(value.(EP[:eCH2GenVar_out])[y,:])
+					sum(value.(EP[:eCH2GenVar_out])[y,:]) +
 					(y in inputs["H2_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
 				tempCStart = tempCStart +
 					(y in inputs["H2_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
 			else
 				tempCTotal = tempCTotal +
 					value.(EP[:eH2GenCFix])[y] +
+					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
+					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
+					(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
 					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCH2GenVar_out])[y,:])
 			end

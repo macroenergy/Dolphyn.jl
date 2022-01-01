@@ -61,6 +61,7 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			retcapenergy[i] = value(EP[:vRETCAPENERGY][i])
 		end
 	end
+	
 	dfCap = DataFrame(
 		Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone],
 		StartCap = dfGen[!,:Existing_Cap_MW],

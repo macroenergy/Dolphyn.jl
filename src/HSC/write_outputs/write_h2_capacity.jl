@@ -40,19 +40,54 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		end
 	end
 
+	capcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	retcapcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	for i in inputs["H2_STOR_ALL"]
+		if i in inputs["NEW_CAP_H2_CHARGE"]
+			capcharge[i] = value(EP[:vH2CAPCHARGE][i])
+		end
+		if i in inputs["RET_CAP_H2_CHARGE"]
+			retcapcharge[i] = value(EP[:vH2RETCAPCHARGE][i])
+		end
+	end
+
+	capenergy = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	retcapenergy = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	for i in inputs["H2_STOR_ALL"]
+		if i in inputs["NEW_CAP_H2_ENERGY"]
+			capenergy[i] = value(EP[:vH2CAPENERGY][i])
+		end
+		if i in inputs["RET_CAP_H2_ENERGY"]
+			retcapenergy[i] = value(EP[:vH2RETCAPENERGY][i])
+		end
+	end
+	
+
 	dfCap = DataFrame(
 		Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
-		StartCap = dfH2Gen[!,:Existing_Cap_Tonne_p_Hr],
+		StartCap = dfH2Gen[!,:Existing_Cap_tonne_p_hr],
 		RetCap = retcapdischarge[:],
 		NewCap = capdischarge[:],
-		EndCap = value.(EP[:eH2GenTotalCap])
+		EndCap = value.(EP[:eH2GenTotalCap]),
+		StartEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_tonne],
+		RetEnergyCap = retcapenergy[:],
+		NewEnergyCap = capenergy[:],
+		EndEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_tonne]+capenergy[:]-retcapenergy[:],
+		StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr],
+		RetChargeCap = retcapcharge[:],
+		NewChargeCap = capcharge[:],
+		EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr]+capcharge[:]-retcapcharge[:]
 	)
 
 
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
 			StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
-			NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap])
+			NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap]),
+			StartEnergyCap = sum(dfCap[!,:StartEnergyCap]), RetEnergyCap = sum(dfCap[!,:RetEnergyCap]),
+			NewEnergyCap = sum(dfCap[!,:NewEnergyCap]), EndEnergyCap = sum(dfCap[!,:EndEnergyCap]),
+			StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
+			NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap])
 		)
 
 	dfCap = vcat(dfCap, total)

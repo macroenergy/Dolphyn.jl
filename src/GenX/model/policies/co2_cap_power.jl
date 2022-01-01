@@ -88,7 +88,7 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 		elseif setup["ModelH2"] == 1 # Add NetPowerConsumption term to Demand side - could positive or negative
 			@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 				sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
-				sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] +EP[:eH2NetpowerConsumptionByAll][z,t] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
+				sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] +EP[:eH2NetpowerConsumptionByAll][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
 				sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 			)
 		end

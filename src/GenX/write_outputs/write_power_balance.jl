@@ -61,10 +61,10 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	     	    dfTemp1[t+rowoffset,9] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 	     	end
 		=#
-		if Z>=2
-			dfTemp1[t+rowoffset,8] = value(EP[:ePowerBalanceNetExportFlows][t,z])
-			dfTemp1[t+rowoffset,9] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
-		end
+			if Z>=2
+				dfTemp1[t+rowoffset,8] = value(EP[:ePowerBalanceNetExportFlows][t,z])
+				dfTemp1[t+rowoffset,9] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
+			end
 	     	dfTemp1[t+rowoffset,10] = -inputs["pD"][t,z]
 
 			if setup["ParameterScale"] == 1
@@ -79,6 +79,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,9] * ModelScalingFactor
 				dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,10] * ModelScalingFactor
 			end
+			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end
 		if z==1
 			dfPowerBalance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)

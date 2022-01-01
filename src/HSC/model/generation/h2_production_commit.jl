@@ -87,6 +87,9 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	EP[:ePowerBalance] += -ePowerBalanceH2GenCommit
 
 
+	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenCommit
+
 	### Constraints ###
 	## Declaration of integer/binary variables
 	if H2GenCommit == 1 # Integer UC constraints
@@ -106,7 +109,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 		###Constraints###
 		@constraints(EP, begin
 		#Power Balance
-		[k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_per_tonne][k]
+		[k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
 	end)
 
 	### Capacitated limits on unit commitment decision variables (Constraints #1-3)

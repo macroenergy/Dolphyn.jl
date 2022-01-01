@@ -47,19 +47,5 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
 	)
 
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-	if setup["ParameterScale"]==1 # Power consumption in GW
-		@expression(EP, eH2PowerConsumptionByGen[z=1:Z, t=1:T], 
-		sum(EP[:vP2G][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
-
-	else  # Power consumption in MW
-		@expression(EP, eH2PowerConsumptionByGen[z=1:Z, t=1:T], 
-		sum(EP[:vP2G][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
-
-	end
-
-# Adding power consumption by generators, later will add power consumption by storage and pipelines
-EP[:eH2NetpowerConsumptionByAll] += eH2PowerConsumptionByGen
-
 	return EP
 end

@@ -59,11 +59,15 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
 
 
+	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
+
+
 	###Constraints###
 	# Power and natural gas consumption associated with H2 generation in each time step
 	@constraints(EP, begin
 		#Power Balance
-		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_per_tonne][k]
+		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
 	end)
 	
 	@constraints(EP, begin

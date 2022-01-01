@@ -137,7 +137,15 @@ include("HSC/model/generation/h2_production_commit.jl")
 include("HSC/model/generation/h2_production_no_commit.jl")
 include("HSC/model/generation/h2_production_all.jl")
 include("HSC/model/generation/h2_production.jl")
+
+# H2 pipelines
 include("HSC/model/transmission/h2_pipeline.jl")
+
+#H2 storage
+include("HSC/model/storage/h2_storage_investment.jl")
+include("HSC/model/storage/h2_storage.jl")
+include("HSC/model/storage/h2_storage_all.jl")
+include("HSC/model/storage/h2_long_duration_storage.jl")
 
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
@@ -204,7 +212,10 @@ include("HSC/write_outputs/write_h2_balance.jl")
 include("HSC/write_outputs/write_h2_pipeline_flow.jl")
 include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
 include("HSC/write_outputs/write_h2_emissions.jl")
+include("HSC/write_outputs/write_h2_charge.jl")
+include("HSC/write_outputs/write_h2_storage.jl")
 include("HSC/write_outputs/write_HSC_outputs.jl")
+
 
 
 # Modeling to generator alternatives

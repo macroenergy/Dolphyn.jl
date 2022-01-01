@@ -21,33 +21,41 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
 
 	println(Z)
-	H2_FLEX = inputs["H2_FLEX"]
+	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
+	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
 	## Power balance for each zone
-	dfPowerBalance = Array{Any}
+	dfH2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 8)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
+			   "Storage Discharging", "Storage Charging",
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_FLEX].!=1) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t])) 
+	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t])) 
 	     	dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
+			dfTemp1[t+rowoffset,4] = 0
+            dfTemp1[t+rowoffset,5] = 0
 	     	if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
 	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
                 dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_FLEX].>=1) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	end
+			 if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+			end 
 	     	
-	     	dfTemp1[t+rowoffset,4] = value(EP[:vH2NSE][1,t,z])
+	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
 	     	
 			if setup["ModelH2Pipelines"] == 1
-			 	dfTemp1[t+rowoffset,5] = value.(EP[:ePipeZoneDemand][t,z])
+			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
 			else
-				dfTemp1[t+rowoffset,5] = 0
+				dfTemp1[t+rowoffset,7] = 0
 			end
 
 		
@@ -55,19 +63,19 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		# 	dfTemp1[t+rowoffset,5] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 		# 	dfTemp1[t+rowoffset,6] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 		# end
-	     	dfTemp1[t+rowoffset,6] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,8] = -inputs["H2_D"][t,z]
 
 			
 	   	end
 		if z==1
-			dfPowerBalance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
+			dfH2Balance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
 		else
-		    dfPowerBalance = hcat(dfPowerBalance, dfTemp1)
+		    dfH2Balance = hcat(dfH2Balance, dfTemp1)
 		end
 	end
-	for c in 2:size(dfPowerBalance,2)
-	   	dfPowerBalance[rowoffset,c]=sum(inputs["omega"].*dfPowerBalance[(rowoffset+1):size(dfPowerBalance,1),c])
+	for c in 2:size(dfH2Balance,2)
+		dfH2Balance[rowoffset,c]=sum(inputs["omega"].*dfH2Balance[(rowoffset+1):size(dfH2Balance,1),c])
 	end
-	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"HSC_h2_balance.csv"), dfPowerBalance, writeheader=false)
+	dfH2Balance = DataFrame(dfH2Balance, :auto)
+	CSV.write(string(path,sep,"HSC_h2_balance.csv"), dfH2Balance, writeheader=false)
 end
