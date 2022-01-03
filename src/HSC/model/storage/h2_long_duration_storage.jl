@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 function h2_long_duration_storage(EP::Model, inputs::Dict)
 
-	println("Long Duration Storage Module")
+	println("Hydrogen Long Duration Storage Module")
 
 	dfH2Gen = inputs["dfH2Gen"]
 

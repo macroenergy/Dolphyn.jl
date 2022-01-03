@@ -181,7 +181,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
-	# Infrastructure
+		# Infrastructure
 		EP = h2_outputs(EP, inputs, setup)
 
 		# Investment cost of various hydrogen generation sources
@@ -211,6 +211,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		if setup["ModelH2Pipelines"] == 1
 			# model hydrogen transmission via pipelines
 			EP = h2_pipeline(EP, inputs, setup)
+		end
+
+		if setup["ModelH2Trucks"] == 1
+			# model hydrogen transmission via trucks
+			EP = h2_truck(EP, inputs, setup)
 		end
 
 	end

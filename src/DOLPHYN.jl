@@ -92,7 +92,8 @@ include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
-include("HSC/load_inputs/load_h2_inputs.jl")
+include("HSC/load_inputs/load_h2_truck.jl")
+include("HSC/load_inputs/load_H2_inputs.jl")
 include("HSC/load_inputs/load_co2_cap_hsc.jl")
 
 
@@ -140,6 +141,12 @@ include("HSC/model/generation/h2_production.jl")
 
 # H2 pipelines
 include("HSC/model/transmission/h2_pipeline.jl")
+
+# H2 trucks
+include("HSC/model/truck/h2_truck_investment.jl")
+include("HSC/model/truck/h2_truck.jl")
+include("HSC/model/truck/h2_truck_all.jl")
+include("HSC/model/truck/h2_long_duration_truck.jl")
 
 #H2 storage
 include("HSC/model/storage/h2_storage_investment.jl")
@@ -214,6 +221,7 @@ include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
 include("HSC/write_outputs/write_h2_emissions.jl")
 include("HSC/write_outputs/write_h2_charge.jl")
 include("HSC/write_outputs/write_h2_storage.jl")
+include("HSC/write_outputs/write_h2_truck.jl")
 include("HSC/write_outputs/write_HSC_outputs.jl")
 
 

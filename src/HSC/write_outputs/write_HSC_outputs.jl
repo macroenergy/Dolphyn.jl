@@ -51,7 +51,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_emissions(path, sep, inputs, setup, EP)
     write_h2_charge(path, sep, inputs, setup, EP)
     write_h2_storage(path, sep, inputs, setup, EP)
-    
+    write_h2_truck(path, sep, inputs, setup, EP)
 
   ## Print confirmation
   println("Wrote outputs HSC outputs to $path$sep")
