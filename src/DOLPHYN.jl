@@ -221,7 +221,8 @@ include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
 include("HSC/write_outputs/write_h2_emissions.jl")
 include("HSC/write_outputs/write_h2_charge.jl")
 include("HSC/write_outputs/write_h2_storage.jl")
-include("HSC/write_outputs/write_h2_truck.jl")
+include("HSC/write_outputs/write_h2_truck_capacity.jl")
+include("HSC/write_outputs/write_h2_truck_flow.jl")
 include("HSC/write_outputs/write_HSC_outputs.jl")
 
 

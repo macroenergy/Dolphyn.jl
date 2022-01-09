@@ -33,7 +33,8 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
 
     # Set of H2 truck types
     inputs_truck["H2_TRUCK_TYPES"] = h2_truck_in[!,:T_TYPE]
-
+    # Set of H2 truck type names
+    inputs_truck["H2_TRUCK_TYPE_NAMES"] = h2_truck_in[!,:H2TruckType]
     # Set of H2 truck types eligible for new capacity
     inputs_truck["NEW_CAP_H2_TRUCK_CHARGE"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
     # Set of H2 truck types eligible for capacity retirement
