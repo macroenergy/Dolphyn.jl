@@ -6,6 +6,7 @@ function h2_long_duration_truck(EP::Model, inputs::Dict)
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
     dfPeriodMap = inputs["Period_Map"]
 
+    inputs["NPeriods"]  = size(inputs["Period_Map"])[1] # Number of modeled periods
     N = inputs["NPeriods"] # Number of modeled periods
     MODELED_PERIODS_INDEX = 1:N
 

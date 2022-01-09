@@ -14,6 +14,11 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
 	# Name of H2 Generation resources
 	inputs_gen["H2_RESOURCES_NAME"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs_gen["H2_RES_ALL"]]))
+	
+	# Resource identifiers by zone (just zones in resource order + resource and zone concatenated)
+	h2_zones = collect(skipmissing(h2_gen_in[!,:Zone][1:inputs_gen["H2_RES_ALL"]]))
+	inputs_gen["H2_R_ZONES"] = h2_zones
+	inputs_gen["H2_RESOURCE_ZONES"] = inputs_gen["H2_RESOURCES_NAME"] .* "_z" .* string.(h2_zones)
 
 	# Set of flexible demand-side resources
 	inputs_gen["H2_FLEX"] = h2_gen_in[h2_gen_in.H2_FLEX.==1,:R_ID]

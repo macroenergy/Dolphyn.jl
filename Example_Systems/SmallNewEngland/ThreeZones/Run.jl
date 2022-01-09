@@ -17,8 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 cd(dirname(@__FILE__))
 settings_path = joinpath(pwd(), "Settings")
 
-#environment_path = "../../../package_activate.jl"
-#include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+environment_path = "../../../package_activate.jl"
+include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 
 ### Set relevant directory paths
 src_path = "../../../src/"
@@ -41,12 +41,10 @@ mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores gl
 mysetup = Dict()
 mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
-
-
 ### Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
-    if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
+    if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
         println("Clustering Time Series Data...")
         cluster_inputs(inpath, settings_path, mysetup)
     else
@@ -54,18 +52,18 @@ if mysetup["TimeDomainReduction"] == 1
     end
 end
 
-### Configure solver
+# ### Configure solver
 println("Configuring Solver")
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
-#### Running a case
+# #### Running a case
 
-### Load inputs
-println("Loading Inputs")
-myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
-myinputs = load_inputs(mysetup, inpath)
+# ### Load inputs
+# println("Loading Inputs")
+ myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
+ myinputs = load_inputs(mysetup, inpath)
 
-### Load H2 inputs if modeling the hydrogen supply chain
+# ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end
