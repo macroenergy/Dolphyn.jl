@@ -38,28 +38,29 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	if (isdir(truck_state_path) == false)
 		mkdir(truck_state_path)
 	end
+	dfH2TruckAvailFull = DataFrame(Time = 1:T)
+	dfH2TruckAvailEmpty = DataFrame(Time = 1:T)
+	dfH2TruckCharged = DataFrame(Time = 1:T)
+	dfH2TruckDischarged = DataFrame(Time = 1:T)
 	for j in H2_TRUCK_TYPES
-		dfH2TruckAvailFull = DataFrame(Time = 1:T)
-		dfH2TruckAvailEmpty = DataFrame(Time = 1:T)
-		dfH2TruckCharged = DataFrame(Time = 1:T)
-		dfH2TruckDischarged = DataFrame(Time = 1:T)
 		for z in 1:Z
-			dfH2TruckAvailFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2Navail_full])[z,j,:]
-			dfH2TruckAvailEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2Navail_empty])[z,j,:]
-			dfH2TruckCharged[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2Ncharged])[z,j,:]
-			dfH2TruckDischarged[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2Ndischarged])[z,j,:]
+			dfH2TruckAvailFull[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Navail_full])[z,j,:]
+			dfH2TruckAvailEmpty[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Navail_empty])[z,j,:]
+			dfH2TruckCharged[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Ncharged])[z,j,:]
+			dfH2TruckDischarged[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Ndischarged])[z,j,:]
 		end
-		CSV.write(string(truck_state_path, sep, string("H2TruckAvailFull_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckAvailFull)
-		CSV.write(string(truck_state_path, sep, string("H2TruckAvailEmpty_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckAvailEmpty)
-		CSV.write(string(truck_state_path, sep, string("H2TruckCharged_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckCharged)
-		CSV.write(string(truck_state_path, sep, string("H2TruckDischarged_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckDischarged)
 	end
+	CSV.write(string(truck_state_path, sep, string("H2TruckAvailFull.csv")), dfH2TruckAvailFull)
+	CSV.write(string(truck_state_path, sep, string("H2TruckAvailEmpty.csv")), dfH2TruckAvailEmpty)
+	CSV.write(string(truck_state_path, sep, string("H2TruckCharged.csv")), dfH2TruckCharged)
+	CSV.write(string(truck_state_path, sep, string("H2TruckDischarged.csv")), dfH2TruckDischarged)
 
 	# H2 truck transit
 	truck_transit_path = string(path, sep, "H2Transit")
 	if (isdir(truck_transit_path) == false)
 		mkdir(truck_transit_path)
 	end
+
 	dfH2TruckTravelFull = DataFrame(Time = 1:T)
 	dfH2TruckArriveFull = DataFrame(Time = 1:T)
 	dfH2TruckDepartFull = DataFrame(Time = 1:T)
