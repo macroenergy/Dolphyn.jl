@@ -44,16 +44,17 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_capacity(path, sep, inputs, setup, EP)
     write_h2_gen(path, sep, inputs, setup, EP)
     write_h2_nse(path, sep, inputs, setup, EP)
-    write_h2_costs(path, sep, inputs, setup, EP)
+    # write_h2_costs(path, sep, inputs, setup, EP)
     write_h2_balance(path,sep,inputs, setup, EP)
-    write_h2_pipeline_flow(path, sep, inputs, setup, EP)
-    write_h2_pipeline_expansion(path, sep, inputs, setup, EP)
+    # write_h2_pipeline_flow(path, sep, inputs, setup, EP)
+    # write_h2_pipeline_expansion(path, sep, inputs, setup, EP)
     write_h2_emissions(path, sep, inputs, setup, EP)
     write_h2_charge(path, sep, inputs, setup, EP)
     write_h2_storage(path, sep, inputs, setup, EP)
+    if setup["ModelH2Trucks"] == 1
     write_h2_truck_capacity(path, sep, inputs, setup, EP)
     write_h2_truck_flow(path, sep, inputs, setup, EP)
-
+    end
   ## Print confirmation
   println("Wrote outputs HSC outputs to $path$sep")
 

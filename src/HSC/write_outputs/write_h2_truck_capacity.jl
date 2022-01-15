@@ -2,6 +2,9 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
     NEW_CAP_H2_TRUCK_CHARGE = inputs["NEW_CAP_H2_TRUCK_CHARGE"]
     RET_CAP_H2_TRUCK_CHARGE = inputs["RET_CAP_H2_TRUCK_CHARGE"]
+    NEW_CAP_H2_TRUCK_ENERGY = inputs["NEW_CAP_H2_TRUCK_ENERGY"]
+    RET_CAP_H2_TRUCK_ENERGY = inputs["RET_CAP_H2_TRUCK_ENERGY"]
+
     dfH2Truck = inputs["dfH2Truck"]
     Z = inputs["Z"]
 
@@ -31,15 +34,21 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
-            tempEnergy[j] = value(EP[:vH2CAPTRUCKENERGY][z,j])
+            if j in NEW_CAP_H2_TRUCK_ENERGY
+                tempEnergy[j] = value(EP[:vH2CAPTRUCKENERGY][z,j])
+            end
         end
         dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
 
+        tempEnergy = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
-            tempEnergy[j] = value(EP[:vH2RETCAPTRUCKENERGY][z,j])
+            if j in RET_CAP_H2_TRUCK_ENERGY
+                tempEnergy[j] = value(EP[:vH2RETCAPTRUCKENERGY][z,j])
+            end
         end
         dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
 
+        tempEnergy = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
             tempEnergy[j] = value(EP[:eTotalH2CapTruckEnergy][z,j])
         end
