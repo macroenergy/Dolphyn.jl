@@ -38,7 +38,7 @@ Pkg.add(Pkg.PackageSpec(name="DocumenterTools", version="0.1.13"))
 Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.9.14"))
 
 # Julia environment variable GUROBI_HOME set to your running machine location
-ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
+# ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
 Pkg.build("Gurobi")
 ##Add if elseif with Method of Morris for these
 Pkg.add(Pkg.PackageSpec(name="DiffEqSensitivity", version="6.52.1"))
