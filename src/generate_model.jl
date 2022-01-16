@@ -218,6 +218,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_truck(EP, inputs, setup)
 		end
 
+		if setup["ModelH2G2P"] == 1
+			#model H2 Gas to Power
+			EP = h2_g2p(EP, inputs, setup)
+		end
+
+
 	end
 
 

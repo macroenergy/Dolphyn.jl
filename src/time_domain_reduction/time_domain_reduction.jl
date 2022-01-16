@@ -127,12 +127,15 @@ function parse_data(myinputs, mysetup)
     wind_profiles = []
     var_profiles = []
     h2_var_col_names = []
+    h2_g2p_var_col_names = []
     h2_var_profiles = []
+    h2_g2p_var_profiles = []
     h2_col_to_zone_map = []
     h2_load_col_names = []
     h2_load_profiles = []
 
     AllHRVarConst = true
+    AllHG2PVarConst = true
 
     # LOAD - Load_data.csv
     load_profiles = [ myinputs["pD"][:,l] for l in 1:size(myinputs["pD"],2) ]
@@ -188,15 +191,30 @@ function parse_data(myinputs, mysetup)
                 AllHRVarConst = false
             end
         end
+
+        if mysetup["ModelH2G2P"] == 1
+            
+            H2_G2P= myinputs["H2_G2P_RESOURCE_ZONES"]    
+            H2_G2P_ZONES = myinputs["H2_G2P_ZONES"]
+
+            for r in 1:length(H2_G2P)
+                push!(h2_g2p_var_col_names, H2_G2P[r])
+                push!(h2_g2p_var_profiles, myinputs["pH2_g2p_Max"][r,:])
+
+                if AllHG2PVarConst && (minimum(myinputs["pH2_g2p_Max"][r,:]) != maximum(myinputs["pH2_g2p_Max"][r,:]))
+                    AllHG2PVarConst = false
+                end
+            end
+        end
     end
 
-    all_col_names = [load_col_names; h2_load_col_names; var_col_names; h2_var_col_names; fuel_col_names]
-    all_profiles = [load_profiles..., h2_load_profiles..., var_profiles..., h2_var_profiles..., fuel_profiles...]
+    all_col_names = [load_col_names; h2_load_col_names; var_col_names; h2_var_col_names; h2_g2p_var_col_names; fuel_col_names]
+    all_profiles = [load_profiles..., h2_load_profiles..., var_profiles..., h2_var_profiles..., h2_g2p_var_profiles..., fuel_profiles...]
 
 
-    return load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, fuel_col_names, all_col_names,
-         load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, fuel_profiles, all_profiles,
-         col_to_zone_map, AllFuelsConst, AllHRVarConst
+    return load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
+    fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
+    fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst
 
 end
 
@@ -572,6 +590,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     PMap_Outfile = joinpath(TimeDomainReductionFolder, "Period_map.csv")
     H2Load_Outfile = joinpath(TimeDomainReductionFolder, "HSC_load_data.csv")
     H2RVar_Outfile = joinpath(TimeDomainReductionFolder, "HSC_generators_variability.csv")
+    H2G2PVar_Outfile = joinpath(TimeDomainReductionFolder, "HSC_g2p_variability.csv")
     YAML_Outfile = joinpath(TimeDomainReductionFolder, "time_domain_reduction_settings.yml")
 
     # Define a local version of the setup so that you can modify the mysetup["ParameterScale"] value to be zero in case it is 1
@@ -590,7 +609,9 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     # Parse input data into useful structures divided by type (load, wind, solar, fuel, groupings thereof, etc.)
     # TO DO LATER: Replace these with collections of col_names, profiles, zones
-    load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, fuel_profiles, all_profiles, col_to_zone_map, AllFuelsConst, AllHRVarConst = parse_data(myinputs, mysetup)
+    load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
+    fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
+    fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst = parse_data(myinputs, mysetup)
 
     # Remove Constant Columns - Add back later in final output
     all_profiles, all_col_names, ConstData, ConstCols, ConstIdx = RemoveConstCols(all_profiles, all_col_names, v)
@@ -829,6 +850,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
         H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_col_names) ]
         H2VarCols = [Symbol(h2_var_col_names[i]) for i in 1:length(h2_var_col_names) ]
+        H2G2PVarCols = [Symbol(h2_g2p_var_col_names[i]) for i in 1:length(h2_g2p_var_col_names) ]
     end
 
     # Cluster Ouput: The original data at the medoids/centers
@@ -849,6 +871,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
         hrvDFs = [] # Hydrogen resource variability DataFrames
         hlpDFs = [] # Hydrogen load profiles
+        hrvg2pDFs = []
     end
     
     for m in 1:NClusters
@@ -865,10 +888,24 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
             if AllHRVarConst
                 hrvDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
             end
+            
+            if mysetup["ModelH2G2P"] == 1
+
+                hrvg2pDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2G2PVarCols)))
+
+                if AllHG2PVarConst
+                    hrvg2pDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
+                end
+
+            else
+                hrvg2pDF = []
+            end
+
 
         else
             hrvDF = []
             hlpDF = []
+            hrvg2pDF = []
         end
                 
         # Add Constant Columns back in
@@ -886,6 +923,15 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
                 elseif Symbol(ConstCols[c]) in H2LoadCols
                     hlpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
                 end
+
+                if mysetup["ModelH2G2P"] == 1
+
+                    if Symbol(ConstCols[c]) in H2G2PVarCols
+                        hrvg2pDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
+                    end
+
+                end
+
             end
         end
 
@@ -908,10 +954,17 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         push!(gvDFs, gvDF)
         push!(lpDFs, lpDF)
         push!(fpDFs, fpDF)
+        
         if mysetup["ModelH2"] == 1
             if AllHRVarConst select!(hrvDF, Not(:Placeholder)) end 
             push!(hrvDFs, hrvDF)
             push!(hlpDFs, hlpDF)
+
+            if mysetup["ModelH2G2P"] == 1
+                if AllHG2PVarConst select!(hrvg2pDF, Not(:Placeholder))end
+                push!(hrvg2pDFs, hrvg2pDF)
+            end
+
         end
     end
     FinalOutputData = vcat(rpDFs...)  # For comparisons with input data to evaluate clustering process
@@ -922,6 +975,11 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
         HLPOutputData = vcat(hlpDFs...) #Hydrogen Load Profiles
         HRVOutputData = vcat(hrvDFs...) #Hydrogen Resource Variability Profiles
+        
+        if mysetup["ModelH2G2P"] == 1
+            HG2POutputData = vcat(hrvg2pDFs...)
+        end
+
     end
 
     ##### Step 5: Evaluation
@@ -1026,6 +1084,17 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         if v println("Writing resource file...") end
         CSV.write(string(inpath,sep,H2RVar_Outfile), HRVOutputData, header=NewHRVColNames)
 
+        if mysetup["ModelH2G2P"] == 1
+            #Write HSC Resource Variability 
+            # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
+            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => myinputs["H2_G2P_NAME"][i] for i in 1:length(myinputs["H2_G2P_NAME"]))
+            HG2PVColMap["Time_Index"] = "Time_Index"
+            HG2POutputData = HG2POutputData[!, Symbol.(myinputs["H2_G2P_RESOURCE_ZONES"])]
+            insertcols!(HG2POutputData, 1, :Time_Index => 1:size(HG2POutputData,1))
+            NewHG2PVColNames = [HG2PVColMap[string(c)] for c in names(HG2POutputData)]
+            if v println("Writing resource file...") end
+            CSV.write(string(inpath,sep,H2G2PVar_Outfile), HG2POutputData, header=NewHG2PVColNames)
+        end
     end
 
     ### time_domain_reduction_settings.yml
