@@ -23,16 +23,17 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	println(Z)
 	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
 	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
-	## Power balance for each zone
+	## Hydrogen balance for each zone
 	dfH2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 8)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
-	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
+	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
+			   "H2_Truck_Import/Export",
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -58,12 +59,17 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,7] = 0
 			end
 
-		
+			if setup["ModelH2Trucks"] == 1
+				dfTemp1[t+rowoffset,8] = value.(EP[:TruckFlow][t,z])
+			else
+				dfTemp1[t+rowoffset,8] = 0
+			end
+
 		# if Z>=2
 		# 	dfTemp1[t+rowoffset,5] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 		# 	dfTemp1[t+rowoffset,6] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 		# end
-	     	dfTemp1[t+rowoffset,8] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,9] = -inputs["H2_D"][t,z]
 
 			
 	   	end
