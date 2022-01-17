@@ -95,6 +95,8 @@ include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_truck.jl")
 include("HSC/load_inputs/load_H2_inputs.jl")
 include("HSC/load_inputs/load_co2_cap_hsc.jl")
+include("HSC/load_inputs/load_h2_g2p.jl")
+include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
 
 #Core GenX Features
@@ -153,6 +155,14 @@ include("HSC/model/storage/h2_storage_investment.jl")
 include("HSC/model/storage/h2_storage.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")
+
+#H2 G2P
+include("HSC/model/g2p/h2_g2p_investment.jl")
+include("HSC/model/g2p/h2_g2p_discharge.jl")
+include("HSC/model/g2p/h2_g2p_all.jl")
+include("HSC/model/g2p/h2_g2p_commit.jl")
+include("HSC/model/g2p/h2_g2p_no_commit.jl")
+include("HSC/model/g2p/h2_g2p.jl")
 
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
@@ -224,8 +234,9 @@ include("HSC/write_outputs/write_h2_storage.jl")
 include("HSC/write_outputs/write_h2_truck_capacity.jl")
 include("HSC/write_outputs/write_h2_truck_flow.jl")
 include("HSC/write_outputs/write_HSC_outputs.jl")
-
-
+include("HSC/write_outputs/write_p_g2p.jl")
+include("HSC/write_outputs/write_h2_g2p.jl")
+include("HSC/write_outputs/write_g2p_capacity.jl")
 
 # Modeling to generator alternatives
 include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")

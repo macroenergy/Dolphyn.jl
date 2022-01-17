@@ -16,6 +16,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
+	
+	if setup["ModelH2G2P"] == 1
+		dfH2G2P = inputs["dfH2G2P"]
+	end
+	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
@@ -25,13 +30,14 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	dfH2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
 	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
-			   "H2_Truck_Import/Export",
+			   "H2_Truck_Import/Export","G2P Demand",
+
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -69,10 +75,17 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		# 	dfTemp1[t+rowoffset,5] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 		# 	dfTemp1[t+rowoffset,6] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 		# end
-	     	dfTemp1[t+rowoffset,9] = -inputs["H2_D"][t,z]
 
+			if setup["ModelH2G2P"] == 1
+				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
+			else
+				dfTemp1[t+rowoffset,9] = 0
+			end
+
+	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][t,z]
 
 	   	end
+
 		if z==1
 			dfH2Balance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
 		else

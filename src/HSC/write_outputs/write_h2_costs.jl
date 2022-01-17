@@ -22,18 +22,43 @@ Function for writing the costs pertaining to the objective function (fixed, vari
 function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
 	dfH2Gen = inputs["dfH2Gen"]
+
 	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
 
+	if setup["ModelH2G2P"] == 1
+		dfH2G2P = inputs["dfH2G2P"]
+
+		cG2PFix = value.(EP[:eTotalH2G2PCFix])
+		cG2PVar = value.(EP[:eTotalCH2G2PVarOut])
+
+		if !isempty(inputs["H2_G2P_COMMIT"])
+			if setup["ParameterScale"] == 1
+				cH2Start = value.(EP[:eTotalH2G2PCStart]) * (ModelScalingFactor^2)
+			else
+				cH2Start = value.(EP[:eTotalH2G2PCStart])
+			end
+
+		else
+			cH2Start = 0
+		end
+
+	else
+		cG2PFix = 0
+		cH2Start = 0
+		cG2PVar = 0
+	end
+
+
 	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))* (ModelScalingFactor^2)
-		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0))*ModelScalingFactor^2
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar)* (ModelScalingFactor^2)
+		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0) + cG2PFix )*ModelScalingFactor^2
 	else
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))
-		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0))
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar)
+		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0) + cG2PFix)
 	end
 
 	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
@@ -44,12 +69,10 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 	if !isempty(inputs["H2_GEN_COMMIT"])
 		if setup["ParameterScale"]==1 # Convert costs in millions to $
-			cH2Start = value(EP[:eTotalH2GenCStart])*ModelScalingFactor^2
+			cH2Start += value(EP[:eTotalH2GenCStart])*ModelScalingFactor^2
 		else
-	    	cH2Start = value(EP[:eTotalH2GenCStart])
+	    	cH2Start += value(EP[:eTotalH2GenCStart])
 		end
-	else
-		cH2Start = 0
 	end
 
 	if Z >1
@@ -101,8 +124,26 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCH2GenVar_out])[y,:])
 			end
+
+			if setup["ModelH2G2P"] == 1
+				for  y in dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]
+
+					tempCFix += value.(EP[:eTotalH2G2PCFix])
+					tempCVar += value.(EP[:eTotalCH2G2PVarOut])
+					tempCTotal += value.(EP[:eTotalH2G2PCFix]) + value.(EP[:eTotalCH2G2PVarOut])
+
+					if !isempty(inputs["H2_G2P_COMMIT"])
+						if y in inputs["H2_G2P_COMMIT"]
+							tempCStart += value.(EP[:eTotalH2G2PCStart]) 
+							tempCTotal += value.(EP[:eTotalH2G2PCStart]) 
+						end
+					end
+				end
+			end
+
 		end
 
+		
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCFix = tempCFix * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)

@@ -63,12 +63,27 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 			inputs = load_h2_truck(path, sep, inputs)
 		end
 	end
+
+	# Read input data about G2P Resources
+	if isfile(string(path,sep,"HSC_g2p.csv"))
+		# Create flag for other parts of the code
+		setup["ModelH2G2P"] = 1
+		inputs = load_h2_g2p(setup,path, sep, inputs)
+		inputs = load_h2_g2p_variability(setup, path, sep, inputs)
+	else
+		setup["ModelH2G2P"] = 0
+	end
 	
 	# If emissions flag is on, read in emissions related inputs
 	if setup["H2CO2Cap"]>=1
 		inputs = load_co2_cap_hsc(setup, path, sep, inputs)
 	end
 
+	#Check whether or not there is LDS for trucks and H2 storage
+	if !haskey(inputs, "Period_Map") && 
+		(setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
+		inputs = load_period_map(setup, path, sep, inputs)
+	end
 	println("HSC Input CSV Files Successfully Read In From $path$sep")
 
 	return inputs

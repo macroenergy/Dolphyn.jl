@@ -16,7 +16,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     
-    H2_load_in = DataFrame(CSV.File(string(path,sep,"HSC_load_data.csv"), header=true), copycols=true)
+	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
+	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) # Use Time Domain Reduced data for GenX
+		H2_load_in = DataFrame(CSV.File(string(joinpath(data_directory,"HSC_load_data.csv")), header=true), copycols=true)
+	else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
+		H2_load_in = DataFrame(CSV.File(string(path,sep,"HSC_load_data.csv"), header=true), copycols=true)
+	end
 
     # Number of demand curtailment/lost load segments
 	inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)

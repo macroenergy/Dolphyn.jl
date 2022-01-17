@@ -51,10 +51,19 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_emissions(path, sep, inputs, setup, EP)
     write_h2_charge(path, sep, inputs, setup, EP)
     write_h2_storage(path, sep, inputs, setup, EP)
+
     if setup["ModelH2Trucks"] == 1
     write_h2_truck_capacity(path, sep, inputs, setup, EP)
     write_h2_truck_flow(path, sep, inputs, setup, EP)
     end
+
+
+    if setup["ModelH2G2P"] == 1
+      write_h2_g2p(path, sep, inputs, setup, EP)
+      write_p_g2p(path, sep, inputs, setup, EP)
+      write_g2p_capacity(path, sep, inputs, setup, EP)
+    end
+
   ## Print confirmation
   println("Wrote outputs HSC outputs to $path$sep")
 
