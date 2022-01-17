@@ -19,8 +19,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
-
-	println(Z)
 	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
 	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
 	## Hydrogen balance for each zone
@@ -37,7 +35,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t])) 
+	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
 			dfTemp1[t+rowoffset,4] = 0
@@ -49,15 +47,16 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 			 if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
 				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
 			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
-			end 
-	     	
+			end
+
 	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
-	     	
+
 			if setup["ModelH2Pipelines"] == 1
 			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
 			else
 				dfTemp1[t+rowoffset,7] = 0
 			end
+
 
 			if setup["ModelH2Trucks"] == 1
 				dfTemp1[t+rowoffset,8] = value.(EP[:TruckFlow][t,z])
@@ -65,13 +64,14 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
+
 		# if Z>=2
 		# 	dfTemp1[t+rowoffset,5] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 		# 	dfTemp1[t+rowoffset,6] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 		# end
 	     	dfTemp1[t+rowoffset,9] = -inputs["H2_D"][t,z]
 
-			
+
 	   	end
 		if z==1
 			dfH2Balance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)

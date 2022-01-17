@@ -16,7 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 import Pkg
 using Pkg
-Pkg.activate("GenXJulEnv")
+# Pkg.activate("DOLPHYNJulEnv")
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="0.8.0"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="0.8.4"))
 Pkg.add(Pkg.PackageSpec(name="DataStructures", version="0.18.9"))
