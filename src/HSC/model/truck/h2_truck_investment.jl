@@ -43,7 +43,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     # New installed energy capacity of truck type "j" on zone "z"
     @variable(EP, vH2CAPTRUCKENERGY[z = 1:Z, j in NEW_CAP_H2_TRUCK_ENERGY] >= 0)
 
-    # Retired energy capacity of truck type "s" on zone "z" from existing capacity
+    # Retired energy capacity of truck type "j" on zone "z" from existing capacity
     @variable(EP, vH2RETCAPTRUCKENERGY[z = 1:Z, j in RET_CAP_H2_TRUCK_ENERGY] >= 0)
 
     # Total available charging capacity in tonnes/hour
