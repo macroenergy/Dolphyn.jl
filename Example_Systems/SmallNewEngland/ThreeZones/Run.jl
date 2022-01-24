@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,11 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 cd(dirname(@__FILE__))
+
+
+
 settings_path = joinpath(pwd(), "Settings")
-#=
+
 environment_path = "../../../package_activate.jl"
 include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
-=#
+
 ### Set relevant directory paths
 src_path = "../../../src/"
 
@@ -29,16 +32,22 @@ inpath = pwd()
 println("Loading packages")
 push!(LOAD_PATH, src_path)
 
-using GenX
+using DOLPHYN
 using YAML
 
-genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path
-mysetup = YAML.load(open(genx_settings)) # mysetup dictionary stores settings and GenX-specific parameters
+genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
+hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
+mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
+mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
+global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
+mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
+mysetup = Dict()
+mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
-### Cluster time series inputs if necessary and if specified by the user
+## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
-    if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
+    if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
         println("Clustering Time Series Data...")
         cluster_inputs(inpath, settings_path, mysetup)
     else
@@ -46,19 +55,24 @@ if mysetup["TimeDomainReduction"] == 1
     end
 end
 
-### Configure solver
+# ### Configure solver
 println("Configuring Solver")
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
-#### Running a case
+# #### Running a case
 
-### Load inputs
-println("Loading Inputs")
-myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
-myinputs = load_inputs(mysetup, inpath)
+# ### Load inputs
+# println("Loading Inputs")
+ myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
+ myinputs = load_inputs(mysetup, inpath)
 
-### Generate model
-println("Generating the Optimization Model")
+# ### Load H2 inputs if modeling the hydrogen supply chain
+if mysetup["ModelH2"] == 1
+    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
+end
+
+# ### Generate model
+# println("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
@@ -66,11 +80,20 @@ println("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
-### Write output
-# Run MGA if the MGA flag is set to 1 else only save the least cost solution
+### Write power system output
+
 println("Writing Output")
 outpath = "$inpath/Results"
-write_outputs(EP, outpath, mysetup, myinputs)
+outpath=write_outputs(EP, outpath, mysetup, myinputs)
+
+# Write hydrogen supply chain outputs
+if mysetup["ModelH2"] == 1
+    outpath_H2 = "$outpath/Results_HSC"
+    write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
+end
+
+# Run MGA if the MGA flag is set to 1 else only save the least cost solution
+# Only valid for power system analysis at this point
 if mysetup["ModelingToGenerateAlternatives"] == 1
     println("Starting Model to Generate Alternatives (MGA) Iterations")
     mga(EP,inpath,mysetup,myinputs,outpath)

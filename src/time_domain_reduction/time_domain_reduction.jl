@@ -104,6 +104,7 @@ function rmse_score(y_true, y_pred)
     return rmse
 end
 
+# include("/Users/youssefshaker/Documents/GitHub/DOLPHYN-dev/src/time_domain_reduction/time_domain_reduction.jl")
 
 @doc raw"""
     parse_data(myinputs)
@@ -111,9 +112,13 @@ end
 Get load, solar, wind, and other curves from the input data.
 
 """
-function parse_data(myinputs)
+function parse_data(myinputs, mysetup)
+    
+    model_h2_flag = mysetup["ModelH2"]
+    
     RESOURCES = myinputs["RESOURCE_ZONES"]
     ZONES = myinputs["R_ZONES"]
+
     # Assuming no missing data
     solar_col_names = []
     wind_col_names = []
@@ -121,6 +126,16 @@ function parse_data(myinputs)
     solar_profiles = []
     wind_profiles = []
     var_profiles = []
+    h2_var_col_names = []
+    h2_g2p_var_col_names = []
+    h2_var_profiles = []
+    h2_g2p_var_profiles = []
+    h2_col_to_zone_map = []
+    h2_load_col_names = []
+    h2_load_profiles = []
+
+    AllHRVarConst = true
+    AllHG2PVarConst = true
 
     # LOAD - Load_data.csv
     load_profiles = [ myinputs["pD"][:,l] for l in 1:size(myinputs["pD"],2) ]
@@ -130,6 +145,7 @@ function parse_data(myinputs)
 
     # CAPACITY FACTORS - Generators_variability.csv
     for r in 1:length(RESOURCES)
+               
         if occursin("PV", RESOURCES[r]) || occursin("pv", RESOURCES[r]) || occursin("Pv", RESOURCES[r]) || occursin("Solar", RESOURCES[r]) || occursin("SOLAR", RESOURCES[r]) || occursin("solar", RESOURCES[r])
             push!(solar_col_names, RESOURCES[r])
             push!(solar_profiles, myinputs["pP_Max"][r,:])
@@ -142,6 +158,8 @@ function parse_data(myinputs)
         col_to_zone_map[RESOURCES[r]] = ZONES[r]
     end
 
+    
+
     fuel_col_names = string.(myinputs["fuels"])
     fuel_profiles = []
     AllFuelsConst = true
@@ -151,13 +169,54 @@ function parse_data(myinputs)
             AllFuelsConst = false
         end
     end
-    all_col_names = [load_col_names; var_col_names; fuel_col_names]
-    all_profiles = [load_profiles..., var_profiles..., fuel_profiles...]
-    return load_col_names, var_col_names, solar_col_names, wind_col_names, fuel_col_names, all_col_names,
-         load_profiles, var_profiles, solar_profiles, wind_profiles, fuel_profiles, all_profiles,
-         col_to_zone_map, AllFuelsConst
-end
+    
+    #Parse H2 Data
+    if model_h2_flag == 1
+        H2_RESOURCES = myinputs["H2_RESOURCE_ZONES"]    
+        H2_ZONES = myinputs["H2_R_ZONES"]
 
+        # Parsing HSC_load_data.csv
+        h2_load_profiles = [ myinputs["H2_D"][:,l] for l in 1:size(myinputs["H2_D"],2) ]
+        h2_load_col_names = ["Load_H2_tonne_per_hr_z"*string(l) for l in 1:size(h2_load_profiles)[1]]
+        h2_load_zones = [l for l in 1:size(h2_load_profiles)[1]]
+        h2_col_to_zone_map = Dict("Load_H2_tonne_per_hr_z"*string(l) => l for l in 1:size(h2_load_profiles)[1])
+
+        # CAPACITY FACTORS - HSC_Generators_variability.csv
+        for r in 1:length(H2_RESOURCES)
+            push!(h2_var_col_names, H2_RESOURCES[r])
+            push!(h2_var_profiles, myinputs["pH2_Max"][r,:])
+            h2_col_to_zone_map[H2_RESOURCES[r]] = H2_ZONES[r]
+
+            if AllHRVarConst && (minimum(myinputs["pH2_Max"][r,:]) != maximum(myinputs["pH2_Max"][r,:]))
+                AllHRVarConst = false
+            end
+        end
+
+        if mysetup["ModelH2G2P"] == 1
+            
+            H2_G2P= myinputs["H2_G2P_RESOURCE_ZONES"]    
+            H2_G2P_ZONES = myinputs["H2_G2P_ZONES"]
+
+            for r in 1:length(H2_G2P)
+                push!(h2_g2p_var_col_names, H2_G2P[r])
+                push!(h2_g2p_var_profiles, myinputs["pH2_g2p_Max"][r,:])
+
+                if AllHG2PVarConst && (minimum(myinputs["pH2_g2p_Max"][r,:]) != maximum(myinputs["pH2_g2p_Max"][r,:]))
+                    AllHG2PVarConst = false
+                end
+            end
+        end
+    end
+
+    all_col_names = [load_col_names; h2_load_col_names; var_col_names; h2_var_col_names; h2_g2p_var_col_names; fuel_col_names]
+    all_profiles = [load_profiles..., h2_load_profiles..., var_profiles..., h2_var_profiles..., h2_g2p_var_profiles..., fuel_profiles...]
+
+
+    return load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
+    fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
+    fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst
+
+end
 
 @doc raw"""
     check_condition(Threshold, R, OldColNames, ScalingMethod, TimestepsPerRepPeriod)
@@ -384,9 +443,80 @@ end
 
 
 @doc raw"""
+
+    get_load_multipliers(ClusterOutputData, ModifiedData, M, W, LoadCols, TimestepsPerRepPeriod, NewColNames, NClusters, Ncols)
+
+Get multipliers to linearly scale clustered load profiles L zone-wise such that their weighted sum equals the original zonal total load.
+Scale load profiles later using these multipliers in order to ensure that a copy of the original load is kept for validation.
+
+Find $k_z$ such that:
+
+```math
+\sum_{i \in I} L_{i,z} = \sum_{t \in T, m \in M} C_{t,m,z} \cdot \frac{w_m}{T} \cdot k_z   \: \: \: \forall z \in Z
+```
+
+where $Z$ is the set of zones, $I$ is the full time domain, $T$ is the length of one period (e.g., 168 for one week in hours),
+$M$ is the set of representative periods, $L_{i,z}$ is the original zonal load profile over time (hour) index $i$, $C_{i,m,z}$ is the
+load in timestep $i$ for representative period $m$ in zone $z$, $w_m$ is the weight of the representative period equal to the total number of
+hours that one hour in representative period $m$ represents in the original profile, and $k_z$ is the zonal load multiplier returned by the function.
+
+"""
+function get_load_multipliers(ClusterOutputData, InputData, M, W, LoadCols, TimestepsPerRepPeriod, NewColNames, NClusters, Ncols, v=false)
+
+    # Compute original zonal total loads
+    zone_sums = Dict()
+    for loadcol in LoadCols
+        zone_sums[loadcol] = sum(InputData[:, loadcol])
+    end
+
+    # Compute zonal loads per representative period
+    cluster_zone_sums = Dict()
+    for m in 1:NClusters
+        clustered_lp_DF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in LoadCols)) )
+        cluster_zone_sums[m] = Dict()
+        for loadcol in LoadCols
+            cluster_zone_sums[m][loadcol] = sum(clustered_lp_DF[:, loadcol])
+        end
+    end
+
+    # Use representative period weights to compute total zonal load of the representative profile
+    # Determine multiplier to bridge the gap between original zonal loads and representative zonal loads
+    weighted_cluster_zone_sums = Dict(loadcol => 0.0 for loadcol in LoadCols)
+    load_mults = Dict()
+    for loadcol in LoadCols
+        for m in 1:NClusters
+            weighted_cluster_zone_sums[loadcol] += (W[m]/(TimestepsPerRepPeriod))*cluster_zone_sums[m][loadcol]
+        end
+        load_mults[loadcol] = zone_sums[loadcol]/weighted_cluster_zone_sums[loadcol]
+        if v println(loadcol, ": ", weighted_cluster_zone_sums[loadcol], " vs. ", zone_sums[loadcol], " => ", load_mults[loadcol]) end
+    end
+
+    # Zone-wise validation that scaled clustered load equals original load (Don't actually scale load in this function)
+    if v
+        new_zone_sums = Dict(loadcol => 0.0 for loadcol in LoadCols)
+        for m in 1:NClusters
+            for i in 1:Ncols
+                if (NewColNames[i] in LoadCols)
+                    # Uncomment this line if we decide to scale load here instead of later. (Also remove "load_mults[NewColNames[i]]*" term from new_zone_sums computation)
+                    #ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] *= load_mults[NewColNames[i]]
+                    println("   Scaling ", M[m], " (", NewColNames[i], ") : ", cluster_zone_sums[m][NewColNames[i]], " => ", load_mults[NewColNames[i]]*sum(ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i]))
+                    new_zone_sums[NewColNames[i]] += (W[m]/(TimestepsPerRepPeriod))*load_mults[NewColNames[i]]*sum(ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i])
+                end
+            end
+        end
+        for loadcol in LoadCols
+            println(loadcol, ": ", new_zone_sums[loadcol], " =?= ", zone_sums[loadcol])
+        end
+    end
+
+    return load_mults
+end
+
+
+@doc raw"""
     cluster_inputs(inpath, settings_path, v=false, norm_plot=false, silh_plot=false, res_plots=false, indiv_plots=false, pair_plots=false)
 
-Use kmeans or kemoids to cluster raw load profiles and resource capacity factor profiles
+Use kmeans or kmedoids to cluster raw load profiles and resource capacity factor profiles
 into representative periods. Use Extreme Periods to capture noteworthy periods or
 periods with notably poor fits.
 
@@ -433,9 +563,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     ##### Step 0: Load in settings and data
 
+    # Read time domain reduction settings file time_domain_reduction_settings.yml
     myTDRsetup = YAML.load(open(joinpath(settings_path,"time_domain_reduction_settings.yml")))
 
-    # Accept Model Parameters from the Settings File time_domain_reduction_settings.yml
+    # Accept model parameters from the settings file time_domain_reduction_settings.yml
     TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
     ClusterMethod = myTDRsetup["ClusterMethod"]
     ScalingMethod = myTDRsetup["ScalingMethod"]
@@ -452,47 +583,59 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ClusterFuelPrices = myTDRsetup["ClusterFuelPrices"]
     TimeDomainReductionFolder = mysetup["TimeDomainReductionFolder"]
 
+    # Set output filenames for later
     Load_Outfile = joinpath(TimeDomainReductionFolder, "Load_data.csv")
     GVar_Outfile = joinpath(TimeDomainReductionFolder, "Generators_variability.csv")
     Fuel_Outfile = joinpath(TimeDomainReductionFolder, "Fuels_data.csv")
     PMap_Outfile = joinpath(TimeDomainReductionFolder, "Period_map.csv")
+    H2Load_Outfile = joinpath(TimeDomainReductionFolder, "HSC_load_data.csv")
+    H2RVar_Outfile = joinpath(TimeDomainReductionFolder, "HSC_generators_variability.csv")
+    H2G2PVar_Outfile = joinpath(TimeDomainReductionFolder, "HSC_g2p_variability.csv")
     YAML_Outfile = joinpath(TimeDomainReductionFolder, "time_domain_reduction_settings.yml")
 
-    if v println("Loading inputs") end
-    myinputs=Dict()
-    # Define a local version of the setup so that you can modify the mysetup["ParameterScale] value to be zero in case it is 1
+    # Define a local version of the setup so that you can modify the mysetup["ParameterScale"] value to be zero in case it is 1
     mysetup_local = mysetup
     # If ParameterScale =1 then make it zero, since clustered inputs will be scaled prior to generating model
     mysetup_local["ParameterScale"]=0  # Performing cluster and report outputs in user-provided units
+    if v println("Loading inputs") end
+    myinputs=Dict()
     myinputs = load_inputs(mysetup_local,inpath)
+
+    if mysetup["ModelH2"] == 1
+      myinputs = load_h2_inputs(myinputs, mysetup_local, inpath)
+    end
 
     if v println() end
 
-    # LATER Replace these with collections of col_names, profiles, zones
-    load_col_names, var_col_names, solar_col_names, wind_col_names, fuel_col_names, all_col_names,
-         load_profiles, var_profiles, solar_profiles, wind_profiles, fuel_profiles, all_profiles,
-         col_to_zone_map, AllFuelsConst = parse_data(myinputs)
+    # Parse input data into useful structures divided by type (load, wind, solar, fuel, groupings thereof, etc.)
+    # TO DO LATER: Replace these with collections of col_names, profiles, zones
+    load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
+    fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
+    fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst = parse_data(myinputs, mysetup)
 
     # Remove Constant Columns - Add back later in final output
     all_profiles, all_col_names, ConstData, ConstCols, ConstIdx = RemoveConstCols(all_profiles, all_col_names, v)
 
+    # Determine whether or not to time domain reduce fuel profiles as well based on user choice and file structure (i.e., variable fuels in Fuels_data.csv)
     IncludeFuel = true
     if (ClusterFuelPrices != 1) || (AllFuelsConst) IncludeFuel = false end
 
+    # Put it together!
     InputData = DataFrame( Dict( all_col_names[c]=>all_profiles[c] for c in 1:length(all_col_names) ) )
     if v
         println("Load (MW) and Capacity Factor Profiles: ")
         println(describe(InputData))
         println()
     end
-
     OldColNames = names(InputData)
-    NewColNames = [OldColNames; :GrpWeight]
+    NewColNames = [Symbol.(OldColNames); :GrpWeight]
     Nhours = nrow(InputData) # Timesteps
+    Ncols = length(NewColNames) - 1
 
 
     ##### Step 1: Normalize or standardize all load, renewables, and fuel data / optionally scale with LoadWeight
 
+    # Normalize/standardize data based on user-provided method
     if ScalingMethod == "N"
         normProfiles = [ StatsBase.transform(fit(UnitRangeTransform, InputData[:,c]; dims=1, unit=true), InputData[:,c]) for c in 1:length(OldColNames)  ]
     elseif ScalingMethod == "S"
@@ -503,9 +646,11 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         normProfiles = [ StatsBase.transform(fit(UnitRangeTransform, InputData[:,c]; dims=1, unit=true), InputData[:,c]) for c in 1:length(OldColNames)  ]
     end
 
+    # Compile newly normalized/standardized profiles
     AnnualTSeriesNormalized = DataFrame(Dict(  OldColNames[c] => normProfiles[c] for c in 1:length(OldColNames) ))
 
-    if LoadWeight != 1   # If we want to value load more/less than capacity factors. Assume nonnegative.
+    # Optional pre-scaling of load in order to give it more preference in clutering algorithm
+    if LoadWeight != 1   # If we want to value load more/less than capacity factors. Assume nonnegative. LW=1 means no scaling.
         for c in load_col_names
             AnnualTSeriesNormalized[!, Symbol(c)] .= AnnualTSeriesNormalized[!, Symbol(c)] .* LoadWeight
         end
@@ -520,16 +665,18 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     ##### STEP 2: Identify extreme periods in the model, Reshape data for clustering
 
-    # Total number of subperiod available in the data set, where each subperiod length = NumGrpDays
+    # Total number of subperiods available in the dataset, where each subperiod length = TimestepsPerRepPeriod
     NumDataPoints = Nhours÷TimestepsPerRepPeriod # 364 weeks in 7 years
     if v println("Total Subperiods in the data set: ", NumDataPoints) end
-    InputData[:, :Group] .= (1:Nhours) .÷ (TimestepsPerRepPeriod+0.0001) .+ 1
+    InputData[:, :Group] .= (1:Nhours) .÷ (TimestepsPerRepPeriod+0.0001) .+ 1    # Group col identifies the subperiod ID of each hour (e.g., all hours in week 2 have Group=2 if using TimestepsPerRepPeriod=168)
 
+    # Group by period (e.g., week)
     cgdf = combine(groupby(InputData, :Group), [c .=> sum for c in OldColNames])
     cgdf = cgdf[setdiff(1:end, NumDataPoints+1), :]
     rename!(cgdf, [:Group; Symbol.(OldColNames)])
 
-    # Extreme Period Identification
+    # Extreme period identification based on user selection in time_domain_reduction_settings.yml
+    LoadExtremePeriod = false        # Used when deciding whether or not to scale load curves to equal original total load
     ExtremeWksList = []
     if UseExtremePeriods == 1
       for profKey in keys(ExtPeriodSelections)
@@ -537,6 +684,9 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
               for typeKey in keys(ExtPeriodSelections[profKey][geoKey])
                   for statKey in keys(ExtPeriodSelections[profKey][geoKey][typeKey])
                       if ExtPeriodSelections[profKey][geoKey][typeKey][statKey] == 1
+                          if profKey == "Load"
+                              LoadExtremePeriod = true
+                          end
                           if geoKey == "System"
                               if v print(geoKey, " ") end
                               (stat, group_idx) = get_extreme_period(InputData, cgdf, profKey, typeKey, statKey, ConstCols, load_col_names, solar_col_names, wind_col_names, v)
@@ -576,15 +726,14 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ### DATA MODIFICATION - Shifting InputData and Normalized InputData
     #    from 8760 (# hours) by n (# profiles) DF to
     #    168*n (n period-stacked profiles) by 52 (# periods) DF
-
     DFsToConcat = [stack(InputData[isequal.(InputData.Group,w),:], OldColNames)[!,:value] for w in 1:NumDataPoints if w <= NumDataPoints ]
     ModifiedData = DataFrame(Dict(Symbol(i) => DFsToConcat[i] for i in 1:NumDataPoints))
-
 
     AnnualTSeriesNormalized[:, :Group] .= (1:Nhours) .÷ (TimestepsPerRepPeriod+0.0001) .+ 1
     DFsToConcatNorm = [stack(AnnualTSeriesNormalized[isequal.(AnnualTSeriesNormalized.Group,w),:], OldColNames)[!,:value] for w in 1:NumDataPoints if w <= NumDataPoints ]
     ModifiedDataNormalized = DataFrame(Dict(Symbol(i) => DFsToConcatNorm[i] for i in 1:NumDataPoints))
 
+    # Remove extreme periods from normalized data before clustering
     NClusters = MinPeriods
     if UseExtremePeriods == 1
         if v println("Pre-removal: ", names(ModifiedDataNormalized)) end
@@ -598,7 +747,6 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
 
     ##### STEP 3: Clustering
-
     cluster_results = []
 
     # Cluster once regardless of iteration decisions
@@ -641,14 +789,13 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     W = last(cluster_results)[3]  # Weights
     M = last(cluster_results)[4]  # Centers or Medoids
     DistMatrix = last(cluster_results)[5]  # Pairwise distances
-
     if v
         println("Total Groups Assigned to Each Cluster: ", W)
         println("Sum Cluster Weights: ", sum(W))
         println("Representative Periods: ", M)
     end
 
-    # K-medoids returns indices from DistMatrix as its medoids.
+    # K-means/medoids returns indices from DistMatrix as its medoids.
     #   This does not account for missing extreme weeks.
     #   This is corrected retroactively here.
     M = [parse(Int64, string(names(ClusteringInputDF)[i])) for i in M]
@@ -657,8 +804,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     ##### Step 4: Aggregation
     # Add the subperiods corresponding to the extreme periods back into the data.
-    # Rescaling weights to account for partial period cut out.
-    # Rescaling load to ensure total demand is equal
+    # Rescale weights to total user-specified number of hours (e.g., 8760 for one year).
+    # If LoadExtremePeriod=false (because we don't want to change peak load day), rescale load to ensure total demand is equal
+
+    # Add extreme periods into the clustering result with # of occurences = 1 for each
     ExtremeWksList = sort(ExtremeWksList)
     if UseExtremePeriods == 1
         if v println("Extreme Periods: ", ExtremeWksList) end
@@ -671,10 +820,13 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     end
 
     N = W  # Keep cluster version of weights stored as N, number of periods represented by RP
+
+    # Rescale weights to total user-specified number of hours
     W = scale_weights(W, WeightTotal, v)
 
-    # SORT A W M in conjunction, chronologically by M, before handling them elsewhere to be consistent
-    # A points to an index of M. We need it to point to a new index of sorted M.
+    # Order representative periods chronologically
+    #   SORT A W M in conjunction, chronologically by M, before handling them elsewhere to be consistent
+    #   A points to an index of M. We need it to point to a new index of sorted M. Hence, AssignMap.
     old_M = M
     df_sort = DataFrame( Weights = W, NumPeriods = N, Rep_Period = M)
     sort!(df_sort, [:Rep_Period])
@@ -684,49 +836,44 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     AssignMap = Dict( i => findall(x->x==old_M[i], M)[1] for i in 1:length(M))
     A = [AssignMap[a] for a in A]
 
-    # Make PeriodMap
+    # Make PeriodMap, maps each period to its representative period
     PeriodMap = DataFrame(Period_Index = 1:length(A),
                             Rep_Period = [M[a] for a in A],
                             Rep_Period_Index = [a for a in A])
 
-    # Get column names by type for later analysis
+    # Get Symbol-version of column names by type for later analysis
     LoadCols = [Symbol("Load_MW_z"*string(i)) for i in 1:length(load_col_names) ]
     VarCols = [Symbol(var_col_names[i]) for i in 1:length(var_col_names) ]
     FuelCols = [Symbol(fuel_col_names[i]) for i in 1:length(fuel_col_names) ]
     ConstCol_Syms = [Symbol(ConstCols[i]) for i in 1:length(ConstCols) ]
 
-    # SCALE LOAD - The representative period's load times the number of periods it represents
-    #  should equal the total load of all the periods it represents (within each load zone)
-    MultMap = Dict()
-    for m in 1:NClusters
-        MultMap[M[m]] = Dict()
-        periods_represented = findall(x->x==m, A)
-        for loadcol in LoadCols
-            ### ADD HERE
-            if loadcol ∉ ConstCol_Syms
-                persums = [sum(InputData[(TimestepsPerRepPeriod*(i-1)+1):(TimestepsPerRepPeriod*i),loadcol]) for i in periods_represented]
-                if length(periods_represented) < 1
-                    multiplier = 0
-                else
-                    sum_persums = sum(persums)
-                    sum_load = sum(InputData[(TimestepsPerRepPeriod*(M[m]-1)+1):(TimestepsPerRepPeriod*M[m]),loadcol])
-                    multiplier = sum_persums / (length(periods_represented)*sum_load)
-                end
-                MultMap[M[m]][loadcol] = multiplier
-            end
-        end
+    if mysetup["ModelH2"] == 1
+        H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_col_names) ]
+        H2VarCols = [Symbol(h2_var_col_names[i]) for i in 1:length(h2_var_col_names) ]
+        H2G2PVarCols = [Symbol(h2_g2p_var_col_names[i]) for i in 1:length(h2_g2p_var_col_names) ]
     end
 
     # Cluster Ouput: The original data at the medoids/centers
-    ClusterOutputData = ModifiedData[:,M]
+    ClusterOutputData = ModifiedData[:,Symbol.(M)]
+
+    # Get zone-wise load multipliers for later scaling in order for weighted-representative-total-zonal load to equal original total-zonal load
+    #  (Only if we don't have load-related extreme periods because we don't want to change peak load periods)
+    if !LoadExtremePeriod
+        load_mults = get_load_multipliers(ClusterOutputData, InputData, M, W, LoadCols, TimestepsPerRepPeriod, NewColNames, NClusters, Ncols)
+    end
 
     # Reorganize Data by Load, Solar, Wind, Fuel, and GrpWeight by Hour, Add Constant Data Back In
     rpDFs = [] # Representative Period DataFrames - Load and Resource Profiles
     gvDFs = [] # Generators Variability DataFrames - Just Resource Profiles
     lpDFs = [] # Load Profile DataFrames - Just Load Profiles
     fpDFs = [] # Fuel Profile DataFrames - Just Fuel Profiles
-    Ncols = length(NewColNames) - 1
 
+    if mysetup["ModelH2"] == 1
+        hrvDFs = [] # Hydrogen resource variability DataFrames
+        hlpDFs = [] # Hydrogen load profiles
+        hrvg2pDFs = []
+    end
+    
     for m in 1:NClusters
         rpDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols) )
         gvDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in VarCols)) )
@@ -734,6 +881,33 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         if IncludeFuel fpDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in FuelCols)) ) end
         if !IncludeFuel fpDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod) end
 
+        if mysetup["ModelH2"] == 1
+            hrvDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2VarCols)) )
+            hlpDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2LoadCols)) )
+
+            if AllHRVarConst
+                hrvDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
+            end
+            
+            if mysetup["ModelH2G2P"] == 1
+
+                hrvg2pDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2G2PVarCols)))
+
+                if AllHG2PVarConst
+                    hrvg2pDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
+                end
+
+            else
+                hrvg2pDF = []
+            end
+
+
+        else
+            hrvDF = []
+            hlpDF = []
+            hrvg2pDF = []
+        end
+                
         # Add Constant Columns back in
         for c in 1:length(ConstCols)
             rpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
@@ -743,15 +917,34 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
                 fpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
             elseif Symbol(ConstCols[c]) in LoadCols
                 lpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
+            elseif mysetup["ModelH2"] == 1
+                if Symbol(ConstCols[c]) in H2VarCols
+                    hrvDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
+                elseif Symbol(ConstCols[c]) in H2LoadCols
+                    hlpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
+                end
+
+                if mysetup["ModelH2G2P"] == 1
+
+                    if Symbol(ConstCols[c]) in H2G2PVarCols
+                        hrvg2pDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
+                    end
+
+                end
+
             end
         end
+
         if !IncludeFuel select!(fpDF, Not(:Placeholder)) end
+        
 
         # Scale Load using previously identified multipliers
         #   Scale lpDF but not rpDF which compares to input data but is not written to file.
-        for loadcol in LoadCols
-            if loadcol ∉ ConstCol_Syms
-                lpDF[!,loadcol] .*= MultMap[M[m]][loadcol]
+        if !LoadExtremePeriod
+            for loadcol in LoadCols
+                if loadcol ∉ ConstCol_Syms
+                    lpDF[!,loadcol] .*= load_mults[loadcol]
+                end
             end
         end
 
@@ -761,12 +954,33 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         push!(gvDFs, gvDF)
         push!(lpDFs, lpDF)
         push!(fpDFs, fpDF)
+        
+        if mysetup["ModelH2"] == 1
+            if AllHRVarConst select!(hrvDF, Not(:Placeholder)) end 
+            push!(hrvDFs, hrvDF)
+            push!(hlpDFs, hlpDF)
+
+            if mysetup["ModelH2G2P"] == 1
+                if AllHG2PVarConst select!(hrvg2pDF, Not(:Placeholder))end
+                push!(hrvg2pDFs, hrvg2pDF)
+            end
+
+        end
     end
     FinalOutputData = vcat(rpDFs...)  # For comparisons with input data to evaluate clustering process
     GVOutputData = vcat(gvDFs...)     # Generators Variability
     LPOutputData = vcat(lpDFs...)     # Load Profiles
     FPOutputData = vcat(fpDFs...)     # Load Profiles
 
+    if mysetup["ModelH2"] == 1
+        HLPOutputData = vcat(hlpDFs...) #Hydrogen Load Profiles
+        HRVOutputData = vcat(hrvDFs...) #Hydrogen Resource Variability Profiles
+        
+        if mysetup["ModelH2G2P"] == 1
+            HG2POutputData = vcat(hrvg2pDFs...)
+        end
+
+    end
 
     ##### Step 5: Evaluation
 
@@ -834,6 +1048,54 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ### Period_map.csv
     if v println("Writing period map...") end
     CSV.write(string(inpath,sep,PMap_Outfile), PeriodMap)
+
+    ### Write Hydrogen Outputs
+    if mysetup["ModelH2"] == 1
+        #Write h2_load_data.csv
+        h2_load_in = DataFrame(CSV.File(string(inpath,sep,"HSC_load_data.csv"), header=true), copycols=true)
+        h2_load_in[!,:Sub_Weights] = h2_load_in[!,:Sub_Weights] * 1.
+        h2_load_in[1:length(W),:Sub_Weights] .= W
+        h2_load_in[!,:Rep_Periods][1] = length(W)
+        h2_load_in[!,:Timesteps_per_Rep_Period][1] = TimestepsPerRepPeriod
+        select!(h2_load_in, Not(H2LoadCols))
+        select!(h2_load_in, Not(:Time_Index))
+        Time_Index_M = Union{Int64, Missings.Missing}[missing for i in 1:size(h2_load_in,1)]
+        Time_Index_M[1:size(HLPOutputData,1)] = 1:size(HLPOutputData,1)
+        h2_load_in[!,:Time_Index] .= Time_Index_M
+
+        for c in H2LoadCols
+            new_col = Union{Float64, Missings.Missing}[missing for i in 1:size(h2_load_in,1)]
+            new_col[1:size(HLPOutputData,1)] = HLPOutputData[!,c]
+            h2_load_in[!,c] .= new_col
+        end
+        
+        h2_load_in = h2_load_in[1:size(HLPOutputData,1),:]
+
+        if v println("Writing load file...") end
+        CSV.write(string(inpath,sep,H2Load_Outfile), h2_load_in)
+
+        #Write HSC Resource Variability 
+        # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
+        HRVColMap = Dict(myinputs["H2_RESOURCE_ZONES"][i] => myinputs["H2_RESOURCES_NAME"][i] for i in 1:length(myinputs["H2_RESOURCES_NAME"]))
+        HRVColMap["Time_Index"] = "Time_Index"
+        HRVOutputData = HRVOutputData[!, Symbol.(myinputs["H2_RESOURCE_ZONES"])]
+        insertcols!(HRVOutputData, 1, :Time_Index => 1:size(HRVOutputData,1))
+        NewHRVColNames = [HRVColMap[string(c)] for c in names(HRVOutputData)]
+        if v println("Writing resource file...") end
+        CSV.write(string(inpath,sep,H2RVar_Outfile), HRVOutputData, header=NewHRVColNames)
+
+        if mysetup["ModelH2G2P"] == 1
+            #Write HSC Resource Variability 
+            # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
+            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => myinputs["H2_G2P_NAME"][i] for i in 1:length(myinputs["H2_G2P_NAME"]))
+            HG2PVColMap["Time_Index"] = "Time_Index"
+            HG2POutputData = HG2POutputData[!, Symbol.(myinputs["H2_G2P_RESOURCE_ZONES"])]
+            insertcols!(HG2POutputData, 1, :Time_Index => 1:size(HG2POutputData,1))
+            NewHG2PVColNames = [HG2PVColMap[string(c)] for c in names(HG2POutputData)]
+            if v println("Writing resource file...") end
+            CSV.write(string(inpath,sep,H2G2PVar_Outfile), HG2POutputData, header=NewHG2PVColNames)
+        end
+    end
 
     ### time_domain_reduction_settings.yml
     if v println("Writing .yml settings...") end
