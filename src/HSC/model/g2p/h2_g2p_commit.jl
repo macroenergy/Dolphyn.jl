@@ -105,7 +105,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 		###Constraints###
 		@constraints(EP, begin
 		#Power Balance
-		[k in H2_G2P_COMMIT, t = 1:T], EP[:vPG2P][k,t] == EP[:vH2G2P][k,t] * dfH2G2P[!,:etaP2G_MWh_p_tonne][k]
+		[k in H2_G2P_COMMIT, t = 1:T], EP[:vPG2P][k,t] == EP[:vH2G2P][k,t] * dfH2G2P[!,:etaG2P_MWh_p_tonne][k]
 	end)
 
 	### Capacitated limits on unit commitment decision variables (Constraints #1-3)

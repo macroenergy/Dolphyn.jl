@@ -43,7 +43,7 @@ function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 
 	## Constraints on retirements and capacity additions
 	# Cannot retire more capacity than existing capacity
-	@constraint(EP, cH2G2PMaxRetNoCommit[k in setdiff(H2_G2P_RET_CAP, H2_G2P_COMMIT)], EP[:vH2G2PRetCap][k] <= dfH2G2P[!,:Existing_Cap_MW][k])
+	@constraint(EP, cH2G2PMaxRetNoCommit[k in setdiff(H2_G2P_RET_CAP, H2_G2P_NO_COMMIT)], EP[:vH2G2PRetCap][k] <= dfH2G2P[!,:Existing_Cap_MW][k])
 	@constraint(EP, cH2G2PMaxRetCommit[k in intersect(H2_G2P_RET_CAP, H2_G2P_COMMIT)], dfH2G2P[!,:Cap_Size_MW][k] * EP[:vH2G2PRetCap][k] <= dfH2G2P[!,:Existing_Cap_MW][k])
 
 	## Constraints on new built capacity
