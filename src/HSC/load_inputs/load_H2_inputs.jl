@@ -56,13 +56,12 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 		inputs["H2_P"] = 0
 	end
 
-	# Read input data about hydrogen trasport truck types
-	if isfile(string(path,sep,"HSC_truck.csv"))
-		# Create flag for other parts of the code
-		setup["ModelH2Trucks"] = 1
-		inputs = load_h2_truck(path, sep, inputs)
-	else
-		setup["ModelH2Trucks"] = 0
+	# Read input data about hydrogen transport truck types
+	if setup["ModelH2Trucks"] == 1
+		if isfile(string(path,sep,"HSC_truck.csv"))
+			# Create flag for other parts of the code
+			inputs = load_h2_truck(path, sep, inputs)
+		end
 	end
 
 	# Read input data about G2P Resources
