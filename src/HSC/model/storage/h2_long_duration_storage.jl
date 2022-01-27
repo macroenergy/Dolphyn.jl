@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -12,6 +12,11 @@ GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+@doc raw"""
+	h2_long_duration_storage(EP::Model, inputs::Dict)
+
 """
 function h2_long_duration_storage(EP::Model, inputs::Dict)
 

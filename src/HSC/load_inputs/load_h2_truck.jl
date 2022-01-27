@@ -14,6 +14,10 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
+
+"""
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 
     Z = inputs_truck["Z"]

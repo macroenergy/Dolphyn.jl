@@ -14,6 +14,10 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
+
+"""
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
     println("H2 truck Investment Module")
