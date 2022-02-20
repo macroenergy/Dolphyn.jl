@@ -3,5 +3,5 @@ H2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer - 0
 ModelH2Pipelines: 0 # Whether to model pipeline in hydrogen supply chain - 0 - not included, 1 - included
 ModelH2Trucks: 0 # Whether to model truck in hydrogen supply chain - 0 - not included, 1 - included
 H2GenCommit: 0 # Continuous or discrete capacity representation of H2 production technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as integer variables;
-H2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
-H2CO2Cap: 1 # CO2 emissions cap for HSC only; 0 = not active (no CO2 emission limit); 1 = mass-based emission limit constraint; 2 = load + rate-based emission limit constraint; 3 = generation + rate-based emission limit constraint; 4 = emissions penalized via a carbon price
+H2NetworkExpansion: 1 # Transmission network expansion; 0 = not active; 1 = active systemwide
+H2CO2Cap: 0 # CO2 emissions cap for HSC only; 0 = not active (no CO2 emission limit); 1 = mass-based emission limit constraint; 2 = load + rate-based emission limit constraint; 3 = generation + rate-based emission limit constraint; 4 = emissions penalized via a carbon price

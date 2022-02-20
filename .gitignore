@@ -15,7 +15,6 @@ time_domain_reduction/PreCluster_Plots.jl
 time_domain_reduction/TSC_Plots.jl
 time_domain_reduction/TSC.jl
 gurobi.log
-Example_Systems/SmallNewEngland/ThreeZones/TDR_*
 Example_Systems/RealSystemExample/ISONE_Singlezone/Manifest.toml
 Example_Systems/RealSystemExample/ISONE_Singlezone/Results*
 Example_Systems/RealSystemExample/ISONE_Trizone/Results*
@@ -24,6 +23,9 @@ Example_Systems/RealSystemExample/MGA_ISONE_Trizone_FullTimeseries/Results*
 Example_Systems/SmallNewEngland/OneZone/Results*
 Example_Systems/SmallNewEngland/OneZone_3VREBin/Results*
 Example_Systems/SmallNewEngland/ThreeZones/Results*
+Example_Systems/SmallNewEngland/ThreeZones/TDR_*
+Example_Systems/SmallNewEngland/SevenZones/Results*
+Example_Systems/SmallNewEngland/SevenZones/TDR_*
 /docs/build/
 Example_Systems/NYISO/Capacity_reserve_margin.csv
 Example_Systems/NYISO/CO2_cap.csv
