@@ -61,7 +61,7 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 
 	EP[:ePowerBalance] += ePowerBalanceDisp
 
-	### Constratints ###
+	### Constraints ###
 	# For resource for which we are modeling hourly power output
 	for y in VRE_POWER_OUT
 		# Define the set of generator indices corresponding to the different sites (or bins) of a particular VRE technology (E.g. wind or solar) in a particular zone.
@@ -84,7 +84,7 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 	for y in VRE_NO_POWER_OUT
 		fix.(EP[:vP][y,:], 0.0, force=true)
 	end
-	##CO2 Polcy Module VRE Generation by zone
+	##CO2 Policy Module VRE Generation by zone
 	@expression(EP, eGenerationByVRE[z=1:Z, t=1:T], # the unit is GW
 		sum(EP[:vP][y,t] for y in intersect(inputs["VRE"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
 	)

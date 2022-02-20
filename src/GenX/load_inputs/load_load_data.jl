@@ -67,7 +67,7 @@ function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, 
 		end
 	end
 
-	# Create time set steps indicies
+	# Create time set steps indices
 	inputs_load["hours_per_subperiod"] = div.(T,inputs_load["REP_PERIOD"]) # total number of hours per subperiod
 	hours_per_subperiod = inputs_load["hours_per_subperiod"] # set value for internal use
 

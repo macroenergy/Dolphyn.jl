@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_minimum_capacity_requirement(path::AbstractString,sep::AbstractString, inputs::Dict, setup::Dict)
 
-Function for reading input parameters related to mimimum capacity requirement constraints (e.g. technology specific deployment mandates)
+Function for reading input parameters related to minimum capacity requirement constraints (e.g. technology specific deployment mandates)
 """
 function load_minimum_capacity_requirement(path::AbstractString,sep::AbstractString, inputs::Dict, setup::Dict)
 	#MinCapReq = CSV.read(string(path,sep,"Minimum_capacity_requirement.csv"), header=true)

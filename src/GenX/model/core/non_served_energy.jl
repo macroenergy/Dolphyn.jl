@@ -97,7 +97,7 @@ function non_served_energy(EP::Model, inputs::Dict)
 	# Add non-served energy/curtailed demand contribution to power balance expression
 	EP[:ePowerBalance] += ePowerBalanceNse
 
-	### Constratints ###
+	### Constraints ###
 
 	# Demand curtailed in each segment of curtailable demands cannot exceed maximum allowable share of demand
 	@constraint(EP, cNSEPerSeg[s=1:SEG, t=1:T, z=1:Z], vNSE[s,t,z] <= inputs["pMax_D_Curtail"][s]*inputs["pD"][t,z])

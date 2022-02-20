@@ -239,11 +239,11 @@ function thermal_commit(EP::Model, inputs::Dict, Reserves::Int)
 			[t in setdiff(INTERIOR_SUBPERIODS,Up_Time_HOURS)], EP[:vCOMMIT][y,t] >= sum(EP[:vSTART][y,e] for e=(t-dfGen[!,:Up_Time][y]):t)
 
 			# cUpTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
-			# cUpTimeWrap constraint equivalant to: sum(EP[:vSTART][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vSTART][y,e] for e=(hours_per_subperiod_max-(dfGen[!,:Up_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
+			# cUpTimeWrap constraint equivalent to: sum(EP[:vSTART][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vSTART][y,e] for e=(hours_per_subperiod_max-(dfGen[!,:Up_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
 			[t in Up_Time_HOURS], EP[:vCOMMIT][y,t] >= sum(EP[:vSTART][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vSTART][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfGen[!,:Up_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
 
 			# cUpTimeStart:
-			# NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
+			# NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalent to "hours_per_subperiod_max"
 			[t in START_SUBPERIODS], EP[:vCOMMIT][y,t] >= EP[:vSTART][y,t]+sum(EP[:vSTART][y,e] for e=((t+hours_per_subperiod-1)-(dfGen[!,:Up_Time][y]-1)):(t+hours_per_subperiod-1))
 		end)
 
@@ -261,11 +261,11 @@ function thermal_commit(EP::Model, inputs::Dict, Reserves::Int)
 			[t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eTotalCap][y]/dfGen[!,:Cap_Size][y]-EP[:vCOMMIT][y,t] >= sum(EP[:vSHUT][y,e] for e=(t-dfGen[!,:Down_Time][y]):t)
 
 			# cDownTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
-			# cDownTimeWrap constraint equivalant to: EP[:eTotalCap][y]/dfGen[!,:Cap_Size][y]-EP[:vCOMMIT][y,t] >= sum(EP[:vSHUT][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vSHUT][y,e] for e=(hours_per_subperiod_max-(dfGen[!,:Down_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
+			# cDownTimeWrap constraint equivalent to: EP[:eTotalCap][y]/dfGen[!,:Cap_Size][y]-EP[:vCOMMIT][y,t] >= sum(EP[:vSHUT][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vSHUT][y,e] for e=(hours_per_subperiod_max-(dfGen[!,:Down_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
 			[t in Down_Time_HOURS], EP[:eTotalCap][y]/dfGen[!,:Cap_Size][y]-EP[:vCOMMIT][y,t] >= sum(EP[:vSHUT][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vSHUT][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfGen[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
 
 			# cDownTimeStart:
-			# NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
+			# NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalent to "hours_per_subperiod_max"
 			[t in START_SUBPERIODS], EP[:eTotalCap][y]/dfGen[!,:Cap_Size][y]-EP[:vCOMMIT][y,t]  >= EP[:vSHUT][y,t]+sum(EP[:vSHUT][y,e] for e=((t+hours_per_subperiod-1)-(dfGen[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1))
 		end)
 	end
@@ -316,7 +316,7 @@ When modeling frequency regulation and spinning reserves contributions, thermal 
 \end{aligned}
 ```
 
-Note there are multiple versions of these constraints in the code in order to avoid creation of unecessary constraints and decision variables for thermal units unable to provide regulation and/or reserves contributions due to input parameters (e.g. ```Reg_Max=0``` and/or ```RSV_Max=0```).
+Note there are multiple versions of these constraints in the code in order to avoid creation of unnecessary constraints and decision variables for thermal units unable to provide regulation and/or reserves contributions due to input parameters (e.g. ```Reg_Max=0``` and/or ```RSV_Max=0```).
 """
 function thermal_commit_reserves(EP::Model, inputs::Dict)
 

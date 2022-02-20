@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_generation(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
+The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyze, natural gas reforming etc.) without unit commitment constraints
 
 """
 
@@ -59,7 +59,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
 
 
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	##For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
 
 
@@ -75,7 +75,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k]* inputs["pH2_Max"][k,t]
 	end)
 
-	#Ramping cosntraints 
+	#Ramping constraints 
 	@constraints(EP, begin
 
 		## Maximum ramp up between consecutive hours

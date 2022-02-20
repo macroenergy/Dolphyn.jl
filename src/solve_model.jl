@@ -19,9 +19,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 inputs: jump_model - a model object containing that has been previously solved.
 
-description: fixes the iteger variables ones the model has been solved in order to calculate approximations of dual variables
+description: fixes the integer variables ones the model has been solved in order to calculate approximations of dual variables
 
-returns: none (modifies an existing-solved model in the memory). solve() must be run again to solve and getdual veriables
+returns: none (modifies an existing-solved model in the memory). solve() must be run again to solve and getdual variables
 
 """
 function fix_integers(jump_model::Model)
@@ -30,11 +30,11 @@ function fix_integers(jump_model::Model)
 	##
 	## inputs: jump_model - a model object containing that has been previously solved.
 	##
-	## description: fixes the iteger variables ones the model has been solved in order
+	## description: fixes the integer variables ones the model has been solved in order
 	## to calculate approximations of dual variables
 	##
 	## returns: no result since it modifies an existing-solved model in the memory.
-	## solve() must be run again to solve and getdual veriables
+	## solve() must be run again to solve and getdual variables
 	##
 	################################################################################
 	values = Dict(v => value(v) for v in all_variables(jump_model))
@@ -85,7 +85,7 @@ function solve_model(EP::Model, setup::Dict)
 	end
 
 	if !has_duals(EP) && setup["WriteShadowPrices"] == 1
-		# function to fix integers and linearize problem
+		# function to fix integers and linear problem
 		fix_integers(EP)
 		# re-solve statement for LP solution
 		println("Solving LP solution for duals")

@@ -135,7 +135,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 			tempCStart = tempCStart * (ModelScalingFactor^2)
 		end
 
-		# Add emisions penalty related costs if the constraints are active to variable and total costs
+		# Add emissions penalty related costs if the constraints are active to variable and total costs
 		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
 		if setup["CO2Cap"]==4
 			tempCVar  = tempCVar + value.(EP[:eCEmissionsPenaltybyZone])[z]

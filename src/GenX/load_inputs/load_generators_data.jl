@@ -40,12 +40,12 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 
 	# Set of storage resources with symmetric charge/discharge capacity
 	inputs_gen["STOR_SYMMETRIC"] = gen_in[gen_in.STOR.==1,:R_ID]
-	# Set of storage resources with asymmetric (separte) charge/discharge capacity components
+	# Set of storage resources with asymmetric (separate) charge/discharge capacity components
 	inputs_gen["STOR_ASYMMETRIC"] = gen_in[gen_in.STOR.==2,:R_ID]
 	# Set of all storage resources
 	inputs_gen["STOR_ALL"] = union(inputs_gen["STOR_SYMMETRIC"],inputs_gen["STOR_ASYMMETRIC"])
 
-	# Set of storage resources with long duration storage capabilitites
+	# Set of storage resources with long duration storage capabilities
 	#if setup["LongDurationStorage"] == 1
 		inputs_gen["STOR_HYDRO_LONG_DURATION"] = gen_in[(gen_in.LDS.==1) .& (gen_in.HYDRO.==1),:R_ID]
 		inputs_gen["STOR_LONG_DURATION"] = gen_in[(gen_in.LDS.==1) .& (gen_in.STOR.==1),:R_ID]
@@ -68,11 +68,11 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 
 	# Set of thermal generator resources
 	if setup["UCommit"]>=1
-		# Set of thermal resources eligible for unit committment
+		# Set of thermal resources eligible for unit commitment
 		inputs_gen["THERM_COMMIT"] = gen_in[gen_in.THERM.==1,:R_ID]
-		# Set of thermal resources not eligible for unit committment
+		# Set of thermal resources not eligible for unit commitment
 		inputs_gen["THERM_NO_COMMIT"] = gen_in[gen_in.THERM.==2,:R_ID]
-	else # When UCommit == 0, no thermal resources are eligible for unit committment
+	else # When UCommit == 0, no thermal resources are eligible for unit commitment
 		inputs_gen["THERM_COMMIT"] = Int64[]
 		inputs_gen["THERM_NO_COMMIT"] = union(gen_in[gen_in.THERM.==1,:R_ID], gen_in[gen_in.THERM.==2,:R_ID])
 	end
@@ -203,7 +203,7 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 		if setup["ParameterScale"] ==1
 			inputs_gen["dfGen"][!,:CO2_per_MWh][g] = inputs_gen["dfGen"][!,:CO2_per_MWh][g] * ModelScalingFactor
 		end
-		# kton/MMBTU * MMBTU/MWh = kton/MWh, to get kton/GWh, we need to mutiply 1000
+		# kton/MMBTU * MMBTU/MWh = kton/MWh, to get kton/GWh, we need to multiply 1000
 		if g in inputs_gen["COMMIT"]
 			# Start-up cost is sum of fixed cost per start plus cost of fuel consumed on startup.
 			# CO2 from fuel consumption during startup also calculated

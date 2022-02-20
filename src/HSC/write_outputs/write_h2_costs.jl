@@ -110,7 +110,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCStart = tempCStart * (ModelScalingFactor^2)
 		end
 
-		# Add emisions penalty related costs if the constraints are active
+		# Add emissions penalty related costs if the constraints are active
 		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
 		if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
 			tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]

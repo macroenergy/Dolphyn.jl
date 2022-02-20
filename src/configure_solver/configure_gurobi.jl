@@ -30,7 +30,7 @@ The Gurobi optimizer instance is configured with the following default parameter
  - PreDual = -1 (Presolve dualization. See https://www.gurobi.com/documentation/8.1/refman/predual.html#parameter:PreDual)
  - TimeLimit = Inf	(Limits total time solver. See https://www.gurobi.com/documentation/8.1/refman/timelimit.html)
  - MIPGap = 1e-4 (Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See https://www.gurobi.com/documentation/8.1/refman/mipgap2.html)
- - Crossover = -1 (Barrier crossver strategy. See https://www.gurobi.com/documentation/8.1/refman/crossover.html#parameter:Crossover)
+ - Crossover = -1 (Barrier crossover strategy. See https://www.gurobi.com/documentation/8.1/refman/crossover.html#parameter:Crossover)
  - Method = -1	(Algorithm used to solve continuous models (including MIP root relaxation). See https://www.gurobi.com/documentation/8.1/refman/method.html)
  - BarConvTol = 1e-8 (Barrier convergence tolerance (determines when barrier terminates). See https://www.gurobi.com/documentation/8.1/refman/barconvtol.html)
  - NumericFocus = 0 (Numerical precision emphasis. See https://www.gurobi.com/documentation/8.1/refman/numericfocus.html)
@@ -55,7 +55,7 @@ function configure_gurobi(solver_settings_path::String)
 		if(haskey(solver_settings, "TimeLimit")) MyTimeLimit = solver_settings["TimeLimit"] end
 	MyMIPGap = 1e-4		# Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See https://www.gurobi.com/documentation/8.1/refman/mipgap2.html
 		if(haskey(solver_settings, "MIPGap")) MyMIPGap = solver_settings["MIPGap"] end
-	MyCrossover = -1 	# Barrier crossver strategy. See https://www.gurobi.com/documentation/8.1/refman/crossover.html#parameter:Crossover
+	MyCrossover = -1 	# Barrier crossover strategy. See https://www.gurobi.com/documentation/8.1/refman/crossover.html#parameter:Crossover
 		if(haskey(solver_settings, "Crossover")) MyCrossover = solver_settings["Crossover"] end
 	MyMethod = -1		# Algorithm used to solve continuous models (including MIP root relaxation). See https://www.gurobi.com/documentation/8.1/refman/method.html
 		if(haskey(solver_settings, "Method")) MyMethod = solver_settings["Method"] end

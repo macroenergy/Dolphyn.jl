@@ -46,7 +46,7 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
     # Variable costs of "generation" for resource "y" during hour "t" = variable O&M plus fuel cost
 
 	#  ParameterScale = 1 --> objective function is in million $ . 
-	## In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	## In power system case we only scale by 1000 because variables are also scaled. But here we don't scale variables.
 	## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.
 	#  ParameterScale = 0 --> objective function is in $
 

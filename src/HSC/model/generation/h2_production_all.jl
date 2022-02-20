@@ -39,7 +39,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
     #Power required by hydrogen generation resource k to make hydrogen (MW)
 	@variable(EP, vP2G[k in H2_GEN, t = 1:T] >= 0 )
 
-	### Constratints ###
+	### Constraints ###
 
 	## Constraints on retirements and capacity additions
 	# Cannot retire more capacity than existing capacity
@@ -48,11 +48,11 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
 	## Constraints on new built capacity
 	# Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is >= Max_Cap_MW and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is >= Max_Cap_MW and lead to infeasibility
 	@constraint(EP, cH2GenMaxCap[k in intersect(dfH2Gen[dfH2Gen.Max_Cap_tonne_p_hr.>0,:R_ID], 1:H)],EP[:eH2GenTotalCap][k] <= dfH2Gen[!,:Max_Cap_tonne_p_hr][k])
 
 	# Constraint on minimum capacity (if applicable) [set input to -1 if no constraint on minimum capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is <= Min_Cap_MW and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is <= Min_Cap_MW and lead to infeasibility
 	@constraint(EP, cH2GenMinCap[k in intersect(dfH2Gen[dfH2Gen.Min_Cap_tonne_p_hr.>0,:R_ID], 1:H)], EP[:eH2GenTotalCap][k] >= dfH2Gen[!,:Min_Cap_tonne_p_hr][k])
 
 	return EP

@@ -152,13 +152,13 @@ for z in 1:Z
             [t in setdiff(1:T,FLEXIBLE_DEMAND_DELAY_HOURS,END_HOURS)], sum(EP[:vP][y,e] for e=(t+1):(t+Int(dfGen[!,:Max_Flexible_Demand_Delay][y]))) >= EP[:vS_FLEX][y,t]
 
             # cFlexibleDemandDelayWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
-            # cFlexibleDemandDelayWrap constraint is equivalant to: sum(EP[:vP][y,e] for e=(t+1):(hours_per_subperiod_max)+sum(EP[:vP][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Delay][y]-(hours_per_subperiod-(t%hours_per_subperiod)))) >= EP[:vS_FLEX][y,t]
+            # cFlexibleDemandDelayWrap constraint is equivalent to: sum(EP[:vP][y,e] for e=(t+1):(hours_per_subperiod_max)+sum(EP[:vP][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Delay][y]-(hours_per_subperiod-(t%hours_per_subperiod)))) >= EP[:vS_FLEX][y,t]
             [t in FLEXIBLE_DEMAND_DELAY_HOURS], sum(EP[:vP][y,e] for e=(t+1):(t+hours_per_subperiod-(t%hours_per_subperiod)))+sum(EP[:vP][y,e] for e=(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+Int(dfGen[!,:Max_Flexible_Demand_Delay][y])-(hours_per_subperiod-(t%hours_per_subperiod)))) >= EP[:vS_FLEX][y,t]
 
-            # cFlexibleDemandDelayEnd: cFlexibleDemandDelayEnd constraint is equivalant to: sum(EP[:vP][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Delay][y])) >= EP[:vS_FLEX][y,t]
+            # cFlexibleDemandDelayEnd: cFlexibleDemandDelayEnd constraint is equivalent to: sum(EP[:vP][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Delay][y])) >= EP[:vS_FLEX][y,t]
             [t in END_HOURS], sum(EP[:vP][y,e] for e=(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+Int(dfGen[!,:Max_Flexible_Demand_Delay][y]))) >= EP[:vS_FLEX][y,t]
-            # NOTE: Expression (hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1) is equivalant to "hours_per_subperiod_min"
-            # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
+            # NOTE: Expression (hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1) is equivalent to "hours_per_subperiod_min"
+            # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalent to "hours_per_subperiod_max"
         end)
 
         # Require advanced demands to be satisfied within the specified time period
@@ -174,13 +174,13 @@ for z in 1:Z
             [t in setdiff(1:T,FLEXIBLE_DEMAND_ADVANCE_HOURS,END_HOURS)], sum(EP[:vCHARGE_FLEX][y,e] for e=(t+1):(t+Int(dfGen[!,:Max_Flexible_Demand_Advance][y]))) >= -EP[:vS_FLEX][y,t]
 
             # cFlexibleDemandAdvanceWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
-            # cFlexibleDemandAdvanceWrap constraint is equivalant to: sum(EP[:vCHARGE_FLEX][y,e] for e=(t+1):hours_per_subperiod_max)+sum(EP[:vCHARGE_FLEX][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Advance][y]-(hours_per_subperiod-(t%hours_per_subperiod)))) >= -EP[:vS_FLEX][y,t]
+            # cFlexibleDemandAdvanceWrap constraint is equivalent to: sum(EP[:vCHARGE_FLEX][y,e] for e=(t+1):hours_per_subperiod_max)+sum(EP[:vCHARGE_FLEX][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Advance][y]-(hours_per_subperiod-(t%hours_per_subperiod)))) >= -EP[:vS_FLEX][y,t]
             [t in FLEXIBLE_DEMAND_ADVANCE_HOURS], sum(EP[:vCHARGE_FLEX][y,e] for e=(t+1):(t+hours_per_subperiod-(t%hours_per_subperiod)))+sum(EP[:vCHARGE_FLEX][y,e] for e=(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+Int(dfGen[!,:Max_Flexible_Demand_Advance][y])-(hours_per_subperiod-(t%hours_per_subperiod)))) >= -EP[:vS_FLEX][y,t]
 
-            # cFlexibleDemandAdvanceEnd: cFlexibleDemandAdvanceEnd constraint is equivalant to: sum(EP[:vCHARGE_FLEX][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Advance][y])) >= -EP[:vS_FLEX][y,t]
+            # cFlexibleDemandAdvanceEnd: cFlexibleDemandAdvanceEnd constraint is equivalent to: sum(EP[:vCHARGE_FLEX][y,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfGen[!,:Max_Flexible_Demand_Advance][y])) >= -EP[:vS_FLEX][y,t]
             [t in END_HOURS], sum(EP[:vCHARGE_FLEX][y,e] for e=(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+Int(dfGen[!,:Max_Flexible_Demand_Advance][y]))) >= -EP[:vS_FLEX][y,t]
-            # NOTE: Expression (hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1) is equivalant to "hours_per_subperiod_min"
-            # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
+            # NOTE: Expression (hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1) is equivalent to "hours_per_subperiod_min"
+            # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalent to "hours_per_subperiod_max"
         end)
     end
 end

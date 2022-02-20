@@ -36,6 +36,6 @@ function write_reliability(path::AbstractString, sep::AbstractString, inputs::Di
 	auxNew_Names=[Symbol("Zone");[Symbol("t$t") for t in 1:T]]
 	rename!(dfReliability,auxNew_Names)
 
-	CSV.write(string(path,sep,"reliabilty.csv"), dftranspose(dfReliability, false), writeheader=false)
+	CSV.write(string(path,sep,"reliability.csv"), dftranspose(dfReliability, false), writeheader=false)
 
 end

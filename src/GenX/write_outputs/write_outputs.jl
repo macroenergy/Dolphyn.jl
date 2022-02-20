@@ -39,12 +39,12 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 
     if !haskey(setup, "OverwriteResults") || setup["OverwriteResults"] == 1
         # Overwrite existing results if dir exists
-        # This is the default behaviour when there is no flag, to avoid breaking existing code
+        # This is the default behavior when there is no flag, to avoid breaking existing code
         if !(isdir(path))
 		    mkdir(path)
 	    end
     else
-        # Find closest unused ouput directory name and create it
+        # Find closest unused output directory name and create it
         path = choose_output_dir(path)
         mkdir(path)
     end
@@ -52,7 +52,7 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	# https://jump.dev/MathOptInterface.jl/v0.9.10/apireference/#MathOptInterface.TerminationStatusCode
 	status = termination_status(EP)
 
-	## Check if solved sucessfully - time out is included
+	## Check if solved successfully - time out is included
 	if status != MOI.OPTIMAL && status != MOI.LOCALLY_SOLVED
 		if status != MOI.TIME_LIMIT # Model failed to solve, so record solver status and exit
 			write_status(path, sep, inputs, setup, EP)

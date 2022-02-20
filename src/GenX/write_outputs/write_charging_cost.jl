@@ -19,7 +19,7 @@ function write_charging_cost(path::AbstractString, sep::AbstractString, inputs::
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	#calculating charging cost
- 	dfChargingcost = DataFrame(Region = dfGen[!,:region], Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], AnnualSum = Array{Union{Missing,Float32}}(undef, G), )
+ 	dfChargingcost = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, G), )
 	# the price is already US$/MWh, and dfPower and dfCharge is already in MW, so no scaling is needed
 	i = 1
 	dfChargingcost_ = (DataFrame([[names(dfCharge)]; collect.(eachrow(dfCharge))], [:column; Symbol.(axes(dfCharge, 1))])[4:T+3,i+1] .*
@@ -44,7 +44,7 @@ function write_charging_cost(path::AbstractString, sep::AbstractString, inputs::
 	end
 	dfChargingcost = hcat(dfChargingcost, DataFrame(dfChargingcost_', :auto))
  	for i in 1:G
- 		dfChargingcost[!,:AnnualSum][i] = sum(dfChargingcost[i,6:T+5])
+ 		dfChargingcost[!,:AnnualSum][i] = sum(dfChargingcost[i,4:T+3])
  	end
 	dfChargingcost_annualonly = dfChargingcost[!,1:5]
 	CSV.write(string(path,sep,"ChargingCost.csv"), dfChargingcost_annualonly)

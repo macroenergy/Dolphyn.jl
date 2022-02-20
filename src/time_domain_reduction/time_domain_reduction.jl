@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 #   Time Domain Reduction
 #    - Jack Morris
 #
-# Use kmeans or kemoids to cluster raw load profiles and resource capacity factor profiles
+# Use kmeans or kmedoids to cluster raw load profiles and resource capacity factor profiles
 # into representative periods. Use Extreme Periods to capture noteworthy periods or
 # periods with notably poor fits.
 #
@@ -582,7 +582,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     # Compile newly normalized/standardized profiles
     AnnualTSeriesNormalized = DataFrame(Dict(  OldColNames[c] => normProfiles[c] for c in 1:length(OldColNames) ))
 
-    # Optional pre-scaling of load in order to give it more preference in clutering algorithm
+    # Optional pre-scaling of load in order to give it more preference in clustering algorithm
     if LoadWeight != 1   # If we want to value load more/less than capacity factors. Assume nonnegative. LW=1 means no scaling.
         for c in load_col_names
             AnnualTSeriesNormalized[!, Symbol(c)] .= AnnualTSeriesNormalized[!, Symbol(c)] .* LoadWeight
@@ -740,7 +740,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     # Rescale weights to total user-specified number of hours (e.g., 8760 for one year).
     # If LoadExtremePeriod=false (because we don't want to change peak load day), rescale load to ensure total demand is equal
 
-    # Add extreme periods into the clustering result with # of occurences = 1 for each
+    # Add extreme periods into the clustering result with # of occurrences = 1 for each
     ExtremeWksList = sort(ExtremeWksList)
     if UseExtremePeriods == 1
         if v println("Extreme Periods: ", ExtremeWksList) end
@@ -749,7 +749,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
             insert!(A, ExtremeWksList[w], NClusters+w)
             push!(W, 1)
         end
-        NClusters += length(ExtremeWksList) #NClusers from this point forward is the ending number of periods
+        NClusters += length(ExtremeWksList) #NClusters from this point forward is the ending number of periods
     end
 
     N = W  # Keep cluster version of weights stored as N, number of periods represented by RP
@@ -780,7 +780,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     FuelCols = [Symbol(fuel_col_names[i]) for i in 1:length(fuel_col_names) ]
     ConstCol_Syms = [Symbol(ConstCols[i]) for i in 1:length(ConstCols) ]
 
-    # Cluster Ouput: The original data at the medoids/centers
+    # Cluster Output: The original data at the medoids/centers
     ClusterOutputData = ModifiedData[:,Symbol.(M)]
 
     # Get zone-wise load multipliers for later scaling in order for weighted-representative-total-zonal load to equal original total-zonal load

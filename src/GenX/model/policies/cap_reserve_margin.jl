@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 
-Instead of modeling capacity reserve margin requirement (a.k.a. capacity market or resource adequacy requirement) using an annual constraint, we model each requirement with hourly constraint by simulating the activation of the capacity obligation. We define capacity reserve margin constraint for subsets of zones,$z  \in \mathcal{Z}^{CRM}_{p}$, and each subset stands for a locational deliverability area (LDA) or a reserve sharing group.  For thermal resources, the available capacity is the total capacity in the LDA derated by the outage rate, $\epsilon_{y,z,p}^{CRM}$. For storage ($y \in \mathcal{O}$), variable renewable energy ($y \in \mathcal{VRE}$), and  flexibile demand resources ($y \in \mathcal{DF}$), the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter, $\epsilon_{y,z,p}^{CRM}$. If the imported capacity is eligible to provide capacity to the CRM constraint, the inbound powerflow on all lines $\mathcal{L}_{p}^{in}$ in time step $t$ will be derated to form the available capacity from outside of the LDA. The reverse is true as well: the outbound derated powerflow on all lines $\mathcal{L}_{p}^{out}$ in time step $t$ is taken out from the total available capacity. The derating factor should be equal to the expected availability of the resource during periods when the capacity reserve constraint is binding (e.g. accounting for forced outages during supply constrained periods) and is similar to derating factors used in the capacity markets. On top of the flexible demand resources, load curtailment can also provide capacity (i.e., demand response or load management). We allow all segments of voluntary load curtailment, $s \geq 2 \in S$, to contribute to capacity requirements. The first segment $s = 1 \in S$ corresponds to involuntary demand curtailment or emergency load shedding at the price cap or value of lost load, and thus does not contribute to reserve requirements.  Note that the time step-weighted sum of the shadow prices of this constraint corresponds to the capacity market payments reported by ISOs with mandate capacity market mechanism.
+Instead of modeling capacity reserve margin requirement (a.k.a. capacity market or resource adequacy requirement) using an annual constraint, we model each requirement with hourly constraint by simulating the activation of the capacity obligation. We define capacity reserve margin constraint for subsets of zones,$z  \in \mathcal{Z}^{CRM}_{p}$, and each subset stands for a locational deliverability area (LDA) or a reserve sharing group.  For thermal resources, the available capacity is the total capacity in the LDA degrated by the outage rate, $\epsilon_{y,z,p}^{CRM}$. For storage ($y \in \mathcal{O}$), variable renewable energy ($y \in \mathcal{VRE}$), and  flexible demand resources ($y \in \mathcal{DF}$), the available capacity is the net injection into the transmission network in time step $t$ degrated by the degrating factor, also stored in the parameter, $\epsilon_{y,z,p}^{CRM}$. If the imported capacity is eligible to provide capacity to the CRM constraint, the inbound powerflow on all lines $\mathcal{L}_{p}^{in}$ in time step $t$ will be degrated to form the available capacity from outside of the LDA. The reverse is true as well: the outbound degrated powerflow on all lines $\mathcal{L}_{p}^{out}$ in time step $t$ is taken out from the total available capacity. The degrating factor should be equal to the expected availability of the resource during periods when the capacity reserve constraint is binding (e.g. accounting for forced outages during supply constrained periods) and is similar to degrating factors used in the capacity markets. On top of the flexible demand resources, load curtailment can also provide capacity (i.e., demand response or load management). We allow all segments of voluntary load curtailment, $s \geq 2 \in S$, to contribute to capacity requirements. The first segment $s = 1 \in S$ corresponds to involuntary demand curtailment or emergency load shedding at the price cap or value of lost load, and thus does not contribute to reserve requirements.  Note that the time step-weighted sum of the shadow prices of this constraint corresponds to the capacity market payments reported by ISOs with mandate capacity market mechanism.
 
 ```math
 \begin{aligned}
@@ -54,7 +54,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexible load
 				- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
 				+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
 				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
@@ -65,7 +65,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexible load
 				+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
 				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
 				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
@@ -77,7 +77,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexible load
 				- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
 				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
 				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
@@ -87,7 +87,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
 				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexible load
 				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
 				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
 			end

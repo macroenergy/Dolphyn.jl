@@ -21,7 +21,7 @@ function configure_settings(settings_path::String)
     # Optional settings parameters ############################################
 	#Write the model formulation as an output; 0 = active; 1 = not active
     if(!haskey(settings, "PrintModel")) settings["PrintModel"] = 0  end
-    # Transmission network expansionl; 0 = not active; 1 = active systemwide
+    # Transmission network expansion; 0 = not active; 1 = active systemwide
     if(!haskey(settings, "NetworkExpansion")) settings["NetworkExpansion"] = 0 end
     # Number of segments used in piecewise linear approximation of transmission losses; 1 = linear, >2 = piecewise quadratic
     if(!haskey(settings, "Trans_Loss_Segments")) settings["Trans_Loss_Segments"] = 1 end
@@ -43,7 +43,7 @@ function configure_settings(settings_path::String)
     if(!haskey(settings, "ParameterScale")) settings["ParameterScale"] = 0 end
     # Write shadow prices of LP or relaxed MILP; 0 = not active; 1 = active
     if(!haskey(settings, "WriteShadowPrices")) settings["WriteShadowPrices"] = 0 end
-    # Unit committment of thermal power plants; 0 = not active; 1 = active using integer clestering; 2 = active using linearized clustering
+    # Unit commitment of thermal power plants; 0 = not active; 1 = active using integer clustering; 2 = active using linearized clustering
     if(!haskey(settings, "UCommit")) settings["UCommit"] = 0 end
     # Sets temporal resolution of the model; 0 = single period to represent the full year, with first-last time step linked; 1 = multiple representative periods
     if(!haskey(settings, "OperationWrapping")) settings["OperationWrapping"] = 0 end

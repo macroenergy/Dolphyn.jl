@@ -25,7 +25,7 @@ function write_energy_revenue(path::AbstractString, sep::AbstractString, inputs:
 	T = inputs["T"]     # Number of time steps (hours)
 	# dfEnergyRevenue = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, G))
 	# the price is already US$/MWh, and dfPower and dfCharge is already in MW, so no scaling is needed
-	dfEnergyRevenue = DataFrame(Region = dfGen[!,:region], Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], AnnualSum = Array{Union{Missing,Float32}}(undef, G), )
+	dfEnergyRevenue = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, G), )
 	# initiation
 	i = 1
 	dfEnergyRevenue_ = (DataFrame([[names(dfPower)]; collect.(eachrow(dfPower))], [:column; Symbol.(axes(dfPower, 1))])[4:T+3,2] .*
@@ -50,7 +50,7 @@ function write_energy_revenue(path::AbstractString, sep::AbstractString, inputs:
 	end
 	dfEnergyRevenue = hcat(dfEnergyRevenue, DataFrame(dfEnergyRevenue_', :auto))
 	for i in 1:G
-		dfEnergyRevenue[!,:AnnualSum][i] = sum(dfEnergyRevenue[i,6:T+5])
+		dfEnergyRevenue[!,:AnnualSum][i] = sum(dfEnergyRevenue[i,4:T+3])
 	end
 	dfEnergyRevenue_annualonly = dfEnergyRevenue[!,1:5]
 	CSV.write(string(path,sep,"EnergyRevenue.csv"), dfEnergyRevenue_annualonly)

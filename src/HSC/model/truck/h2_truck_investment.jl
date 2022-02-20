@@ -82,10 +82,10 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	## Objective Function Expressions ##
 
 	# Charge capacity costs
-	# Fixed costs for truck type "j" = annuitized investment cost
+	# Fixed costs for truck type "j" = annualized investment cost
 	# If truck is not eligible for new charge capacity, fixed costs are zero
 	# Sum individual truck type contributions to fixed costs to get total fixed costs
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we don't scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1
 
@@ -114,9 +114,9 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eObj] += eTotalCFixH2TruckCharge
 
     # Energy capacity costs
-	# Fixed costs for truck type "j" on zone "z" = annuitized investment cost plus fixed O&M costs
+	# Fixed costs for truck type "j" on zone "z" = annualized investment cost plus fixed O&M costs
 	# If resource is not eligible for new energy capacity, fixed costs are only O&M costs
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we don't scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"]==1
 		@expression(EP, eCFixH2TruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],
@@ -143,7 +143,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     EP[:eObj] += eTotalCFixH2TruckEnergy
 
 
-	### Constratints ###
+	### Constraints ###
 
 	## Constraints on truck retirements
 	#Cannot retire more charge capacity than existing charge capacity
@@ -157,11 +157,11 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	## Constraints on new built truck compression energy capacity
 	# Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMaxCapH2TruckEnergy[z = 1:Z, j in intersect(dfH2Truck[dfH2Truck.Max_Energy_Cap_tonne.>0,:T_TYPE], H2_TRUCK_TYPES)], eTotalH2CapTruckEnergy[z, j] <= dfH2Truck[!,:Max_Energy_Cap_tonne][j])
 
-	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
+	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy capacity]
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMinCapH2TruckEnergy[z = 1:Z, j in intersect(dfH2Truck[dfH2Truck.Min_Energy_Cap_tonne.>0,:T_TYPE], H2_TRUCK_TYPES)], eTotalH2CapTruckEnergy[z, j] >= dfH2Truck[!,:Min_Energy_Cap_tonne][j])
 
 	return EP

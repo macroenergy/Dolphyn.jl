@@ -104,7 +104,7 @@ function investment_discharge(EP::Model, inputs::Dict)
 
 	## Objective Function Expressions ##
 
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+	# Fixed costs for resource "y" = annualized investment cost plus fixed O&M costs
 	# If resource is not eligible for new capacity, fixed costs are only O&M costs
 	@expression(EP, eCFix[y in 1:G],
 		if y in NEW_CAP # Resources eligible for new capacity
@@ -124,7 +124,7 @@ function investment_discharge(EP::Model, inputs::Dict)
 	# Add term to objective function expression
 	EP[:eObj] += eTotalCFix
 
-	### Constratints ###
+	### Constraints ###
 
 	## Constraints on retirements and capacity additions
 	# Cannot retire more capacity than existing capacity
@@ -133,11 +133,11 @@ function investment_discharge(EP::Model, inputs::Dict)
 
 	## Constraints on new built capacity
 	# Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is >= Max_Cap_MW and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is >= Max_Cap_MW and lead to infeasibility
 	@constraint(EP, cMaxCap[y in intersect(dfGen[dfGen.Max_Cap_MW.>0,:R_ID], 1:G)], eTotalCap[y] <= dfGen[!,:Max_Cap_MW][y])
 
 	# Constraint on minimum capacity (if applicable) [set input to -1 if no constraint on minimum capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is <= Min_Cap_MW and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is <= Min_Cap_MW and lead to infeasibility
 	@constraint(EP, cMinCap[y in intersect(dfGen[dfGen.Min_Cap_MW.>0,:R_ID], 1:G)], eTotalCap[y] >= dfGen[!,:Min_Cap_MW][y])
 
 	return EP

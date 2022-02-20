@@ -23,7 +23,7 @@ function write_subsidy_revenue(path::AbstractString, sep::AbstractString, inputs
 	dfGen = inputs["dfGen"]
 	#NumberOfMinCapReqs = inputs["NumberOfMinCapReqs"]
 
-	dfSubRevenue = DataFrame(region = dfGen[!,:region], Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], R_ID = dfGen[!,:R_ID])
+	dfSubRevenue = DataFrame(Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], R_ID = dfGen[!,:R_ID])
 	#dfSubRevenue.SubsidyRevenue .= 0.0
 	
 	if v"1.3" <= VERSION < v"1.4"
@@ -43,7 +43,7 @@ function write_subsidy_revenue(path::AbstractString, sep::AbstractString, inputs
 	end
 	### calculating tech specific subsidy revenue
 
-	dfRegSubRevenue = DataFrame(region = dfGen[!,:region], Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], R_ID = dfGen[!,:R_ID])
+	dfRegSubRevenue = DataFrame(Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], R_ID = dfGen[!,:R_ID])
 	#dfRegSubRevenue.SubsidyRevenue .= 0.0
 	if v"1.3" <= VERSION < v"1.4"
 		dfRegSubRevenue[!,:SubsidyRevenue] .= 0.0

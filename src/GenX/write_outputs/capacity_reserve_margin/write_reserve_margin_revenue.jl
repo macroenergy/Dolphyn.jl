@@ -34,7 +34,7 @@ function write_reserve_margin_revenue(path::AbstractString, sep::AbstractString,
 	FLEX = inputs["FLEX"]
 	### calculating capacity reserve revenue
 
-	dfResRevenue = DataFrame(region = dfGen[!,:region], Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], R_ID = dfGen[!,:R_ID])
+	dfResRevenue = DataFrame(Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], R_ID = dfGen[!,:R_ID])
 	for i in 1:inputs["NCapacityReserveMargin"]
 		# initiate the process by assuming everything is thermal
 		dfResRevenue = hcat(dfResRevenue, round.(Int, dfCap[1:end-1,:EndCap] .* dfGen[!,Symbol("CapRes_$i")] .* sum(dfResMar[i,:])))

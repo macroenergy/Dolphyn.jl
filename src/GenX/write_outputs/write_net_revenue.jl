@@ -27,7 +27,7 @@ function write_net_revenue(path::AbstractString, sep::AbstractString, inputs::Di
 	COMMIT = inputs["COMMIT"]		# Thermal units for unit commitment
 
 	# Create a NetRevenue dataframe
- 	dfNetRevenue = DataFrame(region = dfGen[!,:region], Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], R_ID = dfGen[!,:R_ID])
+ 	dfNetRevenue = DataFrame(Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], R_ID = dfGen[!,:R_ID])
 
 	# Add investment cost to the dataframe
 	dfNetRevenue.Inv_cost_MW = dfGen[!,:Inv_Cost_per_MWyr] .* dfCap[1:end-1,:NewCap]

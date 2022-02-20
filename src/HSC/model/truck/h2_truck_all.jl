@@ -36,14 +36,14 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     # Number of available full truck type 'j' in transit at time 't' on zone 'z'
     @variable(EP, vH2Navail_full[z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
-    # Number of travel, arrive and deaprt full truck type 'j' in transit at time 't' from zone 'zz' to 'z'
+    # Number of travel, arrive and depart full truck type 'j' in transit at time 't' from zone 'zz' to 'z'
     @variable(EP, vH2Ntravel_full[zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
     @variable(EP, vH2Narrive_full[zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
     @variable(EP, vH2Ndepart_full[zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
 
     # Number of available empty truck type 'j' in transit at time 't' on zone 'z'
     @variable(EP, vH2Navail_empty[z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
-    # Number of travel, arrive and deaprt empty truck type 'j' in transit at time 't' from zone 'zz' to 'z'
+    # Number of travel, arrive and depart empty truck type 'j' in transit at time 't' from zone 'zz' to 'z'
     @variable(EP, vH2Ntravel_empty[zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
     @variable(EP, vH2Narrive_empty[zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)
     @variable(EP, vH2Ndepart_empty[zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T] >= 0)

@@ -21,7 +21,7 @@ A wide range of energy storage devices (all $o \in \mathcal{O}$) can be modeled 
 
 **Storage with symmetric charge and discharge capacity**
 
-For storage technologies with symmetric charge and discharge capacity (all $o \in \mathcal{O}^{sym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed power capacity, $\Omega_{o,z}$. Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, GenX permits storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), with the simultaenous sum of charge, $\Pi_{o,z,t}$, and discharge, $\Theta_{o,z,t}$, also limited by the total installed power capacity, $\Delta^{total}_{o,z}$. These two constraints are as follows:
+For storage technologies with symmetric charge and discharge capacity (all $o \in \mathcal{O}^{sym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed power capacity, $\Omega_{o,z}$. Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, GenX permits storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), with the simultaneous sum of charge, $\Pi_{o,z,t}$, and discharge, $\Theta_{o,z,t}$, also limited by the total installed power capacity, $\Delta^{total}_{o,z}$. These two constraints are as follows:
 
 ```math
 \begin{aligned}
@@ -100,8 +100,8 @@ If reserves are modeled, two pairs of proxy variables $f^{charge}_{o,z,t}, f^{di
 
 ```math
 \begin{aligned}
-	&  f_{o,z,t} = f^{charge}_{o,z,t} + f^{dicharge}_{o,z,t} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  r_{o,z,t} = r^{charge}_{o,z,t} + r^{dicharge}_{o,z,t} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
+	&  f_{o,z,t} = f^{charge}_{o,z,t} + f^{discharge}_{o,z,t} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
+	&  r_{o,z,t} = r^{charge}_{o,z,t} + r^{discharge}_{o,z,t} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 

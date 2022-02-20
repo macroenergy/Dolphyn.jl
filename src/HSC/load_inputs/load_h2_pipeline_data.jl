@@ -67,7 +67,7 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     #Current number of pipelines
     inputs_nw["pH2_Pipe_No_Curr"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Existing_No_Pipe])))
 
-    #Maxiumum Pipe Flow per Pipe
+    #Maximum Pipe Flow per Pipe
     inputs_nw["pH2_Pipe_Max_Flow"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_Flow_Tonne_p_Hr_Per_Pipe])))
 
     #Maximum Pipeline storage capacity in tonnes per pipe

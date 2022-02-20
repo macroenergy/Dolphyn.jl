@@ -95,7 +95,7 @@ function investment_energy(EP::Model, inputs::Dict)
 
 	## Objective Function Expressions ##
 
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+	# Fixed costs for resource "y" = annualized investment cost plus fixed O&M costs
 	# If resource is not eligible for new energy capacity, fixed costs are only O&M costs
 	@expression(EP, eCFixEnergy[y in STOR_ALL],
 		if y in NEW_CAP_ENERGY # Resources eligible for new capacity
@@ -111,7 +111,7 @@ function investment_energy(EP::Model, inputs::Dict)
 	# Add term to objective function expression
 	EP[:eObj] += eTotalCFixEnergy
 
-	### Constratints ###
+	### Constraints ###
 
 	## Constraints on retirements and capacity additions
 	# Cannot retire more energy capacity than existing energy capacity
@@ -119,11 +119,11 @@ function investment_energy(EP::Model, inputs::Dict)
 
 	## Constraints on new built energy capacity
 	# Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMaxCapEnergy[y in intersect(dfGen[dfGen.Max_Cap_MWh.>0,:R_ID], STOR_ALL)], eTotalCapEnergy[y] <= dfGen[!,:Max_Cap_MWh][y])
 
-	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
+	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy capacity]
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMinCapEnergy[y in intersect(dfGen[dfGen.Min_Cap_MWh.>0,:R_ID], STOR_ALL)], eTotalCapEnergy[y] >= dfGen[!,:Min_Cap_MWh][y])
 
 	return EP

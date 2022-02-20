@@ -27,7 +27,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     #Calculate the number of new pipes
     @expression(EP, eH2NPipeNew[p = 1:H2_P], vH2NPipe[p] - inputs["pH2_Pipe_No_Curr"][p])
 
-    #Calculate net flow at each pipe-zone interfrace
+    #Calculate net flow at each pipe-zone interface
     @expression(EP, eH2PipeFlow_net[p = 1:H2_P, t = 1:T, d = [-1,1]],  vH2PipeFlow_pos[p,t,d] - vH2PipeFlow_neg[p,t,d])
 
 	## Objective Function Expressions ##
@@ -77,7 +77,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
 
 
-	## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
+	## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Policy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
 	# if setup["ParameterScale"]==1 # Power consumption in GW
 	# 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
 	# 	sum(EP[:vH2CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
@@ -110,7 +110,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         end
 	end
 
-    # Modeling expansion of the pipleline network
+    # Modeling expansion of the pipeline network
     if setup["H2NetworkExpansion"]==1
         # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe 
         @constraints(EP, begin
@@ -141,7 +141,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     end)
 
 
-    #YS T Defenition is wrong
+    #YS T Definition is wrong
     @constraints(EP, begin
     [p in 1:H2_P, t in START_SUBPERIODS], vH2PipeLevel[p,t] == vH2PipeLevel[p,t + hours_per_subperiod - 1] - eH2PipeFlow_net[p,t, -1] - eH2PipeFlow_net[p,t,1]
     end)

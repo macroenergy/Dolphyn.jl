@@ -150,7 +150,7 @@ function storage_all_reserves(EP::Model, inputs::Dict)
 			[y in STOR_REG_RSV, t=1:T], EP[:vREG][y,t] <= dfGen[!,:Reg_Max][y]*EP[:eTotalCap][y]
 			[y in STOR_REG_RSV, t=1:T], EP[:vRSV][y,t] <= dfGen[!,:Rsv_Max][y]*EP[:eTotalCap][y]
 
-			# Actual contribution to regulation and reserves is sum of auxilary variables for portions contributed during charging and discharging
+			# Actual contribution to regulation and reserves is sum of auxiliary variables for portions contributed during charging and discharging
 			[y in STOR_REG_RSV, t=1:T], EP[:vREG][y,t] == EP[:vREG_charge][y,t]+EP[:vREG_discharge][y,t]
 			[y in STOR_REG_RSV, t=1:T], EP[:vRSV][y,t] == EP[:vRSV_charge][y,t]+EP[:vRSV_discharge][y,t]
 
@@ -182,7 +182,7 @@ function storage_all_reserves(EP::Model, inputs::Dict)
 			# Maximum storage contribution to reserves is a specified fraction of installed capacity
 			[y in STOR_REG_ONLY, t=1:T], EP[:vREG][y,t] <= dfGen[!,:Reg_Max][y]*EP[:eTotalCap][y]
 
-			# Actual contribution to regulation and reserves is sum of auxilary variables for portions contributed during charging and discharging
+			# Actual contribution to regulation and reserves is sum of auxiliary variables for portions contributed during charging and discharging
 			[y in STOR_REG_ONLY, t=1:T], EP[:vREG][y,t] == EP[:vREG_charge][y,t]+EP[:vREG_discharge][y,t]
 
 			# Maximum charging rate plus contribution to reserves up must be greater than zero
@@ -212,7 +212,7 @@ function storage_all_reserves(EP::Model, inputs::Dict)
 			# Maximum storage contribution to reserves is a specified fraction of installed capacity
 			[y in STOR_RSV_ONLY, t=1:T], EP[:vRSV][y,t] <= dfGen[!,:Rsv_Max][y]*EP[:eTotalCap][y]
 
-			# Actual contribution to regulation and reserves is sum of auxilary variables for portions contributed during charging and discharging
+			# Actual contribution to regulation and reserves is sum of auxiliary variables for portions contributed during charging and discharging
 			[y in STOR_RSV_ONLY, t=1:T], EP[:vRSV][y,t] == EP[:vRSV_charge][y,t]+EP[:vRSV_discharge][y,t]
 
 			# Maximum charging rate plus contribution to reserves up must be greater than zero

@@ -48,7 +48,7 @@ There are three options for the $Contingency$ expression, depending on user sett
 	2. a dynamic contingency based on installed capacity decisions, in which the largest 'installed' generator is used to determine the contingency requirement for all time periods; and
 	3. dynamic unit commitment based contingency, in which the largest 'committed' generator in any time period is used to determine the contingency requirement in that time period.
 
-Note that the two dynamic contigencies are only available if unit commitment is being modeled.
+Note that the two dynamic contingencies are only available if unit commitment is being modeled.
 
 **Static contingency**
 Option 1 (static contingency) is expressed by the following constraint:
@@ -121,8 +121,8 @@ function reserves_contingency(EP::Model, inputs::Dict, UCommit::Int)
 		println("Dynamic Contingency Type 2: Modeling the largest contingency as the largest largest committed generator")
 		@expression(EP, eContingencyReq[t=1:T], vLARGEST_CONTINGENCY[t])
 	else
-		# Largest contingency defined fixed as user-specifed static contingency in MW
-		println("Static Contingency: Modeling the largest contingency as user-specifed static contingency")
+		# Largest contingency defined fixed as user-specified static contingency in MW
+		println("Static Contingency: Modeling the largest contingency as user-specified static contingency")
 		@expression(EP, eContingencyReq[t=1:T], inputs["pStatic_Contingency"])
 	end
 
@@ -138,7 +138,7 @@ function reserves_contingency(EP::Model, inputs::Dict, UCommit::Int)
 		# Ensure vCONTINGENCY_AUX = 1 if total capacity > 0
 		@constraint(EP, cContAux2[y in COMMIT], EP[:eTotalCap][y] <= inputs["pContingency_BigM"][y]*vCONTINGENCY_AUX[y])
 
-		# option 2: ensures vLARGEST_CONTINGENCY is greater than the capacity of the largest commited generator in each hour
+		# option 2: ensures vLARGEST_CONTINGENCY is greater than the capacity of the largest committed generator in each hour
 	elseif UCommit == 1 && pDynamic_Contingency == 2
 		@constraint(EP, cContingency[y in COMMIT, t=1:T], vLARGEST_CONTINGENCY[t] >=
 			inputs["dfGen"][!,:Cap_Size][y]*vCONTINGENCY_AUX[y,t] )
@@ -164,7 +164,7 @@ $r_{y,t,z} \geq 0$ is the contribution of generation or storage resource $y \in 
 
 We assume frequency regulation is symmetric (provided in equal quantity towards both upwards and downwards regulation). To reduce computational complexity, operating reserves are only modeled in the upwards direction, as downwards reserves requirements are rarely binding in practice.
 
-Storage resources ($y \in \mathcal{O}$) have two pairs of auxilary variables to reflect contributions to regulation and reserves when charging and discharging, where the primary variables ($f_{y,z,t}$ \& $r_{y,z,t}$) becomes equal to sum of these auxilary variables.
+Storage resources ($y \in \mathcal{O}$) have two pairs of auxiliary variables to reflect contributions to regulation and reserves when charging and discharging, where the primary variables ($f_{y,z,t}$ \& $r_{y,z,t}$) becomes equal to sum of these auxiliary variables.
 
 **Unmet operating reserves**
 
@@ -180,7 +180,7 @@ There is a penalty $C^{rsv}$ added to the objective function to penalize reserve
 
 **Frequency regulation requirements**
 
-Total requirements for frequency regulation (aka primary reserves) in each time step $t$ are specified as fractions of hourly demand (to reflect demand forecast errors) and variable renewable avaialblity in the time step (to reflect wind and solar forecast errors).
+Total requirements for frequency regulation (aka primary reserves) in each time step $t$ are specified as fractions of hourly demand (to reflect demand forecast errors) and variable renewable availability in the time step (to reflect wind and solar forecast errors).
 
 ```math
 \begin{aligned}
@@ -191,7 +191,7 @@ where $\mathcal{D}_{z,t}$ is the forecasted electricity demand in zone $z$ at ti
 
 **Operating reserve requirements**
 
-Total requirements for operating reserves in the upward direction (aka spinning reserves or contingency reserces or secondary reserves) in each time step $t$ are specified as fractions of time step's demand (to reflect demand forecast errors) and variable renewable avaialblity in the time step (to reflect wind and solar forecast errors) plus the largest planning contingency (e.g. potential forced generation outage).
+Total requirements for operating reserves in the upward direction (aka spinning reserves or contingency reserves or secondary reserves) in each time step $t$ are specified as fractions of time step's demand (to reflect demand forecast errors) and variable renewable availability in the time step (to reflect wind and solar forecast errors) plus the largest planning contingency (e.g. potential forced generation outage).
 
 ```math
 \begin{aligned}
@@ -224,8 +224,8 @@ function reserves_core(EP::Model, inputs::Dict, UCommit::Int)
 	@variable(EP, vREG[y in REG, t=1:T] >= 0) # Contribution to regulation (primary reserves), assumed to be symmetric (up & down directions equal)
 	@variable(EP, vRSV[y in RSV, t=1:T] >= 0) # Contribution to operating reserves (secondary reserves or contingency reserves); only model upward reserve requirements
 
-	# Storage techs have two pairs of auxilary variables to reflect contributions to regulation and reserves
-	# when charging and discharging (primary variable becomes equal to sum of these auxilary variables)
+	# Storage techs have two pairs of auxiliary variables to reflect contributions to regulation and reserves
+	# when charging and discharging (primary variable becomes equal to sum of these auxiliary variables)
 	@variable(EP, vREG_discharge[y in intersect(inputs["STOR_ALL"], REG), t=1:T] >= 0) # Contribution to regulation (primary reserves) (mirrored variable used for storage devices)
 	@variable(EP, vRSV_discharge[y in intersect(inputs["STOR_ALL"], RSV), t=1:T] >= 0) # Contribution to operating reserves (secondary reserves) (mirrored variable used for storage devices)
 	@variable(EP, vREG_charge[y in intersect(inputs["STOR_ALL"], REG), t=1:T] >= 0) # Contribution to regulation (primary reserves) (mirrored variable used for storage devices)
@@ -262,7 +262,7 @@ function reserves_core(EP::Model, inputs::Dict, UCommit::Int)
 
 	## Total system reserve constraints
 	# Regulation requirements as a percentage of load and scheduled variable renewable energy production in each hour
-	# Note: frequencty regulation up and down requirements are symmetric and all resources contributing to regulation are assumed to contribute equal capacity to both up and down directions
+	# Note: frequency regulation up and down requirements are symmetric and all resources contributing to regulation are assumed to contribute equal capacity to both up and down directions
 	@constraint(EP, cReg[t=1:T], sum(vREG[y,t] for y in REG) >= EP[:eRegReq][t])
 
 	@constraint(EP, cRsvReq[t=1:T], sum(vRSV[y,t] for y in RSV) + vUNMET_RSV[t] >= EP[:eRsvReq][t])

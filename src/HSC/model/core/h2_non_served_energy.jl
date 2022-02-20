@@ -84,7 +84,7 @@ function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eTotalH2CNSETS[t=1:T,z=1:Z], sum(eH2CNSE[s,t,z] for s in 1:H2_SEG))
 	@expression(EP, eTotalH2CNSET[t=1:T], sum(eTotalH2CNSETS[t,z] for z in 1:Z))
 
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we don't scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1 
 		@expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t]/(ModelScalingFactor)^2 for t in 1:T))
@@ -103,7 +103,7 @@ function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 	# Add non-served energy/curtailed demand contribution to power balance expression
 	EP[:eH2Balance] += eH2BalanceNse
 
-	### Constratints ###
+	### Constraints ###
 
 	# Demand curtailed in each segment of curtailable demands cannot exceed maximum allowable share of demand
 	@constraint(EP, cH2NSEPerSeg[s=1:H2_SEG, t=1:T, z=1:Z], vH2NSE[s,t,z] <= inputs["pMax_H2_D_Curtail"][s]*inputs["H2_D"][t,z])

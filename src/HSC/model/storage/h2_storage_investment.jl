@@ -83,10 +83,10 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	## Objective Function Expressions ##
 
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+	# Fixed costs for resource "y" = annualized investment cost plus fixed O&M costs
 	# If resource is not eligible for new charge capacity, fixed costs are only O&M costs
 	# Sum individual resource contributions to fixed costs to get total fixed costs
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we don't scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1
 
@@ -115,9 +115,9 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eObj] += eTotalCFixH2Charge
 
     # Energy capacity costs
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+	# Fixed costs for resource "y" = annualized investment cost plus fixed O&M costs
 	# If resource is not eligible for new energy capacity, fixed costs are only O&M costs
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we don't scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"]==1
 		@expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
@@ -144,7 +144,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     EP[:eObj] += eTotalCFixH2Energy
 
 
-	### Constratints ###
+	### Constraints ###
 
 	## Constraints on retirements and capacity additions
 	#Cannot retire more charge capacity than existing charge capacity
@@ -153,11 +153,11 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
   	#Constraints on new built capacity
 
 	# Constraint on maximum charge capacity (if applicable) [set input to -1 if no constraint on maximum charge capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMaxCapH2Charge[y in intersect(dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] <= dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr][y])
 
 	# Constraint on minimum charge capacity (if applicable) [set input to -1 if no constraint on minimum charge capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMinCapH2Charge[y in intersect(dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] >= dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr][y])
 
 
@@ -167,11 +167,11 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	## Constraints on new built energy capacity
 	# Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMaxCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Max_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] <= dfH2Gen[!,:Max_Energy_Cap_tonne][y])
 
-	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
+	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy capacity]
+	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasibility
 	@constraint(EP, cMinCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Min_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] >= dfH2Gen[!,:Min_Energy_Cap_tonne][y])
 
 	return EP

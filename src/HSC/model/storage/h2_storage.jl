@@ -2,7 +2,7 @@ function h2_storage(EP::Model, inputs::Dict, setup::Dict)
 
     println("Hydrogen Storage Module")
 
-   # investment variables expressions and related constraints for H2 storage tehcnologies
+   # investment variables expressions and related constraints for H2 storage technologies
     EP = h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
     # Operating variables, expressions and constraints related to H2 storage
