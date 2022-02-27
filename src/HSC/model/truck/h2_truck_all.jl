@@ -129,7 +129,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     # H2 Power Consumption balance
     @expression(
         EP,
-        eH2TruckCompressionPowerConsumption[t = 1:T, z = 1:Z],
+        ePowerbalanceH2TruckCompression[t = 1:T, z = 1:Z],
         if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
             sum(
                 vH2Ncharged[z, j, t] *
@@ -144,7 +144,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             )
         end
     )
-    EP[:ePowerBalance] += eH2TruckCompressionPowerConsumption
+    EP[:ePowerBalance] += -ePowerbalanceH2TruckCompression
 
     # H2 balance
     @expression(
