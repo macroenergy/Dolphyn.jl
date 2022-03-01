@@ -105,17 +105,17 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	end
 
-	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
+	#@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
 
 
 	# # Sum individual resource contributions to fixed costs to get total fixed costs
 	# #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	# #  ParameterScale = 0 --> objective function is in $
-	# if setup["ParameterScale"] ==1 
-	# 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k]/(ModelScalingFactor)^2 for k in 1:H))
-	# else
-	# 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
-	# end
+	if setup["ParameterScale"] ==1 
+	 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k]/(ModelScalingFactor)^2 for k in 1:H))
+	else
+	 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
+	end
 
 
 	# Add term to objective function expression

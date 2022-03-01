@@ -40,12 +40,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     end    
     ) 
       
-
-
  	@expression(EP, eH2EmissionsByZone[z=1:Z, t=1:T], sum(eH2EmissionsByPlant[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
-
-
-
     
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices
     if (setup["H2CO2Cap"] ==4 && setup["SystemCO2Constraint"] ==1)
