@@ -38,7 +38,7 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
 
 	# Incorporating effect of Parameter scaling (ParameterScale=1) on output values
 	for y in 1:H
-			storagevcapvalue[y,:] = s[y,:]
+		storagevcapvalue[y,:] = s[y,:]
 	end
 
 
