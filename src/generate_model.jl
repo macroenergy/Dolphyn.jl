@@ -114,7 +114,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@expression(EP, eObj, 0)
 
 	# Power supply by z and timestep - used in emissions constraints
-	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)	
+	@expression(EP, eGenerationByZone[t=1:T, z=1:Z], 0)
 
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
@@ -150,7 +150,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = must_run(EP, inputs)
 	end
 
-
 	# Model constraints, variables, expression related to energy storage modeling
 	if !isempty(inputs["STOR_ALL"])
 		EP = storage(EP, inputs, setup["Reserves"], setup["OperationWrapping"])
@@ -174,6 +173,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if !isempty(inputs["THERM_ALL"])
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
 	end
+
+	# EP[:ePowerBalance] += eGenerationByZone #! Yuheng zhang: GenerationByZone is not used in ePowerBalance 
 
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
@@ -222,8 +223,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			#model H2 Gas to Power
 			EP = h2_g2p(EP, inputs, setup)
 		end
-
-
 	end
 
 
@@ -259,7 +258,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
 
 	if setup["ModelH2"] == 1
-		###Hydrogen Balanace constraints
+		###Hydrogen Balance constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
 	end
 	

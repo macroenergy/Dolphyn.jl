@@ -19,11 +19,11 @@ module DOLPHYN
 #export package_activate
 export configure_settings
 export configure_solver
-export load_inputs
+export load_power_inputs
 export load_h2_inputs
 export generate_model
 export solve_model
-export write_outputs
+export write_power_outputs
 export write_HSC_outputs
 export cluster_inputs
 export mga
@@ -82,12 +82,12 @@ include("GenX/load_inputs/load_period_map.jl")
 include("GenX/load_inputs/load_minimum_capacity_requirement.jl")
 include("GenX/load_inputs/load_load_data.jl")
 include("GenX/load_inputs/load_fuels_data.jl")
-include("GenX/load_inputs/load_inputs.jl")
+include("GenX/load_inputs/load_Power_inputs.jl")
 
 # Load time domain reduction related scripts
 include("time_domain_reduction/time_domain_reduction.jl")
 
-#Load input data - HSC
+# Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
@@ -99,7 +99,7 @@ include("HSC/load_inputs/load_h2_g2p.jl")
 include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
 
-#Core GenX Features
+# Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
 include("GenX/model/core/discharge/investment_discharge.jl")
 include("GenX/model/core/non_served_energy.jl")
@@ -128,7 +128,7 @@ include("GenX/model/policies/energy_share_requirement.jl")
 include("GenX/model/policies/cap_reserve_margin.jl")
 include("GenX/model/policies/minimum_capacity_requirement.jl")
 
-#Core HSC Modelling Features
+# Core HSC Modelling Features
 include("HSC/model/core/h2_investment.jl")
 include("HSC/model/core/h2_outputs.jl")
 include("HSC/model/core/h2_non_served_energy.jl")
@@ -150,13 +150,13 @@ include("HSC/model/truck/h2_truck.jl")
 include("HSC/model/truck/h2_truck_all.jl")
 include("HSC/model/truck/h2_long_duration_truck.jl")
 
-#H2 storage
+# H2 storage
 include("HSC/model/storage/h2_storage_investment.jl")
 include("HSC/model/storage/h2_storage.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")
 
-#H2 G2P
+# H2 G2P
 include("HSC/model/g2p/h2_g2p_investment.jl")
 include("HSC/model/g2p/h2_g2p_discharge.jl")
 include("HSC/model/g2p/h2_g2p_all.jl")
@@ -174,7 +174,7 @@ include("generate_model.jl")
 include("solve_model.jl")
 
 
-#Write GenX Outputs
+# Write GenX Outputs
 include("GenX/write_outputs/dftranspose.jl")
 include("GenX/write_outputs/write_capacity.jl")
 include("GenX/write_outputs/write_charge.jl")
@@ -218,7 +218,7 @@ include("GenX/write_outputs/ucommit/write_commit.jl")
 include("GenX/write_outputs/ucommit/write_shutdown.jl")
 include("GenX/write_outputs/ucommit/write_start.jl")
 
-include("GenX/write_outputs/write_outputs.jl")
+include("GenX/write_outputs/write_power_outputs.jl")
 
 # HSC Write Outputs
 include("HSC/write_outputs/write_h2_gen.jl")

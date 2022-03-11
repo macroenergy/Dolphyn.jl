@@ -143,6 +143,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             )
         end
     )
+
     EP[:ePowerBalance] += ePowerbalanceH2TruckCompression
 
     # H2 balance

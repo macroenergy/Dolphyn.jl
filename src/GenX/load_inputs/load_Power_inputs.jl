@@ -25,7 +25,7 @@ path - string path to working directory
 
 returns: Dict (dictionary) object containing all data inputs
 """
-function load_inputs(setup::Dict,path::AbstractString)
+function load_power_inputs(setup::Dict,path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config
 	if Sys.isunix()

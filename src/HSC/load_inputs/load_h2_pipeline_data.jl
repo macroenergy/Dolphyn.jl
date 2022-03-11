@@ -24,20 +24,20 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(CSV.File(string(path,sep,"HSC_pipelines.csv"), header=true), copycols=true)
 
-    #Number of H2 Pipelines = L
+    # Number of H2 Pipelines = L
     inputs_nw["H2_P"]=size(collect(skipmissing(pipeline_var[!,:H2_Pipelines])),1)
 
-    #Find first column of pipe map table
+    # Find first column of pipe map table
     start = findall(s -> s == "z1", names(pipeline_var))[1]
 
-    #Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
+    # Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
     pipe_map = pipeline_var[1:inputs_nw["H2_P"], start:start+inputs_nw["Z"]-1]
 
-    #Create pipe number column
+    # Create pipe number column
     pipe_map[!,:pipe_no] = 1:size(pipe_map,1)
-    #Pivot table
+    # Pivot table
     pipe_map = stack(pipe_map, 1:inputs_nw["Z"])
-    #Create zone column
+    # Create zone column
     pipe_map[!,:Zone] = parse.(Float64,SubString.(pipe_map[!,:variable],2))
     #Remove redundant rows
     pipe_map = pipe_map[pipe_map[!,:value].!=0,:]
@@ -86,7 +86,7 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_nw["pComp_MWh_per_tonne_Pipe"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:BoosterCompEnergy_MWh_per_tonne]))).* inputs_nw["no_booster_comp_stations"] 
 
 
-    println("H2_pipelines.csv Successfully Read!")
+    println("HSC_pipelines.csv Successfully Read!")
 
     return inputs_nw
 end
