@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     # Setup variables, constraints, and expressions common to all hydrogen truck resources
-    println("Hydrogen Truck Core Resources Module")
+    println("H2 Truck Core Resources Module")
 
     dfH2Truck = inputs["dfH2Truck"]
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"] # Set of h2 truck types
@@ -28,7 +28,6 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"] # Index of interior subperiod for each representative period
 
-    TD = round.(Int, inputs["RouteLength"] ./ dfH2Truck[!, :AvgTruckSpeed_mile_per_hour][1])
     ### Variables ###
 
     # Truck flow volume [tonne] through type 'j' at time 't' on zone 'z'
@@ -144,15 +143,16 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             )
         end
     )
-    EP[:ePowerBalance] += -ePowerbalanceH2TruckCompression
+
+    EP[:ePowerBalance] += ePowerbalanceH2TruckCompression
 
     # H2 balance
     @expression(
         EP,
-        TruckFlow[t = 1:T, z = 1:Z],
+        eH2TruckFlow[t = 1:T, z = 1:Z],
         sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_TYPES)
     )
-    EP[:eH2Balance] += TruckFlow
+    EP[:eH2Balance] += eH2TruckFlow
 
     # Dev note: carbon emission balance is under construction
     # Carbon emission balance
@@ -180,26 +180,26 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     ## Total number
     @constraint(
         EP,
-        [j in H2_TRUCK_TYPES, t in 1:T],
-        vH2N_full[j, t] + vH2N_empty[j, t] == EP[:eTotalH2CapTruckNumber][j]
+        cH2TruckTotalNumber[j in H2_TRUCK_TYPES, t in 1:T],
+        vH2N_full[j, t] + vH2N_empty[j, t] == EP[:eTotalH2TruckNumber][j]
     )
 
     # No truck in transit should have the same start and end 
     @constraints(
         EP,
         begin
-            [zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
-            vH2Ntravel_full[zz, z, j, t] == 0
-            [zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
-            vH2Ntravel_empty[zz, z, j, t] == 0
-            [zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
-            vH2Narrive_full[zz, z, j, t] == 0
-            [zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
-            vH2Ndepart_full[zz, z, j, t] == 0
-            [zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
-            vH2Narrive_empty[zz, z, j, t] == 0
-            [zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
-            vH2Ndepart_empty[zz, z, j, t] == 0
+            cH2TruckSameZoneTravelFull[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+                vH2Ntravel_full[zz, z, j, t] == 0
+            cH2TruckSameZoneTravelEmpty[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+                vH2Ntravel_empty[zz, z, j, t] == 0
+            cH2TruckSameZoneArriveFull[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+                vH2Narrive_full[zz, z, j, t] == 0
+            cH2TruckSameZoneArriveEmpty[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+                vH2Narrive_empty[zz, z, j, t] == 0
+            cH2TruckSameZoneDepartFull[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+                vH2Ndepart_full[zz, z, j, t] == 0
+            cH2TruckSameZoneDepartEmpty[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+                vH2Ndepart_empty[zz, z, j, t] == 0
         end
     )
 
@@ -207,11 +207,12 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [j in H2_TRUCK_TYPES, t in 1:T],
+            cH2TruckTotalFull[j in H2_TRUCK_TYPES, t in 1:T],
             vH2N_full[j, t] ==
             sum(vH2Ntravel_full[zz, z, j, t] for zz = 1:Z, z = 1:Z if zz != z) +
             sum(vH2Navail_full[z, j, t] for z = 1:Z)
-            [j in H2_TRUCK_TYPES, t in 1:T],
+
+            cH2TruckTotalEmpty[j in H2_TRUCK_TYPES, t in 1:T],
             vH2N_empty[j, t] ==
             sum(vH2Ntravel_empty[zz, z, j, t] for zz = 1:Z, z = 1:Z if zz != z) +
             sum(vH2Navail_empty[z, j, t] for z = 1:Z)
@@ -225,12 +226,12 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+            cH2TruckChangeFullAvailInterior[z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
             vH2Navail_full[z, j, t] - vH2Navail_full[z, j, t-1] ==
             vH2Ncharged[z, j, t] - vH2Ndischarged[z, j, t] +
             sum(vH2Narrive_full[zz, z, j, t-t_arrive] for zz = 1:Z if zz != z) -
             sum(vH2Ndepart_full[z, zz, j, t-t_depart] for zz = 1:Z if zz != z) + 0
-            [z in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
+            cH2TruckChangeFullAvailStart[z in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
             vH2Navail_full[z, j, t] -
             vH2Navail_full[z, j, t+inputs["hours_per_subperiod"]-1] ==
             vH2Ncharged[z, j, t] - vH2Ndischarged[z, j, t] + sum(
@@ -247,13 +248,13 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+            cH2TruckChangeEmptyAvailInterior[z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
             vH2Navail_empty[z, j, t] - vH2Navail_empty[z, j, t-1] ==
             -vH2Ncharged[z, j, t] +
             vH2Ndischarged[z, j, t] +
             sum(vH2Narrive_empty[zz, z, j, t-t_arrive] for zz = 1:Z if zz != z) -
-            sum(vH2Ndepart_empty[z, zz, j, t-t_depart] for zz = 1:Z if zz != z) + 0
-            [z in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
+            sum(vH2Ndepart_empty[z, zz, j, t-t_depart] for zz = 1:Z if zz != z)
+            cH2TruckChangeEmptyAvailStart[z in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
             vH2Navail_empty[z, j, t] -
             vH2Navail_empty[z, j, t+inputs["hours_per_subperiod"]-1] ==
             -vH2Ncharged[z, j, t] +
@@ -272,10 +273,10 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+            cH2TruckChangeFullTravelInterior[z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
             vH2Ntravel_full[z, zz, j, t] - vH2Ntravel_full[z, zz, j, t-1] ==
             vH2Ndepart_full[z, zz, j, t-t_depart] - vH2Narrive_full[z, zz, j, t-t_arrive]
-            [z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
+            cH2TruckChangeFullTravelStart[z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
             vH2Ntravel_full[z, zz, j, t] -
             vH2Ntravel_full[z, zz, j, t+inputs["hours_per_subperiod"]-1] ==
             vH2Ndepart_full[z, zz, j, t+inputs["hours_per_subperiod"]-1] -
@@ -287,10 +288,10 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+            cH2TruckChangeEmptyTravelInterior[z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
             vH2Ntravel_empty[z, zz, j, t] - vH2Ntravel_empty[z, zz, j, t-1] ==
             vH2Ndepart_empty[z, zz, j, t-t_depart] - vH2Narrive_empty[z, zz, j, t-t_arrive]
-            [z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
+            cH2TruckChangeEmptyTravelStart[z in 1:Z, zz in 1:Z, j in H2_TRUCK_TYPES, t in START_SUBPERIODS],
             vH2Ntravel_empty[z, zz, j, t] -
             vH2Ntravel_empty[z, zz, j, t+inputs["hours_per_subperiod"]-1] ==
             vH2Ndepart_empty[z, zz, j, t+inputs["hours_per_subperiod"]-1] -
@@ -305,50 +306,50 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
             vH2Ntravel_full[zz, z, j, t] >= sum(
                 vH2Narrive_full[zz, z, j, tt] for
-                tt = (t+1):(t+TD[zz, z]) if t + TD[zz, z] >=
+                tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
                 (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-                    t + TD[zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + TD[zz, z]
+                    t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
+                    t + 1 <= t + inputs["TD"][j][zz, z]
             )
             [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
             vH2Ntravel_empty[zz, z, j, t] >= sum(
                 vH2Ndepart_empty[zz, z, j, tt] for
-                tt = (t-TD[zz, z]+1):t if t + TD[zz, z] >=
+                tt = (t-inputs["TD"][j][zz, z]+1):t if t + inputs["TD"][j][zz, z] >=
                 (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-                    t + TD[zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + TD[zz, z]
+                    t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
+                    t + 1 <= t + inputs["TD"][j][zz, z]
             )
         end
     )
 
-    @constraints(
-        EP,
-        begin
-            [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
-            vH2Ntravel_full[zz, z, j, t] >= sum(
-                vH2Narrive_full[zz, z, j, tt] for
-                tt = (t+1):(t+TD[zz, z]) if t + TD[zz, z] >=
-                (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-                    t + TD[zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + TD[zz, z]
-            )
-            [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
-            vH2Ntravel_empty[zz, z, j, t] >= sum(
-                vH2Narrive_empty[zz, z, j, tt] for
-                tt = (t+1):(t+TD[zz, z]) if t + TD[zz, z] >=
-                (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-                    t + TD[zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + TD[zz, z]
-            )
-        end
-    )
+    # @constraints(
+    #     EP,
+    #     begin
+    #         [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+    #         vH2Ntravel_full[zz, z, j, t] >= sum(
+    #             vH2Narrive_full[zz, z, j, tt] for
+    #             tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
+    #             (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
+    #                 t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
+    #                 t + 1 <= t + inputs["TD"][j][zz, z]
+    #         )
+    #         [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+    #         vH2Ntravel_empty[zz, z, j, t] >= sum(
+    #             vH2Narrive_empty[zz, z, j, tt] for
+    #             tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
+    #             (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
+    #                 t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
+    #                 t + 1 <= t + inputs["TD"][j][zz, z]
+    #         )
+    #     end
+    # )
 
     # Capacity constraints
     @constraint(
         EP,
         [z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
         vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_tonne_per_unit][j] <=
-        EP[:eTotalH2CapTruckEnergy][z, j]
+        EP[:eTotalH2TruckEnergy][z, j]
     )
 
     # H2 truck flow balance
@@ -368,9 +369,9 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 end
 
 # # Truck travel delay - reserved for backup
-# if t + TD[zz, z] >=
+# if t + inputs["TD"][j][zz, z] >=
 #    (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-#    t + TD[zz, z] <= t + inputs["hours_per_subperiod"] - 1 &&
-#    t + 1 <= t + TD[zz, z]
+#    t + inputs["TD"][j][zz, z] <= t + inputs["hours_per_subperiod"] - 1 &&
+#    t + 1 <= t + inputs["TD"][j][zz, z]
 #     nothing
 # end

@@ -65,7 +65,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 
 			if setup["ModelH2Trucks"] == 1
-				dfTemp1[t+rowoffset,8] = value.(EP[:TruckFlow][t,z])
+				dfTemp1[t+rowoffset,8] = value.(EP[:eH2TruckFlow][t,z])
 			else
 				dfTemp1[t+rowoffset,8] = 0
 			end

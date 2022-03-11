@@ -1,6 +1,6 @@
 function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources
-    println("Hydrogen Storage Core Resources Module")
+    println("H2 Storage Core Resources Module")
 
     dfH2Gen = inputs["dfH2Gen"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of all h2 storage resources
@@ -25,7 +25,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
 
     # Energy losses related to storage technologies (increase in effective demand)
-	@expression(EP, eEH2LOSS[y in H2_STOR_ALL], sum(inputs["omega"][t]*EP[:vH2CHARGE_STOR][y,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vH2Gen][y,t] for t in 1:T))
+	#@expression(EP, eEH2LOSS[y in H2_STOR_ALL], sum(inputs["omega"][t]*EP[:vH2CHARGE_STOR][y,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vH2Gen][y,t] for t in 1:T))
 
     #Variable costs of "charging" for technologies "y" during hour "t" in zone "z"
     #  ParameterScale = 1 --> objective function is in million $
@@ -57,6 +57,9 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Term to represent electricity consumption associated with H2 storage charging and discharging
 	@expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
     if setup["ParameterScale"] ==1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+
+        sum(EP[:vH2CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)/ModelScalingFactor
+
         sum(EP[:vH2CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
     else
         sum(EP[:vH2CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
