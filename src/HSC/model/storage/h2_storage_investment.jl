@@ -23,7 +23,7 @@ This module defines the  decision variable  representing charging and energy com
 
 function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 storage Investment Module")
+	println("H2 Storage Investment Module")
 
 	dfH2Gen = inputs["dfH2Gen"]
 

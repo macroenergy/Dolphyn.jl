@@ -19,7 +19,7 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         if j in RET_CAP_H2_TRUCK_CHARGE
             retNumber[j] = value(EP[:vH2RetTruckNumber][j])
         end
-        endNumber = value(EP[:eTotalH2TruckNumber][j])
+        endNumber[j] = value(EP[:eTotalH2TruckNumber][j])
     end
 
     dfH2TruckCap = DataFrame(

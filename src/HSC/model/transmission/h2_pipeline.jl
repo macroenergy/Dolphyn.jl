@@ -5,7 +5,7 @@
 
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 Pipeline Module")
+	println("Hydrogen Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity

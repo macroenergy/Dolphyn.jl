@@ -16,7 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 truck Investment Module")
+    println("H2 Truck Investment Module")
 
     dfH2Truck = inputs["dfH2Truck"]
 
@@ -89,7 +89,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	if setup["ParameterScale"] ==1
         @expression(EP, eCFixH2TruckCharge[j in H2_TRUCK_TYPES],
             if j in NEW_CAP_H2_TRUCK_CHARGE # Truck types eligible for new charge capacity
-                (dfH2Truck[!,:H2TruckUnitCapex_per_unit][j]*vH2TruckNumber[j])/ModelScalingFactor^2
+                (dfH2Truck[!,:Inv_Cost_p_unit_p_yr][j]*vH2TruckNumber[j])/ModelScalingFactor^2
             else
                 EP[:vZERO]
             end
@@ -97,7 +97,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     else
         @expression(EP, eCFixH2TruckCharge[j in H2_TRUCK_TYPES],
             if j in NEW_CAP_H2_TRUCK_CHARGE # Truck types eligible for new charge capacity
-                dfH2Truck[!,:H2TruckUnitCapex_per_unit][j]*vH2TruckNumber[j]
+                dfH2Truck[!,:Inv_Cost_p_unit_p_yr][j]*vH2TruckNumber[j]
             else
                 EP[:vZERO]
             end
