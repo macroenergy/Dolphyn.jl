@@ -33,7 +33,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     if setup["ParameterScale"] ==1 
         @expression(EP, eCVarH2Stor_in[y in H2_STOR_ALL,t=1:T], 
         if (dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][y]>0) # Charging consumes fuel - fuel divided by 1000 since fuel cost already scaled in load_fuels_data.jl when ParameterScale =1
-            inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][y]*vH2CHARGE_STOR[y,t]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][k]*vH2CHARGE_STOR[y,t]/ModelScalingFactor
+            inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][y]*vH2CHARGE_STOR[y,t]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]][t] * dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][y]*vH2CHARGE_STOR[y,t]/ModelScalingFactor
         else
             inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][y]*vH2CHARGE_STOR[y,t]/ModelScalingFactor^2
         end
@@ -41,7 +41,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     else
         @expression(EP, eCVarH2Stor_in[y in H2_STOR_ALL,t=1:T], 
         if (dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][y]>0) # Charging consumes fuel 
-            inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][y]*vH2CHARGE_STOR[y,t] +inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][k]
+            inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][y]*vH2CHARGE_STOR[y,t] +inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]][t] * dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][y]
         else
             inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][y]*vH2CHARGE_STOR[y,t]
         end      
