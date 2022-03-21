@@ -311,7 +311,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	## Only activate when carbon capture utilization is online
 	if setup["ModelCO2"] == 1
 		###Carbon Balanace constraints
-		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] - EP[:eCO2BalanceStorTotal][t,z] >= inputs["CO2_D"][t,z])
+		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] - EP[:eCO2BalanceStorTotal][t,z] == inputs["CO2_D"][t,z])
 	end
 	
 	## Record pre-solver time
