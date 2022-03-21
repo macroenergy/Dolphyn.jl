@@ -44,7 +44,9 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	println("Reading co2 Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
     inputs = load_co2_capture(setup, path, sep, inputs)
+	inputs = load_co2_demand(setup, path, sep, inputs)
     inputs = load_co2_capture_variability(setup, path, sep, inputs)
+	inputs = load_co2_storage(setup, path, sep, inputs)
 
 	# If including price offset from negative emssions, read in emissions related inputs
 	if setup["CO2CostOffset"] == 1

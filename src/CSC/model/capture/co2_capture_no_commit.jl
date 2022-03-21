@@ -44,10 +44,10 @@ function co2_capture_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	####################################################################################################################################################
 
 	#CO2 Balance expressions
-	#@expression(EP, eCO2CaptureNoCommit[t=1:T, z=1:Z],
-	#sum(EP[:vCO2Capture][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
+	@expression(EP, eCO2CaptureNoCommit[t=1:T, z=1:Z],
+	sum(EP[:vCO2Capture][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
-	#EP[:eCO2Balance] += eCO2CaptureNoCommit
+	EP[:eCO2Balance] += eCO2CaptureNoCommit
 
 	#Power Consumption for CO2 Capture
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 

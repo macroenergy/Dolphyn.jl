@@ -113,7 +113,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	## Only activate when carbon capture utilization is online
 	# Initialize Carbon Balance Expression
 	# Expression for "baseline" CO2 balance constraint
-	#@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eCO2BalanceStorTotal[t=1:T, z=1:Z], 0)
 
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
@@ -249,6 +250,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = co2_capture(EP, inputs, setup)
 		end
 
+		if !isempty(inputs["CO2_STOR_ALL"])
+			#model CO2 storage
+			EP = co2_storage(EP, inputs, setup)
+		end
+
 		# Direct emissions of various carbon capture sector resources
 		EP = emissions_csc(EP, inputs,setup)
 
@@ -303,10 +309,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 	
 	## Only activate when carbon capture utilization is online
-	#if setup["ModelCO2"] == 1
-	#	###Carbon Balanace constraints
-	#	@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
-	#end
+	if setup["ModelCO2"] == 1
+		###Carbon Balanace constraints
+		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] - EP[:eCO2BalanceStorTotal][t,z] >= inputs["CO2_D"][t,z])
+	end
 	
 	## Record pre-solver time
 	presolver_time = time() - presolver_start_time

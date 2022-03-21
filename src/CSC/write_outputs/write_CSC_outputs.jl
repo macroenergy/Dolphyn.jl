@@ -47,6 +47,10 @@ function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_co2_balance(path,sep,inputs, setup, EP)
     write_co2_emissions(path,sep,inputs, setup, EP)
 
+    #write_co2_storage(path, sep, inputs, setup, EP)
+    write_co2_storage_capacity(path, sep, inputs, setup, EP)
+    #write_co2_storage_costs(path, sep, inputs, setup, EP)
+
   ## Print confirmation
   println("Wrote outputs CSC outputs to $path$sep")
 
