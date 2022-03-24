@@ -23,6 +23,8 @@ This module uses the following 'helper' functions in separate files: ```h2_gener
 """
 function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
+	println("Hydrogen Production Module")
+	
 	if !isempty(inputs["H2_GEN"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies
 		EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)

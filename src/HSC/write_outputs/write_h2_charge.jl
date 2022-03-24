@@ -28,7 +28,7 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
 	charge = zeros(H,T)
 	for i in 1:H
         if i in inputs["H2_STOR_ALL"]
-            charge[i,:] = value.(EP[:vH2CHARGE_STOR])[i,:] 
+            charge[i,:] = value.(EP[:vH2_CHARGE_STOR])[i,:] 
         elseif i in inputs["H2_FLEX"]
             charge[i,:] = value.(EP[:vH2_CHARGE_FLEX])[i,:]
         end

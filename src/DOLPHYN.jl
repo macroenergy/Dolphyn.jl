@@ -151,7 +151,10 @@ include("HSC/model/truck/h2_truck_all.jl")
 include("HSC/model/truck/h2_long_duration_truck.jl")
 
 # H2 storage
-include("HSC/model/storage/h2_storage_investment.jl")
+include("HSC/model/storage/h2_storage_investment_energy.jl")
+include("HSC/model/storage/h2_storage_investment_charge.jl")
+include("HSC/model/storage/h2_storage_symmetric.jl")
+include("HSC/model/storage/h2_storage_asymmetric.jl")
 include("HSC/model/storage/h2_storage.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")

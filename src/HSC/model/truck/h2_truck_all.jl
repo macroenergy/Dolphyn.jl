@@ -154,23 +154,22 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
     EP[:eH2Balance] += eH2TruckFlow
 
-    # Dev note: carbon emission balance is under construction
-    # Carbon emission balance
-    # @expression(
-    #     EP,
-    #     Truck_carbon_emission,
-    #     sum(
-    #         inputs["omega"][t] *
-    #         (
-    #             vH2Narrive_full[zz, z, j, t] *
-    #             dfH2Truck[!, :Full_weight_tonne_per_unit][j] +
-    #             vH2Narrive_empty[zz, z, j, t] * dfH2Truck[!, :Empty_weight_tonne_per_unit][j]
-    #         ) *
-    #         inputs["RouteLength"][zz, z] *
-    #         dfH2Truck[!, :truck_emission_rate_tonne_per_tonne_mile][j] for
-    #         zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
-    #     )
-    # )
+    # H2 truck emission penalty
+    @expression(
+        EP,
+        Truck_carbon_emission,
+        sum(
+            inputs["omega"][t] *
+            (
+                vH2Narrive_full[zz, z, j, t] *
+                dfH2Truck[!, :Full_weight_tonne_per_unit][j] +
+                vH2Narrive_empty[zz, z, j, t] * dfH2Truck[!, :Empty_weight_tonne_per_unit][j]
+            ) *
+            inputs["RouteLength"][zz, z] *
+            dfH2Truck[!, :truck_emission_rate_tonne_per_tonne_mile][j] for
+            zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
+        )
+    )
     # EP[:eCarbonBalance] += Truck_carbon_emission
     ## End Balance Expressions ##
     ### End Expressions ###
@@ -322,27 +321,27 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    # @constraints(
-    #     EP,
-    #     begin
-    #         [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
-    #         vH2Ntravel_full[zz, z, j, t] >= sum(
-    #             vH2Narrive_full[zz, z, j, tt] for
-    #             tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
-    #             (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-    #                 t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
-    #                 t + 1 <= t + inputs["TD"][j][zz, z]
-    #         )
-    #         [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
-    #         vH2Ntravel_empty[zz, z, j, t] >= sum(
-    #             vH2Narrive_empty[zz, z, j, tt] for
-    #             tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
-    #             (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
-    #                 t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
-    #                 t + 1 <= t + inputs["TD"][j][zz, z]
-    #         )
-    #     end
-    # )
+    @constraints(
+        EP,
+        begin
+            [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+            vH2Ntravel_full[zz, z, j, t] >= sum(
+                vH2Narrive_full[zz, z, j, tt] for
+                tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
+                (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
+                    t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
+                    t + 1 <= t + inputs["TD"][j][zz, z]
+            )
+            [zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES, t in INTERIOR_SUBPERIODS],
+            vH2Ntravel_empty[zz, z, j, t] >= sum(
+                vH2Narrive_empty[zz, z, j, tt] for
+                tt = (t+1):(t+inputs["TD"][j][zz, z]) if t + inputs["TD"][j][zz, z] >=
+                (t % inputs["hours_per_subperiod"]) * inputs["hours_per_subperiod"] + 1 &&
+                    t + inputs["TD"][j][zz, z] <= (t % inputs["hours_per_subperiod"]) * (inputs["hours_per_subperiod"] + 1) &&
+                    t + 1 <= t + inputs["TD"][j][zz, z]
+            )
+        end
+    )
 
     # Capacity constraints
     @constraint(

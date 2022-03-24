@@ -24,7 +24,9 @@ Documentation to follow ******
 
 function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
-	#Rename H2Gen dataframe
+	println("H2 Production (Unit Commitment) Module")
+	
+	# Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]
 	H2GenCommit = setup["H2GenCommit"]
 

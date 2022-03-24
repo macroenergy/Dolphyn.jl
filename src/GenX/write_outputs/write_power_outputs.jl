@@ -96,9 +96,13 @@ function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, input
 			println(elapsed_time_expansion)
 		end
 	end
-	elapsed_time_emissions = @elapsed write_emissions(path, sep, inputs, setup, EP)
-	println("Time elapsed for writing emissions is")
-	println(elapsed_time_emissions)
+	
+	if setup["CO2Cap"] == 1
+		elapsed_time_emissions = @elapsed write_emissions(path, sep, inputs, setup, EP)
+		println("Time elapsed for writing emissions is")
+		println(elapsed_time_emissions)
+	end
+
 	if has_duals(EP) == 1
 		elapsed_time_reliability = @elapsed write_reliability(path, sep, inputs, setup, EP)
 		println("Time elapsed for writing reliability is")

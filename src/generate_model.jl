@@ -127,8 +127,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = ucommit(EP, inputs, setup["UCommit"])
 	end
 
-	# Emissions of various power sector resources
-	EP = emissions_power(EP, inputs,setup)
+	if setup["CO2Cap"] > 0
+		# Emissions of various power sector resources
+		EP = emissions_power(EP, inputs,setup)
+	end
 
 	if setup["Reserves"] > 0
 		EP = reserves(EP, inputs, setup["UCommit"])
@@ -189,14 +191,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = h2_investment(EP, inputs, setup)
 	
 		if !isempty(inputs["H2_GEN"])
-			#model H2 generation
+			# Model H2 generation
 			EP = h2_production(EP, inputs, setup)
 		end
 
-		# Direct emissions of various hydrogen sector resources
-		EP = emissions_hsc(EP, inputs,setup)
+		if setup["H2CO2Cap"] > 0
+			# Direct emissions of various hydrogen sector resources
+			EP = emissions_hsc(EP, inputs,setup)
+		end
 
-		#model H2 non-served energy
+		# Model H2 non-served energy
 		EP = h2_non_served_energy(EP, inputs,setup)
 
 		# Model hydrogen storage technologies
@@ -205,22 +209,22 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 
 		if !isempty(inputs["H2_FLEX"])
-			#model H2 flexible demand resources
+			# Model H2 flexible demand resources
 			EP = h2_flexible_demand(EP, inputs, setup)
 		end
 
 		if setup["ModelH2Pipelines"] == 1
-			# model hydrogen transmission via pipelines
+			# Model hydrogen transmission via pipelines
 			EP = h2_pipeline(EP, inputs, setup)
 		end
 
 		if setup["ModelH2Trucks"] == 1
-			# model hydrogen transmission via trucks
+			# Model hydrogen transmission via trucks
 			EP = h2_truck(EP, inputs, setup)
 		end
 
 		if setup["ModelH2G2P"] == 1
-			#model H2 Gas to Power
+			# Model H2 Gas to Power
 			EP = h2_g2p(EP, inputs, setup)
 		end
 	end
@@ -228,11 +232,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	################  Policies #####################3
 	# CO2 emissions limits for the power sector only
-	if setup["ModelH2"] ==0
-		EP = co2_cap_power(EP, inputs, setup)
-	elseif setup["ModelH2"]==1
-		EP = co2_cap_power_hsc(EP, inputs, setup)
-	end
+	# if setup["ModelH2"] == 0
+	# 	EP = co2_cap_power(EP, inputs, setup)
+	# elseif setup["ModelH2"] == 1
+	# 	EP = co2_cap_power_hsc(EP, inputs, setup)
+	# end
 
 
 	# Energy Share Requirement
@@ -240,7 +244,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = energy_share_requirement(EP, inputs, setup)
 	end
 
-	#Capacity Reserve Margin
+	# Capacity Reserve Margin
 	if setup["CapacityReserveMargin"] > 0
 		EP = cap_reserve_margin(EP, inputs, setup)
 	end
