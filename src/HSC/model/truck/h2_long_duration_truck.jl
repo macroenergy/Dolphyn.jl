@@ -17,6 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_long_duration_truck(EP::Model, inputs::Dict)
 
+This function includes LongDurationtruck only when modeling representative periods.
 """
 function h2_long_duration_truck(EP::Model, inputs::Dict)
 

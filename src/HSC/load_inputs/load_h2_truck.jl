@@ -17,6 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
 
+Function for reading input parameters related to CO$_2$ emissions cap constraints
 """
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 

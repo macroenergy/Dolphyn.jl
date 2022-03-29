@@ -21,6 +21,38 @@ This module defines the production decision variable  representing hydrogen inje
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
+```math
+\begin{aligned}
+& \Delta^{total}_{y,z} =(\overline{\Delta_{y,z}}+\Omega_{y,z}-\Delta_{y,z}) \forall y \in \mathcal{G}, z \in \mathcal{Z}
+\end{aligned}
+```
+	
+One cannot retire more capacity than existing capacity.
+```math
+\begin{aligned}
+&\Delta_{y,z} \leq \overline{\Delta_{y,z}}
+	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
+\end{aligned}
+```
+	
+For resources where $\overline{\Omega_{y,z}}$ and $\underline{\Omega_{y,z}}$ is defined, then we impose constraints on minimum and maximum power capacity.
+```math
+\begin{aligned}
+& \Delta^{total}_{y,z} \leq \overline{\Omega}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z} \\
+& \Delta^{total}_{y,z}  \geq \underline{\Omega}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
+\end{aligned}
+```
+	
+In addition, this function adds investment and fixed O\&M related costs related to discharge/generation capacity to the objective function:
+```math
+\begin{aligned}
+& 	\sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}}
+	\left( (\pi^{INVEST}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Omega_{y,z})
+	+ (\pi^{FOM}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Delta^{total}_{y,z})\right)
+\end{aligned}
+```
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 

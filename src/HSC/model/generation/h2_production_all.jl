@@ -19,6 +19,39 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
+
+**Constraints**
+The outputs of each type of H2 generation facilities have to be kept within their lower and upper bounds. q
+```math
+\begin{aligned}
+	\overline{\mathrm{R}}_{k, z}^{\mathrm{GEN}} \mathrm{M}_{k, z}^{\mathrm{GEN}} n_{k, z, t} \geq h_{k, z, t}^{\mathrm{GEN}} \geq \underline{\mathrm{R}}_{k, z}^{\mathrm{GEN}} \mathbf{M}_{k, z}^{\mathrm{GEN}} n_{k, z, t} \\
+	\forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
+\end{aligned}
+```
+
+The number of online units has to be less than the available number of generation units.
+```math
+\begin{aligned}
+	n_{k, z, t} \leq N_{k, z} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
+\end{aligned}
+```
+
+There are limits on the period of time between when a unit starts up and when it can be shut-down again, and vice versa
+```math
+\begin{aligned}
+	n_{k, z, t} \geq \sum_{\tau=t-\tau_{k, z}^{\mathrm{UP}}}^{t} n_{k, z, t}^{\mathrm{UP}} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
+	N_{k, z}-n_{k, z, t} \geq \sum_{\tau=t-\tau_{k, z}^{\mathrm{DOWN}}}^{t} n_{k, z, t}^{\mathrm{DOWN}} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
+\end{aligned}
+```
+
+**Expressions**
+The numbers of units starting up and shutting down are modeled as:
+```math
+\begin{aligned}
+	n_{k, z, t}-n_{k, z, t-1}=n_{k, z, t}^{\mathrm{UP}}-n_{k, z, t}^{\mathrm{DOWN}} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
+\end{aligned}
+```
+
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
