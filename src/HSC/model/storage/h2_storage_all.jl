@@ -17,8 +17,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
+<<<<<<< HEAD
     Sets up variables and constraints common to all storage resources. See ```storage()``` in ```storage.jl``` for description of constraints.
 
+=======
+>>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
 function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources

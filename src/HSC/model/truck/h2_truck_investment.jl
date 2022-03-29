@@ -17,7 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
+<<<<<<< HEAD
 This function includes investment variables, expressions and related constraints for H2 trucks.
+=======
+>>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
