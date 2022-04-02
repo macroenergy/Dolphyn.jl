@@ -18,6 +18,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     h2_long_duration_truck(EP::Model, inputs::Dict)
 
 This function includes LongDurationtruck only when modeling representative periods.
+
+** Variables**
+
+State of charge of truck at beginning of each modeled period n.
+\begin{align}
+    v_{j, t}^{\mathrm{F}}+v_{j, t}^{\mathrm{E}} & = V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+\end{align}
+
+```math
+\begin{aligned}
+    v_{n}^{SOC} \geqslant 0,v_{z,j,n}^{SOC}\leqslant v_{j}^{TRU}
+\end{aligned}
+```
+
 """
 function h2_long_duration_truck(EP::Model, inputs::Dict)
 

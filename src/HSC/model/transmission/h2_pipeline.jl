@@ -21,7 +21,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-<<<<<<< HEAD
     This function includes the variables, expressions and objective funtion of pipeline.
 
     This function expresses H2 change at zone z through pipeline i between two zones and can be split into H2 delivering and flowing out.
@@ -47,8 +46,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 \end{aligned}   
 ```
 
-=======
->>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 

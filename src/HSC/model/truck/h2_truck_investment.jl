@@ -17,10 +17,23 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
-<<<<<<< HEAD
 This function includes investment variables, expressions and related constraints for H2 trucks.
-=======
->>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
+
+**Variables**
+New installed charge capacity of truck type "j" is larger than zero.
+```math
+\begin{aligned}
+    v_{CAP,j}^{TRU} \geqslant 0,v_{RETCAP,j}^{TRU} \geqslant 0,v_{CAP,j}^{TRU} \geqslant 0
+\end{aligned}
+```
+
+**Expressions**
+```math
+\begin{aligned}
+    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \Omega_{t} \mathrm{~L}_{z \rightarrow z^{\prime}} \\
+    & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
+\end{aligned}
+```
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 

@@ -21,6 +21,12 @@ This module defines the production decision variable  representing hydrogen inje
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
+```math
+\begin{aligned}
+	Obj_{Var\_gen} =
+	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
+\end{aligned}
+```
 """
 
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
