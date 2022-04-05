@@ -32,6 +32,15 @@ State of charge of truck at beginning of each modeled period n.
 \end{aligned}
 ```
 
+**Constraints**
+
+State of charge of truck at beginning of each modeled period cannot exceed installed energy capacity
+```math
+\begin{aligned}
+    v_{z,j,n}^{SOC}< v_{j}^{TRU}
+\end{aligned}
+```
+
 """
 function h2_long_duration_truck(EP::Model, inputs::Dict)
 

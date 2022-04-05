@@ -21,6 +21,19 @@ This module defines the production decision variable  representing hydrogen inje
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
+**Variables**
+```math
+\begin{aligned}
+	\vartheta _{k}^{GenNewCap}\ge 0	
+\end{aligned}
+```	
+
+```math
+\begin{aligned}
+	\vartheta _{k}^{GenRetCap}\ge 0
+\end{aligned}
+```
+
 ```math
 \begin{aligned}
 & \Delta^{total}_{y,z} =(\overline{\Delta_{y,z}}-\Delta_{y,z}) \forall y \in \mathcal{G}, z \in \mathcal{Z}
