@@ -49,6 +49,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     if setup["ModelH2Pipelines"] == 1
         write_h2_pipeline_flow(path, sep, inputs, setup, EP)
         write_h2_pipeline_expansion(path, sep, inputs, setup, EP)
+        write_h2_pipeline_level(path, sep, inputs, setup, EP)
     end
 
     if setup["H2CO2Cap"] == 1
