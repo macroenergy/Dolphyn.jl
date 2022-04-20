@@ -110,6 +110,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" H2 balance constraint
 	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
 
+	## Only activate when carbon capture utilization is online
+	# Initialize Carbon Balance Expression
+	# Expression for "baseline" CO2 balance constraint
+	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eCO2BalanceStorTotal[t=1:T, z=1:Z], 0)
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -229,14 +235,54 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 	end
 
+	###### START OF CO2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
+
+	if setup["ModelCO2"] == 1
+
+		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
+		@expression(EP, eCO2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Infrastructure
+		EP = co2_outputs(EP, inputs, setup)
+
+		# Investment cost of various carbon capture sources
+		EP = co2_investment(EP, inputs, setup)
+	
+		if !isempty(inputs["CO2_CAPTURE"])
+			#model CO2 capture
+			EP = co2_capture(EP, inputs, setup)
+		end
+
+		if !isempty(inputs["CO2_STOR_ALL"])
+			#model CO2 storage
+			EP = co2_storage(EP, inputs, setup)
+		end
+
+		# Direct emissions of various carbon capture sector resources
+		EP = emissions_csc(EP, inputs,setup)
+
+	end
 
 	################  Policies #####################3
-	# CO2 emissions limits for the power sector only
-	# if setup["ModelH2"] == 0
-	# 	EP = co2_cap_power(EP, inputs, setup)
-	# elseif setup["ModelH2"] == 1
-	# 	EP = co2_cap_power_hsc(EP, inputs, setup)
-	# end
+
+	if setup["ModelH2"] ==0 
+
+		if setup["ModelCO2"]==0
+			EP = co2_cap_power(EP, inputs, setup)
+
+		elseif setup["ModelCO2"]==1
+			EP = co2_cap_power_csc(EP, inputs, setup)
+		end
+
+	elseif setup["ModelH2"]==1
+
+		if setup["ModelCO2"]==0
+			EP = co2_cap_power_hsc(EP, inputs, setup)
+
+		elseif setup["ModelCO2"]==1
+			EP = co2_cap_power_hsc_csc(EP, inputs, setup)
+		end
+	end
 
 
 	# Energy Share Requirement
@@ -264,6 +310,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if setup["ModelH2"] == 1
 		###Hydrogen Balance constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+	end
+	
+	## Only activate when carbon capture utilization is online
+	if setup["ModelCO2"] == 1
+		###Carbon Balanace constraints
+		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] - EP[:eCO2BalanceStorTotal][t,z] == inputs["CO2_D"][t,z])
 	end
 	
 	## Record pre-solver time

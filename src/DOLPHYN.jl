@@ -21,10 +21,12 @@ export configure_settings
 export configure_solver
 export load_power_inputs
 export load_h2_inputs
+export load_co2_inputs
 export generate_model
 export solve_model
 export write_power_outputs
 export write_HSC_outputs
+export write_CSC_outputs
 export cluster_inputs
 export mga
 
@@ -98,6 +100,13 @@ include("HSC/load_inputs/load_co2_cap_hsc.jl")
 include("HSC/load_inputs/load_h2_g2p.jl")
 include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
+#Load input data - CSC
+include("CSC/load_inputs/load_co2_inputs.jl")
+include("CSC/load_inputs/load_co2_demand.jl")
+include("CSC/load_inputs/load_co2_capture.jl")
+include("CSC/load_inputs/load_co2_capture_variability.jl")
+include("CSC/load_inputs/load_co2_price_csc.jl")
+include("CSC/load_inputs/load_co2_storage.jl")
 
 # Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
@@ -136,10 +145,10 @@ include("HSC/model/flexible_demand/h2_flexible_demand.jl")
 include("HSC/model/core/emissions_hsc.jl")
 
 # H2 production
+include("HSC/model/generation/h2_production.jl")
+include("HSC/model/generation/h2_production_all.jl")
 include("HSC/model/generation/h2_production_commit.jl")
 include("HSC/model/generation/h2_production_no_commit.jl")
-include("HSC/model/generation/h2_production_all.jl")
-include("HSC/model/generation/h2_production.jl")
 
 # H2 pipelines
 include("HSC/model/transmission/h2_pipeline.jl")
@@ -170,9 +179,27 @@ include("HSC/model/g2p/h2_g2p.jl")
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
 
+#Core CSC Modelling Features
+include("CSC/model/core/co2_investment.jl")
+include("CSC/model/core/co2_outputs.jl")
+include("CSC/model/core/emissions_csc.jl")
+
+# CO2 Capture
+include("CSC/model/capture/co2_capture.jl")
+include("CSC/model/capture/co2_capture_all.jl")
+include("CSC/model/capture/co2_capture_commit.jl")
+include("CSC/model/capture/co2_capture_no_commit.jl")
+
+# CO2 Storage
+include("CSC/model/storage/co2_storage_investment.jl")
+include("CSC/model/storage/co2_storage.jl")
+include("CSC/model/storage/co2_storage_all.jl")
+include("CSC/model/storage/co2_long_duration_storage.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
+include("co2_cap_power_csc.jl")
+include("co2_cap_power_hsc_csc.jl")
 include("generate_model.jl")
 include("solve_model.jl")
 
@@ -241,6 +268,17 @@ include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
+
+# CSC Write Outputs
+include("CSC/write_outputs/write_co2_capture.jl")
+include("CSC/write_outputs/write_co2_capacity.jl")
+include("CSC/write_outputs/write_co2_costs.jl")
+include("CSC/write_outputs/write_co2_balance.jl")
+include("CSC/write_outputs/write_co2_emissions.jl")
+include("CSC/write_outputs/write_co2_storage_capacity.jl")
+include("CSC/write_outputs/write_co2_storage_costs.jl")
+include("CSC/write_outputs/write_co2_storage.jl")
+include("CSC/write_outputs/write_CSC_outputs.jl")
 
 # Modeling to generator alternatives
 include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")

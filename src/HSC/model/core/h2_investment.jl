@@ -32,6 +32,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+
     H = inputs["H2_RES_ALL"]
 
     # Capacity of New H2 Gen units (tonnes/hr)
