@@ -22,6 +22,8 @@ The h2 generation module creates decision variables, expressions, and constraint
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
+	println("H2 Production Core Module")
+	
 	dfH2Gen = inputs["dfH2Gen"]
 
 	#Define sets
