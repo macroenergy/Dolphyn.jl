@@ -54,9 +54,9 @@ function co2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Term to represent electricity consumption associated with CO2 storage charging and discharging
 	@expression(EP, ePowerBalanceCO2Stor[t=1:T, z=1:Z],
     if setup["ParameterScale"] ==1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
-        sum(EP[:vCO2CHARGE_STOR][y,t]*dfCO2Stor[!,:CO2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfCO2Stor[dfCO2Stor.Zone.==z,:R_ID],CO2_STOR_ALL))
+        sum(EP[:vCO2CHARGE_STOR][y,t]*dfCO2Stor[!,:CO2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfCO2Stor[dfCO2Stor.Zone.==z,:R_ID],CO2_STOR_ALL); init=0.0)
     else
-        sum(EP[:vCO2CHARGE_STOR][y,t]*dfCO2Stor[!,:CO2Stor_Charge_MWh_p_tonne][y] for y in intersect(dfCO2Stor[dfCO2Stor.Zone.==z,:R_ID],CO2_STOR_ALL))
+        sum(EP[:vCO2CHARGE_STOR][y,t]*dfCO2Stor[!,:CO2Stor_Charge_MWh_p_tonne][y] for y in intersect(dfCO2Stor[dfCO2Stor.Zone.==z,:R_ID],CO2_STOR_ALL); init=0.0)
     end
     )
 
