@@ -33,6 +33,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.==1),:R_ID]
 	inputs_gen["H2_STOR_SHORT_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==0) .& (h2_gen_in.H2_STOR.==1),:R_ID]
 
+	# Set of hydrogen generation plants with CCS
+	inputs_gen["H2_CCS"] = h2_gen_in[h2_gen_in.CCS .== 1,:R_ID]
+	
 	# Set of all storage resources eligible for new energy capacity
 	inputs_gen["NEW_CAP_H2_ENERGY"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Energy_Cap_tonne.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
 	# Set of all storage resources eligible for energy capacity retirements

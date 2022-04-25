@@ -28,20 +28,11 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
+    H2_CCS = inputs["H2_CCS"]
 
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
     # Adjustment of Fuel_CO2 units carried out in load_fuels_data.jl
-
-	@expression(EP, eH2EmissionsByPlant[k=1:H,t=1:T], 
-    if(dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][k]>0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
-        inputs["fuel_CO2"][dfH2Gen[!,:Fuel][k]]* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]* EP[:vH2Gen][k,t] + inputs["fuel_CO2"][dfH2Gen[!,:Fuel][k]]* dfH2Gen[!,:H2Stor_Charge_MMBtu_p_tonne][k]* EP[:vH2CHARGE_STOR][k,t]
-    else
-        inputs["fuel_CO2"][dfH2Gen[!,:Fuel][k]]* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]* EP[:vH2Gen][k,t] 
-    end    
-    ) 
-      
- 	@expression(EP, eH2EmissionsByZone[z=1:Z, t=1:T], sum(eH2EmissionsByPlant[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
   
     @expression(
         EP,
@@ -62,12 +53,26 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
     @expression(
         EP,
+        eCO2CaptureH2ByPlant[y in H2_CCS, t = 1:T],
+        dfH2Gen[!, :CCS_Percentage][y] / (1 - dfH2Gen[!, :CCS_Percentage][y]) *
+        eH2EmissionsByPlant[y, t]
+    )
+
+    @expression(
+        EP,
         eH2EmissionsByZone[z = 1:Z, t = 1:T],
         sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
     )
 
+    # This expression is used for hydrogen plant with CCS
+    @expression(
+		EP,
+		eCO2CaptureH2ByZone[z = 1:Z, t = 1:T],
+		sum(eCO2CapturePowerByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
+	)
+
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices
-    if (setup["H2CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 1)
+    if (setup["CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 1)
         # Use CO2 price for HSC supply chain
         # Emissions penalty by zone - needed to report zonal cost breakdown
         @expression(

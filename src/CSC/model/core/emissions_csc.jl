@@ -33,16 +33,18 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
     # Adjustment of Fuel_CO2 units carried out in load_fuels_data.jl
 
-    #Negative CO2 emission = CO2 emitted by fuel usage - Total amount of CO2 captured
+    #DAC Negative CO2 emission = CO2 emitted by fuel usage - Total amount of CO2 captured
 	@expression(EP, eCO2NegativeEmissionsByPlant[k=1:H,t=1:T], 
         EP[:vCO2Capture][k,t] - inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]]* dfCO2Capture[!,:etaFuel_MMBtu_p_tonne][k]* EP[:vCO2Capture][k,t]
     ) 
       
  	@expression(EP, eCO2NegativeEmissionsByZone[z=1:Z, t=1:T], sum(eCO2NegativeEmissionsByPlant[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+    @expression(EP, eCO2PSCEmissionsByZone[z in 1:Z, t in 1:T], eEmissionsByZone[z ,t] + eH2EmissionsByZone[z, t])
+    @expression(EP, eCO2PSCCaptureByZone[z = 1:Z, t = 1:T], eCO2CapturePowerByZone[z, t] + eCO2CaptureH2ByZone[z, t])
 
     # If CO2 price is implemented in CSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to minus cost penalty due to CO2 prices
     # Also need to deduct away CO2 price offset due to net carbon capture (Negative emissions)
-    if (setup["CO2CostOffset"] ==1 && setup["SystemCO2Constraint"] ==1)
+    if (setup["CO2CostOffset"] ==1 && setup["SystemCO2Constraint"] == 1)
         # Use CO2 price for CSC supply chain
         # Emissions offset by zone - needed to report zonal cost breakdown
         @expression(EP,eCCO2EmissionsOffsetbyZone[z=1:Z],
@@ -57,7 +59,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     	EP[:eObj] -= eCCO2CaptureTotalEmissionsOffset
 
 
-    elseif (setup["CO2Cap"] ==4 && setup["SystemCO2Constraint"] ==2) 
+    elseif (setup["CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 2) 
         # Use CO2 price for power system as the global CO2 price
         # Emissions offset by zone - needed to report zonal cost breakdown
         @expression(EP,eCCO2EmissionsOffsetbyZone[z=1:Z],
