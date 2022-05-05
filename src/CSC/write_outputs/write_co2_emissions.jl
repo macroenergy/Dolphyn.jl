@@ -30,9 +30,9 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 
 	for z in 1:Z
 		if setup["ParameterScale"]==1
-			dfDACEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[z,:])*ModelScalingFactor
+			dfDACEmissions[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[z,:])*ModelScalingFactor
 		else
-			dfDACEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[z,:])/ModelScalingFactor
+			dfDACEmissions[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[z,:])/ModelScalingFactor
 		end
 	end
 
@@ -62,9 +62,9 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 
 	for z in 1:Z
 		if setup["ParameterScale"]==1
-			dfPSCEmission[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2PSCEmissionsByZone])[z,:])*ModelScalingFactor
+			dfPSCEmission[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCEmissionsByZone])[z,:])*ModelScalingFactor
 		else
-			dfPSCEmission[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2PSCEmissionsByZone])[z,:])/ModelScalingFactor
+			dfPSCEmission[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCEmissionsByZone])[z,:])/ModelScalingFactor
 		end
 	end
 
@@ -94,9 +94,9 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 
 	for z in 1:Z
 		if setup["ParameterScale"]==1
-			dfPSCCaptured[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2PSCCaptureByZone])[z,:])*ModelScalingFactor
+			dfPSCCaptured[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCCaptureByZone])[z,:])*ModelScalingFactor
 		else
-			dfPSCCaptured[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2PSCCaptureByZone])[z,:])/ModelScalingFactor
+			dfPSCCaptured[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCCaptureByZone])[z,:])/ModelScalingFactor
 		end
 	end
 

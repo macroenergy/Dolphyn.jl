@@ -182,6 +182,7 @@ include("HSC/model/policies/co2_cap_hsc.jl")
 # Core CSC Modelling Features
 include("CSC/model/core/co2_investment.jl")
 include("CSC/model/core/co2_outputs.jl")
+include("CSC/model/core/co2_non_served.jl")
 include("CSC/model/core/emissions_csc.jl")
 
 # CO2 Capture

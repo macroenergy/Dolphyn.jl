@@ -23,14 +23,14 @@ function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	## Cost results
 	dfCO2Capture = inputs["dfCO2Capture"]
 
-	SEG = inputs["SEG"]  # Number of lines
+	CO2_SEG = inputs["CO2_SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 	CO2_CAPTURE_COMMIT = inputs["CO2_CAPTURE_COMMIT"] # CO2 production technologies with unit commitment
 
 	cCO2Start = 0
 
-	dfCO2Cost = DataFrame(Costs = ["cCO2Total", "cCO2Fix", "cCO2Var", "cCO2Start"])
+	dfCO2Cost = DataFrame(Costs = ["cCO2Total", "cCO2Fix", "cCO2Var", "cCO2NSE", "cCO2Start"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cCO2Var = value(EP[:eTotalCCO2CaptureVarOut])* (ModelScalingFactor^2)
 		cCO2Fix = value(EP[:eTotalCO2CaptureCFix])*ModelScalingFactor^2
@@ -41,9 +41,9 @@ function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 
 	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
 	# Emissions penalty is already scaled by adjusting the value of carbon price used in emissions_CSC.jl
-	#if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["CO2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
-		#cCO2Var  = cCO2Var + value(EP[:eCCO2CaptureTotalEmissionsPenalty])
-	#end
+	if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["CO2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
+		cCO2Var  = cCO2Var + value(EP[:eCCO2CaptureTotalEmissionsPenalty])
+	end
 
 	if !isempty(inputs["CO2_CAPTURE_COMMIT"])
 		if setup["ParameterScale"]==1 # Convert costs in millions to $

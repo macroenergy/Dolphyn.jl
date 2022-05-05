@@ -83,6 +83,7 @@ Example_Systems/SmallNewEngland/SevenZones/TDR_Results_*
 
 Example_Systems/SmallNewEngland/SevenZones/Results*
 Example_Systems/SmallNewEngland/SevenZones/DOLPHYNJulEnv
+Example_Systems/SomeWhere/Results*
 src/test.jl
 src/test.jl
 src/test.jl

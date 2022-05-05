@@ -122,6 +122,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Power supply by z and timestep - used in emissions constraints
 	@expression(EP, eGenerationByZone[t=1:T, z=1:Z], 0)
 
+	# PSC emissions by zone and time
+	@expression(EP, eCO2PSCEmissionsByZone[z = 1:Z, t = 1:T], 0)
+
+	# PSC captured CO2
+	@expression(EP, eCO2PSCCaptureByZone[z = 1:Z, t = 1:T], 0)
+	
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
 
@@ -247,7 +253,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		# Investment cost of various carbon capture sources
 		EP = co2_investment(EP, inputs, setup)
-	
+
+		# Model CO2 non-served energy
+		EP = co2_non_served_energy(EP, inputs, setup)
+		
 		if !isempty(inputs["CO2_CAPTURE"])
 			#model CO2 capture
 			EP = co2_capture(EP, inputs, setup)

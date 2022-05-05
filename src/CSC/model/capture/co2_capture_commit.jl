@@ -56,9 +56,9 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 1 --> objective function is in million $
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1 
-		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_H2_Start"][k]*vCO2CaptureStart[k,t]/ModelScalingFactor^2))
+		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_CO2_Start"][k]*vCO2CaptureStart[k,t]/ModelScalingFactor^2))
 	else
-		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_H2_Start"][k]*vCO2CaptureStart[k,t]))
+		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_CO2_Start"][k]*vCO2CaptureStart[k,t]))
 	end
 
 	# Julia is fastest when summing over one row one column at a time

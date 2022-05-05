@@ -59,9 +59,12 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 	@expression(
 		EP,
 		eCO2CapturePowerByZone[z = 1:Z, t = 1:T],
-		sum(eCO2CapturePowerByPlant[y, t] for y in union(dfGen[(dfGen[!, :Zone].==z), :R_ID], Power_CCS))
+		sum(eCO2CapturePowerByPlant[y, t] for y in intersect(dfGen[(dfGen[!, :Zone].==z), :R_ID], Power_CCS))
 	)
 
+    EP[:eCO2PSCEmissionsByZone] += eEmissionsByZone
+    EP[:eCO2PSCCaptureByZone] += eCO2CapturePowerByZone
+    
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
     # then need to add cost penalty due to CO2 prices
     if (setup["CO2Cap"] == 4)

@@ -39,8 +39,6 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     ) 
       
  	@expression(EP, eCO2NegativeEmissionsByZone[z=1:Z, t=1:T], sum(eCO2NegativeEmissionsByPlant[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
-    @expression(EP, eCO2PSCEmissionsByZone[z in 1:Z, t in 1:T], eEmissionsByZone[z ,t] + eH2EmissionsByZone[z, t])
-    @expression(EP, eCO2PSCCaptureByZone[z = 1:Z, t = 1:T], eCO2CapturePowerByZone[z, t] + eCO2CaptureH2ByZone[z, t])
 
     # If CO2 price is implemented in CSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to minus cost penalty due to CO2 prices
     # Also need to deduct away CO2 price offset due to net carbon capture (Negative emissions)
