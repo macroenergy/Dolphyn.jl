@@ -35,7 +35,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
     #DAC Negative CO2 emission = CO2 emitted by fuel usage - Total amount of CO2 captured
 	@expression(EP, eCO2NegativeEmissionsByPlant[k=1:H,t=1:T], 
-        EP[:vCO2Capture][k,t] - inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]]* dfCO2Capture[!,:etaFuel_MMBtu_p_tonne][k]* EP[:vCO2Capture][k,t]
+        EP[:vCO2Capture][k,t] * (1 - inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]]* dfCO2Capture[!,:etaFuel_MMBtu_p_tonne][k])
     ) 
       
  	@expression(EP, eCO2NegativeEmissionsByZone[z=1:Z, t=1:T], sum(eCO2NegativeEmissionsByPlant[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))

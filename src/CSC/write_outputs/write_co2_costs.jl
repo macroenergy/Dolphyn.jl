@@ -30,7 +30,7 @@ function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 
 	cCO2Start = 0
 
-	dfCO2Cost = DataFrame(Costs = ["cCO2Total", "cCO2Fix", "cCO2Var", "cCO2NSE", "cCO2Start"])
+	dfCO2Cost = DataFrame(Costs = ["cCO2Total", "cCO2Fix", "cCO2Var", "cCO2Start"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cCO2Var = value(EP[:eTotalCCO2CaptureVarOut])* (ModelScalingFactor^2)
 		cCO2Fix = value(EP[:eTotalCO2CaptureCFix])*ModelScalingFactor^2
