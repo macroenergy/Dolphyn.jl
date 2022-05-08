@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting non-served energy for every model zone, time step and cost-segment.
 """

@@ -1,4 +1,4 @@
 # h2_pipeline
-'''@docs
+```@docs
 h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
-'''
+```

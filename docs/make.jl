@@ -14,76 +14,65 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-push!(LOAD_PATH,"../src/")
 #=cd("../")
 include(joinpath(pwd(), "package_activate.jl"))
 genx_path = joinpath(pwd(), "src")
 push!(LOAD_PATH, genx_path)=#
 import DataStructures: OrderedDict
-using GenX
+using DOLPHYN
 using Documenter
-DocMeta.setdocmeta!(GenX, :DocTestSetup, :(using GenX); recursive=true)
+DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive=true)
 println(pwd())
-genx_docpath = joinpath(pwd(), "docs/src")
-push!(LOAD_PATH, genx_docpath)
+push!(LOAD_PATH, DOLPHYN_docpath)
 pages = OrderedDict(
-    "Welcome Page" => "index.md",
-    "Model Concept and Overview" => [
-        "Model Introduction" => "model_introduction.md",
-        "Notation" => "model_notation.md",
-        "Objective Function" => "objective_function.md",
-        "Power Balance" => "power_balance.md"
-    ],
     "Model Function Reference" => [
         "Core" => "core.md",
-        "Resources" => [
-            "Curtailable Variable Renewable" => "curtailable_variable_renewable.md",
-            "Flexible Demand" => "flexible_demand.md",
-            "Hydro" => "hydro_res.md",
-            "Must Run" => "must_run.md",
-            "Storage" => [
-                "Storage" => "storage.md",
-                "Investment Charge" => "investment_charge.md",
-                "Investment Energy" => "investment_energy.md",
-                "Long Duration Storage" => "long_duration_storage.md",
-                "Storage All" => "storage_all.md",
-                "Storage Asymmetric" => "storage_asymmetric.md",
-                "Storage Symmetric" => "storage_symmetric.md"
-            ],
-            "Thermal" => [
-                "Thermal" => "thermal.md",
-                "Thermal Commit" => "thermal_commit.md",
-                "Thermal No Commit" => "thermal_no_commit.md"
-            ]
+        "Flexible Demand" => "flexible_demand.md",
+        "G2P" => "g2p.md",
+        "Generation" => "generation.md",
+        "Policies" => "policies.md",
+        "Storage" => [
+            "Long Duration"=> "h2_long_duration_storage.md",
+            "Storage ALL" => "h2_storage_all.md",
+            "Storage Investment" => "h2_storage_investment.md",
+            "Storage" => "h2_storage.md"
+        ],
+        "Transimission" => "transmission.md",
+        "Truck" => [
+            "Long Duration Truck" => "h2_long_duration_truck.md",
+            "Truck All" => "h2_truck_all.md",
+            "Truck Investment" => "h2_truck_investment.md",
+            "Truck" => "h2_truck.md"
+        ],
+        "Generation" => [
+            "Production All" => "h2_production_all.md",
+            "Production Commit" => "h2_production_commit.md",
+            "Production No Commit" => "h2_production_no_commit.md",
+            "Production" => "h2_production.md"
         ],
         "Policies" => "policies.md"
     ],
-    "Methods" => "methods.md",
-    "Solver Configurations" => "solver_configuration.md",
-    "Solving the Model" => "solve_model.md",
-    "Additional Features" => "additional_features.md",
-    "Model Inputs/Outputs Documentation" => "data_documentation.md",
-    "GenX Inputs Functions" => "load_inputs.md",
-    "GenX Outputs Functions" => "write_outputs.md",
-    #"Unit Testing (Under Development)" => "unit_testing.md"
+    "DOLPHYN Inputs Functions" => "load_inputs.md",
+    "DOLPHYN Outputs Functions" => "write_outputs.md",
 )
-makedocs(;
-    modules=[GenX],
-    authors="Jesse Jenkins, Nestor Sepulveda, Dharik Mallapragada, Aaron Schwartz, Neha Patankar, Qingyu Xu, Jack Morris, Sambuddha Chakrabarti",
+makedocs(
+    source = "../src/HSC/",
+    build = "build",
+    modules=[DOLPHYN],
+    authors="Dharik Mallapragada, Guannan He, Yuheng Zhang",
     #repo="https://github.com/sambuddhac/GenX.jl/blob/{commit}{path}#{line}",
-    sitename="GenX",
+    sitename="DOLPHYN",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://genxproject.github.io/GenX",
         assets=String[],
     ),
     pages=[p for p in pages]
 )
 
 deploydocs(;
-    repo="github.com/GenXProject/GenX.git",
-    target = "build",
-    branch = "gh-pages",
+    repo="github.com/gh-he/DOLPHYN-dev.git",
+    target = "HSCsrc",
+    branch = "jmh_doc",
     devbranch = "main",
     push_preview = true,
 )

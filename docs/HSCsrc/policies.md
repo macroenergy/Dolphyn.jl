@@ -1,4 +1,4 @@
 # co2_cap_hsc
-'''@docs
+```@docs
 co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
-'''
+```
