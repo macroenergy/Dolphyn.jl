@@ -206,10 +206,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_production(EP, inputs, setup)
 		end
 
-		if setup["H2CO2Cap"] > 0
-			# Direct emissions of various hydrogen sector resources
-			EP = emissions_hsc(EP, inputs,setup)
-		end
+		# Direct emissions of various hydrogen sector resources
+		EP = emissions_hsc(EP, inputs,setup)
 
 		# Model H2 non-served energy
 		EP = h2_non_served_energy(EP, inputs,setup)

@@ -76,7 +76,7 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
             sum(
                 inputs["omega"][t] * sum(
                     eEmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
-                    cap in findall(x -> x == 1, inputs["dfCO2CapZones"][z, :])
+                    cap in 1:inputs["NCO2Cap"]
                 ) for t = 1:T
             )
         )
@@ -94,7 +94,7 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCGenTotalEmissionsPenalty,
-            sum(eCEmissionsPenaltybyPolicy[cap] for cap = 1:inputs["NCO2Cap"])
+            sum(eCEmissionsPenaltybyZone[z] for z = 1:Z)
         )
 
         # Add total emissions penalty associated with direct emissions from power generation technologies

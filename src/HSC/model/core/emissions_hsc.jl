@@ -68,7 +68,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     @expression(
 		EP,
 		eCO2CaptureH2ByZone[z = 1:Z, t = 1:T],
-		sum(eCO2CapturePowerByPlant[y, t] for y in intersect(dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID], H2_CCS))
+		sum(eCO2CaptureH2ByPlant[y, t] for y in intersect(dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID], H2_CCS))
 	)
 
     EP[:eCO2PSCEmissionsByZone] += eH2EmissionsByZone
@@ -119,7 +119,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
             sum(
                 inputs["omega"][t] * sum(
                     eH2EmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
-                    cap in findall(x -> x == 1, inputs["dfCO2CapZones"][z, :])
+                    cap in 1:inputs["NCO2Cap"]
                 ) for t = 1:T
             )
         )
@@ -137,7 +137,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCH2GenTotalEmissionsPenalty,
-            sum(eCH2EmissionsPenaltybyPolicy[cap] for cap = 1:inputs["NCO2Cap"])
+            sum(eCH2EmissionsPenaltybyZone[z] for z = 1:Z)
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies

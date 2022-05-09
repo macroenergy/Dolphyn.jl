@@ -41,9 +41,9 @@ function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 
 	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
 	# Emissions penalty is already scaled by adjusting the value of carbon price used in emissions_CSC.jl
-	if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["CO2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
-		cCO2Var  = cCO2Var + value(EP[:eCCO2CaptureTotalEmissionsPenalty])
-	end
+	# if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["CO2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
+	# 	cCO2Var  = cCO2Var + value(EP[:eCCO2CaptureTotalEmissionsPenalty])
+	# end
 
 	if !isempty(inputs["CO2_CAPTURE_COMMIT"])
 		if setup["ParameterScale"]==1 # Convert costs in millions to $
