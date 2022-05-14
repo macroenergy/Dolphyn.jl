@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	h2_generation(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
 The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 

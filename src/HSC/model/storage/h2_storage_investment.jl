@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	h2_storage_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the  decision variable  representing charging and energy components of hydrogen storage technologies
 

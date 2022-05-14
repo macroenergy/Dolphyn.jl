@@ -16,6 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 @doc raw"""
 	h2_long_duration_storage(EP::Model, inputs::Dict)
+	
 This function creates variables and constraints enabling modeling of long duration storage resources when modeling representative time periods.
 
 **Storage inventory balance at beginning of each representative period**

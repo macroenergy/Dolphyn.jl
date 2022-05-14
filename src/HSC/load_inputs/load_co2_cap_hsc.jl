@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2::Dict)
+	load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_hsc::Dict)
 
 Function for reading input parameters related to CO$_2$ emissions cap constraints
 """

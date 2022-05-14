@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_generation(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
 

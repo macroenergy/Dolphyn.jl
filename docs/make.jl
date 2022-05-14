@@ -18,18 +18,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 include(joinpath(pwd(), "package_activate.jl"))
 genx_path = joinpath(pwd(), "src")
 push!(LOAD_PATH, genx_path)=#
+push!(LOAD_PATH,"../src/HSC/")
 import DataStructures: OrderedDict
 using DOLPHYN
+using JuMP
 using Documenter
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive=true)
 println(pwd())
 pages = OrderedDict(
     "Model Function Reference" => [
         "Core" => "core.md",
-        "Flexible Demand" => "flexible_demand.md",
+        "Flexible Demand" => "h2_flexible_demand.md",
         "G2P" => "g2p.md",
-        "Generation" => "generation.md",
-        "Policies" => "policies.md",
         "Storage" => [
             "Long Duration"=> "h2_long_duration_storage.md",
             "Storage ALL" => "h2_storage_all.md",
@@ -55,7 +55,7 @@ pages = OrderedDict(
     "DOLPHYN Outputs Functions" => "write_outputs.md",
 )
 makedocs(
-    source = "../src/HSC/",
+    source = "HSCsrc/",
     build = "build",
     modules=[DOLPHYN],
     authors="Dharik Mallapragada, Guannan He, Yuheng Zhang",
@@ -63,11 +63,4 @@ makedocs(
     sitename="DOLPHYN",
     format=Documenter.HTML(),
     pages=[p for p in pages]
-)
-
-deploydocs(;
-    repo="github.com/gh-he/DOLPHYN-dev.git",
-    branch = "jmh_doc",
-    devbranch = "main",
-    push_preview = true,
 )
