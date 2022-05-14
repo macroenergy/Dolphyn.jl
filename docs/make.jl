@@ -23,7 +23,6 @@ using DOLPHYN
 using Documenter
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive=true)
 println(pwd())
-push!(LOAD_PATH, DOLPHYN_docpath)
 pages = OrderedDict(
     "Model Function Reference" => [
         "Core" => "core.md",
@@ -62,16 +61,12 @@ makedocs(
     authors="Dharik Mallapragada, Guannan He, Yuheng Zhang",
     #repo="https://github.com/sambuddhac/GenX.jl/blob/{commit}{path}#{line}",
     sitename="DOLPHYN",
-    format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        assets=String[],
-    ),
+    format=Documenter.HTML(),
     pages=[p for p in pages]
 )
 
 deploydocs(;
     repo="github.com/gh-he/DOLPHYN-dev.git",
-    target = "HSCsrc",
     branch = "jmh_doc",
     devbranch = "main",
     push_preview = true,
