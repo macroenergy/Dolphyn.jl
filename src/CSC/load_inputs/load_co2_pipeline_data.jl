@@ -15,27 +15,27 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_h2_pipeline_data((setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
+    load_co2_pipeline_data((setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
 Function for reading input parameters related to the hydrogen transmission network
 """
 
-function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
+function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
-        CSV.File(string(path, sep, "HSC_pipelines.csv"), header = true),
+        CSV.File(string(path, sep, "CSC_pipelines.csv"), header = true),
         copycols = true,
     )
 
     # Number of H2 Pipelines = L
-    inputs_nw["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
+    inputs_nw["CO2_P"] = size(collect(skipmissing(pipeline_var[!, :CO2_Pipelines])), 1)
 
     # Find first column of pipe map table
     start = findall(s -> s == "z1", names(pipeline_var))[1]
 
     # Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
-    pipe_map = pipeline_var[1:inputs_nw["H2_P"], start:start+inputs_nw["Z"]-1]
+    pipe_map = pipeline_var[1:inputs_nw["CO2_P"], start:start+inputs_nw["Z"]-1]
 
     # Create pipe number column
     pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
@@ -50,11 +50,11 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(pipe_map, Symbol.(colnames_pipe_map))
 
-    inputs_nw["H2_Pipe_Map"] = pipe_map
+    inputs_nw["CO2_Pipe_Map"] = pipe_map
 
 
     # Number of pipelines routes in the network
-    inputs_nw["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
+    inputs_nw["CO2_P"] = size(collect(skipmissing(pipeline_var[!, :CO2_Pipelines])), 1)
 
     # Length in miles of each pipeline
     inputs_nw["pPipe_length_miles"] =
@@ -70,46 +70,46 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
         inputs_nw["pPipe_length_miles"] ./ inputs_nw["len_bw_comp_mile"]
     # floor.(inputs_nw["pPipe_length_miles"] ./ inputs_nw["len_bw_comp_mile"])
     #Maximum number of pipelines
-    inputs_nw["pH2_Pipe_No_Max"] =
+    inputs_nw["pCO2_Pipe_No_Max"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Max_No_Pipe])))
 
     #Current number of pipelines
-    inputs_nw["pH2_Pipe_No_Curr"] =
+    inputs_nw["pCO2_Pipe_No_Curr"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Existing_No_Pipe])))
 
     #Maxiumum Pipe Flow per Pipe
-    inputs_nw["pH2_Pipe_Max_Flow"] = convert(
+    inputs_nw["pCO2_Pipe_Max_Flow"] = convert(
         Array{Float64},
         collect(skipmissing(pipeline_var[!, :Max_Flow_Tonne_p_Hr_Per_Pipe])),
     )
 
     #Maximum Pipeline storage capacity in tonnes per pipe
-    inputs_nw["pH2_Pipe_Max_Cap"] =
+    inputs_nw["pCO2_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2PipeCap_tonne_per_mile])),
+            collect(skipmissing(pipeline_var[!, :CO2PipeCap_tonne_per_mile])),
         ) .* inputs_nw["pPipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
-    inputs_nw["pH2_Pipe_Min_Cap"] =
+    inputs_nw["pCO2_Pipe_Min_Cap"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :Min_pipecap_stor_frac])),
-        ) .* inputs_nw["pH2_Pipe_Max_Cap"]
+        ) .* inputs_nw["pCO2_Pipe_Max_Cap"]
 
     #Capital Cost Per Pipe
-    inputs_nw["pCAPEX_H2_Pipe"] =
+    inputs_nw["pCAPEX_CO2_Pipe"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2Pipe_Inv_Cost_per_mile_yr])),
+            collect(skipmissing(pipeline_var[!, :CO2Pipe_Inv_Cost_per_mile_yr])),
         ) .* inputs_nw["pPipe_length_miles"]
 
     #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
-    inputs_nw["pCAPEX_Comp_H2_Pipe"] =
-        inputs_nw["pH2_Pipe_Max_Flow"] .* (
+    inputs_nw["pCAPEX_Comp_CO2_Pipe"] =
+        inputs_nw["pCO2_Pipe_Max_Flow"] .* (
             convert(
                 Array{Float64},
-                collect(skipmissing(pipeline_var[!, :H2PipeCompCapex])),
+                collect(skipmissing(pipeline_var[!, :CO2PipeCompCapex])),
             ) .+
             inputs_nw["no_booster_comp_stations"] .* convert(
                 Array{Float64},
@@ -121,14 +121,14 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_nw["pComp_MWh_per_tonne_Pipe"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2PipeCompEnergy]))
+            collect(skipmissing(pipeline_var[!, :CO2PipeCompEnergy]))
         ) .+ 
         inputs_nw["no_booster_comp_stations"] .* convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
         )
 
-    println("HSC_pipelines.csv Successfully Read!")
+    println("CSC_pipelines.csv Successfully Read!")
 
     return inputs_nw
 end

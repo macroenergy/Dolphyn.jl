@@ -15,18 +15,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_long_duration_truck(EP::Model, inputs::Dict)
+    co2_long_duration_storage_truck(EP::Model, inputs::Dict)
 
-This module defines the decision variables related to hydrogen transmission via trucks involing long duration action.
- 
+This module defines the decision variables related to carbon transmission via trucks involing long duration action. 
 """
 
-function h2_long_duration_truck(EP::Model, inputs::Dict)
+function co2_long_duration_truck(EP::Model, inputs::Dict)
 
-    println("H2 Long Duration Truck Module")
+    println("CO2 Long Duration Truck Module")
 
     Z = inputs["Z"] # Number of zone locations
-    H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
+    CO2_TRUCK_TYPES = inputs["CO2_TRUCK_TYPES"]
     dfPeriodMap = inputs["Period_Map"]
 
     inputs["NPeriods"]  = size(inputs["Period_Map"])[1] # Number of modeled periods
@@ -43,29 +42,29 @@ function h2_long_duration_truck(EP::Model, inputs::Dict)
     # State of charge of truck at beginning of each modeled period n
     @variable(
         EP,
-        0 >= vH2TruckSOCw[z = 1:Z, j in H2_TRUCK_TYPES, n in MODELED_HOURS_INDEX] >= 0
+        0 >= vCO2TruckSOCw[z = 1:Z, j in CO2_TRUCK_TYPES, n in MODELED_HOURS_INDEX] >= 0
     )
 
     # Build up in truck inventory over each representative period w
     # Build up inventory is fixed zero
-    @variable(EP, 0 >= vH2TruckdSOC[z = 1:Z, j in H2_TRUCK_TYPES, w = 1:REP_PERIOD] >= 0)
+    @variable(EP, 0 >= vCO2TruckdSOC[z = 1:Z, j in CO2_TRUCK_TYPES, w = 1:REP_PERIOD] >= 0)
 
     @constraints(
         EP,
         begin
             # State of charge of truck at beginning of each modeled period cannot exceed installed energy capacity
-            [z = 1:Z, j in H2_TRUCK_TYPES, n in MODELED_HOURS_INDEX],
-            vH2TruckSOCw[z, j, n] <= vH2NTruck[j]
+            [z = 1:Z, j in CO2_TRUCK_TYPES, n in MODELED_HOURS_INDEX],
+            vCO2TruckSOCw[z, j, n] <= vCO2NTruck[j]
 
             # State of charge of truck balance
-            [z = 1:Z, j in H2_TRUCK_TYPES, n = N],
-                vH2TruckSOCw[z, j, 1] ==
-                vH2TruckSOCw[z, j, n] +
-                vH2TruckdSOC[z, j, dfPeriodMap[!, :RepPeriod_index][n]]
-            [z = 1:Z, j in H2_TRUCK_TYPES, n = 1:N-1],
-                vH2TruckSOCw[z, j, n+1] ==
-                vH2TruckSOCw[z, j, n] +
-                vH2TruckdSOC[z, j, dfPeriodMap[!, :RepPeriod_index][n]]
+            [z = 1:Z, j in CO2_TRUCK_TYPES, n = N],
+                vCO2TruckSOCw[z, j, 1] ==
+                vCO2TruckSOCw[z, j, n] +
+                vCO2TruckdSOC[z, j, dfPeriodMap[!, :RepPeriod_index][n]]
+            [z = 1:Z, j in CO2_TRUCK_TYPES, n = 1:N-1],
+                vCO2TruckSOCw[z, j, n+1] ==
+                vCO2TruckSOCw[z, j, n] +
+                vCO2TruckdSOC[z, j, dfPeriodMap[!, :RepPeriod_index][n]]
         end
     )
 

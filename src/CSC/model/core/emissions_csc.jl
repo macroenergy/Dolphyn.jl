@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	emissions(EP::Model, inputs::Dict, UCommit::Int)
+    emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the net CO2 captured by plants in each zone, which is subsequently deducted to the total emissions
 """

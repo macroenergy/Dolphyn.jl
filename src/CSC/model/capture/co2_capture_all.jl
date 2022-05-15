@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	co2_capture_all(EP::Model, inputs::Dict, setup::Dict)
 
 The co2 capture module creates decision variables, expressions, and constraints related to carbon capture infrastructure
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
 """
+
 function co2_capture_all(EP::Model, inputs::Dict, setup::Dict)
 
 	dfCO2Capture = inputs["dfCO2Capture"]

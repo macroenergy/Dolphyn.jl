@@ -16,7 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 
 @doc raw"""
-	load_inputs(setup::Dict,path::AbstractString)
+	load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
@@ -27,7 +27,7 @@ path - string path to working directory
 returns: Dict (dictionary) object containing all data inputs
 """
 
-function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
+function load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config
 	if Sys.isunix()
