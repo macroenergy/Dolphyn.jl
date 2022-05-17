@@ -226,13 +226,38 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
+	###### START OF CO2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
+
+	if setup["ModelCO2"] == 1
+
+		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
+		@expression(EP, eDACNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Variable costs and carbon captured per DAC resource "k" and time "t"
+		EP = co2_outputs(EP, inputs, setup)
+
+		# Fixed costs of DAC
+		EP = co2_investment(EP, inputs, setup)
+	
+		if !isempty(inputs["CO2_CAPTURE"])
+			#model CO2 capture
+			EP = co2_capture(EP, inputs, setup)
+		end
+
+		# Direct emissions of various carbon capture sector resources
+		EP = emissions_csc(EP, inputs,setup)
+
+	end
+
 
 	################  Policies #####################3
 	# CO2 emissions limits for the power sector only
-	if setup["ModelH2"] ==0
+	if setup["ModelH2"] ==0 
 		EP = co2_cap_power(EP, inputs, setup)
+
 	elseif setup["ModelH2"]==1
 		EP = co2_cap_power_hsc(EP, inputs, setup)
+
 	end
 
 
