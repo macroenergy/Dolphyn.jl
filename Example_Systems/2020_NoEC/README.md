@@ -1,12 +1,12 @@
-# Small New England: Three Zones
+# 2020_NOEC
 
-**SmallNewEngland** is set of a simplified versions of the more detailed example system RealSystemExample. It is condensed for easy comprehension and quick testing of different components of the GenX. **SmallNewEngland/ThreeZones**, a one-year example with hourly resolution, contains zones representing Massachusetts, Connecticut, and Maine. The ten represented resources include only natural gas, solar PV, wind, and lithium-ion battery storage.
+**2020_NOEC** is a power model for the EU for the year 2020. It contains a power model with hourly resolution, contains zones representing Belgium, Germany, Denmark, France, Great Britain, the Netherlands, Sweden, and Norway. The represented resources include nuclear, coal, hydro, oil,, PHS, natural gas, solar PV, and wind. It does not allow for expansion, and is meant for baseline model validation.
 
-To run the model, first navigate to the example directory at `GenX/Example_Systems/SmallNewEngland/ThreeZones`:
+To run the model, first navigate to the example directory at `DOLPHYN-dev/Example_Systems/2020_NOEC`:
 
-`cd("Example_Systems/SmallNewEngland/ThreeZones")`
-   
-Next, ensure that your settings in `GenX_settings.yml` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more. A rate-based carbon cap of 50 gCO<sub>2</sub> per kWh is specified in the `CO2_cap.csv` input file.
+`cd("Example_Systems/2020_NOEC")`
+
+Next, ensure that your settings in `global_model_settings.yml` and `GenX_settings.yml` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more. The CO2_cap.csv is not utilized in this case.
 
 Once the settings are confirmed, run the model with the `Run.jl` script in the example directory:
 
