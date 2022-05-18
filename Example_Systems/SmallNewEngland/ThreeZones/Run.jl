@@ -47,12 +47,23 @@ mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - 
 ## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
-    if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-        println("Clustering Time Series Data...")
-        cluster_inputs(inpath, settings_path, mysetup)
+
+    if mysetup["ModelH2"] == 1
+        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
+            println("Clustering Time Series Data...")
+            cluster_inputs(inpath, settings_path, mysetup)
+        else
+            println("Time Series Data Already Clustered.")
+        end
     else
-        println("Time Series Data Already Clustered.")
+        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
+            println("Clustering Time Series Data...")
+            cluster_inputs(inpath, settings_path, mysetup)
+        else
+            println("Time Series Data Already Clustered.")
+        end
     end
+
 end
 
 # ### Configure solver

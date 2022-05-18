@@ -594,7 +594,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     YAML_Outfile = joinpath(TimeDomainReductionFolder, "time_domain_reduction_settings.yml")
 
     # Define a local version of the setup so that you can modify the mysetup["ParameterScale"] value to be zero in case it is 1
-    mysetup_local = mysetup
+    mysetup_local = copy(mysetup)
     # If ParameterScale =1 then make it zero, since clustered inputs will be scaled prior to generating model
     mysetup_local["ParameterScale"]=0  # Performing cluster and report outputs in user-provided units
     if v println("Loading inputs") end
