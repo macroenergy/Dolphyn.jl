@@ -25,7 +25,7 @@ path - string path to working directory
 
 returns: Dict (dictionary) object containing all data inputs
 """
-function load_inputs(setup::Dict,path::AbstractString)
+function load_power_inputs(setup::Dict,path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config
 	if Sys.isunix()
@@ -84,7 +84,7 @@ function load_inputs(setup::Dict,path::AbstractString)
 	end
 
 	# Read in mapping of modeled periods to representative periods
-	if setup["OperationWrapping"]==1 && !isempty(inputs["STOR_LONG_DURATION"]) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv"))))) # Use Time Domain Reduced data for GenX)
+	if setup["OperationWrapping"]==1 && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv"))))) # Use Time Domain Reduced data for GenX)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
 
@@ -92,3 +92,4 @@ function load_inputs(setup::Dict,path::AbstractString)
 
 	return inputs
 end
+# && !isempty(inputs["STOR_LONG_DURATION"])

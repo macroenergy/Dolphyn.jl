@@ -50,7 +50,7 @@ function h2_long_duration_storage(EP::Model, inputs::Dict)
 	# Alternative to cSoCBalStart constraint which is included when not modeling operations wrapping and long duration storage
 	# Note: tw_min = hours_per_subperiod*(w-1)+1; tw_max = hours_per_subperiod*w
 	@constraint(EP, cH2SoCBalLongDurationStorageStart[w=1:REP_PERIOD, y in H2_STOR_LONG_DURATION],
-				    EP[:vH2S][y,hours_per_subperiod*(w-1)+1] == (1-dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y])*(EP[:vH2S][y,hours_per_subperiod*w]-vdH2SOC[y,w])-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,hours_per_subperiod*(w-1)+1])+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2CHARGE_STOR][y,hours_per_subperiod*(w-1)+1]))
+				    EP[:vH2S][y,hours_per_subperiod*(w-1)+1] == (1-dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y])*(EP[:vH2S][y,hours_per_subperiod*w]-vdH2SOC[y,w])-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,hours_per_subperiod*(w-1)+1])+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,hours_per_subperiod*(w-1)+1]))
 
 	# Storage at beginning of period w = storage at beginning of period w-1 + storage built up in period w (after n representative periods)
 	## Multiply storage build up term from prior period with corresponding weight
@@ -63,7 +63,7 @@ function h2_long_duration_storage(EP::Model, inputs::Dict)
 
 	# Storage at beginning of each modeled period cannot exceed installed energy capacity
 	@constraint(EP, cH2SoCBalLongDurationStorageUpper[y in H2_STOR_LONG_DURATION, r in MODELED_PERIODS_INDEX],
-					vH2SOCw[y,r] <= EP[:eTotalH2CapEnergy][y])
+					vH2SOCw[y,r] <= EP[:eH2GenTotalCap][y])
 
 	# Initial storage level for representative periods must also adhere to sub-period storage inventory balance
 	# Initial storage = Final storage - change in storage inventory across representative period

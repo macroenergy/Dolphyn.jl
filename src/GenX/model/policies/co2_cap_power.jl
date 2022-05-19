@@ -98,7 +98,7 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 	elseif (setup["CO2Cap"]==3)
 		@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 			sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
-			sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+			sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][t,z] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 		)
 	end 
 

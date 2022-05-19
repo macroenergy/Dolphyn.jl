@@ -65,7 +65,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 					sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
 					sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
 					sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
-					sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV/ModelScalingFactor * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+					sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV/ModelScalingFactor * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 				)
 
 			else 
@@ -74,7 +74,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 				sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
 				sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
 				sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
-				sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+				sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 			)
 
 			end
@@ -91,14 +91,14 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 					sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) +
 					sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
-					sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))+
+					sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][t,z] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))+
 					sum(inputs["dfMaxCO2Rate"][z,cap] *H2_LHV/ModelScalingFactor *inputs["omega"][t] * EP[:eH2GenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 				)
 			else
 				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 					sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) +
 					sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
-					sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))+
+					sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][t,z] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))+
 					sum(inputs["dfMaxCO2Rate"][z,cap] *H2_LHV *inputs["omega"][t] * EP[:eH2GenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 				)
 			end

@@ -23,6 +23,8 @@ The h2_generation module creates decision variables, expressions, and constraint
 
 function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
+	println("H2 Production (No Unit Commitment) Module")
+	
 	#Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]
 
