@@ -22,7 +22,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## returns: n/a
 ################################################################################
 @doc raw"""
-	write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+    write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """

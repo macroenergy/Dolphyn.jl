@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """

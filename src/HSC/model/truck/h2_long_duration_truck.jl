@@ -1,3 +1,47 @@
+"""
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+Copyright (C) 2021,  Massachusetts Institute of Technology
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A complete copy of the GNU General Public License v2 (GPLv2) is available
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+@doc raw"""
+    h2_long_duration_truck(EP::Model, inputs::Dict)
+
+This function includes LongDurationtruck only when modeling representative periods.
+
+** Variables**
+
+State of charge of truck at beginning of each modeled period n.
+\begin{align}
+    v_{j, t}^{\mathrm{F}}+v_{j, t}^{\mathrm{E}} & = V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+\end{align}
+
+```math
+\begin{aligned}
+    v_{n}^{SOC} \geqslant 0,v_{z,j,n}^{SOC}\leqslant v_{j}^{TRU}
+\end{aligned}
+```
+
+**Constraints**
+
+State of charge of truck at beginning of each modeled period cannot exceed installed energy capacity
+```math
+\begin{aligned}
+    v_{z,j,n}^{SOC}< v_{j}^{TRU}
+\end{aligned}
+```
+
+"""
 function h2_long_duration_truck(EP::Model, inputs::Dict)
 
     println("H2 Long Duration Truck Module")

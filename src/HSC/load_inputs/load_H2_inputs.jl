@@ -14,9 +14,8 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 @doc raw"""
-	load_inputs(setup::Dict,path::AbstractString)
+	load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 

@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	H2_G2Peration(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 
 The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits

@@ -14,6 +14,61 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
+
+This function includes investment variables, expressions and related constraints for H2 trucks.
+
+**Variables**
+
+## Truck capacity built and retired
+```math
+\begin{aligned}
+    v_{CAP,j}^{TRU} \geqslant 0
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+    v_{RETCAP,j}^{TRU} \geqslant 0
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+   v_{CAP,j}^{TRU} \geqslant 0
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+    v_{NEWCAP,j}^{TRU} \geqslant 0
+\end{aligned}
+```
+
+**Constraints**
+
+Truck retirements cannot retire more charge capacity than existing charge capacity
+```math
+\begin{aligned}
+    v_{RETCAPNUM,j}^{TRU} \le v_{ExistNum,j}^{TRU}
+\end{aligned}
+```
+Truck compression energyCannot retire more energy capacity than existing energy capacity
+```math
+\begin{aligned}
+    v_{RETCAPEnergy,j}^{TRU} \le v_{ExistEnergyCap,j}^{TRU} 
+\end{aligned}
+```
+
+**Expressions**
+```math
+\begin{aligned}
+    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \Omega_{t} \mathrm{~L}_{z \rightarrow z^{\prime}} \\
+    & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
+\end{aligned}
+```
+"""
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
     println("H2 Truck Investment Module")
