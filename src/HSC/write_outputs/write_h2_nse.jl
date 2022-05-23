@@ -50,7 +50,7 @@ function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfNse[!,Symbol("t$t")][1:Z])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+3] .= sum(dfNse[:,Symbol("t$t")][1:Z])
 		end
 	end

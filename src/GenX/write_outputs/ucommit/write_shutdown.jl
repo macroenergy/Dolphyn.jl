@@ -36,7 +36,7 @@ function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict,
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfShutdown[!,Symbol("t$t")][1:G])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+3] .= sum(dfShutdown[:,Symbol("t$t")][1:G])
 		end
 	end

@@ -114,7 +114,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@expression(EP, eObj, 0)
 
 	# Power supply by z and timestep - used in emissions constraints
-	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)	
+	@expression(EP, eGenerationByZone[t=1:T, z=1:Z], 0)
 
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
@@ -127,8 +127,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = ucommit(EP, inputs, setup["UCommit"])
 	end
 
-	# Emissions of various power sector resources
-	EP = emissions_power(EP, inputs,setup)
+	if setup["CO2Cap"] > 0
+		# Emissions of various power sector resources
+		EP = emissions_power(EP, inputs,setup)
+	end
 
 	if setup["Reserves"] > 0
 		EP = reserves(EP, inputs, setup["UCommit"])
@@ -149,7 +151,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if !isempty(inputs["MUST_RUN"])
 		EP = must_run(EP, inputs)
 	end
-
 
 	# Model constraints, variables, expression related to energy storage modeling
 	if !isempty(inputs["STOR_ALL"])
@@ -175,6 +176,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
 	end
 
+	# EP[:ePowerBalance] += eGenerationByZone #! Yuheng zhang: GenerationByZone is not used in ePowerBalance 
+
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
 
@@ -188,14 +191,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = h2_investment(EP, inputs, setup)
 	
 		if !isempty(inputs["H2_GEN"])
-			#model H2 generation
+			# Model H2 generation
 			EP = h2_production(EP, inputs, setup)
 		end
 
-		# Direct emissions of various hydrogen sector resources
-		EP = emissions_hsc(EP, inputs,setup)
+		if setup["H2CO2Cap"] > 0
+			# Direct emissions of various hydrogen sector resources
+			EP = emissions_hsc(EP, inputs,setup)
+		end
 
-		#model H2 non-served energy
+		# Model H2 non-served energy
 		EP = h2_non_served_energy(EP, inputs,setup)
 
 		# Model hydrogen storage technologies
@@ -204,36 +209,34 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 
 		if !isempty(inputs["H2_FLEX"])
-			#model H2 flexible demand resources
+			# Model H2 flexible demand resources
 			EP = h2_flexible_demand(EP, inputs, setup)
 		end
 
 		if setup["ModelH2Pipelines"] == 1
-			# model hydrogen transmission via pipelines
+			# Model hydrogen transmission via pipelines
 			EP = h2_pipeline(EP, inputs, setup)
 		end
 
 		if setup["ModelH2Trucks"] == 1
-			# model hydrogen transmission via trucks
+			# Model hydrogen transmission via trucks
 			EP = h2_truck(EP, inputs, setup)
 		end
 
 		if setup["ModelH2G2P"] == 1
-			#model H2 Gas to Power
+			# Model H2 Gas to Power
 			EP = h2_g2p(EP, inputs, setup)
 		end
-
-
 	end
 
 
 	################  Policies #####################3
 	# CO2 emissions limits for the power sector only
-	if setup["ModelH2"] ==0
-		EP = co2_cap_power(EP, inputs, setup)
-	elseif setup["ModelH2"]==1
-		EP = co2_cap_power_hsc(EP, inputs, setup)
-	end
+	# if setup["ModelH2"] == 0
+	# 	EP = co2_cap_power(EP, inputs, setup)
+	# elseif setup["ModelH2"] == 1
+	# 	EP = co2_cap_power_hsc(EP, inputs, setup)
+	# end
 
 
 	# Energy Share Requirement
@@ -241,7 +244,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = energy_share_requirement(EP, inputs, setup)
 	end
 
-	#Capacity Reserve Margin
+	# Capacity Reserve Margin
 	if setup["CapacityReserveMargin"] > 0
 		EP = cap_reserve_margin(EP, inputs, setup)
 	end
@@ -259,7 +262,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
 
 	if setup["ModelH2"] == 1
-		###Hydrogen Balanace constraints
+		###Hydrogen Balance constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
 	end
 	

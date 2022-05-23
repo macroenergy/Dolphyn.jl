@@ -71,7 +71,7 @@ Truck compression energyCannot retire more energy capacity than existing energy 
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 truck Investment Module")
+    println("H2 Truck Investment Module")
 
     dfH2Truck = inputs["dfH2Truck"]
 
@@ -89,29 +89,28 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     ## Truck capacity built and retired
 
     # New installed charge capacity of truck type "j"
-    @variable(EP, vH2CAPTRUCKNUMBER[j in NEW_CAP_H2_TRUCK_CHARGE] >= 0)
+    @variable(EP, vH2TruckNumber[j in NEW_CAP_H2_TRUCK_CHARGE] >= 0)
 
     # Retired charge capacity of truck type "j" from existing capacity
-    @variable(EP, vH2RETCAPTRUCKNUMBER[j in RET_CAP_H2_TRUCK_CHARGE] >= 0)
+    @variable(EP, vH2RetTruckNumber[j in RET_CAP_H2_TRUCK_CHARGE] >= 0)
 
-	# ? Yuheng Zhang Qn: should truck compression energy be categorized into resources and stored in h2_gen
     # New installed energy capacity of truck type "j" on zone "z"
-    @variable(EP, vH2CAPTRUCKENERGY[z = 1:Z, j in NEW_CAP_H2_TRUCK_ENERGY] >= 0)
+    @variable(EP, vH2TruckEnergy[z = 1:Z, j in NEW_CAP_H2_TRUCK_ENERGY] >= 0)
 
     # Retired energy capacity of truck type "j" on zone "z" from existing capacity
-    @variable(EP, vH2RETCAPTRUCKENERGY[z = 1:Z, j in RET_CAP_H2_TRUCK_ENERGY] >= 0)
+    @variable(EP, vH2RetTruckEnergy[z = 1:Z, j in RET_CAP_H2_TRUCK_ENERGY] >= 0)
 
     # Total available charging capacity in tonnes/hour
     @expression(
         EP,
-        eTotalH2CapTruckNumber[j in H2_TRUCK_TYPES],
+        eTotalH2TruckNumber[j in H2_TRUCK_TYPES],
         if (j in intersect(NEW_CAP_H2_TRUCK_CHARGE, RET_CAP_H2_TRUCK_CHARGE))
-            dfH2Truck[!, :Existing_Number][j] + EP[:vH2CAPTRUCKNUMBER][j] -
-            EP[:vH2RETCAPTRUCKNUMBER][j]
+            dfH2Truck[!, :Existing_Number][j] + EP[:vH2TruckNumber][j] -
+            EP[:vH2RetTruckNumber][j]
         elseif (j in setdiff(NEW_CAP_H2_TRUCK_CHARGE, RET_CAP_H2_TRUCK_CHARGE))
-            dfH2Truck[!, :Existing_Number][j] + EP[:vH2CAPTRUCKNUMBER][j]
+            dfH2Truck[!, :Existing_Number][j] + EP[:vH2TruckNumber][j]
         elseif (j in setdiff(RET_CAP_H2_TRUCK_CHARGE, NEW_CAP_H2_TRUCK_CHARGE))
-            dfH2Truck[!, :Existing_Number][j] - EP[:vH2RETCAPTRUCKNUMBER][j]
+            dfH2Truck[!, :Existing_Number][j] - EP[:vH2RetTruckNumber][j]
         else
             dfH2Truck[!, :Existing_Number][j]
         end
@@ -121,14 +120,14 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     # Total available energy capacity in tonnes
     @expression(
         EP,
-        eTotalH2CapTruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],
+        eTotalH2TruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],
         if (j in intersect(NEW_CAP_H2_TRUCK_ENERGY, RET_CAP_H2_TRUCK_ENERGY))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] + EP[:vH2CAPTRUCKENERGY][z, j] -
-            EP[:vH2RETCAPTRUCKENERGY][z, j]
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] + EP[:vH2TruckEnergy][z, j] -
+            EP[:vH2RetTruckEnergy][z, j]
         elseif (j in setdiff(NEW_CAP_H2_TRUCK_ENERGY, RET_CAP_H2_TRUCK_ENERGY))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] + EP[:vH2CAPTRUCKENERGY][z, j]
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] + EP[:vH2TruckEnergy][z, j]
         elseif (j in setdiff(RET_CAP_H2_TRUCK_ENERGY, NEW_CAP_H2_TRUCK_ENERGY))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] - EP[:vH2RETCAPTRUCKENERGY][z, j]
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] - EP[:vH2RetTruckEnergy][z, j]
         else
             dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j]
         end
@@ -143,19 +142,17 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1
-
         @expression(EP, eCFixH2TruckCharge[j in H2_TRUCK_TYPES],
             if j in NEW_CAP_H2_TRUCK_CHARGE # Truck types eligible for new charge capacity
-                1/ModelScalingFactor^2*(dfH2Truck[!,:H2TruckUnitCapex_per_unit][j]*vH2CAPTRUCKNUMBER[j])
+                (dfH2Truck[!,:Inv_Cost_p_unit_p_yr][j]*vH2TruckNumber[j])/ModelScalingFactor^2
             else
                 EP[:vZERO]
             end
         )
-
     else
         @expression(EP, eCFixH2TruckCharge[j in H2_TRUCK_TYPES],
-            if j in NEW_CAP_H2_TRUCK_CHARGE # Resources eligible for new charge capacity
-                dfH2Truck[!,:H2TruckUnitCapex_per_unit][j]*vH2CAPTRUCKNUMBER[j]
+            if j in NEW_CAP_H2_TRUCK_CHARGE # Truck types eligible for new charge capacity
+                dfH2Truck[!,:Inv_Cost_p_unit_p_yr][j]*vH2TruckNumber[j]
             else
                 EP[:vZERO]
             end
@@ -176,17 +173,17 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	if setup["ParameterScale"]==1
 		@expression(EP, eCFixH2TruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],
 		if j in NEW_CAP_H2_TRUCK_ENERGY # Resources eligible for new capacity
-			1/ModelScalingFactor^2*(dfH2Truck[!,:Inv_Cost_Energy_p_tonne_yr][j]*vH2CAPTRUCKENERGY[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2CapTruckEnergy[z, j])
+			1/ModelScalingFactor^2*(dfH2Truck[!,:Inv_Cost_Energy_p_tonne_yr][j]*vH2TruckEnergy[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2TruckEnergy[z, j])
 		else
-			1/ModelScalingFactor^2*(dfH2truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2CapTruckEnergy[z, j])
+			1/ModelScalingFactor^2*(dfH2truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2TruckEnergy[z, j])
 		end
 		)
 	else
 		@expression(EP, eCFixH2TruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],
 		if j in NEW_CAP_H2_TRUCK_ENERGY # Resources eligible for new capacity
-			dfH2Truck[!,:Inv_Cost_Energy_p_tonne_yr][j]*vH2CAPTRUCKENERGY[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2CapTruckEnergy[z, j]
+			dfH2Truck[!,:Inv_Cost_Energy_p_tonne_yr][j]*vH2TruckEnergy[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2TruckEnergy[z, j]
 		else
-			dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[z, j]
+			dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2TruckEnergy[z, j]
 		end
 		)
 	end
@@ -202,22 +199,22 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	## Constraints on truck retirements
 	#Cannot retire more charge capacity than existing charge capacity
- 	@constraint(EP, cMaxRetH2TruckNumber[j in RET_CAP_H2_TRUCK_CHARGE], vH2RETCAPTRUCKNUMBER[j] <= dfH2Truck[!,:Existing_Number][j])
+ 	@constraint(EP, cMaxRetH2TruckNumber[j in RET_CAP_H2_TRUCK_CHARGE], vH2RetTruckNumber[j] <= dfH2Truck[!,:Existing_Number][j])
 
 
   	## Constraints on truck compression energy
 		
 	# Cannot retire more energy capacity than existing energy capacity
-	@constraint(EP, cMaxRetH2TruckEnergy[z = 1:Z, j in RET_CAP_H2_TRUCK_ENERGY], vH2RETCAPTRUCKENERGY[z,j] <= dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j])
+	@constraint(EP, cMaxRetH2TruckEnergy[z = 1:Z, j in RET_CAP_H2_TRUCK_ENERGY], vH2RetTruckEnergy[z,j] <= dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j])
 
 	## Constraints on new built truck compression energy capacity
 	# Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
-	@constraint(EP, cMaxCapH2TruckEnergy[z = 1:Z, j in intersect(dfH2Truck[dfH2Truck.Max_Energy_Cap_tonne.>0,:T_TYPE], H2_TRUCK_TYPES)], eTotalH2CapTruckEnergy[z, j] <= dfH2Truck[!,:Max_Energy_Cap_tonne][j])
+	@constraint(EP, cMaxCapH2TruckEnergy[z = 1:Z, j in intersect(dfH2Truck[dfH2Truck.Max_Energy_Cap_tonne.>0,:T_TYPE], H2_TRUCK_TYPES)], eTotalH2TruckEnergy[z, j] <= dfH2Truck[!,:Max_Energy_Cap_tonne][j])
 
 	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
-	@constraint(EP, cMinCapH2TruckEnergy[z = 1:Z, j in intersect(dfH2Truck[dfH2Truck.Min_Energy_Cap_tonne.>0,:T_TYPE], H2_TRUCK_TYPES)], eTotalH2CapTruckEnergy[z, j] >= dfH2Truck[!,:Min_Energy_Cap_tonne][j])
+	@constraint(EP, cMinCapH2TruckEnergy[z = 1:Z, j in intersect(dfH2Truck[dfH2Truck.Min_Energy_Cap_tonne.>0,:T_TYPE], H2_TRUCK_TYPES)], eTotalH2TruckEnergy[z, j] >= dfH2Truck[!,:Min_Energy_Cap_tonne][j])
 
 	return EP
 end

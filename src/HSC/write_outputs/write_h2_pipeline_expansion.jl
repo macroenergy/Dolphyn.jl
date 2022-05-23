@@ -19,17 +19,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	L = inputs["H2_P"]     # Number of H2 pipelines
-    
-	
-	transcap = zeros(L) # Transmission network reinforcements in tonne/hour
-	for i in 1:L
-		transcap[i] = (value.(EP[:vH2NPipe][i]) -inputs["pH2_Pipe_No_Curr"][i]).*inputs["pH2_Pipe_Max_Flow"][i]
 
-	end
-	dfTransCap = DataFrame(
-	Line = 1:L, Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"].*inputs["pH2_Pipe_No_Curr"], 
-    New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap)
-	)
-	CSV.write(string(path,sep,"HSC_pipeline_expansion.csv"), dfTransCap)
+    L = inputs["H2_P"]     # Number of H2 pipelines
+
+    transcap = zeros(L) # Transmission network reinforcements in tonne/hour
+    for i = 1:L
+        transcap[i] =
+            (value.(EP[:vH2NPipe][i]) - inputs["pH2_Pipe_No_Curr"][i]) .*
+            inputs["pH2_Pipe_Max_Flow"][i]
+    end
+    dfTransCap = DataFrame(
+        Line = 1:L,
+        Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"] .* inputs["pH2_Pipe_No_Curr"],
+        New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap),
+    )
+    CSV.write(string(path, sep, "HSC_pipeline_expansion.csv"), dfTransCap)
 end

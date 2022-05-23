@@ -47,18 +47,18 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     inputs = load_h2_generators_variability(setup, path, sep, inputs)
 
 	# Read input data about power network topology, operating and expansion attributes
-    if isfile(string(path,sep,"HSC_Pipelines.csv")) 
-		# Creating flag for other parts of the code
-		setup["ModelH2Pipelines"] = 1
-		inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
-	else
-		inputs["H2_P"] = 0
+
+	if setup["ModelH2Pipelines"] == 1
+	    if isfile(string(path,sep,"HSC_pipelines.csv")) 		
+			inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
+		else
+			inputs["H2_P"] = 0
+		end
 	end
 
 	# Read input data about hydrogen transport truck types
 	if setup["ModelH2Trucks"] == 1
-		if isfile(string(path,sep,"HSC_truck.csv"))
-			# Create flag for other parts of the code
+		if isfile(string(path,sep,"HSC_trucks.csv"))
 			inputs = load_h2_truck(path, sep, inputs)
 		end
 	end

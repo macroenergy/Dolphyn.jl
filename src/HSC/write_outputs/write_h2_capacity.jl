@@ -42,7 +42,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 	capcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	retcapcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in inputs["H2_STOR_ALL"]
+	for i in inputs["H2_STOR_ASYMMETRIC"]
 		if i in inputs["NEW_CAP_H2_CHARGE"]
 			capcharge[i] = value(EP[:vH2CAPCHARGE][i])
 		end
@@ -81,14 +81,14 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 
 	total = DataFrame(
-			Resource = "Total", Zone = "n/a",
-			StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
-			NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap]),
-			StartEnergyCap = sum(dfCap[!,:StartEnergyCap]), RetEnergyCap = sum(dfCap[!,:RetEnergyCap]),
-			NewEnergyCap = sum(dfCap[!,:NewEnergyCap]), EndEnergyCap = sum(dfCap[!,:EndEnergyCap]),
-			StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
-			NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap])
-		)
+		Resource = "Total", Zone = "n/a",
+		StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
+		NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap]),
+		StartEnergyCap = sum(dfCap[!,:StartEnergyCap]), RetEnergyCap = sum(dfCap[!,:RetEnergyCap]),
+		NewEnergyCap = sum(dfCap[!,:NewEnergyCap]), EndEnergyCap = sum(dfCap[!,:EndEnergyCap]),
+		StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
+		NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap])
+	)
 
 	dfCap = vcat(dfCap, total)
 	CSV.write(string(path,sep,"HSC_generation_storage_capacity.csv"), dfCap)
