@@ -607,6 +607,13 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     if v println() end
 
+    #Copy Original Parameter Scale Variable
+    parameter_scale_org = mysetup["ParameterScale"]
+    #Copy setup from set-up local. Set-up local contains some H2 setup inputs, except for correct parameter scale
+	mysetup = copy(mysetup_local)
+    #Overwrites paramater scale
+    mysetup["ParameterScale"] = parameter_scale_org 
+
     # Parse input data into useful structures divided by type (load, wind, solar, fuel, groupings thereof, etc.)
     # TO DO LATER: Replace these with collections of col_names, profiles, zones
     load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
