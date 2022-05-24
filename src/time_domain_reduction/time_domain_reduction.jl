@@ -113,6 +113,8 @@ Get load, solar, wind, and other curves from the input data.
 
 """
 function parse_data(myinputs, mysetup)
+
+    print("Model H2G2P:",mysetup["ModelH2G2P"])
     
     model_h2_flag = mysetup["ModelH2"]
     
@@ -170,8 +172,13 @@ function parse_data(myinputs, mysetup)
         end
     end
     
+    print("here1")
+    print("Model H2G2P:",mysetup["ModelH2G2P"])
+
     #Parse H2 Data
     if model_h2_flag == 1
+        print("here2")
+        
         H2_RESOURCES = myinputs["H2_RESOURCE_ZONES"]    
         H2_ZONES = myinputs["H2_R_ZONES"]
 
@@ -192,7 +199,10 @@ function parse_data(myinputs, mysetup)
             end
         end
 
+        print("Model H2G2P:",mysetup["ModelH2G2P"])
         if mysetup["ModelH2G2P"] == 1
+
+            print("here3")
             
             H2_G2P= myinputs["H2_G2P_RESOURCE_ZONES"]    
             H2_G2P_ZONES = myinputs["H2_G2P_ZONES"]
@@ -594,7 +604,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     YAML_Outfile = joinpath(TimeDomainReductionFolder, "time_domain_reduction_settings.yml")
 
     # Define a local version of the setup so that you can modify the mysetup["ParameterScale"] value to be zero in case it is 1
-    mysetup_local = mysetup
+    mysetup_local = copy(mysetup)
     # If ParameterScale =1 then make it zero, since clustered inputs will be scaled prior to generating model
     mysetup_local["ParameterScale"]=0  # Performing cluster and report outputs in user-provided units
     if v println("Loading inputs") end
@@ -606,6 +616,14 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     end
 
     if v println() end
+
+    parameter_scale_org = mysetup["ParameterScale"]
+    mysetup = copy(mysetup_local)
+    mysetup["ParameterScale"] = parameter_scale_org 
+
+    print("Model H2G2P:",mysetup["ModelH2G2P"],"\n")
+    print("Mysetup ParameterScale:",mysetup["ParameterScale"],"\n")
+    print("Mysetuplocal ParameterScale:",mysetup_local["ParameterScale"],"\n")
 
     # Parse input data into useful structures divided by type (load, wind, solar, fuel, groupings thereof, etc.)
     # TO DO LATER: Replace these with collections of col_names, profiles, zones

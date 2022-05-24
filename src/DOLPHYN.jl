@@ -125,6 +125,7 @@ include("GenX/model/resources/storage/long_duration_storage.jl")
 include("GenX/model/resources/storage/investment_charge.jl")
 include("GenX/model/resources/storage/storage_asymmetric.jl")
 include("GenX/model/resources/storage/storage_symmetric.jl")
+include("GenX/model/resources/hydro/hydro_inter_period_linkage.jl")
 
 include("GenX/model/resources/thermal/thermal.jl")
 include("GenX/model/resources/thermal/thermal_commit.jl")
