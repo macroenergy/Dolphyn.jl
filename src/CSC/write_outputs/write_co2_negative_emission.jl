@@ -28,7 +28,7 @@ function write_co2_negative_emission(path::AbstractString, sep::AbstractString, 
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Negative Emissions"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:eDAC_Negative_Emissions_per_type][dfCO2Capture[(dfCO2Capture[!,:CO2_CAPTURE_TYPE].>0) .&  (dfCO2Capture[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,1]= value(EP[:eCSC_Negative_Emissions_per_zone][z,t])
 	   	end
 
 		if z==1

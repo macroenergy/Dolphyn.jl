@@ -60,7 +60,10 @@ function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractS
 
     # Number of booster compressors between source and sink
     # DEV NOTE: we should make the total number of compressors if the ratio is less than 1 for a particular line
-    inputs_nw["no_booster_comp_stations"] = floor.(inputs_nw["pPipe_length_miles"]/inputs_nw["len_bw_comp_mile"])
+
+    #############################################################################################################
+    #Check if there should be a "." after inputs_nw["pPipe_length_miles"] for division    
+    inputs_nw["no_booster_comp_stations"] = floor.(inputs_nw["pPipe_length_miles"]./inputs_nw["len_bw_comp_mile"])
     #Maximum number of pipelines
     inputs_nw["pH2_Pipe_No_Max"] = convert(Array{Float64}, collect(skipmissing(pipeline_var[!,:Max_No_Pipe])))
 

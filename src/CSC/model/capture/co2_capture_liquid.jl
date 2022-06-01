@@ -44,9 +44,8 @@ function co2_capture_liquid(EP::Model, inputs::Dict,setup::Dict)
 	@expression(EP, eDAC_CO2_Captured_Liquid[t=1:T, z=1:Z],
 	sum(EP[:vDAC_CO2_Captured][k,t] for k in intersect(CO2_CAPTURE_LIQUID, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
-
-	############ ADD TO CO2 BALANCE
-
+	#ADD TO CO2 BALANCE
+	EP[:eCaptured_CO2_Balance] += eDAC_CO2_Captured_Liquid
 
 	#Power Balance
 	if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
