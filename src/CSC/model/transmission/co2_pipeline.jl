@@ -28,9 +28,9 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 0 --> objective function is in $
 
     if setup["ParameterScale"] ==1 
-        @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pFixed_Cost_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:CO2_P))
+        @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pCAPEX_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:CO2_P) + sum(vCO2NPipe[p] * inputs["pFixed_OM_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:CO2_P))
     else
-        @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pFixed_Cost_CO2_Pipe"][p] for p = 1:CO2_P))
+        @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pCAPEX_CO2_Pipe"][p] for p = 1:CO2_P) + sum(vCO2NPipe[p] * inputs["pFixed_OM_CO2_Pipe"][p] for p = 1:CO2_P))
     end
 
     EP[:eObj] += eCCO2Pipe

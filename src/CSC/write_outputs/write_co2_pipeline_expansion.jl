@@ -28,7 +28,7 @@ function write_co2_pipeline_expansion(path::AbstractString, sep::AbstractString,
 	for i in 1:L
 		transcap[i] = (value.(EP[:vCO2NPipe][i]) -inputs["pCO2_Pipe_No_Curr"][i]).*inputs["pCO2_Pipe_Max_Flow"][i]
 		Pipes[i] = value.(EP[:vCO2NPipe][i])
-		Fixed_Cost[i] = value.(EP[:eCO2NPipeNew][i]) * inputs["pFixed_Cost_CO2_Pipe"][i]
+		Fixed_Cost[i] = value.(EP[:eCO2NPipeNew][i]) * inputs["pCAPEX_CO2_Pipe"][i] + value.(EP[:vCO2NPipe][i]) * inputs["pFixed_OM_CO2_Pipe"][i]
 		#Comp_Cost[i] = value.(EP[:eCO2NPipeNew][i]) * inputs["pCAPEX_Comp_CO2_Pipe"][i]
 	end
 

@@ -147,12 +147,38 @@ function co2_capture_solid(EP::Model, inputs::Dict, setup::Dict)
 	(1 - EP[:vDAC_Solid_Online][k,t]) >= sum(EP[:vDAC_Solid_Shut][k, hoursbefore_DAC(p,t,0:(Down_Time[k]-1))]))
 
 	##Min and max capture
+	#Old formulation
+
+	#@constraint(EP,cMin_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDAC_CO2_Captured][k,t] >= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * dfCO2Capture[!,:CO2_Capture_Min_Output][k])
+
+	#@constraint(EP,cMax_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDAC_CO2_Captured][k,t] <= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * inputs["CO2_Capture_Max_Output"][k,t])
+		
+	#New formulation
+	#Dummy capacity min and max
 	@constraint(EP,cMin_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
-	EP[:vDAC_CO2_Captured][k,t] >= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * dfCO2Capture[!,:CO2_Capture_Min_Output][k])
+	EP[:vDAC_CO2_Captured][k,t] >= EP[:vDummy_Capacity_DAC_per_type][k,t]  * dfCO2Capture[!,:CO2_Capture_Min_Output][k])
 
 	@constraint(EP,cMax_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
-	EP[:vDAC_CO2_Captured][k,t] <= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * inputs["CO2_Capture_Max_Output"][k,t])
+	EP[:vDAC_CO2_Captured][k,t] <= EP[:vDummy_Capacity_DAC_per_type][k,t] * inputs["CO2_Capture_Max_Output"][k,t])
 		
+	#Big M for online plant
+	M = 10000000
+	@constraint(EP,cBigM_Online_Min[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] >= EP[:vCapacity_DAC_per_type][k] - (1 - EP[:vDAC_Solid_Online][k,t]) * M)
+
+	@constraint(EP,cBigM_Online_Max[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] <= EP[:vCapacity_DAC_per_type][k])
+
+	#Big M for offline plant
+	@constraint(EP,cBigM_Offline_Min[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] >= 0)
+
+	@constraint(EP,cBigM_Offline_Max[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] <= EP[:vDAC_Solid_Online][k,t] * M)
+
+
 	return EP
 
 end

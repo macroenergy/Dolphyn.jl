@@ -82,24 +82,13 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     #Minimum Pipeline storage capacity in tonnes per pipe
     inputs_co2_nw["pCO2_Pipe_Min_Cap"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:Min_pipecap_stor_frac]))) .* inputs_co2_nw["pCO2_Pipe_Max_Cap"]
 
-    if setup["CO2Pipeline_Cost_Power_Model"] == 0
-        #Capital Cost Per Pipe using mean cost
-        inputs_co2_nw["pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
-        inputs_co2_nw["pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
-        inputs_co2_nw["pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
-
-    elseif setup["CO2Pipeline_Cost_Power_Model"] == 1
-        #Capital Cost Per Pipe using trendline CAPEX = C1*Miles + C2*Miles^2
-        inputs_co2_nw["pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_C1]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"] + convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_C2]))) .* (inputs_co2_nw["pCO2_Pipe_length_miles"].^2)
-        inputs_co2_nw["pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_C1]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"] + convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_C2]))) .* (inputs_co2_nw["pCO2_Pipe_length_miles"].^2)
-        inputs_co2_nw["pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_E1]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"] + convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_E2]))) .* (inputs_co2_nw["pCO2_Pipe_length_miles"].^2)
-    end
-
+    #Capital Cost Per Pipe using mean cost
+    inputs_co2_nw["pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
+    inputs_co2_nw["pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
+    inputs_co2_nw["pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
 
     inputs_co2_nw["pLoss_tonne_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2PipeLoss_tonne_per_mile_per_tonne]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
     
-    inputs_co2_nw["pFixed_Cost_CO2_Pipe"] = inputs_co2_nw["pCAPEX_CO2_Pipe"] + inputs_co2_nw["pFixed_OM_CO2_Pipe"]
-
     #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
     inputs_co2_nw["pCAPEX_Comp_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:BoosterCompCapex_per_tonne_p_hr_yr]))).* inputs_co2_nw["pCO2_Pipe_Max_Flow"].*inputs_co2_nw["CO2_no_booster_comp_stations"] 
 
