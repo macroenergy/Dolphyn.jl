@@ -25,8 +25,8 @@ Pkg.add(Pkg.PackageSpec(name="GLPK", version="0.14.12"))
 Pkg.add(Pkg.PackageSpec(name="Ipopt", version="0.7.0"))
 Pkg.add(Pkg.PackageSpec(name="JuMP", version="0.21.8"))
 Pkg.add("MathOptInterface")
-Pkg.add(Pkg.PackageSpec(name="SCIP"))
-Pkg.build("SCIP")
+#Pkg.add(Pkg.PackageSpec(name="SCIP"))
+#Pkg.build("SCIP")
 #Pkg.add(Pkg.PackageSpec(name="CPLEX", version="0.7.7"))
 Pkg.add(Pkg.PackageSpec(name="CSV", version="0.8.5"))
 Pkg.add(Pkg.PackageSpec(name="Clustering", version="0.14.2"))
@@ -35,10 +35,7 @@ Pkg.add(Pkg.PackageSpec(name="Distances", version="0.10.3"))
 Pkg.add(Pkg.PackageSpec(name="DataFrames", version="1.0.0")) #0.20.2
 Pkg.add(Pkg.PackageSpec(name="Documenter", version="0.27.3"))
 Pkg.add(Pkg.PackageSpec(name="DocumenterTools", version="0.1.13"))
-Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.9.14"))
-
-# Julia environment variable GUROBI_HOME set to your running machine location
-# ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
+Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.10.1"))
 Pkg.build("Gurobi")
 ##Add if elseif with Method of Morris for these
 Pkg.add(Pkg.PackageSpec(name="DiffEqSensitivity", version="6.52.1"))
