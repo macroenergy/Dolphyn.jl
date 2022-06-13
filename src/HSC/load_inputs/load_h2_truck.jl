@@ -19,12 +19,12 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     Z = inputs_truck["Z"]
     Z_set = 1:Z
 
-    zone_distance = DataFrame(CSV.File(string(path, sep, "zone-distances-miles.csv"), header=true), copycols=true)
+    zone_distance = DataFrame(CSV.File(string(path, sep, "HSC_zone_distances_miles.csv"), header=true), copycols=true)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
 	inputs_truck["RouteLength"] = RouteLength
     
-    println("zone-distances-miles.csv Successfully Read!")
+    println("HSC_zone_distances_miles.csv Successfully Read!")
 
     # H2 truck type inputs
     h2_truck_in = DataFrame(CSV.File(string(path, sep, "HSC_trucks.csv"), header=true), copycols=true)

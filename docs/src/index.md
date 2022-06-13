@@ -1,7 +1,7 @@
 # GenX Documentation
 
 ```@meta
-CurrentModule = GenX
+CurrentModule = DOLPHYN
 ```
 
 ## Overview

@@ -20,8 +20,8 @@ cd(dirname(@__FILE__))
 
 settings_path = joinpath(pwd(), "Settings")
 
-environment_path = "../../../package_activate.jl"
-include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+#environment_path = "../../../package_activate.jl"
+#include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 
 ### Set relevant directory paths
 src_path = "../../../src/"
@@ -72,14 +72,14 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # #### Running a case
 
-# ### Load inputs
+# ### Load power system inputs
 # println("Loading Inputs")
  myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
  myinputs = load_inputs(mysetup, inpath)
 
-# ### Load H2 inputs if modeling the hydrogen supply chain
+# ### Load inputs for modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
-    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
+    myinputs, mysetup = load_h2_inputs(myinputs, mysetup, inpath)
 end
 
 # ### Generate model
