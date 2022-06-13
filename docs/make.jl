@@ -20,7 +20,7 @@ include(joinpath(pwd(), "package_activate.jl"))
 genx_path = joinpath(pwd(), "src")
 push!(LOAD_PATH, genx_path)=#
 import DataStructures: OrderedDict
-using GenX
+using DOLPHYN
 using Documenter
 DocMeta.setdocmeta!(GenX, :DocTestSetup, :(using GenX); recursive=true)
 println(pwd())
