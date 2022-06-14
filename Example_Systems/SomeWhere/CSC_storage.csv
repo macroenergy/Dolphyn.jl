@@ -2,3 +2,6 @@ CO2_Storage,Zone,LDS,New_Build,Inv_Cost_Charge_p_tonne_p_hr_yr,Inv_Cost_Carbon_p
 Above_ground_storage_1,1,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
 Above_ground_storage_2,2,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
 Above_ground_storage_3,3,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
+Above_ground_storage_4,4,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
+Above_ground_storage_5,5,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
+Above_ground_storage_6,6,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1

@@ -66,6 +66,9 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 	# Set of controllable variable renewable resources
 	inputs_gen["VRE"] = gen_in[gen_in.VRE.>=1,:R_ID]
 
+	# Set of generation plants with CCS
+	inputs_gen["Power_CCS"] = gen_in[gen_in.CCS .== 1,:R_ID]
+
 	# Set of thermal generator resources
 	if setup["UCommit"]>=1
 		# Set of thermal resources eligible for unit committment

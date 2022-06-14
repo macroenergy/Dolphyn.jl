@@ -26,35 +26,98 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
-		dfEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
+	dfDACEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
 
-	for i in 1:Z
+	for z in 1:Z
 		if setup["ParameterScale"]==1
-			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[i,:])*ModelScalingFactor
+			dfDACEmissions[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[z,:])*ModelScalingFactor
 		else
-			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[i,:])/ModelScalingFactor
+			dfDACEmissions[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2NegativeEmissionsByZone])[z,:])/ModelScalingFactor
 		end
 	end
 
-	if setup["ParameterScale"]==1
-		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eCO2NegativeEmissionsByZone])*ModelScalingFactor, :auto))
+	if setup["ParameterScale"] == 1 
+		dfDACEmissions = hcat(dfDACEmissions, DataFrame(value.(EP[:eCO2NegativeEmissionsByZone])*ModelScalingFactor, :auto))
 	else
-		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eCO2NegativeEmissionsByZone])/ModelScalingFactor, :auto))
+		dfDACEmissions = hcat(dfDACEmissions, DataFrame(value.(EP[:eCO2NegativeEmissionsByZone])/ModelScalingFactor, :auto))
 	end
 
-
 	auxNew_Names=[Symbol("Zone"); Symbol("AnnualSum"); [Symbol("t$t") for t in 1:T]]
-	rename!(dfEmissions,auxNew_Names)
-	total = DataFrame(["Total" sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+	rename!(dfDACEmissions,auxNew_Names)
+	total = DataFrame(["Total" sum(dfDACEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
-			total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-		elseif v"1.4" <= VERSION < v"1.7"
-			total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
+			total[!,t+2] .= sum(dfDACEmissions[!,Symbol("t$t")][1:Z])
+		elseif v"1.4" <= VERSION <= v"1.7"
+			total[:,t+2] .= sum(dfDACEmissions[:,Symbol("t$t")][1:Z])
 		end
 	end
 	rename!(total,auxNew_Names)
-	dfEmissions = vcat(dfEmissions, total)
+	dfEmissions = vcat(dfDACEmissions, total)
 
-	CSV.write(string(path,sep,"CSC_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+	CSV.write(string(path,sep,"DAC_net_emissions.csv"), dftranspose(dfDACEmissions, false), writeheader=false)
+	
+	# PSC emissions
+	dfPSCEmission = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
+
+	for z in 1:Z
+		if setup["ParameterScale"]==1
+			dfPSCEmission[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCEmissionsByZone])[z,:])*ModelScalingFactor
+		else
+			dfPSCEmission[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCEmissionsByZone])[z,:])/ModelScalingFactor
+		end
+	end
+
+	if setup["ParameterScale"] == 1 
+		dfPSCEmission = hcat(dfPSCEmission, DataFrame(value.(EP[:eCO2PSCEmissionsByZone])*ModelScalingFactor, :auto))
+	else
+		dfPSCEmission = hcat(dfPSCEmission, DataFrame(value.(EP[:eCO2PSCEmissionsByZone])/ModelScalingFactor, :auto))
+	end
+
+	auxNew_Names=[Symbol("Zone"); Symbol("AnnualSum"); [Symbol("t$t") for t in 1:T]]
+	rename!(dfPSCEmission,auxNew_Names)
+	total = DataFrame(["Total" sum(dfPSCEmission[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+	for t in 1:T
+		if v"1.3" <= VERSION < v"1.4"
+			total[!,t+2] .= sum(dfPSCEmission[!,Symbol("t$t")][1:Z])
+		elseif v"1.4" <= VERSION <= v"1.7"
+			total[:,t+2] .= sum(dfPSCEmission[:,Symbol("t$t")][1:Z])
+		end
+	end
+	rename!(total,auxNew_Names)
+	dfEmissions = vcat(dfPSCEmission, total)
+
+	CSV.write(string(path,sep,"PSC_emissions.csv"), dftranspose(dfPSCEmission, false), writeheader=false)
+
+	# PSC capture CO2
+	dfPSCCaptured = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
+
+	for z in 1:Z
+		if setup["ParameterScale"]==1
+			dfPSCCaptured[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCCaptureByZone])[z,:])*ModelScalingFactor
+		else
+			dfPSCCaptured[!,:AnnualSum][z] = sum(inputs["omega"].*value.(EP[:eCO2PSCCaptureByZone])[z,:])/ModelScalingFactor
+		end
+	end
+
+	if setup["ParameterScale"] == 1 
+		dfPSCCaptured = hcat(dfPSCCaptured, DataFrame(value.(EP[:eCO2PSCCaptureByZone])*ModelScalingFactor, :auto))
+	else
+		dfPSCCaptured = hcat(dfPSCCaptured, DataFrame(value.(EP[:eCO2PSCCaptureByZone])/ModelScalingFactor, :auto))
+	end
+
+	auxNew_Names=[Symbol("Zone"); Symbol("AnnualSum"); [Symbol("t$t") for t in 1:T]]
+	rename!(dfPSCCaptured,auxNew_Names)
+	total = DataFrame(["Total" sum(dfPSCCaptured[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+	for t in 1:T
+		if v"1.3" <= VERSION < v"1.4"
+			total[!,t+2] .= sum(dfPSCCaptured[!,Symbol("t$t")][1:Z])
+		elseif v"1.4" <= VERSION <= v"1.7"
+			total[:,t+2] .= sum(dfPSCCaptured[:,Symbol("t$t")][1:Z])
+		end
+	end
+	rename!(total,auxNew_Names)
+	dfEmissions = vcat(dfPSCCaptured, total)
+
+	CSV.write(string(path,sep,"PSC_co2_capture.csv"), dftranspose(dfPSCCaptured, false), writeheader=false)
 end

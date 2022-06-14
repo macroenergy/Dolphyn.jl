@@ -38,12 +38,14 @@ using JuMP
 
 genx_settings = joinpath(settings_path, "genx_settings.yml") # Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") # Settings YAML file path for HSC modelgrated model
+csc_settings = joinpath(settings_path, "csc_settings.yml") # Settings YAML file path for CSC modelgrated model
 setup_genx = YAML.load(open(genx_settings)) # setup dictionary stores GenX-specific parameters
 setup_hsc = YAML.load(open(hsc_settings)) # setup dictionary stores H2 supply chain-specific parameters
+setup_csc = YAML.load(open(csc_settings)) # setup dictionary stores CO2 supply chain-specific parameters
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for model
 setup_global = YAML.load(open(global_settings)) # setup dictionary stores global settings
 setup = Dict()
-setup = merge(setup_hsc, setup_genx, setup_global) # Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+setup = merge(setup_hsc, setup_csc, setup_genx, setup_global) # Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
 ## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, setup["TimeDomainReductionFolder"])
@@ -72,6 +74,11 @@ if setup["ModelH2"] == 1
     inputs = load_h2_inputs(inputs, setup, inpath)
 end
 
+# ### Load CO2 inputs if modeling the carbon supply chain
+if setup["ModelCO2"] == 1
+    inputs = load_co2_inputs(inputs, setup, inpath)
+end
+
 # ### Generate model
 # println("Generating the Optimization Model")
 EP = generate_model(setup, inputs, OPTIMIZER)
@@ -91,6 +98,12 @@ outpath=write_power_outputs(EP, outpath, setup, inputs)
 if setup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, setup, inputs)
+end
+
+# Write carbon supply chain outputs
+if setup["ModelCO2"] == 1
+    outpath_CO2 = "$outpath/Results_CSC"
+    write_CSC_outputs(EP, outpath_CO2, setup, inputs)
 end
 
 # Run MGA if the MGA flag is set to 1 else only save the least cost solution

@@ -114,7 +114,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Initialize Carbon Balance Expression
 	# Expression for "baseline" CO2 balance constraint
 	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
-	@expression(EP, eCO2BalanceStorTotal[t=1:T, z=1:Z], 0)
 
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
@@ -122,6 +121,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Power supply by z and timestep - used in emissions constraints
 	@expression(EP, eGenerationByZone[t=1:T, z=1:Z], 0)
 
+	# PSC emissions by zone and time
+	@expression(EP, eCO2PSCEmissionsByZone[z = 1:Z, t = 1:T], 0)
+
+	# PSC captured CO2
+	@expression(EP, eCO2PSCCaptureByZone[z = 1:Z, t = 1:T], 0)
+	
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
 
@@ -201,10 +206,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_production(EP, inputs, setup)
 		end
 
-		if setup["H2CO2Cap"] > 0
-			# Direct emissions of various hydrogen sector resources
-			EP = emissions_hsc(EP, inputs,setup)
-		end
+		# Direct emissions of various hydrogen sector resources
+		EP = emissions_hsc(EP, inputs,setup)
 
 		# Model H2 non-served energy
 		EP = h2_non_served_energy(EP, inputs,setup)
@@ -247,7 +250,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		# Investment cost of various carbon capture sources
 		EP = co2_investment(EP, inputs, setup)
-	
+
+		# Model CO2 non-served energy
+		EP = co2_non_served_energy(EP, inputs, setup)
+		
 		if !isempty(inputs["CO2_CAPTURE"])
 			#model CO2 capture
 			EP = co2_capture(EP, inputs, setup)
@@ -315,7 +321,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	## Only activate when carbon capture utilization is online
 	if setup["ModelCO2"] == 1
 		###Carbon Balanace constraints
-		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] - EP[:eCO2BalanceStorTotal][t,z] == inputs["CO2_D"][t,z])
+		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
 	end
 	
 	## Record pre-solver time

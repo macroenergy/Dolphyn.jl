@@ -72,8 +72,11 @@ function co2_capture_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end)
 
 	@constraints(EP, begin
-	# Maximum carbon capture per technology "k" at hour "t"
-	[k in CO2_CAPTURE_NO_COMMIT, t=1:T], EP[:vCO2Capture][k,t] <= EP[:eCO2CaptureTotalCap][k]* inputs["pCO2_Max"][k,t]
+		# Maximum carbon capture per technology "k" at hour "t"
+		[k in CO2_CAPTURE_NO_COMMIT, t=1:T], EP[:vCO2Capture][k,t] <= EP[:eCO2CaptureTotalCap][k]* inputs["pCO2_Max"][k,t]
+
+		# Minimum carbon capture per technology "k" at hour "t"
+		[k in CO2_CAPTURE_NO_COMMIT, t=1:T], EP[:vCO2Capture][k,t] >= EP[:eCO2CaptureTotalCap][k]* dfCO2Capture[!, :CO2Capture_min_output][k]
 	end)
 
 	#Ramping cosntraints 

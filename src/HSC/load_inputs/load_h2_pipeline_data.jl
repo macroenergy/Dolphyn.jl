@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,16 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_network_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
+    load_h2_pipeline_data((setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
-Function for reading input parameters related to the electricity transmission network
+Function for reading input parameters related to the hydrogen transmission network
 """
-function load_h2_pipeline_data(
-    setup::Dict,
-    path::AbstractString,
-    sep::AbstractString,
-    inputs_nw::Dict,
-)
+
+function load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(

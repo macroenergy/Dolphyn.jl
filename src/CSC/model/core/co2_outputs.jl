@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	co2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the production decision variable  representing carbon injected into the network by resource $k$ by at time period $t$.
 
