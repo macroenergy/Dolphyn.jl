@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_h2 charge(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the h2 storage charging energy values of the different storage technologies.
 """
@@ -28,7 +28,7 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
 	charge = zeros(H,T)
 	for i in 1:H
         if i in inputs["H2_STOR_ALL"]
-            charge[i,:] = value.(EP[:vH2CHARGE_STOR])[i,:] 
+            charge[i,:] = value.(EP[:vH2_CHARGE_STOR])[i,:] 
         elseif i in inputs["H2_FLEX"]
             charge[i,:] = value.(EP[:vH2_CHARGE_FLEX])[i,:]
         end
@@ -42,7 +42,7 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfCharge[!,Symbol("t$t")][union(inputs["H2_STOR_ALL"],inputs["H2_FLEX"])])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+3] .= sum(dfCharge[:,Symbol("t$t")][union(inputs["H2_STOR_ALL"],inputs["H2_FLEX"])])
 		end
 	end

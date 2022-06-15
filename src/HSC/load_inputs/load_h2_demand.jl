@@ -14,10 +14,13 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@doc raw""""
-	function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
+@doc raw"""
+	load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
-Function for reading the hydrogen demand.
+<<<<<<< HEAD
+Function for reading input parameters related to CO$_2$ emissions cap constraints
+=======
+>>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     

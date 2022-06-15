@@ -14,9 +14,8 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 @doc raw"""
-	load_h2_inputs(setup::Dict,path::AbstractString)
+	load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
@@ -48,6 +47,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     inputs = load_h2_generators_variability(setup, path, sep, inputs)
 
 	# Read input data about power network topology, operating and expansion attributes
+
 	if setup["ModelH2Pipelines"] == 1
 	    if isfile(string(path,sep,"HSC_pipelines.csv")) 		
 			inputs  = load_h2_pipeline_data(setup, path, sep, inputs)

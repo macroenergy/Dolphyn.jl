@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting non-served energy for every model zone, time step and cost-segment.
 """
@@ -50,7 +50,7 @@ function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfNse[!,Symbol("t$t")][1:Z])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+3] .= sum(dfNse[:,Symbol("t$t")][1:Z])
 		end
 	end

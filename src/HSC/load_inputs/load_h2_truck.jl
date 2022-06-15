@@ -15,7 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
+    load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
 
+<<<<<<< HEAD
+Function for reading input parameters related to CO$_2$ emissions cap constraints
+=======
+>>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 
@@ -56,12 +61,12 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     # Store DataFrame of truck input data for use in model
     inputs_truck["dfH2Truck"] = h2_truck_in
 
+
     # Average truck travel time between zones
     inputs_truck["TD"] = Dict()
     for j in inputs_truck["H2_TRUCK_TYPES"]
         inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
     end
-
     println("HSC_trucks.csv Successfully Read!")
     return inputs_truck
 end

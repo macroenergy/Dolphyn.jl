@@ -15,9 +15,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
+	load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
+<<<<<<< HEAD
+Function for reading input parameters related to CO$_2$ emissions cap constraints
+=======
+>>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
-
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
 	#Read in H2 generation related inputs
@@ -45,7 +49,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
 	# To do - will add a list of storage resources or we can keep them separate
 	# Set of H2 storage resources
-	inputs_gen["H2_STOR_ALL"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	inputs_gen["H2_STOR_SYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
+	inputs_gen["H2_STOR_ALL"] = union(inputs_gen["H2_STOR_SYMMETRIC"],inputs_gen["H2_STOR_ASYMMETRIC"])
 
 	# Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
 	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.==1),:R_ID]

@@ -15,17 +15,45 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the production decision variable  representing hydrogen injected into the network by resource $y$ by at time period $t$.
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
+**Variables**
+```math
+\begin{aligned}
+	Obj_{Var\_gen} =
+	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
+\end{aligned}
+```
+
+**Expressions**
+```math
+\begin{aligned}
+	\varepsilon _{OUT}^{GEN} =
+		\Omega _{t} \times \xi _{k}^{OMCostPTone} {\div} ModelScalingFactors^{2}+ FuelCost   
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+	\varepsilon _{CH2GenVarOutT}^{Total} =\sum_{t}^{t\to t^{'} } \sum_{k}^{ \mathbb{K}} \varepsilon _{k,t}^{GenOut}    
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+	\varepsilon _{CH2GenVarOut}^{Total} =\sum_{t}^{t\to t^{'} } \varepsilon _{t}^{GenOut}      
+\end{aligned}
+```
+
 """
 
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 generation and storage discharge module")
+	println("Hydrogen Generation and Storage Discharge Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 
@@ -37,7 +65,7 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 	### Variables ###
 
     #H2 injected to hydrogen grid from hydrogen generation resource k (tonnes of H2/hr) in time t
-	@variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0 )
+	@variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0)
 
 	### Expressions ###
 

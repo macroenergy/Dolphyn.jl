@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
 	H = inputs["H2_RES_ALL"]  # Set of H2 storage resources
 
 	# Storage level (state of charge) of each resource in each time step
-	dfStorage = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone])
+	dfH2Storage = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone])
 	s = zeros(H,T)
 	storagevcapvalue = zeros(H,T)
 	for i in 1:H
@@ -42,8 +42,8 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
 	end
 
 
-	dfStorage = hcat(dfStorage, DataFrame(storagevcapvalue, :auto))
+	dfH2Storage = hcat(dfH2Storage, DataFrame(storagevcapvalue, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
-	rename!(dfStorage,auxNew_Names)
-	CSV.write(string(path,sep,"storage.csv"), dftranspose(dfStorage, false), writeheader=false)
+	rename!(dfH2Storage,auxNew_Names)
+	CSV.write(string(path,sep,"storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
 end
