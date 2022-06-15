@@ -18,7 +18,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
-
 """
 function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
