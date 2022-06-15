@@ -1,5 +1,5 @@
 # Curtailable Variable Renewables
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["curtailable_variable_renewable.jl"]
 ```

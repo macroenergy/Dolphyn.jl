@@ -1,29 +1,29 @@
 # Configuring the Solvers
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["configure_solver.jl"]
 ```
 
 ## Configuring Gurobi
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["configure_gurobi.jl"]
 ```
 
 ## Configuring CPLEX
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["configure_cplex.jl"]
 ```
 
 ## Configuring Clp
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["configure_clp.jl"]
 ```
 
 ## Configuring Cbc
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["configure_cbc.jl"]
 ```

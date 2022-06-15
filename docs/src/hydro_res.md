@@ -1,5 +1,5 @@
 # Hydro Resources
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["hydro_res.jl"]
 ```

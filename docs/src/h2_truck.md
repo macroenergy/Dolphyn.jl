@@ -1,5 +1,5 @@
-# Must Run
+# h2_truck
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["must_run.jl"]
+Pages = ["h2_truck.jl"] 
 ```

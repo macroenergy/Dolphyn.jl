@@ -1,5 +1,5 @@
 # Storage All
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["storage_all.jl"]
 ```

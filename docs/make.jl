@@ -86,13 +86,12 @@ pages = OrderedDict(
                 "Production Commit" => "h2_production_commit.md",
                 "Production No Commit" => "h2_production_no_commit.md",
                 "Production" => "h2_production.md",
-            ],
-            "Policies" => "h2_policies.md",
+            ]
         ],
     ],
 )
 
-makedocs(
+makedocs(;
     modules = [DOLPHYN],
     authors = "Dharik Mallapragada, Guannan He, Yuheng Zhang",
     sitename = "DOLPHYN",

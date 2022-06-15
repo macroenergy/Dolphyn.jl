@@ -1,5 +1,5 @@
 # Storage Symmetric
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["storage_symmetric.jl"]
 ```

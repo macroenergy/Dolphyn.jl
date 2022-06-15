@@ -2,6 +2,6 @@
 
 ## Modeling to Generate Alternatives
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["modeling_to_generate_alternatives.jl"]
 ```

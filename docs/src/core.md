@@ -2,30 +2,30 @@
 
 ## Discharge
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["discharge.jl"]
 ```
 
 ## Non-served Energy
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["non_served_energy.jl"]
 ```
 
 ## Reserves
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["reserves.jl"]
 ```
 
 ## Transmission
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["transmission.jl"]
 ```
 
 ## Unit Commitment
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["ucommit.jl"]
 ```

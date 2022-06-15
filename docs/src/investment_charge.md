@@ -1,5 +1,5 @@
 # Investment Charge
 ```@autodocs
-Modules = [GenX]
+Modules = [DOLPHYN]
 Pages = ["investment_charge.jl"]
 ```
