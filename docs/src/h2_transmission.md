@@ -1,4 +1,4 @@
-# h2_pipeline
+# Hydrogen Transmission
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_pipeline.jl"]

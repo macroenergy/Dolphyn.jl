@@ -1,4 +1,4 @@
-## Solving the Model
+# Solving the Model
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["solve_model.jl"]

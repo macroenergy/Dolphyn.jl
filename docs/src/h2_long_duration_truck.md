@@ -1,4 +1,4 @@
-# h2_long_duration_truck
+# Long Duration Truck for Hydrogen
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_long_duration_truck.jl"]

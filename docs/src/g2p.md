@@ -1,36 +1,36 @@
-# Hydrogen gas to power
+# Hydrogen Gas to Power
 
-## h2_g2p_all
+## Hydrogen Gas to Power All
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_g2p_all.jl"]
 ```
 
-## h2_g2p_commit
+## Hydrogen Gas to Power Commitment
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_g2p_commit.jl"]
 ```
 
-## h2_g2p_discharge
+## Hydrogen Gas to Power Discharge
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_g2p_discharge.jl"]
 ```
 
-## h2_g2p_investment
+## Hydrogen Gas to Power Investment
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_g2p_investment.jl"]
 ```
 
-## h2_g2p_no_commit
+## Hydrogen Gas to Power No Commitment
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_g2p_no_commit.jl"]
 ```
 
-## h2_g2p
+## Hydrogen Gas to Power
 ```@autodocs
 Modules = [DOLPHYN]
 Pages = ["h2_g2p.jl"]

@@ -1,4 +1,4 @@
-# h2_production
+# Hydrogen Production
 ```@autodocs
 Modules = [DOLPHYN]
 pages = ["h2_production.jl"]
