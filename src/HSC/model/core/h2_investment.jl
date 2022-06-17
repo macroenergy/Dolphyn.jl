@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the production decision variable  representing hydrogen injected into the network by resource $y$ by at time period $t$.
+This module defines the production decision variable representing hydrogen injected into the network by resource $y$ by at time period $t$.
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 

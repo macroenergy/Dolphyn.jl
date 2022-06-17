@@ -91,6 +91,7 @@ The charging capability of truck stations is limited by their compression or liq
 \end{aligned}    
 ```   
 """
+
 function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     # Setup variables, constraints, and expressions common to all hydrogen truck resources

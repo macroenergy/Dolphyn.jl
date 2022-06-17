@@ -128,6 +128,7 @@ As with losses option 2, this segment-wise approximation of a quadratic loss fun
 \end{aligned}
 ```
 """
+
 function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::Int)
 
 	println("Transmission Module")

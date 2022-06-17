@@ -38,6 +38,7 @@ The total cost of start-ups across all generators subject to unit commitment ($y
 
 The sum of start-up costs is added to the objective function.
 """
+
 function ucommit(EP::Model, inputs::Dict, UCommit::Int)
 
 	println("Unit Commitment Module")

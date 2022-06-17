@@ -23,7 +23,7 @@ inputs:
 setup - dict object containing setup parameters
 path - string path to working directory
 
-returns: Dict (dictionary) object containing all data inputs
+returns: Dict (dictionary) object containing all data inputs of hydrogen sector.
 """
 
 function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)

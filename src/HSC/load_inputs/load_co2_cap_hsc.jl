@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to CO$_2$ emissions cap constraints
 """
+
 function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_hsc::Dict)
     # Definition of Cap requirements by zone (as Max Mtons)
     inputs_co2_hsc["dfH2CO2Cap"] = DataFrame(

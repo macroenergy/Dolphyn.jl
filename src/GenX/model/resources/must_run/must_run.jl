@@ -28,6 +28,7 @@ For must-run resources ($y\in \mathcal{MR}$) output in each time period $t$ must
 \end{aligned}
 ```
 """
+
 function must_run(EP::Model, inputs::Dict)
 
 	println("Must-Run Resources Module")

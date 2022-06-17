@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_h2_generators_variability(setup::Dict, path::AbstractString, sep::AbstractString, inputs_genvar::Dict)
 
-Function for reading input parameters related to hourly maximum capacity factors for all generators (plus storage and flexible demand resources)
+Function for reading input parameters related to hourly maximum capacity factors for all hydrogen generators (plus storage).
 """
 function load_h2_generators_variability(setup::Dict, path::AbstractString, sep::AbstractString, inputs_genvar::Dict)
 

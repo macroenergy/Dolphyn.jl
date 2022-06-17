@@ -27,12 +27,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## DataFrames appears to exist.
 ################################################################################
 """
-   df = dftranspose(df::DataFrame, withhead::Bool)
+   dftranspose(df::DataFrame, withhead::Bool)
 
 Returns a transpose of a Dataframe.\n
 FIXME: This is for DataFrames@0.20.2, as used in GenX. 
 Versions 0.21+ could use stack and unstack to make further changes while retaining the order
 """
+
 function dftranspose(df::DataFrame, withhead::Bool)
 	if withhead
 		colnames = cat(:Row, Symbol.(df[!,1]), dims=1)

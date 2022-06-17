@@ -32,6 +32,7 @@ The Cbc optimizer instance is configured with the following default parameters i
  - threads = 1
 
 """
+
 function configure_cbc(solver_settings_path::String)
 
 	solver_settings = YAML.load(open(solver_settings_path))

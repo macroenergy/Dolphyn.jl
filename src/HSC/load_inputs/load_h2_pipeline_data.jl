@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     load_h2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
-Function for reading input parameters related to the electricity transmission network
+Function for reading input parameters related to the hydrogen transmission network via pipelines.
 """
 function load_h2_pipeline_data(
     setup::Dict,

@@ -143,6 +143,7 @@ Finally, the constraints on maximum discharge rate are replaced by the following
 
 The above reserve related constraints are established by ```storage_all_reserves()``` in ```storage_all.jl```
 """
+
 function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources
     println("H2 Storage Core Resources Module")

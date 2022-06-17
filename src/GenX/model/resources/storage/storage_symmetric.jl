@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities. See ```storage()``` in ```storage.jl``` for description of constraints.
 """
+
 function storage_symmetric(EP::Model, inputs::Dict, Reserves::Int)
 	# Set up additional variables, constraints, and expressions associated with storage resources with symmetric charge & discharge capacity
 	# (e.g. most electrochemical batteries that use same components for charge & discharge)
@@ -55,6 +56,7 @@ end
 
 Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities when reserves are modeled. See ```storage()``` in ```storage.jl``` for description of constraints.
 """
+
 function storage_symmetric_reserves(EP::Model, inputs::Dict)
 
 	dfGen = inputs["dfGen"]

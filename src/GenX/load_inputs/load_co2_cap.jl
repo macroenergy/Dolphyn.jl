@@ -17,8 +17,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2::Dict)
 
-Function for reading input parameters related to CO$_2$ emissions cap constraints
+Function for reading input parameters related to CO$_2$ emissions cap constraints.
 """
+
 function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2::Dict)
 	# Definition of Cap requirements by zone (as Max Mtons)
 	#inputs_co2["dfCO2Cap"] = CSV.read(string(path,sep,"CO2_cap.csv"), header=true)
@@ -70,7 +71,7 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 		end
 
 	end
+
 	println("CO2_cap.csv Successfully Read!")
 	return inputs_co2
-	
 end

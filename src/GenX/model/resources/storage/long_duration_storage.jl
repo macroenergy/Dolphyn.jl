@@ -71,6 +71,7 @@ Finally, the next constraint enforces that the initial storage level for each in
 \end{aligned}
 ```
 """
+
 function long_duration_storage(EP::Model, inputs::Dict)
 
 	println("Long Duration Storage Module")

@@ -35,6 +35,7 @@ The above constraint is defined as an inequality instead of an equality to allow
 
 Note that if ```Reserves=1``` indicating that frequency regulation and operating reserves are modeled, then this function calls ```curtailable_variable_renewable_reserves()```, which replaces the above constraints with a formulation inclusive of reserve provision.
 """
+
 function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 	## Controllable variable renewable generators
 	### Option of modeling VRE generators with multiple availability profiles and capacity limits -  Num_VRE_Bins in Generators_data.csv  >1

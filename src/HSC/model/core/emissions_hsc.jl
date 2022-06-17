@@ -17,9 +17,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
-This function creates expression to add the CO2 emissions  in each zone, which is subsequently added to the total emissions
-
+This function creates expression to add the CO2 emissions for hydrogen supply chain in each zone, which is subsequently added to the total emissions.
 """
+
 function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
     println("H2 Emissions Module for CO2 Policy modularization")

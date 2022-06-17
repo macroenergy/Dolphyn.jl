@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_storage_investment_energy(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the  decision variable representing energy components of hydrogen storage technologies
+This module defines the decision variables representing energy components of hydrogen storage technologies.
 
 """
 

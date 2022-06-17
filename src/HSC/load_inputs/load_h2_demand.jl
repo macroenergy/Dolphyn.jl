@@ -18,10 +18,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
 <<<<<<< HEAD
-Function for reading input parameters related to CO$_2$ emissions cap constraints
+Function for reading input hydrogen demand of each zone.
 =======
 >>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
+
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])

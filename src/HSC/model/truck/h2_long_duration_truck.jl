@@ -42,6 +42,7 @@ State of charge of truck at beginning of each modeled period cannot exceed insta
 ```
 
 """
+
 function h2_long_duration_truck(EP::Model, inputs::Dict)
 
     println("H2 Long Duration Truck Module")
