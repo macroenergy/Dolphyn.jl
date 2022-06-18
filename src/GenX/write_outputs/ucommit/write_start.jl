@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_start(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-
+Fucntion for reporting startup action of resources at each time step.
 """
 
 function write_start(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)

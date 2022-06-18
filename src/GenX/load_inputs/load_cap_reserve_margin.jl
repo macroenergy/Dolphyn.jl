@@ -15,9 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict, network_var::DataFrame)
+	load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)
 
-Function for reading input parameters related to planning reserve margin constraints
+Function for reading input parameters related to planning reserve margin constraints.
 """
 
 function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)

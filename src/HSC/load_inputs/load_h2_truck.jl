@@ -17,10 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
 
-<<<<<<< HEAD
 Function for reading input parameters of hydrogen truck.
-=======
->>>>>>> cb9e7bd3abdeb93868119116f42dcfff2b5a81bb
 """
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 

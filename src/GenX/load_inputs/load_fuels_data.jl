@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
 
-Function for reading input parameters related to fuel costs and CO$_2$ content of fuels.
+Function for reading input parameters related to fuel costs and CO$_2$ emission intensity of fuels.
 """
 
 function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)

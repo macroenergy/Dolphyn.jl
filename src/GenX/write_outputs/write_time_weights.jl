@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_time_weights(path::AbstractString, sep::AbstractString, inputs::Dict)
 
-
+Function for reporting the time weights after clustering process.
 """
 
 function write_time_weights(path::AbstractString, sep::AbstractString, inputs::Dict)
