@@ -239,7 +239,7 @@ include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
 
-# Modeling to generator alternatives
-include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
+# Modeling to generate alternatives
+include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end
