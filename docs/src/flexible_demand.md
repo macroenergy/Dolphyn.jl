@@ -1,5 +1,5 @@
 # Flexible Demand
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["flexible_demand.jl"]
+Pages = ["src/GenX/model/resources/flexible_demand/flexible_demand.jl"]
 ```
