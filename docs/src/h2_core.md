@@ -1,23 +1,23 @@
 ## Hydrogen Supply Chain Policies
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["co2_cap_hsc.jl"]
+Pages = ["HSC/model/policies/co2_cap_hsc.jl"]
 ```
 
 ## Hydrogen Resources Investment
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["h2_investment.jl"]
+Pages = ["HSC/model/core/h2_investment.jl"]
 ```
 
 ## Non-served Hydrogen
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["h2_non_served_energy.jl"]
+pages = ["HSC/model/core/h2_non_served.jl"]
 ```
 
 ## Hydrogen Output
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["h2_outputs.jl"]
+Pages = ["HSC/model/core/h2_outputs.jl"]
 ```

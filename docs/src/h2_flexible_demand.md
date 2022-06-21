@@ -1,5 +1,5 @@
 # Flexible Hydrogen Demand
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["h2_flexible_demand.jl"]
+pages = ["HSC/model/flexible_demand/h2_flexible_demand.jl"]
 ```

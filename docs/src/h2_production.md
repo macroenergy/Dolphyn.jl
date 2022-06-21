@@ -1,5 +1,5 @@
 # Hydrogen Production
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["h2_production.jl"]
+pages = ["HSC/model/generation/h2_production.jl"]
 ```

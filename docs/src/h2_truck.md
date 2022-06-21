@@ -1,5 +1,5 @@
 # Hydrogen Truck
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["h2_truck.jl"] 
+Pages = ["HSC/model/truck/h2_truck_all.jl"] 
 ```
