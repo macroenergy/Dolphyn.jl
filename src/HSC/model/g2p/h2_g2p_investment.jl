@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module defines the investment cost of hydrogen to power plants.
 
 """
-
 function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2G2P = inputs["dfH2G2P"]

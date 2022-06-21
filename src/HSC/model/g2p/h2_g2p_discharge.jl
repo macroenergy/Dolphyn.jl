@@ -22,7 +22,6 @@ This module defines the production decision variable representing power form hyd
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
 """
-
 function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
 	println("H2 g2p demand module")

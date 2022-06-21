@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 The hydrogen to power module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
 """
-
 function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 
 	dfH2G2P = inputs["dfH2G2P"]

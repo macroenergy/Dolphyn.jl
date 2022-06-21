@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies.
 """
-
 function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
 	if !isempty(inputs["H2_G2P"])

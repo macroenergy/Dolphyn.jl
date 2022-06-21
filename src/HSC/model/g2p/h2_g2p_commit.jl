@@ -21,7 +21,6 @@ This module creates decision variables, expressions, and constraints related to 
 
 Documentation to follow ******
 """
-
 function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	#Rename H2Gen dataframe

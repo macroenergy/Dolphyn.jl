@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies without unit commitment constraints
 
 """
-
 function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename H2Gen dataframe
