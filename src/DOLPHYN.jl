@@ -132,7 +132,7 @@ include("GenX/model/policies/minimum_capacity_requirement.jl")
 #Core HSC Modelling Features
 include("HSC/model/core/h2_investment.jl")
 include("HSC/model/core/h2_outputs.jl")
-include("HSC/model/core/h2_non_served_energy.jl")
+include("HSC/model/core/h2_non_served.jl")
 include("HSC/model/flexible_demand/h2_flexible_demand.jl")
 include("HSC/model/core/emissions_hsc.jl")
 
