@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing network revenue of different generation technologies.
 """
-
 function write_net_revenue(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model, dfCap::DataFrame, dfESRRev::DataFrame, dfResRevenue::DataFrame, dfChargingcost::DataFrame, dfPower::DataFrame, dfEnergyRevenue::DataFrame, dfSubRevenue::DataFrame, dfRegSubRevenue::DataFrame)
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]     			# Number of time steps (hours)

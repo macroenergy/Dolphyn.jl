@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing the h2 storage charging values of the different hydrogen storage technologies.
 """
-
 function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
 	H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)

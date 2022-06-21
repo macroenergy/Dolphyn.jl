@@ -58,7 +58,6 @@ Finally, the next constraint enforces that the initial storage level for each in
 \end{aligned}
 ```
 """
-
 function hydro_inter_period_linkage(EP::Model, inputs::Dict)
 
 	println("Long Duration Storage Module for Hydro Reservoir")

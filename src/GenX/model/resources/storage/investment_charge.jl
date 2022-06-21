@@ -54,7 +54,6 @@ In addition, this function adds investment and fixed O&M related costs related t
 \end{aligned}
 ```
 """
-
 function investment_charge(EP::Model, inputs::Dict)
 
 	println("Charge Investment Module")

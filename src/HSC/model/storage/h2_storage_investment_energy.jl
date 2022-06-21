@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module defines the decision variables representing energy components of hydrogen storage technologies.
 
 """
-
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
     println("H2 Storage Energy Investment Module")

@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing hydrogen storage level for each pipeline.
 """
-
 function write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 
     P = inputs["H2_P"]  # Number of H2 pipelines

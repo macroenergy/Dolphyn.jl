@@ -33,7 +33,6 @@ Returns a transpose of a Dataframe.\n
 FIXME: This is for DataFrames@0.20.2, as used in GenX. 
 Versions 0.21+ could use stack and unstack to make further changes while retaining the order
 """
-
 function dftranspose(df::DataFrame, withhead::Bool)
 	if withhead
 		colnames = cat(:Row, Symbol.(df[!,1]), dims=1)

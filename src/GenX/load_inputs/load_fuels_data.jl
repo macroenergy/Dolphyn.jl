@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to fuel costs and CO$_2$ emission intensity of fuels.
 """
-
 function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
 
 	# Fuel related inputs - read in different files depending on if time domain reduction is activated or not

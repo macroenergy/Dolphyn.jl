@@ -21,4 +21,3 @@ pages = ["h2_non_served_energy.jl"]
 Modules = [DOLPHYN]
 Pages = ["h2_outputs.jl"]
 ```
-

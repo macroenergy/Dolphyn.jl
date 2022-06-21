@@ -18,8 +18,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     configure_settings(settings_path::String)
 
 Function to configure generic settings from YAML file in settings_path.
-"""
 
+"""
 function configure_settings(settings_path::String)
 
     settings = YAML.load(open(settings_path))

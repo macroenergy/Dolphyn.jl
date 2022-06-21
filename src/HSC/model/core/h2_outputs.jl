@@ -50,7 +50,6 @@ This module additionally defines contributions to the objective function from va
 ```
 
 """
-
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Hydrogen Generation and Storage Discharge Module")

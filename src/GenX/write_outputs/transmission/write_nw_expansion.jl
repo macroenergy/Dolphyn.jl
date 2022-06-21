@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting the expansion statuses of electricity network expansion.	
 """
-
 function write_nw_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	L = inputs["L"]     # Number of transmission lines
 

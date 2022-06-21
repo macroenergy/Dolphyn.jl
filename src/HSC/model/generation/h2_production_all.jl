@@ -54,7 +54,6 @@ The numbers of units starting up and shutting down are modeled as:
 \end{aligned}
 ```
 """
-
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
 	println("H2 Production Core Module")

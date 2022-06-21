@@ -25,7 +25,6 @@ path - string path to working directory
 
 returns: Dict (dictionary) object containing all data inputs of hydrogen sector.
 """
-
 function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config

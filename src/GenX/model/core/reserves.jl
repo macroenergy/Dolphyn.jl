@@ -24,7 +24,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function sets up reserve decisions and constraints, using the reserves_core()` and reserves_contingency()` functions.
 """
-
 function reserves(EP::Model, inputs::Dict, UCommit::Int)
 
 	if inputs["pStatic_Contingency"] > 0 || (UCommit >= 1 && inputs["pDynamic_Contingency"] >= 1)

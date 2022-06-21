@@ -24,7 +24,6 @@ The "solver" argument is a string which specifies the solver to be used, and can
 The "solver\_settings\_path" argument is a string which specifies the path to the directory that contains the settings YAML file for the specified solver.
 
 """
-
 function configure_solver(solver::String, solver_settings_path::String)
 
     if solver == "Gurobi"

@@ -90,7 +90,6 @@ In case the reservoir capacity is known ($y \in W^{cap}$), then an additional co
 \end{aligned}
 ```
 """
-
 function hydro_res(EP::Model, inputs::Dict, Reserves::Int)
 
 	println("Hydro Reservoir Core Resources Module")

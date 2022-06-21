@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting electricity flow via transmision lines.
 """
-
 function write_transmission_flows(path::AbstractString, sep::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	# Transmission related values
 	T = inputs["T"]     # Number of time steps (hours)

@@ -54,7 +54,6 @@ In addition, this function adds investment and fixed O\&M related costs related 
 \end{aligned}
 ```
 """
-
 function investment_discharge(EP::Model, inputs::Dict)
 
 	println("Investment Discharge Module")

@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing long duration storage related operations.
 """
-
 function write_opwrap_lds_dstor(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	
 	## Extract data frames from input dictionary

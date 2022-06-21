@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to the electricity transmission network.
 """
-
 #DEV NOTE:  add DC power flow related parameter inputs in a subsequent commit
 function load_network_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 

@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to mimimum energy share requirement constraints (e.g. renewable portfolio standard or clean electricity standard policies).
 """
-
 function load_energy_share_requirement(setup::Dict, path::AbstractString, sep::AbstractString, inputs_ESR::Dict)
 	# Definition of ESR requirements by zone (as % of load)
 	# e.g. any policy requiring a min share of qualifying resources (Renewable Portfolio Standards / Renewable Energy Obligations / Clean Energy Standards etc.)

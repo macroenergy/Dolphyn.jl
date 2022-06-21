@@ -57,7 +57,6 @@ In addition, this function adds investment and fixed O\&M related costs related 
 \end{aligned}
 ```
 """
-
 function investment_energy(EP::Model, inputs::Dict)
 
 	println("Storage Investment Module")

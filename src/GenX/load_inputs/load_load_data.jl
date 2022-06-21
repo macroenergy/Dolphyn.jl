@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to electricity load (demand).
 """
-
 function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
 	# Load related inputs

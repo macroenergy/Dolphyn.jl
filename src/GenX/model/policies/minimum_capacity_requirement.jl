@@ -27,7 +27,6 @@ The minimum capacity requirement constraint allows for modeling minimum deployme
 
 Note that $\epsilon_{y,z,p}^{MinCapReq}$ is the eligiblity of a generator of technology $y$ in zone $z$ of requirement $p$ and will be equal to $1$ for eligible generators and will be zero for ineligible resources. The dual value of each minimum capacity constraint can be interpreted as the required payment (e.g. subsidy) per MW per year required to ensure adequate revenue for the qualifying resources.
 """
-
 function minimum_capacity_requirement(EP::Model, inputs::Dict)
 
 	println("Minimum Capacity Requirement Module")

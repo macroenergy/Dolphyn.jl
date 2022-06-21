@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module separates the hydrogen storage type into asymmetric and symmetric charge and models the action when charging and discharging is symmetric.
 """
-
 function h2_storage_symmetric(EP::Model, inputs::Dict)
     # Set up additional variables, constraints, and expressions associated with hydrogen storage resources with symmetric charge & discharge capacity
     # STOR = 1 corresponds to storage with distinct power and energy capacity decisions but symmetric charge/discharge power ratings

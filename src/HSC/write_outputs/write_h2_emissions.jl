@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting time-dependent CO$_2$ emissions by zone in hydrogen supply chain.
 """
-
 function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)

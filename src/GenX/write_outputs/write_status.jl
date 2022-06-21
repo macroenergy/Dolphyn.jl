@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing the final solve status of the optimization problem solved.
 """
-
 function write_status(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	# https://jump.dev/MathOptInterface.jl/v0.9.10/apireference/#MathOptInterface.TerminationStatusCode

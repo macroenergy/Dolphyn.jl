@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to frequency regulation and operating reserve requirements.
 """
-
 function load_reserves(setup::Dict,path::AbstractString,sep::AbstractString, inputs_res::Dict)
 	##Reserve inputs
 	res_in = DataFrame(CSV.File(string(path,sep,"Reserves.csv"), header=true), copycols=true)

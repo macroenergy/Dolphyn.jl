@@ -69,7 +69,6 @@ Truck compression energyCannot retire more energy capacity than existing energy 
 \end{aligned}
 ```
 """
-
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
     println("H2 Truck Investment Module")

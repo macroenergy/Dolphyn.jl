@@ -57,7 +57,6 @@ In addition, this function adds investment and fixed O\&M related costs related 
 \end{aligned}
 ```
 """
-
 function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	println("H2 storage Investment Module")

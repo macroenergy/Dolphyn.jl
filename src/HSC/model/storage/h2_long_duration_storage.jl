@@ -71,7 +71,6 @@ Finally, the next constraint enforces that the initial storage level for each in
 \end{aligned}
 ```
 """
-
 function h2_long_duration_storage(EP::Model, inputs::Dict)
 
 	println("Hydrogen Long Duration Storage Module")

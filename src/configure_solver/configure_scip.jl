@@ -27,7 +27,6 @@ The SCIP optimizer instance is configured with the following default parameters 
  - limitsgap = 0.05
 
 """
-
 function configure_scip(solver_settings_path::String)
 
     solver_settings = YAML.load(open(solver_settings_path))

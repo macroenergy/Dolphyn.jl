@@ -59,7 +59,6 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 ```
 
 """
-
 function non_served_energy(EP::Model, inputs::Dict)
 
 	println("Non-served Energy Module")

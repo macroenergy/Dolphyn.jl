@@ -26,7 +26,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for the entry-point of hydrogen supply chain for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-
 function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
     ## Use appropriate directory separator depending on Mac or Windows config

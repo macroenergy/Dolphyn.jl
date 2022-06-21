@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function to write prices under energy share requirements.	
 """
-
 function write_esr_prices(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	
 	dfESR = DataFrame(ESR_Price = convert(Array{Union{Missing, Float64}}, dual.(EP[:cESRShare])))

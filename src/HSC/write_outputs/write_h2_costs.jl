@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing the costs of hydrogen supply chain pertaining to the objective function (fixed, variable O&M etc.).
 """
-
 function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
 	dfH2Gen = inputs["dfH2Gen"]

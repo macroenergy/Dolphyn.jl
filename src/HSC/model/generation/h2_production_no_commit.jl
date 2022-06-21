@@ -56,7 +56,6 @@ When not modeling regulation and reserves, thermal units not subject to unit com
 \end{aligned}
 ```
 """
-
 function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	println("H2 Production (No Unit Commitment) Module")
