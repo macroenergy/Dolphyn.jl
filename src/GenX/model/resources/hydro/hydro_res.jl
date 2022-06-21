@@ -211,7 +211,6 @@ r_{y,z, t} \leq \upsilon^{rsv}_{y,z}\times \Delta^{total}_{y,z}
 ```
 
 """
-
 function hydro_res_reserves(EP::Model, inputs::Dict)
 
 	println("Hydro Reservoir Reserves Module")

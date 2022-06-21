@@ -55,7 +55,6 @@ end
 
 Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities when reserves are modeled. See ```storage()``` in ```storage.jl``` for description of constraints.
 """
-
 function storage_symmetric_reserves(EP::Model, inputs::Dict)
 
 	dfGen = inputs["dfGen"]

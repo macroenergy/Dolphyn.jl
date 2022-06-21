@@ -83,7 +83,6 @@ Option 3 (dynamic commitment-based contingency) is expressed by the following se
 
 where $M_y$ is a `big M' constant equal to the largest possible capacity that can be installed for generation cluster $y$, and $Contingency\_Aux_{y,z,t} \in [0,1]$ is a binary auxiliary variable that is forced by the second and third equations above to be 1 if the commitment state for that generation cluster $\nu_{y,z,t} > 0$ for any generator $y \in \mathcal{UC}$ and zone $z$ and time period $t$, and can be 0 otherwise. Note that this dynamic commitment-based contingency can only be specified if discrete unit commitment decisions are used (e.g. it will not work if relaxed unit commitment is used).
 """
-
 function reserves_contingency(EP::Model, inputs::Dict, UCommit::Int)
 
 	println("Reserves Contingency Module")
@@ -202,7 +201,6 @@ Total requirements for operating reserves in the upward direction (aka spinning 
 
 where $\mathcal{D}_{z,t}$ is the forecasted electricity demand in zone $z$ at time $t$ (before any demand flexibility); $\rho^{max}_{y,z,t}$ is the forecasted capacity factor for variable renewable resource $y \in VRE$ and zone $z$ in time step $t$; $\Delta^{\text{total}}_{y,z}$ is the total installed capacity of variable renewable resources $y \in VRE$ and zone $z$; and $\epsilon^{load}_{rsv}$ and $\epsilon^{vre}_{rsv}$ are parameters specifying the required contingency reserves as a fraction of forecasted demand and variable renewable generation. $Contingency$ is an expression defined in the reserves\_contingency() function meant to represent the largest `N-1` contingency (unplanned generator outage) that the system operator must carry operating reserves to cover and depends on how the user wishes to specify contingency requirements.
 """
-
 function reserves_core(EP::Model, inputs::Dict, UCommit::Int)
 
 	# DEV NOTE: After simplifying reserve changes are integrated/confirmed, should we revise such that reserves can be modeled without UC constraints on?
