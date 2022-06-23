@@ -63,3 +63,9 @@ Pages = ["GenX/load_inputs/load_energy_share_requirement.jl"]
 Modules = [DOLPHYN]
 Pages = ["GenX/load_inputs/load_period_map.jl"]
 ```
+
+## Reserve
+```@autodocs
+Modules = [DOLPHYN]
+Pages = ["GenX/load_inputs/load_reserves.jl"]
+```

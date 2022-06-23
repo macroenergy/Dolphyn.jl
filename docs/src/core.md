@@ -35,3 +35,9 @@ Pages = ["GenX/model/core/transmission.jl"]
 Modules = [DOLPHYN]
 Pages = ["GenX/model/core/ucommit.jl"]
 ```
+
+## Emissions
+```@autodocs
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/emissions_power.jl"]
+```

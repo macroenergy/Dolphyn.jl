@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_truck(EP::Model, inputs::Dict, setup::Dict)
 
-This function includes three parts of the Truck Model.The details can be found seperately in"h2_truck_investment.jl" "h2_long_duration_truck.jl"and "h2_truck_all.jl".
+This function includes three parts of the Truck Model.The details can be found seperately in "h2\_truck\_investment.jl" "h2\_long\_duration_truck.jl" and "h2\_truck\_all.jl".
    
 """
 function h2_truck(EP::Model, inputs::Dict, setup::Dict)

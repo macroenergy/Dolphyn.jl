@@ -1,7 +1,7 @@
 ## Hydrogen Supply Chain Results
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["HSC/write_outputs/write_HSC_outputs.jl"]
+Pages = ["HSC/write_outputs/write_HSC_outputs.jl"]
 ```
 
 ## Write Hydrogen Gas to Power Capacity
@@ -13,7 +13,7 @@ Pages = ["HSC/write_outputs/write_g2p_capacity.jl"]
 ## Write Hydrogen Gas to Power Balance
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["HSC/write_outputs/write_h2_g2p.jl"]
+Pages = ["HSC/write_outputs/write_h2_g2p.jl"]
 ```
 
 ## Write Hydrogen Balance
@@ -43,7 +43,7 @@ Pages = ["HSC/write_outputs/write_h2_costs.jl"]
 ## Write Hydrogen Emissions
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["HSC/write_outputs/write_h2_emissions.jl"]
+Pages = ["HSC/write_outputs/write_h2_emissions.jl"]
 ```
 
 ## Write Hydrogen Generation

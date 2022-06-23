@@ -7,13 +7,13 @@ Pages = ["HSC/load_inputs/load_H2_inputs.jl"]
 ## Load Carbon Cap in Hydrogen Sector
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["HSC/load_inputs/laod_co2_cap_hsc.jl"]
+Pages = ["HSC/load_inputs/load_co2_cap_hsc.jl"]
 ```
 
 ## Load Hydrogen Demand
 ```@autodocs
 Modules = [DOLPHYN]
-pages = ["HSC/load_inputs/load_h2_demand.jl"]
+Pages = ["HSC/load_inputs/load_h2_demand.jl"]
 ```
 
 ## Load Hydrogen Gas to Power Variability

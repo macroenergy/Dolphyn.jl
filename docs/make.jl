@@ -26,6 +26,7 @@ pages = OrderedDict(
     "Solvers" => "solvers.md",
     "Solving the Model" => "solve_model.md",
     "Additional Features" => "additional_features.md",
+    "Additional Tools" => "additional_tools.md",
     "Methods" => "methods.md",
     "GenX" => [
         "GenX Introduction" => "model_introduction.md",
