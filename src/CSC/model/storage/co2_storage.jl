@@ -14,7 +14,7 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@docs raw"""
+@doc raw"""
     co2_storage(EP::Model, inputs::Dict, setup::Dict)
 
 This function contains and maintains all functions related to carbon storage.
