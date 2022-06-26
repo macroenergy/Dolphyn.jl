@@ -24,8 +24,9 @@ The "solver" argument is a string which specifies the solver to be used, and can
 The "solver\_settings\_path" argument is a string which specifies the path to the directory that contains the settings YAML file for the specified solver.
 
 """
-function configure_solver(solver::String, solver_settings_path::String)
+function configure_solver(solver_settings_path::String, solver::String)
 
+	println("Configuring Solver")
 	# Set solver as Gurobi
 	if solver == "Gurobi"
 		gurobi_settings_path = joinpath(solver_settings_path, "gurobi_settings.yml")
@@ -42,7 +43,7 @@ function configure_solver(solver::String, solver_settings_path::String)
         OPTIMIZER = configure_cbc(cbc_settings_path)
 	elseif solver == "SCIP"
 		scip_settings_path = joinpath(solver_settings_path, "scip_settings.yml")
-	OPTIMIZER = configure_scip(scip_settings_path)
+		OPTIMIZER = configure_scip(scip_settings_path)
 	end
 
 	return OPTIMIZER

@@ -14,15 +14,8 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-################################################################################
-## function output
-##
-## description: Writes results to multiple .csv output files in path directory
-##
-## returns: n/a
-################################################################################
 @doc raw"""
-	write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+	write_power_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
@@ -182,7 +175,4 @@ function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, input
 	println(elapsed_time_net_rev)
 	## Print confirmation
 	println("Wrote outputs to $path$sep")
-
-	return path
-
 end # END output()

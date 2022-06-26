@@ -16,7 +16,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 module DOLPHYN
 
-#export package_activate
 export configure_settings
 export configure_solver
 export load_power_inputs
@@ -44,9 +43,7 @@ using Distances
 using Combinatorics
 using Documenter
 using Revise
-# Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
 using Gurobi
-#using CPLEX
 
 using Clp
 using Cbc
@@ -249,7 +246,7 @@ include("GenX/write_outputs/ucommit/write_commit.jl")
 include("GenX/write_outputs/ucommit/write_shutdown.jl")
 include("GenX/write_outputs/ucommit/write_start.jl")
 
-include("GenX/write_outputs/write_power_outputs.jl")
+include("GenX/write_outputs/write_Power_outputs.jl")
 
 # HSC Write Outputs
 include("HSC/write_outputs/write_h2_gen.jl")
@@ -282,6 +279,6 @@ include("CSC/write_outputs/write_co2_storage.jl")
 include("CSC/write_outputs/write_CSC_outputs.jl")
 
 # Modeling to generator alternatives
-include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
+include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end
