@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 using Pkg
-# include(joinpath(dirname(@__FILE__), "julenv.jl")) #Run this line only for the first time; comment it out for all subsequent use
+# include(joinpath(dirname(@__FILE__), "julenv.jl"))
 println("Activating the Julia virtual environment")
 Pkg.activate("DOLPHYNJulEnv")
 Pkg.status() # Store the path of the current working directory
