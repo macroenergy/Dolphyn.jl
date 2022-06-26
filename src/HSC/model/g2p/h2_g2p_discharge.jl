@@ -21,6 +21,12 @@ This module defines the production decision variable representing power form hyd
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
+```math
+\begin{aligned}
+	Obj_{Var\_g2p} =
+	\sum_{h \in \mathcal{H}} \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{h}
+\end{aligned}
+```
 """
 function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
@@ -28,15 +34,14 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2G2P = inputs["dfH2G2P"]
 
-	#Define sets
+	# Define sets
 	H = inputs["H2_G2P_ALL"] #Number of Hydrogen gen units
 	T = inputs["T"]     # Number of time steps (hours)
-
 
 	### Variables ###
 
     #Electricity Discharge from hydrogen G2P resource k (MWh) in time t
-	@variable(EP, vPG2P[k=1:H, t = 1:T] >= 0 )
+	@variable(EP, vPG2P[k=1:H, t = 1:T] >= 0)
 
 	### Expressions ###
 

@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
-This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies.
+This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies as well as carbon emission policy constraints.
 """
 function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
@@ -42,7 +42,7 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 		EP = h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
 
-	##For CO2 Polcy constraint right hand side development - H2 Generation by zone and each time step
+	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
 		@expression(EP, eGenerationByZoneG2P[t=1:T, z=1:Z], # the unit is tonne/hour
 		sum(EP[:vPG2P][y,t] for y in intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==z,:R_ID]))
 	)
