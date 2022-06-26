@@ -31,12 +31,12 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 	inputs_co2["NCO2Cap"] = cap
 
 	# Emission limits
-	if setup["CO2Cap"]==1
+	if setup["CO2Cap"] == 1
 		#  CO2 emissions cap in mass
 		first_col = findall(s -> s == "CO2_Max_Mtons_1", names(inputs_co2["dfCO2Cap"]))[1]
 		last_col = findall(s -> s == "CO2_Max_Mtons_$cap", names(inputs_co2["dfCO2Cap"]))[1]
 		# note the default inputs is in million tons
-		if setup["ParameterScale"] ==1
+		if setup["ParameterScale"] == 1
 			inputs_co2["dfMaxCO2"] = Matrix{Float64}(inputs_co2["dfCO2Cap"][:,first_col:last_col])*(1e6)/ModelScalingFactor
 			# when scaled, the constraint unit is kton
 		else
@@ -44,7 +44,7 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 			# when not scaled, the constraint unit is ton
 		end
 
-	elseif (setup["CO2Cap"]==2 || setup["CO2Cap"]==3)
+	elseif (setup["CO2Cap"] == 2 || setup["CO2Cap"] == 3)
 		#  CO2 emissions rate applied per MWh
 		first_col = findall(s -> s == "CO2_Max_tons_MWh_1", names(inputs_co2["dfCO2Cap"]))[1]
 		last_col = findall(s -> s == "CO2_Max_tons_MWh_$cap", names(inputs_co2["dfCO2Cap"]))[1]
@@ -56,7 +56,7 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 			# when not scaled, the constraint unit is ton/MWh
 		end
 	
-	elseif setup["CO2Cap"] ==4 # Carbon emissions penalized via a carbon price on total emissions
+	elseif setup["CO2Cap"] == 4 # Carbon emissions penalized via a carbon price on total emissions
 		#  CO2 emissions cap in mass
 		first_col = findall(s -> s == "CO2_Price_1", names(inputs_co2["dfCO2Cap"]))[1]
 		last_col = findall(s -> s == "CO2_Price_$cap", names(inputs_co2["dfCO2Cap"]))[1]
@@ -68,9 +68,9 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 			inputs_co2["dfCO2Price"] = Matrix{Float64}(inputs_co2["dfCO2Cap"][:,first_col:last_col])
 			# when not scaled, the constraint unit is ton
 		end
-
 	end
+
 	println("CO2_cap.csv Successfully Read!")
-	return inputs_co2
 	
+	return inputs_co2
 end

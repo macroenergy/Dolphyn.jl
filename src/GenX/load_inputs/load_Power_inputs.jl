@@ -57,15 +57,15 @@ function load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 	## Read in generator/resource availability profiles
 	inputs = load_generators_variability(setup, path, sep, inputs)
 
-	if setup["CapacityReserveMargin"]==1
+	if setup["CapacityReserveMargin"] == 1
 		inputs = load_cap_reserve_margin(setup, path, sep, inputs)
-		if inputs["Z"] >1
+		if inputs["Z"] > 1
 			inputs = load_cap_reserve_margin_trans(setup, path, sep, inputs,network_var)
 		end
 	end
 
 	## Read in general configuration parameters for reserves (resource-specific reserve parameters are read in generators_data())
-	if setup["Reserves"]==1
+	if setup["Reserves"] == 1
 		inputs = load_reserves(setup, path, sep, inputs)
 	end
 
@@ -73,7 +73,7 @@ function load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 		inputs = load_minimum_capacity_requirement(path,sep, inputs, setup)
 	end
 
-	if setup["EnergyShareRequirement"]==1
+	if setup["EnergyShareRequirement"] == 1
 		inputs = load_energy_share_requirement(setup, path, sep, inputs)
 	end
 
