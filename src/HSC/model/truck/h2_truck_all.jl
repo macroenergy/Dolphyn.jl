@@ -203,7 +203,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             inputs["omega"][t] *
             (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
             inputs["fuel_CO2"][dfH2Truck[!, :Fuel][j]] *
-            dfH2Truck[!, :Fuel_per_mile][j] *
+            dfH2Truck[!, :Fuel_MMBTU_per_mile][j] *
             inputs["RouteLength"][zz, z] for
             zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
         )
