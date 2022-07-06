@@ -45,7 +45,15 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\mathcal{Z}^{CO_2}_{p,gen} \subseteq \mathcal{Z}$ | set of zones are under the emission cap generation emission-rate based cap-and-trade policy constraint $p \in \mathcal{P}^{CO2,gen}$ |
 |$\mathcal{L}_p^{in} \subseteq \mathcal{L}$ | The subset of transmission lines entering Locational Deliverability Area of capacity reserve margin policy $p \in \mathcal{P}^{CRM}$ |
 |$\mathcal{L}_p^{out} \subseteq \mathcal{L}$ | The subset of transmission lines leaving Locational Deliverability Area of capacity reserve margin policy $p \in \mathcal{P}^{CRM}$ |
+|$y \in \mathcal{G}$ | |
+|$z \in \mathcal{Z}$ | |
+|$s \in \mathcal{S}$ | |
+|$t \in \mathcal{T}$ | |
+|$y \in \mathcal{DF}$ | |
+|$\Gamma_{y,z,t} \in \mathbb{R}$ | |
+|$h \in UC$ | |
 ---
+
 
 
 ## Decision Variables
@@ -84,6 +92,42 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\Delta\mathcal{Q}_{o,m} \in \mathbb{R}$ | Excess storage inventory built up during representative period $m$ [MWh]|
 |$ON^{+}_{l,t} \in \{0,1\} $ | Binary variable to activate positive flows on line $l$ in time $t$|
 |$TransON^{+}_{l,t} \in \mathbb{R}_+$ | Variable defining maximum positive flow in line $l$ in time $t$ [MW]|
+|$\varepsilon _{OUT}^{GEN}$ |   |
+|$\vartheta _{k}^{GenNewCap}$ |   |
+|$\vartheta _{k}^{GenRetCap}$ |   |
+|$\Delta^{total}_{y,z}$ |   |
+|$\Delta_{y,z}$ |   |
+|$\pi^{INVEST}_{y,z}$ |   |
+|$\pi^{FOM}_{y,z}$ |   |
+|$\Omega^{size}_{y,z}$ |   |
+|$\Lambda_{s,t,z}$ |   |
+|$n_{s}^{size}$ |   |
+|$D_{t,z}$ |   |
+|$\omega_{t}$ |   |
+|$\pi^{VOM}_{y}$ |   |
+|$\pi^{FUEL}_{y}$ |   |
+|$\Theta_{y,t}$ |   |
+|$xi _{k}^{OMCostPTone}$ |   |
+|$\xi _{k}^{OMCostPTone}$ |   |
+|$\varepsilon _{k,t}^{GenOut}$ |   |
+|$\varepsilon _{CH2GenVarOut}^{Total}$ |   |
+|$\rho^{max}_{y,z,t}$ |   |
+|$\tau^{advance}_{y,z}$ |   |
+|$\tau^{delay}_{y,z}$ |   |
+|$\eta_{y,z}^{dflex}$ |   |
+|$\Gamma_{y,z,t}$ |   |
+|$\Theta_{y,z,t}$ |   |
+|$\Pi_{y,z,t}$ |   |
+|$\varepsilon _{t}^{GenOut}$ |   |
+|$\Omega_{y,z}$ |   |
+|$\nu_{y,t,z}$| designates the commitment state of g2p generator cluster $h$ in zone $z$ at time $t$ |   
+|$\chi_{y,t,z}$| represents number of g2p startup decisions in cluster $h$ in zone $z$ at time $t$ |   
+|$\zeta_{y,t,z}$| represents number of g2p shutdown decisions in cluster $h$ in zone $z$ at time $t$ |   
+|$C^{start}$ |   |
+|$start\_cost_{h}$ |   |
+|$start\_cost_{h}$ |   |
+|$\chi_{h,t}$ |   |
+
 ---
 
 
