@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	write_transmission_losses(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+Function for reporting electricity losses during transmission via lines.
+"""
 function write_transmission_losses(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones

@@ -51,5 +51,6 @@ function write_storage(path::AbstractString, sep::AbstractString, inputs::Dict,s
 	dfStorage = hcat(dfStorage, DataFrame(storagevcapvalue, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
 	rename!(dfStorage,auxNew_Names)
+	
 	CSV.write(string(path,sep,"storage.csv"), dftranspose(dfStorage, false), writeheader=false)
 end

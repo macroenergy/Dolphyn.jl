@@ -64,5 +64,6 @@ function write_subsidy_revenue(path::AbstractString, sep::AbstractString, inputs
 
 	CSV.write(string(path,sep,"SubsidyRevenue.csv"), dfSubRevenue)
 	CSV.write(string(path,sep,"RegSubsidyRevenue.csv"), dfRegSubRevenue)
+	
 	return dfSubRevenue, dfRegSubRevenue
 end

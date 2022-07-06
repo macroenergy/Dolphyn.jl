@@ -1,5 +1,5 @@
 # Long Duration Storage
 ```@autodocs
-Modules = [GenX]
-Pages = ["long_duration_storage.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/resources/storage/long_duration_storage.jl"]
 ```

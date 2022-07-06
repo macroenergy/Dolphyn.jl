@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_reserves(setup::Dict,path::AbstractString,sep::AbstractString, inputs_res::Dict)
 
-Function for reading input parameters related to frequency regulation and operating reserve requirements
+Function for reading input parameters related to frequency regulation and operating reserve requirements.
 """
 function load_reserves(setup::Dict,path::AbstractString,sep::AbstractString, inputs_res::Dict)
 	##Reserve inputs

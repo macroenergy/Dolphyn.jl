@@ -15,31 +15,44 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the production decision variable  representing hydrogen injected into the network by resource $y$ by at time period $t$.
+This function defines the expressions and constraints keeping track of total available gas to power capacity.
 
-This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
+The total capacity of g2p is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
+```math
+\begin{aligned}
+& \Delta^{total}_{h,z} =(\overline{\Delta_{h,z}}+\Omega_{h,z}-\Delta_{h,z}) \forall h \in \mathcal{H}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+In addition, this function adds investment and fixed O\&M related costs related to discharge/generation capacity to the objective function:
+```math
+\begin{aligned}
+& 	\sum_{h \in \mathcal{H} } \sum_{z \in \mathcal{Z}}
+	\left( (\pi^{INVEST}_{h,z} \times \overline{\Omega}^{size}_{h,z} \times \Omega_{h,z})
+	+ (\pi^{FOM}_{h,z} \times \overline{\Omega}^{size}_{h,z} \times \Delta^{total}_{h,z})\right)
+\end{aligned}
+```
 """
 function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2G2P = inputs["dfH2G2P"]
 
-    #Define sets
+    # Define sets
 	H2_G2P_NEW_CAP = inputs["H2_G2P_NEW_CAP"] 
 	H2_G2P_RET_CAP = inputs["H2_G2P_RET_CAP"] 
     H2_G2P_COMMIT = inputs["H2_G2P_COMMIT"]
 
-	#NOT SURE ABOUT THIS
-	H =inputs["H2_G2P_ALL"]
+	# NOT SURE ABOUT THIS
+	H = inputs["H2_G2P_ALL"]
 
-
-	#Capacity of New H2 G2P units (MW)
-	#For G2P with unit commitment, this variable refers to the number of units, not capacity. 
+	# Capacity of New H2 G2P units (MW)
+	# For G2P with unit commitment, this variable refers to the number of units, not capacity. 
 	@variable(EP, vH2G2PNewCap[k in H2_G2P_NEW_CAP] >= 0)
-	#Capacity of Retired H2 G2P units built (MW)
-    #For generation with unit commitment, this variable refers to the number of units, not capacity. 
+	# Capacity of Retired H2 G2P units built (MW)
+    # For generation with unit commitment, this variable refers to the number of units, not capacity. 
 	@variable(EP, vH2G2PRetCap[k in H2_G2P_RET_CAP] >= 0)
 	
 	### Expressions ###
@@ -71,8 +84,7 @@ function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 	)
 
 	## Objective Function Expressions ##
-
-		# Sum individual resource contributions to fixed costs to get total fixed costs
+	# Sum individual resource contributions to fixed costs to get total fixed costs
 	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1 
@@ -108,22 +120,8 @@ function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	@expression(EP, eTotalH2G2PCFix, sum(EP[:eH2G2PCFix][k] for k in 1:H))
 
-
-	# # Sum individual resource contributions to fixed costs to get total fixed costs
-	# #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
-	# #  ParameterScale = 0 --> objective function is in $
-	# if setup["ParameterScale"] ==1 
-	# 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k]/(ModelScalingFactor)^2 for k in 1:H))
-	# else
-	# 	@expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in 1:H))
-	# end
-
-
 	# Add term to objective function expression
 	EP[:eObj] += eTotalH2G2PCFix
 
-
     return EP
-
-
 end

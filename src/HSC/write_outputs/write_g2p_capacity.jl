@@ -1,5 +1,5 @@
 """
-GenX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model))
+	write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the diferent capacities for the different generation technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
+Function for writing the diferent capacities for the different hydrogen to power technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
 function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions

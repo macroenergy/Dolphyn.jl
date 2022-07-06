@@ -14,13 +14,6 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-################################################################################
-## function output
-##
-## description: Writes results to multiple .csv output files in path directory
-##
-## returns: n/a
-################################################################################
 @doc raw"""
 	write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 

@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict, fuel_costs::Dict, fuel_CO2::Dict)
 
-Function for reading input parameters related to electricity generators (plus storage and flexible demand resources)
+Function for reading input parameters related to electricity generators (plus storage and flexible demand resources).
 """
 function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict, fuel_costs::Dict, fuel_CO2::Dict)
 
@@ -220,6 +220,7 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 			#   thus the overall is MTons/GW, and thus inputs_gen["dfGen"][!,:CO2_per_Start][g] is ton
 		end
 	end
+	
 	println("Generators_data.csv Successfully Read!")
 
 	return inputs_gen

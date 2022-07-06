@@ -15,10 +15,28 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	H2_G2Peration(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 
-The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
+The hydrogen to power module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
+
+One cannot retire more capacity than existing capacity.
+```math
+\begin{aligned}
+&\Delta_{y,z} \leq \overline{\Delta_{y,z}}
+	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+For resources where $\overline{\Omega_{y,z}}$ and $\underline{\Omega_{y,z}}$ is defined, then we impose constraints on minimum and maximum power capacity.
+```math
+\begin{aligned}
+& \Delta^{total}_{y,z} \leq \overline{\Omega}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z} \\
+& \Delta^{total}_{y,z}  \geq \underline{\Omega}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
+\end{aligned}
+```
 """
 function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 

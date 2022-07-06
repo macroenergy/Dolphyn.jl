@@ -132,7 +132,8 @@ include("GenX/model/policies/minimum_capacity_requirement.jl")
 #Core HSC Modelling Features
 include("HSC/model/core/h2_investment.jl")
 include("HSC/model/core/h2_outputs.jl")
-include("HSC/model/core/h2_non_served_energy.jl")
+include("HSC/model/core/h2_non_served.jl")
+
 include("HSC/model/flexible_demand/h2_flexible_demand.jl")
 include("HSC/model/core/emissions_hsc.jl")
 
@@ -151,13 +152,17 @@ include("HSC/model/truck/h2_truck.jl")
 include("HSC/model/truck/h2_truck_all.jl")
 include("HSC/model/truck/h2_long_duration_truck.jl")
 
-#H2 storage
+# H2 storage
 include("HSC/model/storage/h2_storage_investment.jl")
+include("HSC/model/storage/h2_storage_investment_energy.jl")
+include("HSC/model/storage/h2_storage_investment_charge.jl")
 include("HSC/model/storage/h2_storage.jl")
+include("HSC/model/storage/h2_storage_asymmetric.jl")
+include("HSC/model/storage/h2_storage_symmetric.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")
 
-#H2 G2P
+# H2 G2P
 include("HSC/model/g2p/h2_g2p_investment.jl")
 include("HSC/model/g2p/h2_g2p_discharge.jl")
 include("HSC/model/g2p/h2_g2p_all.jl")
@@ -175,7 +180,7 @@ include("generate_model.jl")
 include("solve_model.jl")
 
 
-#Write GenX Outputs
+# Write GenX Outputs
 include("GenX/write_outputs/dftranspose.jl")
 include("GenX/write_outputs/write_capacity.jl")
 include("GenX/write_outputs/write_charge.jl")
@@ -239,7 +244,7 @@ include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
 
-# Modeling to generator alternatives
-include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
+# Modeling to generate alternatives
+include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end

@@ -17,12 +17,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
 
-Function for reading input parameters related to fuel costs and CO$_2$ content of fuels
+Function for reading input parameters related to fuel costs and CO$_2$ emission intensity of fuels.
 """
 function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
 
 	# Fuel related inputs - read in different files depending on if time domain reduction is activated or not
-	#data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) # Use Time Domain Reduced data for GenX
 		fuels_in = DataFrame(CSV.File(string(joinpath(data_directory,"Fuels_data.csv")), header=true), copycols=true)

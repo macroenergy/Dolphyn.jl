@@ -15,29 +15,33 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the production decision variable  representing hydrogen injected into the network by resource $y$ by at time period $t$.
+This module defines the production decision variable representing power form hydrogen injected into the network by resource $y$ by at time period $t$.
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
+```math
+\begin{aligned}
+	Obj_{Var\_g2p} =
+	\sum_{h \in \mathcal{H}} \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{h}
+\end{aligned}
+```
 """
-
 function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
 	println("H2 g2p demand module")
 
     dfH2G2P = inputs["dfH2G2P"]
 
-	#Define sets
+	# Define sets
 	H = inputs["H2_G2P_ALL"] #Number of Hydrogen gen units
 	T = inputs["T"]     # Number of time steps (hours)
-
 
 	### Variables ###
 
     #Electricity Discharge from hydrogen G2P resource k (MWh) in time t
-	@variable(EP, vPG2P[k=1:H, t = 1:T] >= 0 )
+	@variable(EP, vPG2P[k=1:H, t = 1:T] >= 0)
 
 	### Expressions ###
 
