@@ -16,9 +16,7 @@ jobs:
         with:
           version: '1.7'
       - name: Install dependencies
-        env:
-          GUROBI_HOME: "/home/gurobi/gurobi912/linux64" # For Gurobi package building
-        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
+        run: julia --project=docs/ -e 'using Pkg; Pkg.instantiate()'
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
