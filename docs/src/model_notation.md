@@ -62,8 +62,8 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$o \in \mathcal{O}^{sym}$ | |
 |$i \in \mathbb{I}$ | |
 |$j \in \mathbb{J}$ | |
-|$z \rightarrow z^{\prime} \in \mathbb{B}$ | |
- 
+|$z \rightarrow z^{\prime} \in \mathbb{B}$ |     |
+|$z \rightarrow z^{\prime} \in \mathbb{B}$ |     |
 
 ---
 
