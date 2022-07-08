@@ -52,6 +52,19 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$y \in \mathcal{DF}$ | |
 |$\Gamma_{y,z,t} \in \mathbb{R}$ | |
 |$h \in UC$ | |
+|$h \in \mathcal{H}$ | |
+|$p \in \mathcal{P}^{CO_2}$ | |
+|$z \in \mathcal{Z}^{CO_2}_{p,mass}$ | |
+|$p \in \mathcal{P}^{CO_2}_{load}$ | to set emissions target based on a CO$_2$ emission rate limit in tCO$_2$/MWh $\times$ the total demand served in each zone |
+|$o \in \mathcal{O}^{LDES}$ | |
+|$n \in \mathcal{N}$ | |
+|$m \in \mathcal{M}$ | |
+|$o \in \mathcal{O}^{sym}$ | |
+|$i \in \mathbb{I}$ | |
+|$j \in \mathbb{J}$ | |
+|$z \rightarrow z^{\prime} \in \mathbb{B}$ | |
+ 
+
 ---
 
 
@@ -127,9 +140,97 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$start\_cost_{h}$ |   |
 |$start\_cost_{h}$ |   |
 |$\chi_{h,t}$ |   |
-
----
-
+|$\nu_{h,z,t}$ |   |
+|$\Delta^{\text{total}}_{h,z}$ |   |
+|$\Omega^{size}_{h,z}$ |   |
+|$\chi_{h,z,t}$ | represents number of startup decisions |
+|$\zeta_{h,z,t}$ | represents number of shutdown decisions  |
+|$\Theta_{h,z,t}$ | is the energy injected into the grid by technology |
+|$\Delta^{\text{total}}_{h,z}$ | is the total installed capacity  |
+|$\kappa^{down}_{h,z}$ |  |
+|$\rho^{min}_{h,z}$ |  |
+|$\rho^{max}_{h,z,t}$ |  |
+|$\pi^{VOM}_{h}$ |  |
+|$\pi^{INVEST}_{h,z}$ |  |
+|$\pi^{FOM}_{h,z}$ |  |
+|$\kappa_{h,z}^{up}$ |  |
+|$\rho^{max}_{h,z,t}$ |  |
+|$n_{k, z, t}$ |  |
+|$n_{k, z, t}^{\mathrm{DOWN}} $ |  |
+|$\tau_{k, z}^{\mathrm{DOWN}} $ |  |
+|$n_{k, z, t}^{\mathrm{UP}} $ |  |
+|$\nu_{y,z,t} $ | designates the commitment state of generator cluster |
+|$\chi_{y,z,t} $ | represents number of startup decisions |
+|$\zeta_{y,z,t} $ | represents number of shutdown decisions |
+|$\Delta^{\text{total}}_{y,z} $ | is the total installed capacity |
+|$\kappa_{y,z,t}^{up|down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity |
+|$\rho_{y,z}^{min} $ | is the minimum stable power output per unit of installed capacity |
+|$\rho_{y,z,t}^{max} $ | is the maximum available generation per unit of installed capacity |
+|$\tau_{y,z}^{up|down} $ | is the minimum up or down time for units in generating cluster |
+|$\epsilon^{CO_{2}}_{z,p, mass} $ | to be provided in terms of million metric tonnes |
+|$epsilon_{y,z}^{CO_2} $ |  |
+|$\epsilon_{z,p,load}^{maxCO_2}$ | denotes the emission limit in terms on tCO$_2$/MWh |
+|$\epsilon_{z,p,gen}^{maxCO_2}$ |have to buy emission allowances from the emission regulator in the region $z$ where they are located |
+|$\eta_{o,z}^{discharge} $ |  |
+|$\Delta Q_{o,z,m} $ |  |
+|$\tau^{period} $ |  |
+|$\Gamma_{o,z,f(n)} $ |  |
+|$\Delta^{total, energy}_{o,z} $ |  |
+|$\Pi_{o,z,t} $ |  |
+|$\Omega_{o,z} $ |  |
+|$\Theta_{o,z,t} $ |  |
+|$\Delta^{total}_{o,z} $ |  |
+|$r^{discharge}_{o,z,t} $ | is the contribution of storage resources to upward reserves while discharging |
+|$f^{discharge}_{o,z,t} $ | is the contribution of storage resources to frequency regulation while discharging |
+|$f^{charge}_{o,z,t} $ | is the contribution of storage resources to frequency regulation while charging |
+|$f^{+}_{y=o,z,t} $ | is the contribution of storage resources to frequency regulation while charging |
+|$\Gamma_{o,z,t} $ |  |
+|$\eta_{o,z}^{loss} $ |  |
+|$f_{o,z,t} $ |  |
+|$r_{o,z,t} $ |  |
+|$\upsilon^{reg}_{y,z} $ |  |
+|$\upsilon^{rsv}_{y,z} $ |  |
+|$f_{y,z,t} $ |  |
+|$r_{y,z,t} $ |  |
+|$\Delta^{total,energy}_{y,z} $ |  |
+|$\Delta^{energy}_{y,z} $ |  |
+|$\Omega^{energy}_{y,z} $ |  |
+|$\pi^{INVEST,energy}_{y,z} $ |  |
+|$\pi^{FOM,energy}_{y,z} $ |  |
+|$\ C_{\mathrm{PIP}}^{\mathrm{c}} $ |  |
+|$\delta_{i}^{\mathrm{PIP}} $ |  |
+|$\mathrm{PIP} $ |  |
+|$\overline{\mathrm{F}}_{i} l_{z \rightarrow z,^{\prime}i}   $ |  |
+|$h_{z \rightarrow z,{ }^{\prime}, t}^{\mathrm{PIP+}}$ |  |
+|$h_{z \rightarrow z,{ }^{\prime} i, t}^{\mathrm{PIP}} $ |  |
+|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z,^{\prime} i} $ |  |
+|$v_{j, t}^{\mathrm{F}} $ |  |
+|$v_{j, t}^{\mathrm{E}} $ |  |
+|$v_{n}^{SOC} $ |  |
+|$v_{z,j,n}^{SOC} $ |  |
+|$v_{j}^{TRU} $ |  |
+|$u_{z \rightarrow z, \prime^{\prime}, t}^{\mathrm{F}} $ |  |
+|$q_{z, j, t}^{\mathrm{F}} $ |  |
+|$q_{z, j, t}^{\mathrm{E}} $ |  |
+|$q_{z, j, t}^{\mathrm{CHA} }$ |  |
+|$q_{z, j, t}^{\mathrm{DIS}} $ |  |
+|$ h_{z, j, t}^{\mathrm{TRU}} $ |  |
+|$\sigma_{j} $| |
+|$u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}} $ |  |
+|$u_{z \rightarrow z,^{\prime} j, t}^{\mathrm{E}} $ | |
+|$u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}$| |
+|$x_{z \rightarrow z,^{\prime} j, e}^{\mathrm{F}} $| |
+|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}} $| |
+|$H_{z, j}^{\mathrm{TRU}}$| |
+|$v_{CAP,j}^{TRU}$| |
+|$v_{RETCAP,j}^{TRU}$| |
+|$v_{NEWCAP,j}^{TRU}$| |
+|$v_{RETCAPNUM,j}^{TRU}$| |
+|$v_{ExistNum,j}^{TRU}$| |
+|$v_{RETCAPEnergy,j}^{TRU}$| |
+|$v_{ExistEnergyCap,j}^{TRU}$| |
+|$C_{\mathrm{TRU}}^{\mathrm{o}}$| |
+|$C_{\mathrm{o}_{j}}^{\mathrm{TRU}}$| |
 
 ## Parameters
 ---
@@ -193,4 +294,10 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\eta_{y,z}^{dflex}$ | energy losses associated with shifting the flexible load [%]|
 |$\mu_{p,z}^{\mathcal{RPS}}$ | share of total demand in each model zone $z \in \mathcal{RPS}^{p}$  that must be served by qualifying renewable energy resources $y \in \mathcal{G}^{RPS}_{p}$|
 |$f(n)$ | Mapping each modeled period $n \in \mathcal{N}$ to corresponding representative period $w \in \mathcal{W}$|
+|$\Omega^{size}_{h,z}$ | is the unit size|
+|$\kappa_{h,z,t}^{up|down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity|
+|$\tau_{h,z}^{up|down}$ | is the minimum up or down time for units in generating cluster|
+|$\Omega^{size}_{y,z}$ | is the unit size|
+|$\epsilon_{y,z}^{CO_2}$ | reflects the specific $CO_2$ emission intensity in tCO$_2$/MWh associated with its operation|
+
 ---
