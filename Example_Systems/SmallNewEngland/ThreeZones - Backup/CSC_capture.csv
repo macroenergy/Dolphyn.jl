@@ -1,7 +1,0 @@
-CO2_Resource,Zone,CO2_CAPTURE_TYPE,New_Build,etaPCO2_MWh_p_tonne,etaFuel_MMBtu_p_tonne,RefCAPEX_per_y,RefFixedOM_per_y,Fuel,Max_Cap_tonne_p_hr,Min_Cap_tonne_p_hr,RefCapacity_Mt_y,MaxCapacity_Mt_y,MinCapacity_Mt_y,Ramp_Up_Percentage,Ramp_Down_Percentage,CO2_Capture_Min_Output,Start_Cost_per_tonne_p_hr,Up_Time,Down_Time
-Liquid_DAC_1,1,2,1,0.34,10.15,116000000,39500000,MA_NG,-1,0,1,100,0,1,1,0,0,0,0
-Liquid_DAC_2,2,2,1,0.34,10.15,116000000,39500000,CT_NG,-1,0,1,100,0,1,1,0,0,0,0
-Liquid_DAC_3,3,2,1,0.34,10.15,116000000,39500000,ME_NG,-1,0,1,100,0,1,1,0,0,0,0
-Solid_DAC_1,1,2,1,0.23,3.9,133000000,14600000,MA_NG,-1,0,1,100,0,1,1,0,0,0,0
-Solid_DAC_2,2,2,1,0.23,3.9,133000000,14600000,CT_NG,-1,0,1,100,0,1,1,0,0,0,0
-Solid_DAC_3,3,2,1,0.23,3.9,133000000,14600000,ME_NG,-1,0,1,100,0,1,1,0,0,0,0
