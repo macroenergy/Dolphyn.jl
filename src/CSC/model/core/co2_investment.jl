@@ -24,14 +24,14 @@ This module additionally defines contributions to the objective function from va
 """
 function co2_investment(EP::Model, inputs::Dict, setup::Dict)
 
+	println("Carbon Capture Investment Module")
+
     dfCO2Capture = inputs["dfCO2Capture"]
 
-
-    #Define sets
+    # Define sets
 	CO2_CAPTURE_NEW_CAP = inputs["CO2_CAPTURE_NEW_CAP"] 
     CO2_CAPTURE_COMMIT = inputs["CO2_CAPTURE_COMMIT"]
-	H =inputs["CO2_RES_ALL"]
-
+	CO2_RES_ALL = inputs["CO2_RES_ALL"]
 
 	#Capacity of New CO2 Capture units (tonnes/hr)
 	#For capture with unit commitment, this variable refers to the number of units, not capacity. 

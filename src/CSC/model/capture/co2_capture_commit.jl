@@ -17,37 +17,28 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 
-The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies with unit commitment constraints (e.g. natural gas reforming etc.)
+The co2_capture_commit module creates decision variables, expressions, and constraints related to various hydrogen generation technologies with unit commitment constraints (e.g. natural gas reforming etc.)
 
 Documentation to follow ******
 """
 
 function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 
-	#Rename H2Gen dataframe
+	println("Carbon Capture (Unit Commitment) Module")
+
+	# Rename CO2Capture dataframe
 	dfCO2Capture = inputs["dfCO2Capture"]
 	CO2CaptureCommit = setup["CO2CaptureCommit"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H"]		#NUmber of hydrogen generation units 
 	
 	CO2_CAPTURE_COMMIT = inputs["CO2_CAPTURE_COMMIT"]
-	CO2_CAPTURE_NEW_CAP = inputs["CO2_CAPTURE_NEW_CAP"] 
 	
-	#Define start subperiods and interior subperiods
+	# Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
-	hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
-
-    ###Variables###
-
-	# commitment state variable
-	@variable(EP, vCO2CaptureCommit[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
-	# Start up variable
-	@variable(EP, vCO2CaptureStart[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
-	# Shutdown Variable
-	@variable(EP, vCO2CaptureShut[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
+	hours_per_subperiod = inputs["hours_per_subperiod"]
 
 	###Expressions###
 
@@ -61,32 +52,37 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_CO2_Start"][k]*vCO2CaptureStart[k,t]))
 	end
 
-	# Julia is fastest when summing over one row one column at a time
 	@expression(EP, eTotalCO2CaptureCStartT[t=1:T], sum(eCO2CaptureCStart[k,t] for k in CO2_CAPTURE_COMMIT))
 	@expression(EP, eTotalCO2CaptureCStart, sum(eTotalCO2CaptureCStartT[t] for t=1:T))
 
 	EP[:eObj] += eTotalCO2CaptureCStart
 
-	#CO2 Balance expressions
+    ###Variables###
+	# Commitment state variable
+	@variable(EP, vCO2CaptureCommit[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
+	# Start up variable
+	@variable(EP, vCO2CaptureStart[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
+	# Shutdown Variable
+	@variable(EP, vCO2CaptureShut[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
+
+	# CO2 Balance expressions
 	@expression(EP, eCO2CaptureCommit[t=1:T, z=1:Z],
 	sum(EP[:vCO2Capture][k,t] for k in intersect(CO2_CAPTURE_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eCO2Balance] += eCO2CaptureCommit
 
-	#Power Consumption for CO2 Capture
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+	# Power Consumption for CO2 Capture
+	if setup["ParameterScale"] ==1
 		@expression(EP, ePowerBalanceCO2CaptureCommit[t=1:T, z=1:Z],
 		sum(EP[:vPCO2][k,t]/ModelScalingFactor for k in intersect(CO2_CAPTURE_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
-
-	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+	else
 		@expression(EP, ePowerBalanceCO2CaptureCommit[t=1:T, z=1:Z],
 		sum(EP[:vPCO2][k,t] for k in intersect(CO2_CAPTURE_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceCO2CaptureCommit
 
-
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	## For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCO2NetpowerConsumptionByAll] += ePowerBalanceCO2CaptureCommit
 
 	### Constraints ###
@@ -98,11 +94,10 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 			set_integer.(vCO2CaptureShut[k,:])
             set_integer(EP[:vCO2CaptureNewCap][k])
 		end
-	end #END unit commitment configuration
-
-		###Constraints###
-		@constraints(EP, begin
-		#Power Balance
+	end # END unit commitment configuration
+	
+	# Power Balance
+	@constraints(EP, begin
 		[k in CO2_CAPTURE_COMMIT, t = 1:T], EP[:vPCO2][k,t] == EP[:vCO2Capture][k,t] * dfCO2Capture[!,:etaPCO2_MWh_p_tonne][k]
 	end)
 

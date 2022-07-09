@@ -43,7 +43,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	## CO2 Capture by zone and each time step
-		@expression(EP, eCO2CaptureByZone[z=1:Z, t=1:T], # the unit is tonne/hour
+	@expression(EP, eCO2CaptureByZone[z=1:Z, t=1:T], # the unit is tonne/hour
 		sum(EP[:vCO2Capture][y,t] for y in intersect(inputs["CO2_CAPTURE"], dfCO2Capture[dfCO2Capture[!,:Zone].==z,:R_ID]))
 	)
 

@@ -15,15 +15,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
-The co2_capture module creates decision variables, expressions, and constraints related to various carbon capture technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
+The co2_capture_no_commit module creates decision variables, expressions, and constraints related to various carbon capture technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
 
 """
 
-function co2_capture_no_commit(EP::Model, inputs::Dict,setup::Dict)
+function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
-	#Rename CO2Capture dataframe
+	println("Carbon Capture (Unit Commitment) Module")
+
+	# Rename CO2Capture dataframe
 	dfCO2Capture = inputs["dfCO2Capture"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -32,37 +34,30 @@ function co2_capture_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	
 	CO2_CAPTURE_NO_COMMIT = inputs["CO2_CAPTURE_NO_COMMIT"]
 	
-	#Define start subperiods and interior subperiods
+	# Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
-	hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
+	hours_per_subperiod = inputs["hours_per_subperiod"]
 
 	###Expressions###
-
-	####################################################################################################################################################
-	#################################### Use when CO2 demand is online to ensure captured CO2 >= demand for utilization ################################
-	####################################################################################################################################################
-
-	#CO2 Balance expressions
+	# CO2 Balance expressions
 	@expression(EP, eCO2CaptureNoCommit[t=1:T, z=1:Z],
 	sum(EP[:vCO2Capture][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eCO2Balance] += eCO2CaptureNoCommit
 
-	#Power Consumption for CO2 Capture
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+	# Power Consumption for CO2 Capture
+	if setup["ParameterScale"] == 1
 		@expression(EP, ePowerBalanceCO2CaptureNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vPCO2][k,t]/ModelScalingFactor for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
-
-	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of CO2 related power consumption
+	else
 		@expression(EP, ePowerBalanceCO2CaptureNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vPCO2][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceCO2CaptureNoCommit
 
-
-	##For CO2 Policy constraint right hand side development - power consumption by zone and each time step
+	## For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCO2NetpowerConsumptionByAll] += ePowerBalanceCO2CaptureNoCommit
 	
 	# Power and natural gas consumption associated with CO2 generation in each time step
@@ -79,9 +74,8 @@ function co2_capture_no_commit(EP::Model, inputs::Dict,setup::Dict)
 		[k in CO2_CAPTURE_NO_COMMIT, t=1:T], EP[:vCO2Capture][k,t] >= EP[:eCO2CaptureTotalCap][k]* dfCO2Capture[!, :CO2Capture_min_output][k]
 	end)
 
-	#Ramping cosntraints 
+	# Ramping cosntraints 
 	@constraints(EP, begin
-
 		## Maximum ramp up between consecutive hours
 		# Start Hours: Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
 		# NOTE: We should make wrap-around a configurable option
@@ -100,7 +94,7 @@ function co2_capture_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end)
 
 	return EP
-
+	
 end
 
 
