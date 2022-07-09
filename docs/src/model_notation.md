@@ -66,7 +66,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\Delta_{y,z}^{total,energy} \in \mathbb{R}_+$ | Total installed energy capacity of technology $y$ in zone $z$  - only applicable for storage resources, $y \in \mathcal{O}$ [MWh]|
 |$\Delta_{y,z}^{total,charge} \in \mathbb{R}_+$ | Total installed charging power capacity of technology $y$ in zone $z$ - only applicable for storage resources, $y \in \mathcal{O}^{asym}$ [MW]|
 |$\bigtriangleup\varphi^{max}_{l}$ | Additional transmission capacity added to line $l$ [MW] |
-|$\Theta_{y,z,t} \in \mathbb{R}_+$ | Energy injected into the grid by technology $y$ at time step $t$ in zone $z$ [MWh]|
+|$\Theta_{y,z,t} \in \mathbb{R}_+$ | Energy injected into the grid by technology $y$ at time step $t$ in zone $z$ [MWh] or hydrogen produced by technology $y$ in zone $z$ at time step $t$ [tonne-$\ce{H2}$]|
 |$\Pi_{y,z,t} \in \mathbb{R}_+$ | Energy withdrawn from grid by technology $y$ at time step $t$ in zone $z$ [MWh]|
 |$\Gamma_{y,z,t} \in \mathbb{R}_+$ | Stored energy level of technology $y$ at end of time step $t$ in zone $z$ [MWh]|
 |$\Lambda_{s,z,t} \in \mathbb{R}_+$ | Non-served energy/curtailed demand from the price-responsive demand segment $s$ in zone $z$ at time step $t$ [MWh] |
@@ -88,60 +88,22 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\Delta\mathcal{Q}_{o,m} \in \mathbb{R}$ | Excess storage inventory built up during representative period $m$ [MWh]|
 |$ON^{+}_{l,t} \in \{0,1\}$ | Binary variable to activate positive flows on line $l$ in time $t$|
 |$TransON^{+}_{l,t} \in \mathbb{R}_+$ | Variable defining maximum positive flow in line $l$ in time $t$ [MW]|
-|$\varepsilon _{OUT}^{GEN}$ |   |
-|$\vartheta _{k}^{GenNewCap}$ |   |
-|$\vartheta _{k}^{GenRetCap}$ |   |
-|$\Delta^{total}_{y,z}$ |   |
-|$\Delta_{y,z}$ |   |
-|$\pi^{INVEST}_{y,z}$ |   |
-|$\pi^{FOM}_{y,z}$ |   |
-|$\Omega^{size}_{y,z}$ |   |
-|$\Lambda_{s,t,z}$ |   |
-|$n_{s}^{size}$ |   |
-|$D_{t,z}$ |   |
-|$\omega_{t}$ |   |
-|$\pi^{VOM}_{y}$ |   |
-|$\pi^{FUEL}_{y}$ |   |
-|$\Theta_{y,t}$ |   |
-|$xi _{k}^{OMCostPTone}$ |   |
-|$\xi _{k}^{OMCostPTone}$ |   |
-|$\varepsilon _{k,t}^{GenOut}$ |   |
-|$\varepsilon _{CH2GenVarOut}^{Total}$ |   |
-|$\rho^{max}_{y,z,t}$ |   |
-|$\tau^{advance}_{y,z}$ |   |
-|$\tau^{delay}_{y,z}$ |   |
-|$\eta_{y,z}^{dflex}$ |   |
-|$\Gamma_{y,z,t}$ |   |
-|$\Theta_{y,z,t}$ |   |
-|$\Pi_{y,z,t}$ |   |
-|$\varepsilon _{t}^{GenOut}$ |   |
-|$\Omega_{y,z}$ |   |
+|$\varepsilon _{OUT}^{GEN}$ | Variable defining the output of hydrogen generation unit $y$ and storage device $s$ in time $t$ [tonne-$\ce{H2}$] |
+|$\vartheta_{k}^{GenNewCap}$ | Installed capcaity of hydrogen generation unit $k$ [tonne-$\ce{H2}$] |
+|$\vartheta_{k}^{GenRetCap}$ | Retired capcaity of hydrogen generation unit $k$ [tonne-$\ce{H2}$] |
+|$\Delta_{y,z}^{total} \in \mathbb{R}_+$ | Total installed capacity of hydrogen generation technology $y$ in zone $z$ [tonne-$\ce{H2}$] |
+|$\Delta_{y,z} \in \mathbb{R}_+$ | Retired capacity of hydrogen generation technology $y$ from existing capacity in zone $z$ [tonne-$\ce{H2}$]|
+|$n_{s}^{size}$ | maximum quantity of demand in this segment, specified as a share of demand in each zone in each time step |
+|$\rho^{min}_{y,z,t}$ | minimum rate of output from technology $y$ in zone $z$ at time step $t$ [\%] |
+|$\rho^{max}_{y,z,t}$ | maximum rate of output from technology $y$ in zone $z$ at time step $t$ [\%] |
+|$\tau^{advance}_{y,z}$ | advance time for flexible demand |
+|$\tau^{delay}_{y,z}$ | delay time for flexible demand|
+|$\eta_{y,z}^{dflex}$ | energy lossed efficiency associated with flexible demand |
 |$\nu_{y,t,z}$| designates the commitment state of g2p generator cluster $h$ in zone $z$ at time $t$ |   
 |$\chi_{y,t,z}$| represents number of g2p startup decisions in cluster $h$ in zone $z$ at time $t$ |   
 |$\zeta_{y,t,z}$| represents number of g2p shutdown decisions in cluster $h$ in zone $z$ at time $t$ |   
-|$C^{start}$ |   |
-|$start\_cost_{h}$ |   |
-|$start\_cost_{h}$ |   |
-|$\chi_{h,t}$ |   |
-|$\nu_{h,z,t}$ |   |
-|$\Delta^{\text{total}}_{h,z}$ |   |
-|$\Omega^{size}_{h,z}$ |   |
-|$\chi_{h,z,t}$ | represents number of startup decisions |
-|$\zeta_{h,z,t}$ | represents number of shutdown decisions  |
 |$\Theta_{h,z,t}$ | is the energy injected into the grid by technology |
 |$\Delta^{\text{total}}_{h,z}$ | is the total installed capacity  |
-|$\kappa^{down}_{h,z}$ |  |
-|$\rho^{min}_{h,z}$ |  |
-|$\rho^{max}_{h,z,t}$ |  |
-|$\pi^{VOM}_{h}$ |  |
-|$\pi^{INVEST}_{h,z}$ |  |
-|$\pi^{FOM}_{h,z}$ |  |
-|$\kappa_{h,z}^{up}$ |  |
-|$\rho^{max}_{h,z,t}$ |  |
-|$n_{k, z, t}$ |  |
-|$n_{k, z, t}^{\mathrm{DOWN}}$ |  |
-|$\tau_{k, z}^{\mathrm{DOWN}}$ |  |
-|$n_{k, z, t}^{\mathrm{UP}}$ |  |
 |$\nu_{y,z,t}$ | designates the commitment state of generator cluster |
 |$\chi_{y,z,t}$ | represents number of startup decisions |
 |$\zeta_{y,z,t}$ | represents number of shutdown decisions |
@@ -151,38 +113,25 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\rho_{y,z,t}^{max}$ | is the maximum available generation per unit of installed capacity |
 |$\tau_{y,z}^{up/down}$ | is the minimum up or down time for units in generating cluster |
 |$\epsilon^{CO_{2}}_{z,p, mass}$ | to be provided in terms of million metric tonnes |
-|$epsilon_{y,z}^{CO_2}$ |  |
 |$\epsilon_{z,p,load}^{maxCO_2}$ | denotes the emission limit in terms on tCO$_2$/MWh |
 |$\epsilon_{z,p,gen}^{maxCO_2}$ |have to buy emission allowances from the emission regulator in the region $z$ where they are located |
-|$\eta_{o,z}^{discharge}$ |  |
-|$\Delta Q_{o,z,m}$ |  |
-|$\tau^{period}$ |  |
-|$\Gamma_{o,z,f(n)}$ |  |
-|$\Delta^{total, energy}_{o,z}$ |  |
-|$\Pi_{o,z,t}$ |  |
-|$\Omega_{o,z}$ |  |
-|$\Theta_{o,z,t}$ |  |
-|$\Delta^{total}_{o,z}$ |  |
+|$\eta_{o,z}^{discharge}$ | discharge efficiency for storage device $o$ in zone $z$ [\%] |
+|$\Delta Q_{o,z,m}$ | change in storage inventory associated with representative period $m$ |
+|$\tau^{period}$ | number of repeated times |
+|$\Pi_{o,z,t}$ | charge rate |
+|$\Theta_{o,z,t}$ | released energy or hydrogen from storage device $o$ in zone $z$ at time step $t$ |
 |$r^{discharge}_{o,z,t}$ | is the contribution of storage resources to upward reserves while discharging |
 |$f^{discharge}_{o,z,t}$ | is the contribution of storage resources to frequency regulation while discharging |
 |$f^{charge}_{o,z,t}$ | is the contribution of storage resources to frequency regulation while charging |
 |$f^{+}_{y=o,z,t}$ | is the contribution of storage resources to frequency regulation while charging |
-|$\Gamma_{o,z,t}$ |  |
-|$\eta_{o,z}^{loss}$ |  |
-|$f_{o,z,t}$ |  |
-|$r_{o,z,t}$ |  |
-|$\upsilon^{reg}_{y,z}$ |  |
-|$\upsilon^{rsv}_{y,z}$ |  |
-|$f_{y,z,t}$ |  |
-|$r_{y,z,t}$ |  |
-|$\Delta^{total,energy}_{y,z}$ |  |
-|$\Delta^{energy}_{y,z}$ |  |
-|$\Omega^{energy}_{y,z}$ |  |
-|$\pi^{INVEST,energy}_{y,z}$ |  |
-|$\pi^{FOM,energy}_{y,z}$ |  |
-|$\ C_{\mathrm{PIP}}^{\mathrm{c}}$ |  |
+|$\Gamma_{o,z,t}$ | stored energy level or hydrogen level in storage device $o$ in zone $z$ at time step $t$ |
+|$\eta_{o,z}^{loss}$ | storage discharge efficiency of device $o$ in zone $z$ |
+|$f_{o,z,t}$ | The total storage contribution to frequency regulation |
+|$r_{o,z,t}$ | The total storage contribution to reserves |
+|$\upsilon^{reg}_{y,z}$ | limited specified fraction of installed discharge for frequency regulation |
+|$\upsilon^{rsv}_{y,z}$ | limited specified fraction of installed discharge for capacity reserve |
+|$\C_{\mathrm{PIP}}^{\mathrm{c}}$ |  |
 |$\delta_{i}^{\mathrm{PIP}}$ |  |
-|$\mathrm{PIP}$ |  |
 |$\overline{\mathrm{F}}_{i} l_{z \rightarrow z,^{\prime}i}$ |  |
 |$h_{z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}$ |  |
 |$h_{z \rightarrow z^{\prime} i, t}^{\mathrm{PIP}}$ |  |
@@ -219,7 +168,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 ---
 |**Notation** | **Description**|
 | :------------ | :-----------|
-|$D_{z,t}$ | Electricity demand in zone $z$ and at time step $t$ [MWh]|
+|$D_{z,t}$ | Electricity demand in zone $z$ and at time step $t$ [MWh] or hydrogen demand in zone $z$ at time step $t$ [tonne-$\ce{H2}$]|
 |$\tau^{period}$ | number of time steps in each representative period $w \in \mathcal{W}^{rep}$ and each input period $w \in \mathcal{W}^{input}$|
 |$\omega_{t}$ | weight of each model time step $\omega_t =1 \forall t \in T$ when modeling each time step of the year at an hourly resolution|
 |$n_s^{slope}$ | Cost of non-served energy/demand curtailment for price-responsive demand segment $s$ [\$/MWh]|
@@ -278,9 +227,8 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\mu_{p,z}^{\mathcal{RPS}}$ | share of total demand in each model zone $z \in \mathcal{RPS}^{p}$  that must be served by qualifying renewable energy resources $y \in \mathcal{G}^{RPS}_{p}$|
 |$f(n)$ | Mapping each modeled period $n \in \mathcal{N}$ to corresponding representative period $w \in \mathcal{W}$|
 |$\Omega^{size}_{h,z}$ | is the unit size|
-|$\kappa_{h,z,t}^{up|down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity|
-|$\tau_{h,z}^{up|down}$ | is the minimum up or down time for units in generating cluster|
+|$\kappa_{h,z,t}^{up/down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity|
+|$\tau_{h,z}^{up/down}$ | is the minimum up or down time for units in generating cluster|
 |$\Omega^{size}_{y,z}$ | is the unit size|
 |$\epsilon_{y,z}^{CO_2}$ | reflects the specific $CO_2$ emission intensity in tCO$_2$/MWh associated with its operation|
-
 ---
