@@ -8,14 +8,15 @@
 |$\mathcal{T}^{interior} \subseteq \mathcal{T}^{}$ | where $\mathcal{T}^{interior}$ is the set of interior timesteps in the data series|
 |$\mathcal{T}^{start} \subseteq \mathcal{T}$ |  where $\mathcal{T}^{start}$ is the set of initial timesteps in the data series. $\mathcal{T}^{start}={1}$ when representing entire year as a single contiguous period; $\mathcal{T}^{start}=\{\left(m-1\right) \times \tau^{period}+1 \| m \in \mathcal{M}\}$, which corresponds to the first time step of each representative period $m \in \mathcal{M}$|
 |$n \in \mathcal{N}$ | where $n$ corresponds to a contiguous time period and $\mathcal{N}$ corresponds to the set of contiguous periods of length $\tau^{period}$ that make up the input time series (e.g. load, variable renewable energy availability) to the model|
-|$\mathcal{N}^{rep} \subseteq \mathcal{N}$ | where $\mathcal{N}^{rep}$ corresponds to the set of representative time periods that are selected from the set of contiguous periods, $\mathcal{M}$|
+|$\mathcal{N}^{rep} \subseteq \mathcal{N}$ | where $\mathcal{N}^{rep}$ corresponds to the set of representative time periods that are selected from the set of contiguous periods $\mathcal{M}$|
 |$m \in \mathcal{M}$ | where $m$ corresponds to a representative time period and $\mathcal{M}$ corresponds to the set of representative time periods indexed as per their chronological ocurrence in the set of contiguous periods spanning the input time series data, i.e. $\mathcal{N}$|
 $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of zones in the network|
-|$l \in \mathcal{L}$ | where $l$ denotes a line and $\mathcal{L}$ is the set of transmission lines in the network|
-|$y \in \mathcal{G}$ | where $y$ denotes a technology and $\mathcal{G}$ is the set of available technologies |
-|$\mathcal{H} \subseteq \mathcal{G}$ | where $\mathcal{H}$ is the subset of thermal resources|
+|$z \rightarrow z^{\prime} \in \mathcal{B}$ |where $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity, hydrogen flow via pipelines and trucks, carbon flow via pipelines and trucks and $\mathcal{B}$ is the set of all possible routes|
+|$l \in \mathcal{L}$ | where $l$ denotes a transmission line and $\mathcal{L}$ is the set of transmission lines in the network of power, hydrogen or carbon|
+|$y \in \mathcal{G}$ | where $y$ denotes a technology and $\mathcal{G}$ is the set of available technologies in power, hydrogen or carbon systems |
+|$\mathcal{H} \subseteq \mathcal{G}$ | where $\mathcal{H}$ is the subset of thermal resources in power system|
 |$\mathcal{VRE} \subseteq \mathcal{G}$ | where $\mathcal{VRE}$ is the subset of curtailable Variable Renewable Energy (VRE) resources|
-|$\overline{\mathcal{VRE}}^{y,z}$ | set of VRE resource bins for VRE technology type $y \in \mathcal{VRE}$ in zone $z$ |
+|$\overline{\mathcal{VRE}}_{y,z}$ | set of VRE resource bins for VRE technology type $y \in \mathcal{VRE}$ in zone $z$ |
 |$\mathcal{CE} \subseteq \mathcal{G}$ | where $\mathcal{CE}$ is the subset of resources qualifying for the clean energy standard policy constraint|
 |$\mathcal{UC} \subseteq \mathcal{H}$ | where $\mathcal{UC}$ is the subset of thermal resources subject to unit commitment constraints|
 |$s \in \mathcal{S}$ | where $s$ denotes a segment and $\mathcal{S}$ is the set of consumers segments for price-responsive demand curtailment|
@@ -28,7 +29,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\mathcal{W}^{nocap} \subseteq \mathcal{W}$ | where $\mathcal{W}^{nocap}$ is a subset of set of $ \mathcal{W}$ and represents resources with unknown reservoir capacity|
 |$\mathcal{W}^{cap} \subseteq \mathcal{W}$ | where $\mathcal{W}^{cap}$ is a subset of set of $ \mathcal{W}$ and represents resources with known reservoir capacity|
 |$\mathcal{MR} \subseteq \mathcal{G}$ | where $\mathcal{MR}$ set of must-run resources|
-|$\mathcal{DF} \subseteq \mathcal{G}$ | where $\mathcal{DF}$ set of flexible demand resources|
+|$\mathcal{DF} \subseteq \mathcal{G}$ | where $\mathcal{DF}$ set of flexible demand resources in power an dhydrogen system|
 |$\mathcal{G}_p^{ESR} \subseteq \mathcal{G}$ | where $\mathcal{G}_p^{ESR}$ is a subset of $\mathcal{G}$ that is eligible for Energy Share Requirement (ESR) policy constraint $p$|
 |$p \in \mathcal{P}$ | where $p$ denotes a instance in the policy set $\mathcal{P}$|
 |$\mathcal{P}^{ESR} \subseteq \mathcal{P}$ | Energy Share Requirement type policies |
@@ -45,24 +46,8 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\mathcal{Z}^{CO_2}_{p,gen} \subseteq \mathcal{Z}$ | set of zones are under the emission cap generation emission-rate based cap-and-trade policy constraint $p \in \mathcal{P}^{CO2,gen}$ |
 |$\mathcal{L}_p^{in} \subseteq \mathcal{L}$ | The subset of transmission lines entering Locational Deliverability Area of capacity reserve margin policy $p \in \mathcal{P}^{CRM}$ |
 |$\mathcal{L}_p^{out} \subseteq \mathcal{L}$ | The subset of transmission lines leaving Locational Deliverability Area of capacity reserve margin policy $p \in \mathcal{P}^{CRM}$ |
-|$y \in \mathcal{G}$ | |
-|$z \in \mathcal{Z}$ | |
-|$s \in \mathcal{S}$ | |
-|$t \in \mathcal{T}$ | |
-|$y \in \mathcal{DF}$ | |
-|$\Gamma_{y,z,t} \in \mathbb{R}$ | |
-|$h \in UC$ | |
-|$h \in \mathcal{H}$ | |
-|$p \in \mathcal{P}^{CO_2}$ | |
-|$z \in \mathcal{Z}^{CO_2}_{p,mass}$ | |
 |$p \in \mathcal{P}^{CO_2}_{load}$ | to set emissions target based on a CO$_2$ emission rate limit in tCO$_2$/MWh $\times$ the total demand served in each zone |
-|$o \in \mathcal{O}^{LDES}$ | |
-|$n \in \mathcal{N}$ | |
-|$m \in \mathcal{M}$ | |
-|$o \in \mathcal{O}^{sym}$ | |
-|$i \in \mathbb{I}$ | |
-|$j \in \mathbb{J}$ | |
-|$z \rightarrow z^{\prime} \in \mathbb{B}$ |     |
+|$j \in \mathbb{J}$ |where $j$ denotes the type of truck used in hydrogen and carbon transmission and $\mathcal{J}$ is the set of all truck types|
 ---
 
 
