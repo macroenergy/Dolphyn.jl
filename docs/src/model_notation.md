@@ -63,8 +63,6 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$i \in \mathbb{I}$ | |
 |$j \in \mathbb{J}$ | |
 |$z \rightarrow z^{\prime} \in \mathbb{B}$ |     |
-|$z \rightarrow z^{\prime} \in \mathbb{B}$ |     |
-|$z \rightarrow z^{\prime} \in \mathbb{B}$ |     |
 ---
 
 
@@ -103,7 +101,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\zeta_{y,z,t}$ | Number of shutdown decisions,  of the generation cluster $y$ in zone $z$ at time $t$|
 |$\mathcal{Q}_{o,n} \in \mathbb{R}_+$ | Inventory of storage of type $o$ at the beginning of input period $n$ [MWh]|
 |$\Delta\mathcal{Q}_{o,m} \in \mathbb{R}$ | Excess storage inventory built up during representative period $m$ [MWh]|
-|$ON^{+}_{l,t} \in \{0,1\} $ | Binary variable to activate positive flows on line $l$ in time $t$|
+|$ON^{+}_{l,t} \in \{0,1\}$ | Binary variable to activate positive flows on line $l$ in time $t$|
 |$TransON^{+}_{l,t} \in \mathbb{R}_+$ | Variable defining maximum positive flow in line $l$ in time $t$ [MW]|
 |$\varepsilon _{OUT}^{GEN}$ |   |
 |$\vartheta _{k}^{GenNewCap}$ |   |
@@ -156,81 +154,81 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\kappa_{h,z}^{up}$ |  |
 |$\rho^{max}_{h,z,t}$ |  |
 |$n_{k, z, t}$ |  |
-|$n_{k, z, t}^{\mathrm{DOWN}} $ |  |
-|$\tau_{k, z}^{\mathrm{DOWN}} $ |  |
-|$n_{k, z, t}^{\mathrm{UP}} $ |  |
-|$\nu_{y,z,t} $ | designates the commitment state of generator cluster |
-|$\chi_{y,z,t} $ | represents number of startup decisions |
-|$\zeta_{y,z,t} $ | represents number of shutdown decisions |
-|$\Delta^{\text{total}}_{y,z} $ | is the total installed capacity |
-|$\kappa_{y,z,t}^{up|down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity |
-|$\rho_{y,z}^{min} $ | is the minimum stable power output per unit of installed capacity |
-|$\rho_{y,z,t}^{max} $ | is the maximum available generation per unit of installed capacity |
-|$\tau_{y,z}^{up|down} $ | is the minimum up or down time for units in generating cluster |
-|$\epsilon^{CO_{2}}_{z,p, mass} $ | to be provided in terms of million metric tonnes |
-|$epsilon_{y,z}^{CO_2} $ |  |
+|$n_{k, z, t}^{\mathrm{DOWN}}$ |  |
+|$\tau_{k, z}^{\mathrm{DOWN}}$ |  |
+|$n_{k, z, t}^{\mathrm{UP}}$ |  |
+|$\nu_{y,z,t}$ | designates the commitment state of generator cluster |
+|$\chi_{y,z,t}$ | represents number of startup decisions |
+|$\zeta_{y,z,t}$ | represents number of shutdown decisions |
+|$\Delta^{\text{total}}_{y,z}$ | is the total installed capacity |
+|$\kappa_{y,z,t}^{up/down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity |
+|$\rho_{y,z}^{min}$ | is the minimum stable power output per unit of installed capacity |
+|$\rho_{y,z,t}^{max}$ | is the maximum available generation per unit of installed capacity |
+|$\tau_{y,z}^{up/down}$ | is the minimum up or down time for units in generating cluster |
+|$\epsilon^{CO_{2}}_{z,p, mass}$ | to be provided in terms of million metric tonnes |
+|$epsilon_{y,z}^{CO_2}$ |  |
 |$\epsilon_{z,p,load}^{maxCO_2}$ | denotes the emission limit in terms on tCO$_2$/MWh |
 |$\epsilon_{z,p,gen}^{maxCO_2}$ |have to buy emission allowances from the emission regulator in the region $z$ where they are located |
-|$\eta_{o,z}^{discharge} $ |  |
-|$\Delta Q_{o,z,m} $ |  |
-|$\tau^{period} $ |  |
-|$\Gamma_{o,z,f(n)} $ |  |
-|$\Delta^{total, energy}_{o,z} $ |  |
-|$\Pi_{o,z,t} $ |  |
-|$\Omega_{o,z} $ |  |
-|$\Theta_{o,z,t} $ |  |
-|$\Delta^{total}_{o,z} $ |  |
-|$r^{discharge}_{o,z,t} $ | is the contribution of storage resources to upward reserves while discharging |
-|$f^{discharge}_{o,z,t} $ | is the contribution of storage resources to frequency regulation while discharging |
-|$f^{charge}_{o,z,t} $ | is the contribution of storage resources to frequency regulation while charging |
-|$f^{+}_{y=o,z,t} $ | is the contribution of storage resources to frequency regulation while charging |
-|$\Gamma_{o,z,t} $ |  |
-|$\eta_{o,z}^{loss} $ |  |
-|$f_{o,z,t} $ |  |
-|$r_{o,z,t} $ |  |
-|$\upsilon^{reg}_{y,z} $ |  |
-|$\upsilon^{rsv}_{y,z} $ |  |
-|$f_{y,z,t} $ |  |
-|$r_{y,z,t} $ |  |
-|$\Delta^{total,energy}_{y,z} $ |  |
-|$\Delta^{energy}_{y,z} $ |  |
-|$\Omega^{energy}_{y,z} $ |  |
-|$\pi^{INVEST,energy}_{y,z} $ |  |
-|$\pi^{FOM,energy}_{y,z} $ |  |
-|$\ C_{\mathrm{PIP}}^{\mathrm{c}} $ |  |
-|$\delta_{i}^{\mathrm{PIP}} $ |  |
-|$\mathrm{PIP} $ |  |
-|$\overline{\mathrm{F}}_{i} l_{z \rightarrow z,^{\prime}i}   $ |  |
-|$h_{z \rightarrow z,{ }^{\prime}, t}^{\mathrm{PIP+}}$ |  |
-|$h_{z \rightarrow z,{ }^{\prime} i, t}^{\mathrm{PIP}} $ |  |
-|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z,^{\prime} i} $ |  |
-|$v_{j, t}^{\mathrm{F}} $ |  |
-|$v_{j, t}^{\mathrm{E}} $ |  |
-|$v_{n}^{SOC} $ |  |
-|$v_{z,j,n}^{SOC} $ |  |
-|$v_{j}^{TRU} $ |  |
-|$u_{z \rightarrow z, \prime^{\prime}, t}^{\mathrm{F}} $ |  |
-|$q_{z, j, t}^{\mathrm{F}} $ |  |
-|$q_{z, j, t}^{\mathrm{E}} $ |  |
-|$q_{z, j, t}^{\mathrm{CHA} }$ |  |
-|$q_{z, j, t}^{\mathrm{DIS}} $ |  |
-|$ h_{z, j, t}^{\mathrm{TRU}} $ |  |
-|$\sigma_{j} $| |
-|$u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}} $ |  |
-|$u_{z \rightarrow z,^{\prime} j, t}^{\mathrm{E}} $ | |
-|$u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}$| |
-|$x_{z \rightarrow z,^{\prime} j, e}^{\mathrm{F}} $| |
-|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}} $| |
-|$H_{z, j}^{\mathrm{TRU}}$| |
-|$v_{CAP,j}^{TRU}$| |
-|$v_{RETCAP,j}^{TRU}$| |
-|$v_{NEWCAP,j}^{TRU}$| |
-|$v_{RETCAPNUM,j}^{TRU}$| |
-|$v_{ExistNum,j}^{TRU}$| |
-|$v_{RETCAPEnergy,j}^{TRU}$| |
-|$v_{ExistEnergyCap,j}^{TRU}$| |
-|$C_{\mathrm{TRU}}^{\mathrm{o}}$| |
-|$C_{\mathrm{o}_{j}}^{\mathrm{TRU}}$| |
+|$\eta_{o,z}^{discharge}$ |  |
+|$\Delta Q_{o,z,m}$ |  |
+|$\tau^{period}$ |  |
+|$\Gamma_{o,z,f(n)}$ |  |
+|$\Delta^{total, energy}_{o,z}$ |  |
+|$\Pi_{o,z,t}$ |  |
+|$\Omega_{o,z}$ |  |
+|$\Theta_{o,z,t}$ |  |
+|$\Delta^{total}_{o,z}$ |  |
+|$r^{discharge}_{o,z,t}$ | is the contribution of storage resources to upward reserves while discharging |
+|$f^{discharge}_{o,z,t}$ | is the contribution of storage resources to frequency regulation while discharging |
+|$f^{charge}_{o,z,t}$ | is the contribution of storage resources to frequency regulation while charging |
+|$f^{+}_{y=o,z,t}$ | is the contribution of storage resources to frequency regulation while charging |
+|$\Gamma_{o,z,t}$ |  |
+|$\eta_{o,z}^{loss}$ |  |
+|$f_{o,z,t}$ |  |
+|$r_{o,z,t}$ |  |
+|$\upsilon^{reg}_{y,z}$ |  |
+|$\upsilon^{rsv}_{y,z}$ |  |
+|$f_{y,z,t}$ |  |
+|$r_{y,z,t}$ |  |
+|$\Delta^{total,energy}_{y,z}$ |  |
+|$\Delta^{energy}_{y,z}$ |  |
+|$\Omega^{energy}_{y,z}$ |  |
+|$\pi^{INVEST,energy}_{y,z}$ |  |
+|$\pi^{FOM,energy}_{y,z}$ |  |
+|$\ C_{\mathrm{PIP}}^{\mathrm{c}}$ |  |
+|$\delta_{i}^{\mathrm{PIP}}$ |  |
+|$\mathrm{PIP}$ |  |
+|$\overline{\mathrm{F}}_{i} l_{z \rightarrow z,^{\prime}i}$ |  |
+|$h_{z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}$ |  |
+|$h_{z \rightarrow z^{\prime} i, t}^{\mathrm{PIP}}$ |  |
+|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z,^{\prime} i}$ |  |
+|$v_{j, t}^{\mathrm{F}}$ |  |
+|$v_{j, t}^{\mathrm{E}}$ |  |
+|$v_{n}^{SOC}$ |  |
+|$v_{z,j,n}^{SOC}$ |  |
+|$v_{j}^{TRU}$ |  |
+|$u_{z \rightarrow z, \prime^{\prime}, t}^{\mathrm{F}}$ |  |
+|$q_{z, j, t}^{\mathrm{F}}$ |  |
+|$q_{z, j, t}^{\mathrm{E}}$ |  |
+|$q_{z, j, t}^{\mathrm{CHA}}$ |  |
+|$q_{z, j, t}^{\mathrm{DIS}}$ |  |
+|$h_{z, j, t}^{\mathrm{TRU}}$ |  |
+|$\sigma_{j}$| |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{E}}$ | |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | |
+|$x_{z \rightarrow z^{\prime} j, e}^{\mathrm{F}}$ | |
+|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}}$ | |
+|$H_{z, j}^{\mathrm{TRU}}$ | |
+|$v_{CAP,j}^{TRU}$ | |
+|$v_{RETCAP,j}^{TRU}$ | |
+|$v_{NEWCAP,j}^{TRU}$ | |
+|$v_{RETCAPNUM,j}^{TRU}$ | |
+|$v_{ExistNum,j}^{TRU}$ | |
+|$v_{RETCAPEnergy,j}^{TRU}$ | |
+|$v_{ExistEnergyCap,j}^{TRU}$ | |
+|$C_{\mathrm{TRU}}^{\mathrm{o}}$ | |
+|$C_{\mathrm{o}_{j}}^{\mathrm{TRU}}$ | |
 
 ## Parameters
 ---
