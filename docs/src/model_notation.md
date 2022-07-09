@@ -128,41 +128,26 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\eta_{o,z}^{loss}$ | storage discharge efficiency of device $o$ in zone $z$ |
 |$f_{o,z,t}$ | The total storage contribution to frequency regulation |
 |$r_{o,z,t}$ | The total storage contribution to reserves |
-|$\upsilon^{reg}_{y,z}$ | limited specified fraction of installed discharge for frequency regulation |
-|$\upsilon^{rsv}_{y,z}$ | limited specified fraction of installed discharge for capacity reserve |
-|$\C_{\mathrm{PIP}}^{\mathrm{c}}$ |  |
-|$\delta_{i}^{\mathrm{PIP}}$ |  |
-|$\overline{\mathrm{F}}_{i} l_{z \rightarrow z,^{\prime}i}$ |  |
-|$h_{z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}$ |  |
-|$h_{z \rightarrow z^{\prime} i, t}^{\mathrm{PIP}}$ |  |
-|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z,^{\prime} i}$ |  |
-|$v_{j, t}^{\mathrm{F}}$ |  |
-|$v_{j, t}^{\mathrm{E}}$ |  |
-|$v_{n}^{SOC}$ |  |
-|$v_{z,j,n}^{SOC}$ |  |
-|$v_{j}^{TRU}$ |  |
-|$u_{z \rightarrow z, \prime^{\prime}, t}^{\mathrm{F}}$ |  |
-|$q_{z, j, t}^{\mathrm{F}}$ |  |
-|$q_{z, j, t}^{\mathrm{E}}$ |  |
-|$q_{z, j, t}^{\mathrm{CHA}}$ |  |
-|$q_{z, j, t}^{\mathrm{DIS}}$ |  |
-|$h_{z, j, t}^{\mathrm{TRU}}$ |  |
-|$\sigma_{j}$| |
-|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | |
-|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{E}}$ | |
-|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | |
-|$x_{z \rightarrow z^{\prime} j, e}^{\mathrm{F}}$ | |
-|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}}$ | |
-|$H_{z, j}^{\mathrm{TRU}}$ | |
-|$v_{CAP,j}^{TRU}$ | |
-|$v_{RETCAP,j}^{TRU}$ | |
-|$v_{NEWCAP,j}^{TRU}$ | |
-|$v_{RETCAPNUM,j}^{TRU}$ | |
-|$v_{ExistNum,j}^{TRU}$ | |
-|$v_{RETCAPEnergy,j}^{TRU}$ | |
-|$v_{ExistEnergyCap,j}^{TRU}$ | |
-|$C_{\mathrm{TRU}}^{\mathrm{o}}$ | |
-|$C_{\mathrm{o}_{j}}^{\mathrm{TRU}}$ | |
+|$h_{i, z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}$ | Positive transported hydrogen through pipeline $i$ throught route $z \rightarrow z^{\prime}$ at time step $t$ [tonne-$\ce{H2}$] |
+|$h_{i, z \rightarrow z^{\prime}, t}^{\mathrm{PIP-}}$ | Negtive transported hydrogen through pipeline $i$ throught route $z \rightarrow z^{\prime}$ at time step $t$ [tonne-$\ce{H2}$] |
+|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}}$ | The maximum amount of hydrogen that could be storaed in the pipeline $i$ [tonne-$\ce{H2}$] |
+|$v_{j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ at time $t$ |
+|$v_{j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ at time $t$ |
+|$v_{j}^{TRU}$ | Total number of hydrogen trucks of type $j$ |
+|$u_{j, z \rightarrow z^{\prime}, t}^{\mathrm{F}}$ | Number of full or empty hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t |
+|$q_{z, j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$q_{z, j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$q_{z, j, t}^{\mathrm{CHA}}$ | Number of charged hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$q_{z, j, t}^{\mathrm{DIS}}$ | Number of discharged hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$h_{z, j, t}^{\mathrm{TRU}}$ | Amount of transprted hydrogen through truck rtype $j$ [tonne-$\ce{H2}$] |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t$} |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t$} |
+|$H_{z, j}^{\mathrm{TRU}}$ | Maximum compression/liquefaction capacity of hydrogen truck station type $j$ at zone $z$ [tonne-$\ce{H2}$] |
+|$v_{CAP,j}^{TRU}$ | Capacity of truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{RETCAP,j}^{TRU}$ | Retired capacity of truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{NEWCAP,j}^{TRU}$ | New constructed capacity of truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{RETCAPNUM,j}^{TRU}$ | Retired number of hydrogen truck type $j$ |
+|$v_{RETCAPEnergy,j}^{TRU}$ | Retired energy capacity of truck type $j$ [tonne-$\ce{H2}/hour$] |
 
 ## Parameters
 ---
@@ -231,4 +216,14 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\tau_{h,z}^{up/down}$ | is the minimum up or down time for units in generating cluster|
 |$\Omega^{size}_{y,z}$ | is the unit size|
 |$\epsilon_{y,z}^{CO_2}$ | reflects the specific $CO_2$ emission intensity in tCO$_2$/MWh associated with its operation|
+|$C_{\mathrm{PIP}}^{\mathrm{c}}$ | Unit constructure costs of pipeline in hydrogen transmission [\$/(tonne-$\ce{H2}$/hour]|
+|$\upsilon^{reg}_{y,z}$ | limited specified fraction of installed discharge for frequency regulation |
+|$\upsilon^{rsv}_{y,z}$ | limited specified fraction of installed discharge for capacity reserve |
+|$\delta_{i}^{\mathrm{PIP}}$ | Annuity factor for pipeline resources |
+|$\overline{\mathrm{F}}_{i}$ | The maximum injecting/withdrawing flow rate of the pipeline $i$ for hydrogen |
+|$\sigma_{j}$| Loss efficiency through truck transmission [%]|
+|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}}$ | Capacity of hydrogen truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{ExistEnergyCap,j}^{TRU}$ | Existing energy capacity of truck type $j$ [tonne-$\ce{H2}/hour$] |
+|$C_{\mathrm{TRU}}^{\mathrm{o}}$ | Unit cost of operation truck type $j$ |
+|$v_{ExistNum,j}^{TRU}$ | Existing number of hydrogen truck type $j$ |
 ---
