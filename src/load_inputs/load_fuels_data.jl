@@ -22,7 +22,6 @@ Function for reading input parameters related to fuel costs and CO$_2$ content o
 function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
 
 	# Fuel related inputs - read in different files depending on if time domain reduction is activated or not
-	#data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) # Use Time Domain Reduced data for GenX
 		fuels_in = DataFrame(CSV.File(string(joinpath(data_directory,"Fuels_data.csv")), header=true), copycols=true)
@@ -30,7 +29,7 @@ function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString,
 		fuels_in = DataFrame(CSV.File(string(path,sep,"Fuels_data.csv"), header=true), copycols=true)
 	end
 
-	# Fuel costs .&  CO2 emissions rate for each fuel type (stored in dictionary objects)
+	# Fuel costs & CO2 emissions rate for each fuel type (stored in dictionary objects)
 	fuels = names(fuels_in)[2:end] # fuel type indexes
 	costs = Matrix(fuels_in[2:end,2:end])
 	# New addition for variable fuel price
@@ -53,5 +52,5 @@ function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString,
 
 	println("Fuels_data.csv Successfully Read!")
 
-	return inputs_fuel, fuel_costs, fuel_CO2
+	return inputs_fuel
 end

@@ -15,11 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict, fuel_costs::Dict, fuel_CO2::Dict)
+	load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
 Function for reading input parameters related to electricity generators (plus storage and flexible demand resources)
 """
-function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict, fuel_costs::Dict, fuel_CO2::Dict)
+function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
+
+	fuel_costs = inputs_gen["fuel_costs"]
+	fuel_CO2 = inputs_gen["fuel_CO2"]
 
 	# Generator related inputs
 	gen_in = DataFrame(CSV.File(string(path,sep,"Generators_data.csv"), header=true), copycols=true)
@@ -37,7 +40,6 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 	G = inputs_gen["G"]   # Number of resources (generators, storage, DR, and DERs)
 
 	## Defining sets of generation and storage resources
-
 	# Set of storage resources with symmetric charge/discharge capacity
 	inputs_gen["STOR_SYMMETRIC"] = gen_in[gen_in.STOR.==1,:R_ID]
 	# Set of storage resources with asymmetric (separte) charge/discharge capacity components

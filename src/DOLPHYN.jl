@@ -18,6 +18,7 @@ module DOLPHYN
 
 export configure_settings
 export configure_solver
+export load_basic_inputs
 export load_power_inputs
 export load_h2_inputs
 export load_co2_inputs
@@ -69,6 +70,11 @@ include("configure_solver/configure_clp.jl")
 include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
 
+# Load global input data
+include("load_inputs/load_Basic_inputs.jl")
+include("load_inputs/load_fuels_data.jl")
+include("load_inputs/load_period_map.jl")
+
 # Load input data - GenX
 include("GenX/load_inputs/load_generators_data.jl")
 include("GenX/load_inputs/load_generators_variability.jl")
@@ -77,10 +83,8 @@ include("GenX/load_inputs/load_reserves.jl")
 include("GenX/load_inputs/load_cap_reserve_margin.jl")
 include("GenX/load_inputs/load_energy_share_requirement.jl")
 include("GenX/load_inputs/load_co2_cap.jl")
-include("GenX/load_inputs/load_period_map.jl")
 include("GenX/load_inputs/load_minimum_capacity_requirement.jl")
 include("GenX/load_inputs/load_load_data.jl")
-include("GenX/load_inputs/load_fuels_data.jl")
 include("GenX/load_inputs/load_Power_inputs.jl")
 
 # Load time domain reduction related scripts
@@ -97,7 +101,7 @@ include("HSC/load_inputs/load_co2_cap_hsc.jl")
 include("HSC/load_inputs/load_h2_g2p.jl")
 include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
-#Load input data - CSC
+# Load input data - CSC
 include("CSC/load_inputs/load_co2_inputs.jl")
 include("CSC/load_inputs/load_co2_demand.jl")
 include("CSC/load_inputs/load_co2_capture.jl")
@@ -201,9 +205,13 @@ include("co2_cap_power_hsc_csc.jl")
 include("generate_model.jl")
 include("solve_model.jl")
 
+# Write global outputs
+include("write_outputs/dftranspose.jl")
+include("write_outputs/choose_output_dir.jl")
+include("write_outputs/write_status.jl")
+include("write_outputs/write_time_weights.jl")
 
 # Write GenX Outputs
-include("GenX/write_outputs/dftranspose.jl")
 include("GenX/write_outputs/write_capacity.jl")
 include("GenX/write_outputs/write_charge.jl")
 include("GenX/write_outputs/write_charging_cost.jl")
@@ -217,12 +225,9 @@ include("GenX/write_outputs/write_power.jl")
 include("GenX/write_outputs/write_power_balance.jl")
 include("GenX/write_outputs/write_price.jl")
 include("GenX/write_outputs/write_reliability.jl")
-include("GenX/write_outputs/write_status.jl")
 include("GenX/write_outputs/write_storage.jl")
 include("GenX/write_outputs/write_storagedual.jl")
 include("GenX/write_outputs/write_subsidy_revenue.jl")
-include("GenX/write_outputs/write_time_weights.jl")
-include("GenX/write_outputs/choose_output_dir.jl")
 
 include("GenX/write_outputs/capacity_reserve_margin/write_capacity_value.jl")
 include("GenX/write_outputs/capacity_reserve_margin/write_reserve_margin_revenue.jl")
@@ -278,7 +283,7 @@ include("CSC/write_outputs/write_co2_storage_costs.jl")
 include("CSC/write_outputs/write_co2_storage.jl")
 include("CSC/write_outputs/write_CSC_outputs.jl")
 
-# Modeling to generator alternatives
+# Modeling to generate alternatives
 include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end

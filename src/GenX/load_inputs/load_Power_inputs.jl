@@ -50,17 +50,15 @@ function load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 
 	## Read temporal-resolved load data, and clustering information if relevant
 	inputs = load_load_data(setup, path, sep, inputs)
-	## Read fuel cost data, including time-varying fuel costs
-	inputs, cost_fuel, CO2_fuel = load_fuels_data(setup, path, sep, inputs)
 	## Read in generator/resource related inputs
-	inputs = load_generators_data(setup, path, sep, inputs, cost_fuel, CO2_fuel)
+	inputs = load_generators_data(setup, path, sep, inputs)
 	## Read in generator/resource availability profiles
 	inputs = load_generators_variability(setup, path, sep, inputs)
 
 	if setup["CapacityReserveMargin"] == 1
 		inputs = load_cap_reserve_margin(setup, path, sep, inputs)
 		if inputs["Z"] > 1
-			inputs = load_cap_reserve_margin_trans(setup, path, sep, inputs,network_var)
+			inputs = load_cap_reserve_margin_trans(setup, path, sep, inputs, network_var)
 		end
 	end
 
@@ -79,11 +77,6 @@ function load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 
 	if setup["CO2Cap"] >= 1
 		inputs = load_co2_cap(setup, path, sep, inputs)
-	end
-
-	## Read in mapping of modeled periods to representative periods
-	if setup["OperationWrapping"]==1 && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv"))))) # Use Time Domain Reduced data for GenX)
-		inputs = load_period_map(setup, path, sep, inputs)
 	end
 
 	println("CSV Files Successfully Read In From $path$sep")

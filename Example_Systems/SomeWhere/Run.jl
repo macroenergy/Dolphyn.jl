@@ -81,14 +81,19 @@ OPTIMIZER = configure_solver(solver_settings_path, setup["Solver"])
 ### Load inputs
 println("Loading Inputs")
 inputs = Dict()
+
+## Load basic inputs
+inputs = load_basic_inputs(inputs, setup, inpath)
+
+## Load GenX inputs
 inputs = load_power_inputs(inputs, setup, inpath)
 
-### Load H2 inputs if modeling the hydrogen supply chain
+## Load H2 inputs if modeling the hydrogen supply chain
 if setup["ModelH2"] == 1
     inputs = load_h2_inputs(inputs, setup, inpath)
 end
 
-### Load CO2 inputs if modeling the carbon supply chain
+## Load CO2 inputs if modeling the carbon supply chain
 if setup["ModelCO2"] == 1
     inputs = load_co2_inputs(inputs, setup, inpath)
 end
@@ -105,17 +110,17 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 ### Writing output
 println("Writing Output")
 outpath = "$inpath/Results"
-### Write power system output
+## Write power system output
 outpath_Power = "$inpath/Results_Power"
 write_power_outputs(EP, outpath, setup, inputs)
 
-### Write hydrogen supply chain outputs
+## Write hydrogen supply chain outputs
 if setup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, setup, inputs)
 end
 
-### Write carbon supply chain outputs
+## Write carbon supply chain outputs
 if setup["ModelCO2"] == 1
     outpath_CO2 = "$outpath/Results_CSC"
     write_CSC_outputs(EP, outpath_CO2, setup, inputs)
