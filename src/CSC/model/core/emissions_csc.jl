@@ -25,7 +25,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
     dfCO2Capture = inputs["dfCO2Capture"]
 
-    H = inputs["CO2_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
+    CO2_CAPTURE = inputs["CO2_CAPTURE"]     # Number of resources (generators, storage, flexible demand)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
 
@@ -36,7 +36,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     #DAC Negative CO2 emission = CO2 emitted by fuel usage - Total amount of CO2 captured
     @expression(
         EP,
-        eCO2NegativeEmissionsByPlant[k = 1:H, t = 1:T],
+        eCO2NegativeEmissionsByPlant[k in CO2_CAPTURE, t = 1:T],
         EP[:vCO2Capture][k, t] * (
             1 -
             inputs["fuel_CO2"][dfCO2Capture[!, :Fuel][k]] *

@@ -29,13 +29,13 @@ function co2_outputs(EP::Model, inputs::Dict, setup::Dict)
     dfCO2Capture = inputs["dfCO2Capture"]
 
 	# Define sets
-	H = inputs["CO2_RES_ALL"] # Number of Carbon capture units
+	CO2_CAPTURE = inputs["CO2_CAPTURE"] # Number of Carbon capture units
 	T = inputs["T"]     # Number of time steps (hours)
 
 	### Variables ###
 
     # CO2 captured from carbon capture resource k (tonnes of CO2/hr) in time t
-	@variable(EP, vCO2Capture[k = 1:H, t = 1:T] >= 0 )
+	@variable(EP, vCO2Capture[k in CO2_CAPTURE, t = 1:T] >= 0 )
 
 	### Expressions ###
 
@@ -49,14 +49,14 @@ function co2_outputs(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 0 --> objective function is in $
 
 	if setup["ParameterScale"] ==1
-		@expression(EP, eCCO2CaptureVar_out[k = 1:H,t = 1:T], 
+		@expression(EP, eCCO2CaptureVar_out[k in CO2_CAPTURE,t = 1:T], 
 		(inputs["omega"][t] * (dfCO2Capture[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfCO2Capture[!,:Fuel][k]][t] * dfCO2Capture[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vCO2Capture[k,t]))
 	else
-		@expression(EP, eCCO2CaptureVar_out[k = 1:H,t = 1:T], 
+		@expression(EP, eCCO2CaptureVar_out[k in CO2_CAPTURE,t = 1:T], 
 		(inputs["omega"][t] * ((dfCO2Capture[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfCO2Capture[!,:Fuel][k]][t] * dfCO2Capture[!,:etaFuel_MMBtu_p_tonne][k])) * vCO2Capture[k,t]))
 	end
 
-	@expression(EP, eTotalCCO2CaptureVarOutT[t=1:T], sum(eCCO2CaptureVar_out[k,t] for k in 1:H))
+	@expression(EP, eTotalCCO2CaptureVarOutT[t=1:T], sum(eCCO2CaptureVar_out[k,t] for k in CO2_CAPTURE))
 	@expression(EP, eTotalCCO2CaptureVarOut, sum(eTotalCCO2CaptureVarOutT[t] for t in 1:T))
 	
 	# Add total variable discharging cost contribution to the objective function

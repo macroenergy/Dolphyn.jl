@@ -70,6 +70,11 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	EP[:eCO2Balance] += eCO2CaptureCommit
 
+	# Power Balance
+	@constraints(EP, begin
+		[k in CO2_CAPTURE_COMMIT, t = 1:T], EP[:vPCO2][k,t] == EP[:vCO2Capture][k,t] * dfCO2Capture[!,:etaPCO2_MWh_p_tonne][k]
+	end)
+	
 	# Power Consumption for CO2 Capture
 	if setup["ParameterScale"] ==1
 		@expression(EP, ePowerBalanceCO2CaptureCommit[t=1:T, z=1:Z],
@@ -94,11 +99,6 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
             set_integer(EP[:vCO2CaptureNewCap][k])
 		end
 	end # END unit commitment configuration
-	
-	# Power Balance
-	@constraints(EP, begin
-		[k in CO2_CAPTURE_COMMIT, t = 1:T], EP[:vPCO2][k,t] == EP[:vCO2Capture][k,t] * dfCO2Capture[!,:etaPCO2_MWh_p_tonne][k]
-	end)
 
 	### Capacitated limits on unit commitment decision variables (Constraints #1-3)
 	@constraints(EP, begin

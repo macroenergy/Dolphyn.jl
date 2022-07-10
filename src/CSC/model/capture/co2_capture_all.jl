@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 The co2 capture module creates decision variables, expressions, and constraints related to carbon capture infrastructure
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
 """
-
 function co2_capture_all(EP::Model, inputs::Dict, setup::Dict)
 
 	dfCO2Capture = inputs["dfCO2Capture"]
@@ -34,7 +33,7 @@ function co2_capture_all(EP::Model, inputs::Dict, setup::Dict)
 	# Define variables needed across both commit and no commit sets
 
 	# Power required by carbon capture resource k (MW)
-	@variable(EP, vPCO2[k in CO2_CAPTURE, t = 1:T] >= 0 )
+	@variable(EP, vPCO2[k in CO2_CAPTURE, t = 1:T] >= 0)
 
 	### Constratints ###
 
