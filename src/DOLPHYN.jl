@@ -24,6 +24,7 @@ export load_h2_inputs
 export load_co2_inputs
 export generate_model
 export solve_model
+export write_basic_outputs
 export write_power_outputs
 export write_HSC_outputs
 export write_CSC_outputs
@@ -71,9 +72,10 @@ include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
 
 # Load global input data
-include("load_inputs/load_Basic_inputs.jl")
 include("load_inputs/load_fuels_data.jl")
 include("load_inputs/load_period_map.jl")
+
+include("load_inputs/load_Basic_inputs.jl")
 
 # Load input data - GenX
 include("GenX/load_inputs/load_generators_data.jl")
@@ -96,18 +98,20 @@ include("HSC/load_inputs/load_h2_demand.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_truck.jl")
-include("HSC/load_inputs/load_H2_inputs.jl")
 include("HSC/load_inputs/load_co2_cap_hsc.jl")
 include("HSC/load_inputs/load_h2_g2p.jl")
 include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
+include("HSC/load_inputs/load_H2_inputs.jl")
+
 # Load input data - CSC
-include("CSC/load_inputs/load_co2_inputs.jl")
 include("CSC/load_inputs/load_co2_demand.jl")
 include("CSC/load_inputs/load_co2_capture.jl")
 include("CSC/load_inputs/load_co2_capture_variability.jl")
 include("CSC/load_inputs/load_co2_price_csc.jl")
 include("CSC/load_inputs/load_co2_storage.jl")
+
+include("CSC/load_inputs/load_CO2_inputs.jl")
 
 # Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
@@ -210,6 +214,8 @@ include("write_outputs/dftranspose.jl")
 include("write_outputs/choose_output_dir.jl")
 include("write_outputs/write_status.jl")
 include("write_outputs/write_time_weights.jl")
+
+include("write_outputs/write_Basic_outputs.jl")
 
 # Write GenX Outputs
 include("GenX/write_outputs/write_capacity.jl")

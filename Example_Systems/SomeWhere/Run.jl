@@ -110,9 +110,11 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 ### Writing output
 println("Writing Output")
 outpath = "$inpath/Results"
+write_basic_outputs(EP, outpath, setup, inputs)
+
 ## Write power system output
 outpath_Power = "$inpath/Results_Power"
-write_power_outputs(EP, outpath, setup, inputs)
+write_power_outputs(EP, outpath_Power, setup, inputs)
 
 ## Write hydrogen supply chain outputs
 if setup["ModelH2"] == 1

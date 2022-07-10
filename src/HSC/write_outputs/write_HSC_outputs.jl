@@ -36,6 +36,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     else
         sep = "/"
     end
+    
     # Create directory if it does not exist
     if !(isdir(path))
         mkdir(path)

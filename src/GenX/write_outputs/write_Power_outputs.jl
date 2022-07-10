@@ -30,36 +30,11 @@ function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, input
         sep = "/"
 	end
 
-    if !haskey(setup, "OverwriteResults") || setup["OverwriteResults"] == 1
-        # Overwrite existing results if dir exists
-        # This is the default behaviour when there is no flag, to avoid breaking existing code
-        if !(isdir(path))
-		    mkdir(path)
-	    end
-    else
-        # Find closest unused ouput directory name and create it
-        path = choose_output_dir(path)
+	# Create directory if it does not exist
+    if !(isdir(path))
         mkdir(path)
     end
-
-	# https://jump.dev/MathOptInterface.jl/v0.9.10/apireference/#MathOptInterface.TerminationStatusCode
-	status = termination_status(EP)
-
-	## Check if solved sucessfully - time out is included
-	if status != MOI.OPTIMAL && status != MOI.LOCALLY_SOLVED
-		if status != MOI.TIME_LIMIT # Model failed to solve, so record solver status and exit
-			write_status(path, sep, inputs, setup, EP)
-			return
-			# Model reached timelimit but failed to find a feasible solution
-	#### Aaron Schwartz - Not sure if the below condition is valid anymore. We should revisit ####
-		elseif isnan(objective_value(EP))==true
-			# Model failed to solve, so record solver status and exit
-			write_status(path, sep, inputs, setup, EP)
-			return
-		end
-	end
-
-	write_status(path, sep, inputs, setup, EP)
+	
 	elapsed_time_costs = @elapsed write_costs(path, sep, inputs, setup, EP)
 	println("Time elapsed for writing costs is")
 	println(elapsed_time_costs)
@@ -125,7 +100,6 @@ function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, input
 		end
 	end
 
-
 	# Output additional variables related inter-period energy transfer via storage
 	if setup["OperationWrapping"] == 1 && !isempty(inputs["STOR_LONG_DURATION"])
 		elapsed_time_lds_init = @elapsed write_opwrap_lds_stor_init(path, sep, inputs, setup, EP)
@@ -148,9 +122,6 @@ function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, input
 		dfSubRevenue, dfRegSubRevenue = write_subsidy_revenue(path, sep, inputs, setup, dfCap, EP)
 	end
 
-	elapsed_time_time_weights = @elapsed write_time_weights(path, sep, inputs)
-	println("Time elapsed for writing time weights is")
-	println(elapsed_time_time_weights)
 	dfESR = DataFrame()
 	dfESRRev = DataFrame()
 	if setup["EnergyShareRequirement"]==1 && has_duals(EP) == 1
@@ -173,6 +144,7 @@ function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, input
 	elapsed_time_net_rev = @elapsed write_net_revenue(path, sep, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
 	println("Time elapsed for writing net revenue is")
 	println(elapsed_time_net_rev)
-	## Print confirmation
-	println("Wrote outputs to $path$sep")
+
+	println("Wrote power outputs to $path$sep")
+
 end # END output()
