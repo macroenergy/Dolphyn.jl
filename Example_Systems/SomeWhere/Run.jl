@@ -113,7 +113,7 @@ outpath = "$inpath/Results"
 write_basic_outputs(EP, outpath, setup, inputs)
 
 ## Write power system output
-outpath_Power = "$inpath/Results_Power"
+outpath_Power = "$outpath/Results_Power"
 write_power_outputs(EP, outpath_Power, setup, inputs)
 
 ## Write hydrogen supply chain outputs
