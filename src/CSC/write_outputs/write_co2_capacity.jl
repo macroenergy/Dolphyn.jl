@@ -1,5 +1,5 @@
 """
-CAPTUREX: An Configurable Capacity Expansion Model
+DOLPHYN: An Configurable Capacity Expansion Model
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU CAPTUREeral Public License as published by

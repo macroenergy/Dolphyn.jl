@@ -20,10 +20,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module defines the  decision variable  representing charging and carbon components of hydrogen storage technologies.
 
 """
-
 function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
-	println("CO2 storage Investment Module")
+	println("CO2 Storage Investment Module")
 
 	dfCO2Stor = inputs["dfCO2Stor"]
 
@@ -31,9 +30,7 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	NEW_CAP_CO2_CHARGE = inputs["NEW_CAP_CO2_CHARGE"] # Set of asymmetric charge storage resources eligible for new charge capacity
 
-    NEW_CAP_CO2_CARBON = inputs["NEW_CAP_CO2_CARBON"] # set of storage resource eligible for new carbon capacity investment
-
-    
+    NEW_CAP_CO2_STORAGE = inputs["NEW_CAP_CO2_STORAGE"] # set of storage resource eligible for new carbon capacity investment
 
 	### Variables ###
 
@@ -43,7 +40,7 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	@variable(EP, vCO2CAPCHARGE[y in NEW_CAP_CO2_CHARGE] >= 0)
     
 	# New installed carbon capacity of resource "y"
-	@variable(EP, vCO2CAPCARBON[y in NEW_CAP_CO2_CARBON] >= 0)
+	@variable(EP, vCO2CAPCARBON[y in NEW_CAP_CO2_STORAGE] >= 0)
 
 	### Expressions ###
 	# Total available charging capacity in tonnes/hour

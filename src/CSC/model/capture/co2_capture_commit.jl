@@ -21,7 +21,6 @@ The co2_capture_commit module creates decision variables, expressions, and const
 
 Documentation to follow ******
 """
-
 function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Carbon Capture (Unit Commitment) Module")
@@ -39,6 +38,14 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
 	hours_per_subperiod = inputs["hours_per_subperiod"]
+    
+	###Variables###
+	# Commitment state variable
+	@variable(EP, vCO2CaptureCommit[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
+	# Start up variable
+	@variable(EP, vCO2CaptureStart[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
+	# Shutdown Variable
+	@variable(EP, vCO2CaptureShut[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
 
 	###Expressions###
 
@@ -46,7 +53,7 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 	# Startup costs of "generation" for resource "y" during hour "t"
 	#  ParameterScale = 1 --> objective function is in million $
 	#  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"] ==1 
+	if setup["ParameterScale"] == 1 
 		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_CO2_Start"][k]*vCO2CaptureStart[k,t]/ModelScalingFactor^2))
 	else
 		@expression(EP, eCO2CaptureCStart[k in CO2_CAPTURE_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_CO2_Start"][k]*vCO2CaptureStart[k,t]))
@@ -56,14 +63,6 @@ function co2_capture_commit(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eTotalCO2CaptureCStart, sum(eTotalCO2CaptureCStartT[t] for t=1:T))
 
 	EP[:eObj] += eTotalCO2CaptureCStart
-
-    ###Variables###
-	# Commitment state variable
-	@variable(EP, vCO2CaptureCommit[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
-	# Start up variable
-	@variable(EP, vCO2CaptureStart[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
-	# Shutdown Variable
-	@variable(EP, vCO2CaptureShut[k in CO2_CAPTURE_COMMIT, t=1:T] >= 0)
 
 	# CO2 Balance expressions
 	@expression(EP, eCO2CaptureCommit[t=1:T, z=1:Z],

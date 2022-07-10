@@ -110,7 +110,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" H2 balance constraint
 	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
 
-	## Only activate when carbon capture utilization is online
 	# Initialize Carbon Balance Expression
 	# Expression for "baseline" CO2 balance constraint
 	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
@@ -182,6 +181,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if !isempty(inputs["FLEX"])
 		EP = flexible_demand(EP, inputs)
 	end
+	
 	# Model constraints, variables, expression related to thermal resource technologies
 	if !isempty(inputs["THERM_ALL"])
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])

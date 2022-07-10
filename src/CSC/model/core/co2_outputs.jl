@@ -22,22 +22,20 @@ This module defines the production decision variable  representing carbon inject
 This module additionally defines contributions to the objective function from variable costs of capture (variable O&M plus fuel cost) from all resources over all time periods.
 
 """
-
 function co2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
-	println("CO2 capture module")
+	println("CO2 Capture Module")
 
     dfCO2Capture = inputs["dfCO2Capture"]
 
-	#Define sets
-	H = inputs["CO2_RES_ALL"] #Number of Carbon capture units
+	# Define sets
+	H = inputs["CO2_RES_ALL"] # Number of Carbon capture units
 	T = inputs["T"]     # Number of time steps (hours)
-
 
 	### Variables ###
 
-    #CO2 captured from carbon capture resource k (tonnes of CO2/hr) in time t
-	@variable(EP, vCO2Capture[k=1:H, t = 1:T] >= 0 )
+    # CO2 captured from carbon capture resource k (tonnes of CO2/hr) in time t
+	@variable(EP, vCO2Capture[k = 1:H, t = 1:T] >= 0 )
 
 	### Expressions ###
 

@@ -40,12 +40,12 @@ function co2_investment(EP::Model, inputs::Dict, setup::Dict)
 	### Expressions ###
 	# Cap_Size is set to 1 for all variables when unit UCommit == 0
 	# When UCommit > 0, Cap_Size is set to 1 for all variables except those where THERM == 1
-	@expression(EP, eCO2CaptureTotalCap[k in 1:H],
-			if k in CO2_CAPTURE_COMMIT
-				dfCO2Capture[!,:Cap_Size_tonne_p_hr][k] * EP[:vCO2CaptureNewCap][k]
-			else
-				EP[:vCO2CaptureNewCap][k]
-			end
+	@expression(EP, eCO2CaptureTotalCap[k in CO2_RES_ALL],
+		if k in CO2_CAPTURE_NEW_CAP
+			dfCO2Capture[!,:Cap_Size_tonne_p_hr][k] * EP[:vCO2CaptureNewCap][k]
+		else
+			EP[:vCO2CaptureNewCap][k]
+		end
 	)
 
 	## Objective Function Expressions ##
@@ -53,10 +53,10 @@ function co2_investment(EP::Model, inputs::Dict, setup::Dict)
 	# Sum individual resource contributions to fixed costs to get total fixed costs
 	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	#  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"] ==1 
+	if setup["ParameterScale"] == 1 
 		# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
 		# If resource is not eligible for new capacity, fixed costs are only O&M costs
-		@expression(EP, eCO2CaptureCFix[k in 1:H],
+		@expression(EP, eCO2CaptureCFix[k in CO2_RES_ALL],
 			if k in CO2_CAPTURE_COMMIT
 				1/ModelScalingFactor^2*(dfCO2Capture[!,:Inv_Cost_p_tonne_p_hr_yr][k] * dfCO2Capture[!,:Cap_Size_tonne_p_hr][k] * EP[:vCO2CaptureNewCap][k] + dfCO2Capture[!,:Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eCO2CaptureTotalCap[k])
 			else
@@ -66,34 +66,27 @@ function co2_investment(EP::Model, inputs::Dict, setup::Dict)
 	else
 		# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
 		# If resource is not eligible for new capacity, fixed costs are only O&M costs
-		@expression(EP, eCO2CaptureCFix[k in 1:H],
+		@expression(EP, eCO2CaptureCFix[k in CO2_RES_ALL],
 			if k in CO2_CAPTURE_COMMIT
 				dfCO2Capture[!,:Inv_Cost_p_tonne_p_hr_yr][k] * dfCO2Capture[!,:Cap_Size_tonne_p_hr][k] * EP[:vCO2CaptureNewCap][k] + dfCO2Capture[!,:Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eCO2CaptureTotalCap[k]
 			else
 				dfCO2Capture[!,:Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vCO2CaptureNewCap][k] + dfCO2Capture[!,:Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eCO2CaptureTotalCap[k]
 			end
 		)
-
 	end
-
-	#@expression(EP, eTotalCO2CaptureCFix, sum(EP[:eCO2CaptureCFix][k] for k in 1:H))
-
 
 	# # Sum individual resource contributions to fixed costs to get total fixed costs
 	# #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	# #  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"] ==1 
-		@expression(EP, eTotalCO2CaptureCFix, sum(EP[:eCO2CaptureCFix][k]/(ModelScalingFactor)^2 for k in 1:H))
+	if setup["ParameterScale"] == 1 
+		@expression(EP, eTotalCO2CaptureCFix, sum(EP[:eCO2CaptureCFix][k]/(ModelScalingFactor)^2 for k in CO2_RES_ALL))
 	else
-	 	@expression(EP, eTotalCO2CaptureCFix, sum(EP[:eCO2CaptureCFix][k] for k in 1:H))
+	 	@expression(EP, eTotalCO2CaptureCFix, sum(EP[:eCO2CaptureCFix][k] for k in CO2_RES_ALL))
 	end
-
 
 	# Add term to objective function expression
 	EP[:eObj] += eTotalCO2CaptureCFix
 
-
     return EP
-
 
 end

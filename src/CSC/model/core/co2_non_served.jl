@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module defines the non-serverd carbon laod on zone $z$ by at time period $t$.
 
 """
-
 function co2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 
     println("Carbon Non-served Module")
@@ -65,7 +64,6 @@ function co2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
     else
         @expression(EP, eTotalCO2CNSE, sum(eTotalCO2CNSET[t] for t = 1:T))
     end
-
 
     # Add total cost contribution of non-served energy/curtailed demand to the objective function
     EP[:eObj] += eTotalCO2CNSE

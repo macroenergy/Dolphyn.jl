@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw """
+	load_co2_demand(setup::Dict, path::AbstractString, sep::AbstractString, CSC_inputs_load::Dict)
+
+
+"""
 function load_co2_demand(setup::Dict, path::AbstractString, sep::AbstractString, CSC_inputs_load::Dict)
     
 	#data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
@@ -28,7 +33,6 @@ function load_co2_demand(setup::Dict, path::AbstractString, sep::AbstractString,
 	CSC_inputs_load["CO2_SEG"]=size(collect(skipmissing(CO2_load_in[!,:Demand_Segment])),1)
 
     # Demand in tonnes per hour for each zone
-	#println(names(load_in))
 	start = findall(s -> s == "Load_CO2_tonne_per_hr_z1", names(CO2_load_in))[1] #gets the starting column number of all the columns, with header "Load_CO2_z1"
 	
 	# Max value of non-served energy in $/(tonne)
@@ -46,9 +50,9 @@ function load_co2_demand(setup::Dict, path::AbstractString, sep::AbstractString,
 		# Maximum hourly demand curtailable as % of the max demand (for each segment)
 		CSC_inputs_load["pMax_CO2_D_Curtail"][s] = collect(skipmissing(CO2_load_in[!,:Max_Demand_Curtailment]))[s]
 	end
+
 	println("CSC_load_data.csv Successfully Read!")
 
     return CSC_inputs_load
 
 end
-

@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to the hydrogen transmission network
 """
-
 function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
     # Network zones inputs and Network topology inputs
