@@ -8,7 +8,7 @@
 #SBATCH --mail-user="2845024327@qq.com"
 
 #SBATCH -p C032M0128G
-#SBATCH -qos=low
+#SBATCH --qos=low
 
 #SBATCH -N 1
 #SBATCH -n 1
