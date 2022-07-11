@@ -30,7 +30,6 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["CO2_CAPTURE"]		#NUmber of carbon capture units 
 	
 	CO2_CAPTURE_NO_COMMIT = inputs["CO2_CAPTURE_NO_COMMIT"]
 	

@@ -41,6 +41,9 @@ function load_co2_capture(setup::Dict, path::AbstractString, sep::AbstractString
     # Set of all CO2 capture Units - can be either commit or new commit
     inputs_capture["CO2_CAPTURE"] = union(inputs_capture["CO2_CAPTURE_COMMIT"], inputs_capture["CO2_CAPTURE_NO_COMMIT"])
 
+	# Number of CO2 capture units
+	inputs_capture["CO2_RES_ALL"] = size(collect(skipmissing(co2_capture[!,:R_ID])),1)
+
     # Set of all resources eligible for new capacity - includes both storage and capture
 	# DEV NOTE: Should we allow investment in flexible demand capacity later on?
 	inputs_capture["CO2_CAPTURE_NEW_CAP"] = intersect(co2_capture[co2_capture.New_Build.==1 ,:R_ID], co2_capture[co2_capture.Max_Cap_tonne_p_hr.!=0,:R_ID]) 

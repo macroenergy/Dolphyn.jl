@@ -25,26 +25,25 @@ function co2_capture_all(EP::Model, inputs::Dict, setup::Dict)
 	dfCO2Capture = inputs["dfCO2Capture"]
 
 	# Define sets
-	CO2_CAPTURE = inputs["CO2_CAPTURE"]
-
+	K = inputs["CO2_RES_ALL"]
 	T = inputs["T"]     # Number of time steps (hours)
 
 	####Variables####
 	# Define variables needed across both commit and no commit sets
 
 	# Power required by carbon capture resource k (MW)
-	@variable(EP, vPCO2[k in CO2_CAPTURE, t = 1:T] >= 0)
+	@variable(EP, vPCO2[k in 1:K, t = 1:T] >= 0)
 
 	### Constratints ###
 
 	## Constraints on new built capacity
 	# Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap is >= Max_Cap and lead to infeasabilty
-	@constraint(EP, cCO2CaptureMaxCap[k in intersect(dfCO2Capture[dfCO2Capture.Max_Cap_tonne_p_hr.>0,:R_ID], CO2_CAPTURE)],EP[:eCO2CaptureTotalCap][k] <= dfCO2Capture[!,:Max_Cap_tonne_p_hr][k])
+	@constraint(EP, cCO2CaptureMaxCap[k in intersect(dfCO2Capture[dfCO2Capture.Max_Cap_tonne_p_hr.>0,:R_ID], 1:K)],EP[:eCO2CaptureTotalCap][k] <= dfCO2Capture[!,:Max_Cap_tonne_p_hr][k])
 
 	# Constraint on minimum capacity (if applicable) [set input to -1 if no constraint on minimum capacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap is <= Min_Cap and lead to infeasabilty
-	@constraint(EP, cCO2CaptureMinCap[k in intersect(dfCO2Capture[dfCO2Capture.Min_Cap_tonne_p_hr.>0,:R_ID], CO2_CAPTURE)], EP[:eCO2CaptureTotalCap][k] >= dfCO2Capture[!,:Min_Cap_tonne_p_hr][k])
+	@constraint(EP, cCO2CaptureMinCap[k in intersect(dfCO2Capture[dfCO2Capture.Min_Cap_tonne_p_hr.>0,:R_ID], 1:K)], EP[:eCO2CaptureTotalCap][k] >= dfCO2Capture[!,:Min_Cap_tonne_p_hr][k])
 
 	return EP
 

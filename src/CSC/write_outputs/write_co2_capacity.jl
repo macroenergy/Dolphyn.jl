@@ -31,8 +31,6 @@ function write_co2_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		end
 	end
 
-
-
 	dfCap = DataFrame(
 		Resource = inputs["CO2_RESOURCES_NAME"], Zone = dfCO2Capture[!,:Zone],
 		StartCap = dfCO2Capture[!,:Existing_Cap_tonne_p_hr],
@@ -40,15 +38,16 @@ function write_co2_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		EndCap = value.(EP[:eCO2CaptureTotalCap]),
 	)
 
-
 	total = DataFrame(
-			Resource = "Total", Zone = "n/a",
-			StartCap = sum(dfCap[!,:StartCap]),
-			NewCap = sum(dfCap[!,:NewCap]),
-			EndCap = sum(dfCap[!,:EndCap]),
-		)
+		Resource = "Total", Zone = "n/a",
+		StartCap = sum(dfCap[!,:StartCap]),
+		NewCap = sum(dfCap[!,:NewCap]),
+		EndCap = sum(dfCap[!,:EndCap]),
+	)
 
 	dfCap = vcat(dfCap, total)
+
 	CSV.write(string(path,sep,"CSC_capture_capacity.csv"), dfCap)
+	
 	return dfCap
 end

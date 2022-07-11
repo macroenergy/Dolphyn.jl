@@ -28,30 +28,30 @@ Function for the entry-point for writing the different output files. From here, 
 """
 function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
-  ## Use appropriate directory separator depending on Mac or Windows config
-  if Sys.isunix()
-    sep = "/"
+    ## Use appropriate directory separator depending on Mac or Windows config
+    if Sys.isunix()
+        sep = "/"
     elseif Sys.iswindows()
-    sep = "\U005c"
+        sep = "\U005c"
     else
         sep = "/"
-  end
+    end
     # Create directory if it does not exist
     if !(isdir(path))
-      mkdir(path)
+        mkdir(path)
     end
 
     write_co2_capacity(path, sep, inputs, setup, EP)
     write_co2_capture(path, sep, inputs, setup, EP)
     write_co2_costs(path, sep, inputs, setup, EP)
-    write_co2_balance(path,sep,inputs, setup, EP)
-    write_co2_emissions(path,sep,inputs, setup, EP)
+    write_co2_balance(path, sep, inputs, setup, EP)
+    write_co2_emissions(path, sep, inputs, setup, EP)
 
     #write_co2_storage(path, sep, inputs, setup, EP)
     write_co2_storage_capacity(path, sep, inputs, setup, EP)
     #write_co2_storage_costs(path, sep, inputs, setup, EP)
 
-  ## Print confirmation
-  println("Wrote outputs CSC outputs to $path$sep")
+    ## Print confirmation
+    println("Wrote outputs CSC outputs to $path$sep")
 
 end # END output()
