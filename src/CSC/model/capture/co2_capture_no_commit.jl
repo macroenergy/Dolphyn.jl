@@ -20,10 +20,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 The co2_capture_no_commit module creates decision variables, expressions, and constraints related to various carbon capture technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
 
 """
-
 function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Carbon Capture (Unit Commitment) Module")
+	println("Carbon Capture (No Unit Commitment) Module")
 
 	# Rename CO2Capture dataframe
 	dfCO2Capture = inputs["dfCO2Capture"]

@@ -21,7 +21,6 @@ This module defines the basic decision variables and common expressions related 
 capability.
 
 """
-
 function co2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all carbon storage resources
     println("CO2 Storage Core Resources Module")

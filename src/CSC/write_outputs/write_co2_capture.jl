@@ -49,7 +49,7 @@ function write_co2_capture(path::AbstractString, sep::AbstractString, inputs::Di
 	rename!(total,auxNew_Names)
 	dfCO2CaptureOut = vcat(dfCO2CaptureOut, total)
 
- 	CSV.write(string(path,sep,"CSC_co2_capture.csv"), dftranspose(dfCO2CaptureOut, false), writeheader=false)
+ 	CSV.write(string(path,sep,"DAC_co2_capture.csv"), dftranspose(dfCO2CaptureOut, false), writeheader=false)
 	
 	return dfCO2CaptureOut
 
