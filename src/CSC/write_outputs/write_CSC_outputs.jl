@@ -47,8 +47,33 @@ function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_co2_capture_costs(path, sep, inputs, setup, EP)
     write_co2_negative_emission(path, sep, inputs, setup, EP)
     write_co2_fuel_emission(path, sep, inputs, setup, EP)
-    write_co2_power_consumption(path, sep, inputs, setup, EP)
+    write_co2_capture_power_consumption(path, sep, inputs, setup, EP)
+    
+    write_co2_storage_injection_power_consumption(path, sep, inputs, setup, EP)
+    write_co2_storage_injection_plant(path, sep, inputs, setup, EP)
+    write_co2_storage_injection_zone(path, sep, inputs, setup, EP)
+    write_co2_storage_injection_costs(path, sep, inputs, setup, EP)
+    write_co2_storage_injection_capacity(path, sep, inputs, setup, EP)
 
+    write_co2_capture_compression_power_consumption(path, sep, inputs, setup, EP)
+    write_co2_capture_compression_plant(path, sep, inputs, setup, EP)
+    write_co2_capture_compression_zone(path, sep, inputs, setup, EP)
+    write_co2_capture_compression_costs(path, sep, inputs, setup, EP)
+    write_co2_capture_compression_capacity(path, sep, inputs, setup, EP)
+
+    if setup["ModelCO2Pipelines"] ==1 
+
+      write_co2_pipeline_flow(path, sep, inputs, setup, EP)
+      write_co2_pipeline_expansion(path, sep, inputs, setup, EP)
+      write_co2_pipeline_power_consumption(path, sep, inputs, setup, EP)
+      write_co2_pipeline_power_consumption_comp(path, sep, inputs, setup, EP)
+
+      if setup["CO2Pipeline_Loss"] ==1 
+        write_co2_pipeline_loss(path, sep, inputs, setup, EP)
+      end
+    end
+    
+    
   ## Print confirmation
   println("Wrote outputs CSC outputs to $path$sep")
 

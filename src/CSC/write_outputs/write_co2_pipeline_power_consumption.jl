@@ -14,32 +14,32 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_co2_power_consumption(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfCO2Capture = inputs["dfCO2Capture"]
+function write_co2_pipeline_power_consumption(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
 	## Carbon balance for each zone
-	dfCO2NegEmi = Array{Any}
+	dfCO2PipePowerConsumption = Array{Any}
 	rowoffset=3
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 1)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Consumption"]
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["CO2 Pipeline Power Consumption"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vPower_DAC][dfCO2Capture[(dfCO2Capture[!,:CO2_CAPTURE_TYPE].>0) .&  (dfCO2Capture[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,1]= value(EP[:ePowerDemandCO2Pipe_zt][z,t])
 	   	end
 
 		if z==1
-			dfCO2NegEmi =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
+			dfCO2PipePowerConsumption =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
 		else
-		    dfCO2NegEmi = hcat(dfCO2NegEmi, dfTemp1)
+		    dfCO2PipePowerConsumption = hcat(dfCO2PipePowerConsumption, dfTemp1)
 		end
 	end
-	for c in 2:size(dfCO2NegEmi,2)
-		dfCO2NegEmi[rowoffset,c]=sum(inputs["omega"].*dfCO2NegEmi[(rowoffset+1):size(dfCO2NegEmi,1),c])
+	for c in 2:size(dfCO2PipePowerConsumption,2)
+		dfCO2PipePowerConsumption[rowoffset,c]=sum(inputs["omega"].*dfCO2PipePowerConsumption[(rowoffset+1):size(dfCO2PipePowerConsumption,1),c])
 	end
-	dfCO2NegEmi = DataFrame(dfCO2NegEmi, :auto)
-	CSV.write(string(path,sep,"CSC_co2_power_consumption_zone.csv"), dfCO2NegEmi, writeheader=false)
+	dfCO2PipePowerConsumption = DataFrame(dfCO2PipePowerConsumption, :auto)
+	CSV.write(string(path,sep,"CSC_co2_pipeline_power_consumption_zone.csv"), dfCO2PipePowerConsumption, writeheader=false)
 end

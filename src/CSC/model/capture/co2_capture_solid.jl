@@ -27,6 +27,9 @@ function co2_capture_solid(EP::Model, inputs::Dict, setup::Dict)
 	#Rename CO2Capture dataframe
 	dfCO2Capture = inputs["dfCO2Capture"]
 
+	DAC_Capacity_Min_Limit = dfCO2Capture[!,:MinCapacity_Mt_y]/(365*24)*10^6 # t/h
+	DAC_Capacity_Max_Limit = dfCO2Capture[!,:MaxCapacity_Mt_y]/(365*24)*10^6 # t/h
+
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	
@@ -65,8 +68,9 @@ function co2_capture_solid(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eDAC_CO2_Captured_Solid[t=1:T, z=1:Z],
 	sum(EP[:vDAC_CO2_Captured][k,t] for k in intersect(CO2_CAPTURE_SOLID, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
-	############ ADD TO CO2 BALANCE
-
+	#ADD TO CO2 BALANCE
+	EP[:eCaptured_CO2_Balance] += eDAC_CO2_Captured_Solid
+	
 	#Power Balance
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
 		@expression(EP, ePower_Balance_DAC_Solid[t=1:T, z=1:Z],
@@ -146,12 +150,54 @@ function co2_capture_solid(EP::Model, inputs::Dict, setup::Dict)
 	(1 - EP[:vDAC_Solid_Online][k,t]) >= sum(EP[:vDAC_Solid_Shut][k, hoursbefore_DAC(p,t,0:(Down_Time[k]-1))]))
 
 	##Min and max capture
+	#Old formulation
+
+	#@constraint(EP,cMin_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDAC_CO2_Captured][k,t] >= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * dfCO2Capture[!,:CO2_Capture_Min_Output][k])
+
+	#@constraint(EP,cMax_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDAC_CO2_Captured][k,t] <= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * inputs["CO2_Capture_Max_Output"][k,t])
+		
+	#New formulation
+	#Dummy capacity min and max
 	@constraint(EP,cMin_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
-	EP[:vDAC_CO2_Captured][k,t] >= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * dfCO2Capture[!,:CO2_Capture_Min_Output][k])
+	EP[:vDAC_CO2_Captured][k,t] >= EP[:vDummy_Capacity_DAC_per_type][k,t]  * dfCO2Capture[!,:CO2_Capture_Min_Output][k])
 
 	@constraint(EP,cMax_CO2_Captured_DAC_Solid_per_type_per_time[k in CO2_CAPTURE_SOLID, t = 1:T],
-	EP[:vDAC_CO2_Captured][k,t] <= EP[:vCapacity_DAC_per_type][k] * EP[:vDAC_Solid_Online][k,t] * inputs["CO2_Capture_Max_Output"][k,t])
+	EP[:vDAC_CO2_Captured][k,t] <= EP[:vDummy_Capacity_DAC_per_type][k,t] * inputs["CO2_Capture_Max_Output"][k,t])
 		
+	#Big M for online plant
+	#M = 10000000
+	#@constraint(EP,cBigM_Online_Min[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDummy_Capacity_DAC_per_type][k,t] >= EP[:vCapacity_DAC_per_type][k] - (1 - EP[:vDAC_Solid_Online][k,t]) * M)
+
+	#@constraint(EP,cBigM_Online_Max[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDummy_Capacity_DAC_per_type][k,t] <= EP[:vCapacity_DAC_per_type][k])
+
+	#Big M for offline plant
+	#@constraint(EP,cBigM_Offline_Min[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDummy_Capacity_DAC_per_type][k,t] >= 0)
+
+	#@constraint(EP,cBigM_Offline_Max[k in CO2_CAPTURE_SOLID, t = 1:T],
+	#EP[:vDummy_Capacity_DAC_per_type][k,t] <= EP[:vDAC_Solid_Online][k,t] * M)
+
+	#Standard Linearization formulation
+	#Eq 1 min
+	@constraint(EP,cStan_Lin_1_Min[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] >= DAC_Capacity_Min_Limit[k] * EP[:vDAC_Solid_Online][k,t])
+
+	#Eq 1 max
+	@constraint(EP,cStan_Lin_1_Max[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] <= DAC_Capacity_Max_Limit[k] * EP[:vDAC_Solid_Online][k,t])
+
+	#Eq 2 min
+	@constraint(EP,cStan_Lin_2_Min[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] >= EP[:vCapacity_DAC_per_type][k] - (1 - EP[:vDAC_Solid_Online][k,t]) * DAC_Capacity_Max_Limit[k])
+
+	#Eq 2 max
+	@constraint(EP,cStan_Lin_2_Max[k in CO2_CAPTURE_SOLID, t = 1:T],
+	EP[:vDummy_Capacity_DAC_per_type][k,t] <= EP[:vCapacity_DAC_per_type][k] - (1 - EP[:vDAC_Solid_Online][k,t]) * DAC_Capacity_Min_Limit[k])
+
 	return EP
 
 end

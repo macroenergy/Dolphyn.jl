@@ -26,6 +26,12 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 	dfCO2Capture = inputs["dfCO2Capture"]
     CO2_RES_ALL = inputs["CO2_RES_ALL"]
 
+    dfCO2Storage = inputs["dfCO2Storage"]
+	CO2_STOR_ALL = inputs["CO2_STOR_ALL"]
+
+    dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
+	CO2_CAPTURE_COMP_ALL = inputs["CO2_CAPTURE_COMP_ALL"]
+
     T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	
@@ -41,8 +47,37 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eDAC_Negative_Emissions_per_type[k=1:CO2_RES_ALL,t=1:T], 
         EP[:vDAC_CO2_Captured][k,t] - EP[:eDAC_Fuel_CO2_Production_per_type][k,t]) 
     
-    #Total negative emission per zone
- 	@expression(EP, eDAC_Negative_Emissions_per_zone[z=1:Z, t=1:T], sum(eDAC_Negative_Emissions_per_type[k,t] for k in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+
+    #Total carbon captured per zone
+ 	@expression(EP, eDAC_CO2_Captured_per_zone[z=1:Z, t=1:T], sum(EP[:vDAC_CO2_Captured][k,t] for k in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+
+
+    #Total negative emission per zone, need to minus CO2 loss in pipelines
+    @expression(EP, eDAC_Negative_Emissions_per_zone[z=1:Z, t=1:T], sum(eDAC_Negative_Emissions_per_type[k,t] for k in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+
+
+    
+    #Carbon compressed = Carbon captured per zone
+    if setup["ModelCO2Pipelines"] ==1 
+        if setup["CO2Pipeline_Loss"] ==1 
+             @expression(EP, eCSC_Negative_Emissions_per_zone[z=1:Z, t=1:T], eDAC_Negative_Emissions_per_zone[z,t] - EP[:eCO2Loss_Pipes_zt][z,t])
+        end
+    else
+        @expression(EP, eCSC_Negative_Emissions_per_zone[z=1:Z, t=1:T], eDAC_Negative_Emissions_per_zone[z,t])
+    end
+    
+
+    ###################################################################################################################################################################
+    ##Compression
+	#Amount of carbon compressed for storage or transport
+	@expression(EP, eCO2_Capture_Compressed_per_zone[z=1:Z, t=1:T], sum(EP[:vCO2_Capture_Compressed][k,t] for k in dfCO2CaptureComp[(dfCO2CaptureComp[!,:Zone].==z),:R_ID]))
+
+
+	@constraint(EP,cCaptured_Equals_Compressed_CO2[z=1:Z, t=1:T], eCO2_Capture_Compressed_per_zone[z,t] == eDAC_CO2_Captured_per_zone[z,t])
+
+
+    ###################################################################################################################################################################
+
 
     return EP
 end

@@ -104,7 +104,9 @@ include("HSC/load_inputs/load_h2_g2p_variability.jl")
 include("CSC/load_inputs/load_co2_inputs.jl")
 include("CSC/load_inputs/load_co2_capture.jl")
 include("CSC/load_inputs/load_co2_capture_variability.jl")
-
+include("CSC/load_inputs/load_co2_storage.jl")
+include("CSC/load_inputs/load_co2_capture_compression.jl")
+include("CSC/load_inputs/load_co2_pipeline_data.jl")
 
 #Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
@@ -117,6 +119,7 @@ include("GenX/model/core/emissions_power.jl")
 include("GenX/model/resources/curtailable_variable_renewable/curtailable_variable_renewable.jl")
 include("GenX/model/resources/flexible_demand/flexible_demand.jl")
 include("GenX/model/resources/hydro/hydro_res.jl")
+#include("GenX/model/resources/hydro/hydro_inter_period_linkage.jl")
 include("GenX/model/resources/must_run/must_run.jl")
 include("GenX/model/resources/storage/storage.jl")
 include("GenX/model/resources/storage/investment_energy.jl")
@@ -178,14 +181,24 @@ include("HSC/model/policies/co2_cap_hsc.jl")
 #Core CSC Modelling Features
 include("CSC/model/core/co2_investment.jl")
 include("CSC/model/core/co2_outputs.jl")
-include("CSC/model/core/emissions_csc.jl")
 
 # CO2 Capture
 include("CSC/model/capture/co2_capture.jl")
 include("CSC/model/capture/co2_capture_liquid.jl")
 include("CSC/model/capture/co2_capture_solid.jl")
 
+# CO2 Storage
+include("CSC/model/storage/co2_injection_investment.jl")
+include("CSC/model/storage/co2_injection.jl")
 
+# CO2 Compression
+include("CSC/model/compression/co2_capture_compression_investment.jl")
+include("CSC/model/compression/co2_capture_compression.jl")
+
+# CO2 Pipeline
+include("CSC/model/transmission/co2_pipeline.jl")
+
+include("CSC/model/core/emissions_csc.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
@@ -266,8 +279,25 @@ include("CSC/write_outputs/write_co2_capture_zone.jl")
 include("CSC/write_outputs/write_co2_negative_emission.jl")
 include("CSC/write_outputs/write_co2_fuel_emission.jl")
 include("CSC/write_outputs/write_CSC_outputs.jl")
-include("CSC/write_outputs/write_co2_power_consumption.jl")
+include("CSC/write_outputs/write_co2_capture_power_consumption.jl")
 
+include("CSC/write_outputs/write_co2_storage_injection_power_consumption.jl")
+include("CSC/write_outputs/write_co2_storage_injection_plant.jl")
+include("CSC/write_outputs/write_co2_storage_injection_zone.jl")
+include("CSC/write_outputs/write_co2_storage_injection_costs.jl")
+include("CSC/write_outputs/write_co2_storage_injection_capacity.jl")
+
+include("CSC/write_outputs/write_co2_capture_compression_power_consumption.jl")
+include("CSC/write_outputs/write_co2_capture_compression_plant.jl")
+include("CSC/write_outputs/write_co2_capture_compression_zone.jl")
+include("CSC/write_outputs/write_co2_capture_compression_costs.jl")
+include("CSC/write_outputs/write_co2_capture_compression_capacity.jl")
+
+include("CSC/write_outputs/write_co2_pipeline_flow.jl")
+include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
+include("CSC/write_outputs/write_co2_pipeline_loss.jl")
+include("CSC/write_outputs/write_co2_pipeline_power_consumption.jl")
+include("CSC/write_outputs/write_co2_pipeline_power_consumption_comp.jl")
 
 # Modeling to generator alternatives
 include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")

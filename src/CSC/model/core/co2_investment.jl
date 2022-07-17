@@ -26,6 +26,7 @@ function co2_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfCO2Capture = inputs["dfCO2Capture"]
 	CO2_RES_ALL = inputs["CO2_RES_ALL"]
+	T = inputs["T"]     # Number of time steps (hours)
 	
 	##Load cost parameters
 	#  ParameterScale = 1 --> objective function is in million $ . 
@@ -47,6 +48,7 @@ function co2_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_DAC_per_type[i in 1:CO2_RES_ALL])
+	@variable(EP,vDummy_Capacity_DAC_per_type[i in 1:CO2_RES_ALL, t in 1:T]) #To linearize UC constraint
 	@variable(EP,vCAPEX_DAC_per_type[i in 1:CO2_RES_ALL])
 
 	if setup["DAC_CAPEX_Piecewise"] ==1 
