@@ -46,7 +46,6 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	EP[:eH2Balance] += eH2GenNoCommit
 
 	#Power Consumption for H2 Generation
-	#Power Consumption for H2 Generation
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
 		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
@@ -59,7 +58,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
 
 
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	##For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
 
 

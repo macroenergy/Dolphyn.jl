@@ -113,6 +113,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Initialize CO2 Capture Balance Expression
 	@expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
 
+	# Initialize Liquid Fuel Balance
+	@expression(EP, eLFBalance[t=1:T, z=1:Z], 0)
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -275,6 +278,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
+	#Model Syn Fuels
+	if setup["ModelSynFuels"] == 1
+		@expression(EP, eLiquidFuelsConsumptionByAll[t=1:T,z=1:Z], 0)
+		EP = syn_fuel_outputs(EP, inputs, setup)
+		EP = syn_fuel_investment(EP, inputs, setup)
+		EP = syn_fuel_resources(EP, inputs, setup)
+		EP = liquid_fuel_demand(EP, inputs, setup)
+		EP = liquid_fuel_emissions(EP, inputs, setup)
+
+	end
 
 	################  Policies #####################3
 	# CO2 emissions limits for the power sector only
@@ -317,6 +330,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if setup["ModelCO2"] == 1
 		###Captured CO2 Balanace constraints
 		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
+	end
+
+	if setup["ModelSynFuels"] == 1
+		###HLiquid Fuel Demand Constraints
+		@constraint(EP, cLFBalance[t=1:T, z=1:Z], EP[:eLFBalance][t,z] == inputs["Liquid_Fuel_D"][t,z])
 	end
 	
 	## Record pre-solver time

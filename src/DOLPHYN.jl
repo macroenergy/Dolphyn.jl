@@ -22,6 +22,7 @@ export configure_solver
 export load_inputs
 export load_h2_inputs
 export load_co2_inputs
+export load_syn_fuel_inputs
 export generate_model
 export solve_model
 export write_outputs
@@ -107,6 +108,11 @@ include("CSC/load_inputs/load_co2_capture_variability.jl")
 include("CSC/load_inputs/load_co2_storage.jl")
 include("CSC/load_inputs/load_co2_capture_compression.jl")
 include("CSC/load_inputs/load_co2_pipeline_data.jl")
+
+#Load input data - syn fuels
+include("SynFuels/load_inputs/load_syn_fuels_inputs.jl")
+include("SynFuels/load_inputs/load_syn_fuels_resources.jl")
+include("SynFuels/load_inputs/load_liquid_fuel_demand.jl")
 
 #Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
@@ -199,6 +205,17 @@ include("CSC/model/compression/co2_capture_compression.jl")
 include("CSC/model/transmission/co2_pipeline.jl")
 
 include("CSC/model/core/emissions_csc.jl")
+
+#Syn Fuels
+include("SynFuels/model/core/syn_fuel_investment.jl")
+include("SynFuels/model/core/liquid_fuel_emissions.jl")
+include("SynFuels/model/core/syn_fuel_outputs.jl")
+
+include("SynFuels/model/demand/liquid_fuel_demand.jl")
+
+include("SynFuels/model/resources/syn_fuel_res_all.jl")
+include("SynFuels/model/resources/syn_fuel_resources.jl")
+include("SynFuels/model/resources/syn_fuels_res_no_commit.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
