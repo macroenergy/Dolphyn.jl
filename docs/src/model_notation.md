@@ -8,14 +8,15 @@
 |$\mathcal{T}^{interior} \subseteq \mathcal{T}^{}$ | where $\mathcal{T}^{interior}$ is the set of interior timesteps in the data series|
 |$\mathcal{T}^{start} \subseteq \mathcal{T}$ |  where $\mathcal{T}^{start}$ is the set of initial timesteps in the data series. $\mathcal{T}^{start}={1}$ when representing entire year as a single contiguous period; $\mathcal{T}^{start}=\{\left(m-1\right) \times \tau^{period}+1 \| m \in \mathcal{M}\}$, which corresponds to the first time step of each representative period $m \in \mathcal{M}$|
 |$n \in \mathcal{N}$ | where $n$ corresponds to a contiguous time period and $\mathcal{N}$ corresponds to the set of contiguous periods of length $\tau^{period}$ that make up the input time series (e.g. load, variable renewable energy availability) to the model|
-|$\mathcal{N}^{rep} \subseteq \mathcal{N}$ | where $\mathcal{N}^{rep}$ corresponds to the set of representative time periods that are selected from the set of contiguous periods, $\mathcal{M}$|
+|$\mathcal{N}^{rep} \subseteq \mathcal{N}$ | where $\mathcal{N}^{rep}$ corresponds to the set of representative time periods that are selected from the set of contiguous periods $\mathcal{M}$|
 |$m \in \mathcal{M}$ | where $m$ corresponds to a representative time period and $\mathcal{M}$ corresponds to the set of representative time periods indexed as per their chronological ocurrence in the set of contiguous periods spanning the input time series data, i.e. $\mathcal{N}$|
 $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of zones in the network|
-|$l \in \mathcal{L}$ | where $l$ denotes a line and $\mathcal{L}$ is the set of transmission lines in the network|
-|$y \in \mathcal{G}$ | where $y$ denotes a technology and $\mathcal{G}$ is the set of available technologies |
-|$\mathcal{H} \subseteq \mathcal{G}$ | where $\mathcal{H}$ is the subset of thermal resources|
+|$z \rightarrow z^{\prime} \in \mathcal{B}$ |where $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity, hydrogen flow via pipelines and trucks, carbon flow via pipelines and trucks and $\mathcal{B}$ is the set of all possible routes|
+|$l \in \mathcal{L}$ | where $l$ denotes a transmission line and $\mathcal{L}$ is the set of transmission lines in the network of power, hydrogen or carbon|
+|$y \in \mathcal{G}$ | where $y$ denotes a technology and $\mathcal{G}$ is the set of available technologies in power, hydrogen or carbon systems |
+|$\mathcal{H} \subseteq \mathcal{G}$ | where $\mathcal{H}$ is the subset of thermal resources in power system|
 |$\mathcal{VRE} \subseteq \mathcal{G}$ | where $\mathcal{VRE}$ is the subset of curtailable Variable Renewable Energy (VRE) resources|
-|$\overline{\mathcal{VRE}}^{y,z}$ | set of VRE resource bins for VRE technology type $y \in \mathcal{VRE}$ in zone $z$ |
+|$\overline{\mathcal{VRE}}_{y,z}$ | set of VRE resource bins for VRE technology type $y \in \mathcal{VRE}$ in zone $z$ |
 |$\mathcal{CE} \subseteq \mathcal{G}$ | where $\mathcal{CE}$ is the subset of resources qualifying for the clean energy standard policy constraint|
 |$\mathcal{UC} \subseteq \mathcal{H}$ | where $\mathcal{UC}$ is the subset of thermal resources subject to unit commitment constraints|
 |$s \in \mathcal{S}$ | where $s$ denotes a segment and $\mathcal{S}$ is the set of consumers segments for price-responsive demand curtailment|
@@ -28,7 +29,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\mathcal{W}^{nocap} \subseteq \mathcal{W}$ | where $\mathcal{W}^{nocap}$ is a subset of set of $ \mathcal{W}$ and represents resources with unknown reservoir capacity|
 |$\mathcal{W}^{cap} \subseteq \mathcal{W}$ | where $\mathcal{W}^{cap}$ is a subset of set of $ \mathcal{W}$ and represents resources with known reservoir capacity|
 |$\mathcal{MR} \subseteq \mathcal{G}$ | where $\mathcal{MR}$ set of must-run resources|
-|$\mathcal{DF} \subseteq \mathcal{G}$ | where $\mathcal{DF}$ set of flexible demand resources|
+|$\mathcal{DF} \subseteq \mathcal{G}$ | where $\mathcal{DF}$ set of flexible demand resources in power an dhydrogen system|
 |$\mathcal{G}_p^{ESR} \subseteq \mathcal{G}$ | where $\mathcal{G}_p^{ESR}$ is a subset of $\mathcal{G}$ that is eligible for Energy Share Requirement (ESR) policy constraint $p$|
 |$p \in \mathcal{P}$ | where $p$ denotes a instance in the policy set $\mathcal{P}$|
 |$\mathcal{P}^{ESR} \subseteq \mathcal{P}$ | Energy Share Requirement type policies |
@@ -45,7 +46,10 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\mathcal{Z}^{CO_2}_{p,gen} \subseteq \mathcal{Z}$ | set of zones are under the emission cap generation emission-rate based cap-and-trade policy constraint $p \in \mathcal{P}^{CO2,gen}$ |
 |$\mathcal{L}_p^{in} \subseteq \mathcal{L}$ | The subset of transmission lines entering Locational Deliverability Area of capacity reserve margin policy $p \in \mathcal{P}^{CRM}$ |
 |$\mathcal{L}_p^{out} \subseteq \mathcal{L}$ | The subset of transmission lines leaving Locational Deliverability Area of capacity reserve margin policy $p \in \mathcal{P}^{CRM}$ |
+|$p \in \mathcal{P}^{CO_2}_{load}$ | to set emissions target based on a CO$_2$ emission rate limit in tCO$_2$/MWh $\times$ the total demand served in each zone |
+|$j \in \mathbb{J}$ |where $j$ denotes the type of truck used in hydrogen and carbon transmission and $\mathcal{J}$ is the set of all truck types|
 ---
+
 
 
 ## Decision Variables
@@ -62,7 +66,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\Delta_{y,z}^{total,energy} \in \mathbb{R}_+$ | Total installed energy capacity of technology $y$ in zone $z$  - only applicable for storage resources, $y \in \mathcal{O}$ [MWh]|
 |$\Delta_{y,z}^{total,charge} \in \mathbb{R}_+$ | Total installed charging power capacity of technology $y$ in zone $z$ - only applicable for storage resources, $y \in \mathcal{O}^{asym}$ [MW]|
 |$\bigtriangleup\varphi^{max}_{l}$ | Additional transmission capacity added to line $l$ [MW] |
-|$\Theta_{y,z,t} \in \mathbb{R}_+$ | Energy injected into the grid by technology $y$ at time step $t$ in zone $z$ [MWh]|
+|$\Theta_{y,z,t} \in \mathbb{R}_+$ | Energy injected into the grid by technology $y$ at time step $t$ in zone $z$ [MWh] or hydrogen produced by technology $y$ in zone $z$ at time step $t$ [tonne-$\ce{H2}$]|
 |$\Pi_{y,z,t} \in \mathbb{R}_+$ | Energy withdrawn from grid by technology $y$ at time step $t$ in zone $z$ [MWh]|
 |$\Gamma_{y,z,t} \in \mathbb{R}_+$ | Stored energy level of technology $y$ at end of time step $t$ in zone $z$ [MWh]|
 |$\Lambda_{s,z,t} \in \mathbb{R}_+$ | Non-served energy/curtailed demand from the price-responsive demand segment $s$ in zone $z$ at time step $t$ [MWh] |
@@ -82,16 +86,74 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\zeta_{y,z,t}$ | Number of shutdown decisions,  of the generation cluster $y$ in zone $z$ at time $t$|
 |$\mathcal{Q}_{o,n} \in \mathbb{R}_+$ | Inventory of storage of type $o$ at the beginning of input period $n$ [MWh]|
 |$\Delta\mathcal{Q}_{o,m} \in \mathbb{R}$ | Excess storage inventory built up during representative period $m$ [MWh]|
-|$ON^{+}_{l,t} \in \{0,1\} $ | Binary variable to activate positive flows on line $l$ in time $t$|
+|$ON^{+}_{l,t} \in \{0,1\}$ | Binary variable to activate positive flows on line $l$ in time $t$|
 |$TransON^{+}_{l,t} \in \mathbb{R}_+$ | Variable defining maximum positive flow in line $l$ in time $t$ [MW]|
----
-
+|$\varepsilon _{OUT}^{GEN}$ | Variable defining the output of hydrogen generation unit $y$ and storage device $s$ in time $t$ [tonne-$\ce{H2}$] |
+|$\vartheta_{k}^{GenNewCap}$ | Installed capcaity of hydrogen generation unit $k$ [tonne-$\ce{H2}$] |
+|$\vartheta_{k}^{GenRetCap}$ | Retired capcaity of hydrogen generation unit $k$ [tonne-$\ce{H2}$] |
+|$\Delta_{y,z}^{total} \in \mathbb{R}_+$ | Total installed capacity of hydrogen generation technology $y$ in zone $z$ [tonne-$\ce{H2}$] |
+|$\Delta_{y,z} \in \mathbb{R}_+$ | Retired capacity of hydrogen generation technology $y$ from existing capacity in zone $z$ [tonne-$\ce{H2}$]|
+|$n_{s}^{size}$ | maximum quantity of demand in this segment, specified as a share of demand in each zone in each time step |
+|$\rho^{min}_{y,z,t}$ | minimum rate of output from technology $y$ in zone $z$ at time step $t$ [\%] |
+|$\rho^{max}_{y,z,t}$ | maximum rate of output from technology $y$ in zone $z$ at time step $t$ [\%] |
+|$\tau^{advance}_{y,z}$ | advance time for flexible demand |
+|$\tau^{delay}_{y,z}$ | delay time for flexible demand|
+|$\eta_{y,z}^{dflex}$ | energy lossed efficiency associated with flexible demand |
+|$\nu_{y,t,z}$| designates the commitment state of g2p generator cluster $h$ in zone $z$ at time $t$ |   
+|$\chi_{y,t,z}$| represents number of g2p startup decisions in cluster $h$ in zone $z$ at time $t$ |   
+|$\zeta_{y,t,z}$| represents number of g2p shutdown decisions in cluster $h$ in zone $z$ at time $t$ |   
+|$\Theta_{h,z,t}$ | is the energy injected into the grid by technology |
+|$\Delta^{\text{total}}_{h,z}$ | is the total installed capacity  |
+|$\nu_{y,z,t}$ | designates the commitment state of generator cluster |
+|$\chi_{y,z,t}$ | represents number of startup decisions |
+|$\zeta_{y,z,t}$ | represents number of shutdown decisions |
+|$\Delta^{\text{total}}_{y,z}$ | is the total installed capacity |
+|$\kappa_{y,z,t}^{up/down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity |
+|$\rho_{y,z}^{min}$ | is the minimum stable power output per unit of installed capacity |
+|$\rho_{y,z,t}^{max}$ | is the maximum available generation per unit of installed capacity |
+|$\tau_{y,z}^{up/down}$ | is the minimum up or down time for units in generating cluster |
+|$\epsilon^{CO_{2}}_{z,p, mass}$ | to be provided in terms of million metric tonnes |
+|$\epsilon_{z,p,load}^{maxCO_2}$ | denotes the emission limit in terms on tCO$_2$/MWh |
+|$\epsilon_{z,p,gen}^{maxCO_2}$ |have to buy emission allowances from the emission regulator in the region $z$ where they are located |
+|$\eta_{o,z}^{discharge}$ | discharge efficiency for storage device $o$ in zone $z$ [\%] |
+|$\Delta Q_{o,z,m}$ | change in storage inventory associated with representative period $m$ |
+|$\tau^{period}$ | number of repeated times |
+|$\Pi_{o,z,t}$ | charge rate |
+|$\Theta_{o,z,t}$ | released energy or hydrogen from storage device $o$ in zone $z$ at time step $t$ |
+|$r^{discharge}_{o,z,t}$ | is the contribution of storage resources to upward reserves while discharging |
+|$f^{discharge}_{o,z,t}$ | is the contribution of storage resources to frequency regulation while discharging |
+|$f^{charge}_{o,z,t}$ | is the contribution of storage resources to frequency regulation while charging |
+|$f^{+}_{y=o,z,t}$ | is the contribution of storage resources to frequency regulation while charging |
+|$\Gamma_{o,z,t}$ | stored energy level or hydrogen level in storage device $o$ in zone $z$ at time step $t$ |
+|$\eta_{o,z}^{loss}$ | storage discharge efficiency of device $o$ in zone $z$ |
+|$f_{o,z,t}$ | The total storage contribution to frequency regulation |
+|$r_{o,z,t}$ | The total storage contribution to reserves |
+|$h_{i, z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}$ | Positive transported hydrogen through pipeline $i$ throught route $z \rightarrow z^{\prime}$ at time step $t$ [tonne-$\ce{H2}$] |
+|$h_{i, z \rightarrow z^{\prime}, t}^{\mathrm{PIP-}}$ | Negtive transported hydrogen through pipeline $i$ throught route $z \rightarrow z^{\prime}$ at time step $t$ [tonne-$\ce{H2}$] |
+|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}}$ | The maximum amount of hydrogen that could be storaed in the pipeline $i$ [tonne-$\ce{H2}$] |
+|$v_{j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ at time $t$ |
+|$v_{j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ at time $t$ |
+|$v_{j}^{TRU}$ | Total number of hydrogen trucks of type $j$ |
+|$u_{j, z \rightarrow z^{\prime}, t}^{\mathrm{F}}$ | Number of full or empty hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t |
+|$q_{z, j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$q_{z, j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$q_{z, j, t}^{\mathrm{CHA}}$ | Number of charged hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$q_{z, j, t}^{\mathrm{DIS}}$ | Number of discharged hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
+|$h_{z, j, t}^{\mathrm{TRU}}$ | Amount of transprted hydrogen through truck rtype $j$ [tonne-$\ce{H2}$] |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t$} |
+|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t$} |
+|$H_{z, j}^{\mathrm{TRU}}$ | Maximum compression/liquefaction capacity of hydrogen truck station type $j$ at zone $z$ [tonne-$\ce{H2}$] |
+|$v_{CAP,j}^{TRU}$ | Capacity of truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{RETCAP,j}^{TRU}$ | Retired capacity of truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{NEWCAP,j}^{TRU}$ | New constructed capacity of truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{RETCAPNUM,j}^{TRU}$ | Retired number of hydrogen truck type $j$ |
+|$v_{RETCAPEnergy,j}^{TRU}$ | Retired energy capacity of truck type $j$ [tonne-$\ce{H2}/hour$] |
 
 ## Parameters
 ---
 |**Notation** | **Description**|
 | :------------ | :-----------|
-|$D_{z,t}$ | Electricity demand in zone $z$ and at time step $t$ [MWh]|
+|$D_{z,t}$ | Electricity demand in zone $z$ and at time step $t$ [MWh] or hydrogen demand in zone $z$ at time step $t$ [tonne-$\ce{H2}$]|
 |$\tau^{period}$ | number of time steps in each representative period $w \in \mathcal{W}^{rep}$ and each input period $w \in \mathcal{W}^{input}$|
 |$\omega_{t}$ | weight of each model time step $\omega_t =1 \forall t \in T$ when modeling each time step of the year at an hourly resolution|
 |$n_s^{slope}$ | Cost of non-served energy/demand curtailment for price-responsive demand segment $s$ [\$/MWh]|
@@ -149,4 +211,19 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\eta_{y,z}^{dflex}$ | energy losses associated with shifting the flexible load [%]|
 |$\mu_{p,z}^{\mathcal{RPS}}$ | share of total demand in each model zone $z \in \mathcal{RPS}^{p}$  that must be served by qualifying renewable energy resources $y \in \mathcal{G}^{RPS}_{p}$|
 |$f(n)$ | Mapping each modeled period $n \in \mathcal{N}$ to corresponding representative period $w \in \mathcal{W}$|
+|$\Omega^{size}_{h,z}$ | is the unit size|
+|$\kappa_{h,z,t}^{up/down}$ | is the maximum ramp-up or ramp-down rate as a percentage of installed capacity|
+|$\tau_{h,z}^{up/down}$ | is the minimum up or down time for units in generating cluster|
+|$\Omega^{size}_{y,z}$ | is the unit size|
+|$\epsilon_{y,z}^{CO_2}$ | reflects the specific $CO_2$ emission intensity in tCO$_2$/MWh associated with its operation|
+|$C_{\mathrm{PIP}}^{\mathrm{c}}$ | Unit constructure costs of pipeline in hydrogen transmission [\$/(tonne-$\ce{H2}$/hour]|
+|$\upsilon^{reg}_{y,z}$ | limited specified fraction of installed discharge for frequency regulation |
+|$\upsilon^{rsv}_{y,z}$ | limited specified fraction of installed discharge for capacity reserve |
+|$\delta_{i}^{\mathrm{PIP}}$ | Annuity factor for pipeline resources |
+|$\overline{\mathrm{F}}_{i}$ | The maximum injecting/withdrawing flow rate of the pipeline $i$ for hydrogen |
+|$\sigma_{j}$| Loss efficiency through truck transmission [%]|
+|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}}$ | Capacity of hydrogen truck type $j$ [tonne-$\ce{H2}$] |
+|$v_{ExistEnergyCap,j}^{TRU}$ | Existing energy capacity of truck type $j$ [tonne-$\ce{H2}/hour$] |
+|$C_{\mathrm{TRU}}^{\mathrm{o}}$ | Unit cost of operation truck type $j$ |
+|$v_{ExistNum,j}^{TRU}$ | Existing number of hydrogen truck type $j$ |
 ---
