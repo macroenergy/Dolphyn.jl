@@ -16,6 +16,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 module DOLPHYN
 
+export check_TDR_data
+export cluster_inputs
 export configure_settings
 export configure_solver
 export load_basic_inputs
@@ -28,7 +30,6 @@ export write_basic_outputs
 export write_power_outputs
 export write_HSC_outputs
 export write_CSC_outputs
-export cluster_inputs
 export mga
 
 
@@ -90,7 +91,9 @@ include("GenX/load_inputs/load_load_data.jl")
 include("GenX/load_inputs/load_Power_inputs.jl")
 
 # Load time domain reduction related scripts
+include("time_domain_reduction/check_TDR_data.jl")
 include("time_domain_reduction/time_domain_reduction.jl")
+# include("time_domain_reduction/PreCluster.jl")
 
 # Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")

@@ -22,50 +22,54 @@ src_path = "../../src/"
 println("Loading packages")
 push!(LOAD_PATH, src_path)
 
+### Load packages
 using DOLPHYN
 using YAML
 using JuMP
+using Pkg
 
-## Run this line to activate the Julia virtual environment for DOLPHYN;
-## Skip it, if the appropriate package versions are installed.
-environment_path = "../../package_activate.jl"
+### Run this line to initialize the Julia virtual environment for DOLPHYN;
+### Skip it, if the appropriate package versions are installed.
+environment_path = "../../env.jl"
 # include(environment_path)
 
+println("Activating the Julia virtual environment")
+Pkg.activate("DOLPHYNJulEnv")
+Pkg.status()
+
+## Store the path of the current working directory
 inpath = pwd()
 settings_path = joinpath(pwd(), "Settings")
 
-### Setup
-setup = Dict()
-### Sector Specific Settings
-sectors_settings_path = joinpath(settings_path, "Sectors")
-genx_settings = joinpath(sectors_settings_path, "genx_settings.yml") # Settings YAML file path for GenX
-hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml") # Settings YAML file path for HSC modelgrated model
-csc_settings = joinpath(sectors_settings_path, "csc_settings.yml") # Settings YAML file path for CSC modelgrated model
-
-setup_genx = YAML.load(open(genx_settings)) # setup dictionary stores GenX-specific parameters
-setup_hsc = YAML.load(open(hsc_settings)) # setup dictionary stores H2 supply chain-specific parameters
-setup_csc = YAML.load(open(csc_settings)) # setup dictionary stores CO2 supply chain-specific parameters
-
 ### Starters Settings
 starters_settings_path = joinpath(settings_path, "Starters")
-global_settings = joinpath(starters_settings_path, "global_model_settings.yml") # Global settings for model
-setup_global = YAML.load(open(global_settings)) # setup dictionary stores global settings
+## Global settings for model
+global_settings = joinpath(starters_settings_path, "global_model_settings.yml")
+## Setup dictionary stores global settings
+setup_global = YAML.load(open(global_settings))
+
+### Sector Specific Settings
+sectors_settings_path = joinpath(settings_path, "Sectors")
+## Settings YAML file path for GenX of power sector
+genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
+## Settings YAML file path for HSC modelgrated model
+hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml")
+## Settings YAML file path for CSC modelgrated model
+csc_settings = joinpath(sectors_settings_path, "csc_settings.yml")
+
+## Setup dictionary stores GenX-specific parameters
+setup_genx = YAML.load(open(genx_settings))
+## Setup dictionary stores H2 supply chain-specific parameters
+setup_hsc = YAML.load(open(hsc_settings))
+## Setup dictionary stores CO2 supply chain-specific parameters
+setup_csc = YAML.load(open(csc_settings))
 
 ## Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 setup = merge(setup_global, setup_genx, setup_hsc, setup_csc)
 
-## Cluster time series inputs if necessary and if specified by the user
-TDRpath = joinpath(inpath, setup["TimeDomainReductionFolder"])
+### Cluster time series inputs if necessary and if specified by the user
 if setup["TimeDomainReduction"] == 1
-    if (
-        (!isfile(TDRpath * "/Load_data.csv")) ||
-        (!isfile(TDRpath * "/Generators_variability.csv")) ||
-        (!isfile(TDRpath * "/Fuels_data.csv")) ||
-        (!isfile(TDRpath * "/HSC_generators_variability.csv")) ||
-        (!isfile(TDRpath * "/HSC_load_data.csv")) ||
-        (!isfile(TDRpath * "/CSC_load_data.csv")) ||
-        (!isfile(TDRpath * "/CSC_capture_variability.csv"))
-    )
+    if (check_TDR_data(setup, inpath))
         println("Clustering Time Series Data...")
         cluster_inputs(inpath, settings_path, setup)
     else
