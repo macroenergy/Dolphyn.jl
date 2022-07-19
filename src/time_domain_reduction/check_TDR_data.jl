@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function is used to check whether time domain reduction data exists when ```TimeDomainReduction``` is set to true.
 """
-function check_TDR_data(setup::Dict, inpath::AbstractString)
+function check_TDR_data(inpath::AbstractString, setup::Dict)
     
     println("Using Time Domain Reduction. Checking TDR Data...")
 
@@ -32,7 +32,7 @@ function check_TDR_data(setup::Dict, inpath::AbstractString)
     end
 
     if setup["ModelH2"] == 1
-        flag = flag || (!isfile(joinpath(TDRpath, "HSC_generators_variability.csv"))) || (!isfile(joinpath(TDRpath, "HSC_load_data.csv")))
+        flag = flag || (!isfile(joinpath(TDRpath, "HSC_load_data.csv"))) || (!isfile(joinpath(TDRpath, "HSC_generators_variability.csv")))
     end
 
     if setup["ModelCO2"] == 1

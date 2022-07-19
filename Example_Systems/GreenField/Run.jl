@@ -69,9 +69,9 @@ setup = merge(setup_global, setup_genx, setup_hsc, setup_csc)
 
 ### Cluster time series inputs if necessary and if specified by the user
 if setup["TimeDomainReduction"] == 1
-    if (check_TDR_data(setup, inpath))
+    if (check_TDR_data(inpath, setup))
         println("Clustering Time Series Data...")
-        cluster_inputs(inpath, settings_path, setup)
+        cluster_inputs(inpath, settings_path, setup) #!this function needs more test and efforts.
     else
         println("Time Series Data Already Clustered.")
     end
@@ -84,10 +84,9 @@ OPTIMIZER = configure_solver(solver_settings_path, setup["Solver"])
 ### Running a case
 ### Load inputs
 println("Loading Inputs")
-inputs = Dict()
 
-## Load basic inputs
-inputs = load_basic_inputs(inputs, setup, inpath)
+## Load basic inputs and decide spatial and temporal details
+inputs = load_basic_inputs(inpath, setup)
 
 ## Load GenX inputs
 inputs = load_power_inputs(inputs, setup, inpath)
