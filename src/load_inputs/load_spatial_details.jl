@@ -26,12 +26,12 @@ function load_spatial_details(setup::Dict, inputs::Dict)
 
     Z = size(Zones, 1)
 
-    if size(Set(Zones), 1) != Z
+    if length(Set(Zones)) != Z
         println("There Exists Duplicate Zones in Predefined Spatial Aspect. Please Check.") #!this should be a trigger for exception.
         Zones = collect(Set(Zones))
     end
 
-    println("$Z Zones Modelled")
+    println("$Z Zones Modelled: ", Zones)
 
     inputs["Z"] = Z
     inputs["Zones"] = Zones

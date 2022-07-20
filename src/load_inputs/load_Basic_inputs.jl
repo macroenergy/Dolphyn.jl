@@ -36,17 +36,12 @@ function load_basic_inputs(path::AbstractString, setup::Dict)
     inputs = load_spatial_details(setup, inputs)
 
     ## Load temporal details from setup
-    inputs = load_temporal_details(setup, inputs)
+    inputs = load_temporal_details(setup, inputs, path)
     
     ## Read input files
     println("Reading Basic Input CSV Files")
     ## Read fuel cost data, including time-varying fuel costs
 	inputs = load_fuels_data(setup, path, sep, inputs)
-
-    ## Read in mapping of modeled periods to representative periods
-	if setup["OperationWrapping"]==1 && isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))) # Use Time Domain Reduced data for GenX)
-		inputs = load_period_map(setup, path, sep, inputs)
-	end
 
     return inputs
 end

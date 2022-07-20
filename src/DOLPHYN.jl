@@ -73,8 +73,9 @@ include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
 
 # Load global input data
+include("load_inputs/load_spatial_details.jl")
+include("load_inputs/load_temporal_details.jl")
 include("load_inputs/load_fuels_data.jl")
-include("load_inputs/load_period_map.jl")
 
 include("load_inputs/load_Basic_inputs.jl")
 

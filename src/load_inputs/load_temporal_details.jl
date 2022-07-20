@@ -18,29 +18,35 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 
 """
-function load_temporal_detail(setup::Dict, inputs::Dict)
+function load_temporal_details(setup::Dict, inputs::Dict, path::AbstractString)
 
     println("Loading Temporal Details")
 
     # Number of time steps (periods)
-	inputs["T"] = setup["T"]
+	inputs["T"] = setup["TotalLength"]
 
-    inputs["omega"] = zeros(Float64, T) # weights associated with operational sub-period in the model - sum of weight = 8760
-	inputs["REP_PERIOD"] = 1   # Number of periods initialized
-	inputs["H"] = 1   # Number of sub-periods within each period
+	T = inputs["T"]
+	# Weights associated with operational sub-period in the model - sum of weight = length of time scale
+    inputs["omega"] = zeros(Float64, T)
+	# Number of periods initialized
+	inputs["REP_PERIOD"] = 1
+	# Number of sub-periods within each period
+	inputs["H"] = 1
 
-	if setup["OperationWrapping"]==0 # Modeling full year chronologically at hourly resolution
+	if setup["OperationWrapping"] == 0
 		# Total number of subtime periods
 		inputs["REP_PERIOD"] = 1
 		# Simple scaling factor for number of subperiods
-		inputs["omega"][:] .= 1 #changes all rows of inputs["omega"] from 0.0 to 1.0
-	elseif setup["OperationWrapping"]==1
+		inputs["omega"][:] .= 1
+	elseif setup["OperationWrapping"] == 1
+		data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
+		weights = DataFrame(CSV.File(joinpath(data_directory, "weights.csv")))
 		# Weights for each period - assumed same weights for each sub-period within a period
-		inputs["Weights"] = collect(skipmissing(load_in[!,:Sub_Weights])) # Weights each period
+		inputs["Weights"] = collect(skipmissing(weights[!,:Sub_Weights])) # Weights each period
 
 		# Total number of periods and subperiods
-		inputs["REP_PERIOD"] = convert(Int16, collect(skipmissing(load_in[!,:Rep_Periods]))[1])
-		inputs["H"] = convert(Int64, collect(skipmissing(load_in[!,:Timesteps_per_Rep_Period]))[1])
+		inputs["REP_PERIOD"] = convert(Int16, collect(skipmissing(weights[!,:Rep_Periods]))[1])
+		inputs["H"] = convert(Int64, collect(skipmissing(weights[!,:Timesteps_per_Rep_Period]))[1])
 
 		# Creating sub-period weights from weekly weights
 		for w in 1:inputs["REP_PERIOD"]
@@ -49,14 +55,24 @@ function load_temporal_detail(setup::Dict, inputs::Dict)
 				inputs["omega"][t] = inputs["Weights"][w]/inputs["H"]
 			end
 		end
+
+		## Read in mapping of modeled periods to representative periods
+		if isfile(joinpath(data_directory, "Period_map.csv")) # Use Time Domain Reduced data for GenX)
+			inputs["Period_Map"] = DataFrame(CSV.File(joinpath(data_directory, "Period_map.csv"), header=true), copycols=true)
+			println("Period_map.csv Successfully Read!")
+		end
 	end
 
 	# Create time set steps indicies
 	inputs["hours_per_subperiod"] = div.(T,inputs["REP_PERIOD"]) # total number of hours per subperiod
 	hours_per_subperiod = inputs["hours_per_subperiod"] # set value for internal use
 
-	inputs["START_SUBPERIODS"] = 1:hours_per_subperiod:T 	# set of indexes for all time periods that start a subperiod (e.g. sample day/week)
-	inputs["INTERIOR_SUBPERIODS"] = setdiff(1:T,inputs["START_SUBPERIODS"]) # set of indexes for all time periods that do not start a subperiod
+	# set of indexes for all time periods that start a subperiod (e.g. sample day/week)
+	inputs["START_SUBPERIODS"] = 1:hours_per_subperiod:T
+	# set of indexes for all time periods that do not start a subperiod
+	inputs["INTERIOR_SUBPERIODS"] = setdiff(1:T,inputs["START_SUBPERIODS"])
+    
+	println("$T Timesteps Modelled: 1-$T")
 
-    return inputs
+	return inputs
 end
