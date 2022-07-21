@@ -24,7 +24,6 @@ push!(LOAD_PATH, src_path)
 
 ### Load packages
 using YAML
-using JuMP
 using Pkg
 using DOLPHYN
 
