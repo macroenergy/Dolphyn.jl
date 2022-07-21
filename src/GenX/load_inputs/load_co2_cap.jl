@@ -61,7 +61,7 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 		first_col = findall(s -> s == "CO2_Price_1", names(inputs_co2["dfCO2Cap"]))[1]
 		last_col = findall(s -> s == "CO2_Price_$cap", names(inputs_co2["dfCO2Cap"]))[1]
 		# note the default inputs is in million tons
-		if setup["ParameterScale"] ==1
+		if setup["ParameterScale"] == 1
 			inputs_co2["dfCO2Price"] = Matrix{Float64}(inputs_co2["dfCO2Cap"][:,first_col:last_col])*ModelScalingFactor/1e+6
 			# when scaled, the constraint unit is million$/ktonne
 		else

@@ -16,6 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 import Pkg
 using Pkg
+println("Activating the Julia virtual environment")
 Pkg.activate("DOLPHYNJulEnv")
 Pkg.add(Pkg.PackageSpec(name="MathOptInterface"))
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="0.8.0"))
