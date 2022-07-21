@@ -49,11 +49,11 @@ function load_power_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	end
 
 	## Read temporal-resolved load data, and clustering information if relevant
-	inputs = load_load_data(setup, path, sep, inputs)
+	inputs = load_load_data(path, setup, inputs)
 	## Read in generator/resource related inputs
-	inputs = load_generators_data(setup, path, sep, inputs)
+	inputs = load_generators_data(path, setup, inputs)
 	## Read in generator/resource availability profiles
-	inputs = load_generators_variability(setup, path, sep, inputs)
+	inputs = load_generators_variability(path, setup, inputs)
 
 	if setup["CapacityReserveMargin"] == 1
 		inputs = load_cap_reserve_margin(setup, path, sep, inputs)
