@@ -96,7 +96,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/gn-he/DOLPHYN-dev.git",
+    repo = "github.com/MacroEnergyProject/DOLPHYN-dev.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",
