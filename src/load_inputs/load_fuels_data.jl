@@ -15,23 +15,23 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
+	load_fuels_data(setup::Dict, inputs::Dict, path::AbstractString)
 
 Function for reading input parameters related to fuel costs and CO$_2$ content of fuels
 """
-function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_fuel::Dict)
+function load_fuels_data(setup::Dict, inputs::Dict, path::AbstractString)
 
 	# Fuel related inputs - read in different files depending on if time domain reduction is activated or not
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) # Use Time Domain Reduced data for GenX
-		fuels_in = DataFrame(CSV.File(string(joinpath(data_directory,"Fuels_data.csv")), header=true), copycols=true)
-	else  # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
-		fuels_in = DataFrame(CSV.File(string(path,sep,"Fuels_data.csv"), header=true), copycols=true)
+	if setup["TimeDomainReduction"] == 1 && isfile(joinpath(data_directory, "Fuels_data.csv")) # Use Time Domain Reduced data for GenX
+		fuels_in = DataFrame(CSV.File(joinpath(data_directory,"Fuels_data.csv"), header=true), copycols=true)
 	end
+
+	T = inputs["T"]
 
 	# Fuel costs & CO2 emissions rate for each fuel type (stored in dictionary objects)
 	fuels = names(fuels_in)[2:end] # fuel type indexes
-	costs = Matrix(fuels_in[2:end,2:end])
+	costs = Matrix(fuels_in[2:T+1,2:end])
 	# New addition for variable fuel price
 	CO2_content = fuels_in[1,2:end] # tons CO2/MMBtu
 	fuel_costs = Dict{AbstractString,Array{Float64}}()
@@ -46,11 +46,11 @@ function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString,
 		end
 	end
 
-	inputs_fuel["fuels"] = fuels
-	inputs_fuel["fuel_costs"] = fuel_costs
-	inputs_fuel["fuel_CO2"] = fuel_CO2
+	inputs["fuels"] = fuels
+	inputs["fuel_costs"] = fuel_costs
+	inputs["fuel_CO2"] = fuel_CO2
 
 	println("Fuels_data.csv Successfully Read!")
 
-	return inputs_fuel
+	return inputs
 end

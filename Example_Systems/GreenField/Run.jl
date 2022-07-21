@@ -90,7 +90,7 @@ inputs = load_basic_inputs(inpath, setup)
 
 ## Load GenX inputs
 if setup["ModelPower"] == 1
-    inputs = load_power_inputs(inputs, setup, inpath)
+    inputs = load_power_inputs(inpath, setup, inputs)
 end
 
 ## Load H2 inputs if modeling the hydrogen supply chain

@@ -15,18 +15,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
+	load_power_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
-inputs - dict object containing basic input data
-setup - dict object containing setup parameters
 path - string path to working directory
+setup - dict object containing setup parameters
+inputs - dict object containing basic input data
 
 returns: Dict (dictionary) object containing all data inputs
 """
-function load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
+function load_power_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 
 	## Use appropriate directory separator depending on Mac or Windows config
 	if Sys.isunix()
@@ -37,14 +37,13 @@ function load_power_inputs(inputs::Dict, setup::Dict, path::AbstractString)
         sep = "/"
 	end
 
-	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
-
 	## Read input files
 	println("Reading Power Input CSV Files")
 	## Read input data about power network topology, operating and expansion attributes
-    if isfile(string(path, sep, "Network.csv"))
-		inputs, network_var = load_network_data(setup, path, sep, inputs)
+    if isfile(joinpath(path, "Network.csv"))
+		inputs, network_var = load_network_data(path, setup, inputs)
 	else
+		println("No Topology of Modeled Zone is Provided!")
 		inputs["Z"] = 1
 		inputs["L"] = 0
 	end

@@ -23,15 +23,6 @@ function load_basic_inputs(path::AbstractString, setup::Dict)
     
     inputs = Dict()
 
-    ## Use appropriate directory separator depending on Mac or Windows config
-	if Sys.isunix()
-		sep = "/"
-    elseif Sys.iswindows()
-		sep = "\U005c"
-    else
-        sep = "/"
-	end
-
     ## Load spatial details from setup
     inputs = load_spatial_details(setup, inputs)
 
@@ -41,7 +32,7 @@ function load_basic_inputs(path::AbstractString, setup::Dict)
     ## Read input files
     println("Reading Basic Input CSV Files")
     ## Read fuel cost data, including time-varying fuel costs
-	inputs = load_fuels_data(setup, path, sep, inputs)
+	inputs = load_fuels_data(setup, inputs, path)
 
     return inputs
 end
