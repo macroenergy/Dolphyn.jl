@@ -23,6 +23,8 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 	println("Syn Fuel module")
 
     dfSynFuels = inputs["dfSynFuels"]
+	dfSynFuelsByProdPrice = inputs["dfSynFuelsByProdPrice"]
+	dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
 
 	#Define sets
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"] #Number of Syn fuel units
@@ -31,9 +33,9 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 
     ## Variables ##
     #CO2 Required by SynFuel Resource in MTonnes
-	@variable(EP, vSFCO2in[k in SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
+	@variable(EP, vSFCO2in[k in 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
     #Amount of By-productProduced in MMBTU
-	@variable(EP, vSFByProd[k in SYN_FUELS_RES_ALL, b in 1:NSFByProd, t = 1:T] >= 0 )
+	@variable(EP, vSFByProd[k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd, t = 1:T] >= 0 )
     
 	### Expressions ###
 
@@ -50,20 +52,20 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 
         #Variable Cost of Syn Fuel Production
 		@expression(EP, eCSFProdVar_out[k = 1:SYN_FUELS_RES_ALL,t = 1:T], 
-		(inputs["omega"][t] * (dfSynFuels[!,:Var_OM_Cost_p_tonne_co2][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfSynFuels[!,:Fuel][k]][t] * dfSynFuels[!,:mmbtu_ng_p_tonne_co2][k]/ModelScalingFactor) * vSFCO2in[k,t]))
+		(inputs["omega"][t] * (dfSynFuels[!,:Var_OM_cost_p_tonne_co2][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfSynFuels[!,:Fuel][k]][t] * dfSynFuels[!,:mmbtu_ng_p_tonne_co2][k]/ModelScalingFactor) * vSFCO2in[k,t]))
 	
         #Revenue from by-product
         @expression(EP, eCSFByProdRevenue_out[k = 1:SYN_FUELS_RES_ALL, t = 1:T, b = 1:NSFByProd], 
-        (inputs["omega"][t] * (dfSynFuelsByProdPrice[!,b][k] * dfSynFuelsByProdExcess[!,b][k]/ModelScalingFactor) * vSFCO2in[k,t]))
+        (inputs["omega"][t] * (dfSynFuelsByProdPrice[:,b][k] * dfSynFuelsByProdExcess[:,b][k]/ModelScalingFactor) * vSFCO2in[k,t]))
     
     else
         #Variable Cost of Syn Fuel Production
 		@expression(EP, eCSFProdVar_out[k = 1:SYN_FUELS_RES_ALL,t = 1:T], 
 		(inputs["omega"][t] * ((dfSynFuels[!,:Var_OM_cost_p_tonne_co2][k] + inputs["fuel_costs"][dfSynFuels[!,:Fuel][k]][t] * dfSynFuels[!,:mmbtu_ng_p_tonne_co2][k])) * vSFCO2in[k,t]))
-
+		
         #Revenue from by-product
         @expression(EP, eCSFByProdRevenue_out[k = 1:SYN_FUELS_RES_ALL, t = 1:T, b = 1:NSFByProd], 
-        (inputs["omega"][t] * (dfSynFuelsByProdPrice[!,b][k] * dfSynFuelsByProdExcess[!,b][k]) * vSFCO2in[k,t]))
+        (inputs["omega"][t] * (dfSynFuelsByProdPrice[:,b][k] * dfSynFuelsByProdExcess[:,b][k]) * vSFCO2in[k,t]))
 	end
 
 

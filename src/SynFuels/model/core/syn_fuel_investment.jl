@@ -24,7 +24,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	
 	println("Syn Fuel Cost module")
 
-    dfSynFuel = inputs["dfSynFuel"]
+    dfSynFuels = inputs["dfSynFuels"]
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
 	T = inputs["T"]     # Number of time steps (hours)
 	
@@ -34,16 +34,16 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 0 --> objective function is in $
 	
 	if setup["ParameterScale"] ==1 
-		Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuel[!,:Inv_Cost_p_tonne_co2_p_hr_yr]/ModelScalingFactor^2 # $/t/h/y
-		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuel[!,:Fixed_OM_cost_p_tonne_co2_hr_yr]/ModelScalingFactor^2 # $/t/h/y
+		Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuels[!,:Inv_Cost_p_tonne_co2_p_hr_yr]/ModelScalingFactor^2 # $/t/h/y
+		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr]/ModelScalingFactor^2 # $/t/h/y
 	else
-        Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuel[!,:Inv_Cost_p_tonne_co2_p_hr_yr]# $/t/h/y
-		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuel[!,:Fixed_OM_cost_p_tonne_co2_hr_yr] # $/t/h/y
+        Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuels[!,:Inv_Cost_p_tonne_co2_p_hr_yr]# $/t/h/y
+		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr] # $/t/h/y
 	end
 
 	#Load capacity parameters
-	MinCapacity_tonne_p_hr = dfSynFuel[!,:MinCapacity_tonne_p_hr] # t/h
-	MaxCapacity_tonne_p_hr = dfSynFuel[!,:MaxCapacity_tonne_p_hr] # t/h
+	MinCapacity_tonne_p_hr = dfSynFuels[!,:MinCapacity_tonne_p_hr] # t/h
+	MaxCapacity_tonne_p_hr = dfSynFuels[!,:MaxCapacity_tonne_p_hr] # t/h
 
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL]) #Capacity of units in co2 input mtonnes/hr 
@@ -128,15 +128,15 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	#####################################################################################################################################
 	#Min and max capacity constraints
-	@constraint(EP,cMinCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Cap_Size_tonne_p_hr[i] >= MinCapacity_tonne_p_hr[i])
-	@constraint(EP,cMaxCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Cap_Size_tonne_p_hr[i] <= MaxCapacity_tonne_p_hr[i])
+	@constraint(EP,cMinSFCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  >= MinCapacity_tonne_p_hr[i])
+	@constraint(EP,cMaxSFCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  <= MaxCapacity_tonne_p_hr[i])
 
 	#####################################################################################################################################
 	##Expressions
 	#Cost per type of technology
 	
 	#Fixed OM cost #Check again to match capacity
-	@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i] * Cap_Size_tonne_p_hr[i])
+	@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i])
 
 	#Total fixed cost = CAPEX + Fixed OM
 	@expression(EP, eFixed_Cost_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:eFixed_OM_Syn_Fuels_per_type][i] + EP[:eCAPEX_Syn_Fuel_per_type][i])

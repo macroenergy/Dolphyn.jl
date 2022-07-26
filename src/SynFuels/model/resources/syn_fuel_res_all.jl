@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	
 """
-function syn_fuel_resource_all(EP::Model, inputs::Dict, setup::Dict)
+function syn_fuel_resources_all(EP::Model, inputs::Dict, setup::Dict)
 	#Define sets
 
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
@@ -28,11 +28,11 @@ function syn_fuel_resource_all(EP::Model, inputs::Dict, setup::Dict)
 	#Define variables needed across both commit and no commit sets
     
     #Amount of Syn Fuel Produced in MMBTU
-	@variable(EP, vSFProd[k in SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
+	@variable(EP, vSFProd[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
     #Hydrogen Required by SynFuel Resource
-    @variable(EP, vSFH2in[k in SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
+    @variable(EP, vSFH2in[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
     #Power Required by SynFuel Resource
-    @variable(EP, vSFPin[k in SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
+    @variable(EP, vSFPin[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
 
 	return EP
 

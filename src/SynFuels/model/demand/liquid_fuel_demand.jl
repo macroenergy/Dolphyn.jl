@@ -21,6 +21,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
     dfSynFuels = inputs["dfSynFuels"]
+    Liquid_Fuels_D = inputs["Liquid_Fuels_D"]
+    SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
 
 	#Define sets
     Z = inputs["Z"]     # Number of zones
@@ -31,17 +33,17 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
     ## Variables ##
     #Conventional liquid Fuel Demand
-	@variable(EP, vConvLFDemand[z = 1:Z, t = 1:T] >= 0 )
+	@variable(EP, vConvLFDemand[t = 1:T, z = 1:Z] >= 0 )
     
 	### Expressions ###
     #Objective Function Expressions
     #Cost of Conventional Fuel
     if setup["ParameterScale"] ==1
 		@expression(EP, eCLFVar_out[z = 1:Z,t = 1:T], 
-		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * vLFDemand[z,t])) / ModelScalingFactor
+		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * Liquid_Fuels_D[t,z])) / ModelScalingFactor
     else
 		@expression(EP, eCLFVar_out[z = 1:Z,t = 1:T], 
-		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * vLFDemand[z,t]))
+		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * Liquid_Fuels_D[t,z]))
 	end
 
     #Sum up conventional Fuel Costs
@@ -52,9 +54,9 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
     EP[:eLFBalance] -= vConvLFDemand
     EP[:eObj] += eTotalCLFVarOut
 
-    ### Constraints ###
-    @constraints(EP, begin [z in 1:Z, t=1:T, k in SYN_FUELS_RES_ALL], vSFByProd[k,b,t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[!,b][k]
-	end)
+    # ### Constraints ###
+    # @constraints(EP, begin [z in 1:Z, t=1:T, k in 1:SYN_FUELS_RES_ALL], EP[:vSFByProd][k,b,t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[!,b][k]
+	# end)
 
 	return EP
 

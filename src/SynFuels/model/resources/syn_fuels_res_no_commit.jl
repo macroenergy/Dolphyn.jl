@@ -22,7 +22,7 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename H2Gen dataframe
 	dfSynFuels = inputs["dfSynFuels"]
-    dfSynFuelsByProdExcess = ["dfSynFuelsByProdExcess"]
+    dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -31,22 +31,22 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	SYN_FUEL_RES_NO_COMMIT = inputs["SYN_FUEL_RES_NO_COMMIT"]
 
 	###Expressions###
-
+	
     #Liquid Fuel Balance Expression
     @expression(EP, eSynFuelProdNoCommit[t=1:T, z=1:Z],
-	sum(EP[:vSFProd][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vSFProd][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))#intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
     EP[:eLFBalance] -= eSynFuelProdNoCommit
 
 	#H2 Balance expressions
 	@expression(EP, eSynFuelH2ConsNoCommit[t=1:T, z=1:Z],
-	sum(EP[:vSFH2in][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vSFH2in][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] -= eSynFuelH2ConsNoCommit
 
     #CO2 Balance Expression
     @expression(EP, eSynFuelCO2ConsNoCommit[t=1:T, z=1:Z],
-	sum(EP[:vSFCO2in][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vSFCO2in][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eCaptured_CO2_Balance] -= eSynFuelCO2ConsNoCommit
 
@@ -71,7 +71,7 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	
     # By-product produced cosntraint
     @constraints(EP, begin
-	[k in SYN_FUEL_RES_NO_COMMIT, b in 1:NSFByProd, t=1:T], vSFByProd[k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[!,b][k]
+	[k in SYN_FUEL_RES_NO_COMMIT, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
 	end)
 
     # Production must be smaller than available capacity

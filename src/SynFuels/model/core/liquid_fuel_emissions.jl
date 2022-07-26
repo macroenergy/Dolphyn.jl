@@ -43,13 +43,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
     
     #CO2 emitted as a result of conventional fuel consumption
     @expression(EP,eLiquid_Fuels_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-    Conventional_fuel_co2_per_mmbtu * vConvLFDemand[z,t])
-    
-    #Total carbon input to syn fuel process per zone
- 	@expression(EP, eSyn_Fuels_CO2_Input_By_Zone[z=1:Z, t=1:T], vSFCO2in[k,t] for k in intersect(SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]) )
-
-    #Add CO2 Consumed for Syn Fuels to Captured CO2 Balance 
-    EP[:eCaptured_CO2_Balance] -= eSyn_Fuels_CO2_Input_By_Zone
+    Conventional_fuel_co2_per_mmbtu * EP[:vConvLFDemand][t,z])
 
     return EP
 end
