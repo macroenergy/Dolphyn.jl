@@ -51,14 +51,14 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 		if setup["ParameterScale"]==1
 			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])*ModelScalingFactor
 		else
-			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])/ModelScalingFactor
+			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])
 		end
 	end
 
 	if setup["ParameterScale"]==1
 		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])*ModelScalingFactor, :auto))
 	else
-		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])/ModelScalingFactor, :auto))
+		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone]), :auto))
 	end
 
 
