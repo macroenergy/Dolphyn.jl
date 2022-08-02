@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-
+    load_spatial_details(setup::Dict, inputs::Dict)
 
 """
 function load_spatial_details(setup::Dict, inputs::Dict)

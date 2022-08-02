@@ -28,15 +28,6 @@ returns: Dict (dictionary) object containing all data inputs
 """
 function load_power_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 
-	## Use appropriate directory separator depending on Mac or Windows config
-	if Sys.isunix()
-		sep = "/"
-    elseif Sys.iswindows()
-		sep = "\U005c"
-    else
-        sep = "/"
-	end
-
 	## Read input files
 	println("Reading Power Input CSV Files")
 	## Read input data about power network topology, operating and expansion attributes
@@ -56,30 +47,30 @@ function load_power_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	inputs = load_generators_variability(path, setup, inputs)
 
 	if setup["CapacityReserveMargin"] == 1
-		inputs = load_cap_reserve_margin(setup, path, sep, inputs)
+		inputs = load_cap_reserve_margin(setup, path, inputs)
 		if inputs["Z"] > 1
-			inputs = load_cap_reserve_margin_trans(setup, path, sep, inputs, network_var)
+			inputs = load_cap_reserve_margin_trans(setup, path, inputs, network_var)
 		end
 	end
 
 	## Read in general configuration parameters for reserves (resource-specific reserve parameters are read in generators_data())
 	if setup["Reserves"] == 1
-		inputs = load_reserves(setup, path, sep, inputs)
+		inputs = load_reserves(setup, path, inputs)
 	end
 
 	if setup["MinCapReq"] == 1
-		inputs = load_minimum_capacity_requirement(path,sep, inputs, setup)
+		inputs = load_minimum_capacity_requirement(path, inputs, setup)
 	end
 
 	if setup["EnergyShareRequirement"] == 1
-		inputs = load_energy_share_requirement(setup, path, sep, inputs)
+		inputs = load_energy_share_requirement(setup, path, inputs)
 	end
 
 	if setup["CO2Cap"] >= 1
-		inputs = load_co2_cap(setup, path, sep, inputs)
+		inputs = load_co2_cap(setup, path, inputs)
 	end
 
-	println("CSV Files Successfully Read In From $path$sep")
+	println("CSV Files Successfully Read In From $path")
 
 	return inputs
 end

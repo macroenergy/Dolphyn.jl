@@ -36,8 +36,9 @@ Pkg.activate("DOLPHYNJulEnv")
 Pkg.status()
 
 ## Store the path of the current working directory
-inpath = pwd()
-settings_path = joinpath(pwd(), "Settings")
+root_path = pwd()
+settings_path = joinpath(root_path, "Settings")
+inputs_path = joinpath(root_path, "Inputs")
 
 ### Starters Settings
 starters_settings_path = joinpath(settings_path, "Starters")
@@ -67,9 +68,9 @@ setup = merge(setup_global, setup_genx, setup_hsc, setup_csc)
 
 ### Cluster time series inputs if necessary and if specified by the user
 if setup["TimeDomainReduction"] == 1
-    if (check_TDR_data(inpath, setup))
+    if (check_TDR_data(inputs_path, setup))
         println("Clustering Time Series Data...")
-        cluster_inputs(inpath, settings_path, setup) #!this function needs more test and efforts.
+        cluster_inputs(inputs_path, settings_path, setup) #!this function needs more test and efforts.
     else
         println("Time Series Data Already Clustered.")
     end
@@ -84,21 +85,24 @@ OPTIMIZER = configure_solver(solver_settings_path, setup["Solver"])
 println("Loading Inputs")
 
 ## Load basic inputs and decide spatial and temporal details
-inputs = load_basic_inputs(inpath, setup)
+inputs = load_basic_inputs(inputs_path, setup)
 
 ## Load GenX inputs
 if setup["ModelPower"] == 1
-    inputs = load_power_inputs(inpath, setup, inputs)
+    power_inputs_path = joinpath(inputs_path, "Power")
+    inputs = load_power_inputs(power_inputs_path, setup, inputs)
 end
 
 ## Load H2 inputs if modeling the hydrogen supply chain
 if setup["ModelH2"] == 1
-    inputs = load_h2_inputs(inputs, setup, inpath)
+    h2_inputs_path = joinpath(inputs_path, "HSC")
+    inputs = load_h2_inputs(h2_inputs_path, setup, inpath)
 end
 
 ## Load CO2 inputs if modeling the carbon supply chain
 if setup["ModelCO2"] == 1
-    inputs = load_co2_inputs(inputs, setup, inpath)
+    co2_inputs_path = joinpath(inputs_path, "CSC")
+    inputs = load_co2_inputs(co2_inputs_path, setup, inpath)
 end
 
 ### Generate model
@@ -112,28 +116,28 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 
 ### Writing output
 println("Writing Output")
-outpath = "$inpath/Results"
-write_basic_outputs(EP, outpath, setup, inputs)
+output_path = "$root_path/Results"
+write_basic_outputs(EP, output_path, setup, inputs)
 
 ## Write power system output
-outpath_Power = "$outpath/Results_Power"
+outpath_Power = "$output_path/Results_Power"
 write_power_outputs(EP, outpath_Power, setup, inputs)
 
 ## Write hydrogen supply chain outputs
 if setup["ModelH2"] == 1
-    outpath_H2 = "$outpath/Results_HSC"
+    outpath_H2 = "$output_path/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, setup, inputs)
 end
 
 ## Write carbon supply chain outputs
 if setup["ModelCO2"] == 1
-    outpath_CO2 = "$outpath/Results_CSC"
+    outpath_CO2 = "$output_path/Results_CSC"
     write_CSC_outputs(EP, outpath_CO2, setup, inputs)
 end
 
-### Run MGA if the MGA flag is set to 1 else only save the least cost solution
-### Only valid for power system analysis at this point
-if setup["ModelingToGenerateAlternatives"] == 1
-    println("Starting Model to Generate Alternatives (MGA) Iterations")
-    mga(EP, inpath, setup, inputs, outpath)
-end
+# ### Run MGA if the MGA flag is set to 1 else only save the least cost solution
+# ### Only valid for power system analysis at this point
+# if setup["ModelingToGenerateAlternatives"] == 1
+#     println("Starting Model to Generate Alternatives (MGA) Iterations")
+#     mga(EP, inpath, setup, inputs, outpath)
+# end

@@ -15,14 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict, network_var::DataFrame)
+	load_cap_reserve_margin(setup::Dict, path::AbstractString, inputs_crm::Dict, network_var::DataFrame)
 
 Function for reading input parameters related to planning reserve margin constraints
 """
-function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)
+function load_cap_reserve_margin(setup::Dict, path::AbstractString, inputs_crm::Dict)
 
 	# Definition of capacity reserve margin (crm) by locational deliverability area (LDA)
-	inputs_crm["dfCapRes"] = DataFrame(CSV.File(string(path, sep,"Capacity_reserve_margin.csv"), header=true), copycols=true)
+	inputs_crm["dfCapRes"] = DataFrame(CSV.File(joinpath(path, "Capacity_reserve_margin.csv"), header=true), copycols=true)
 
 	# Ensure float format values:
 
@@ -38,7 +38,7 @@ function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::Abstrac
 	return inputs_crm
 end
 
-function load_cap_reserve_margin_trans(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict, network_var::DataFrame)
+function load_cap_reserve_margin_trans(setup::Dict, path::AbstractString, inputs_crm::Dict, network_var::DataFrame)
 
 	res = inputs_crm["NCapacityReserveMargin"]
 

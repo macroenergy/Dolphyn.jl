@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-
+	load_temporal_details(setup::Dict, inputs::Dict, path::AbstractString)
 
 """
 function load_temporal_details(setup::Dict, inputs::Dict, path::AbstractString)
@@ -39,8 +39,7 @@ function load_temporal_details(setup::Dict, inputs::Dict, path::AbstractString)
 		# Simple scaling factor for number of subperiods
 		inputs["omega"][:] .= 1
 	elseif setup["OperationWrapping"] == 1
-		data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-		weights = DataFrame(CSV.File(joinpath(data_directory, "weights.csv")))
+		weights = DataFrame(CSV.File(joinpath(path, "weights.csv")))
 		# Weights for each period - assumed same weights for each sub-period within a period
 		inputs["Weights"] = collect(skipmissing(weights[!,:Sub_Weights])) # Weights each period
 
@@ -57,8 +56,8 @@ function load_temporal_details(setup::Dict, inputs::Dict, path::AbstractString)
 		end
 
 		## Read in mapping of modeled periods to representative periods
-		if isfile(joinpath(data_directory, "Period_map.csv")) # Use Time Domain Reduced data for GenX)
-			inputs["Period_Map"] = DataFrame(CSV.File(joinpath(data_directory, "Period_map.csv"), header=true), copycols=true)
+		if isfile(joinpath(path, "Period_map.csv")) # Use Time Domain Reduced data for GenX)
+			inputs["Period_Map"] = DataFrame(CSV.File(joinpath(path, "Period_map.csv"), header=true), copycols=true)
 			println("Period_map.csv Successfully Read!")
 		end
 	end

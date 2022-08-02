@@ -15,28 +15,26 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc """
-    check_TDR_data(setup::Dict)
+    check_TDR_data(path::AbstractString, setup::Dict)
 
 This function is used to check whether time domain reduction data exists when ```TimeDomainReduction``` is set to true.
 """
-function check_TDR_data(inpath::AbstractString, setup::Dict)
+function check_TDR_data(path::AbstractString, setup::Dict)
     
     println("Using Time Domain Reduction. Checking TDR Data...")
-
-    TDRpath = joinpath(inpath, setup["TimeDomainReductionFolder"])
     
-    flag = (!isfile(joinpath(TDRpath, "Fuels_data.csv")))
+    flag = (!isfile(joinpath(path, "Fuels_data.csv")))
 
     if setup["ModelPower"] == 1
-        flag = flag || (!isfile(joinpath(TDRpath, "Load_data.csv"))) || (!isfile(joinpath(TDRpath, "Generators_variability.csv")))
+        flag = flag || (!isfile(joinpath(path, "Power", "Load_data.csv"))) || (!isfile(joinpath(path, "Power", "Generators_variability.csv")))
     end
 
     if setup["ModelH2"] == 1
-        flag = flag || (!isfile(joinpath(TDRpath, "HSC_load_data.csv"))) || (!isfile(joinpath(TDRpath, "HSC_generators_variability.csv")))
+        flag = flag || (!isfile(joinpath(path, "HSC", "HSC_load_data.csv"))) || (!isfile(joinpath(path, "HSC", "HSC_generators_variability.csv")))
     end
 
     if setup["ModelCO2"] == 1
-        flag = flag || (!isfile(joinpath(TDRpath, "CSC_load_data.csv"))) || (!isfile(joinpath(TDRpath, "CSC_capture_variability.csv")))
+        flag = flag || (!isfile(joinpath(path, "CSC", "CSC_load_data.csv"))) || (!isfile(joinpath(path, "CSC", "CSC_capture_variability.csv")))
     end
 
     return flag

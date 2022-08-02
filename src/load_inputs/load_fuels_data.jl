@@ -22,9 +22,8 @@ Function for reading input parameters related to fuel costs and CO$_2$ content o
 function load_fuels_data(setup::Dict, inputs::Dict, path::AbstractString)
 
 	# Fuel related inputs - read in different files depending on if time domain reduction is activated or not
-	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-	if setup["TimeDomainReduction"] == 1 && isfile(joinpath(data_directory, "Fuels_data.csv")) # Use Time Domain Reduced data for GenX
-		fuels_in = DataFrame(CSV.File(joinpath(data_directory,"Fuels_data.csv"), header=true), copycols=true)
+	if setup["TimeDomainReduction"] == 1 && isfile(joinpath(path, "Fuels_data.csv")) # Use Time Domain Reduced data for GenX
+		fuels_in = DataFrame(CSV.File(joinpath(path,"Fuels_data.csv"), header=true), copycols=true)
 	end
 
 	T = inputs["T"]
@@ -36,7 +35,7 @@ function load_fuels_data(setup::Dict, inputs::Dict, path::AbstractString)
 	CO2_content = fuels_in[1,2:end] # tons CO2/MMBtu
 	fuel_costs = Dict{AbstractString,Array{Float64}}()
 	fuel_CO2 = Dict{AbstractString,Float64}()
-	for i = 1:length(fuels)
+	for i in 1:length(fuels)
 		if setup["ParameterScale"] ==1
 			fuel_costs[string(fuels[i])] = costs[:,i]/ModelScalingFactor
 			fuel_CO2[string(fuels[i])] = CO2_content[i]/ModelScalingFactor # kton/MMBTU

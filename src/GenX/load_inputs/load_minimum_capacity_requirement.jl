@@ -19,9 +19,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to mimimum capacity requirement constraints (e.g. technology specific deployment mandates)
 """
-function load_minimum_capacity_requirement(path::AbstractString,sep::AbstractString, inputs::Dict, setup::Dict)
+function load_minimum_capacity_requirement(path::AbstractString, inputs::Dict, setup::Dict)
 
-	MinCapReq = DataFrame(CSV.File(string(path, sep, "Minimum_capacity_requirement.csv"), header=true), copycols=true)
+	MinCapReq = DataFrame(CSV.File(joinpath(path, "Minimum_capacity_requirement.csv"), header=true), copycols=true)
 	
 	NumberOfMinCapReqs = size(collect(skipmissing(MinCapReq[!,:MinCapReqConstraint])),1)
 	inputs["NumberOfMinCapReqs"] = NumberOfMinCapReqs
