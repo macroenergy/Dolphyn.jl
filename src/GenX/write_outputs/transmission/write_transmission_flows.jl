@@ -14,11 +14,17 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_transmission_flows(path::AbstractString, sep::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+@doc raw"""
+	write_transmission_flows(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+"""
+function write_transmission_flows(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	# Transmission related values
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	L = inputs["L"]     # Number of transmission lines
+
 	# Power flows on transmission lines at each time step
 	dfFlow = DataFrame(Line = 1:L, Sum = Array{Union{Missing,Float32}}(undef, L))
 	if setup["ParameterScale"] == 1
@@ -32,6 +38,7 @@ function write_transmission_flows(path::AbstractString, sep::AbstractString, set
 		end
 		dfFlow = hcat(dfFlow, DataFrame(value.(EP[:vFLOW]), :auto))
 	end
+
 	auxNew_Names=[Symbol("Line");Symbol("Sum");[Symbol("t$t") for t in 1:T]]
 	rename!(dfFlow,auxNew_Names)
 	total = DataFrame(["Total" sum(dfFlow[!,:Sum]) fill(0.0, (1,T))], :auto)
@@ -46,5 +53,5 @@ function write_transmission_flows(path::AbstractString, sep::AbstractString, set
 	rename!(total,auxNew_Names)
 	dfFlow = vcat(dfFlow, total)
 
-	CSV.write(string(path,sep,"flow.csv"), dftranspose(dfFlow, false), writeheader=false)
+	CSV.write(joinpath(path, "flow.csv"), dftranspose(dfFlow, false), writeheader=false)
 end

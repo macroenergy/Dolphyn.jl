@@ -14,12 +14,18 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+@doc raw"""
+	write_shutdown(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+"""
+function write_shutdown(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	
 	dfGen = inputs["dfGen"]
+	
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
+	
 	# Operational decision variable states
-
 	# Shutdown state for each resource in each time step
 	dfShutdown = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], Sum = Array{Union{Missing,Float32}}(undef, G))
 	shut = zeros(G,T)
@@ -29,6 +35,7 @@ function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict,
 		end
 		dfShutdown[!,:Sum][i] = sum(shut[i,:])
 	end
+
 	dfShutdown = hcat(dfShutdown, DataFrame(shut, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("Sum");[Symbol("t$t") for t in 1:T]]
 	rename!(dfShutdown,auxNew_Names)
@@ -40,7 +47,9 @@ function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict,
 			total[:,t+3] .= sum(dfShutdown[:,Symbol("t$t")][1:G])
 		end
 	end
+
 	rename!(total,auxNew_Names)
 	dfShutdown = vcat(dfShutdown, total)
-	CSV.write(string(path,sep,"shutdown.csv"), dftranspose(dfShutdown, false), writeheader=false)
+	
+	CSV.write(joinpath(path, "shutdown.csv"), dftranspose(dfShutdown, false), writeheader=false)
 end

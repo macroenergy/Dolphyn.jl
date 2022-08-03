@@ -120,8 +120,10 @@ output_path = joinpath(root_path, "Results")
 write_basic_outputs(EP, output_path, setup, inputs)
 
 ## Write power system output
-outpath_Power = joinpath(output_path, "Results_Power")
-write_power_outputs(EP, outpath_Power, setup, inputs)
+if setup["ModelPower"] == 1
+    outpath_Power = joinpath(output_path, "Results_Power")
+    write_power_outputs(EP, outpath_Power, setup, inputs)
+end
 
 ## Write hydrogen supply chain outputs
 if setup["ModelH2"] == 1

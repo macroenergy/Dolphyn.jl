@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_costs(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_costs(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
 	dfGen = inputs["dfGen"]
 	SEG = inputs["SEG"]  # Number of lines
@@ -48,7 +48,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	end
 
 	# Start cost
-	if setup["UCommit"]>=1
+	if setup["UCommit"] >= 1
 		if setup["ParameterScale"] == 1
 			cStartCost = value(EP[:eTotalCStart]) * (ModelScalingFactor^2)
 		else
@@ -78,7 +78,6 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		else
 			cNetworkExpansionCost = value(EP[:eTotalCNetworkExp])
 		end
-
 	else
 		cNetworkExpansionCost =0
 		#cTotal += dfCost[!,2][7]
@@ -152,5 +151,6 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 
 		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
 	end
-	CSV.write(string(path,sep,"costs.csv"), dfCost)
+
+	CSV.write(joinpath(path, "costs.csv"), dfCost)
 end

@@ -15,20 +15,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
-
 """
-function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfGen = inputs["dfGen"]
+	
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	L = inputs["L"]     # Number of transmission lines
 	W = inputs["REP_PERIOD"]     # Number of subperiods
     SEG = inputs["SEG"] # Number of load curtailment segments
-
 
 	if (setup["WriteShadowPrices"]==1 || setup["UCommit"]==0 || (setup["UCommit"]==2 && (setup["Reserves"]==0 || (setup["Reserves"]>0 && inputs["pDynamic_Contingency"]==0)))) # fully linear model
 		# CO2 emissions by zone
@@ -96,9 +96,6 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 			rename!(total,auxNew_Names)
 			dfEmissions = vcat(dfEmissions, total)
 		end
-
-
-## Aaron - Combined elseif setup["Dual_MIP"]==1 block with the first block since they were identical. Why do we have this third case? What is different about it?
 	else
 		# CO2 emissions by zone
 		dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(AnnualSum = Array{Union{Missing,Float64}}(undef, Z)))
@@ -127,5 +124,6 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 		rename!(total,auxNew_Names)
 		dfEmissions = vcat(dfEmissions, total)
 	end
-	CSV.write(string(path,sep,"emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+
+	CSV.write(joinpath(path, "emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
 end

@@ -14,7 +14,12 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_power_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+@doc raw"""
+	write_power_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+"""
+function write_power_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfGen = inputs["dfGen"]
 	
 	if setup["ModelH2"] == 1
@@ -74,12 +79,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	     	dfTemp1[t+rowoffset,8] = value(EP[:vNSE][1,t,z])
 	     	dfTemp1[t+rowoffset,9] = 0
 	     	dfTemp1[t+rowoffset,10] = 0
-		#=
-	     	if setup["NetworkExpansion"] == 1
-	     	    dfTemp1[t+rowoffset,8] = value(EP[:ePowerBalanceNetExportFlows][t,z])
-	     	    dfTemp1[t+rowoffset,9] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
-	     	end
-		=#
+
 			if Z>=2
 				dfTemp1[t+rowoffset,9] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 				dfTemp1[t+rowoffset,10] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
@@ -101,7 +101,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end
-		if z==1
+		if z == 1
 			dfPowerBalance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
 		else
 		    dfPowerBalance = hcat(dfPowerBalance, dfTemp1)
@@ -111,5 +111,6 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	   	dfPowerBalance[rowoffset,c]=sum(inputs["omega"].*dfPowerBalance[(rowoffset+1):size(dfPowerBalance,1),c])
 	end
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"power_balance.csv"), dfPowerBalance, writeheader=false)
+	
+	CSV.write(joinpath(path, "power_balance.csv"), dfPowerBalance, writeheader=false)
 end

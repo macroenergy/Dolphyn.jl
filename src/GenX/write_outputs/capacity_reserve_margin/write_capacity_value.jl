@@ -14,8 +14,14 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_capacity_value(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, dfPower::DataFrame, dfCharge::DataFrame, dfResMar::DataFrame, dfCap::DataFrame)
+@doc raw"""
+	write_capacity_value(path::AbstractString, inputs::Dict, setup::Dict, dfPower::DataFrame, dfCharge::DataFrame, dfResMar::DataFrame, dfCap::DataFrame)
+
+"""
+function write_capacity_value(path::AbstractString, inputs::Dict, setup::Dict, dfPower::DataFrame, dfCharge::DataFrame, dfResMar::DataFrame, dfCap::DataFrame)
+	
 	dfGen = inputs["dfGen"]
+	
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	SEG = inputs["SEG"]  # Number of lines
@@ -62,5 +68,6 @@ function write_capacity_value(path::AbstractString, sep::AbstractString, inputs:
 		end
 		dfCapValue = vcat(dfCapValue, dfCapValue_)
 	end
-	CSV.write(string(path,sep,"CapacityValue.csv"),dfCapValue)
+
+	CSV.write(joinpath(path, "CapacityValue.csv"),dfCapValue)
 end

@@ -15,14 +15,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_curtailment(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_curtailment(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the curtailment values of the different variable renewable resources.
 """
-function write_curtailment(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_curtailment(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfGen = inputs["dfGen"]
+	
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
+	
 	dfCurtailment = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, G))
 	for i in 1:G
 		if i in inputs["VRE"]
@@ -31,13 +34,13 @@ function write_curtailment(path::AbstractString, sep::AbstractString, inputs::Di
 			dfCurtailment[!,:AnnualSum][i] = 0
 		end
 	end
+
 	if setup["ParameterScale"] ==1
 		dfCurtailment.AnnualSum = dfCurtailment.AnnualSum * ModelScalingFactor
 		dfCurtailment = hcat(dfCurtailment, DataFrame(( ModelScalingFactor * (inputs["pP_Max"]).*value.(EP[:eTotalCap]).- value.(EP[:vP])), :auto))
 	else
 		dfCurtailment = hcat(dfCurtailment, DataFrame(((inputs["pP_Max"]).*value.(EP[:eTotalCap]).- value.(EP[:vP])), :auto))
 	end
-
 
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 	rename!(dfCurtailment,auxNew_Names)
@@ -51,6 +54,8 @@ function write_curtailment(path::AbstractString, sep::AbstractString, inputs::Di
 	end
 	rename!(total,auxNew_Names)
 	dfCurtailment = vcat(dfCurtailment, total)
-	CSV.write(string(path,sep,"curtail.csv"), dftranspose(dfCurtailment, false), writeheader=false)
+	
+	CSV.write(joinpath(path, "curtail.csv"), dftranspose(dfCurtailment, false), writeheader=false)
+	
 	return dfCurtailment
 end
