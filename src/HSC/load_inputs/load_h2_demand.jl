@@ -14,42 +14,45 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
+@doc raw"""
+	load_h2_demand(path::AbstractString, setup::Dict, inputs::Dict)
+
+"""
+function load_h2_demand(path::AbstractString, setup::Dict, inputs::Dict)
     
-	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) # Use Time Domain Reduced data for GenX
-		H2_load_in = DataFrame(CSV.File(string(joinpath(data_directory,"HSC_load_data.csv")), header=true), copycols=true)
+	if setup["TimeDomainReduction"] == 1
+		H2_load_in = DataFrame(CSV.File(joinpath(path, "HSC_load_data.csv"), header=true), copycols=true)
 	else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
-		H2_load_in = DataFrame(CSV.File(string(path,sep,"HSC_load_data.csv"), header=true), copycols=true)
+		H2_load_in = DataFrame(CSV.File(joinpath(path, "HSC_load_data.csv"), header=true), copycols=true)
 	end
 
     # Number of demand curtailment/lost load segments
-	inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
+	inputs["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
     # Demand in tonnes per hour for each zone
 	#println(names(load_in))
 	start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
 	
 	# Max value of non-served energy in $/(tonne)
-	inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
+	inputs["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
 	# Demand in Tonnes per hour
-	inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+	inputs["H2_D"] =Matrix(H2_load_in[1:inputs["T"],start:start-1+inputs["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
 	
 
     # Cost of non-served energy/demand curtailment (for each segment)
-	H2_SEG = inputs_load["H2_SEG"]  # Number of demand segments
-	inputs_load["pC_H2_D_Curtail"] = zeros(H2_SEG)
-	inputs_load["pMax_H2_D_Curtail"] = zeros(H2_SEG)
+	H2_SEG = inputs["H2_SEG"]  # Number of demand segments
+	inputs["pC_H2_D_Curtail"] = zeros(H2_SEG)
+	inputs["pMax_H2_D_Curtail"] = zeros(H2_SEG)
 	for s in 1:H2_SEG
 		# Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
-		inputs_load["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_per_Tonne]))[s]*inputs_load["Voll"][1]
+		inputs["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_per_Tonne]))[s]*inputs["Voll"][1]
 		# Maximum hourly demand curtailable as % of the max demand (for each segment)
-		inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
+		inputs["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
 	end
     
 	println("HSC_load_data.csv Successfully Read!")
 
-    return inputs_load
+    return inputs
 
 end
 

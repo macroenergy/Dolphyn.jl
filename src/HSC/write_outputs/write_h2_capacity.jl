@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model))
+	write_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the diferent capacities for the different generation technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
-function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2Gen = inputs["dfH2Gen"]
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
@@ -61,7 +61,6 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 			retcapenergy[i] = value(EP[:vH2RETCAPENERGY][i])
 		end
 	end
-	
 
 	dfCap = DataFrame(
 		Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
@@ -91,6 +90,8 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	)
 
 	dfCap = vcat(dfCap, total)
-	CSV.write(string(path,sep,"HSC_generation_storage_capacity.csv"), dfCap)
+
+	CSV.write(joinpath(path, "HSC_generation_storage_capacity.csv"), dfCap)
+	
 	return dfCap
 end

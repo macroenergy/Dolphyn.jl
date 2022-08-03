@@ -96,7 +96,7 @@ end
 ## Load H2 inputs if modeling the hydrogen supply chain
 if setup["ModelH2"] == 1
     h2_inputs_path = joinpath(inputs_path, "HSC")
-    inputs = load_h2_inputs(h2_inputs_path, setup, inpath)
+    inputs = load_h2_inputs(h2_inputs_path, setup, inputs)
 end
 
 ## Load CO2 inputs if modeling the carbon supply chain
@@ -116,22 +116,22 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 
 ### Writing output
 println("Writing Output")
-output_path = "$root_path/Results"
+output_path = joinpath(root_path, "Results")
 write_basic_outputs(EP, output_path, setup, inputs)
 
 ## Write power system output
-outpath_Power = "$output_path/Results_Power"
+outpath_Power = joinpath(output_path, "Results_Power")
 write_power_outputs(EP, outpath_Power, setup, inputs)
 
 ## Write hydrogen supply chain outputs
 if setup["ModelH2"] == 1
-    outpath_H2 = "$output_path/Results_HSC"
+    outpath_H2 = joinpath(output_path, "Results_HSC")
     write_HSC_outputs(EP, outpath_H2, setup, inputs)
 end
 
 ## Write carbon supply chain outputs
 if setup["ModelCO2"] == 1
-    outpath_CO2 = "$output_path/Results_CSC"
+    outpath_CO2 = joinpath(output_path, "Results_CSC")
     write_CSC_outputs(EP, outpath_CO2, setup, inputs)
 end
 

@@ -15,17 +15,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+write_h2_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
-
 """
-function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfH2Gen = inputs["dfH2Gen"]
+
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-
 
 	if ((setup["H2CO2Cap"]==1||setup["H2CO2Cap"]==2||setup["H2CO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
 		# Dual variable of CO2 constraint = shadow price of CO2
@@ -62,7 +62,6 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])/ModelScalingFactor, :auto))
 	end
 
-
 	if ((setup["H2CO2Cap"]==1||setup["H2CO2Cap"]==2||setup["H2CO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
 		auxNew_Names=[Symbol("Zone");[Symbol("CO2_Price_$cap") for cap in 1:inputs["H2NCO2Cap"]];Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 		rename!(dfEmissions,auxNew_Names)
@@ -91,5 +90,5 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 		dfEmissions = vcat(dfEmissions, total)
 	end
 
-	CSV.write(string(path,sep,"HSC_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+	CSV.write(joinpath(path, "HSC_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
 end

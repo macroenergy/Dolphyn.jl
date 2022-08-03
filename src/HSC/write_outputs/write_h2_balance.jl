@@ -14,9 +14,13 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+@doc raw"""
+	write_h2_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+"""
+function write_h2_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfH2Gen = inputs["dfH2Gen"]
-	
 	if setup["ModelH2G2P"] == 1
 		dfH2G2P = inputs["dfH2G2P"]
 	end
@@ -37,7 +41,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
 			   "H2_Truck_Import/Export","G2P Demand",
-
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -70,12 +73,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
-
-		# if Z>=2
-		# 	dfTemp1[t+rowoffset,5] = value(EP[:ePowerBalanceNetExportFlows][t,z])
-		# 	dfTemp1[t+rowoffset,6] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
-		# end
-
 			if setup["ModelH2G2P"] == 1
 				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
 			else
@@ -83,18 +80,20 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 			end
 
 	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][t,z]
-
 	   	end
 
-		if z==1
+		if z == 1
 			dfH2Balance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
 		else
 		    dfH2Balance = hcat(dfH2Balance, dfTemp1)
 		end
 	end
+
 	for c in 2:size(dfH2Balance,2)
 		dfH2Balance[rowoffset,c]=sum(inputs["omega"].*dfH2Balance[(rowoffset+1):size(dfH2Balance,1),c])
 	end
+	
 	dfH2Balance = DataFrame(dfH2Balance, :auto)
-	CSV.write(string(path,sep,"HSC_h2_balance.csv"), dfH2Balance, writeheader=false)
+
+	CSV.write(joinpath(path, "HSC_h2_balance.csv"), dfH2Balance, writeheader=false)
 end

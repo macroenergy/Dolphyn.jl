@@ -15,13 +15,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model))
+	write_g2p_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the diferent capacities for the different generation technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
-function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_g2p_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	# Capacity decisions
 	dfH2G2P = inputs["dfH2G2P"]
+
 	capdischarge = zeros(size(inputs["H2_G2P_NAME"]))
 	for i in inputs["H2_G2P_NEW_CAP"]
 		if i in inputs["H2_G2P_COMMIT"]
@@ -40,8 +42,6 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		end
 	end
 
-	
-
 	dfCap = DataFrame(
 		Resource = inputs["H2_G2P_NAME"], Zone = dfH2G2P[!,:Zone],
 		StartCap = dfH2G2P[!,:Existing_Cap_MW],
@@ -50,7 +50,6 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		EndCap = value.(EP[:eH2G2PTotalCap]),
 	)
 
-
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
 			StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
@@ -58,6 +57,8 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		)
 
 	dfCap = vcat(dfCap, total)
-	CSV.write(string(path,sep,"HSC_g2p_capacity.csv"), dfCap)
+
+	CSV.write(joinpath(path, "HSC_g2p_capacity.csv"), dfCap)
+	
 	return dfCap
 end

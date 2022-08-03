@@ -15,12 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_h2 charge(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2 charge(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the h2 storage charging energy values of the different storage technologies.
 """
-function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_charge(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfH2Gen = inputs["dfH2Gen"]
+	
 	H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	# Power withdrawn to charge each resource in each time step
@@ -48,6 +50,8 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
 	end
 	rename!(total,auxNew_Names)
 	dfCharge = vcat(dfCharge, total)
-	CSV.write(string(path,sep,"HSC_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
+
+	CSV.write(joinpath(path, "HSC_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
+	
 	return dfCharge
 end

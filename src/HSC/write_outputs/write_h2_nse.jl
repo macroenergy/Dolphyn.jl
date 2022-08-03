@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_nse(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting non-served energy for every model zone, time step and cost-segment.
 """
-function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_nse(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -31,12 +32,10 @@ function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, s
 		dfTemp = DataFrame(Segment=zeros(H2_SEG), Zone=zeros(H2_SEG), AnnualSum = Array{Union{Missing,Float32}}(undef, H2_SEG))
 		dfTemp[!,:Segment] = (1:H2_SEG)
 		dfTemp[!,:Zone] = fill(z,(H2_SEG))
-		
 			for i in 1:H2_SEG
 				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2NSE])[i,:,z]))
 			end
 			dfTemp = hcat(dfTemp, DataFrame(value.(EP[:vH2NSE])[:,:,z], :auto))
-		
 		if z == 1
 			dfNse = dfTemp
 		else
@@ -57,6 +56,7 @@ function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	rename!(total,auxNew_Names)
 	dfNse = vcat(dfNse, total)
 
-	CSV.write(string(path,sep,"HSC_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
+	CSV.write(joinpath(path, "HSC_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
+
 	return dfTemp
 end

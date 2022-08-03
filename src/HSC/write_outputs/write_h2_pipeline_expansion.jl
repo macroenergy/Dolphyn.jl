@@ -14,7 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+@doc raw"""
+    write_h2_pipeline_expansion(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+"""
+function write_h2_pipeline_expansion(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
     L = inputs["H2_P"]     # Number of H2 pipelines
 
@@ -24,10 +28,12 @@ function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, 
             (value.(EP[:vH2NPipe][i]) - inputs["pH2_Pipe_No_Curr"][i]) .*
             inputs["pH2_Pipe_Max_Flow"][i]
     end
+
     dfTransCap = DataFrame(
         Line = 1:L,
         Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"] .* inputs["pH2_Pipe_No_Curr"],
         New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap),
     )
-    CSV.write(string(path, sep, "HSC_pipeline_expansion.csv"), dfTransCap)
+    
+    CSV.write(joinpath(path, "HSC_pipeline_expansion.csv"), dfTransCap)
 end

@@ -15,12 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+	write_h2_storage(path::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 
 Function for writing the capacities of different H2 storage technologies, including hydro reservoir, flexible storage tech etc.
 """
-function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+function write_h2_storage(path::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+
 	dfH2Gen = inputs["dfH2Gen"]
+	
 	T = inputs["T"]     # Number of time steps (hours)
 	H = inputs["H2_RES_ALL"]  # Set of H2 storage resources
 
@@ -41,9 +43,9 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
 		storagevcapvalue[y,:] = s[y,:]
 	end
 
-
 	dfH2Storage = hcat(dfH2Storage, DataFrame(storagevcapvalue, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
 	rename!(dfH2Storage,auxNew_Names)
-	CSV.write(string(path,sep,"storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
+
+	CSV.write(joinpath(path, "h2_storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
 end

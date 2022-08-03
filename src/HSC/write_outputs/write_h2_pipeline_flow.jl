@@ -14,8 +14,14 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_h2_pipeline_flow(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+@doc raw"""
+	write_h2_pipeline_flow(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+"""
+function write_h2_pipeline_flow(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
 	dfH2Gen = inputs["dfH2Gen"]
+
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_P= inputs["H2_P"] # Number of Hydrogen Pipelines
@@ -37,10 +43,9 @@ function write_h2_pipeline_flow(path::AbstractString, sep::AbstractString, input
 	     	dfTemp1[t+rowoffset,1]= value.(EP[:eH2PipeFlow_net][p,t,1])
 	     	dfTemp1[t+rowoffset,2] = value.(EP[:eH2PipeFlow_net][p,t,-1])
             dfTemp1[t+rowoffset,3] = value.(EP[:vH2PipeLevel][p,t])
-	     	
-			
 	   	end
-		if p==1
+
+		if p == 1
 			dfPowerBalance =  hcat(vcat(["", "Pipe", "Zone"], ["t$t" for t in 1:T]), dfTemp1)
 		else
 		    dfPowerBalance = hcat(dfPowerBalance, dfTemp1)
@@ -48,5 +53,6 @@ function write_h2_pipeline_flow(path::AbstractString, sep::AbstractString, input
 	end
 
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"HSC_h2_pipeline_flow.csv"), dfPowerBalance, writeheader=false)
+
+	CSV.write(joinpath(path, "HSC_h2_pipeline_flow.csv"), dfPowerBalance, writeheader=false)
 end

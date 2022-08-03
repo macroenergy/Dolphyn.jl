@@ -15,12 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+    write_h2_pipeline_level(path::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 
 Function for writing hydrogen storage level for each pipeline.
 """
-
-function write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+function write_h2_pipeline_level(path::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 
     P = inputs["H2_P"]  # Number of H2 pipelines
     T = inputs["T"]  # Model operating time steps
@@ -35,5 +34,6 @@ function write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inpu
     dfH2PipelineLevel = hcat(dfH2PipelineLevel, DataFrame(p, :auto))
     auxNew_Names=[Symbol("Pipelines");[Symbol("t$t") for t in 1:T]]
     rename!(dfH2PipelineLevel, auxNew_Names)
-    CSV.write(string(path, sep, "HSC_h2_pipeline_level.csv"), dftranspose(dfH2PipelineLevel, false), writeheader=false)
+
+    CSV.write(joinpath(path, "HSC_h2_pipeline_level.csv"), dftranspose(dfH2PipelineLevel, false), writeheader=false)
 end

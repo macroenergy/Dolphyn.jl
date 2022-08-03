@@ -14,15 +14,19 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
+@doc raw"""
+    load_h2_truck(path::AbstractString, setup::Dict, inputs::Dict)
 
-    Z = inputs_truck["Z"]
+"""
+function load_h2_truck(path::AbstractString, setup::Dict, inputs::Dict)
+
+    Z = inputs["Z"]
     Z_set = 1:Z
 
-    zone_distance = DataFrame(CSV.File(string(path, sep, "zone-distances-miles.csv"), header=true), copycols=true)
+    zone_distance = DataFrame(CSV.File(joinpath(path, "zone-distances-miles.csv"), header=true), copycols=true)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
-	inputs_truck["RouteLength"] = RouteLength
+	inputs["RouteLength"] = RouteLength
     
     println("zone-distances-miles.csv Successfully Read!")
 
@@ -33,32 +37,32 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
 	h2_truck_in[!,:T_TYPE] = 1:size(collect(skipmissing(h2_truck_in[!,1])),1)
 
     # Set of H2 truck types
-    inputs_truck["H2_TRUCK_TYPES"] = h2_truck_in[!,:T_TYPE]
+    inputs["H2_TRUCK_TYPES"] = h2_truck_in[!,:T_TYPE]
     # Set of H2 truck type names
-    inputs_truck["H2_TRUCK_TYPE_NAMES"] = h2_truck_in[!,:H2TruckType]
+    inputs["H2_TRUCK_TYPE_NAMES"] = h2_truck_in[!,:H2TruckType]
 
-    inputs_truck["H2_TRUCK_LONG_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 1, :T_TYPE]
-	inputs_truck["H2_TRUCK_SHORT_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 0, :T_TYPE]
+    inputs["H2_TRUCK_LONG_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 1, :T_TYPE]
+	inputs["H2_TRUCK_SHORT_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 0, :T_TYPE]
 
     # Set of H2 truck types eligible for new capacity
-    inputs_truck["NEW_CAP_H2_TRUCK_CHARGE"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
+    inputs["NEW_CAP_H2_TRUCK_CHARGE"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
     # Set of H2 truck types eligible for capacity retirement
-    inputs_truck["RET_CAP_H2_TRUCK_CHARGE"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
+    inputs["RET_CAP_H2_TRUCK_CHARGE"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
 
     # Set of H2 truck types eligible for new energy capacity
-    inputs_truck["NEW_CAP_H2_TRUCK_ENERGY"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
+    inputs["NEW_CAP_H2_TRUCK_ENERGY"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
     # Set of H2 truck types eligible for energy capacity retirement
-    inputs_truck["RET_CAP_H2_TRUCK_ENERGY"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
+    inputs["RET_CAP_H2_TRUCK_ENERGY"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
         
     # Store DataFrame of truck input data for use in model
-    inputs_truck["dfH2Truck"] = h2_truck_in
+    inputs["dfH2Truck"] = h2_truck_in
 
 
     # Average truck travel time between zones
-    inputs_truck["TD"] = Dict()
-    for j in inputs_truck["H2_TRUCK_TYPES"]
-        inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
+    inputs["TD"] = Dict()
+    for j in inputs["H2_TRUCK_TYPES"]
+        inputs["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
     end
     println("HSC_trucks.csv Successfully Read!")
-    return inputs_truck
+    return inputs
 end
