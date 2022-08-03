@@ -24,25 +24,25 @@ This function includes investment variables, expressions and related constraints
 ## Truck capacity built and retired
 ```math
 \begin{aligned}
-    v_{CAP,j}^{TRU} \geqslant 0
+    v_{CAP,j}^{TRU} \geq 0
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-    v_{RETCAP,j}^{TRU} \geqslant 0
+    v_{RETCAP,j}^{TRU} \geq 0
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-   v_{CAP,j}^{TRU} \geqslant 0
+   v_{CAP,j}^{TRU} \geq 0
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-    v_{NEWCAP,j}^{TRU} \geqslant 0
+    v_{NEWCAP,j}^{TRU} \geq 0
 \end{aligned}
 ```
 
@@ -54,7 +54,7 @@ Truck retirements cannot retire more charge capacity than existing charge capaci
     v_{RETCAPNUM,j}^{TRU} \le v_{ExistNum,j}^{TRU}
 \end{aligned}
 ```
-Truck compression energyCannot retire more energy capacity than existing energy capacity
+Truck compression energy: Cannot retire more energy capacity than existing energy capacity
 ```math
 \begin{aligned}
     v_{RETCAPEnergy,j}^{TRU} \le v_{ExistEnergyCap,j}^{TRU} 
