@@ -28,7 +28,7 @@ Pkg.add(Pkg.PackageSpec(name="SCIP"))
 Pkg.build("SCIP")
 Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.9.14"))
 # Julia environment variable GUROBI_HOME set to your running machine location
-# ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
+ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
 Pkg.build("Gurobi")
 
 Pkg.add(Pkg.PackageSpec(name="Dates"))
@@ -52,3 +52,5 @@ Pkg.add(Pkg.PackageSpec(name="Statistics"))
 Pkg.add(Pkg.PackageSpec(name="OrdinaryDiffEq", version="5.60.1"))
 Pkg.add(Pkg.PackageSpec(name="QuasiMonteCarlo", version="0.2.3"))
 Pkg.add(Pkg.PackageSpec(name="BenchmarkTools", version="1.1.1"))
+
+Pkg.precompile()
