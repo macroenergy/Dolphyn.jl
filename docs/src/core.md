@@ -2,30 +2,42 @@
 
 ## Discharge
 ```@autodocs
-Modules = [GenX]
-Pages = ["discharge.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/discharge/discharge.jl"]
+```
+
+## Invstment Discharge
+```@autodocs
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/discharge/investment_discharge.jl"]
 ```
 
 ## Non-served Energy
 ```@autodocs
-Modules = [GenX]
-Pages = ["non_served_energy.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/non_served_energy.jl"]
 ```
 
 ## Reserves
 ```@autodocs
-Modules = [GenX]
-Pages = ["reserves.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/reserves.jl"]
 ```
 
 ## Transmission
 ```@autodocs
-Modules = [GenX]
-Pages = ["transmission.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/transmission.jl"]
 ```
 
 ## Unit Commitment
 ```@autodocs
-Modules = [GenX]
-Pages = ["ucommit.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/ucommit.jl"]
+```
+
+## Emissions
+```@autodocs
+Modules = [DOLPHYN]
+Pages = ["GenX/model/core/emissions_power.jl"]
 ```
