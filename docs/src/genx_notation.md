@@ -1,4 +1,4 @@
-# Model Notation
+# GenX Model Notation
 
 ## Model Indices and Sets
 ---
@@ -11,9 +11,9 @@
 |$\mathcal{N}^{rep} \subseteq \mathcal{N}$ | where $\mathcal{N}^{rep}$ corresponds to the set of representative time periods that are selected from the set of contiguous periods $\mathcal{M}$|
 |$m \in \mathcal{M}$ | where $m$ corresponds to a representative time period and $\mathcal{M}$ corresponds to the set of representative time periods indexed as per their chronological ocurrence in the set of contiguous periods spanning the input time series data, i.e. $\mathcal{N}$|
 $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of zones in the network|
-|$z \rightarrow z^{\prime} \in \mathcal{B}$ |where $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity, hydrogen flow via pipelines and trucks, carbon flow via pipelines and trucks and $\mathcal{B}$ is the set of all possible routes|
-|$l \in \mathcal{L}$ | where $l$ denotes a transmission line and $\mathcal{L}$ is the set of transmission lines in the network of power, hydrogen or carbon|
-|$y \in \mathcal{G}$ | where $y$ denotes a technology and $\mathcal{G}$ is the set of available technologies in power, hydrogen or carbon systems |
+|$z \rightarrow z^{\prime} \in \mathcal{B}$ |where $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity|
+|$l \in \mathcal{L}$ | where $l$ denotes a transmission line and $\mathcal{L}$ is the set of transmission lines in the network of power|
+|$y \in \mathcal{G}$ | where $y$ denotes a technology and $\mathcal{G}$ is the set of available technologies in power|
 |$\mathcal{H} \subseteq \mathcal{G}$ | where $\mathcal{H}$ is the subset of thermal resources in power system|
 |$\mathcal{VRE} \subseteq \mathcal{G}$ | where $\mathcal{VRE}$ is the subset of curtailable Variable Renewable Energy (VRE) resources|
 |$\overline{\mathcal{VRE}}_{y,z}$ | set of VRE resource bins for VRE technology type $y \in \mathcal{VRE}$ in zone $z$ |
@@ -128,26 +128,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$\eta_{o,z}^{loss}$ | storage discharge efficiency of device $o$ in zone $z$ |
 |$f_{o,z,t}$ | The total storage contribution to frequency regulation |
 |$r_{o,z,t}$ | The total storage contribution to reserves |
-|$h_{i, z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}$ | Positive transported hydrogen through pipeline $i$ throught route $z \rightarrow z^{\prime}$ at time step $t$ [tonne-$\ce{H2}$] |
-|$h_{i, z \rightarrow z^{\prime}, t}^{\mathrm{PIP-}}$ | Negtive transported hydrogen through pipeline $i$ throught route $z \rightarrow z^{\prime}$ at time step $t$ [tonne-$\ce{H2}$] |
-|$\overline{\mathrm{E}}_{i}^{\mathrm{PIP}}$ | The maximum amount of hydrogen that could be storaed in the pipeline $i$ [tonne-$\ce{H2}$] |
-|$v_{j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ at time $t$ |
-|$v_{j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ at time $t$ |
-|$v_{j}^{TRU}$ | Total number of hydrogen trucks of type $j$ |
-|$u_{j, z \rightarrow z^{\prime}, t}^{\mathrm{F}}$ | Number of full or empty hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t |
-|$q_{z, j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
-|$q_{z, j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
-|$q_{z, j, t}^{\mathrm{CHA}}$ | Number of charged hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
-|$q_{z, j, t}^{\mathrm{DIS}}$ | Number of discharged hydrogen or carbon trucks of type $j$ available at $z$ at time $t$ |
-|$h_{z, j, t}^{\mathrm{TRU}}$ | Amount of transprted hydrogen through truck rtype $j$ [tonne-$\ce{H2}$] |
-|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{F}}$ | Number of full hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t$} |
-|$u_{z \rightarrow z^{\prime} j, t}^{\mathrm{E}}$ | Number of empty hydrogen or carbon trucks of type $j$ in transit from $z$ to $z^{\prime}$ at time $t$} |
-|$H_{z, j}^{\mathrm{TRU}}$ | Maximum compression/liquefaction capacity of hydrogen truck station type $j$ at zone $z$ [tonne-$\ce{H2}$] |
-|$v_{CAP,j}^{TRU}$ | Capacity of truck type $j$ [tonne-$\ce{H2}$] |
-|$v_{RETCAP,j}^{TRU}$ | Retired capacity of truck type $j$ [tonne-$\ce{H2}$] |
-|$v_{NEWCAP,j}^{TRU}$ | New constructed capacity of truck type $j$ [tonne-$\ce{H2}$] |
-|$v_{RETCAPNUM,j}^{TRU}$ | Retired number of hydrogen truck type $j$ |
-|$v_{RETCAPEnergy,j}^{TRU}$ | Retired energy capacity of truck type $j$ [tonne-$\ce{H2}/hour$] |
+
 
 ## Parameters
 ---
@@ -219,11 +200,4 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 |$C_{\mathrm{PIP}}^{\mathrm{c}}$ | Unit constructure costs of pipeline in hydrogen transmission [\$/(tonne-$\ce{H2}$/hour]|
 |$\upsilon^{reg}_{y,z}$ | limited specified fraction of installed discharge for frequency regulation |
 |$\upsilon^{rsv}_{y,z}$ | limited specified fraction of installed discharge for capacity reserve |
-|$\delta_{i}^{\mathrm{PIP}}$ | Annuity factor for pipeline resources |
-|$\overline{\mathrm{F}}_{i}$ | The maximum injecting/withdrawing flow rate of the pipeline $i$ for hydrogen |
-|$\sigma_{j}$| Loss efficiency through truck transmission [%]|
-|$\overline{\mathrm{E}}_{j}^{\mathrm{TRU}}$ | Capacity of hydrogen truck type $j$ [tonne-$\ce{H2}$] |
-|$v_{ExistEnergyCap,j}^{TRU}$ | Existing energy capacity of truck type $j$ [tonne-$\ce{H2}/hour$] |
-|$C_{\mathrm{TRU}}^{\mathrm{o}}$ | Unit cost of operation truck type $j$ |
-|$v_{ExistNum,j}^{TRU}$ | Existing number of hydrogen truck type $j$ |
 ---
