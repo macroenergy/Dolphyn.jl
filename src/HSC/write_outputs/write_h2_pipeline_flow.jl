@@ -24,11 +24,11 @@ function write_h2_pipeline_flow(path::AbstractString, inputs::Dict, setup::Dict,
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H2_P= inputs["H2_P"] # Number of Hydrogen Pipelines
+	H2_P = inputs["H2_P"] # Number of Hydrogen Pipelines
     H2_Pipe_Map = inputs["H2_Pipe_Map"]
 
-	## Power balance for each zone
-	dfPowerBalance = Array{Any}
+	## Hydrogen balance for each zone
+	dfH2Balance = Array{Any}
 	rowoffset=3
 	for p in 1:H2_P
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 3)
@@ -46,13 +46,13 @@ function write_h2_pipeline_flow(path::AbstractString, inputs::Dict, setup::Dict,
 	   	end
 
 		if p == 1
-			dfPowerBalance =  hcat(vcat(["", "Pipe", "Zone"], ["t$t" for t in 1:T]), dfTemp1)
+			dfH2Balance =  hcat(vcat(["", "Pipe", "Zone"], ["t$t" for t in 1:T]), dfTemp1)
 		else
-		    dfPowerBalance = hcat(dfPowerBalance, dfTemp1)
+		    dfH2Balance = hcat(dfH2Balance, dfTemp1)
 		end
 	end
 
-	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
+	dfH2Balance = DataFrame(dfH2Balance, :auto)
 
-	CSV.write(joinpath(path, "HSC_h2_pipeline_flow.csv"), dfPowerBalance, writeheader=false)
+	CSV.write(joinpath(path, "HSC_pipeline_flow.csv"), dfH2Balance, writeheader=false)
 end

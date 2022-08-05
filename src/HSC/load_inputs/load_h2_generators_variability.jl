@@ -15,11 +15,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_generators_variability(path::AbstractString, setup::Dict, inputs::Dict)
+	load_h2_generators_variability(path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for reading input parameters related to hourly maximum capacity factors for all generators (plus storage and flexible demand resources)
 """
 function load_h2_generators_variability(path::AbstractString, setup::Dict, inputs::Dict)
+	
+	# Set indices for internal use
+	T = inputs["T"]   # Number of time steps (hours)
+	Zones = inputs["Zones"] # List of modeled zones
 
 	# Hourly capacity factors
 	if setup["TimeDomainReduction"] == 1
@@ -32,7 +36,7 @@ function load_h2_generators_variability(path::AbstractString, setup::Dict, input
 	select!(gen_var, [:Time_Index; Symbol.(inputs["H2_RESOURCES_NAME"]) ])
 
 	# Maximum power output and variability of each energy resource
-	inputs["pH2_Max"] = transpose(Matrix{Float64}(gen_var[1:inputs["T"],2:(inputs["H2_RES_ALL"]+1)]))
+	inputs["pH2_Max"] = transpose(Matrix{Float64}(gen_var[1:T, 2:(inputs["H2_RES_ALL"]+1)]))
 
 	println("HSC_generators_variability.csv Successfully Read!")
 

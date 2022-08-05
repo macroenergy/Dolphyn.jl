@@ -27,33 +27,45 @@ function load_h2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
         copycols = true,
     )
 
-    # Number of H2 Pipelines = L
+    # Number of zones in the network
+    Z = inputs["Z"]
+    Zones = inputs["Zones"]
+    
+    # Filter pipelines in modeled zones
+    pipeline_var = filter(row -> (row.StartZone in ["z$z" for z in Zones] && row.EndZone in ["z$z" for z in Zones]), pipeline_var)
+
+    # Number of H2 Pipelines
     inputs["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
+    L = inputs["H2_P"]
 
-    # Find first column of pipe map table
-    start = findall(s -> s == "z1", names(pipeline_var))[1]
+    # Topology of the pipeline network source-sink matrix
+    pipe_map = zeros(Int64, L, Z)
+    for l in 1:L
+        z_start = parse(Int32, pipeline_var[!, :StartZone][l][2:end])
+        z_end = parse(Int32, pipeline_var[!, :EndZone][l][2:end])
+        pipe_map[l, z_start] = 1
+        pipe_map[l, z_end] = -1
+    end
 
-    # Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
-    pipe_map = pipeline_var[1:inputs["H2_P"], start:start+inputs["Z"]-1]
+    pipe_map = DataFrame(pipe_map, :auto)
 
     # Create pipe number column
     pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
+    
     # Pivot table
-    pipe_map = stack(pipe_map, 1:inputs["Z"])
+    pipe_map = stack(pipe_map, Zones)
+
     # Create zone column
-    pipe_map[!, :Zone] = parse.(Float64, SubString.(pipe_map[!, :variable], 2))
-    #Remove redundant rows
+    pipe_map[!, :Zone] = parse.(Int32, SubString.(pipe_map[!, :variable], 2))
+    
+    # Remove redundant rows
     pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
 
-    #Rename column
+    # Rename column
     colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(pipe_map, Symbol.(colnames_pipe_map))
-
+    
     inputs["H2_Pipe_Map"] = pipe_map
-
-
-    # Number of pipelines routes in the network
-    inputs["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
 
     # Length in miles of each pipeline
     inputs["pPipe_length_miles"] =

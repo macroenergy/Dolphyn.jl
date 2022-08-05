@@ -20,8 +20,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 
-	#Read in H2 generation related inputs
+	# Set indices for internal use
+	T = inputs["T"]   # Number of time steps (hours)
+	Zones = inputs["Zones"] # List of modeled zones
+	
+	# Read in H2 generation related inputs
     h2_gen_in = DataFrame(CSV.File(joinpath(path, "HSC_generation.csv"), header=true), copycols=true)
+
+	# Filter resources in modeled zones
+	h2_gen_in = filter(row -> (row.Zone in Zones), h2_gen_in)
 
     # Add Resource IDs after reading to prevent user errors
 	h2_gen_in[!,:R_ID] = 1:size(collect(skipmissing(h2_gen_in[!,1])),1)
@@ -87,7 +94,6 @@ function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 	
 	inputs["C_H2_Start"] = inputs["dfH2Gen"][!,:Cap_Size_tonne_p_hr].* start_cost
 
-    
 	# Direct CO2 emissions per tonne of H2 produced for various technologies
 	inputs["dfH2Gen"][!,:CO2_per_tonne] = zeros(Float64, inputs["H2_RES_ALL"])
 

@@ -31,7 +31,7 @@ function load_h2_truck(path::AbstractString, setup::Dict, inputs::Dict)
     println("zone-distances-miles.csv Successfully Read!")
 
     # H2 truck type inputs
-    h2_truck_in = DataFrame(CSV.File(string(path, sep, "HSC_trucks.csv"), header=true), copycols=true)
+    h2_truck_in = DataFrame(CSV.File(joinpath(path, "HSC_trucks.csv"), header=true), copycols=true)
 
     # Add Truck Type IDs after reading to prevent user errors
 	h2_truck_in[!,:T_TYPE] = 1:size(collect(skipmissing(h2_truck_in[!,1])),1)
@@ -63,6 +63,8 @@ function load_h2_truck(path::AbstractString, setup::Dict, inputs::Dict)
     for j in inputs["H2_TRUCK_TYPES"]
         inputs["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
     end
+
     println("HSC_trucks.csv Successfully Read!")
+    
     return inputs
 end

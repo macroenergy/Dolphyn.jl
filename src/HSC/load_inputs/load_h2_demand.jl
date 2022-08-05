@@ -19,6 +19,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 function load_h2_demand(path::AbstractString, setup::Dict, inputs::Dict)
+	
+	# Set indices for internal use
+	T = inputs["T"]   # Number of time steps (hours)
+	Zones = inputs["Zones"] # List of modeled zones
     
 	if setup["TimeDomainReduction"] == 1
 		H2_load_in = DataFrame(CSV.File(joinpath(path, "HSC_load_data.csv"), header=true), copycols=true)
@@ -27,18 +31,13 @@ function load_h2_demand(path::AbstractString, setup::Dict, inputs::Dict)
 	end
 
     # Number of demand curtailment/lost load segments
-	inputs["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
-
-    # Demand in tonnes per hour for each zone
-	#println(names(load_in))
-	start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
+	inputs["H2_SEG"] = size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 	
 	# Max value of non-served energy in $/(tonne)
 	inputs["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
 	# Demand in Tonnes per hour
-	inputs["H2_D"] =Matrix(H2_load_in[1:inputs["T"],start:start-1+inputs["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+	inputs["H2_D"] = Matrix(H2_load_in[1:T, ["Load_H2_tonne_per_hr_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
 	
-
     # Cost of non-served energy/demand curtailment (for each segment)
 	H2_SEG = inputs["H2_SEG"]  # Number of demand segments
 	inputs["pC_H2_D_Curtail"] = zeros(H2_SEG)
@@ -55,4 +54,3 @@ function load_h2_demand(path::AbstractString, setup::Dict, inputs::Dict)
     return inputs
 
 end
-

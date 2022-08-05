@@ -22,6 +22,10 @@ src_path = "../../src/"
 println("Loading packages")
 push!(LOAD_PATH, src_path)
 
+### Load packages
+using YAML
+using Pkg
+
 ### Run this line to initialize the Julia virtual environment for DOLPHYN;
 ### Skip it, if the appropriate package versions are installed.
 environment_path = "../../env.jl"
@@ -30,9 +34,6 @@ println("Activating the Julia virtual environment")
 Pkg.activate("DOLPHYNJulEnv")
 Pkg.status()
 
-### Load packages
-using YAML
-using Pkg
 using DOLPHYN
 
 ## Store the path of the current working directory
