@@ -27,8 +27,8 @@ function write_h2_truck_flow(path::AbstractString, inputs::Dict,setup::Dict, EP:
 	T = inputs["T"]
 
     # H2 truck flow
-	truck_flow_path = string(path, sep, "H2TruckFlow")
-	if (isdir(truck_flow_path) == false)
+	truck_flow_path = joinpath(path, "H2TruckFlow")
+	if !isdir(truck_flow_path)
 		mkdir(truck_flow_path)
 	end
 
@@ -37,12 +37,12 @@ function write_h2_truck_flow(path::AbstractString, inputs::Dict,setup::Dict, EP:
 		for z in 1:Z
 			dfH2TruckFlow[!,Symbol("Zone$z")] = value.(EP[:vH2TruckFlow])[z,j,:]
 		end
-		CSV.write(string(truck_flow_path, sep, string("H2TruckFlow_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckFlow)
+		CSV.write(joinpath(truck_flow_path, string("H2TruckFlow_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckFlow)
 	end
 
 	# H2 truck Number
 	truck_number_path = joinpath(path, "H2TruckNumber")
-	if (!isdir(truck_number_path))
+	if !isdir(truck_number_path)
 		mkdir(truck_number_path)
 	end
 
@@ -52,12 +52,12 @@ function write_h2_truck_flow(path::AbstractString, inputs::Dict,setup::Dict, EP:
 		dfH2TruckNumberFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2N_full])[j,:]
 		dfH2TruckNumberEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2N_empty])[j,:]
 	end
-	CSV.write(string(truck_number_path, sep, "H2TruckNumberFull.csv"), dfH2TruckNumberFull)
-	CSV.write(string(truck_number_path, sep, "H2TruckNumberEmpty.csv"), dfH2TruckNumberEmpty)
+	CSV.write(joinpath(truck_number_path, "H2TruckNumberFull.csv"), dfH2TruckNumberFull)
+	CSV.write(joinpath(truck_number_path, "H2TruckNumberEmpty.csv"), dfH2TruckNumberEmpty)
 
 	# H2 truck state
 	truck_state_path = joinpath(path, "H2TruckState")
-	if (!isdir(truck_state_path))
+	if !isdir(truck_state_path)
 		mkdir(truck_state_path)
 	end
 
@@ -81,7 +81,7 @@ function write_h2_truck_flow(path::AbstractString, inputs::Dict,setup::Dict, EP:
 
 	# H2 truck transit
 	truck_transit_path = joinpath(path, "H2Transit")
-	if (!isdir(truck_transit_path))
+	if !isdir(truck_transit_path)
 		mkdir(truck_transit_path)
 	end
 
