@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_h2_g2p(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 	
-Function for reading input parameters of hydrogen to power generators.
+Function for reading input parameters related to hydrogen to power generators.
 """
 function load_h2_g2p(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 

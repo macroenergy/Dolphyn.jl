@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
-Function for reading input parameters of hydrogen generators.
+Function for reading input parameters related to hydrogen generators.
 """
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 

@@ -20,6 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
+inputs - dict object containing input data
 setup - dict object containing setup parameters
 path - string path to working directory
 
