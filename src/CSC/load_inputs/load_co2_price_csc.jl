@@ -15,25 +15,34 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_co2_price_csc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2::Dict)
+	load_co2_price_csc(path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for reading input parameters related to CO$_2$ emission cap constraints
 """
-function load_co2_price_csc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_price_csc::Dict)
+function load_co2_price_csc(path::AbstractString, setup::Dict, inputs::Dict)
+
+	# Set indices for internal use
+	T = inputs["T"]   # Number of time steps (hours)
+	Zones = inputs["Zones"] # List of modeled zones
+
 	# Definition of CO2 emission cap requirements by zone (as Max Mtons)
-	co2_price_csc = DataFrame(CSV.File(string(path, sep,"CSC_CO2_price.csv"), header=true), copycols=true)
+	co2_price_csc = DataFrame(CSV.File(joinpath(path, "CSC_CO2_price.csv"), header=true), copycols=true)
+
+	# Filter zonal CO2 price in modeled zones
+	co2_price_csc = filter(row -> (row.Zone in ["z$z" for z in Zones]), co2_price_csc)
 
 	# Emission limits
-	if  setup["CO2CostOffset"] ==1 # Carbon capture offset via a carbon price on total emission
-		if setup["ParameterScale"] ==1
-			inputs_co2_price_csc["dfCO2CO2PriceZone"] = co2_price_csc[!,:CO_2_Price_Zone]*ModelScalingFactor/1e+6
+	if  setup["CO2CostOffset"] == 1 # Carbon capture offset via a carbon price on total emission
+		if setup["ParameterScale"] == 1
+			inputs["dfCO2CO2PriceZone"] = co2_price_csc[!,:CO2_Price]*ModelScalingFactor/1e+6
 			# when scaled, the constraint unit is million$/ktonne
 		else
-			inputs_co2_price_csc["dfCO2CO2PriceZone"] = co2_price_csc[!,:CO_2_Price_Zone]
+			inputs["dfCO2CO2PriceZone"] = co2_price_csc[!,:CO2_Price]
 			# when not scaled, the constraint unit is ton
 		end
-
 	end
+
 	println("CSC_CO2_price.csv Successfully Read!")
-	return inputs_co2_price_csc
+	
+	return inputs
 end

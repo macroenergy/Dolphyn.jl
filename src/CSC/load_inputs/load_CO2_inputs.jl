@@ -16,18 +16,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 
 @doc raw"""
-	load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
+	load_co2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
-setup - dict object containing setup parameters
 path - string path to working directory
+setup - dict object containing setup parameters
+inputs - dict object containing inputs data
 
 returns: Dict (dictionary) object containing all data inputs
 """
 
-function load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
+function load_co2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 
 	## Use appropriate directory separator depending on Mac or Windows config
 	if Sys.isunix()
@@ -38,19 +39,17 @@ function load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
         sep = "/"
 	end
 
-	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
-
 	## Read input files
-	println("Reading co2 Input CSV Files")
+	println("Reading CO2 Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
-    inputs = load_co2_capture(setup, path, sep, inputs)
-	inputs = load_co2_demand(setup, path, sep, inputs)
-    inputs = load_co2_capture_variability(setup, path, sep, inputs)
-	inputs = load_co2_storage(setup, path, sep, inputs)
+    inputs = load_co2_capture(path, setup, inputs)
+	inputs = load_co2_demand(path, setup, inputs)
+    inputs = load_co2_capture_variability(path, setup, inputs)
+	inputs = load_co2_storage(path, setup, inputs)
 
 	# If including price offset from negative emssions, read in emissions related inputs
 	if setup["CO2CostOffset"] == 1
-		inputs = load_co2_price_csc(setup, path, sep, inputs)
+		inputs = load_co2_price_csc(path, setup, inputs)
 	end
 
 	
@@ -59,10 +58,10 @@ function load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 	##############################################################################################################################
 
 	# Read input data about power network topology, operating and expansion attributes
-    #if isfile(string(path,sep,"CSC_Pipelines.csv")) 
+    #if isfile(string(path,"CSC_Pipelines.csv")) 
 		# Creating flag for other parts of the code
 		#setup["ModelCO2Pipelines"] = 1
-		#inputs  = load_co2_pipeline_data(setup, path, sep, inputs)
+		#inputs  = load_co2_pipeline_data(setup, path,  inputs)
 	#else
 		#inputs["CO2_P"] = 0
 	#end
@@ -74,9 +73,9 @@ function load_co2_inputs(inputs::Dict, setup::Dict, path::AbstractString)
 	#Check whether or not there is LDS for trucks and co2 storage
 	#if !haskey(inputs, "Period_Map") && 
 		#(setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
-		#inputs = load_period_map(setup, path, sep, inputs)
+		#inputs = load_period_map(setup, path,  inputs)
 	#end
-	println("CSC Input CSV Files Successfully Read In From $path$sep")
+	println("CSC Input CSV Files Successfully Read In From $path")
 
 	return inputs
 end
