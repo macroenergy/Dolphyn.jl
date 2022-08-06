@@ -17,10 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
-    Sets up variables and constraints common to all storage resources. See ```storage()``` in ```storage.jl``` for description of constraints.
-**Storage with symmetric charge and discharge capacity**
+Sets up variables and constraints common to all hydrogen storage resources. See ```h2_storage()``` in ```h2_storage.jl``` for description of constraints.
+**Hydrogen storage devices with symmetric charge and discharge capacity**
 
-For storage technologies with symmetric charge and discharge capacity (all $o \in \mathcal{O}^{sym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed power capacity, $\Omega_{o,z}$. Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, GenX permits storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), with the simultaenous sum of charge, $\Pi_{o,z,t}$, and discharge, $\Theta_{o,z,t}$, also limited by the total installed power capacity, $\Delta^{total}_{o,z}$. These two constraints are as follows:
+For hydrogen storage technologies with symmetric charge and discharge capacity (all $o \in \mathcal{O}^{sym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed power capacity, $\Omega_{o,z}$. Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, DOLPHYN permits storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), with the simultaenous sum of charge, $\Pi_{o,z,t}$, and discharge, $\Theta_{o,z,t}$, also limited by the total installed power capacity, $\Delta^{total}_{o,z}$. These two constraints are as follows:
 
 ```math
 \begin{aligned}
@@ -29,44 +29,7 @@ For storage technologies with symmetric charge and discharge capacity (all $o \i
 \end{aligned}
 ```
 
-These constraints are created with the function ```storage_symmetric()``` in ```storage_symmetric.jl```.
-
-If reserves are modeled, the following two constraints replace those above:
-
-```math
-\begin{aligned}
-&  \Pi_{o,z,t} + f^{charge}_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-&  \Pi_{o,z,t} + f^{charge}_{o,z,t} + \Theta_{o,z,t} + f^{discharge}_{o,z,t} + r^{discharge}_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-\end{aligned}
-```
-
-where $f^{charge}_{o,z,t}$ is the contribution of storage resources to frequency regulation while charging, $f^{discharge}_{o,z,t}$ is the contribution of storage resources to frequency regulation while discharging, and $r^{discharge}_{o,z,t}$ is the contribution of storage resources to upward reserves while discharging. Note that as storage resources can contribute to regulation and reserves while either charging or discharging, the proxy variables $f^{charge}_{o,z,t}, f^{discharge}_{o,z,t}$ and $r^{charge}_{o,z,t}, r^{discharge}_{o,z,t}$ are created for storage resources where the total contribution to regulation and reserves, $f_{o,z,t}, r_{o,z,t}$ is the sum of the proxy variables.
-
-These constraints are created with the function ```storage_symmetric_reserves()``` in ```storage_symmetric.jl```.
-
-**Storage with asymmetric charge and discharge capacity**
-
-For storage technologies with asymmetric charge and discharge capacities (all $o \in \mathcal{O}^{asym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed charge capacity, $\Delta^{total, charge}_{o,z}$, as follows:
-
-```math
-\begin{aligned}
-	&  \Pi_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-These constraints are created with the function ```storage_asymmetric()``` in ```storage_asymmetric.jl```.
-
-If reserves are modeled, the above constraint is replaced by the following:
-
-```math
-\begin{aligned}
-	&  \Pi_{o,z,t} + f^{charge}_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-where $f^{+}_{y=o,z,t}$ is the contribution of storage resources to frequency regulation while charging.
-
-These constraints are created with the function ```storage_asymmetric_reserves()``` in ```storage_asymmetric.jl```.
+These constraints are created with the function ```h2_storage_symmetric()``` in ```h2_storage_symmetric.jl```.
 
 **All storage resources**
 
@@ -93,55 +56,7 @@ The next constraint limits the volume of energy stored at any time, $\Gamma_{o,z
 \end{aligned}
 ```
 
-The above constraints are established in ```storage_all()``` in ```storage_all.jl```.
-
-If reserves are modeled, two pairs of proxy variables $f^{charge}_{o,z,t}, f^{discharge}_{o,z,t}$ and $r^{charge}_{o,z,t}, r^{discharge}_{o,z,t}$ are created for storage resources, to denote the contribution of storage resources to regulation or reserves while charging or discharging, respectively. The total contribution to regulation and reserves, $f_{o,z,t}, r_{o,z,t}$ is then the sum of the proxy variables:
-
-```math
-\begin{aligned}
-	&  f_{o,z,t} = f^{charge}_{o,z,t} + f^{dicharge}_{o,z,t} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  r_{o,z,t} = r^{charge}_{o,z,t} + r^{dicharge}_{o,z,t} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-The total storage contribution to frequency regulation ($f_{o,z,t}$) and reserves ($r_{o,z,t}$) are each limited specified fraction of installed discharge power capacity ($\upsilon^{reg}_{y,z}, \upsilon^{rsv}_{y,z}$), reflecting the maximum ramp rate for the storage resource in whatever time interval defines the requisite response time for the regulation or reserve products (e.g., 5 mins or 15 mins or 30 mins). These response times differ by system operator and reserve product, and so the user should define these parameters in a self-consistent way for whatever system context they are modeling.
-
-```math
-\begin{aligned}
-	f_{y,z,t} \leq \upsilon^{reg}_{y,z} \times \Delta^{total}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{W}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	r_{y,z, t} \leq \upsilon^{rsv}_{y,z}\times \Delta^{total}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{W}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-When charging, reducing the charge rate is contributing to upwards reserve and frequency regulation as it drops net demand. As such, the sum of the charge rate plus contribution to regulation and reserves up must be greater than zero. Additionally, the discharge rate plus the contribution to regulation must be greater than zero.
-
-```math
-\begin{aligned}
-	&  \Pi_{o,z,t} - f^{charge}_{o,z,t} - r^{charge}_{o,z,t} \geq 0 & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  \Theta_{o,z,t} - f^{discharge}_{o,z,t} \geq 0 & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-Additionally, when reserves are modeled, the maximum charge rate and contribution to regulation while charging can be no greater than the available energy storage capacity, or the difference between the total energy storage capacity, $\Delta^{total, energy}_{o,z}$, and the state of charge at the end of the previous time period, $\Gamma_{o,z,t-1}$. Note that for storage to contribute to reserves down while charging, the storage device must be capable of increasing the charge rate (which increase net load).
-
-```math
-\begin{aligned}
-	&  \Pi_{o,z,t} + f^{charge}_{o,z,t} \leq \Delta^{energy, total}_{o,z} - \Gamma_{o,z,t-1} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-Finally, the constraints on maximum discharge rate are replaced by the following, to account for capacity contributed to regulation and reserves:
-
-```math
-\begin{aligned}
-	&  \Theta_{o,z,t} + f^{discharge}_{o,z,t} + r^{discharge}_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  \Theta_{o,z,t} + f^{discharge}_{o,z,t} + r^{discharge}_{o,z,t} \leq \Gamma_{o,z,t-1} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-The above reserve related constraints are established by ```storage_all_reserves()``` in ```storage_all.jl```
+The above constraints are established in ```h2_storage_all()``` in ```h2_storage_all.jl```.
 """
 function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources

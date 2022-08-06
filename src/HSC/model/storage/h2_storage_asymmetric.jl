@@ -18,6 +18,16 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     h2_storage_asymmetric(EP::Model, inputs::Dict)
 
 This module separates the hydrogen storage type into asymmetric and symmetric charge and models the action when charging and discharging is asymmetric.
+
+**Storage with asymmetric charge and discharge capacity**
+
+For storage technologies with asymmetric charge and discharge capacities (all $o \in \mathcal{O}^{asym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed charge capacity, $\Delta^{total, charge}_{o,z}$, as follows:
+
+```math
+\begin{aligned}
+	&  \Pi_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{aligned}
+```
 """
 function h2_storage_asymmetric(EP::Model, inputs::Dict)
     # Set up additional variables, constraints, and expressions associated with storage resources with asymmetric charge & discharge capacity

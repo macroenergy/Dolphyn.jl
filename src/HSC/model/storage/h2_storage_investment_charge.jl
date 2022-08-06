@@ -19,6 +19,43 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module defines the decision variables representing charging investment of hydrogen storage technologies.
 
+The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+
+```math
+\begin{aligned}
+& \Delta^{total,power}_{y,z} =(\overline{\Delta^{power}_{y,z}}+\Omega^{power}_{y,z}-\Delta^{power}_{y,z}) \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+One cannot retire more capacity than existing capacity.
+
+```math
+\begin{aligned}
+&\Delta^{power}_{y,z} \leq \overline{\Delta^{power}_{y,z}}
+		\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+For resources where $\overline{\Omega_{y,z}^{power}}$ and $\underline{\Omega_{y,z}^{power}}$ is defined, then we impose constraints on minimum and maximum power capacity.
+
+```math
+\begin{aligned}
+& \Delta^{total,power}_{y,z} \leq \overline{\Omega}^{power}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
+& \Delta^{total,power}_{y,z}  \geq \underline{\Omega}^{power}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+In addition, this function adds investment and fixed O\&M related costs related to charge capacity to the objective function:
+
+```math
+\begin{aligned}
+& 	\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
+	\left( (\pi^{INVEST,power}_{y,z} \times    \Omega^{power}_{y,z})
+	+ (\pi^{FOM,power}_{y,z} \times  \Delta^{total,power}_{y,z})\right)
+\end{aligned}
+```
 """
 function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
@@ -66,7 +103,6 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     #  ParameterScale = 0 --> objective function is in $
     if setup["ParameterScale"] == 1
-
         @expression(
             EP,
             eCFixH2Charge[y in H2_STOR_ALL],
@@ -83,7 +119,6 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
                 )
             end
         )
-
     else
         @expression(
             EP,

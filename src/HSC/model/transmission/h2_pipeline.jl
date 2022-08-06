@@ -17,30 +17,30 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-This function includes the variables, expressions and objective funtion of pipeline.
+This function includes the variables, expressions and objective funtion of hydrogen pipeline.
 
-This function expresses H2 change at zone z through pipeline i between two zones and can be split into H2 delivering and flowing out.
+This function expresses hydrogen exchange through pipeline i between two zones and can be split into H2 delivering and flowing out.
 
 ```math
 \begin{aligned}
-    C_{\mathrm{PIP}}^{\mathrm{c}}=\delta_{i}^{\mathrm{PIP}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{i \in \mathbb{I}} \mathrm{c}_{i}^{\mathrm{PIP}} \mathrm{L}_{z \rightarrow z^{\prime}} l_{z \rightarrow z,,^{\prime} i}
-    h_{z \rightarrow z,^{\prime}i, t}^{\mathrm{PIP}}=h_{z \rightarrow z,^{\prime}i, t}^{\mathrm{PIP+}}-h_{z \rightarrow z,{ }^{\prime} i, t}^{\mathrm{PIP-}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, i \in \mathbb{I}, t \in \mathbb{T}
+    C_{\mathrm{PIP}}^{\mathrm{c}}=\delta_{i}^{\mathrm{PIP}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{i \in \mathbb{I}} \mathrm{c}_{i}^{\mathrm{PIP}} \mathrm{L}_{z \rightarrow z^{\prime}} l_{z \rightarrow z,^{\prime}, i}
+    h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP}}=h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP+}}-h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP-}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, i \in \mathbb{I}, t \in \mathbb{T}
 \end{aligned}    
- ```
+```
 
-The flow rate of H2 through pipeline type i is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline i
+The flow rate of hydrogen through pipeline type i is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline i
 ```math
 \begin{aligned}
-    \overline{\mathrm{F}}_{i} l_{z \rightarrow z,^{\prime} i} \geq h_{z \rightarrow z,{ }^{\prime}, t}^{\mathrm{PIP+}}, h_{z \rightarrow z,{ }^{\prime} i, t}^{\mathrm{PIP}} \geq 0 \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, i \in \mathbb{I}, t \in \mathbb{T}
+    \overline{\mathrm{F}}_{i} l_{z \rightarrow z^{\prime} i} \geq h_{z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}, h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP}} \geq 0 \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, i \in \mathbb{I}, t \in \mathbb{T}
 \end{aligned}    
 ```
 
 The pipeline has storage capacity via line packing:
 ```math
 \begin{aligned}
-    \overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z,^{\prime} i} \geq &-\sum_{\tau=t_{0}}^{t}\left(h_{z^{\prime} \rightarrow z, i, \tau}^{\mathrm{PIP}}+h_{z \rightarrow z,^{\prime} i, \tau}^{\mathrm{PIP}}\right) \Delta t \geq \underline{\mathrm{R}}_{i}^{\mathrm{PIP}} \overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z,^{\prime} i} \\
+    \overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z^{\prime}, i} \geq &-\sum_{\tau=t_{0}}^{t}\left(h_{z^{\prime} \rightarrow z, i, \tau}^{\mathrm{PIP}}+h_{z \rightarrow z^{\prime}, i, \tau}^{\mathrm{PIP}}\right) \Delta t \geq \underline{\mathrm{R}}_{i}^{\mathrm{PIP}} \overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z^{\prime}, i} \\
     & \forall z^{\prime} \in \mathbb{Z}, z \in \mathbb{Z}, i \in \mathbb{I}, t \in \mathbb{T}
-\end{aligned}   
+\end{aligned}
 ```
 
 """
