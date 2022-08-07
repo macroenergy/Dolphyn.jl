@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_curtailment(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_curtailment(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for writing the curtailment values of the different variable renewable resources.
 """
-function write_curtailment(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_curtailment(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
 	

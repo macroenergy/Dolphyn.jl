@@ -1,9 +1,9 @@
 @doc raw"""
-	write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for reporting non-served energy for every model zone, time step and cost-segment.
 """
-function write_co2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_co2_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -41,6 +41,5 @@ function write_co2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, 
 	rename!(total,auxNew_Names)
 	dfNse = vcat(dfNse, total)
 
-	CSV.write(string(path,sep,"CSC_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
-	return dfTemp
+	CSV.write(joinpath(path, "CSC_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
 end

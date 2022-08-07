@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_costs(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+	
 	## Cost results
 	dfGen = inputs["dfGen"]
 	SEG = inputs["SEG"]  # Number of lines

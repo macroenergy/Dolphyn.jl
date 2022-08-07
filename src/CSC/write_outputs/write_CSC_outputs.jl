@@ -22,26 +22,26 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## returns: n/a
 ################################################################################
 @doc raw"""
-	write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+	write_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-function write_CSC_outputs(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+function write_CSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     # Create directory if it does not exist
     if !isdir(path)
         mkdir(path)
     end
 
-    write_co2_capacity(EP, path, inputs, setup)
-    write_co2_capture(EP, path, inputs, setup)
-    write_co2_costs(EP, path, inputs, setup)
-    write_co2_balance(EP, path, inputs, setup)
-    write_co2_emissions(EP, path, inputs, setup)
+    write_co2_capacity(path, setup, inputs, EP)
+    write_co2_capture(path, setup, inputs, EP)
+    write_co2_costs(path, setup, inputs, EP)
+    write_co2_balance(path, setup, inputs, EP)
+    write_co2_emissions(path, setup, inputs, EP)
 
-    #write_co2_storage(path, sep, inputs, setup, EP)
-    write_co2_storage_capacity(EP, path, inputs, setup)
-    #write_co2_storage_costs(path, sep, inputs, setup, EP)
+    #write_co2_storage(path, setup, inputs, setup)
+    write_co2_storage_capacity(path, setup, inputs, EP)
+    #write_co2_storage_costs(path, setup, inputs, EP)
 
     ## Print confirmation
     println("Wrote CSC outputs to $path")

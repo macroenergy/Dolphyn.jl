@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_power_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_power_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_power_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_power_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
 	

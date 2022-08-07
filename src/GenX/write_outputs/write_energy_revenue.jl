@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_energy_revenue(path::AbstractString, inputs::Dict, setup::Dict, EP::Model, dfPower::DataFrame, dfPrice::DataFrame, dfCharge::DataFrame)
+	write_energy_revenue(path::AbstractString, setup::Dict, inputs::Dict, EP::Model, dfPower::DataFrame, dfPrice::DataFrame, dfCharge::DataFrame)
 
 Function for writing energy revenue from the different generation technologies.
 """
-function write_energy_revenue(path::AbstractString, inputs::Dict, setup::Dict, EP::Model, dfPower::DataFrame, dfPrice::DataFrame, dfCharge::DataFrame)
+function write_energy_revenue(path::AbstractString, setup::Dict, inputs::Dict, EP::Model, dfPower::DataFrame, dfPrice::DataFrame, dfCharge::DataFrame)
 	
 	dfGen = inputs["dfGen"]
 	

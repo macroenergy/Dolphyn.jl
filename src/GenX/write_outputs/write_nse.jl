@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_nse(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for reporting non-served energy for every model zone, time step and cost-segment.
 """
-function write_nse(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
 	

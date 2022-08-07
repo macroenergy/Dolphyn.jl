@@ -15,25 +15,16 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_basic_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+    write_basic_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Write basic outputs like model solving status and time weights used in the model.
 """
-function write_basic_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
-
-    ## Use appropriate directory separator depending on Mac or Windows config
-	if Sys.isunix()
-		sep = "/"
-    elseif Sys.iswindows()
-		sep = "\U005c"
-    else
-        sep = "/"
-	end
+function write_basic_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     if !haskey(setup, "OverwriteResults") || setup["OverwriteResults"] == 1
         # Overwrite existing results if dir exists
         # This is the default behaviour when there is no flag, to avoid breaking existing code
-        if !(isdir(path))
+        if !isdir(path)
 		    mkdir(path)
 	    end
     else
@@ -48,20 +39,20 @@ function write_basic_outputs(EP::Model, path::AbstractString, setup::Dict, input
 	## Check if solved sucessfully - time out is included
 	if status != MOI.OPTIMAL && status != MOI.LOCALLY_SOLVED
 		if status != MOI.TIME_LIMIT # Model failed to solve, so record solver status and exit
-			write_status(path, sep, inputs, setup, EP)
+			write_status(path, setup, inputs, EP)
 			return
 		elseif isnan(objective_value(EP))==true
 			# Model failed to solve, so record solver status and exit
-			write_status(path, sep, inputs, setup, EP)
+			write_status(path, setup, inputs, EP)
 			return
 		end
 	end
 
-	write_status(path, sep, inputs, setup, EP)
+	write_status(path, setup, inputs, EP)
 
-    elapsed_time_time_weights = @elapsed write_time_weights(path, sep, inputs)
+    elapsed_time_time_weights = @elapsed write_time_weights(path, setup, inputs)
 	println("Time elapsed for writing time weights is")
 	println(elapsed_time_time_weights)
 
-    println("Wrote basic outputs to $path$sep")
+    println("Wrote basic outputs to $path")
 end

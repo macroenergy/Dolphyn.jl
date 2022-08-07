@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_co2_capture(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+	write_co2_capture(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for writing the different values of CO2 captured by the different technologies in operation.
 """
-function write_co2_capture(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+function write_co2_capture(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	
 	dfCO2Capture = inputs["dfCO2Capture"]
 	

@@ -119,24 +119,24 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 ### Writing output
 println("Writing Output")
 output_path = joinpath(root_path, "Results")
-write_basic_outputs(EP, output_path, setup, inputs)
+write_basic_outputs(output_path, setup, inputs, EP)
 
 ## Write power system output
 if setup["ModelPower"] == 1
     outpath_Power = joinpath(output_path, "Results_Power")
-    write_power_outputs(EP, outpath_Power, setup, inputs)
+    write_power_outputs(outpath_Power, setup, inputs, EP)
 end
 
 ## Write hydrogen supply chain outputs
 if setup["ModelH2"] == 1
     outpath_H2 = joinpath(output_path, "Results_HSC")
-    write_HSC_outputs(EP, outpath_H2, setup, inputs)
+    write_HSC_outputs(outpath_H2, setup, inputs, EP)
 end
 
 ## Write carbon supply chain outputs
 if setup["ModelCO2"] == 1
     outpath_CO2 = joinpath(output_path, "Results_CSC")
-    write_CSC_outputs(EP, outpath_CO2, setup, inputs)
+    write_CSC_outputs(outpath_CO2, setup, inputs, EP)
 end
 
 # ### Run MGA if the MGA flag is set to 1 else only save the least cost solution

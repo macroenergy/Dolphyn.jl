@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_co2_storage_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
+Function for reporting the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_co2_storage_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_co2_storage_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	## Cost results
 	dfCO2Stor = inputs["dfCO2Stor"]
 
@@ -42,7 +42,6 @@ function write_co2_storage_costs(path::AbstractString, sep::AbstractString, inpu
 
     dfCO2StorageCost[!,Symbol("Total")] = [cCO2StorageTotal, cCO2StorageFix, cCO2StorageVar]
 
-
 	for z in 1:Z
 		tempCStorageTotal = 0
 		tempCStorageFix = 0
@@ -54,7 +53,6 @@ function write_co2_storage_costs(path::AbstractString, sep::AbstractString, inpu
 			tempCStorageTotal = tempCStorageTotal + tempCStorageFix + tempCStorageVar
 		end
 
-		
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCStorageFix = tempCStorageFix * (ModelScalingFactor^2)
 			tempCStorageVar = tempCStorageVar * (ModelScalingFactor^2)
@@ -63,5 +61,6 @@ function write_co2_storage_costs(path::AbstractString, sep::AbstractString, inpu
 
 		dfCO2StorageCost[!,Symbol("Zone$z")] = [tempCStorageTotal, tempCStorageFix, tempCStorageVar]
 	end
-	CSV.write(string(path,sep,"CSC_storage_costs.csv"), dfCO2StorageCost)
+
+	CSV.write(joinpath(path, "CSC_storage_costs.csv"), dfCO2StorageCost)
 end

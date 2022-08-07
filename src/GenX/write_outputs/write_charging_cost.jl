@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_charging_cost(path::AbstractString, inputs::Dict, dfCharge::DataFrame, dfPrice::DataFrame, dfPower::DataFrame, setup::Dict)
+	write_charging_cost(path::AbstractString, inputs::Dict, setup::Dict, dfCharge::DataFrame, dfPrice::DataFrame, dfPower::DataFrame)
 
 """
-function write_charging_cost(path::AbstractString, inputs::Dict, dfCharge::DataFrame, dfPrice::DataFrame, dfPower::DataFrame, setup::Dict)
+function write_charging_cost(path::AbstractString, inputs::Dict, setup::Dict, dfCharge::DataFrame, dfPrice::DataFrame, dfPower::DataFrame)
 	
 	dfGen = inputs["dfGen"]
 	

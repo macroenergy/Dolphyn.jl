@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_co2_emissions(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+	write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
 """
-function write_co2_emissions(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+function write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	
 	dfCO2Capture = inputs["dfCO2Capture"]
 	T = inputs["T"]     # Number of time steps (hours)

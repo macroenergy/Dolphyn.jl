@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_commit(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_commit(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_commit(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_commit(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
 	

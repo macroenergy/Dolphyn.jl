@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_storagedual(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_storagedual(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for reporting dual of storage level (state of charge) balance of each resource in each time step.
 """
-function write_storagedual(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_storagedual(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
 

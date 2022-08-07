@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_esr_prices(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_esr_prices(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_esr_prices(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_esr_prices(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfESR = DataFrame(ESR_Price = convert(Array{Union{Missing, Float64}}, dual.(EP[:cESRShare])))
 	

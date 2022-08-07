@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_co2_capacity(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+	write_co2_capacity(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for writing the diferent capacities for the different generation technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
-function write_co2_storage_capacity(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+function write_co2_storage_capacity(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	# Capacity decisions
 	dfCO2Stor = inputs["dfCO2Stor"]
 

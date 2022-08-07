@@ -22,45 +22,44 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## returns: n/a
 ################################################################################
 @doc raw"""
-    write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+    write_HSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+function write_HSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     # Create directory if it does not exist
-    if !(isdir(path))
+    if !isdir(path)
         mkdir(path)
     end
 
-    write_h2_capacity(path, inputs, setup, EP)
-    write_h2_gen(path, inputs, setup, EP)
-    write_h2_nse(path, inputs, setup, EP)
-    # write_h2_costs(path, sep, inputs, setup, EP)
-    write_h2_balance(path, inputs, setup, EP)
+    write_h2_capacity(path, setup, inputs, EP)
+    write_h2_gen(path, setup, inputs, EP)
+    write_h2_nse(path, setup, inputs, EP)
+    # write_h2_costs(path, sep, setup, inputs, EP)
+    write_h2_balance(path, setup, inputs, EP)
     if setup["ModelH2Pipelines"] == 1
-        write_h2_pipeline_flow(path, inputs, setup, EP)
-        write_h2_pipeline_expansion(path, inputs, setup, EP)
-        write_h2_pipeline_level(path, inputs, setup, EP)
+        write_h2_pipeline_flow(path, setup, inputs, EP)
+        write_h2_pipeline_expansion(path, setup, inputs, EP)
+        write_h2_pipeline_level(path, setup, inputs, EP)
     end
 
     if setup["H2CO2Cap"] == 1
-        write_h2_emissions(path, inputs, setup, EP)
+        write_h2_emissions(path, setup, inputs, EP)
     end
 
-    write_h2_charge(path, inputs, setup, EP)
-    write_h2_storage(path, inputs, setup, EP)
+    write_h2_charge(path, setup, inputs, EP)
+    write_h2_storage(path, setup, inputs, EP)
 
     if setup["ModelH2Trucks"] == 1
-        write_h2_truck_capacity(path, inputs, setup, EP)
-        write_h2_truck_flow(path, inputs, setup, EP)
+        write_h2_truck_capacity(path, setup, inputs, EP)
+        write_h2_truck_flow(path, setup, inputs, EP)
     end
 
-
     if setup["ModelH2G2P"] == 1
-        write_h2_g2p(path, inputs, setup, EP)
-        write_p_g2p(path, inputs, setup, EP)
-        write_g2p_capacity(path, inputs, setup, EP)
+        write_h2_g2p(path, setup, inputs, EP)
+        write_p_g2p(path, setup, inputs, EP)
+        write_g2p_capacity(path, setup, inputs, EP)
     end
 
     ## Print confirmation

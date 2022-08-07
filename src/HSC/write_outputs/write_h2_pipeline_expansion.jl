@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_h2_pipeline_expansion(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+    write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_h2_pipeline_expansion(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     L = inputs["H2_P"]     # Number of H2 pipelines
 

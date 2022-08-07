@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+	write_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_co2_costs(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+function write_co2_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	## Cost results
 	dfCO2Capture = inputs["dfCO2Capture"]
