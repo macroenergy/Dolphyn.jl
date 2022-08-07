@@ -15,14 +15,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_co2_emissions(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
-
 """
-function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_co2_emissions(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+	
 	dfCO2Capture = inputs["dfCO2Capture"]
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
@@ -48,14 +47,14 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+2] .= sum(dfDACEmissions[!,Symbol("t$t")][1:Z])
-		elseif v"1.4" <= VERSION <= v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+2] .= sum(dfDACEmissions[:,Symbol("t$t")][1:Z])
 		end
 	end
 	rename!(total,auxNew_Names)
 	dfEmissions = vcat(dfDACEmissions, total)
 
-	CSV.write(string(path,sep,"DAC_net_emissions.csv"), dftranspose(dfDACEmissions, false), writeheader=false)
+	CSV.write(joinpath(path, "DAC_net_emissions.csv"), dftranspose(dfDACEmissions, false), writeheader=false)
 	
 	# PSC emissions
 	dfPSCEmission = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
@@ -80,14 +79,14 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+2] .= sum(dfPSCEmission[!,Symbol("t$t")][1:Z])
-		elseif v"1.4" <= VERSION <= v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+2] .= sum(dfPSCEmission[:,Symbol("t$t")][1:Z])
 		end
 	end
 	rename!(total,auxNew_Names)
 	dfEmissions = vcat(dfPSCEmission, total)
 
-	CSV.write(string(path,sep,"PSC_emissions.csv"), dftranspose(dfPSCEmission, false), writeheader=false)
+	CSV.write(joinpath(path, "PSC_emissions.csv"), dftranspose(dfPSCEmission, false), writeheader=false)
 
 	# PSC capture CO2
 	dfPSCCaptured = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
@@ -112,12 +111,12 @@ function write_co2_emissions(path::AbstractString, sep::AbstractString, inputs::
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+2] .= sum(dfPSCCaptured[!,Symbol("t$t")][1:Z])
-		elseif v"1.4" <= VERSION <= v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+2] .= sum(dfPSCCaptured[:,Symbol("t$t")][1:Z])
 		end
 	end
 	rename!(total,auxNew_Names)
 	dfEmissions = vcat(dfPSCCaptured, total)
 
-	CSV.write(string(path,sep,"PSC_co2_capture.csv"), dftranspose(dfPSCCaptured, false), writeheader=false)
+	CSV.write(joinpath(path, "PSC_co2_capture.csv"), dftranspose(dfPSCCaptured, false), writeheader=false)
 end

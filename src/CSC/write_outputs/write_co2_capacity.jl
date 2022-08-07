@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model))
+	write_co2_capacity(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
 
 Function for writing the diferent capacities for the different capture technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
-function write_co2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_co2_capacity(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+
 	# Capacity decisions
 	dfCO2Capture = inputs["dfCO2Capture"]
 	capdischarge = zeros(size(inputs["CO2_RESOURCES_NAME"]))
@@ -47,7 +48,7 @@ function write_co2_capacity(path::AbstractString, sep::AbstractString, inputs::D
 
 	dfCap = vcat(dfCap, total)
 
-	CSV.write(string(path,sep,"CSC_capture_capacity.csv"), dfCap)
+	CSV.write(joinpath(path, "CSC_capture_capacity.csv"), dfCap)
 	
 	return dfCap
 end

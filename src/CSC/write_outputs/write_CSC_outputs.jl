@@ -26,32 +26,24 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+function write_CSC_outputs(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
 
-    ## Use appropriate directory separator depending on Mac or Windows config
-    if Sys.isunix()
-        sep = "/"
-    elseif Sys.iswindows()
-        sep = "\U005c"
-    else
-        sep = "/"
-    end
     # Create directory if it does not exist
-    if !(isdir(path))
+    if !isdir(path)
         mkdir(path)
     end
 
-    write_co2_capacity(path, sep, inputs, setup, EP)
-    write_co2_capture(path, sep, inputs, setup, EP)
-    write_co2_costs(path, sep, inputs, setup, EP)
-    write_co2_balance(path, sep, inputs, setup, EP)
-    write_co2_emissions(path, sep, inputs, setup, EP)
+    write_co2_capacity(EP, path, inputs, setup)
+    write_co2_capture(EP, path, inputs, setup)
+    write_co2_costs(EP, path, inputs, setup)
+    write_co2_balance(EP, path, inputs, setup)
+    write_co2_emissions(EP, path, inputs, setup)
 
     #write_co2_storage(path, sep, inputs, setup, EP)
-    write_co2_storage_capacity(path, sep, inputs, setup, EP)
+    write_co2_storage_capacity(EP, path, inputs, setup)
     #write_co2_storage_costs(path, sep, inputs, setup, EP)
 
     ## Print confirmation
-    println("Wrote CSC outputs to $path$sep")
+    println("Wrote CSC outputs to $path")
 
 end # END output()

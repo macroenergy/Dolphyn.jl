@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_costs(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
 
 Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_co2_costs(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+
 	## Cost results
 	dfCO2Capture = inputs["dfCO2Capture"]
 
@@ -31,7 +32,7 @@ function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	cCO2Start = 0
 
 	dfCO2Cost = DataFrame(Costs = ["cCO2Total", "cCO2Fix", "cCO2Var", "cCO2Start"])
-	if setup["ParameterScale"]==1 # Convert costs in millions to $
+	if setup["ParameterScale"] == 1 # Convert costs in millions to $
 		cCO2Var = value(EP[:eTotalCCO2CaptureVarOut])* (ModelScalingFactor^2)
 		cCO2Fix = value(EP[:eTotalCO2CaptureCFix])*ModelScalingFactor^2
 	else
@@ -96,5 +97,6 @@ function write_co2_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 
 		dfCO2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCStart]
 	end
-	CSV.write(string(path,sep,"CSC_costs.csv"), dfCO2Cost)
+
+	CSV.write(joinpath(path, "CSC_costs.csv"), dfCO2Cost)
 end

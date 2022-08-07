@@ -1,5 +1,5 @@
 """
-CaptureX: An Configurable Capacity Expansion Model
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,7 +14,12 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function write_co2_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+@doc raw"""
+	write_co2_balance(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+
+"""
+function write_co2_balance(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
+	
 	dfCO2Capture = inputs["dfCO2Capture"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
@@ -40,6 +45,8 @@ function write_co2_balance(path::AbstractString, sep::AbstractString, inputs::Di
 	for c in 2:size(dfCO2Balance,2)
 		dfCO2Balance[rowoffset,c]=sum(inputs["omega"].*dfCO2Balance[(rowoffset+1):size(dfCO2Balance,1),c])
 	end
+
 	dfCO2Balance = DataFrame(dfCO2Balance, :auto)
-	CSV.write(string(path,sep,"CSC_co2_balance.csv"), dfCO2Balance, writeheader=false)
+	
+	CSV.write(joinpath(path, "CSC_co2_balance.csv"), dfCO2Balance, writeheader=false)
 end

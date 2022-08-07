@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model))
+	write_co2_capacity(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
 
 Function for writing the diferent capacities for the different generation technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
-function write_co2_storage_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_co2_storage_capacity(EP::Model, path::AbstractString, inputs::Dict, setup::Dict)
 	# Capacity decisions
 	dfCO2Stor = inputs["dfCO2Stor"]
 
@@ -34,14 +34,12 @@ function write_co2_storage_capacity(path::AbstractString, sep::AbstractString, i
 	for i in inputs["CO2_STOR_ALL"]
 		capcarbon[i] = value(EP[:vCO2CAPCARBON][i])
 	end
-	
 
 	dfStorageCap = DataFrame(
 		Storage = inputs["CO2_STORAGE_NAME"], Zone = dfCO2Stor[!,:Zone],
 		NewCarbonCap = capcarbon[:],
 		NewChargeCap = capcharge[:],
 	)
-
 
 	total = DataFrame(
 			Storage = "Total", Zone = "n/a",
@@ -50,6 +48,8 @@ function write_co2_storage_capacity(path::AbstractString, sep::AbstractString, i
 		)
 
 	dfStorageCap = vcat(dfStorageCap, total)
-	CSV.write(string(path,sep,"CSC_storage_capacity.csv"), dfStorageCap)
+
+	CSV.write(joinpath(path, "CSC_storage_capacity.csv"), dfStorageCap)
+	
 	return dfStorageCap
 end

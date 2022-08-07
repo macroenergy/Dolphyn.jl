@@ -104,7 +104,7 @@ end
 ## Load CO2 inputs if modeling the carbon supply chain
 if setup["ModelCO2"] == 1
     co2_inputs_path = joinpath(inputs_path, "CSC")
-    inputs = load_co2_inputs(co2_inputs_path, setup, inpath)
+    inputs = load_co2_inputs(co2_inputs_path, setup, inputs)
 end
 
 ### Generate model
