@@ -1,7 +1,0 @@
-CO2_Storage,Zone,LDS,New_Build,Inv_Cost_Charge_p_tonne_p_hr_yr,Inv_Cost_Carbon_p_tonne_yr,Fixed_OM_Cost_Charge_p_tonne_p_hr_yr,Fixed_OM_Cost_Carbon_p_tonne_yr,Var_OM_Cost_p_tonne,Var_OM_Cost_Charge_p_tonne,Fuel,Max_Charge_Cap_tonne_p_hr,Min_Charge_Cap_tonne_p_hr,Max_Carbon_Cap_tonne,Min_Carbon_Cap_tonne,Cap_Size_tonne_p_hr,CO2Stor_min_level,CO2Stor_max_level,CO2Stor_Charge_MWh_p_tonne,CO2Stor_Charge_MMBtu_p_tonne,CO2Stor_eff_charge
-Above_ground_storage_1,1,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
-Above_ground_storage_2,2,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
-Above_ground_storage_3,3,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
-Above_ground_storage_4,4,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
-Above_ground_storage_5,5,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
-Above_ground_storage_6,6,0,1,0,0,0,0,0,0,None,-1,0,-1,0,0,0,1,0,0,1
