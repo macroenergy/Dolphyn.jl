@@ -1,18 +1,26 @@
+# .gitignore File
+
+## julia cache files
 *.jl.cov
 *.jl.*.cov
 *.jl.mem
-*.DS_Store
-/Manifest.toml
-.Rhistory
-.vscode/
-YourModel.lp
-gurobi.log
-Example_Systems/SmallNewEngland/ThreeZones/TDR_*
-Example_Systems/SmallNewEngland/SevenZones/TDR_*
-Example_Systems/SmallNewEngland/ThreeZones/Results*
-Example_Systems/SmallNewEngland/SevenZones/Results*
-Example_Systems/SomeWhere/Results*
-Example_Systems/GreenField/Results*
-src/test.jl
+
+## julia project files
+Manifest.toml
+Project.toml
+
+## project document build
 /docs/build/
+
+## project running case
+**/DOLPHYNJulEnv
+gurobi.log
+YourModel.lp
+**/Results*
+
+## MacOS cache files
+*.DS_Store
+
+## IDE cache files
+.vscode/
 **/.ipynb_checkpoints/
