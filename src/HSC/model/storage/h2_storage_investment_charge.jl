@@ -23,7 +23,7 @@ The total capacity of each resource is defined as the sum of the existing capaci
 
 ```math
 \begin{aligned}
-& \Delta^{total,power}_{y,z} =(\overline{\Delta^{power}_{y,z}}+\Omega^{power}_{y,z}-\Delta^{power}_{y,z}) \forall y \in \mathcal{O}, z \in \mathcal{Z}
+& \Delta^{total,charge}_{y,z} =(\overline{\Delta^{charge}_{y,z}}+\Omega^{charge}_{y,z}-\Delta^{charge}_{y,z}) \forall y \in \mathcal{O}, z \in \mathcal{Z}
 \end{aligned}
 ```
 
@@ -31,18 +31,18 @@ One cannot retire more capacity than existing capacity.
 
 ```math
 \begin{aligned}
-&\Delta^{power}_{y,z} \leq \overline{\Delta^{power}_{y,z}}
+&\Delta^{charge}_{y,z} \leq \overline{\Delta^{charge}_{y,z}}
 		\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
 \end{aligned}
 ```
 
-For resources where $\overline{\Omega_{y,z}^{power}}$ and $\underline{\Omega_{y,z}^{power}}$ is defined, then we impose constraints on minimum and maximum power capacity.
+For resources where $\overline{\Omega_{y,z}^{charge}}$ and $\underline{\Omega_{y,z}^{charge}}$ is defined, then we impose constraints on minimum and maximum charge capacity.
 
 ```math
 \begin{aligned}
-& \Delta^{total,power}_{y,z} \leq \overline{\Omega}^{power}_{y,z}
+& \Delta^{total,charge}_{y,z} \leq \overline{\Omega}^{charge}_{y,z}
 	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
-& \Delta^{total,power}_{y,z}  \geq \underline{\Omega}^{power}_{y,z}
+& \Delta^{total,charge}_{y,z}  \geq \underline{\Omega}^{charge}_{y,z}
 	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
 \end{aligned}
 ```
@@ -52,8 +52,8 @@ In addition, this function adds investment and fixed O\&M related costs related 
 ```math
 \begin{aligned}
 & 	\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST,power}_{y,z} \times    \Omega^{power}_{y,z})
-	+ (\pi^{FOM,power}_{y,z} \times  \Delta^{total,power}_{y,z})\right)
+	\left( (\pi^{INVEST,charge}_{y,z} \times    \Omega^{charge}_{y,z})
+	+ (\pi^{FOM,charge}_{y,z} \times  \Delta^{total,charge}_{y,z})\right)
 \end{aligned}
 ```
 """
@@ -70,7 +70,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
     ### Variables ###
 
-    ## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
+    ## Storage capacity built and retired for storage resources with independent charge and discharge charge capacities (STOR=2)
 
     # New installed charge capacity of resource "y"
     @variable(EP, vH2CAPCHARGE[y in NEW_CAP_H2_CHARGE] >= 0)

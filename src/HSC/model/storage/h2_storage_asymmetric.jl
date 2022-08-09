@@ -19,9 +19,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module separates the hydrogen storage type into asymmetric and symmetric charge and models the action when charging and discharging is asymmetric.
 
-**Storage with asymmetric charge and discharge capacity**
+**Hydrogen storage with asymmetric charge and discharge capacity**
 
-For storage technologies with asymmetric charge and discharge capacities (all $o \in \mathcal{O}^{asym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed charge capacity, $\Delta^{total, charge}_{o,z}$, as follows:
+For hydrogen storage technologies with asymmetric charge and discharge capacities (all $o \in \mathcal{O}^{asym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed charge capacity, $\Delta^{total, charge}_{o,z}$, as follows:
 
 ```math
 \begin{aligned}
