@@ -15,25 +15,25 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+    write_co2_pipeline_level(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
+Function for writing carbon storage level for each pipeline.
 """
-function write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_co2_pipeline_level(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-    L = inputs["H2_P"]     # Number of H2 pipelines
+    P = inputs["CO2_P"]  # Number of H2 pipelines
+    T = inputs["T"]  # Model operating time steps
 
-    transcap = zeros(L) # Transmission network reinforcements in tonne/hour
-    for i = 1:L
-        transcap[i] =
-            (value.(EP[:vH2NPipe][i]) - inputs["pH2_Pipe_No_Curr"][i]) .*
-            inputs["pH2_Pipe_Max_Flow"][i]
+    p = zeros(P, T)
+    dfCO2PipelineLevel = DataFrame(Pipelines = 1:P)
+
+    for i in 1:P
+        p[i, :] = value.(EP[:vCO2PipeLevel])[i, :]
     end
 
-    dfTransCap = DataFrame(
-        Line = 1:L,
-        Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"] .* inputs["pH2_Pipe_No_Curr"],
-        New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap),
-    )
-    
-    CSV.write(joinpath(path, "HSC_pipeline_expansion.csv"), dfTransCap)
+    dfCO2PipelineLevel = hcat(dfCO2PipelineLevel, DataFrame(p, :auto))
+    auxNew_Names=[Symbol("Pipelines");[Symbol("t$t") for t in 1:T]]
+    rename!(dfCO2PipelineLevel, auxNew_Names)
+
+    CSV.write(joinpath(path, "CSC_pipeline_level.csv"), dftranspose(dfCO2PipelineLevel, false), writeheader=false)
 end

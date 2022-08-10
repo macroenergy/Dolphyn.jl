@@ -37,11 +37,25 @@ function write_CSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::
     write_co2_capture(path, setup, inputs, EP)
     write_co2_costs(path, setup, inputs, EP)
     write_co2_balance(path, setup, inputs, EP)
-    write_co2_emissions(path, setup, inputs, EP)
 
-    #write_co2_storage(path, setup, inputs, setup)
+    if setup["ModelCO2Pipelines"] == 1
+        write_co2_pipeline_flow(path, setup, inputs, EP)
+        write_co2_pipeline_expansion(path, setup, inputs, EP)
+        write_co2_pipeline_level(path, setup, inputs, EP)
+    end
+    
+    if setup["CO2CO2Cap"] == 1
+        write_co2_emissions(path, setup, inputs, EP)
+    end
+
+    if setup["ModelCO2Trucks"] == 1
+        write_co2_truck_capacity(path, setup, inputs, EP)
+        write_co2_truck_flow(path, setup, inputs, EP)
+    end
+
+    # write_co2_storage(path, setup, inputs, EP)
     write_co2_storage_capacity(path, setup, inputs, EP)
-    #write_co2_storage_costs(path, setup, inputs, EP)
+    # write_co2_storage_costs(path, setup, inputs, EP)
 
     ## Print confirmation
     println("Wrote CSC outputs to $path")

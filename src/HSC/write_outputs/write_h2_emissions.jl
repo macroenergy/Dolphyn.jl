@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-write_h2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+	write_h2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
 """

@@ -15,42 +15,42 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_h2_pipeline_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+	write_co2_pipeline_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_h2_pipeline_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_co2_pipeline_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H2_P = inputs["H2_P"] # Number of Hydrogen Pipelines
-    H2_Pipe_Map = inputs["H2_Pipe_Map"]
+	CO2_P = inputs["CO2_P"] # Number of Hydrogen Pipelines
+    CO2_Pipe_Map = inputs["CO2_Pipe_Map"]
 
 	## Hydrogen balance for each zone
-	dfH2Balance = Array{Any}
+	dfCO2Balance = Array{Any}
 	rowoffset=3
-	for p in 1:H2_P
+	for p in 1:CO2_P
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 3)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Source_Zone_H2_Net", 
-	           "Sink_Zone_H2_Net", "Pipe_Level"]
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Source_Zone_CO2_Net", 
+	           "Sink_Zone_CO2_Net", "Pipe_Level"]
 
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([p],size(dfTemp1,2))
         
-        dfTemp1[3,1:size(dfTemp1,2)] = [[H2_Pipe_Map[(H2_Pipe_Map[!,:d] .== 1) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:zone_str][1]],[H2_Pipe_Map[(H2_Pipe_Map[!,:d] .== -1) .& (H2_Pipe_Map[!,:pipe_no] .== p), :][!,:zone_str][1]],"NA"]
+        dfTemp1[3,1:size(dfTemp1,2)] = [[CO2_Pipe_Map[(CO2_Pipe_Map[!,:d] .== 1) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:zone_str][1]],[CO2_Pipe_Map[(CO2_Pipe_Map[!,:d] .== -1) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:zone_str][1]],"NA"]
 
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= value.(EP[:eH2PipeFlow_net][p,t,1])
-	     	dfTemp1[t+rowoffset,2] = value.(EP[:eH2PipeFlow_net][p,t,-1])
-            dfTemp1[t+rowoffset,3] = value.(EP[:vH2PipeLevel][p,t])
+	     	dfTemp1[t+rowoffset,1]= value.(EP[:eCO2PipeFlow_net][p,t,1])
+	     	dfTemp1[t+rowoffset,2] = value.(EP[:eCO2PipeFlow_net][p,t,-1])
+            dfTemp1[t+rowoffset,3] = value.(EP[:vCO2PipeLevel][p,t])
 	   	end
 
 		if p == 1
-			dfH2Balance =  hcat(vcat(["", "Pipe", "Zone"], ["t$t" for t in 1:T]), dfTemp1)
+			dfCO2Balance =  hcat(vcat(["", "Pipe", "Zone"], ["t$t" for t in 1:T]), dfTemp1)
 		else
-		    dfH2Balance = hcat(dfH2Balance, dfTemp1)
+		    dfCO2Balance = hcat(dfCO2Balance, dfTemp1)
 		end
 	end
 
-	dfH2Balance = DataFrame(dfH2Balance, :auto)
+	dfCO2Balance = DataFrame(dfCO2Balance, :auto)
 
-	CSV.write(joinpath(path, "HSC_pipeline_flow.csv"), dfH2Balance, writeheader=false)
+	CSV.write(joinpath(path, "CSC_pipeline_flow.csv"), dfCO2Balance, writeheader=false)
 end
