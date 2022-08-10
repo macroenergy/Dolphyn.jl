@@ -18,7 +18,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
 The co2_capture_no_commit module creates decision variables, expressions, and constraints related to various carbon capture technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
-
 """
 function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
@@ -45,13 +44,8 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eCO2Balance] += eCO2CaptureNoCommit
 
 	# Power Consumption for CO2 Capture
-	if setup["ParameterScale"] == 1
-		@expression(EP, ePowerBalanceCO2CaptureNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vPCO2][k,t]/ModelScalingFactor for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
-	else
-		@expression(EP, ePowerBalanceCO2CaptureNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vPCO2][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
-	end
+	@expression(EP, ePowerBalanceCO2CaptureNoCommit[t=1:T, z=1:Z],
+	sum(EP[:vPCO2][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
 
 	EP[:ePowerBalance] += -ePowerBalanceCO2CaptureNoCommit
 
@@ -59,10 +53,7 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eCO2NetpowerConsumptionByAll] += ePowerBalanceCO2CaptureNoCommit
 	
 	# Power and natural gas consumption associated with CO2 generation in each time step
-	@constraints(EP, begin
-		#Power Balance
-		[k in CO2_CAPTURE_NO_COMMIT, t = 1:T], EP[:vPCO2][k,t] == EP[:vCO2Capture][k,t] * dfCO2Capture[!,:etaPCO2_MWh_p_tonne][k]
-	end)
+	@constraint(EP, [k in CO2_CAPTURE_NO_COMMIT, t = 1:T], EP[:vPCO2][k,t] == EP[:vCO2Capture][k,t] * dfCO2Capture[!,:etaPCO2_MWh_p_tonne][k])
 
 	@constraints(EP, begin
 		# Maximum carbon capture per technology "k" at hour "t"
@@ -94,7 +85,3 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 	return EP
 	
 end
-
-
-
-

@@ -114,10 +114,12 @@ include("CSC/load_inputs/load_co2_capture.jl")
 include("CSC/load_inputs/load_co2_capture_variability.jl")
 include("CSC/load_inputs/load_co2_price_csc.jl")
 include("CSC/load_inputs/load_co2_storage.jl")
+include("CSC/load_inputs/load_co2_pipeline_data.jl")
+include("CSC/load_inputs/load_co2_truck.jl")
 
 include("CSC/load_inputs/load_CO2_inputs.jl")
 
-# Core GenX Features
+# Core GenX features
 include("GenX/model/core/discharge/discharge.jl")
 include("GenX/model/core/discharge/investment_discharge.jl")
 include("GenX/model/core/non_served_energy.jl")
@@ -146,7 +148,7 @@ include("GenX/model/policies/energy_share_requirement.jl")
 include("GenX/model/policies/cap_reserve_margin.jl")
 include("GenX/model/policies/minimum_capacity_requirement.jl")
 
-# Core HSC Modelling Features
+# Core HSC modelling features
 include("HSC/model/core/h2_investment.jl")
 include("HSC/model/core/h2_outputs.jl")
 include("HSC/model/core/h2_non_served_energy.jl")
@@ -188,23 +190,26 @@ include("HSC/model/g2p/h2_g2p.jl")
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
 
-# Core CSC Modelling Features
+# Core CSC modelling features
 include("CSC/model/core/co2_investment.jl")
 include("CSC/model/core/co2_outputs.jl")
 include("CSC/model/core/co2_non_served.jl")
 include("CSC/model/core/emissions_csc.jl")
 
-# CO2 Capture
+# CO2 capture
 include("CSC/model/capture/co2_capture.jl")
 include("CSC/model/capture/co2_capture_all.jl")
 include("CSC/model/capture/co2_capture_commit.jl")
 include("CSC/model/capture/co2_capture_no_commit.jl")
 
-# CO2 Storage
+# CO2 storage
 include("CSC/model/storage/co2_storage_investment.jl")
 include("CSC/model/storage/co2_storage.jl")
 include("CSC/model/storage/co2_storage_all.jl")
 include("CSC/model/storage/co2_long_duration_storage.jl")
+
+# CO2 pipelines
+include("CSC/model/transmission/co2_pipeline.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
@@ -221,7 +226,7 @@ include("write_outputs/write_time_weights.jl")
 
 include("write_outputs/write_Basic_outputs.jl")
 
-# Write GenX Outputs
+# Write GenX outputs
 include("GenX/write_outputs/write_capacity.jl")
 include("GenX/write_outputs/write_charge.jl")
 include("GenX/write_outputs/write_charging_cost.jl")
@@ -263,7 +268,7 @@ include("GenX/write_outputs/ucommit/write_start.jl")
 
 include("GenX/write_outputs/write_Power_outputs.jl")
 
-# HSC Write Outputs
+# Write HSC outputs
 include("HSC/write_outputs/write_h2_gen.jl")
 include("HSC/write_outputs/write_h2_capacity.jl")
 include("HSC/write_outputs/write_h2_nse.jl")
@@ -282,7 +287,7 @@ include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
 
-# CSC Write Outputs
+# Write CSC outputs
 include("CSC/write_outputs/write_co2_capture.jl")
 include("CSC/write_outputs/write_co2_capacity.jl")
 include("CSC/write_outputs/write_co2_costs.jl")

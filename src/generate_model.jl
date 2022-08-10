@@ -264,28 +264,32 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = co2_storage(EP, inputs, setup)
 		end
 
+		if setup["ModelCO2Pipelines"] == 1
+			# Model hydrogen transmission via pipelines
+			EP = co2_pipeline(EP, inputs, setup)
+		end
+
+		if setup["ModelCO2Trucks"] == 1
+			EP = co2_truck(EP, inputs, setup)
+		end
+		
 		# Direct emissions of various carbon capture sector resources
-		EP = emissions_csc(EP, inputs,setup)
+		EP = emissions_csc(EP, inputs, setup)
 
 	end
 
 	################  Policies #####################3
 
-	if setup["ModelH2"] ==0 
-
-		if setup["ModelCO2"]==0
+	if setup["ModelH2"] == 0 
+		if setup["ModelCO2"] == 0
 			EP = co2_cap_power(EP, inputs, setup)
-
-		elseif setup["ModelCO2"]==1
+		elseif setup["ModelCO2"] == 1
 			EP = co2_cap_power_csc(EP, inputs, setup)
 		end
-
-	elseif setup["ModelH2"]==1
-
-		if setup["ModelCO2"]==0
+	elseif setup["ModelH2"] == 1
+		if setup["ModelCO2"] == 0
 			EP = co2_cap_power_hsc(EP, inputs, setup)
-
-		elseif setup["ModelCO2"]==1
+		elseif setup["ModelCO2"] == 1
 			EP = co2_cap_power_hsc_csc(EP, inputs, setup)
 		end
 	end

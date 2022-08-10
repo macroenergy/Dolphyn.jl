@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module defines the variables and constraints with carbon transimission via pipelines.
  
 """
-
 function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     println("Carbon Pipeline Module")

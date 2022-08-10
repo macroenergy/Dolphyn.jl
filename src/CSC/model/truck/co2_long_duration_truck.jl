@@ -15,12 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_long_duration_storage_truck(EP::Model, inputs::Dict)
+    co2_long_duration_storage_truck(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the decision variables related to carbon transmission via trucks involing long duration action. 
 """
-
-function co2_long_duration_truck(EP::Model, inputs::Dict)
+function co2_long_duration_truck(EP::Model, inputs::Dict, setup::Dict)
 
     println("CO2 Long Duration Truck Module")
 

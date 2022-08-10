@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module implements the basic variables and constraints related to carbon transmission via trucks.
 """
-
 function co2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     # Setup variables, constraints, and expressions common to all carbon truck resources

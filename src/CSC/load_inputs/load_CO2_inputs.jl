@@ -52,29 +52,13 @@ function load_co2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 		inputs = load_co2_price_csc(path, setup, inputs)
 	end
 
-	
-	##############################################################################################################################
-	####################################### ADD IN FUTURE WHEN MODELING CO2 PIPELINE #############################################
-	##############################################################################################################################
-
 	# Read input data about power network topology, operating and expansion attributes
-    #if isfile(string(path,"CSC_Pipelines.csv")) 
-		# Creating flag for other parts of the code
-		#setup["ModelCO2Pipelines"] = 1
-		#inputs  = load_co2_pipeline_data(setup, path,  inputs)
-	#else
-		#inputs["CO2_P"] = 0
-	#end
+    if setup["ModelCO2Pipelines"] == 1 
+		inputs  = load_co2_pipeline_data(setup, path,  inputs)
+	else
+		inputs["CO2_P"] = 0
+	end
 
-	##############################################################################################################################
-	############################################## WHAT DOES THIS MEAN ###########################################################
-	##############################################################################################################################
-
-	#Check whether or not there is LDS for trucks and co2 storage
-	#if !haskey(inputs, "Period_Map") && 
-		#(setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
-		#inputs = load_period_map(setup, path,  inputs)
-	#end
 	println("CSC Input CSV Files Successfully Read In From $path")
 
 	return inputs
