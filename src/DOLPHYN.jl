@@ -211,6 +211,12 @@ include("CSC/model/storage/co2_long_duration_storage.jl")
 # CO2 pipelines
 include("CSC/model/transmission/co2_pipeline.jl")
 
+# CO2 trucks
+include("CSC/model/truck/co2_truck_investment.jl")
+include("CSC/model/truck/co2_truck.jl")
+include("CSC/model/truck/co2_truck_all.jl")
+include("CSC/model/truck/co2_long_duration_truck.jl")
+
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
 include("co2_cap_power_csc.jl")

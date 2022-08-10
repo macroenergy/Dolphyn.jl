@@ -38,18 +38,14 @@ function load_h2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	# Read input data about power network topology, operating and expansion attributes
 
 	if setup["ModelH2Pipelines"] == 1
-	    if isfile(joinpath(path, "HSC_pipelines.csv")) 		
-			inputs  = load_h2_pipeline_data(path, setup, inputs)
-		else
-			inputs["H2_P"] = 0
-		end
+		inputs  = load_h2_pipeline_data(path, setup, inputs)
+	else
+		inputs["H2_P"] = 0
 	end
-
+	
 	# Read input data about hydrogen transport truck types
 	if setup["ModelH2Trucks"] == 1
-		if isfile(joinpath(path, "HSC_trucks.csv"))
-			inputs = load_h2_truck(path, setup, inputs)
-		end
+		inputs = load_h2_truck(path, setup, inputs)
 	end
 
 	# Read input data about G2P Resources

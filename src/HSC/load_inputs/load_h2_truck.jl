@@ -26,7 +26,7 @@ function load_h2_truck(path::AbstractString, setup::Dict, inputs::Dict)
     zone_distance = DataFrame(CSV.File(joinpath(path, "zone-distances-miles.csv"), header=true), copycols=true)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
-	inputs["RouteLength"] = RouteLength
+	inputs["H2TruckRouteLength"] = RouteLength
     
     println("zone-distances-miles.csv Successfully Read!")
 

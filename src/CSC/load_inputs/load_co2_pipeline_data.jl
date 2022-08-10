@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_co2_pipeline_data((setup::Dict, path::AbstractString, inputs::Dict)
+    load_co2_pipeline_data((path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for reading input parameters related to the hydrogen transmission network
 """
-function load_co2_pipeline_data(setup::Dict, path::AbstractString, inputs::Dict)
+function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(

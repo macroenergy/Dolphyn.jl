@@ -82,7 +82,7 @@ function co2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 (vCO2Narrive_full[zz, z, j, t] + vCO2Narrive_empty[zz, z, j, t]) *
                 inputs["fuel_costs"][dfCO2Truck[!, :Fuel][j]][t] *
                 dfCO2Truck[!, :Fuel_MMBTU_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["CO2TruckRouteLength"][zz, z] for
                 zz = 1:Z, z = 1:Z, j in CO2_TRUCK_TYPES, t = 1:T if zz != z
             ) / ModelScalingFactor^2
         )
@@ -95,7 +95,7 @@ function co2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 (vCO2Narrive_full[zz, z, j, t] + vCO2Narrive_empty[zz, z, j, t]) *
                 inputs["fuel_costs"][dfCO2Truck[!, :Fuel][j]][t] *
                 dfCO2Truck[!, :Fuel_MMBTU_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["CO2TruckRouteLength"][zz, z] for
                 zz = 1:Z, z = 1:Z, j in CO2_TRUCK_TYPES, t = 1:T if zz != z
             )
         )
@@ -157,14 +157,14 @@ function co2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             sum(
                 (vCO2Narrive_full[zz, z, j, t] + vCO2Narrive_empty[zz, z, j, t]) *
                 dfCO2Truck[!, :Power_MW_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["CO2TruckRouteLength"][zz, z] for
                 zz = 1:Z, j in CO2_TRUCK_TYPES if zz != z
             ) / ModelScalingFactor
         else
             sum(
                 (vCO2Narrive_full[zz, z, j, t] + vCO2Narrive_empty[zz, z, j, t]) *
                 dfCO2Truck[!, :Power_MW_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["CO2TruckRouteLength"][zz, z] for
                 zz = 1:Z, j in CO2_TRUCK_TYPES if zz != z
             )
         end
@@ -183,17 +183,17 @@ function co2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     # carbon truck emission penalty
     @expression(
         EP,
-        Truck_carbon_emission,
+        CO2_Truck_carbon_emission,
         sum(
             inputs["omega"][t] *
             (vCO2Narrive_full[zz, z, j, t] + vCO2Narrive_empty[zz, z, j, t]) *
             inputs["fuel_CO2"][dfCO2Truck[!, :Fuel][j]] *
-            dfCO2Truck[!, :Fuel_per_mile][j] *
-            inputs["RouteLength"][zz, z] for
+            dfCO2Truck[!, :Fuel_MMBTU_per_mile][j] *
+            inputs["CO2TruckRouteLength"][zz, z] for
             zz = 1:Z, z = 1:Z, j in CO2_TRUCK_TYPES, t = 1:T if zz != z
         )
     )
-    # EP[:eCarbonBalance] += Truck_carbon_emission
+    # EP[:eCarbonBalance] += CO2_Truck_carbon_emission
     ## End Balance Expressions ##
     ### End Expressions ###
 

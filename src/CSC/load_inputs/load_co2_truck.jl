@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_co2_truck(path::AbstractString, inputs::Dict, setup::Dict)
+    load_co2_truck(path::AbstractString, setup::Dict, inputs::Dict)
 
 """
-function load_co2_truck(path::AbstractString, inputs::Dict, setup::Dict)
+function load_co2_truck(path::AbstractString, setup::Dict, inputs::Dict)
 
     Z = inputs["Z"]
     Z_set = 1:Z
@@ -26,7 +26,7 @@ function load_co2_truck(path::AbstractString, inputs::Dict, setup::Dict)
     zone_distance = DataFrame(CSV.File(joinpath(path, "zone-distances-miles.csv"), header=true), copycols=true)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
-	inputs["RouteLength"] = RouteLength
+	inputs["CO2TruckRouteLength"] = RouteLength
     
     println("zone-distances-miles.csv Successfully Read!")
 
@@ -39,7 +39,7 @@ function load_co2_truck(path::AbstractString, inputs::Dict, setup::Dict)
     # Set of cabon truck types
     inputs["CO2_TRUCK_TYPES"] = co2_truck_in[!,:T_TYPE]
     # Set of carbon truck type names
-    inputs["CO2_TRUCK_TYPE_NAMES"] = co2_truck_in[!,:H2TruckType]
+    inputs["CO2_TRUCK_TYPE_NAMES"] = co2_truck_in[!,:CO2TruckType]
 
     inputs["CO2_TRUCK_LONG_DURATION"] = co2_truck_in[co2_truck_in.LDS .== 1, :T_TYPE]
 	inputs["CO2_TRUCK_SHORT_DURATION"] = co2_truck_in[co2_truck_in.LDS .== 0, :T_TYPE]

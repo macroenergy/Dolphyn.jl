@@ -84,7 +84,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
                 inputs["fuel_costs"][dfH2Truck[!, :Fuel][j]][t] *
                 dfH2Truck[!, :Fuel_MMBTU_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["H2TruckRouteLength"][zz, z] for
                 zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
             ) / ModelScalingFactor^2
         )
@@ -97,7 +97,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
                 inputs["fuel_costs"][dfH2Truck[!, :Fuel][j]][t] *
                 dfH2Truck[!, :Fuel_MMBTU_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["H2TruckRouteLength"][zz, z] for
                 zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
             )
         )
@@ -159,14 +159,14 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             sum(
                 (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
                 dfH2Truck[!, :Power_MW_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["H2TruckRouteLength"][zz, z] for
                 zz = 1:Z, j in H2_TRUCK_TYPES if zz != z
             ) / ModelScalingFactor
         else
             sum(
                 (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
                 dfH2Truck[!, :Power_MW_per_mile][j] *
-                inputs["RouteLength"][zz, z] for
+                inputs["H2TruckRouteLength"][zz, z] for
                 zz = 1:Z, j in H2_TRUCK_TYPES if zz != z
             )
         end
@@ -189,7 +189,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         sum(
             (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
             dfH2Truck[!, :H2_tonne_per_mile][j] *
-            inputs["RouteLength"][zz, z] for
+            inputs["H2TruckRouteLength"][zz, z] for
             zz = 1:Z, j in H2_TRUCK_TYPES if zz != z
         )
     )
@@ -198,17 +198,17 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     # H2 truck emission penalty
     @expression(
         EP,
-        Truck_carbon_emission,
+        H2_Truck_carbon_emission,
         sum(
             inputs["omega"][t] *
             (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
             inputs["fuel_CO2"][dfH2Truck[!, :Fuel][j]] *
             dfH2Truck[!, :Fuel_MMBTU_per_mile][j] *
-            inputs["RouteLength"][zz, z] for
+            inputs["H2TruckRouteLength"][zz, z] for
             zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
         )
     )
-    # EP[:eCarbonBalance] += Truck_carbon_emission
+    # EP[:eCarbonBalance] += H2_Truck_carbon_emission
     ## End Balance Expressions ##
     ### End Expressions ###
 
