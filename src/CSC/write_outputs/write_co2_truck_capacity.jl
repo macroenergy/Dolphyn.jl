@@ -52,7 +52,7 @@ function write_co2_truck_capacity(path::AbstractString, setup::Dict, inputs::Dic
     )
 
     for z in 1:Z
-        dfCO2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfCO2TruckCap[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
+        dfCO2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfCO2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
         tempEnergy = zeros(size(CO2_TRUCK_TYPES))
         for j in CO2_TRUCK_TYPES
             if j in NEW_CAP_CO2_TRUCK_ENERGY
