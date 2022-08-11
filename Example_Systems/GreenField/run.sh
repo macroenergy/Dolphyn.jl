@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name="CSC_NO_COMMIT_TEST_2022_08_03"
-#SBATCH --output="CSC_NO_COMMIT_TEST_2022_08_03.%A.%a.out"
-#SBATCH --error="CSC_NO_COMMIT_TEST_2022_08_03.%A.%a.err"
+#SBATCH --job-name="CSC_TEST_2022_08_11"
+#SBATCH --output="%j.out"
+#SBATCH --error="%j.err"
 
 #SBATCH --mail-type=fail
 #SBATCH --mail-user="2845024327@qq.com"
