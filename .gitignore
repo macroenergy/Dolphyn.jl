@@ -24,3 +24,7 @@ YourModel.lp
 ## IDE cache files
 .vscode/
 **/.ipynb_checkpoints/
+
+## Slurm cache files
+**/.out/**.out
+**/.err/**.err

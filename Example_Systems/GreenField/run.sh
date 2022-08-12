@@ -1,8 +1,12 @@
 #!/bin/bash
 
+#Create directory for out and err files
+[! -d .out] && mkdir -p .out
+[! -d .err] && mkdir -p .err
+
 #SBATCH --job-name="CSC_TEST_2022_08_11"
-#SBATCH --output="%j.out"
-#SBATCH --error="%j.err"
+#SBATCH --output=".out/%j.out"
+#SBATCH --error=".err/%j.err"
 
 #SBATCH --mail-type=fail
 #SBATCH --mail-user="2845024327@qq.com"
