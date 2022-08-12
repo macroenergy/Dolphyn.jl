@@ -12,7 +12,7 @@
 
 #SBATCH -N 1
 #SBATCH -n 1
-#SBATCH -c 32
+#SBATCH -c 14
 
 module load ~/modulefiles/julia/1.7.3
 module load ~/modulefiles/gurobi/9.1.2
