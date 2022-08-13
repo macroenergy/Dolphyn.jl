@@ -4,7 +4,7 @@ H2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = ac
 ModelH2Pipelines: 1 # Whether to model pipeline in hydrogen supply chain - 0 - not included, 1 - included
 H2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer - 0 - continuous capacity, 1- discrete capacity
 
-ModelH2Trucks: 1 # Whether to model truck in hydrogen supply chain - 0 - not included, 1 - included
+ModelH2Trucks: 0 # Whether to model truck in hydrogen supply chain - 0 - not included, 1 - included
 ModelH2G2P: 0 # Whether to model hydrogen to power in hydrogen supply chain - 0 - not included, 1 - included
 
 H2GenCommit: 1 # Continuous or discrete capacity representation of H2 production technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as integer variables;
