@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #Create directory for out and err files
-[! -d .out] && mkdir -p .out
-[! -d .err] && mkdir -p .err
+[ ! -d .out ] && mkdir -p .out
+[ ! -d .err ] && mkdir -p .err
 
 #SBATCH --job-name="CSC_TEST_2022_08_11"
 #SBATCH --output=".out/%j.out"
