@@ -100,7 +100,3 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	return EP
 
 end
-
-
-
-
