@@ -17,17 +17,33 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	discharge(EP::Model, inputs::Dict)
 
-This module defines the power decision variable $\Theta_{y,t} \forall y \in \mathcal{G}, t \in \mathcal{T}$, representing energy injected into the grid by resource $y$ by at time period $t$.
+This module defines the power generation decision variable $x_{k,t}^{E,THE} \forall k \in \mathcal{K}, t \in \mathcal{T}$, representing energy injected into the grid by thermal resource $k$ at time period $t$.
 
-This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources $y \in \mathcal{G}$ over all time periods $t \in \mathcal{T}$:
+This module defines the power generation decision variable $x_{r,t}^{E,VRE} \forall r \in \mathcal{R}, t \in \mathcal{T}$, representing energy injected into the grid by renewable resource $r$ at time period $t$.
+
+This module defines the power discharge decision variable $x_{s,t}^{E,DIS} \forall s \in \mathcal{S}, t \in \mathcal{T}$, representing energy injected into the grid by storage resource $s$ at time period $t$.
+
+The variable defined in this file named after ```vP``` covers all variables $x_{k,t}^{E,THE}, x_{r,t}^{E,VRE}, x_{s,t}^{E,DIS}$.
+
+```math
+\begin{equation}
+	x_{g,t}^{E,GEN} = 
+	\begin{cases}
+		x_{k,t}^{E,THE} if g \in \mathcal{K} \\
+		x_{r,t}^{E,VRE} if g \in \mathcal{R} \\
+		x_{s,t}^{E,DIS} if g \in \mathcal{S} \\
+	\end{cases}
+\end{equation}
+```
+
+This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro) over all time periods $t \in \mathcal{T}$:
 
 ```math
 \begin{aligned}
-	Obj_{Var\_gen} =
-	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
+	C^{E,GEN,o} =
+	\sum_{g \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times\left(c_{g}^{E,VOM} + c_{g}^{E,FUEL}\right)\times x_{g,t}^{E,GEN}}
 \end{aligned}
 ```
-
 """
 function discharge(EP::Model, inputs::Dict)
 
