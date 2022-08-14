@@ -23,20 +23,20 @@ This function creates decision variables and cost expressions associated with th
 
 This function defines the following decision variables:
 
-$\nu_{y,t,z}$ designates the commitment state of generator cluster $y$ in zone $z$ at time $t$;
-$\chi_{y,t,z}$ represents number of startup decisions in cluster $y$ in zone $z$ at time $t$;
-$\zeta_{y,t,z}$ represents number of shutdown decisions in cluster $y$ in zone $z$ at time $t$.
+$\n_{k,z,t}^{E,THE}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$;
+$\n_{k,z,t}^{E,UP}$ represents number of startup decisions in cluster $k$ in zone $z$ at time $t$;
+$\n_{k,z,t}^{E,DN}$ represents number of shutdown decisions in cluster $k$ in zone $z$ at time $t$.
 
 **Cost expressions:**
 
-The total cost of start-ups across all generators subject to unit commitment ($y \in UC$) and all time periods, t is expressed as:
+The total cost of start-ups across all generators subject to unit commitment ($k \in UC$) and all time periods, t is expressed as:
 ```math
 \begin{aligned}
-	C^{start} = \sum_{y \in UC, t \in T} \omega_t \times start\_cost_{y} \times \chi_{y,t}
+	C^{E,start} = \sum_{k \in UC, t \in T} \omega_t \times c_{k}^{E,start} \times \n_{k,z,t}^{E,UP}
 \end{aligned}
 ```
 
-The sum of start-up costs is added to the objective function.
+If set ```UCommit``` to 1, the unit commitment variables are set to integer types.
 """
 function ucommit(EP::Model, inputs::Dict, UCommit::Int)
 
