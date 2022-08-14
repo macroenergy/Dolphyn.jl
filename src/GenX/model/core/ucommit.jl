@@ -29,10 +29,10 @@ $\n_{k,z,t}^{E,DN}$ represents number of shutdown decisions in cluster $k$ in zo
 
 **Cost expressions:**
 
-The total cost of start-ups across all generators subject to unit commitment ($k \in UC$) and all time periods, t is expressed as:
+The total cost of start-ups across all generators subject to unit commitment ($k \in \mathcal{UC}, \mathcal{UC} \subseteq \mathcal{G}$) and all time periods $t$ is expressed as:
 ```math
 \begin{aligned}
-	C^{E,start} = \sum_{k \in UC, t \in T} \omega_t \times c_{k}^{E,start} \times \n_{k,z,t}^{E,UP}
+	C^{E,start} = \sum_{k \in \mathcal{UC}, t \in \mathcal{T}} \omega_t \times c_{k}^{E,start} \times \n_{k,z,t}^{E,UP}
 \end{aligned}
 ```
 

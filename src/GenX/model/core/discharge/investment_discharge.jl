@@ -60,7 +60,7 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{g}^{E,GEN,retired} \leq y_{g}^{E,GEN,existing}
+	0 \leq y_{g}^{E,GEN,retired} \leq y_{g}^{E,GEN,existing} \forall g \in \mathcal{G}
 \end{equation}
 ```
 

@@ -27,7 +27,7 @@ This function defines contributions to the objective function from the cost of n
 
 ```math
 \begin{eqution}
-	C^{E,NSD} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_{t} \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
+	C^{E,NSD} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_{t} \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
 \end{eqution}
 ```
 
@@ -35,7 +35,7 @@ Contributions to the power balance expression from non-served energy/curtailed d
 
 ```math
 \begin{eqution}
-	PowerBal_{NSE} = \sum_{s \in \mathcal{S}} x_{s,z,t}^{E,NSD}
+	PowerBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD}
 \end{eqution}
 ```
 
@@ -45,7 +45,7 @@ Demand curtailed in each segment of curtailable demands $s \in \mathcal{S}$ cann
 
 ```math
 \begin{aligned}
-	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \forall s \in \mathcal{S}, z\in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \forall s \in \mathcal{SEG}, z\in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -53,7 +53,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 
 ```math
 \begin{aligned}
-	\sum_{s \in \mathcal{S}} x_{s,z,t}^{E,NSD} \leq D_{t,z} \forall z\in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \leq D_{t,z} \forall z\in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 """
