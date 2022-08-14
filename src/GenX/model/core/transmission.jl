@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::Int)
 
-This function establishes decisions, expressions, and constraints related to transmission power flows between model zones and associated transmission losses (if modeled).
+This function establishes decision variables, expressions, and constraints related to transmission power flows between model zones and associated transmission losses (if modeled).
 
 The function adds transmission reinforcement or construction costs to the objective function. Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $pi^{TCAP}_{l}$, times the additional transmission capacity variable, $\bigtriangleup\varphi^{max}_{l}$.
 ```math
@@ -137,7 +137,6 @@ function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::I
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	L = inputs["L"]     # Number of transmission lines
-	SEG = inputs["SEG"] # Number of load curtailment segments
 
 	## sets and indices for transmission losses and expansion
 	TRANS_LOSS_SEGS = inputs["TRANS_LOSS_SEGS"] # Number of segments used in piecewise linear approximations quadratic loss functions - can only take values of TRANS_LOSS_SEGS =1, 2
@@ -178,7 +177,7 @@ function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::I
 			@variable(EP, vTAUX_POS_ON[l in LOSS_LINES, s=1:TRANS_LOSS_SEGS, t=1:T], Bin)
 			@variable(EP, vTAUX_NEG_ON[l in LOSS_LINES, s=1:TRANS_LOSS_SEGS, t=1:T], Bin)
 		end
-    	end
+    end
 
 	# Transmission losses on each transmission line "l" at hour "t"
 	@variable(EP, vTLOSS[l in LOSS_LINES,t=1:T] >= 0)
@@ -200,26 +199,24 @@ function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::I
 	end
 
 	# Net power flow outgoing from zone "z" at hour "t" in MW
-    	@expression(EP, eNet_Export_Flows[z=1:Z,t=1:T], sum(inputs["pNet_Map"][l,z] * vFLOW[l,t] for l=1:L))
+    @expression(EP, eNet_Export_Flows[z=1:Z,t=1:T], sum(inputs["pNet_Map"][l,z] * vFLOW[l,t] for l=1:L))
 
 	# Losses from power flows into or out of zone "z" in MW
-    	@expression(EP, eLosses_By_Zone[z=1:Z,t=1:T], sum(abs(inputs["pNet_Map"][l,z]) * vTLOSS[l,t] for l in LOSS_LINES))
+    @expression(EP, eLosses_By_Zone[z=1:Z,t=1:T], sum(abs(inputs["pNet_Map"][l,z]) * vTLOSS[l,t] for l in LOSS_LINES))
 
 	## Objective Function Expressions ##
 
 	if NetworkExpansion == 1
 		@expression(EP, eTotalCNetworkExp, sum(vNEW_TRANS_CAP[l]*inputs["pC_Line_Reinforcement"][l] for l in EXPANSION_LINES))
 		EP[:eObj] += eTotalCNetworkExp
-    	end
+    end
 
 	## End Objective Function Expressions ##
 
 	## Power Balance Expressions ##
 
-	@expression(EP, ePowerBalanceNetExportFlows[t=1:T, z=1:Z],
-		-eNet_Export_Flows[z,t])
-	@expression(EP, ePowerBalanceLossesByZone[t=1:T, z=1:Z],
-		-(1/2)*eLosses_By_Zone[z,t])
+	@expression(EP, ePowerBalanceNetExportFlows[t=1:T, z=1:Z], -eNet_Export_Flows[z,t])
+	@expression(EP, ePowerBalanceLossesByZone[t=1:T, z=1:Z], -(1/2)*eLosses_By_Zone[z,t])
 
 	EP[:ePowerBalance] += ePowerBalanceLossesByZone
 	EP[:ePowerBalance] += ePowerBalanceNetExportFlows
@@ -245,7 +242,6 @@ function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::I
 
 	# Transmission loss related constraints - linear losses as a function of absolute value
 	if TRANS_LOSS_SEGS == 1
-
 		@constraints(EP, begin
 			# Losses are alpha times absolute values
 			cTLoss[l in LOSS_LINES, t=1:T], vTLOSS[l,t] == inputs["pPercent_Loss"][l]*(vTAUX_POS[l,t]+vTAUX_NEG[l,t])
@@ -277,7 +273,6 @@ function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::I
 				[l in LOSS_LINES,t=1:T], vPROD_TRANSCAP_ON[l,t] >= eAvail_Trans_Cap[l]-(1-vTAUX_POS_ON[l,t])*inputs["pTrans_Max_Possible"][l]
 			end)
 		end
-
 	end # End if(TRANS_LOSS_SEGS == 1) block
 
 	# When number of segments is greater than 1
