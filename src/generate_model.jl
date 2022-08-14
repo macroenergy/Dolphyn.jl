@@ -114,6 +114,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" CO2 balance constraint
 	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
 
+	# Initialize Synthesis Fuels Balance Expression
+	# Expression for "baseline" CO2 balance constraint
+	@expression(EP, eSynBalance[t=1:T, z=1:Z], 0)
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -222,14 +226,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_flexible_demand(EP, inputs, setup)
 		end
 
-		if setup["ModelH2Pipelines"] == 1
-			# Model hydrogen transmission via pipelines
-			EP = h2_pipeline(EP, inputs, setup)
-		end
+		if Z > 1
+			if setup["ModelH2Pipelines"] == 1
+				# Model hydrogen transmission via pipelines
+				EP = h2_pipeline(EP, inputs, setup)
+			end
 
-		if setup["ModelH2Trucks"] == 1
-			# Model hydrogen transmission via trucks
-			EP = h2_truck(EP, inputs, setup)
+			if setup["ModelH2Trucks"] == 1
+				# Model hydrogen transmission via trucks
+				EP = h2_truck(EP, inputs, setup)
+			end
 		end
 
 		if setup["ModelH2G2P"] == 1
@@ -251,28 +257,30 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Investment cost of various carbon capture sources
 		EP = co2_investment(EP, inputs, setup)
 
-		# Model CO2 non-served energy
-		EP = co2_non_served_energy(EP, inputs, setup)
+		# Model CO2 non-served
+		EP = co2_non_served(EP, inputs, setup)
 		
 		if !isempty(inputs["CO2_CAPTURE"])
-			#model CO2 capture
+			# Model CO2 capture
 			EP = co2_capture(EP, inputs, setup)
 		end
 
 		if !isempty(inputs["CO2_STOR_ALL"])
-			#model CO2 storage
+			# Model CO2 storage
 			EP = co2_storage(EP, inputs, setup)
 		end
 
-		if setup["ModelCO2Pipelines"] == 1
-			# Model hydrogen transmission via pipelines
-			EP = co2_pipeline(EP, inputs, setup)
+		if Z > 1
+			if setup["ModelCO2Pipelines"] == 1
+				# Model carbon transmission via pipelines
+				EP = co2_pipeline(EP, inputs, setup)
+			end
+
+			if setup["ModelCO2Trucks"] == 1
+				EP = co2_truck(EP, inputs, setup)
+			end
 		end
 
-		if setup["ModelCO2Trucks"] == 1
-			EP = co2_truck(EP, inputs, setup)
-		end
-		
 		# Direct emissions of various carbon capture sector resources
 		EP = emissions_csc(EP, inputs, setup)
 
@@ -294,7 +302,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 	end
 
-
 	# Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
 		EP = energy_share_requirement(EP, inputs, setup)
@@ -315,10 +322,13 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	## Power balance constraints
 	# demand = generation + storage discharge - storage charge - demand deferral + deferred demand satisfaction - demand curtailment (NSE)
 	#          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
-	@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
+	if setup["ModelPower"] == 1
+		### Power balance constraints
+		@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
+	end
 
 	if setup["ModelH2"] == 1
-		###Hydrogen Balance constraints
+		### Hydrogen Balance constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
 	end
 	
@@ -328,9 +338,14 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
 	end
 	
+	if setup["ModelSyn"] == 1
+		### Synthesis fuels balance constraints
+		@constraint(EP, cSynBalance[t=1:T,z=1:Z], EP[:eSynFuelBalance[t,z] == inputs[SynFuel_D][t,z]])
+	end
+
 	## Record pre-solver time
 	presolver_time = time() - presolver_start_time
-    	#### Question - What do we do with this time now that we've split this function into 2?
+    #### Question - What do we do with this time now that we've split this function into 2?
 	if setup["PrintModel"] == 1
 		if modeloutput === nothing
 			filepath = joinpath(pwd(), "YourModel.lp")

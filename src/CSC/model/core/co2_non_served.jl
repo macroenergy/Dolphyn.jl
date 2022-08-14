@@ -15,12 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
+    co2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the non-serverd carbon laod on zone $z$ by at time period $t$.
 
 """
-function co2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
+function co2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
     println("Carbon Non-served Module")
 

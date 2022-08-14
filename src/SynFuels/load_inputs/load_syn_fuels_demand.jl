@@ -14,25 +14,28 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
+@doc raw"""
+
+
+"""
+function load_syn_fuels_demand(path::AbstractString, inputs::Dict, setup::Dict)
     
-	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory,"Liquid_Fuels_demand.csv")) # Use Time Domain Reduced data for GenX
-		Liquid_Fuels_demand_in = DataFrame(CSV.File(string(joinpath(data_directory,"Liquid_Fuels_demand.csv")), header=true), copycols=true)
+	if setup["TimeDomainReduction"] == 1
+		Syn_fuels_demand_in = DataFrame(CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header=true), copycols=true)
 	else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
-		Liquid_Fuels_demand_in = DataFrame(CSV.File(string(path,sep,"Liquid_Fuels_demand.csv"), header=true), copycols=true)
+		Syn_fuels_demand_in = DataFrame(CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header=true), copycols=true)
 	end
 
-    # Demand in tonnes per hour for each zone
+    # Demand in MMBTU per hour for each zone
 	#println(names(load_in))
-	start = findall(s -> s == "Load_mmbtu_z1", names(Liquid_Fuels_demand_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
+	start = findall(s -> s == "Load_mmbtu_z1", names(Syn_fuels_demand_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
 	
 	# Demand in Tonnes per hour
-	inputs["Liquid_Fuels_D"] =Matrix(Liquid_Fuels_demand_in[1:inputs["T"],start:start-1+inputs["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+	inputs["Syn_fuels_D"] =Matrix(Syn_fuels_demand_in[1:inputs["T"],start:start-1+inputs["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
     
-    inputs["Conventional_fuel_co2_per_mmbtu"] = Liquid_Fuels_demand_in[!, "Conventional_fuel_co2_per_mmbtu"][1]
-    inputs["Conventional_fuel_price_per_mmbtu"] = Liquid_Fuels_demand_in[!, "Conventional_fuel_price_per_mmbtu"][1]
-    inputs["Syn_fuel_co2_per_mmbtu"] = Liquid_Fuels_demand_in[!, "Syn_fuel_co2_per_mmbtu"][1]
+    inputs["Conventional_fuel_co2_per_mmbtu"] = Syn_fuels_demand_in[!, "Conventional_fuel_co2_per_mmbtu"][1]
+    inputs["Conventional_fuel_price_per_mmbtu"] = Syn_fuels_demand_in[!, "Conventional_fuel_price_per_mmbtu"][1]
+    inputs["Syn_fuel_co2_per_mmbtu"] = Syn_fuels_demand_in[!, "Syn_fuel_co2_per_mmbtu"][1]
 
 	println("Syn_Fuels_demand.csv Successfully Read!")
 
