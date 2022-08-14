@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#Create directory for out and err files
 [ ! -d .out ] && mkdir -p .out
 [ ! -d .err ] && mkdir -p .err
 
