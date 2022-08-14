@@ -17,13 +17,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     flexible_demand(EP::Model, inputs::Dict)
 
-This function defines the operating constraints for flexible demand resources. As implemented, flexible demand resources ($y \in \mathcal{DF}$) are characterized by: a) maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $\rho^{max}_{y,z,t}$, b) the maximum time this demand can be advanced and delayed, defined by parameters, $\tau^{advance}_{y,z}$ and $\tau^{delay}_{y,z}$, respectively and c) the energy losses associated with shifting demand, $\eta_{y,z}^{dflex}$.
+This function defines the operating constraints for flexible demand resources. As implemented, flexible demand resources ($f \in \mathcal{DF}, \mathcal{DF} \subseteq \mathcal{G}$) are characterized by: 
+a) maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $R_{f,z,t}^{E,FLEX}$, 
+b) the maximum time this demand can be advanced and delayed, defined by parameters, $\tau^{advance}_{f,z}$ and $\tau^{delay}_{f,z}$, respectively and 
+c) the energy losses associated with shifting demand, $\eta_{f,z}^{E,FLEX}$.
 
-**Tracking total deferred demand**
+**Tracking total deferred power demand**
 
 The operational constraints governing flexible demand resources are as follows.
 
-The first two constraints model keep track of inventory of deferred demand in each time step.  Specifically, the amount of deferred demand remaining to be served ($\Gamma_{y,z,t}$) depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$). Note that variable $\Gamma_{y,z,t} \in \mathbb{R}$, $\forall y \in \mathcal{DF}, t  \in \mathcal{T}$. Similar to hydro inventory or storage state of charge constraints, for the first time step of the year (or each representative period), we define the deferred demand level based on level of deferred demand in the last time step of the year (or each representative period).
+The first two constraints model keep track of inventory of deferred demand in each time step. 
+Specifically, the amount of deferred demand remaining to be served ($x_{f,z,t}^{E,FLEX}$) depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$). Note that variable $\Gamma_{y,z,t} \in \mathbb{R}$, $\forall y \in \mathcal{DF}, t  \in \mathcal{T}$. 
+Similar to hydro inventory or storage state of charge constraints, for the first time step of the year (or each representative period), we define the deferred demand level based on level of deferred demand in the last time step of the year (or each representative period).
 
 ```math
 \begin{aligned}
@@ -63,7 +68,6 @@ A similar constraints maximum time steps of demand advancement. This is done by 
 ```
 
 If $t$ is first time step of the year (or the first time step of the representative period), then the above two constraints are implemented to look back over the last n time steps, starting with the last time step of the year (or the last time step of the representative period). This time-wrapping implementation is similar to the time-wrapping implementations used for defining the storage balance constraints for hydropower reservoir resources and energy storage resources.
-
 """
 function flexible_demand(EP::Model, inputs::Dict)
     ## Flexible demand resources available during all hours and can be either delayed or advanced (virtual storage-shiftable demand) - DR ==1
