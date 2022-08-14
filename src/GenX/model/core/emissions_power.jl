@@ -30,29 +30,32 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 	Z = inputs["Z"]     # Number of zones
 	COMMIT = inputs["COMMIT"] # For not, thermal resources are the only ones eligible for Unit Committment
 
-	@expression(EP, eEmissionsByPlant[y=1:G,t=1:T],
+	@expression(EP, eEmissionsByPlant[y=1:G, t=1:T],
 	 	if y in inputs["COMMIT"]
 		 	dfGen[!,:CO2_per_MWh][y]*EP[:vP][y,t]+dfGen[!,:CO2_per_Start][y]*EP[:vSTART][y,t]
 	 	else
 		 	dfGen[!,:CO2_per_MWh][y]*EP[:vP][y,t]
 	 	end
  	)
- 	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
+ 	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z), :R_ID]))
 
- # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
- # then need to add cost penalty due to CO2 prices
-	if (setup["CO2Cap"] ==4) 
+ 	# If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
+ 	# then need to add cost penalty due to CO2 prices
+	if (setup["CO2Cap"] == 4) 
 		# Use CO2 price for power system as the global CO2 price
 		# Emissions penalty by zone - needed to report zonal cost breakdown
-		@expression(EP,eCEmissionsPenaltybyZone[z=1:Z],
-		sum(inputs["omega"][t]*sum(eEmissionsByZone[z,t]*inputs["dfCO2Price"][z,cap] for cap=findall(x->x==1, inputs["dfCO2CapZones"][z,:])) for t= 1:T)
+		@expression(EP,eCEmissionsPenaltybyZone[z = 1:Z],
+			sum(inputs["omega"][t]*sum(eEmissionsByZone[z,t]*inputs["dfCO2Price"][z,cap] for cap = findall(x->x==1, inputs["dfCO2CapZones"][z,:])) for t = 1:T)
 		)
+
 		# Sum over each policy type, each zone and each time step
-		@expression(EP,eCEmissionsPenaltybyPolicy[cap=1:inputs["NCO2Cap"]],
-		sum(inputs["omega"][t]*sum(eEmissionsByZone[z,t]*inputs["dfCO2Price"][z,cap] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) for t= 1:T)
+		@expression(EP,eCEmissionsPenaltybyPolicy[cap = 1:inputs["NCO2Cap"]],
+			sum(inputs["omega"][t]*sum(eEmissionsByZone[z,t]*inputs["dfCO2Price"][z,cap] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) for t = 1:T)
 		)
+
 		@expression(EP,eCGenTotalEmissionsPenalty,
-		sum(eCEmissionsPenaltybyPolicy[cap] for cap=1:inputs["NCO2Cap"]))
+			sum(eCEmissionsPenaltybyPolicy[cap] for cap=1:inputs["NCO2Cap"])
+		)
 
 		# Add total emissions penalty associated with direct emissions from power generation technologies
 		EP[:eObj] += eCGenTotalEmissionsPenalty
