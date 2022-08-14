@@ -17,25 +17,26 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     non_served_energy(EP::Model, inputs::Dict)
 
-This function defines the non-served energy/curtailed demand decision variable $\Lambda_{s,t,z} \forall s \in \mathcal{S}, \forall t \in \mathcal{T}, z \in \mathcal{Z}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $n_{1}^{slope}$. Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response). Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{slope}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) and a maximum quantity of demand in this segment, $n_{s}^{size}$, specified as a share of demand in each zone in each time step, $D_{t,z}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
+This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
+The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $c_{1}^{E,NSD}$.
+Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response).
+Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{E,NSD}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
+and a maximum quantity of demand in this segment, $n_{s}^{E,NSD}$, specified as a share of demand in each zone in each time step, $D_{z, t}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
 
 This function defines contributions to the objective function from the cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
-\begin{aligned}
-	Obj_{NSE} =
-	\sum_{s \in \mathcal{S} } \sum_{t \in \mathcal{T}} \sum_{z \in \mathcal{Z}}\omega_{t} \times n_{s}^{slope} \times \Lambda_{s,t,z}
-\end{aligned}
+\begin{eqution}
+	C^{E,NSD} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_{t} \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
+\end{eqution}
 ```
 
 Contributions to the power balance expression from non-served energy/curtailed demand from each demand segment $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{aligned}
-	PowerBal_{NSE} =
-	\sum_{s \in \mathcal{S} } \Lambda_{s,t,z}
-		\hspace{4 cm}  \forall s \in \mathcal{S}, t \in \mathcal{T}
-\end{aligned}
+\begin{eqution}
+	PowerBal_{NSE} = \sum_{s \in \mathcal{S}} x_{s,z,t}^{E,NSD}
+\end{eqution}
 ```
 
 **Bounds on curtailable demand**
@@ -44,8 +45,7 @@ Demand curtailed in each segment of curtailable demands $s \in \mathcal{S}$ cann
 
 ```math
 \begin{aligned}
-	\Lambda_{s,t,z} \leq (n_{s}^{size} \times D_{t,z})
-	\hspace{4 cm}  \forall s \in \mathcal{S}, t \in \mathcal{T}, z\in \mathcal{Z}
+	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \forall s \in \mathcal{S}, z\in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -53,11 +53,9 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 
 ```math
 \begin{aligned}
-	\sum_{s \in \mathcal{S} } \Lambda_{s,t,z} \leq D_{t,z}
-	\hspace{4 cm}  \forall t \in \mathcal{T}, z\in \mathcal{Z}
+	\sum_{s \in \mathcal{S}} x_{s,z,t}^{E,NSD} \leq D_{t,z} \forall z\in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
-
 """
 function non_served_energy(EP::Model, inputs::Dict)
 
@@ -91,8 +89,7 @@ function non_served_energy(EP::Model, inputs::Dict)
 	EP[:eObj] += eTotalCNSE
 
 	## Power Balance Expressions ##
-	@expression(EP, ePowerBalanceNse[t=1:T, z=1:Z],
-	sum(vNSE[s,t,z] for s=1:SEG))
+	@expression(EP, ePowerBalanceNse[t=1:T, z=1:Z], sum(vNSE[s,t,z] for s=1:SEG))
 
 	# Add non-served energy/curtailed demand contribution to power balance expression
 	EP[:ePowerBalance] += ePowerBalanceNse
