@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Load basic inputs for the macro energy system. The external fuels data, time weights used in the time domain reduction method.
 """
 function load_basic_inputs(path::AbstractString, setup::Dict)
-    
+
     inputs = Dict()
 
     ## Load spatial details from setup
@@ -28,11 +28,11 @@ function load_basic_inputs(path::AbstractString, setup::Dict)
 
     ## Load temporal details from setup
     inputs = load_temporal_details(setup, inputs, path)
-    
+
     ## Read input files
     println("Reading Basic Input CSV Files")
     ## Read fuel cost data, including time-varying fuel costs
-	inputs = load_fuels_data(setup, inputs, path)
+    inputs = load_fuels_data(setup, inputs, path)
 
     return inputs
 end
