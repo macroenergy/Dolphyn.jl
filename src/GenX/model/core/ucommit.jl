@@ -19,17 +19,24 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function creates decision variables and cost expressions associated with thermal plant unit commitment or start-up and shut-down decisions (cycling on/off)
 
-**Unit commitment decision variables:**
+**Unit commitment decision variables**
 
-This function defines the following decision variables:
+This module defines the commitment state variable $\n_{k,z,t}^{E,THE}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-$\n_{k,z,t}^{E,THE}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$;
-$\n_{k,z,t}^{E,UP}$ represents number of startup decisions in cluster $k$ in zone $z$ at time $t$;
-$\n_{k,z,t}^{E,DN}$ represents number of shutdown decisions in cluster $k$ in zone $z$ at time $t$.
+This module defines the number of startup decision variable $\n_{k,z,t}^{E,UP}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-**Cost expressions:**
+This module defines the number of shutdown decision variable $\n_{k,z,t}^{E,DN}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+
+The variable defined in this file named after ```vCOMMIT``` covers $\n_{k,z,t}^{E,THE}$.
+
+The variable defined in this file named after ```vSTART``` covers $\n_{k,z,t}^{E,UP}$.
+
+The variable defined in this file named after ```vSHUT``` covers $\n_{k,z,t}^{E,DN}$.
+
+**Cost expressions**
 
 The total cost of start-ups across all generators subject to unit commitment ($k \in \mathcal{UC}, \mathcal{UC} \subseteq \mathcal{G}$) and all time periods $t$ is expressed as:
+
 ```math
 \begin{aligned}
 	C^{E,start} = \sum_{k \in \mathcal{UC}, t \in \mathcal{T}} \omega_t \times c_{k}^{E,start} \times \n_{k,z,t}^{E,UP}
