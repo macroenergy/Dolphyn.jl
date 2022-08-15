@@ -21,15 +21,15 @@ The h2_generation module creates decision variables, expressions, and constraint
 
 Documentation to follow ******
 
-**Power balance expression**
+**Hydrogen balance expression**
 
-This function adds the sum of power generation from thermal units subject to unit commitment ($\Theta_{y \in UC,t \in T,z \in Z}$) to the power balance expression.
+This function adds the sum of hydrogen generation from hydrogen units subject to unit commitment ($\Theta_{y \in UC,t \in T,z \in Z}$) to the power balance expression.
 
 **Startup and shutdown events (thermal plant cycling)**
 
 *Capacitated limits on unit commitment decision variables*
 
-Thermal resources subject to unit commitment ($y \in \mathcal{UC}$) adhere to the following constraints on commitment states, startup events, and shutdown events, which limit each decision to be no greater than the maximum number of discrete units installed (as per the following three constraints):
+Hydrogen resources subject to unit commitment ($y \in \mathcal{UC}$) adhere to the following constraints on commitment states, startup events, and shutdown events, which limit each decision to be no greater than the maximum number of discrete units installed (as per the following three constraints):
 
 ```math
 \begin{aligned}
@@ -92,11 +92,11 @@ Thermal resources subject to unit commitment ($y \in UC$) adhere to the followin
 ```
 (See Constraints 5-6 in the code)
 
-where decision $\Theta_{y,z,t}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{y,z,t}^{up|down}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\rho_{y,z}^{min}$ is the minimum stable power output per unit of installed capacity, and parameter $\rho_{y,z,t}^{max}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
+where decision $\Theta_{y,z,t}$ is the hydrogen injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{y,z,t}^{up|down}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\rho_{y,z}^{min}$ is the minimum stable power output per unit of installed capacity, and parameter $\rho_{y,z,t}^{max}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
 
-**Minimum and maximum power output**
+**Minimum and maximum hydrogen output**
 
-If not modeling regulation and spinning reserves, thermal resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
+If not modeling regulation and spinning reserves, hydrogen resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
 
 ```math
 \begin{aligned}
@@ -107,14 +107,14 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 ```math
 \begin{aligned}
-	\Theta_{y,z,t} \geq \rho^{max}_{y,z} \times \Omega^{size}_{y,z} \times \nu_{y,z,t}
+	\Theta_{y,z,t} \leq \rho^{max}_{y,z} \times \Omega^{size}_{y,z} \times \nu_{y,z,t}
 	\hspace{1.5cm} \forall y \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
 \end{aligned}
 ```
 
 (See Constraints 7-8 the code)
 
-If modeling reserves and regulation, these constraints are replaced by those established in this ```thermal_commit_reserves()```.
+
 
 **Minimum and maximum up and down time**
 
@@ -129,7 +129,7 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{aligned}
-	\frac{\overline{\Delta_{y,z}} + \Omega_{y,z} - \Delta_{y,z}}{\Omega^{size}_{y,z}} -  \nu_{y,z,t} \geq \displaystyle \sum_{\hat{t} = t-\tau^{down}_{y,z}}^t \zeta_{y,z,\hat{t}}
+	\frac{\Delta^{\text{total}}_{y,z}}{\Omega^{size}_{y,z}} -  \nu_{y,z,t} \geq \displaystyle \sum_{\hat{t} = t-\tau^{down}_{y,z}}^t \zeta_{y,z,\hat{t}}
 	\hspace{1.5cm} \forall y \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
 \end{aligned}
 ```

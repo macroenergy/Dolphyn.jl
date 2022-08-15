@@ -28,7 +28,7 @@ State of charge of truck at beginning of each modeled period n.
 
 ```math
 \begin{aligned}
-    v_{n}^{SOC} \geqslant 0,v_{z,j,n}^{SOC}\leqslant v_{j}^{TRU}
+    v_{n}^{SOC} \geq 0
 \end{aligned}
 ```
 
@@ -37,7 +37,7 @@ State of charge of truck at beginning of each modeled period n.
 State of charge of truck at beginning of each modeled period cannot exceed installed energy capacity
 ```math
 \begin{aligned}
-    v_{z,j,n}^{SOC}< v_{j}^{TRU}
+    v_{z,j,n}^{SOC} \leq v_{j}^{TRU}
 \end{aligned}
 ```
 

@@ -21,7 +21,7 @@ The h2_generation module creates decision variables, expressions, and constraint
 
 **Ramping limits**
 
-Thermal resources not subject to unit commitment ($y \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
+Hydrogen resources not subject to unit commitment ($y \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
 \begin{aligned}
@@ -36,11 +36,11 @@ Thermal resources not subject to unit commitment ($y \in H \setminus UC$) adhere
 ```
 (See Constraints 1-2 in the code)
 
-This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$, is within the eligible ramp of the power output in the final time step of the year (or each representative period), $t+\tau^{period}-1$.
+This set of time-coupling constraints wrap around to ensure the hydrogen output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$, is within the eligible ramp of the power output in the final time step of the year (or each representative period), $t+\tau^{period}-1$.
 
-**Minimum and maximum power output**
+**Minimum and maximum hydrogen output**
 
-When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
+When not modeling regulation and reserves, hydrogen units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
 \begin{aligned}

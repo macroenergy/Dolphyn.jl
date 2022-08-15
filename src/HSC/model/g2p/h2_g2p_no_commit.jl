@@ -40,7 +40,7 @@ This set of time-coupling constraints wrap around to ensure the power output in 
 
 **Minimum and maximum power output**
 
-When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
+When not modeling regulation and reserves, hydrogen units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
 \begin{aligned}

@@ -23,16 +23,16 @@ This module creates decision variables, expressions, and constraints related to 
 
 This function defines the following decision variables:
 
-$\nu_{y,t,z}$ designates the commitment state of g2p generator cluster $h$ in zone $z$ at time $t$;
-$\chi_{y,t,z}$ represents number of g2p startup decisions in cluster $h$ in zone $z$ at time $t$;
-$\zeta_{y,t,z}$ represents number of g2p shutdown decisions in cluster $h$ in zone $z$ at time $t$.
+$\nu_{h,t,z}$ designates the commitment state of g2p generator cluster $h$ in zone $z$ at time $t$;
+$\chi_{h,t,z}$ represents number of g2p startup decisions in cluster $h$ in zone $z$ at time $t$;
+$\zeta_{h,t,z}$ represents number of g2p shutdown decisions in cluster $h$ in zone $z$ at time $t$.
 
 **Cost expressions:**
 
 The total cost of start-ups across g2p generators subject to unit commitment ($h \in UC$) and all time periods, t is expressed as:
 ```math
 \begin{aligned}
-	C^{start} = \sum_{h \in UC, t \in T} \omega_t \times start\_cost_{h} \times \chi_{h,t}
+	\pi^{start} = \sum_{h \in UC, t \in T} \omega_t \times start\_cost_{h} \times \chi_{h,t}
 \end{aligned}
 ```
 
@@ -86,7 +86,7 @@ Like other time-coupling constraints, this constraint wraps around to link the c
 
 **Ramping constraints**
 
-Thermal resources subject to unit commitment ($h \in UC$) adhere to the following ramping constraints on hourly changes in power output:
+Hydrogen to power resources subject to unit commitment ($h \in UC$) adhere to the following ramping constraints on hourly changes in power output:
 
 ```math
 \begin{aligned}
@@ -109,7 +109,7 @@ where decision $\Theta_{h,z,t}$ is the energy injected into the grid by technolo
 
 **Minimum and maximum power output**
 
-If not modeling regulation and spinning reserves, thermal resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
+If not modeling regulation and spinning reserves, hydrogen to power resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
 
 ```math
 \begin{aligned}
@@ -120,7 +120,7 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 ```math
 \begin{aligned}
-	\Theta_{h,z,t} \geq \rho^{max}_{h,z} \times \Omega^{size}_{h,z} \times \nu_{h,z,t}
+	\Theta_{h,z,t} \leq \rho^{max}_{h,z} \times \Omega^{size}_{h,z} \times \nu_{h,z,t}
 	\hspace{1.5cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
 \end{aligned}
 ```
@@ -129,7 +129,7 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 **Minimum and maximum up and down time**
 
-Thermal resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
+Hydrogen to power resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
 
 ```math
 \begin{aligned}
@@ -140,7 +140,7 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{aligned}
-	\frac{\overline{\Delta_{h,z}} + \Omega_{h,z} - \Delta_{h,z}}{\Omega^{size}_{h,z}} -  \nu_{h,z,t} \geq \displaystyle \sum_{\hat{t} = t-\tau^{down}_{h,z}}^t \zeta_{h,z,\hat{t}}
+	\frac{\Delta^{\text{total}}_{h,z}}{\Omega^{size}_{h,z}} -  \nu_{h,z,t} \geq \displaystyle \sum_{\hat{t} = t-\tau^{down}_{h,z}}^t \zeta_{h,z,\hat{t}}
 	\hspace{1.5cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
 \end{aligned}
 ```
@@ -149,7 +149,7 @@ Thermal resources subject to unit commitment adhere to the following constraints
 where $\tau_{h,z}^{up|down}$ is the minimum up or down time for units in generating cluster $h$ in zone $z$.
 
 Like with the ramping constraints, the minimum up and down constraint time also wrap around from the start of each time period to the end of each period.
-It is recommended that users of GenX must use longer subperiods than the longest min up/down time if modeling UC. Otherwise, the model will report error.
+It is recommended that users of DOLPHYN must use longer subperiods than the longest min up/down time if modeling UC. Otherwise, the model will report error.
 """
 function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
