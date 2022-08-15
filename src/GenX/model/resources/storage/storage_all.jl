@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::Int)
 
-Sets up variables and constraints common to all storage resources. See ```storage()``` in ```storage.jl``` for description of constraints.
+Sets up variables and constraints common to all storage resources.
 
 **Storage discharge and inventory level decision variables**
 
