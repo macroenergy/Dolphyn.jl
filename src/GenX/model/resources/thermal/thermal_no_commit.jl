@@ -53,17 +53,15 @@ This set of time-coupling constraints wrap around to ensure the power output in 
 When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \geq \rho^{min}_{y,z} \times \Delta^{total}_{y,z}
-	\hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t}^{E,THE} \geq \underline{R_{k,z}^{E,THE}} \times y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \leq \rho^{max}_{y,z,t} \times \Delta^{total}_{y,z}
-	\hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t}^{E,THE} \leq \overline{R_{k,z}^{E,THE}} \times y_{k,z}^{E,THE} \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 (See Constraints 3-4 in the code)
 """
