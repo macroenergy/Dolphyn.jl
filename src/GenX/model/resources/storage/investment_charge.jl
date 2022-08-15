@@ -38,7 +38,7 @@ In addition, this module adds investment and fixed OM costs related to charge ca
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{s,z}^{E,CHA,retired} \leq y_{s,z}^{E,CHA,existing} \forall s \in \mathcal{O}^{asym}, z \in \mathcal{Z}
+	0 \leq y_{s,z}^{E,CHA,retired} \leq y_{s,z}^{E,CHA,existing} \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation}
 ```
 
