@@ -17,22 +17,32 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	thermal_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 
-This function defines the operating constraints for thermal power plants NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions ($y \in H \setminus UC$).
+This function defines the operating constraints for thermal power plants NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions $k \in \mathcal{THE} \setminus \mathcal{UC}$.
+
+**Power balance expressions**
+
+Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
+	
+```math
+\begin{eqution}
+	PowerBal_{THE} = \sum_{k \in \mathcal{R}} x_{k,z,t}^{E,THE} \forall k \in \mathcal{THE} \setminus \mathcal{UC}
+\end{eqution}
+```	
 
 **Ramping limits**
 
-Thermal resources not subject to unit commitment ($y \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
+Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t-1} - \Theta_{y,z,t} \leq \kappa_{y,z}^{down} \Delta^{\text{total}}_{y,z} \hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} \leq \kappa_{k,z}^{DN} y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} - \Theta_{y,z,t-1} \leq \kappa_{y,z}^{up} \Delta^{\text{total}}_{y,z} \hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} \leq \kappa_{k,z}^{UP} y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 (See Constraints 1-2 in the code)
 

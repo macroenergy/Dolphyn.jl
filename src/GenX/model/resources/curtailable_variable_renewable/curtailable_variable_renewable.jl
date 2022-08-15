@@ -21,6 +21,16 @@ This function defines the constraints for operation of variable renewable energy
 
 The operational constraints for VRE resources are a function of each technology's time-dependent hourly capacity factor (or availability factor, $R_{r,z,t}^{E,VRE}$), in per unit terms, and the total available capacity ($y_{r,z}^{E,VRE,total}$).
 
+**Power balance expressions**
+
+Contributions to the power balance expression from renewable energy from each renewable resources $r \in \mathcal{R}$ are also defined as:
+
+```math
+\begin{eqution}
+	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{E,VRE}
+\end{eqution}
+```
+
 **Variable renewable power output in each time step**
 
 For each VRE technology type $r$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($R_{r,z,t}^{E,VRE}$), maximum availability ($\overline{y_{r,z}^{E,VRE}}$) and investment cost ($C_{r,z}^{E,INV}$, for example, due to interconnection cost differences). 
