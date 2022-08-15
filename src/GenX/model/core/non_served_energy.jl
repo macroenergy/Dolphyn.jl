@@ -23,15 +23,19 @@ Additional segments, $s \geq 2$ can be used to specify a segment-wise approximat
 Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{E,NSD}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
 and a maximum quantity of demand in this segment, $n_{s}^{E,NSD}$, specified as a share of demand in each zone in each time step, $D_{z, t}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
 
+**Cost expressions**
+
 This function defines contributions to the objective function from the cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
 \begin{eqution}
-	C^{E,NSD} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_{t} \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
+	C^{E,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_{t} \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
 \end{eqution}
 ```
 
-Contributions to the power balance expression from non-served energy/curtailed demand from each demand segment $s \in \mathcal{S}$ are also defined as:
+**Power balance expressions**
+
+Contributions to the power balance expression from non-served energy/curtailed demand from each demand segment $s \in \mathcal{SEG}$ are also defined as:
 
 ```math
 \begin{eqution}
