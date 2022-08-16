@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -19,6 +19,43 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module defines the decision variables representing charging investment of hydrogen storage technologies.
 
+The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+
+```math
+\begin{aligned}
+& \Delta^{total,charge}_{y,z} =(\overline{\Delta^{charge}_{y,z}}+\Omega^{charge}_{y,z}-\Delta^{charge}_{y,z}) \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+One cannot retire more capacity than existing capacity.
+
+```math
+\begin{aligned}
+&\Delta^{charge}_{y,z} \leq \overline{\Delta^{charge}_{y,z}}
+		\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+For resources where $\overline{\Omega_{y,z}^{charge}}$ and $\underline{\Omega_{y,z}^{charge}}$ is defined, then we impose constraints on minimum and maximum charge capacity.
+
+```math
+\begin{aligned}
+& \Delta^{total,charge}_{y,z} \leq \overline{\Omega}^{charge}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
+& \Delta^{total,charge}_{y,z}  \geq \underline{\Omega}^{charge}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+In addition, this function adds investment and fixed O\&M related costs related to charge capacity to the objective function:
+
+```math
+\begin{aligned}
+& 	\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
+	\left( (\pi^{INVEST,charge}_{y,z} \times    \Omega^{charge}_{y,z})
+	+ (\pi^{FOM,charge}_{y,z} \times  \Delta^{total,charge}_{y,z})\right)
+\end{aligned}
+```
 """
 function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
@@ -33,7 +70,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
     ### Variables ###
 
-    ## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
+    ## Storage capacity built and retired for storage resources with independent charge and discharge charge capacities (STOR=2)
 
     # New installed charge capacity of resource "y"
     @variable(EP, vH2CAPCHARGE[y in NEW_CAP_H2_CHARGE] >= 0)
@@ -66,7 +103,6 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     #  ParameterScale = 0 --> objective function is in $
     if setup["ParameterScale"] == 1
-
         @expression(
             EP,
             eCFixH2Charge[y in H2_STOR_ALL],
@@ -83,7 +119,6 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
                 )
             end
         )
-
     else
         @expression(
             EP,

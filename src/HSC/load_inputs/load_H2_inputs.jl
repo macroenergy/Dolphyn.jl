@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
+inputs - dict object containing input data
 setup - dict object containing setup parameters
 path - string path to working directory
 

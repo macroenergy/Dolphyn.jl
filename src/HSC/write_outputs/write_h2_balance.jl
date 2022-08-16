@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing hydrogen balance data to csv file.
+Function for reporting hydrogen balance.
 """
 function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
@@ -42,7 +42,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
 			   "H2_Truck_Import/Export","G2P Demand",
-
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T

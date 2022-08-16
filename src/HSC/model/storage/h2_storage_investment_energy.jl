@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,10 +15,47 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	h2_storage_investment_energy(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the decision variables representing energy components of hydrogen storage technologies.
 
+The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+
+```math
+\begin{aligned}
+& \Delta^{total,energy}_{y,z} =(\overline{\Delta^{energy}_{y,z}}+\Omega^{energy}_{y,z}-\Delta^{energy}_{y,z}) \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+One cannot retire more capacity than existing capacity.
+
+```math
+\begin{aligned}
+&\Delta^{energy}_{y,z} \leq \overline{\Delta^{energy}_{y,z}}
+		\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+For resources where $\overline{\Omega_{y,z}^{energy}}$ and $\underline{\Omega_{y,z}^{energy}}$ is defined, then we impose constraints on minimum and maximum power capacity.
+
+```math
+\begin{aligned}
+& \Delta^{total,energy}_{y,z} \leq \overline{\Omega}^{energy}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
+& \Delta^{total,energy}_{y,z}  \geq \underline{\Omega}^{energy}_{y,z}
+	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+\end{aligned}
+```
+
+In addition, this function adds investment and fixed O\&M related costs related to charge capacity to the objective function:
+
+```math
+\begin{aligned}
+& 	\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
+	\left( (\pi^{INVEST,energy}_{y,z} \times    \Omega^{energy}_{y,z})
+	+ (\pi^{FOM,energy}_{y,z} \times  \Delta^{total,energy}_{y,z})\right)
+\end{aligned}
+```
 """
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 

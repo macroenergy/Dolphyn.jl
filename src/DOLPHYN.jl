@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -153,7 +153,6 @@ include("HSC/model/truck/h2_truck_all.jl")
 include("HSC/model/truck/h2_long_duration_truck.jl")
 
 # H2 storage
-include("HSC/model/storage/h2_storage_investment.jl")
 include("HSC/model/storage/h2_storage_investment_energy.jl")
 include("HSC/model/storage/h2_storage_investment_charge.jl")
 include("HSC/model/storage/h2_storage.jl")

@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
-Function for reading input hydrogen demand of each zone.
+Function for reading input parameters related to hydrogen load (demand) of each zone.
 """
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     

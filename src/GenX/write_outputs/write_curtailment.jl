@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_curtailment(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the curtailment values of the different variable renewable resources.
+Function for reporting the curtailment values of the different variable renewable resources.
 """
 function write_curtailment(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
@@ -45,7 +45,7 @@ function write_curtailment(path::AbstractString, sep::AbstractString, inputs::Di
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfCurtailment[!,Symbol("t$t")][1:G])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+3] .= sum(dfCurtailment[:,Symbol("t$t")][1:G])
 		end
 	end

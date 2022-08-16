@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_capacity_value(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, dfPower::DataFrame, dfCharge::DataFrame, dfResMar::DataFrame, dfCap::DataFrame)
 
-Function to write the capacity value of generation and storage resources to csv file.
+Function for reporting the capacity value of generation and storage resources to csv file.
 """
 function write_capacity_value(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, dfPower::DataFrame, dfCharge::DataFrame, dfResMar::DataFrame, dfCap::DataFrame)
 	dfGen = inputs["dfGen"]
@@ -40,7 +40,7 @@ function write_capacity_value(path::AbstractString, sep::AbstractString, inputs:
 		dfCapValue_ = select!(dfCapValue_, Not(:AnnualSum))
 		if v"1.3" <= VERSION < v"1.4"
 			dfCapValue_[!,:Reserve] .= Symbol("CapRes_$i")
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			#dfCapValue_.Reserve = Symbol("CapRes_$i")
 			dfCapValue_.Reserve = fill(Symbol("CapRes_$i"), size(dfCapValue_, 1))
 		end

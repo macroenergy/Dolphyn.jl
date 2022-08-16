@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	write_reserve_margin(path::AbstractString, sep::AbstractString, setup::Dict, EP::Model)
+
+Function for reporting capacity reserve margin dual.
+"""
 function write_reserve_margin(path::AbstractString, sep::AbstractString, setup::Dict, EP::Model)
 	temp_ResMar = dual.(EP[:cCapacityResMargin])
 	if setup["ParameterScale"] == 1
