@@ -23,7 +23,7 @@ Sets up variables and constraints common to all storage resources.
 
 This module defines the storage energy inventory level variable $U_{s,z,t}^{E,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy stored in the storage device $s$ in zone $z$ at time period $t$.
 
-This module defines the power charge decision variable $x_{s,z,t}^{E,CHA}$\forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$.
+This module defines the power charge decision variable $x_{s,z,t}^{E,CHA}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$.
 
 The variable defined in this file named after ```vS``` covers $U_{s,z,t}^{E,STO}$.
 
@@ -45,7 +45,7 @@ Contributions to the power balance expression from storage charging and discharg
 
 ```math
 \begin{eqution}
-	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \left)x_{s,z,t}^{E,DIS} - x_{s,z,t}^{E,CHA}\right)
+	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{E,DIS} - x_{s,z,t}^{E,CHA}\right)
 \end{eqution}
 ```
 
@@ -53,13 +53,13 @@ Contributions to the power balance expression from storage charging and discharg
 
 The following constraints apply to all storage resources, $s \in \mathcal{S}$, regardless of whether the charge/discharge capacities are symmetric or asymmetric.
 
-The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{E,STO}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{E,STO}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{E,CHA}, x_{s,z,t}^{E,DIS}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{loss}$. 
+The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{E,STO}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{E,STO}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{E,CHA}, x_{s,z,t}^{E,DIS}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{E,loss}$. 
 The first of these two constraints enforces storage inventory balance for interior time steps $(t \in \mathcal{T}^{interior})$, while the second enforces storage balance constraint for the initial time step $(t \in \mathcal{T}^{start})$.
 
 ```math
 \begin{aligned}
-	U_{s,z,t}^{E,STO} &= U_{s,z,t-1}^{E,STO} - \frac{1}{\eta_{s,z}^{E,STO}}x_{s,z,t}^{E,DIS} + \eta_{s,z}^{E,STO}x_{s,z,t}^{E,STO} - \eta_{s,z}^{loss}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	U_{s,z,t}^{E,STO} &= U_{s,z,t+\tau^{period}-1}^{E,STO} - \frac{1}{\eta_{s,z}^{E,STO}}x_{s,z,t}^{E,DIS} + \eta_{s,z}^{E,STO}x_{s,z,t}^{E,CHA} - \eta_{s,z}^{loss}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	U_{s,z,t}^{E,STO} &= U_{s,z,t-1}^{E,STO} - \frac{1}{\eta_{s,z}^{E,STO}}x_{s,z,t}^{E,DIS} + \eta_{s,z}^{E,STO}x_{s,z,t}^{E,STO} - \eta_{s,z}^{E,loss}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	U_{s,z,t}^{E,STO} &= U_{s,z,t+\tau^{period}-1}^{E,STO} - \frac{1}{\eta_{s,z}^{E,STO}}x_{s,z,t}^{E,DIS} + \eta_{s,z}^{E,STO}x_{s,z,t}^{E,CHA} - \eta_{s,z}^{E,loss}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 
