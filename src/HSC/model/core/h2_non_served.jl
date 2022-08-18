@@ -17,47 +17,49 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 
-This function defines the non-served hydrogen/curtailed hydrogen demand decision variable $\Lambda_{s,t,z} \forall s \in \mathcal{S}, \forall t \in \mathcal{T}, z \in \mathcal{Z}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $n_{1}^{slope}$. Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response). Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{slope}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) and a maximum quantity of demand in this segment, $n_{s}^{size}$, specified as a share of demand in each zone in each time step, $D_{t,z}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
+This function defines the non-served hydrogen demand decision variable $x_{s,z,t}^{H,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of hydrogen demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
+The first segment of non-served hydrogen, $s=1$, is used to denote the cost of involuntary hydrogen demand curtailment, specified as the value of $c_{1}^{H,NSD}$.
+Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic hydrogen demand curve, or segments of price-responsive curtailable hydrogen loads.
+Each segment denotes a price/cost at which the segment of hydrogen demand is willing to curtail consumption, $n_{s}^{H,NSD}$, representing the marginal willingness to pay for hydrogen demand of this segment of demand (or opportunity cost incurred when demand is not served) 
+and a maximum quantity of demand in this segment, $n_{s}^{H,NSD}$, specified as a share of hydrogen demand in each zone in each time step, $D_{z, t}^{H}$. Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
 
-This function defines contributions to the objective function from the cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
+The variable defined in this file named after ```vH2NSE``` covers the variable $x_{s,z,t}^{H2,NSD}$.
 
-```math
-\begin{aligned}
-	Obj_{NSE} =
-	\sum_{s \in \mathcal{S} } \sum_{t \in \mathcal{T}} \sum_{z \in \mathcal{Z}}\omega_t \times n_{s}^{slope} \times \Lambda_{s,t,z}
-\end{aligned}
-```
+**Cost expressions**
 
-Contributions to the power balance expression from non-served energy/curtailed demand from each demand segment $s \in \mathcal{S}$ are also defined as:
-
-```math
-\begin{aligned}
-	PowerBal_{NSE} =
-	\sum_{s \in \mathcal{S} } \Lambda_{s,t,z}
-		\hspace{4 cm}  \forall s \in \mathcal{S}, t \in \mathcal{T}
-\end{aligned}
-```
-
-**Bounds on curtailable demand**
-
-Demand curtailed in each segment of curtailable demands $s \in \mathcal{S}$ cannot exceed maximum allowable share of demand:
+This function defines contributions to the objective function from the cost of non-served hydrogen/curtailed hydrogen from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
-\begin{aligned}
-	\Lambda_{s,t,z} \leq (n_{s}^{size} \times D_{t,z})
-	\hspace{4 cm}  \forall s \in \mathcal{S}, t \in \mathcal{T}, z\in \mathcal{Z}
-\end{aligned}
+\begin{eqution}
+	C^{H,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{H,NSD} \times x_{s,z,t}^{H,NSD}
+\end{eqution}
 ```
 
-Additionally, total demand curtailed in each time step cannot exceed total demand:
+Contributions to the hydrogen balance expression from non-served hydrogen/curtailed hydrogen from each demand segment $s \in \mathcal{SEG}$ are also defined as:
 
 ```math
-\begin{aligned}
-	\sum_{s \in \mathcal{S} } \Lambda_{s,t,z} \leq D_{t,z}
-	\hspace{4 cm}  \forall t \in \mathcal{T}, z\in \mathcal{Z}
-\end{aligned}
+\begin{equation}
+	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
+**Bounds on curtailable hydrogen demand**
+
+Hydrogen demand curtailed in each segment of curtailable demands $s \in \mathcal{SEG}$ cannot exceed maximum allowable share of hydrogen demand:
+
+```math
+\begin{equation}
+	x_{s,z,t}^{H,NSD} \leq n_{s}^{H,NSD} \times D_{z,t}^{H} \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
+```
+
+Additionally, total demand curtailed in each time step cannot exceed total hydrogen demand:
+
+```math
+\begin{equation}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \leq D_{z,t} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
+```
 """
 function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 

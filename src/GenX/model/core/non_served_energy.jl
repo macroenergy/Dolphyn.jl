@@ -17,15 +17,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     non_served_energy(EP::Model, inputs::Dict)
 
+Sets up variables of non served power demand.
+
 This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
 The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $c_{1}^{E,NSD}$.
 Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response).
 Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{E,NSD}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
-and a maximum quantity of demand in this segment, $n_{s}^{E,NSD}$, specified as a share of demand in each zone in each time step, $D_{z, t}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
+and a maximum quantity of demand in this segment, $n_{s}^{E,NSD}$, specified as a share of demand in each zone in each time step, $D_{z, t}^{E}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
+
+The variable defined in this file named after ```vNSE``` covers the variable $x_{s,z,t}^{E,NSD}$.
 
 **Cost expressions**
 
-This function defines contributions to the objective function from the cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
+This function defines contributions to the objective function from the cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
 \begin{eqution}
@@ -39,7 +43,7 @@ Contributions to the power balance expression from non-served energy/curtailed d
 
 ```math
 \begin{eqution}
-	PowerBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD}
+	PowerBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{eqution}
 ```
 
@@ -57,7 +61,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 
 ```math
 \begin{aligned}
-	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \leq D_{t,z} \forall z\in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \leq D_{z,t} \forall z\in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 """
