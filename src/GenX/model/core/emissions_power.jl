@@ -18,6 +18,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the CO2 emissions by plants in each zone, which is subsequently added to the total emissions.
+
+**Cost expressions**
+
+```math
+\begin{equation}
+	#! Yuheng Zhang, emission terms are not defined well in the equation
+	C^{E,EMI} = \Omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} c_{z}^{E,EMI} x_{z,t}^{E,EMI}
+\end{equation}
+```
 """
 function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
