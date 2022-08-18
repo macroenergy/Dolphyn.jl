@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -23,16 +23,16 @@ This function defines a series of operationg variables,expresstions and constrai
 
 The sum of full and empty trucks should equal the total number of invested trucks.
 ```math
-\begin{aligned}
+\begin{equation}
     v_{j, t}^{\mathrm{F}}+v_{j, t}^{\mathrm{E}}=V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
-\end{aligned}    
+\end{equation}    
 ```
     
 The full (empty) trucks include full (empty) trucks in transit and staying at each zones.
 ```math
 \begin{aligned}
-    v_{j, t}^{\mathrm{F}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z, \prime^{\prime}, t}^{\mathrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\mathrm{F}} \\
-    v_{j, t}^{\mathrm{E}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z,,^{\prime}, t}^{\mathrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\mathrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+    v_{j, t}^{\mathrm{F}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z^{\prime}, t}^{\mathrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\mathrm{F}} \\
+    v_{j, t}^{\mathrm{E}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z^{\prime}, t}^{\mathrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\mathrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}    
 ```
     
@@ -42,9 +42,9 @@ The change of the total number of full (empty) available trucks at zone z should
 ```math
 {\begin{aligned}
     q_{z, j, t}^{\mathrm{F}}-q_{z, j, t-1}^{\mathrm{F}}=& q_{z, j, t}^{\mathrm{CHA}}-q_{z, j, t}^{\mathrm{DIS}} \\
-    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}}+y_{z \rightarrow z, j, t-1}^{\mathrm{F}}\right) \\
+    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{F}}+y_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{F}}\right) \\
     q_{z, j, t}^{\mathrm{E}}-q_{z, j, t-1}^{\mathrm{E}}=&-q_{z, j, t}^{\mathrm{CHA}}+q_{z, j, t}^{\mathrm{DIS}} \\
-    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z,,^{\prime} j, t-1}^{\mathrm{E}}+y_{z \rightarrow z,,^{\prime} j, t-1}^{\mathrm{E}}\right) \\
+    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{E}}+y_{z \rightarrow z^{\prime} j, t-1}^{\mathrm{E}}\right) \\
     \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
@@ -52,8 +52,8 @@ The change of the total number of full (empty) available trucks at zone z should
 The change of the total number of full (empty) trucks in transit from zone z to zone zz should equal the number of full (empty) trucks that just departed from zone z minus the number of full (empty) trucks that just arrived at zone zz:
 ```math
 \begin{aligned}
-    u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}-u_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}} & =x_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}}-y_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}} \\
-    u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{E}}-u_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{E}} & =x_{z \rightarrow z,^{\prime} j, t-1}^{\mathrm{E}}-y_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{E}} \\
+    u_{z \rightarrow z^{\prime}, j, t}^{\mathrm{F}}-u_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{F}} & =x_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{F}}-y_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{F}} \\
+    u_{z \rightarrow z^{\prime}, j, t}^{\mathrm{E}}-u_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{E}} & =x_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{E}}-y_{z \rightarrow z^{\prime}, j, t-1}^{\mathrm{E}} \\
     & \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}    
 ```
@@ -69,15 +69,15 @@ The amount of H2 delivered to zone z should equal the truck capacity times the n
 The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
-    u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z,^{\prime} j, e}^{\mathrm{F}} \\
-    u_{z \rightarrow z,^{\prime} j, t}^{\mathrm{E}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z, j, e}^{\mathrm{E}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
+    u_{z \rightarrow z^{\prime}, j, t}^{\mathrm{F}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z^{\prime}, j, e}^{\mathrm{F}} \\
+    u_{z \rightarrow z^{\prime}, j, t}^{\mathrm{E}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z, j, e}^{\mathrm{E}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
     
 ```math
 \begin{aligned}
-    u_{z \rightarrow z,^{\prime}j, t}^{\mathrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z,^{\prime} j, e}^{\mathrm{F}} \\
-    u_{z \rightarrow z, j, t}^{\mathrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z,^{\prime} j, e}^{\mathrm{E}} \\
+    u_{z \rightarrow z^{\prime}, j, t}^{\mathrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z^{\prime} j, e}^{\mathrm{F}} \\
+    u_{z \rightarrow z, j, t}^{\mathrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z^{\prime} j, e}^{\mathrm{E}} \\
     \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}   
 ```

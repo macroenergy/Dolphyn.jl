@@ -23,50 +23,50 @@ This function includes investment variables, expressions and related constraints
 
 ## Truck capacity built and retired
 ```math
-\begin{aligned}
-    v_{CAP,j}^{TRU} \geqslant 0
-\end{aligned}
+\begin{equation}
+    0 \leq v_{CAP,j}^{TRU}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-    v_{RETCAP,j}^{TRU} \geqslant 0
-\end{aligned}
+\begin{equation}
+    0 \leq v_{RETCAP,j}^{TRU}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-   v_{CAP,j}^{TRU} \geqslant 0
-\end{aligned}
+\begin{equation}
+    0 \leq v_{CAP,j}^{TRU}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-    v_{NEWCAP,j}^{TRU} \geqslant 0
-\end{aligned}
+\begin{equation}
+    0 \leq v_{NEWCAP,j}^{TRU}
+\end{equation}
 ```
 
 **Constraints**
 
 Truck retirements cannot retire more charge capacity than existing charge capacity
 ```math
-\begin{aligned}
-    v_{RETCAPNUM,j}^{TRU} \le v_{ExistNum,j}^{TRU}
-\end{aligned}
+\begin{equation}
+    v_{RETCAPNUM,j}^{TRU} \leq v_{ExistNum,j}^{TRU}
+\end{equation}
 ```
 Truck compression energyCannot retire more energy capacity than existing energy capacity
 ```math
-\begin{aligned}
-    v_{RETCAPEnergy,j}^{TRU} \le v_{ExistEnergyCap,j}^{TRU} 
-\end{aligned}
+\begin{equation}
+    v_{RETCAPEnergy,j}^{TRU} \leq v_{ExistEnergyCap,j}^{TRU} 
+\end{equation}
 ```
 
 **Expressions**
 ```math
-\begin{aligned}
+\begin{equation}
     C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \mathrm{~L}_{z \rightarrow z^{\prime}} \\
     & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
-\end{aligned}
+\end{equation}
 ```
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
