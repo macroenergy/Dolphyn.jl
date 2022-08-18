@@ -17,7 +17,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_storage_asymmetric(EP::Model, inputs::Dict)
 
-This module separates the hydrogen storage type into asymmetric and symmetric charge and models the action when charging and discharging is symmetric.
+Sets up variables and constraints specific to hydrogen storage resources with symmetric charge and discharge capacities.
+
+For storage technologies with symmetric charge and discharge capacity (all $s \in \mathcal{S}^{sym}$), charge rate, $x_{s,z,t}^{H,CHA}$, is constrained by the total installed power capacity $y_{s,z}^{H,STO,POW}$. 
+Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, DOLPHYN permits storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), 
+with the simultaenous sum of charge $x_{s,z,t}^{H,CHA}$, and discharge $x_{s,z,t}^{E,DIS}$, also limited by the total installed power capacity, $y_{s,z}^{H,STO,POW}$. 
+These two constraints are as follows:
+
+```math
+\begin{equation}
+	x_{s,z,t}^{H,CHA} \leq y_{s,z}^{H,STO,POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 """
 function h2_storage_symmetric(EP::Model, inputs::Dict)
     # Set up additional variables, constraints, and expressions associated with hydrogen storage resources with symmetric charge & discharge capacity

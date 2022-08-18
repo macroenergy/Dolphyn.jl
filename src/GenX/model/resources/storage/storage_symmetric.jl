@@ -28,6 +28,7 @@ These two constraints are as follows:
 \begin{equation}
 	x_{s,z,t}^{E,CHA} \leq y_{s,z}^{E,STO,POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
+```
 
 ```math
 \begin{equation}
