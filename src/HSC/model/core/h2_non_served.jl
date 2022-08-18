@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
+	h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines the non-served hydrogen demand decision variable $x_{s,z,t}^{H,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of hydrogen demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
 The first segment of non-served hydrogen, $s=1$, is used to denote the cost of involuntary hydrogen demand curtailment, specified as the value of $c_{1}^{H,NSD}$.
@@ -61,9 +61,9 @@ Additionally, total demand curtailed in each time step cannot exceed total hydro
 \end{equation}
 ```
 """
-function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
+function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
-    println("Hydrogen Non-served Energy Module")
+    println("Hydrogen Non-served Module")
 
     T = inputs["T"]     # Number of time steps
     Z = inputs["Z"]     # Number of zones
@@ -71,14 +71,14 @@ function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 
     ### Variables ###
 
-    # Non-served energy/curtailed demand in the segment "s" at hour "t" in zone "z"
+    # Non-served hydrogen/curtailed hydrogen demand in the segment "s" at hour "t" in zone "z"
     @variable(EP, vH2NSE[s = 1:H2_SEG, t = 1:T, z = 1:Z] >= 0)
 
     ### Expressions ###
 
     ## Objective Function Expressions ##
 
-    # Cost of non-served energy/curtailed demand at hour "t" in zone "z"
+    # Cost of non-served hydrogen/curtailed hydrogen demand at hour "t" in zone "z"
     @expression(
         EP,
         eH2CNSE[s = 1:H2_SEG, t = 1:T, z = 1:Z],

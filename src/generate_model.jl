@@ -195,8 +195,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions of various hydrogen sector resources
 		EP = emissions_hsc(EP, inputs,setup)
 
-		#model H2 non-served energy
-		EP = h2_non_served_energy(EP, inputs,setup)
+		# Model H2 non-served
+		EP = h2_non_served(EP, inputs,setup)
 
 		# Model hydrogen storage technologies
 		if !isempty(inputs["H2_STOR_ALL"])
