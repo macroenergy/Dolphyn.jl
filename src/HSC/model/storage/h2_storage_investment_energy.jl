@@ -17,8 +17,41 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_storage_investment_energy(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the decision variables representing energy components of hydrogen storage technologies.
+This function defines the expressions and constraints keeping track of total available storage energy capacity as well as constraints on capacity retirements. 
+The function also adds investment and fixed OM costs related to energy capacity to the objective function.
 
+The total energy capacity of storage resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+
+```math
+\begin{equation}
+	y_{s,z}^{H,ENE,total} = y_{s,z}^{H,ENE,existing} + y_{s,z}^{H,ENE,new} - y_{s,z}^{H,ENE,retired} \forall s \in \mathcal{S}, z \in \mathcal{Z}
+\end{equation}
+```
+
+**Cost expressions**
+
+In addition, this module adds investment and fixed OM costs related to energy capacity to the objective function:
+```math
+\begin{equation}
+	\sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{H,ENE,INV} \times y_{s,z}^{H,ENE,new} + c_{s,z}^{H,ENE,FOM} \times y_{y,z}^{H,ENE,total})
+\end{equation}
+```
+
+**Constraints on storage energy capacity**
+
+One cannot retire more capacity than existing capacity.
+```math
+\begin{equation}
+	0 \leq y_{s,z}^{H,ENE,retired} \leq y_{s,z}^{H,ENE,existing} \forall s \in \mathcal{S}, z \in \mathcal{Z}
+\end{equation}
+```
+
+For storage resources where upper bound $\overline{R_{s,z}^{H,ENE}}$ and lower bound $\underline{R_{s,z}^{H,ENE}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
+```math
+\begin{equation}
+	\underline{R_{s,z}^{H,ENE}} \leq y_{s,z}^{H,ENE} \leq \overline{R_{s,z}^{H,ENE}} \forall s \in \mathcal{S}, z \in \mathcal{Z}
+\end{equation}
+```
 """
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
