@@ -129,7 +129,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	# PSC captured CO2
 	@expression(EP, eCO2PSCCaptureByZone[z = 1:Z, t = 1:T], 0)
-	
+
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
 
@@ -185,26 +185,26 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if !isempty(inputs["FLEX"])
 		EP = flexible_demand(EP, inputs)
 	end
-	
+
 	# Model constraints, variables, expression related to thermal resource technologies
 	if !isempty(inputs["THERM_ALL"])
 		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
 	end
 
-	# EP[:ePowerBalance] += eGenerationByZone #! Yuheng zhang: GenerationByZone is not used in ePowerBalance 
+	# EP[:ePowerBalance] += eGenerationByZone #! Yuheng zhang: GenerationByZone is not used in ePowerBalance
 
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
 
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)
 
 		# Infrastructure
 		EP = h2_outputs(EP, inputs, setup)
 
 		# Investment cost of various hydrogen generation sources
 		EP = h2_investment(EP, inputs, setup)
-	
+
 		if !isempty(inputs["H2_GEN"])
 			# Model H2 generation
 			EP = h2_production(EP, inputs, setup)
@@ -249,7 +249,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if setup["ModelCO2"] == 1
 
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eCO2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+		@expression(EP, eCO2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)
 
 		# Infrastructure
 		EP = co2_outputs(EP, inputs, setup)
@@ -259,7 +259,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		# Model CO2 non-served
 		EP = co2_non_served(EP, inputs, setup)
-		
+
 		if !isempty(inputs["CO2_CAPTURE"])
 			# Model CO2 capture
 			EP = co2_capture(EP, inputs, setup)
@@ -288,7 +288,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	################  Policies #####################3
 
-	if setup["ModelH2"] == 0 
+	if setup["ModelH2"] == 0
 		if setup["ModelCO2"] == 0
 			EP = co2_cap_power(EP, inputs, setup)
 		elseif setup["ModelCO2"] == 1
@@ -331,16 +331,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		### Hydrogen Balance constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
 	end
-	
+
 	## Only activate when carbon capture utilization is online
 	if setup["ModelCO2"] == 1
 		###Carbon Balanace constraints
 		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
 	end
-	
+
 	if setup["ModelSyn"] == 1
 		### Synthesis fuels balance constraints
-		@constraint(EP, cSynBalance[t=1:T,z=1:Z], EP[:eSynFuelBalance[t,z] == inputs[SynFuel_D][t,z]])
+		@constraint(EP, cSynBalance[t=1:T,z=1:Z], EP[:eSynFuelBalance][t,z] == inputs["SynFuel_D"][t,z]])
 	end
 
 	## Record pre-solver time
