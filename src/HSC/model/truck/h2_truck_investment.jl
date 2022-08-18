@@ -64,7 +64,7 @@ Truck compression energyCannot retire more energy capacity than existing energy 
 **Expressions**
 ```math
 \begin{aligned}
-    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \Omega_{t} \mathrm{~L}_{z \rightarrow z^{\prime}} \\
+    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \mathrm{~L}_{z \rightarrow z^{\prime}} \\
     & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
 \end{aligned}
 ```

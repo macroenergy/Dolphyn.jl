@@ -29,7 +29,7 @@ This function defines contributions to the objective function from the cost of n
 
 ```math
 \begin{eqution}
-	C^{E,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_{t} \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
+	C^{E,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
 \end{eqution}
 ```
 

@@ -24,7 +24,7 @@ This function defines contributions to the objective function from the cost of n
 ```math
 \begin{aligned}
 	Obj_{NSE} =
-	\sum_{s \in \mathcal{S} } \sum_{t \in \mathcal{T}} \sum_{z \in \mathcal{Z}}\omega_{t} \times n_{s}^{slope} \times \Lambda_{s,t,z}
+	\sum_{s \in \mathcal{S} } \sum_{t \in \mathcal{T}} \sum_{z \in \mathcal{Z}}\omega_t \times n_{s}^{slope} \times \Lambda_{s,t,z}
 \end{aligned}
 ```
 

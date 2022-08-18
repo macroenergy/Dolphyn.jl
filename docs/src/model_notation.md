@@ -155,7 +155,7 @@ $\mathcal{W} \subseteq \mathcal{G}$ | where $\mathcal{W}$ set of hydroelectric g
 | :------------ | :-----------|
 |$D_{z,t}$ | Electricity demand in zone $z$ and at time step $t$ [MWh] or hydrogen demand in zone $z$ at time step $t$ [tonne-$\ce{H2}$]|
 |$\tau^{period}$ | number of time steps in each representative period $w \in \mathcal{W}^{rep}$ and each input period $w \in \mathcal{W}^{input}$|
-|$\omega_{t}$ | weight of each model time step $\omega_t =1 \forall t \in T$ when modeling each time step of the year at an hourly resolution|
+|$\omega_t$ | weight of each model time step $\omega_t =1 \forall t \in T$ when modeling each time step of the year at an hourly resolution|
 |$n_s^{slope}$ | Cost of non-served energy/demand curtailment for price-responsive demand segment $s$ [\$/MWh]|
 |$n_s^{size}$ | Size of price-responsive demand segment $s$ as a fraction of the hourly zonal demand [%]|
 |$\overline{\Omega}_{y,z}$ | Maximum capacity of technology $y$ in zone $z$ [MW]|

@@ -24,7 +24,7 @@ This module additionally defines contributions to the objective function from va
 ```math
 \begin{aligned}
 	Obj_{Var\_g2p} =
-	\sum_{h \in \mathcal{H}} \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{h}
+	\sum_{h \in \mathcal{H}} \sum_{t \in \mathcal{T}}\omega_t\times(\pi^{VOM}_{h}
 \end{aligned}
 ```
 """

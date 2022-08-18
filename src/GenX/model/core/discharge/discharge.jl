@@ -45,7 +45,7 @@ This module additionally defines contributions to the objective function from va
 ```math
 \begin{aligned}
 	C^{E,GEN,o} =
-	\sum_{g \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times\left(c_{g}^{E,VOM} + c_{g}^{E,FUEL}\right)\times x_{g,t}^{E,GEN}}
+	\sum_{g \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_t\times\left(c_{g}^{E,VOM} + c_{g}^{E,FUEL}\right)\times x_{g,t}^{E,GEN}}
 \end{aligned}
 ```
 """

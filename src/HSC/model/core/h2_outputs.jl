@@ -25,7 +25,7 @@ This module additionally defines contributions to the objective function from va
 ```math
 \begin{aligned}
 	Obj_{Var\_gen} =
-	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
+	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_t\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
 \end{aligned}
 ```
 

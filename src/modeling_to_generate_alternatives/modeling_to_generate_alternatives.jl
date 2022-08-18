@@ -26,7 +26,7 @@ To create the MGA formulation, we replace the cost-minimizing objective function
 	\text{max/min} \quad
 	&\sum_{z \in \mathcal{Z}}\sum_{r \in \mathcal{R}} \beta_{z,r}^{k}P_{z,r}\\
 	\text{s.t.} \quad
-	&P_{zr} = \sum_{y \in \mathcal{G}}\sum_{t \in \mathcal{T}} \omega_{t} \Theta_{y,t,z,r}  \\
+	&P_{zr} = \sum_{y \in \mathcal{G}}\sum_{t \in \mathcal{T}} \omega_t \Theta_{y,t,z,r}  \\
 	& f \leq f^* + \delta \\
 	&Ax = b
 \end{aligned}

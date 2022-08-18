@@ -25,8 +25,8 @@ For each energy share requirement constraint $p \in \mathcal{P}^{ESR}$, we speci
 
 ```math
 \begin{aligned}
-&\sum_{z \in \mathcal{Z}_{p}^{ESR}} \sum_{y \in \mathcal{G}_{p}^{ESR}} \sum_{t \in \mathcal{T}} (\omega_{t} \times  \Theta_{y,z,t}) \geq  \sum_{z \in \mathcal{Z}^{ESR}_{p}} \sum_{t \in \mathcal{T}} (\mu_{p,z}^{ESR} \times \omega_{t} \times D_{z,t}) + \\
-&\sum_{y \in \mathcal{O}} \sum_{z \in \mathcal{Z}^{ESR}_{p}} \sum_{t \in \mathcal{T}} \left(\mu_{p,z}^{ESR} \times \omega_{t} \times (\Pi_{y,z,t} - \Theta_{y,z,t}) \right) \hspace{1 cm}  \forall p \in \mathcal{P}^{ESR} \\
+&\sum_{z \in \mathcal{Z}_{p}^{ESR}} \sum_{y \in \mathcal{G}_{p}^{ESR}} \sum_{t \in \mathcal{T}} (\omega_t \times  \Theta_{y,z,t}) \geq  \sum_{z \in \mathcal{Z}^{ESR}_{p}} \sum_{t \in \mathcal{T}} (\mu_{p,z}^{ESR} \times \omega_t \times D_{z,t}) + \\
+&\sum_{y \in \mathcal{O}} \sum_{z \in \mathcal{Z}^{ESR}_{p}} \sum_{t \in \mathcal{T}} \left(\mu_{p,z}^{ESR} \times \omega_t \times (\Pi_{y,z,t} - \Theta_{y,z,t}) \right) \hspace{1 cm}  \forall p \in \mathcal{P}^{ESR} \\
 \end{aligned}
 ```
 
