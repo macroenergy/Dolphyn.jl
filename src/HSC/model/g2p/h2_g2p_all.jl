@@ -18,25 +18,24 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 
 The hydrogen to power module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
-- Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
+
+The variable defined in this file named after ```vH2G2P``` covers .
+
+**Constraints on generation discharge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{aligned}
-&\Delta_{y,z} \leq \overline{\Delta_{y,z}}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation}
+	0 \leq y_{g}^{H,G2P,retired} \leq y_{g}^{H,G2P,existing} \forall g \in \mathcal{G}
+\end{equation}
 ```
 
-For resources where $\overline{\Omega_{y,z}}$ and $\underline{\Omega_{y,z}}$ is defined, then we impose constraints on minimum and maximum power capacity.
+For resources where upper bound $\overline{y_{g}^{H,G2P}}$ and lower bound $\underline{y_{g}^{H,G2P}}$ of capacity is defined, then we impose constraints on minimum and maximum power capacity.
+
 ```math
-\begin{aligned}
-& \Delta^{total}_{y,z} \leq \overline{\Omega}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z} \\
-& \Delta^{total}_{y,z}  \geq \underline{\Omega}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
-```
+\begin{equation}
+	\underline{y_{g}^{H,G2P}} \leq y_{g}^{H,G2P} \leq \overline{y_{g}^{H,G2P}} \forall g \in \mathcal{G}
+\end{equatio
 """
 function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 

@@ -19,41 +19,45 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies without unit commitment constraints
 
-**Ramping limits**
+**Hydrogen balance expressions**
 
-Hydrogen to power resources not subject to unit commitment ($h \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
+Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
+	
+```math
+\begin{eqution}
+	HydrogenBal_{G2P} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{H,G2P} \forall k \in \mathcal{G2P} \setminus \mathcal{UC}
+\end{eqution}
+```	
+
+Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t-1} - \Theta_{h,z,t} \leq \kappa_{h,z}^{down} \Delta^{\text{total}}_{h,z} \hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t-1}^{H,G2P} - x_{k,z,t}^{H,G2P} \leq \kappa_{k,z}^{G2P,DN} y_{k,z}^{H,G2P} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t} - \Theta_{h,z,t-1} \leq \kappa_{h,z}^{up} \Delta^{\text{total}}_{h,z} \hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t}^{H,G2P} - x_{k,z,t-1}^{H,G2P} \leq \kappa_{k,z}^{G2P,UP} y_{k,z}^{H,G2P} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 (See Constraints 1-2 in the code)
-
-This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$, is within the eligible ramp of the power output in the final time step of the year (or each representative period), $t+\tau^{period}-1$.
 
 **Minimum and maximum power output**
 
 When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t} \geq \rho^{min}_{h,z} \times \Delta^{total}_{h,z}
-	\hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t}^{H,G2P} \geq \underline{R_{k,z}^{H,G2P}} \times y_{k,z}^{H,G2P} \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t} \leq \rho^{max}_{h,z,t} \times \Delta^{total}_{h,z}
-	\hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	x_{k,z,t}^{H,G2P} \leq \overline{R_{k,z}^{H,G2P}} \times y_{k,z}^{H,G2P} \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 (See Constraints 3-4 in the code)
 """

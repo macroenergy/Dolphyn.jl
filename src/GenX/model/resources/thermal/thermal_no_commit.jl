@@ -25,7 +25,7 @@ Contributions to the power balance expression from each thermal resources withou
 	
 ```math
 \begin{eqution}
-	PowerBal_{THE} = \sum_{k \in \mathcal{R}} x_{k,z,t}^{E,THE} \forall k \in \mathcal{THE} \setminus \mathcal{UC}
+	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{E,THE} \forall k \in \mathcal{THE} \setminus \mathcal{UC}
 \end{eqution}
 ```	
 
