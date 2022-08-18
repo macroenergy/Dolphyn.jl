@@ -24,7 +24,7 @@ This function creates expression to add the CO2 emissions by plants in each zone
 ```math
 \begin{equation}
 	#! Yuheng Zhang, emission terms are not defined well in the equation
-	C^{E,EMI} = \Omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} c_{z}^{E,EMI} x_{z,t}^{E,EMI}
+	C^{E,EMI} = \omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} c_{z}^{E,EMI} x_{z,t}^{E,EMI}
 \end{equation}
 ```
 """
