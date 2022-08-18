@@ -18,6 +18,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
 This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies as well as carbon emission policy constraints.
+
+This module uses the following 'helper' functions in separate files: ```h2_g2p_commit()``` for thermal resources subject to unit commitment decisions and constraints (if any) and ```h2_g2p_no_commit()``` for thermal resources not subject to unit commitment (if any).
 """
 function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 

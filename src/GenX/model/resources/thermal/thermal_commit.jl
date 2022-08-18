@@ -143,7 +143,7 @@ Thermal resources subject to unit commitment adhere to the following constraints
 ```
 (See Constraints 9-10 in the code)
 
-where $\tau_{k,z}^{UP}$ and $\tau_{k,z}^{DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
+where $\tau_{k,z}^{E,UP}$ and $\tau_{k,z}^{E,DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
 
 Like with the ramping constraints, the minimum up and down constraint time also wrap around from the start of each time period to the end of each period.
 It is recommended that users of DOLPHYN must use longer subperiods than the longest min up/down time if modeling unit commitment. Otherwise, the model will report error.
