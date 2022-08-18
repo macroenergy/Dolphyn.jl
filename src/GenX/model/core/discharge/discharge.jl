@@ -17,6 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	discharge(EP::Model, inputs::Dict)
 
+Sets up variables common to all generation resources.
+
 This module defines the power generation decision variable $x_{k,t}^{E,THE} \forall k \in \mathcal{K}, t \in \mathcal{T}$, representing energy injected into the grid by thermal resource $k$ at time period $t$.
 
 This module defines the power generation decision variable $x_{r,t}^{E,VRE} \forall r \in \mathcal{R}, t \in \mathcal{T}$, representing energy injected into the grid by renewable resource $r$ at time period $t$.
@@ -35,6 +37,8 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 	\end{cases}
 \end{equation}
 ```
+
+**Cost expressions**
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro) over all time periods $t \in \mathcal{T}$:
 

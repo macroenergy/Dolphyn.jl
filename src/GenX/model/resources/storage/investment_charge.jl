@@ -28,12 +28,16 @@ The total capacity of each storage resource is defined as the sum of the existin
 \end{equation}
 ```
 
+**Cost expressions**
+
 In addition, this module adds investment and fixed OM costs related to charge capacity to the objective function:
 ```math
 \begin{equation}
 	\sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{E,CHA,INV} \times y_{s,z}^{E,CHA,new} + c_{s,z}^{E,CHA,FOM} \times y_{y,z}^{E,CHA,total})
 \end{equation}
 ```
+
+**Constraints on storage charge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math

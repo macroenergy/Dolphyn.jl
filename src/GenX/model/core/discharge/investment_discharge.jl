@@ -17,6 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	investment_discharge(EP::Model, inputs::Dict)
 
+Sets up constraints common to all generation resources.
+
 This function defines the expressions and constraints keeping track of total available thermal generation capacity $y_{k}^{E,THE}$ as well as constraints on capacity retirements.
 
 This function defines the expressions and constraints keeping track of total available renewable generation capacity $y_{r}^{E,VRE}$ as well as constraints on capacity retirements.
@@ -49,13 +51,17 @@ Note for energy storage resources in power sector, additional energy and charge 
 \end{equation}
 ```
 
-This module additionally defines contributions to the objective function from investment costs of generation (fixed O&M plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
 
 ```math
 \begin{equation}
 	C^{E,GEN,c} = \sum_{g in G} y_{g}^{E,GEN,new}\times c_{g}^{E,INV} + \sum_{g in G} y_{g}^{E,GEN,total}\times c_{g}^{E,FOM}
 \end{equation}
 ```
+
+**Constraints on generation discharge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
