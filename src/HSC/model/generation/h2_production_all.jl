@@ -18,6 +18,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
 The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
+The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies with unit commitment constraints (e.g. natural gas reforming etc.)
 
 This module uses the following 'helper' functions in separate files: ```h2_generation_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```h2_generation_no_commit()``` for resources not subject to unit commitment (if any).
 - Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits

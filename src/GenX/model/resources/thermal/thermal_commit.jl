@@ -74,8 +74,8 @@ minus the number of units shut down in the current period, $n_{k,z,t}^{E,DN}$:
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{E,THE} &= n_{k,z,t-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	n_{k,z,t}^{E,THE} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	n_{k,z,t}^{E,THE} &= n_{k,z,t-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	n_{k,z,t}^{E,THE} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 (See Constraint 4 in the code)
