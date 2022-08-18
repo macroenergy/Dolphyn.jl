@@ -17,38 +17,34 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the production decision variable  representing hydrogen injected into the network by resource $y$ by at time period $t$.
+Sets up variables common to all hydrogen generation resources.
 
-This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
+This module defines the hydrogen generation decision variable $x_{k,z,t}^{H,GEN} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen injected into the grid by hydrogen generation resource $k$ in zone $z$ at time period $t$.
 
-**Variables**
-```math
-\begin{aligned}
-	Obj_{Var\_gen} =
-	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_t\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
-\end{aligned}
-```
+This module defines the gydrogen discharge decision variable $x_{s,z,t}^{H,DIS} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen injected into the grid by hydrogen storage resource $s$ in zone $z$ at time period $t$.
 
-**Expressions**
-```math
-\begin{aligned}
-	\varepsilon _{OUT}^{GEN} =
-		\Omega _{t} \times \xi _{k}^{OMCostPTone} {\div} ModelScalingFactors^{2}+ FuelCost   
-\end{aligned}
-```
+The variable defined in this file named after ```vH2Gen``` covers all variables $x_{k,z,t}^{H,GEN}, x_{s,z,t}^{H,DIS}$.
 
 ```math
-\begin{aligned}
-	\varepsilon _{CH2GenVarOutT}^{Total} =\sum_{t}^{t\to t^{'} } \sum_{k}^{ \mathbb{K}} \varepsilon _{k,t}^{GenOut}    
-\end{aligned}
+\begin{equation}
+	x_{g,z,t}^{H,GEN} = 
+	\begin{cases}
+		x_{k,z,t}^{H,THE} if g \in \mathcal{K} \\
+		x_{s,z,t}^{H,DIS} if g \in \mathcal{S}
+	\end{cases}
+	\forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all resources over all time periods.
 
 ```math
-\begin{aligned}
-	\varepsilon _{CH2GenVarOut}^{Total} =\sum_{t}^{t\to t^{'} } \varepsilon _{t}^{GenOut}      
-\end{aligned}
+\begin{equation}
+	C^{H,GEN,o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{H,GEN}
+\end{equation}
 ```
-
 """
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
