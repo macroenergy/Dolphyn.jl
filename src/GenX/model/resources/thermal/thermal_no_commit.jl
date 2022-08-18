@@ -35,13 +35,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation}
-	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} \leq \kappa_{k,z}^{DN} y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} \leq \kappa_{k,z}^{E,DN} y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} \leq \kappa_{k,z}^{UP} y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} \leq \kappa_{k,z}^{E,UP} y_{k,z}^{E,THE} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 (See Constraints 1-2 in the code)
