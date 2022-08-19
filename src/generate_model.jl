@@ -340,7 +340,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	
 	if setup["ModelSyn"] == 1
 		### Synthesis fuels balance constraints
-		@constraint(EP, cSynBalance[t=1:T,z=1:Z], EP[:eSynFuelBalance[t,z] == inputs[SynFuel_D][t,z]])
+		@constraint(EP, cSynBalance[t=1:T,z=1:Z], EP[:eSynFuelBalance][t,z] == inputs["SynFuel_D"][t,z])
 	end
 
 	## Record pre-solver time
