@@ -19,13 +19,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function establishes decision variables, expressions, and constraints related to transmission power flows between model zones and associated transmission losses (if modeled).
 
-The function adds transmission reinforcement or construction costs to the objective function. Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $pi^{TCAP}_{l}$, times the additional transmission capacity variable, $\bigtriangleup\varphi^{max}_{l}$.
+The function adds transmission reinforcement or construction costs to the objective function. 
+Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $pi^{TCAP}_{l}$, times the additional transmission capacity variable, $\bigtriangleup\varphi^{max}_{l}$.
+
 ```math
 \begin{aligned}
 & \sum_{l \in \mathcal{L}}\left(\pi^{TCAP}_{l} \times \bigtriangleup\varphi^{max}_{l}\right)
 \end{aligned}
 ```
-Note that fixed O\&M and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the GenX objective function.
+Note that fixed OM and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the GenX objective function.
 
 Power flow and transmission loss terms are also added to the power balance constraint for each zone:
 ```math

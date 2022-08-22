@@ -47,7 +47,7 @@ For resources where $\overline{\Omega_{y,z}^{energy}}$ and $\underline{\Omega_{y
 \end{aligned}
 ```
 
-In addition, this function adds investment and fixed O\&M related costs related to charge capacity to the objective function:
+In addition, this function adds investment and fixed OM related costs related to charge capacity to the objective function:
 
 ```math
 \begin{aligned}
