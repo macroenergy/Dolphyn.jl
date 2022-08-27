@@ -114,10 +114,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" CO2 balance constraint
 	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
 
-	# Initialize Synthesis Fuels Balance Expression
-	# Expression for "baseline" CO2 balance constraint
-	@expression(EP, eSynBalance[t=1:T, z=1:Z], 0)
-
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -338,12 +334,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
 	end
 
-	if setup["ModelSyn"] == 1
-		### Synthesis fuels balance constraints
-		@constraint(EP, cSynBalance[t=1:T,z=1:Z], EP[:eSynFuelBalance][t,z] == inputs["SynFuel_D"][t,z])
-	end
-
-	## Record pre-solver time
+    ## Record pre-solver time
 	presolver_time = time() - presolver_start_time
     #### Question - What do we do with this time now that we've split this function into 2?
 	if setup["PrintModel"] == 1
