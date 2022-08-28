@@ -19,11 +19,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables common to all generation resources.
 
-This module defines the power generation decision variable $x_{k,z,t}^{E,THE} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by thermal resource $k$ in zone $z$ at time period $t$.
-
-This module defines the power generation decision variable $x_{r,z,t}^{E,VRE} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by renewable resource $r$ in zone $z$ at time period $t$.
-
-This module defines the power discharge decision variable $x_{s,z,t}^{E,DIS} \forall s \in \mathcal{S}, z t \in \mathcal{T}$, representing energy injected into the grid by storage resource $s$ in zone $z$ at time period $t$.
+This module defines the following variables:
+- $x_{k,z,t}^{E,THE} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by thermal resource $k$ in zone $z$ at time period $t$.
+- $x_{r,z,t}^{E,VRE} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by renewable resource $r$ in zone $z$ at time period $t$.
+- $x_{s,z,t}^{E,DIS} \forall s \in \mathcal{S}, z t \in \mathcal{T}$, representing energy injected into the grid by storage resource $s$ in zone $z$ at time period $t$.
 
 The variable defined in this file named after ```vP``` covers all variables $x_{k,z,t}^{E,THE}, x_{r,z,t}^{E,VRE}, x_{s,z,t}^{E,DIS}$.
 
