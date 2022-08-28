@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This function establishes decision variables, expressions, and constraints related to transmission power flows between model zones and associated transmission losses (if modeled).
 
 The function adds transmission reinforcement or construction costs to the objective function. 
-Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $c_{l}^{E,NET}$, times the additional transmission capacity variable, $y_{l}^{E,NET,new}$.
+Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $c_{l}^{E,NET}$, and the additional transmission capacity variable, $y_{l}^{E,NET,new}$.
 
 ```math
 \begin{equation}
@@ -66,9 +66,13 @@ The additional transmission capacity, $y_{l}^{E,NET,new} $, is constrained by a 
 **Accounting for Transmission Losses**
 
 Transmission losses due to power flows can be accounted for in three different ways. 
-The first option is to neglect losses entirely, setting the value of the losses function to zero for all lines at all hours. 
-The second option is to assume that losses are a fixed percentage, $\eta_{l}^{E,NET}$, of the magnitude of power flow on each line, $\mid x_{l,t}^{E,NET} \mid$ (e.g., losses are a linear function of power flows). 
-Finally, the third option is to calculate losses, $\ell_{l,t}$, by approximating a quadratic-loss function of power flow across the line using a piecewise-linear function with total number of segments equal to the size of the set $\mathcal{M}$.
+
+{\textbf The first option} is to neglect losses entirely, setting the value of the losses function to zero for all lines at all hours. 
+
+
+{\textbf The second option} is to assume that losses are a fixed percentage, $\eta_{l}^{E,NET}$, of the magnitude of power flow on each line, $\mid x_{l,t}^{E,NET} \mid$ (e.g., losses are a linear function of power flows). 
+
+{\textbf the third option} is to calculate losses, $\ell_{l,t}$, by approximating a quadratic-loss function of power flow across the line using a piecewise-linear function with total number of segments equal to the size of the set $\mathcal{M}$.
 
 ```math
 \begin{equation}
@@ -105,7 +109,7 @@ This unrealistic behavior can be eliminated via inclusion of additional constrai
 ```
 where $TransON_{l,t}^{E,NET+}$ is a continuous variable, representing the product of the binary variable $ON_{l,t}^{E,NET+}$ and the expression, $(y_{l}^{E,NET,existing} + y_{l}^{E,NET,new})$. 
 This product cannot be defined explicitly, since it will lead to a bilinear expression involving two variables. 
-Instead, we enforce this definition via the Glover's Linearization as shown below (also referred McCormick Envelopes constraints for bilinear expressions, which is exact when one of the variables is binary).
+Instead, we enforce this definition via the Glover's Linearization as shown below (also the McCormick Envelopes constraints for bilinear expressions, which is exact when one of the variables is binary).
 
 ```math
 \begin{aligned}

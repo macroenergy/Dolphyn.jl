@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -33,7 +33,7 @@ This function defines contributions to the objective function from the cost of n
 
 ```math
 \begin{eqution}
-	C^{E,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
+	C^{E,NSD} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
 \end{eqution}
 ```
 

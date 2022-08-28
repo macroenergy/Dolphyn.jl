@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -21,11 +21,11 @@ This function creates decision variables and cost expressions associated with th
 
 **Unit commitment decision variables**
 
-This module defines the commitment state variable $\n_{k,z,t}^{E,THE}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Commitment state variable $\n_{k,z,t}^{E,THE}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-This module defines the number of startup decision variable $\n_{k,z,t}^{E,UP}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Startup decision variable $\n_{k,z,t}^{E,UP}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-This module defines the number of shutdown decision variable $\n_{k,z,t}^{E,DN}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Shutdown decision variable $\n_{k,z,t}^{E,DN}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
 The variable defined in this file named after ```vCOMMIT``` covers $\n_{k,z,t}^{E,THE}$.
 
@@ -43,7 +43,7 @@ The total cost of start-ups across all generators subject to unit commitment ($k
 \end{aligned}
 ```
 
-If set ```UCommit``` to 1, the unit commitment variables are set to integer types.
+If set ```UCommit``` to 1, the unit commitment variables are set to integer types. IF ```UCommit``` =2, these variables are treated as continuous.
 """
 function ucommit(EP::Model, inputs::Dict, UCommit::Int)
 

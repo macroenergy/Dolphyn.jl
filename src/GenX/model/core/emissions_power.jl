@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -12,21 +12,13 @@ GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 
 @doc raw"""
 	emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the CO2 emissions by plants in each zone, which is subsequently added to the total emissions.
-
-**Cost expressions**
-
-```math
-\begin{equation}
-	#! Yuheng Zhang, emission terms are not defined well in the equation
-	C^{E,EMI} = \omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} c_{z}^{E,EMI} x_{z,t}^{E,EMI}
-\end{equation}
-```
 """
 function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
@@ -47,6 +39,8 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 	 	end
  	)
  	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z), :R_ID]))
+
+	## TO DO: add expression to keep track of captured emissions by zone and plant (Jun Wen)
 
  	# If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
  	# then need to add cost penalty due to CO2 prices

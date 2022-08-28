@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -19,11 +19,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up constraints common to all generation resources.
 
-This function defines the expressions and constraints keeping track of total available thermal generation capacity $y_{k}^{E,THE}$ as well as constraints on capacity retirements.
-
-This function defines the expressions and constraints keeping track of total available renewable generation capacity $y_{r}^{E,VRE}$ as well as constraints on capacity retirements.
-
-This function defines the expressions and constraints keeping track of total available storage discharge capacity $y_{s}^{E,STO,DIS}$ as well as constraints on capacity retirements.
+This function defines the expressions and constraints keeping track of: 
+	- total available thermal generation capacity $y_{k}^{E,THE}$ as well as constraints on capacity retirements.
+	- total available renewable generation capacity $y_{r}^{E,VRE}$ as well as constraints on capacity retirements.
+	- total available storage discharge capacity $y_{s}^{E,STO,DIS}$ as well as constraints on capacity retirements.
 
 The expression defined in this file named after ```eTotalCap``` covers all variables $y_{k}^{E,THE}, y_{r}^{E,VRE}, y_{s}^{E,STO,DIS}$.
 
