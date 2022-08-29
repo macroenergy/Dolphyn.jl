@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -24,16 +24,12 @@ println(pwd())
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Solvers" => "solvers.md",
-    "Solving the Model" => "solve_model.md",
-    "Additional Features" => "additional_features.md",
-    "Additional Tools" => "additional_tools.md",
-    "Methods" => "methods.md",
     "GenX" => [
         "GenX Introduction" => "model_introduction.md",
         "Model Inputs/Outputs Documentation" => "data_documentation.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" => "write_outputs.md",
-        "Notation" => "model_notation.md",
+        "GenX Notation" => "genx_notation.md",
         "Objective Function" => "objective_function.md",
         "Power Balance" => "power_balance.md",
         "GenX Function Reference" => [
@@ -60,6 +56,7 @@ pages = OrderedDict(
     "HSC" => [
         "HSC Inputs Functions" => "load_h2_inputs.md",
         "HSC Outputs Functions" => "write_h2_outputs.md",
+        "Hydrogen Notation" => "hsc_notation.md",
         "HSC Function Reference" => [
             "Hydrogen Core" => "h2_core.md",
             "Hydrogen Flexible Demand" => "h2_flexible_demand.md",
@@ -85,6 +82,9 @@ pages = OrderedDict(
             ],
         ],
     ],
+    "Additional Tools" => "additional_tools.md",
+    "Solving the Model" => "solve_model.md",
+    "Methods" => "methods.md",
 )
 
 makedocs(;
@@ -100,5 +100,8 @@ deploydocs(;
     target = "build",
     branch = "gh-pages",
     devbranch = "main",
-    push_preview = true,
+    devurl = "dev",
+    push_preview=true,
+    versions = ["stable" => "v^", "v#.#"],
+    forcepush = false,
 )
