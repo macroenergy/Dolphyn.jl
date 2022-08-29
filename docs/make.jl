@@ -29,7 +29,7 @@ pages = OrderedDict(
         "Model Inputs/Outputs Documentation" => "data_documentation.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" => "write_outputs.md",
-        "Notation" => "genx_notation.md",
+        "GenX Notation" => "genx_notation.md",
         "Objective Function" => "objective_function.md",
         "Power Balance" => "power_balance.md",
         "GenX Function Reference" => [
@@ -56,7 +56,7 @@ pages = OrderedDict(
     "HSC" => [
         "HSC Inputs Functions" => "load_h2_inputs.md",
         "HSC Outputs Functions" => "write_h2_outputs.md",
-        "Notation" => "hsc_notation.md",
+        "Hydrogen Notation" => "hsc_notation.md",
         "HSC Function Reference" => [
             "Hydrogen Core" => "h2_core.md",
             "Hydrogen Flexible Demand" => "h2_flexible_demand.md",
@@ -100,5 +100,8 @@ deploydocs(;
     target = "build",
     branch = "gh-pages",
     devbranch = "main",
-    push_preview = true,
+    devurl = "dev",
+    push_preview=true,
+    versions = ["stable" => "v^", "v#.#"],
+    forcepush = false,
 )
