@@ -34,9 +34,9 @@ The variable defined in this file named after ```vH2_CHARGE_STOR``` covers $x_{s
 This module additionally defines contributions to the objective function from variable costs (variable O&M plus fuel cost) of charging action of storage devices $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,STO,o} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z} \sum_{t \in \mathcal{T} \omega_t \times c_{s,z,t}^{H,STO,o} \times x_{s,z,t}^{H,CHA}
-\end{equation}
+\end{equation*}
 ```
 
 **Power balance expressions**
@@ -44,9 +44,9 @@ This module additionally defines contributions to the objective function from va
 Contributions to the power balance expression from compression due to storage charging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{H,CHA}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Hydrogen balance expressions**
@@ -54,9 +54,9 @@ Contributions to the power balance expression from compression due to storage ch
 Contributions to the power balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{H,DIS} - x_{s,z,t}^{H,CHA}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Storage inventory level track constraints**
@@ -87,9 +87,9 @@ The storage power capacity sets lower and upper bounds on the storage energy cap
 It limits the volume of energy $U_{s,z,t}^{H,STO}$ at any time $t$ to be less than the installed energy storage capacity $y_{s,z}^{H,STO,ENE}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq U_{s,z,t}^{H,STO} \leq y_{s,z}^{H,STO,ENE} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 It also limits the discharge power $x_{s,z,t}^{H,DIS}$ at any time to be less than the installed power capacity $y_{s,z}^{H,STO,POW}$.

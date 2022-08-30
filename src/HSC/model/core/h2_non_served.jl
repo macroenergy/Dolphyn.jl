@@ -30,17 +30,17 @@ The variable defined in this file named after ```vH2NSE``` covers the variable $
 This function defines contributions to the objective function from the cost of non-served hydrogen/curtailed hydrogen from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{H,NSD} \times x_{s,z,t}^{H,NSD}
-\end{equation}
+\end{equation*}
 ```
 
 Contributions to the hydrogen balance expression from non-served hydrogen/curtailed hydrogen from each demand segment $s \in \mathcal{SEG}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Bounds on curtailable hydrogen demand**
@@ -48,17 +48,17 @@ Contributions to the hydrogen balance expression from non-served hydrogen/curtai
 Hydrogen demand curtailed in each segment of curtailable demands $s \in \mathcal{SEG}$ cannot exceed maximum allowable share of hydrogen demand:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{s,z,t}^{H,NSD} \leq n_{s}^{H,NSD} \times D_{z,t}^{H} \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 Additionally, total demand curtailed in each time step cannot exceed total hydrogen demand:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_non_served(EP::Model, inputs::Dict, setup::Dict)

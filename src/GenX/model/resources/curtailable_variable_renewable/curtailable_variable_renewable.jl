@@ -26,9 +26,9 @@ The operational constraints for VRE resources are a function of each technology'
 Contributions to the power balance expression from renewable energy from each renewable resources $r \in \mathcal{R}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{E,VRE} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Variable renewable power output in each time step**
@@ -40,18 +40,18 @@ This approach allows for modeling many different bins per VRE technology type an
 Thus, the maximum power output for each VRE resource type in each zone is given by the following equation:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{r,z,t}^{E,VRE} \leq \sum_{(r,z)\in \overline{\mathcal{VRE}}^{r,z}}{R_{r,z,t}^{E,VRE} \times y_{r,z,t}^{E,VRE,total}} \forall r,z \in \{(r,z)|VREIndex_{r,z}=1, z \in \mathcal{Z}\},t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 The above constraint is defined as an inequality instead of an equality to allow for VRE power output to be curtailed if desired. 
 This adds the possibility of introducing VRE curtailment as an extra degree of freedom to guarantee that generation exactly meets demand in each time step.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq x_{r,z,t}^{E,CUR} \leq x_{r,z,t}^{E,VRE} \quad \forall r \in \mathcal{VRE}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 Note that if ```Reserves=1``` indicating that frequency regulation and operating reserves are modeled, then this function calls ```curtailable_variable_renewable_reserves()```, which replaces the above constraints with a formulation inclusive of reserve provision.

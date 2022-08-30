@@ -24,9 +24,9 @@ This function defines the operating constraints for thermal power plants NOT sub
 Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
 	
 ```math
-\begin{equation}
+\begin{equation*}
 	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}
-\end{equation}
+\end{equation*}
 ```	
 
 **Ramping limits**
@@ -34,15 +34,15 @@ Contributions to the power balance expression from each thermal resources withou
 Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} \leq \kappa_{k,z}^{E,DN} y_{k,z}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} \leq \kappa_{k,z}^{E,UP} y_{k,z}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 1-2 in the code)
 
@@ -53,15 +53,15 @@ This set of time-coupling constraints wrap around to ensure the power output in 
 When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} \geq \underline{R_{k,z}^{E,THE}} \times y_{k,z}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} \leq \overline{R_{k,z}^{E,THE}} \times y_{k,z}^{E,THE} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 3-4 in the code)
 """

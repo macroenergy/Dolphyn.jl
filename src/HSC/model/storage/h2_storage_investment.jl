@@ -22,17 +22,17 @@ This module defines the  decision variable  representing charging and energy com
 The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\Delta^{total,energy}_{y,z} =(\overline{\Delta^{energy}_{y,z}}+\Omega^{energy}_{y,z}-\Delta^{energy}_{y,z}) \quad \forall y \in \mathcal{O}, z \in \mathcal{Z}
-\end{equation}
+\end{equation*}
 ```
 
 One cannot retire more capacity than existing capacity.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\Delta^{energy}_{y,z} \leq \overline{\Delta^{energy}_{y,z}} \quad \forall y \in \mathcal{O}, z \in \mathcal{Z}
-\end{equation}
+\end{equation*}
 ```
 
 For resources where $\overline{\Omega_{y,z}^{energy}}$ and $\underline{\Omega_{y,z}^{energy}}$ is defined, then we impose constraints on minimum and maximum power capacity.

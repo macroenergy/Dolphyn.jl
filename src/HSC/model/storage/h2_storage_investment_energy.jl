@@ -23,34 +23,34 @@ The function also adds investment and fixed OM costs related to energy capacity 
 The total energy capacity of storage resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	y_{s,z}^{H,ENE,total} = y_{s,z}^{H,ENE,existing} + y_{s,z}^{H,ENE,new} - y_{s,z}^{H,ENE,retired} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
-\end{equation}
+\end{equation*}
 ```
 
 **Cost expressions**
 
 In addition, this module adds investment and fixed OM costs related to energy capacity to the objective function:
 ```math
-\begin{equation}
+\begin{equation*}
 	\sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{H,ENE,INV} \times y_{s,z}^{H,ENE,new} + c_{s,z}^{H,ENE,FOM} \times y_{y,z}^{H,ENE,total})
-\end{equation}
+\end{equation*}
 ```
 
 **Constraints on storage energy capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq y_{s,z}^{H,ENE,retired} \leq y_{s,z}^{H,ENE,existing} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
-\end{equation}
+\end{equation*}
 ```
 
 For storage resources where upper bound $\overline{R_{s,z}^{H,ENE}}$ and lower bound $\underline{R_{s,z}^{H,ENE}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
 ```math
-\begin{equation}
+\begin{equation*}
 	\underline{R_{s,z}^{H,ENE}} \leq y_{s,z}^{H,ENE} \leq \overline{R_{s,z}^{H,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)

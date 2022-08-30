@@ -24,9 +24,9 @@ This function defines the operating constraints for thermal hydrogen generation 
 Contributions to the hydrogen balance expression from each thermal resources with unit commitment $k \in \mathcal{UC}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	HydrogenBal_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{H,GEN} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Startup and shutdown events (thermal plant cycling)**
@@ -36,9 +36,9 @@ Contributions to the hydrogen balance expression from each thermal resources wit
 Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to the following constraints on commitment states, startup events, and shutdown events, which limit each decision to be no greater than the maximum number of discrete units installed (as per the following three constraints):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{H,GEN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
@@ -100,15 +100,15 @@ where decision $x_{k,z,t}^{H,GEN}$ is the energy injected into the grid by techn
 and parameter $\overline{\rho_{k,z,t}^{H,GEN}}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,GEN} \geq \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,GEN} \geq \overline{\rho_{k,z}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 (See Constraints 7-8 the code)
@@ -118,15 +118,15 @@ and parameter $\overline{\rho_{k,z,t}^{H,GEN}}$ is the maximum available generat
 Thermal resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{H,GEN} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,UP}}^t n_{k,z,\tau}^{H,UP} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} - n_{k,z,t}^{H,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,DN}}^t n_{k,z,\tau}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 9-10 in the code)
 

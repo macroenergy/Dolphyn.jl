@@ -26,9 +26,9 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro) over all time periods $t \in \mathcal{T}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,G2P,o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{H,G2P}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)

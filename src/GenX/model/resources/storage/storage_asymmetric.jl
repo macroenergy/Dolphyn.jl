@@ -22,17 +22,17 @@ Sets up variables and constraints specific to storage resources with asymmetric 
 For storage technologies with asymmetric charge and discharge capacities (all $s \in \mathcal{S}^{asym}$), charge rate $x_{s,z,t}^{E,CHA}$, is constrained by the total installed charge capacity $y_{s,z}^{E,STO,CHA}$, as follows:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq x_{s,z,t}^{E,CHA} \leq y_{s,z}^{E,STO,CHA} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 If reserves are modeled, the above constraint is replaced by the following:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq x_{s,z,t}^{E,CHA} + f_{s,z,t}^{E,CHA} \leq y_{s,z}^{E,STO,CHA} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 where $f_{s,z,t}^{E,CHA}$ is the contribution of storage resources to frequency regulation while charging.
@@ -103,9 +103,9 @@ Additionally, when reserves are modeled, the maximum charge rate and contributio
 Note that for storage to contribute to reserves down while charging, the storage device must be capable of increasing the charge rate (which increase net load).
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{s,z,t}^{E,CHA} + f_{s,z,t}^{E,CHA} \leq y_{s,z}^{E,STO,ENE} - U_{s,z,t-1}^{E,STO} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 Finally, the constraints on maximum discharge rate are replaced by the following, to account for capacity contributed to regulation and reserves:

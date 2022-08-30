@@ -24,23 +24,23 @@ This module creates decision variables, expressions, and constraints related to 
 Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
 	
 ```math
-\begin{equation}
+\begin{equation*}
 	HydrogenBal_{G2P} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{H,G2P} \quad \forall k \in \mathcal{G2P} \setminus \mathcal{UC}
-\end{equation}
+\end{equation*}
 ```	
 
 Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t-1}^{H,G2P} - x_{k,z,t}^{H,G2P} \leq \kappa_{k,z}^{G2P,DN} y_{k,z}^{H,G2P} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,G2P} - x_{k,z,t-1}^{H,G2P} \leq \kappa_{k,z}^{G2P,UP} y_{k,z}^{H,G2P} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 1-2 in the code)
 
@@ -49,15 +49,15 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,G2P} \geq \underline{R_{k,z}^{H,G2P}} \times y_{k,z}^{H,G2P} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,G2P} \leq \overline{R_{k,z}^{H,G2P}} \times y_{k,z}^{H,G2P} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 3-4 in the code)
 """

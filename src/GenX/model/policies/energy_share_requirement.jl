@@ -27,9 +27,9 @@ For each constraint $p \in \mathcal{P}^{ESR}$, we define a subset of zones $z \i
 For each energy share requirement constraint $p \in \mathcal{P}^{ESR}$, we specify the share of total demand in each eligible model zone, $z \in \mathcal{Z}_{p}^{ESR}$, that must be served by qualifying resources, $\mathcal{G}_{p}^{ESR} \subset \mathcal{G}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\sum_{z \in \mathcal{Z}_{p}^{ESR}} \sum_{g \in \mathcal{G}_{p}^{ESR}} \sum_{t \in \mathcal{T}} (\omega_t \times x_{g,z,t}^{E,GEN}) \geq \sum_{z \in \mathcal{Z}_{p}^{ESR}} \sum_{t \in \mathcal{T}} (\mu_{p,z}^{ESR} \times \omega_t \times D_{z,t}) + \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}_{p}^{ESR}} \sum_{t \in \mathcal{T}} \left(\mu_{p,z}^{ESR} \times \omega_t \times (x_{s,z,t}^{E,CHA} - x_{s,z,t}^{E,DIS})\right) \forall p \in \mathcal{P}^{ESR}
-\end{equation}
+\end{equation*}
 ```
 
 The final term in the summation above adds roundtrip storage losses to the total load to which the energy share obligation applies. 

@@ -25,9 +25,9 @@ with the simultaenous sum of charge $x_{s,z,t}^{H,CHA}$, and discharge $x_{s,z,t
 These two constraints are as follows:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{s,z,t}^{H,CHA} \leq y_{s,z}^{H,STO,POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 """
 function h2_storage_symmetric(EP::Model, inputs::Dict)
     # Set up additional variables, constraints, and expressions associated with hydrogen storage resources with symmetric charge & discharge capacity

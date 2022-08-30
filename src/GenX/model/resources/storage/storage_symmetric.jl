@@ -25,15 +25,15 @@ with the simultaenous sum of charge $x_{s,z,t}^{E,CHA}$, and discharge $x_{s,z,t
 These two constraints are as follows:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{s,z,t}^{E,CHA} \leq y_{s,z}^{E,STO,POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{s,z,t}^{E,CHA} + x_{s,z,t}^{E,DIS} \leq y_{s,z}^{E,STO,POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 """
 function storage_symmetric(EP::Model, inputs::Dict, Reserves::Int)

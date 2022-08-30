@@ -27,17 +27,17 @@ The variable defined in this file named after ```vP2G``` cover variable $x_{z,t}
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 
 For resources where upper bound $\overline{y_{g}^{H,GEN}}$ and lower bound $\underline{y_{g}^{H,GEN}}$ of capacity is defined, then we impose constraints on minimum and maximum generation capacity.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\underline{y_{g}^{H,GEN}} \leq y_{g}^{H,GEN} \leq \overline{y_{g}^{H,GEN}} \quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)

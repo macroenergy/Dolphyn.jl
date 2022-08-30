@@ -23,17 +23,17 @@ The function adds transmission reinforcement or construction costs to the object
 Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $c_{l}^{E,NET}$, and the additional transmission capacity variable, $y_{l}^{E,NET,new}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\sum_{l \in \mathcal{L}}\left(c_{l}^{E,NET} \times y_{l}^{E,NET,new}\right)
-\end{equation}
+\end{equation*}
 ```
 Note that fixed OM and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the DOLPHYN objective function.
 
 Power flow and transmission loss terms are also added to the power balance constraint for each zone:
 ```math
-\begin{equation}
+\begin{equation*}
 	- \sum_{l\in \mathcal{L}}{(f^{E,map}(\cdot) \times x_{l,t}^{E,NET})} - \frac{1}{2} \sum_{l\in \mathcal{L}}{(f^{E,map}(\cdot) \times f^{E,loss}(\cdot))}
-\end{equation}
+\end{equation*}
 ```
 
 Power flows, $x_{l,t}^{E,NET}$, on each line $l$ into or out of a zone (defined by the network map $f^{E,map}(\cdot): l \rightarrow z$), are considered in the demand balance equation for each zone. 
@@ -47,21 +47,21 @@ Transmission flow constraints are modeled using a 'transport method', where powe
 The additional transmission capacity, $y_{l}^{E,NET,new} $, is constrained by a maximum allowed reinforcement, $\overline{y_{l}^{E,NET,new}}$, for each line $l \in \mathcal{E}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	-y_{l}^{E,NET,existing} \leq x_{l,t}^{E,NET} \leq y_{l}^{E,NET,existing} \quad \forall l \in (\mathcal{L} \setminus \mathcal{E}), t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	-(y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}) \leq x_{l,t}^{E,NET} \leq (y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}) \quad \forall l \in \mathcal{E}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	y_{l}^{E,NET,new} \leq \overline{y_{l}^{E,NET,new}} \quad \forall l \in \mathcal{E}
-\end{equation}
+\end{equation*}
 ```
 
 **Accounting for Transmission Losses**
@@ -75,7 +75,7 @@ Transmission losses due to power flows can be accounted for in three different w
 {\textbf the third option} is to calculate losses, $\ell_{l,t}$, by approximating a quadratic-loss function of power flow across the line using a piecewise-linear function with total number of segments equal to the size of the set $\mathcal{M}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	f^{E,loss}(\cdot) = 
 	\begin{cases} 
 	0 & \text{if~} \text{losses.~0} \\
@@ -83,7 +83,7 @@ Transmission losses due to power flows can be accounted for in three different w
 	\ell_{l,t} &\text{if~} \text{losses.~2} 
 	\end{cases}
 	\quad \forall l \in \mathcal{L}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 For the second option, an absolute value approximation is utilized to calculate the magnitude of the power flow on each line (reflecting the fact that negative power flows for a line linking nodes $z$ and $z^{\prime}$ represents flows from node $z^{\prime}$ to $z$ and causes the same magnitude of losses as an equal power flow from $i$ to $j$). 

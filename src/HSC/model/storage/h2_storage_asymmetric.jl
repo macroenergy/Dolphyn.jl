@@ -22,9 +22,9 @@ Sets up variables and constraints specific to hydrogen storage resources with as
 For storage technologies with asymmetric charge and discharge capacities (all $s \in \mathcal{S}^{asym}$), charge rate $x_{s,z,t}^{H,CHA}$, is constrained by the total installed charge capacity $y_{s,z}^{H,STO,CHA}$, as follows:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq x_{s,z,t}^{H,CHA} \leq y_{s,z}^{H,STO,CHA} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_storage_asymmetric(EP::Model, inputs::Dict)

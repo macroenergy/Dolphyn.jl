@@ -26,14 +26,14 @@ This module defines the gydrogen discharge decision variable $x_{s,z,t}^{H,DIS} 
 The variable defined in this file named after ```vH2Gen``` covers all variables $x_{k,z,t}^{H,GEN}, x_{s,z,t}^{H,DIS}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{g,z,t}^{H,GEN} = 
 	\begin{cases}
 		x_{k,z,t}^{H,THE} if g \in \mathcal{K} \\
 		x_{s,z,t}^{H,DIS} if g \in \mathcal{S}
 	\end{cases}
 	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Cost expressions**
@@ -41,9 +41,9 @@ The variable defined in this file named after ```vH2Gen``` covers all variables 
 This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all resources over all time periods.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,GEN,o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{H,GEN}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)

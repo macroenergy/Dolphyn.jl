@@ -40,32 +40,32 @@ The variable defined in this file named after ```vH2PipeLevel``` covers variable
 This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus construction) from all pipeline resources $i \in \mathcal{I}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
     C_{\mathrm{PIP}}^{\mathrm{c}}=\delta_{i}^{\mathrm{PIP}} \sum_{i \in \mathbb{I}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \mathrm{c}_{i}^{\mathrm{PIP}} \mathrm{L}_{z \rightarrow z^{\prime}} l_{i,z \rightarrow z^{\prime}}
     h_{i,z \rightarrow z^{\prime}, t}^{\mathrm{PIP}}=h_{z \rightarrow z,^{\prime}i, t}^{\mathrm{PIP+}}-h_{z \rightarrow z,{ }^{\prime} i, t}^{\mathrm{PIP-}} \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
-\end{equation}    
+\end{equation*}    
  ```
 
 The flow rate of H2 through pipeline type i is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline i
 ```math
-\begin{equation}
+\begin{equation*}
     \overline{\mathrm{F}}_{i} l_{i,z \rightarrow z^{\prime}} \geq x_{i,z \rightarrow z^{\prime}, t}^{\mathrm{H,PIP+}}, x_{i,z \rightarrow z^{\prime}, t}^{\mathrm{H,PIP-}} \geq 0 \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
-\end{equation}    
+\end{equation*}    
 ```
 
 The pipeline has storage capacity via line packing:
 ```math
-\begin{equation}
+\begin{equation*}
     \overline{\mathrm{U}}_{i}^{\mathrm{H,PIP}} l_{i,z \rightarrow z^{\prime}} \geq -\sum_{\tau=t_{0}}^{t}\left(x_{i,z^{\prime} \rightarrow z, \tau}^{\mathrm{H,PIP}}+x_{i,z \rightarrow z^{\prime}, \tau}^{\mathrm{H,PIP}}\right) \Delta t \geq \underline{\mathrm{R}}_{i}^{\mathrm{H,PIP}} \overline{\mathrm{E}}_{i}^{\mathrm{H,PIP}} l_{i,z \rightarrow z^{\prime}} \\
     & \forall z^{\prime} \in \mathbb{Z}, z \in \mathbb{Z}, i \in \mathbb{I}, t \in \mathbb{T}
-\end{equation}   
+\end{equation*}   
 ```
 
 The change of hydrogen pipeline storage inventory is modeled as follows:
 ```math
-\begin{equation}
+\begin{equation*}
     U_{i,z \rightarrow z^{\prime},t}^{H,PIP} - U_{i,z \rightarrow z^{\prime},t-1} = x_{i,z \rightarrow z^{\prime},t}^{H,PIP-} + x_{i,z^{\prime} \rightarrow z,t}^{H,PIP-}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)

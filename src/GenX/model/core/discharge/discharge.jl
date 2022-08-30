@@ -27,7 +27,7 @@ This module defines the following variables:
 The variable defined in this file named after ```vP``` covers all variables $x_{k,z,t}^{E,THE}, x_{r,z,t}^{E,VRE}, x_{s,z,t}^{E,DIS}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{g,z,t}^{E,GEN} = 
 	\begin{cases}
 		x_{k,z,t}^{E,THE} \quad if \quad g \in \mathcal{K} \\
@@ -35,7 +35,7 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 		x_{s,z,t}^{E,DIS} \quad if \quad g \in \mathcal{S}
 	\end{cases}
 	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Cost expressions**
@@ -43,9 +43,9 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro) over all time periods $t \in \mathcal{T}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{E,GEN,o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{E,VOM} + c_{g}^{E,FUEL}\right) \times x_{g,z,t}^{E,GEN}
-\end{equation}
+\end{equation*}
 ```
 """
 function discharge(EP::Model, inputs::Dict)

@@ -32,9 +32,9 @@ The variable defined in this file named after ```vNSE``` covers the variable $x_
 This function defines contributions to the objective function from the cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{E,NSD} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
-\end{equation}
+\end{equation*}
 ```
 
 **Power balance expressions**
@@ -42,9 +42,9 @@ This function defines contributions to the objective function from the cost of n
 Contributions to the power balance expression from non-served energy/curtailed demand from each demand segment $s \in \mathcal{SEG}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	PowerBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Bounds on curtailable demand**
@@ -52,9 +52,9 @@ Contributions to the power balance expression from non-served energy/curtailed d
 Demand curtailed in each segment of curtailable demands $s \in \mathcal{S}$ cannot exceed maximum allowable share of demand:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 Additionally, total demand curtailed in each time step cannot exceed total demand:

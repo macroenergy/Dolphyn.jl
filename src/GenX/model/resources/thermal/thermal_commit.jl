@@ -31,9 +31,9 @@ However, this method entails the simplifying assumption that all clustered units
 Contributions to the power balance expression from each thermal resources with unit commitment $k \in \mathcal{UC}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	PowerBal_{THE} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{E,THE} \forall k \in \mathcal{UC}
-\end{equation}
+\end{equation*}
 ```
 
 **Startup and shutdown events (thermal plant cycling)**
@@ -43,21 +43,21 @@ Contributions to the power balance expression from each thermal resources with u
 Thermal resources subject to unit commitment $k \in \mathcal{UC}$ adhere to the following constraints on commitment states, startup events, and shutdown events, which limit each decision to be no greater than the maximum number of discrete units installed (as per the following three constraints):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{E,THE} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{E,UP} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{E,DN} \leq \frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 where decision $n_{k,z,t}^{E,THE}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
@@ -112,15 +112,15 @@ and parameter $\overline{\rho_{k,z,t}^{E,THE}}$ is the maximum available generat
 If not modeling regulation and spinning reserves, thermal resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} \geq \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} \geq \overline{\rho_{k,z}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 (See Constraints 7-8 the code)
@@ -132,15 +132,15 @@ If modeling reserves and regulation, these constraints are replaced by those est
 Thermal resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{E,THE} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,UP}}^t n_{k,z,\tau}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} - n_{k,z,t}^{E,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,DN}}^t n_{k,z,\tau}^{E,DN} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 9-10 in the code)
 
@@ -271,15 +271,15 @@ This function is called by the ```thermal_commit()``` function when regulation a
 When modeling frequency regulation and reserves contributions, thermal units subject to unit commitment adhere to the following constraints which limit the maximum contribution to regulation and reserves in each time step to a specified maximum fraction ($,\upsilon^{rsv}_{y,z}$) of the commitment capacity in that time step ($(\Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP})$):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	f_{k,z,t}^{E,THE} \leq \upsilon^{reg}_{k,z} \times \overline{\rho_{k,z,t}^{E,THE}}} (\Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	r_{k,z,t}^{E,THE} \leq \upsilon^{rsv}_{y,z} \times \overline{\rho_{k,z,t}^{E,THE}}} (\Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 where $f_{k,z,t}^{E,THE}$ is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon^{reg}_{k,z}$, and $r_{k,z,t}^{E,THE}$ is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$. 
@@ -291,15 +291,15 @@ These response times differ by system operator and reserve product, and so the u
 When modeling frequency regulation and spinning reserves contributions, thermal resources subject to unit commitment adhere to the following constraints that ensure the sum of power output and reserve and/or regulation contributions do not exceed minimum and maximum feasible power output:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} - f_{k,z,t}^{E,THE} \geq \underline{\rho_{k,z,t}^{E,THE}} \times Omega^{size}_{y,z} \times n_{k,z,t}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{E,THE} + f_{k,z,t}^{E,THE} + r_{k,z,t}^{E,THE} \leq \overline{\rho_{k,z,t}^{E,THE}}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 Note there are multiple versions of these constraints in the code in order to avoid creation of unecessary constraints and decision variables for thermal units unable to provide regulation and/or reserves contributions due to input parameters (e.g. ```Reg_Max=0``` and/or ```RSV_Max=0```).

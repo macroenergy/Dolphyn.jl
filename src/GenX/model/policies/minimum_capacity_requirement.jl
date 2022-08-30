@@ -21,9 +21,9 @@ The minimum capacity requirement constraint allows for modeling minimum deployme
 The default unit of the constraint is in MW. For each requirement $p \in \mathcal{P}^{MinCapReq}$, we model the policy with the following constraint.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\sum_{g \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \left(\epsilon_{g,z,p}^{MinCapReq} \times y_{g,z}^{E,GEN} \right) \geq REQ_{p}^{MinCapReq} \forall p \in \mathcal{P}^{MinCapReq}
-\end{equation}
+\end{equation*}
 ```
 
 Note that $\epsilon_{g,z,p}^{MinCapReq}$ is the eligiblity of a generator of technology $g$ in zone $z$ of requirement $p$ and will be equal to $1$ for eligible generators and will be zero for ineligible resources. 

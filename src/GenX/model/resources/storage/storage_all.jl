@@ -34,9 +34,9 @@ The variable defined in this file named after ```vCHARGE``` covers $x_{s,z,t}^{E
 This module additionally defines contributions to the objective function from variable costs (variable O&M plus fuel cost) of charging action of storage devices $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{E,STO,o} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z} \sum_{t \in \mathcal{T}\Omega_t \times c_{s,z,t}^{E,STO,o} \times x_{s,z,t}^{E,CHA}
-\end{equation}
+\end{equation*}
 ```
 
 **Power balance expressions**
@@ -44,9 +44,9 @@ This module additionally defines contributions to the objective function from va
 Contributions to the power balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{E,DIS} - x_{s,z,t}^{E,CHA}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 **Storage inventory level track constraints**
@@ -82,9 +82,9 @@ The storage power capacity sets lower and upper bounds on the storage energy cap
 It limits the volume of energy $U_{s,z,t}^{E,STO}$ at any time $t$ to be less than the installed energy storage capacity $y_{s,z}^{E,STO,ENE}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq U_{s,z,t}^{E,STO} \leq y_{s,z}^{E,STO,ENE} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 It also limits the discharge power $x_{s,z,t}^{E,DIS}$ at any time to be less than the installed power capacity $y_{s,z}^{E,STO,POW}$.

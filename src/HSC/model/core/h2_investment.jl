@@ -26,13 +26,13 @@ This function defines the expressions and constraints keeping track of total ava
 The expression defined in this file named after ```eH2GenTotalCap``` covers all variables $y_{k}^{H,THE}, y_{s}^{H,STO,DIS}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	y_{g}^{H,GEN} = 
 	\begin{cases}
 		y_{k}^{H,THE} \quad if g \in \mathcal{K} \\
 		y_{s}^{H,STO,DIS} \quad if g \in \mathcal{S}
 	\end{cases}
-\end{equation}
+\end{equation*}
 ```
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all resources over all time periods.
@@ -41,13 +41,13 @@ The total capacity of each resource (SMR, storage, electrolysis) is defined as t
 Note for energy storage resources in hydrogen sector, additional energy and charge capacity decisions and constraints are defined in the storage module.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\begin{split}
 	y_{g}^{H,GEN} &= y_{g}^{H,GEN,total} \\ 
 	& = y_{g}^{H,GEN,existing}+y_{g}^{H,GEN,new}-y_{g}^{H,GEN,retired}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 
 **Cost expressions**
@@ -55,18 +55,18 @@ Note for energy storage resources in hydrogen sector, additional energy and char
 This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,GEN,c} = \sum_{g in G} y_{g}^{H,GEN,new}\times c_{g}^{H,INV} + \sum_{g in G} y_{g}^{H,GEN,total} \times c_{g}^{H,FOM}
-\end{equation}
+\end{equation*}
 ```
 
 **Constraints on generation discharge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)

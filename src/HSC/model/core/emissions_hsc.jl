@@ -22,9 +22,9 @@ This function creates expression to add the CO2 emissions for hydrogen supply ch
 **Cost expressions**
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,EMI} = \omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} c_{z}^{H,EMI} x_{z,t}^{H,EMI}
-\end{equation}
+\end{equation*}
 ```
 """
 function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)

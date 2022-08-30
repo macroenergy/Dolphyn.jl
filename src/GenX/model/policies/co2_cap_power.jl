@@ -35,9 +35,9 @@ For every generator $g$, the parameter $\epsilon_{g,z}^{CO_2}$ reflects the spec
 The resulting constraint is given as:
 
 ```math
-\begin{equation}
+\begin{equation*}
     \sum_{z \in \mathcal{Z}_{p,mass}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{E,GEN}\right) \leq \sum_{z \in \mathcal{Z}_{p,mass}^{CO_2}} \epsilon_{z,p,mass}^{CO_{2}} \forall p \in \mathcal{P}_{mass}^{CO_2}
-\end{equation}
+\end{equation*}
 ```
 
 In the above constraint, we include both power discharge and charge term for each resource to account for the potential for $CO_2$ emissions (or removal when considering negative emissions technologies) associated with each step. Note that if a limit is applied to each zone separately, then the set $\mathcal{Z}_{p,mass}^{CO_2}$ will contain only one zone with no possibility of trading. 
@@ -49,9 +49,9 @@ We modify the right hand side of the above mass-based constraint, $p \in \mathca
 In the following constraint, total demand served takes into account non-served energy and storage related losses. Here, $overline{\epsilon_{z,p,load}^{CO_2}}$ denotes the emission limit in terms on t$CO_2$/MWh.
 
 ```math
-\begin{equation}
+\begin{equation*}
     \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{E,GEN} \right) \leq \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{t \in \mathcal{T}}  \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times D_{z,t}\right) + \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{o \in \mathcal{O}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times \left(x_{s,z,t}^{E,CHA} - x_{s,z,t}^{E,DIS}\right)\right) - \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{s \in \mathcal{SEG}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times x_{s,z,t}^{E,NSD}\right) \forall p \in \mathcal{P}_{load}^{CO_2}
-\end{equation}
+\end{equation*}
 ```
 
 **Generator-side emissions rate-based constraint**
@@ -59,9 +59,9 @@ In the following constraint, total demand served takes into account non-served e
 Similarly, a generation based emission constraint is defined by setting the emission limit based on the total generation times the carbon emission rate limit in t$CO_2$/MWh of the region. The resulting constraint is given as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\sum_{z \in \mathcal{Z}_{p,gen}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{E,GEN} \right) \leq \sum_{z \in \mathcal{Z}_{p,gen}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,gen}^{CO_2} \times \omega_t \times x_{g,z,t} \right) \forall p \in \mathcal{P}_{gen}^{CO_2}
-\end{equation}
+\end{equation*}
 ```
 
 Note that the generator-side rate-based constraint can be used to represent a fee-rebate (``feebate'') system: the dirty generators that emit above the bar ($\overline{\epsilon_{z,p,gen}^{CO_2}}$) have to buy emission allowances from the emission regulator in the region $z$ where they are located; in the same vein, the clean generators get rebates from the emission regulator at an emission allowance price being the dual variable of the emissions rate constraint.

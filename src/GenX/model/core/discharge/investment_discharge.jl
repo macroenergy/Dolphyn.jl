@@ -27,7 +27,7 @@ This function defines the expressions and constraints keeping track of:
 The expression defined in this file named after ```eTotalCap``` covers all variables $y_{k}^{E,THE}, y_{r}^{E,VRE}, y_{s}^{E,STO,DIS}$.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	y_{g}^{E,GEN} = 
 	\begin{cases}
 		y_{k}^{E,THE} \quad if \quad k \in \mathcal{K} \\
@@ -35,20 +35,20 @@ The expression defined in this file named after ```eTotalCap``` covers all varia
 		y_{s}^{E,STO,DIS} \quad if \quad s \in \mathcal{S}
 	\end{cases}
 	\quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 
 The total capacity of each resource (thermal, renewable, storage, DR, flexible demand resources and hydro) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. 
 Note for energy storage resources in power sector, additional energy and charge power capacity decisions and constraints are defined in the storage module.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\begin{split}
 	y_{g}^{E,GEN} &= y_{g}^{E,GEN,total} \\ 
 	& = y_{g}^{E,GEN,existing}+y_{g}^{E,GEN,new}-y_{g}^{E,GEN,retired}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 
 **Cost expressions**
@@ -56,26 +56,26 @@ Note for energy storage resources in power sector, additional energy and charge 
 This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{E,GEN,c} = \sum_{g in G} y_{g}^{E,GEN,new}\times c_{g}^{E,INV} + \sum_{g in G} y_{g}^{E,GEN,total}\times c_{g}^{E,FOM}
-\end{equation}
+\end{equation*}
 ```
 
 **Constraints on generation discharge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{equation}
+\begin{equation*}
 	0 \leq y_{g}^{E,GEN,retired} \leq y_{g}^{E,GEN,existing} \quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 
 For resources where upper bound $\overline{y_{g}^{E,GEN}}$ and lower bound $\underline{y_{g}^{E,GEN}}$ of capacity is defined, then we impose constraints on minimum and maximum power capacity.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\underline{y_{g}^{E,GEN}} \leq y_{g}^{E,GEN} \leq \overline{y_{g}^{E,GEN}} \quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 """
 function investment_discharge(EP::Model, inputs::Dict)

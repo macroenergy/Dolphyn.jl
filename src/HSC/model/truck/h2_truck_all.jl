@@ -23,9 +23,9 @@ This function defines a series of operationg variables,expresstions and constrai
 
 The sum of full and empty trucks should equal the total number of invested trucks.
 ```math
-\begin{equation}
+\begin{equation*}
     v_{j, t}^{\mathrm{F}}+v_{j, t}^{\mathrm{E}}=V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
-\end{equation}    
+\end{equation*}    
 ```
     
 The full (empty) trucks include full (empty) trucks in transit and staying at each zones.
@@ -86,9 +86,9 @@ The minimum travelling time delay is modelled as follows.
     
 The charging capability of truck stations is limited by their compression or liquefaction capacity.
 ```math
-\begin{equation}
+\begin{equation*}
     q_{z, j, t}^{\mathrm{CHA}} \overline{\mathrm{E}}_{j}^{\mathrm{TRU}} \leq H_{z, j}^{\mathrm{TRU}} \quad \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
-\end{equation}    
+\end{equation*}    
 ```   
 """
 function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)

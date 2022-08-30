@@ -40,9 +40,9 @@ This assumption implicitly excludes the possibility of transferring energy from 
 To model long-duration energy storage using representative periods, we replace the state of charge equation, such that the first term on the right hand side accounts for change in storage inventory associated with representative period $m$ ($\Delta U_{s,z,m}^{E,STO}$), which could be positive (net accumulation) or negative (net reduction).
 
 ```math
-\begin{equation}
+\begin{equation*}
 	U_{s,z,(m-1)\times\tau^{period}+1} = \left(1-\eta_{s,z}^{E,STO,loss}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{E,STO,DIS}}x_{s,z,(m-1)\times \tau^{period}+1}^{E,STO} + \eta_{s,z}^{E,STO,CHA}x_{s,z,(m-1)\times \tau^{period}+1}^{E,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
-\end{equation}
+\end{equation*}
 ```
 
 By definition $\mathcal{T}^{start}=\{\left(m-1\right) \times \tau^{period}+1 | m \in \mathcal{M}\}$, which implies that this constraint is defined for all values of $t \in T^{start}$.
@@ -63,30 +63,30 @@ Finally, if the input period is also a representative period, then a third const
 Note that $|N|$ refers to the last modeled period.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	U_{s,z,n+1}^{E,STO} = U_{s,z,n}^{E,STO} + \Delta U_{s,z,f(n)} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}\setminus\{|N|\}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	U_{s,z,1}^{E,STO} = U_{s,z,|N|}^{E,STO} + \Delta U_{s,z,f(|N|)}^{E,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n = |N|
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	U_{s,z,n}^{E,STO} = U_{s,z,f(n) \times \tau^{period}}^{E,STO} - \Delta U_{s,z,m}^{E,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}^{rep},
-\end{equation}
+\end{equation*}
 ```
 
 Finally, the next constraint enforces that the initial storage level for each input period $n$ must be less than the installed energy capacity limit. 
 This constraint ensures that installed energy storage capacity is consistent with the state of charge during both the operational time periods $t$ during each sample period $m$ as well as at the start of each chronologically ordered input period $n$ in the full annual time series.
 
 ```math
-\begin{equation}
+\begin{equation*}
     U_{s,z,n}^{E,STO} \leq y_{s,z}^{E,STO,ENE} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}
-\end{equation}
+\end{equation*}
 ```
 """
 function long_duration_storage(EP::Model, inputs::Dict)

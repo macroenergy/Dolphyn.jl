@@ -22,13 +22,13 @@ This function defines the expressions and constraints keeping track of total ava
 The total capacity of hydrogen to power generation is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\begin{split}
 	y_{g}^{H,G2P} &= y_{g}^{H,G2P,total} \\ 
 	& = y_{g}^{H,G2P,existing}+y_{g}^{H,G2P,new}-y_{g}^{H,G2P,retired}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
-\end{equation}
+\end{equation*}
 ```
 
 **Cost expressions**
@@ -36,9 +36,9 @@ The total capacity of hydrogen to power generation is defined as the sum of the 
 This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,G2P,c} = \sum_{g in G} y_{g}^{H,G2P,new}\times c_{g}^{E,INV} + \sum_{g in G} y_{g}^{H,G2P,total}\times c_{g}^{E,FOM}
-\end{equation}
+\end{equation*}
 ```
 """
 function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)

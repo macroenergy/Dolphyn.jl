@@ -38,9 +38,9 @@ The variable defined in this file named after ```vH2G2PSHUT``` covers $\n_{k,z,t
 The total cost of start-ups across g2p generators subject to unit commitment ($h \in UC$) and all time periods, t is expressed as:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	C^{H,G2P,start} = \sum_{k \in \mathcal{UC}, t \in \mathcal{T}} \omega_t \times c_{k}^{H,G2P,start} \times \n_{k,z,t}^{H,G2P,UP}
-\end{equation}
+\end{equation*}
 ```
 
 **Startup and shutdown events (thermal plant cycling)**
@@ -50,9 +50,9 @@ The total cost of start-ups across g2p generators subject to unit commitment ($h
 Hydrogen to power resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to the following constraints on commitment states, startup events, and shutdown events, which limit each decision to be no greater than the maximum number of discrete units installed (as per the following three constraints):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{H,G2P} \leq \frac{y_{k,z}^{H,G2P}}{\Omega^{H,G2P,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
@@ -115,15 +115,15 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 If not modeling regulation and spinning reserves, thermal resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,G2P} \geq \underline{\rho_{k,z,t}^{H,G2P}} \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	x_{k,z,t}^{H,G2P} \geq \overline{\rho_{k,z}^{H,G2P}} \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 (See Constraints 7-8 the code)
@@ -133,15 +133,15 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 Thermal resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
 
 ```math
-\begin{equation}
+\begin{equation*}
 	n_{k,z,t}^{H,G2P} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,G2P,UP}}^t n_{k,z,\tau}^{H,G2P,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 
 ```math
-\begin{equation}
+\begin{equation*}
 	\frac{y_{k,z}^{H,G2P}}{\Omega_{k,z}^{H,G2P,size}} - n_{k,z,t}^{H,G2P,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,G2P,DN}}^t n_{k,z,\tau}^{H,G2P,DN} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation}
+\end{equation*}
 ```
 (See Constraints 9-10 in the code)
 
