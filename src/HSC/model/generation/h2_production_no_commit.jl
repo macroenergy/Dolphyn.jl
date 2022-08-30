@@ -24,9 +24,9 @@ This function defines the operating constraints for thermal hydrogen generation 
 Contributions to the hydrogen balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
 	
 ```math
-\begin{eqution}
-	HydrogenBal_{GEN} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{H,GEN} \forall k \in \mathcal{THE} \setminus \mathcal{UC}
-\end{eqution}
+\begin{equation}
+	HydrogenBal_{GEN} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{H,GEN} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```	
 
 **Ramping limits**
@@ -35,13 +35,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation}
-	x_{k,z,t-1}^{H,GEN} - x_{k,z,t}^{H,GEN} \leq \kappa_{k,z}^{H,DN} y_{k,z}^{H,GEN} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t-1}^{H,GEN} - x_{k,z,t}^{H,GEN} \leq \kappa_{k,z}^{H,DN} y_{k,z}^{H,GEN} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{H,GEN} - x_{k,z,t-1}^{H,GEN} \leq \kappa_{k,z}^{H,UP} y_{k,z}^{H,GEN} \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{H,GEN} - x_{k,z,t-1}^{H,GEN} \leq \kappa_{k,z}^{H,UP} y_{k,z}^{H,GEN} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 (See Constraints 1-2 in the code)
@@ -52,13 +52,13 @@ This set of time-coupling constraints wrap around to ensure the hydrogen output 
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{H,GEN} \geq \underline{R_{k,z}^{H,GEN}} \times y_{k,z}^{H,GEN} \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{H,GEN} \geq \underline{R_{k,z}^{H,GEN}} \times y_{k,z}^{H,GEN} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{H,GEN} \leq \overline{R_{k,z}^{H,GEN}} \times y_{k,z}^{H,GEN} \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{H,GEN} \leq \overline{R_{k,z}^{H,GEN}} \times y_{k,z}^{H,GEN} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 (See Constraints 3-4 in the code)

@@ -28,7 +28,7 @@ The variable defined in this file named after ```vP2G``` cover variable $x_{z,t}
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \forall g \in \mathcal{G}
+	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 
@@ -36,7 +36,7 @@ For resources where upper bound $\overline{y_{g}^{H,GEN}}$ and lower bound $\und
 
 ```math
 \begin{equation}
-	\underline{y_{g}^{H,GEN}} \leq y_{g}^{H,GEN} \leq \overline{y_{g}^{H,GEN}} \forall g \in \mathcal{G}
+	\underline{y_{g}^{H,GEN}} \leq y_{g}^{H,GEN} \leq \overline{y_{g}^{H,GEN}} \quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 """

@@ -51,13 +51,13 @@ This function includes investment variables, expressions and related constraints
 Truck retirements cannot retire more charge capacity than existing charge capacity
 ```math
 \begin{equation}
-    v_{RETCAPNUM,j}^{TRU} \leq v_{ExistNum,j}^{TRU}
+    v_{RETCAPNUM,j}^{TRU} \leq v_{ExistNum,j}^{TRU} \quad \forall j \in \mathbb{J}
 \end{equation}
 ```
 Truck compression energyCannot retire more energy capacity than existing energy capacity
 ```math
 \begin{equation}
-    v_{RETCAPEnergy,j}^{TRU} \leq v_{ExistEnergyCap,j}^{TRU} 
+    v_{RETCAPEnergy,j}^{TRU} \leq v_{ExistEnergyCap,j}^{TRU} \quad \forall j \in \mathbb{J}
 \end{equation}
 ```
 

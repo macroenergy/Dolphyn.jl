@@ -39,7 +39,7 @@ Contributions to the hydrogen balance expression from non-served hydrogen/curtai
 
 ```math
 \begin{equation}
-	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
@@ -49,7 +49,7 @@ Hydrogen demand curtailed in each segment of curtailable demands $s \in \mathcal
 
 ```math
 \begin{equation}
-	x_{s,z,t}^{H,NSD} \leq n_{s}^{H,NSD} \times D_{z,t}^{H} \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{s,z,t}^{H,NSD} \leq n_{s}^{H,NSD} \times D_{z,t}^{H} \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
@@ -57,7 +57,7 @@ Additionally, total demand curtailed in each time step cannot exceed total hydro
 
 ```math
 \begin{equation}
-	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \leq D_{z,t} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 """

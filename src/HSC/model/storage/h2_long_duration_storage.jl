@@ -41,7 +41,7 @@ To model long-duration hydrogen storage using representative periods, we replace
 
 ```math
 \begin{equation}
-	U_{s,z,(m-1)\times\tau^{period}+1}^{H,STO} = \left(1-\eta_{s,z}^{H,STO,loss}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{H,STO,DIS}}x_{s,z,(m-1)\times \tau^{period}+1}^{H,STO} + \eta_{s,z}^{H,STO,CHA}x_{s,z,(m-1)\times \tau^{period}+1}^{H,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
+	U_{s,z,(m-1)\times\tau^{period}+1}^{H,STO} = \left(1-\eta_{s,z}^{H,STO,loss}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{H,STO,DIS}}x_{s,z,(m-1)\times \tau^{period}+1}^{H,STO} + \eta_{s,z}^{H,STO,CHA}x_{s,z,(m-1)\times \tau^{period}+1}^{H,STO} \quad \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
 \end{equation}
 ```
 

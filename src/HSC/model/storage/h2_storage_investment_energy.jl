@@ -24,7 +24,7 @@ The total energy capacity of storage resource is defined as the sum of the exist
 
 ```math
 \begin{equation}
-	y_{s,z}^{H,ENE,total} = y_{s,z}^{H,ENE,existing} + y_{s,z}^{H,ENE,new} - y_{s,z}^{H,ENE,retired} \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	y_{s,z}^{H,ENE,total} = y_{s,z}^{H,ENE,existing} + y_{s,z}^{H,ENE,new} - y_{s,z}^{H,ENE,retired} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation}
 ```
 
@@ -42,14 +42,14 @@ In addition, this module adds investment and fixed OM costs related to energy ca
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{s,z}^{H,ENE,retired} \leq y_{s,z}^{H,ENE,existing} \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	0 \leq y_{s,z}^{H,ENE,retired} \leq y_{s,z}^{H,ENE,existing} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation}
 ```
 
 For storage resources where upper bound $\overline{R_{s,z}^{H,ENE}}$ and lower bound $\underline{R_{s,z}^{H,ENE}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
 ```math
 \begin{equation}
-	\underline{R_{s,z}^{H,ENE}} \leq y_{s,z}^{H,ENE} \leq \overline{R_{s,z}^{H,ENE}} \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	\underline{R_{s,z}^{H,ENE}} \leq y_{s,z}^{H,ENE} \leq \overline{R_{s,z}^{H,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation}
 ```
 """

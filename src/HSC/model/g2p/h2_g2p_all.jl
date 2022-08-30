@@ -26,7 +26,7 @@ The variable defined in this file named after ```vH2G2P``` covers .
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{g}^{H,G2P,retired} \leq y_{g}^{H,G2P,existing} \forall g \in \mathcal{G}
+	0 \leq y_{g}^{H,G2P,retired} \leq y_{g}^{H,G2P,existing} \quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 
@@ -34,7 +34,7 @@ For resources where upper bound $\overline{y_{g}^{H,G2P}}$ and lower bound $\und
 
 ```math
 \begin{equation}
-	\underline{y_{g}^{H,G2P}} \leq y_{g}^{H,G2P} \leq \overline{y_{g}^{H,G2P}} \forall g \in \mathcal{G}
+	\underline{y_{g}^{H,G2P}} \leq y_{g}^{H,G2P} \leq \overline{y_{g}^{H,G2P}} \quad \forall g \in \mathcal{G}
 \end{equatio
 """
 function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)

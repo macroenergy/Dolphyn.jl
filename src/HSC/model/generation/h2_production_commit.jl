@@ -24,9 +24,9 @@ This function defines the operating constraints for thermal hydrogen generation 
 Contributions to the hydrogen balance expression from each thermal resources with unit commitment $k \in \mathcal{UC}$ are also defined as:
 
 ```math
-\begin{eqution}
-	HydrogenBal_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{H,GEN} \forall k \in \mathcal{UC}
-\end{eqution}
+\begin{equation}
+	HydrogenBal_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{H,GEN} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 **Startup and shutdown events (thermal plant cycling)**
@@ -37,19 +37,19 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 
 ```math
 \begin{equation}
-	n_{k,z,t}^{H,GEN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{H,GEN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,UP} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{H,UP} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,DN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{H,DN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 where decision $n_{k,z,t}^{H,GEN}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
@@ -67,8 +67,8 @@ minus the number of units shut down in the current period, $n_{k,z,t}^{H,DN}$:
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,GEN} &= n_{k,z,t-1} + n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	n_{k,z,t}^{H,GEN} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	n_{k,z,t}^{H,GEN} &= n_{k,z,t-1} + n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	n_{k,z,t}^{H,GEN} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 (See Constraint 4 in the code)
@@ -83,7 +83,7 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 \begin{aligned}
 	x_{k,z,t-1}^{H,GEN} - x_{k,z,t}^{H,GEN} &\leq \kappa_{k,z}^{H,DN} \times \Omega_{k,z}^{H,GEN,size} \times \left(n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN}\right) \\
 	\qquad &- \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,GEN}}}, \text{max}(\underline{\rho_{k,z,t}^{H,GEN}}, \kappa_{k,z}^{H,GEN})) \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN}  \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,GEN}}}, \text{max}(\underline{\rho_{k,z,t}^{H,GEN}}, \kappa_{k,z}^{H,GEN})) \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
 \end{aligned}
 ```
 
@@ -91,7 +91,7 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 \begin{aligned}
 	x_{k,z,t}^{H,GEN} - x_{k,z,t-1}^{H,GEN} &\leq \kappa_{k,z}^{H,UP} \times \Omega_{k,z}^{H,GEN,size} \times \left(n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN}\right) \\
 	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,GEN}}, \text{max}(\underline{\rho_{k,z,t}^{H,GEN}}, \kappa_{k,z}^{H,UP})) \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \\
-	\qquad &- \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\qquad &- \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
@@ -101,13 +101,13 @@ and parameter $\overline{\rho_{k,z,t}^{H,GEN}}$ is the maximum available generat
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{H,GEN} \geq \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{H,GEN} \geq \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{H,GEN} \geq \overline{\rho_{k,z}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{H,GEN} \geq \overline{\rho_{k,z}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
@@ -119,13 +119,13 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{equation}
-	n_{k,z,t}^{H,GEN} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,UP}}^t n_{k,z,\tau}^{H,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{H,GEN} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,UP}}^t n_{k,z,\tau}^{H,UP} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	\frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} - n_{k,z,t}^{H,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,DN}}^t n_{k,z,\tau}^{H,DN} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} - n_{k,z,t}^{H,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,DN}}^t n_{k,z,\tau}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 (See Constraints 9-10 in the code)

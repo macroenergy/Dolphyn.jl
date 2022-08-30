@@ -32,7 +32,7 @@ The variable defined in this file named after ```vH2Gen``` covers all variables 
 		x_{k,z,t}^{H,THE} if g \in \mathcal{K} \\
 		x_{s,z,t}^{H,DIS} if g \in \mathcal{S}
 	\end{cases}
-	\forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 

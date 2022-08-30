@@ -44,9 +44,9 @@ This module additionally defines contributions to the objective function from va
 Contributions to the power balance expression from compression due to storage charging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{eqution}
-	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{H,CHA}}
-\end{eqution}
+\begin{equation}
+	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{H,CHA}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 **Hydrogen balance expressions**
@@ -55,7 +55,7 @@ Contributions to the power balance expression from storage charging and discharg
 
 ```math
 \begin{eqution}
-	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{H,DIS} - x_{s,z,t}^{H,CHA}\right)
+	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{H,DIS} - x_{s,z,t}^{H,CHA}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{eqution}
 ```
 

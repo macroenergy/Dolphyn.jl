@@ -29,8 +29,8 @@ The expression defined in this file named after ```eH2GenTotalCap``` covers all 
 \begin{equation}
 	y_{g}^{H,GEN} = 
 	\begin{cases}
-		y_{k}^{H,THE} if g \in \mathcal{K} \\
-		y_{s}^{H,STO,DIS} if g \in \mathcal{S}
+		y_{k}^{H,THE} \quad if g \in \mathcal{K} \\
+		y_{s}^{H,STO,DIS} \quad if g \in \mathcal{S}
 	\end{cases}
 \end{equation}
 ```
@@ -65,7 +65,7 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \forall g \in \mathcal{G}
+	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 """
