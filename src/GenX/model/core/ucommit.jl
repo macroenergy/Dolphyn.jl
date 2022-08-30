@@ -21,17 +21,17 @@ This function creates decision variables and cost expressions associated with th
 
 **Unit commitment decision variables**
 
-Commitment state variable $\n_{k,z,t}^{E,THE}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Commitment state variable $n_{k,z,t}^{E,THE}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-Startup decision variable $\n_{k,z,t}^{E,UP}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Startup decision variable $n_{k,z,t}^{E,UP}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-Shutdown decision variable $\n_{k,z,t}^{E,DN}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Shutdown decision variable $n_{k,z,t}^{E,DN}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-The variable defined in this file named after ```vCOMMIT``` covers $\n_{k,z,t}^{E,THE}$.
+The variable defined in this file named after ```vCOMMIT``` covers $n_{k,z,t}^{E,THE}$.
 
-The variable defined in this file named after ```vSTART``` covers $\n_{k,z,t}^{E,UP}$.
+The variable defined in this file named after ```vSTART``` covers $n_{k,z,t}^{E,UP}$.
 
-The variable defined in this file named after ```vSHUT``` covers $\n_{k,z,t}^{E,DN}$.
+The variable defined in this file named after ```vSHUT``` covers $n_{k,z,t}^{E,DN}$.
 
 **Cost expressions**
 

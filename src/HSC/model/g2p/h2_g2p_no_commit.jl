@@ -24,9 +24,9 @@ This module creates decision variables, expressions, and constraints related to 
 Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
 	
 ```math
-\begin{eqution}
+\begin{equation}
 	HydrogenBal_{G2P} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{H,G2P} \quad \forall k \in \mathcal{G2P} \setminus \mathcal{UC}
-\end{eqution}
+\end{equation}
 ```	
 
 Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:

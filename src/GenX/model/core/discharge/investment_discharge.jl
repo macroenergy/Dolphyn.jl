@@ -30,9 +30,9 @@ The expression defined in this file named after ```eTotalCap``` covers all varia
 \begin{equation}
 	y_{g}^{E,GEN} = 
 	\begin{cases}
-		y_{k}^{E,THE} if g \in \mathcal{K} \\
-		y_{r}^{E,VRE} if g \in \mathcal{R} \\
-		y_{s}^{E,STO,DIS} if g \in \mathcal{S}
+		y_{k}^{E,THE} \quad if \quad k \in \mathcal{K} \\
+		y_{r}^{E,VRE} \quad if \quad r \in \mathcal{R} \\
+		y_{s}^{E,STO,DIS} \quad if \quad s \in \mathcal{S}
 	\end{cases}
 	\quad \forall g \in \mathcal{G}
 \end{equation}

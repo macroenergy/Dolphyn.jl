@@ -24,9 +24,9 @@ This function defines the operating constraints for thermal power plants NOT sub
 Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
 	
 ```math
-\begin{eqution}
+\begin{equation}
 	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}
-\end{eqution}
+\end{equation}
 ```	
 
 **Ramping limits**

@@ -20,9 +20,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Sets up variables common to all generation resources.
 
 This module defines the following variables:
-- $x_{k,z,t}^{E,THE} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by thermal resource $k$ in zone $z$ at time period $t$.
-- $x_{r,z,t}^{E,VRE} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by renewable resource $r$ in zone $z$ at time period $t$.
-- $x_{s,z,t}^{E,DIS} \forall s \in \mathcal{S}, z t \in \mathcal{T}$, representing energy injected into the grid by storage resource $s$ in zone $z$ at time period $t$.
+- $x_{k,z,t}^{E,THE} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$. This variable represents energy injected into the grid by thermal resource $k$ in zone $z$ at time period $t$.
+- $x_{r,z,t}^{E,VRE} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$. This variable represents energy injected into the grid by renewable resource $r$ in zone $z$ at time period $t$.
+- $x_{s,z,t}^{E,DIS} \forall s \in \mathcal{S}, z t \in \mathcal{T}$. This variable represents energy injected into the grid by storage resource $s$ in zone $z$ at time period $t$.
 
 The variable defined in this file named after ```vP``` covers all variables $x_{k,z,t}^{E,THE}, x_{r,z,t}^{E,VRE}, x_{s,z,t}^{E,DIS}$.
 
@@ -30,9 +30,9 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 \begin{equation}
 	x_{g,z,t}^{E,GEN} = 
 	\begin{cases}
-		x_{k,z,t}^{E,THE} if g \in \mathcal{K} \\
-		x_{r,z,t}^{E,VRE} if g \in \mathcal{R} \\
-		x_{s,z,t}^{E,DIS} if g \in \mathcal{S}
+		x_{k,z,t}^{E,THE} \quad if \quad g \in \mathcal{K} \\
+		x_{r,z,t}^{E,VRE} \quad if \quad g \in \mathcal{R} \\
+		x_{s,z,t}^{E,DIS} \quad if \quad g \in \mathcal{S}
 	\end{cases}
 	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}

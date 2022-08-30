@@ -30,9 +30,9 @@ The variable defined in this file named after ```vH2NSE``` covers the variable $
 This function defines contributions to the objective function from the cost of non-served hydrogen/curtailed hydrogen from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T}$ and all zones $z \in \mathcal{Z}$:
 
 ```math
-\begin{eqution}
+\begin{equation}
 	C^{H,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{H,NSD} \times x_{s,z,t}^{H,NSD}
-\end{eqution}
+\end{equation}
 ```
 
 Contributions to the hydrogen balance expression from non-served hydrogen/curtailed hydrogen from each demand segment $s \in \mathcal{SEG}$ are also defined as:

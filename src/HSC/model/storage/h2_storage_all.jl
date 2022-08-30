@@ -54,9 +54,9 @@ Contributions to the power balance expression from compression due to storage ch
 Contributions to the power balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{eqution}
+\begin{equation}
 	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{H,DIS} - x_{s,z,t}^{H,CHA}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{eqution}
+\end{equation}
 ```
 
 **Storage inventory level track constraints**

@@ -26,9 +26,9 @@ The operational constraints for VRE resources are a function of each technology'
 Contributions to the power balance expression from renewable energy from each renewable resources $r \in \mathcal{R}$ are also defined as:
 
 ```math
-\begin{eqution}
+\begin{equation}
 	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{E,VRE} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{eqution}
+\end{equation}
 ```
 
 **Variable renewable power output in each time step**
@@ -50,7 +50,7 @@ This adds the possibility of introducing VRE curtailment as an extra degree of f
 
 ```math
 \begin{equation}
-	0 \leq x_{r,z,t}^{E,CUR} \leq x_{r,z,t}^{E,VRE} \forall r \in \mathcal{VRE}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{r,z,t}^{E,CUR} \leq x_{r,z,t}^{E,VRE} \quad \forall r \in \mathcal{VRE}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 

@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables of non served power demand.
 
-This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
+This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{E,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
 The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $c_{1}^{E,NSD}$.
 Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response).
 Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{E,NSD}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
@@ -53,7 +53,7 @@ Demand curtailed in each segment of curtailable demands $s \in \mathcal{S}$ cann
 
 ```math
 \begin{equation}
-	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \quad \forall s \in \mathcal{SEG}, z\in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
@@ -61,7 +61,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 
 ```math
 \begin{aligned}
-	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \leq D_{z,t} \quad \forall z\in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 """
