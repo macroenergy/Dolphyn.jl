@@ -20,9 +20,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Sets up constraints common to all generation resources.
 
 This function defines the expressions and constraints keeping track of: 
-	- total available thermal generation capacity $y_{k}^{E,THE}$ as well as constraints on capacity retirements.
-	- total available renewable generation capacity $y_{r}^{E,VRE}$ as well as constraints on capacity retirements.
-	- total available storage discharge capacity $y_{s}^{E,STO,DIS}$ as well as constraints on capacity retirements.
+- total available thermal generation capacity $y_{k}^{E,THE}$ as well as constraints on capacity retirements.
+- total available renewable generation capacity $y_{r}^{E,VRE}$ as well as constraints on capacity retirements.
+- total available storage discharge capacity $y_{s}^{E,STO,DIS}$ as well as constraints on capacity retirements.
 
 The expression defined in this file named after ```eTotalCap``` covers all variables $y_{k}^{E,THE}, y_{r}^{E,VRE}, y_{s}^{E,STO,DIS}$.
 
@@ -34,6 +34,7 @@ The expression defined in this file named after ```eTotalCap``` covers all varia
 		y_{r}^{E,VRE} if g \in \mathcal{R} \\
 		y_{s}^{E,STO,DIS} if g \in \mathcal{S}
 	\end{cases}
+	\quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 
@@ -65,7 +66,7 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation}
-	0 \leq y_{g}^{E,GEN,retired} \leq y_{g}^{E,GEN,existing} \forall g \in \mathcal{G}
+	0 \leq y_{g}^{E,GEN,retired} \leq y_{g}^{E,GEN,existing} \quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 
@@ -73,7 +74,7 @@ For resources where upper bound $\overline{y_{g}^{E,GEN}}$ and lower bound $\und
 
 ```math
 \begin{equation}
-	\underline{y_{g}^{E,GEN}} \leq y_{g}^{E,GEN} \leq \overline{y_{g}^{E,GEN}} \forall g \in \mathcal{G}
+	\underline{y_{g}^{E,GEN}} \leq y_{g}^{E,GEN} \leq \overline{y_{g}^{E,GEN}} \quad \forall g \in \mathcal{G}
 \end{equation}
 ```
 """

@@ -34,7 +34,7 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 		x_{r,z,t}^{E,VRE} if g \in \mathcal{R} \\
 		x_{s,z,t}^{E,DIS} if g \in \mathcal{S}
 	\end{cases}
-	\forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 

@@ -31,9 +31,9 @@ However, this method entails the simplifying assumption that all clustered units
 Contributions to the power balance expression from each thermal resources with unit commitment $k \in \mathcal{UC}$ are also defined as:
 
 ```math
-\begin{eqution}
+\begin{equation}
 	PowerBal_{THE} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{E,THE} \forall k \in \mathcal{UC}
-\end{eqution}
+\end{equation}
 ```
 
 **Startup and shutdown events (thermal plant cycling)**
@@ -44,21 +44,22 @@ Thermal resources subject to unit commitment $k \in \mathcal{UC}$ adhere to the 
 
 ```math
 \begin{equation}
-	n_{k,z,t}^{E,THE} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{E,THE} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
-\begin{aligned}
-	n_{k,z,t}^{E,UP} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	n_{k,z,t}^{E,UP} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 ```math
-\begin{aligned}
-	n_{k,z,t}^{E,DN} \leq \frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+	n_{k,z,t}^{E,DN} \leq \frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
+
 where decision $n_{k,z,t}^{E,THE}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
 decision $n_{k,z,t}^{E,UP}$ represents number of startup decisions, 
 decision $n_{k,z,t}^{E,DN}$ represents number of shutdown decisions, 
@@ -74,8 +75,8 @@ minus the number of units shut down in the current period, $n_{k,z,t}^{E,DN}$:
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{E,THE} &= n_{k,z,t-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	n_{k,z,t}^{E,THE} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	n_{k,z,t}^{E,THE} &= n_{k,z,t-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	n_{k,z,t}^{E,THE} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 (See Constraint 4 in the code)
@@ -90,7 +91,7 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 \begin{aligned}
 	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} &\leq \kappa_{k,z}^{E,DN} \times \Omega_{k,z}^{E,THE,size} \times \left(n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN}\right) \\
 	\qquad &- \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{E,THE}}}, \text{max}(\underline{\rho_{k,z,t}^{E,THE}}, \kappa_{k,z}^{E,THE})) \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN}  \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{E,THE}}}, \text{max}(\underline{\rho_{k,z,t}^{E,THE}}, \kappa_{k,z}^{E,THE})) \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
 \end{aligned}
 ```
 
@@ -98,7 +99,7 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 \begin{aligned}
 	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} &\leq \kappa_{k,z}^{E,UP} \times \Omega_{k,z}^{E,THE,size} \times \left(n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN}\right) \\
 	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{E,THE}}, \text{max}(\underline{\rho_{k,z,t}^{E,THE}}, \kappa_{k,z}^{E,UP})) \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \\
-	\qquad &- \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\qquad &- \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
@@ -112,13 +113,13 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{E,THE} \geq \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{E,THE} \geq \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	x_{k,z,t}^{E,THE} \geq \overline{\rho_{k,z}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{E,THE} \geq \overline{\rho_{k,z}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
@@ -132,13 +133,13 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{equation}
-	n_{k,z,t}^{E,THE} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,UP}}^t n_{k,z,\tau}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{E,THE} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,UP}}^t n_{k,z,\tau}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 
 ```math
 \begin{equation}
-	\frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} - n_{k,z,t}^{E,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,DN}}^t n_{k,z,\tau}^{E,DN} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} - n_{k,z,t}^{E,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,DN}}^t n_{k,z,\tau}^{E,DN} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation}
 ```
 (See Constraints 9-10 in the code)

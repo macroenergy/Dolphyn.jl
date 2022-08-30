@@ -27,7 +27,7 @@ Contributions to the power balance expression from renewable energy from each re
 
 ```math
 \begin{eqution}
-	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{E,VRE}
+	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{E,VRE} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{eqution}
 ```
 

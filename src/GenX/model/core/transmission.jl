@@ -35,6 +35,7 @@ Power flow and transmission loss terms are also added to the power balance const
 	- \sum_{l\in \mathcal{L}}{(f^{E,map}(\cdot) \times x_{l,t}^{E,NET})} - \frac{1}{2} \sum_{l\in \mathcal{L}}{(f^{E,map}(\cdot) \times f^{E,loss}(\cdot))}
 \end{equation}
 ```
+
 Power flows, $x_{l,t}^{E,NET}$, on each line $l$ into or out of a zone (defined by the network map $f^{E,map}(\cdot): l \rightarrow z$), are considered in the demand balance equation for each zone. 
 By definition, power flows leaving their reference zone are positive, thus the minus sign is used for this term. 
 Losses due to power flows increase demand, and one-half of losses across a line linking two zones are attributed to each connected zone. 
@@ -59,7 +60,7 @@ The additional transmission capacity, $y_{l}^{E,NET,new} $, is constrained by a 
 
 ```math
 \begin{equation}
-	y_{l}^{E,NET,new} \leq \overline{y_{l}^{E,NET,new}}, \quad \forall l \in \mathcal{E}
+	y_{l}^{E,NET,new} \leq \overline{y_{l}^{E,NET,new}} \quad \forall l \in \mathcal{E}
 \end{equation}
 ```
 
@@ -68,7 +69,6 @@ The additional transmission capacity, $y_{l}^{E,NET,new} $, is constrained by a 
 Transmission losses due to power flows can be accounted for in three different ways. 
 
 {\textbf The first option} is to neglect losses entirely, setting the value of the losses function to zero for all lines at all hours. 
-
 
 {\textbf The second option} is to assume that losses are a fixed percentage, $\eta_{l}^{E,NET}$, of the magnitude of power flow on each line, $\mid x_{l,t}^{E,NET} \mid$ (e.g., losses are a linear function of power flows). 
 

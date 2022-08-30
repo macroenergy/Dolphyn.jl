@@ -33,8 +33,8 @@ Similar to hydro inventory or storage state of charge constraints, for the first
 
 ```math
 \begin{aligned}
-\Gamma_{y,z,t} = \Gamma_{y,z,t-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-\Gamma_{y,z,t} = \Gamma_{y,z,t +\tau^{period}-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+\Gamma_{y,z,t} = \Gamma_{y,z,t-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \quad \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+\Gamma_{y,z,t} = \Gamma_{y,z,t +\tau^{period}-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \quad \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 
@@ -44,7 +44,7 @@ At any given time step, the amount of demand that can be shifted or deferred can
 
 ```math
 \begin{aligned}
-    \Pi_{y,t} \leq \rho^{max}_{y,z,t}\Delta_{y,z} \forall f \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
+    \Pi_{y,t} \leq \rho^{max}_{y,z,t}\Delta_{y,z} \quad \forall f \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -53,18 +53,18 @@ At any given time step, the amount of demand that can be shifted or deferred can
 Delayed demand must then be served within a fixed number of time steps. This is done by enforcing the sum of demand satisfied ($\Theta_{y,z,t}$) in the following $\tau_{f,z}^{delay}$ time steps (e.g., t + 1 to t + $\tau_{f,z}^{delay}$) to be greater than or equal to the level of energy deferred during time step $t$.
 
 ```math
-\begin{aligned}
-    \sum_{e=t+1}^{t+\tau_{f,z}^{delay}}{\Theta_{f,z,e}} \geq \Gamma_{f,z,t} \forall f \in \mathcal{DF},z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+    \sum_{e=t+1}^{t+\tau_{f,z}^{delay}}{\Theta_{f,z,e}} \geq \Gamma_{f,z,t} \quad \forall f \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 A similar constraints maximum time steps of demand advancement. This is done by enforcing the sum of demand deferred ($\Pi_{f,t}$) in the following $\tau_{y,z}^{advance}$ time steps (e.g., t + 1 to t + $\tau_{f,z}^{advance}$) to be greater than or equal to the total level of energy deferred during time $t$ (-$\Gamma_{f,t}$). 
 The negative sign is included to account for the established sign convention that treat demand deferred in advance of the actual demand is defined to be negative.
 
 ```math
-\begin{aligned}
-    \sum_{e=t+1}^{t+\tau_{f,z}^{advance}}{\Pi_{y,z,e}} \geq -\Gamma_{y,z,t} \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation}
+    \sum_{e=t+1}^{t+\tau_{f,z}^{advance}}{\Pi_{y,z,e}} \geq -\Gamma_{y,z,t} \quad \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 If $t$ is first time step of the year (or the first time step of the representative period), then the above two constraints are implemented to look back over the last n time steps, starting with the last time step of the year (or the last time step of the representative period). 

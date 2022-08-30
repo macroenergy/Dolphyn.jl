@@ -44,9 +44,9 @@ This module additionally defines contributions to the objective function from va
 Contributions to the power balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
-\begin{eqution}
-	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{E,DIS} - x_{s,z,t}^{E,CHA}\right)
-\end{eqution}
+\begin{equation}
+	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{E,DIS} - x_{s,z,t}^{E,CHA}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation}
 ```
 
 **Storage inventory level track constraints**
