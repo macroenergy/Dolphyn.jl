@@ -23,25 +23,25 @@ This function creates variables and constraints enabling modeling of long durati
 
 **Long duration hydrogen storage initial inventory and change decision variables**
 
-This module defines the initial storage hydrogen inventory level variable $U_{s,z,t}^{H,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial hydrogen stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
+This module defines the initial storage hydrogen inventory level variable $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial hydrogen stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
 
-This module defines the change of storage hydrogen inventory level during each representative period $\Delta U_{s,z,m}^{H,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage hydrogen inventory level of the storage device $s$ in zone $z$ during each representative period $m$.
+This module defines the change of storage hydrogen inventory level during each representative period $\Delta U_{s,z,m}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage hydrogen inventory level of the storage device $s$ in zone $z$ during each representative period $m$.
 
-The variable defined in this file named after ```vH2SOCw``` covers $U_{s,z,t}^{H,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$.
+The variable defined in this file named after ```vH2SOCw``` covers $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$.
 
-The variable defined in this file named after ```vdH2SOC``` covers $\Delta U_{s,z,m}^{H,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$.
+The variable defined in this file named after ```vdH2SOC``` covers $\Delta U_{s,z,m}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$.
 
 **Storage inventory balance at beginning of each representative period**
 
 The constraints in this section are used to approximate the behavior of long-duration hydrogen storage technologies when approximating annual grid operations by modeling operations over representative periods. 
 Previously, the state of charge balance for storage (as defined in ```storage_all()```) assumed that state of charge at the beginning and end of each representative period has to be the same. 
-In other words, the amount of hydrogen built up or consumed by storage technology $s$ in zone $z$ over the representative period $m$, $\Delta U_{s,z,m}^{H,STO} = 0$. 
+In other words, the amount of hydrogen built up or consumed by storage technology $s$ in zone $z$ over the representative period $m$, $\Delta U_{s,z,m}^{\textrm{H,STO}} = 0$. 
 This assumption implicitly excludes the possibility of transferring hydrogen from one representative period to the other which could be cost-optimal when the capital cost of hydrogen storage capacity is relatively small. 
-To model long-duration hydrogen storage using representative periods, we replace the state of charge equation, such that the first term on the right hand side accounts for change in hydrogen storage inventory associated with representative period $m$ ($\Delta U_{s,z,m}^{H,STO}$), which could be positive (net accumulation) or negative (net reduction).
+To model long-duration hydrogen storage using representative periods, we replace the state of charge equation, such that the first term on the right hand side accounts for change in hydrogen storage inventory associated with representative period $m$ ($\Delta U_{s,z,m}^{\textrm{H,STO}}$), which could be positive (net accumulation) or negative (net reduction).
 
 ```math
 \begin{equation*}
-	U_{s,z,(m-1)\times\tau^{period}+1}^{H,STO} = \left(1-\eta_{s,z}^{H,STO,loss}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{H,STO,DIS}}x_{s,z,(m-1)\times \tau^{period}+1}^{H,STO} + \eta_{s,z}^{H,STO,CHA}x_{s,z,(m-1)\times \tau^{period}+1}^{H,STO} \quad \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
+	U_{s,z,(m-1)\times\tau^{period}+1}^{\textrm{H,STO}} = \left(1-\eta_{s,z}^{\textrm{H,STO,loss}}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{\textrm{\textrm{H,STO,DIS}}}}x_{s,z,(m-1)\times \tau^{period}+1}^{\textrm{H,STO}} + \eta_{s,z}^{\textrm{H,STO,CHA}}x_{s,z,(m-1)\times \tau^{period}+1}^{\textrm{H,STO}} \quad \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
 \end{equation*}
 ```
 
@@ -64,19 +64,19 @@ Note that $|N|$ refers to the last modeled period.
 
 ```math
 \begin{equation*}
-	U_{s,z,n+1}^{H,STO} = U_{s,z,n}^{H,STO} + \Delta U_{s,z,f(n)} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}\setminus\{|N|\}
+	U_{s,z,n+1}^{\textrm{H,STO}} = U_{s,z,n}^{\textrm{H,STO}} + \Delta U_{s,z,f(n)} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}\setminus\{|N|\}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	U_{s,z,1}^{H,STO} = U_{s,z,|N|}^{H,STO} + \Delta U_{s,z,f(|N|)}^{H,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n = |N|
+	U_{s,z,1}^{\textrm{H,STO}} = U_{s,z,|N|}^{\textrm{H,STO}} + \Delta U_{s,z,f(|N|)}^{\textrm{H,STO}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n = |N|
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	U_{s,z,n}^{H,STO} = U_{s,z,f(n) \times \tau^{period}}^{H,STO} - \Delta U_{s,z,m}^{H,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}^{rep},
+	U_{s,z,n}^{\textrm{H,STO}} = U_{s,z,f(n) \times \tau^{period}}^{\textrm{H,STO}} - \Delta U_{s,z,m}^{\textrm{H,STO}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}^{rep},
 \end{equation*}
 ```
 
@@ -85,7 +85,7 @@ This constraint ensures that installed energy storage capacity is consistent wit
 
 ```math
 \begin{equation*}
-    U_{s,z,n}^{H,STO} \leq y_{s,z}^{H,STO,ENE} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}
+    U_{s,z,n}^{\textrm{H,STO}} \leq y_{s,z}^{\textrm{H,STO,ENE}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}
 \end{equation*}
 ```
 """

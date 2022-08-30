@@ -19,19 +19,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up constraints common to all hydrogen generation resources.
 
-This function defines the expressions and constraints keeping track of total available generation capacity $y_{k}^{H,GEN}$ as well as constraints on capacity retirements.
+This function defines the expressions and constraints keeping track of total available generation capacity $y_{k}^{\textrm{H,GEN}}$ as well as constraints on capacity retirements.
 
-This function defines the expressions and constraints keeping track of total available storage discharge capacity $y_{s}^{H,STO,DIS}$ as well as constraints on capacity retirements.
+This function defines the expressions and constraints keeping track of total available storage discharge capacity $y_{s}^{\textrm{\textrm{H,STO},DIS}}$ as well as constraints on capacity retirements.
 
-The expression defined in this file named after ```eH2GenTotalCap``` covers all variables $y_{k}^{H,THE}, y_{s}^{H,STO,DIS}$.
+The expression defined in this file named after ```eH2GenTotalCap``` covers all variables $y_{k}^{\textrm{H,THE}}, y_{s}^{\textrm{\textrm{H,STO},DIS}}$.
 
 ```math
 \begin{equation*}
-	y_{g}^{H,GEN} = 
+	y_{g}^{\textrm{H,GEN}} = 
 	\begin{cases}
-		y_{k}^{H,THE} \quad if g \in \mathcal{K} \\
-		y_{s}^{H,STO,DIS} \quad if g \in \mathcal{S}
+		y_{k}^{\textrm{H,THE}} \quad if \quad g \in \mathcal{K} \\
+		y_{s}^{\textrm{\textrm{H,STO},DIS}} \quad if \quad g \in \mathcal{S}
 	\end{cases}
+    \quad \forall g \in \mathcal{G}
 \end{equation*}
 ```
 
@@ -43,8 +44,8 @@ Note for energy storage resources in hydrogen sector, additional energy and char
 ```math
 \begin{equation*}
 	\begin{split}
-	y_{g}^{H,GEN} &= y_{g}^{H,GEN,total} \\ 
-	& = y_{g}^{H,GEN,existing}+y_{g}^{H,GEN,new}-y_{g}^{H,GEN,retired}
+	y_{g}^{\textrm{H,GEN}} &= y_{g}^{\textrm{H,GEN,total}} \\ 
+	& = y_{g}^{\textrm{H,GEN,existing}} + y_{g}^{\textrm{H,GEN,new}} - y_{g}^{\textrm{H,GEN,retired}}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
 \end{equation*}
@@ -52,11 +53,11 @@ Note for energy storage resources in hydrogen sector, additional energy and char
 
 **Cost expressions**
 
-This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
+This module additionally defines contributions to the objective function from investment costs of generation (fixed O\&M plus investment costs) from all generation resources $g \in \mathcal{G}$:
 
 ```math
 \begin{equation*}
-	C^{H,GEN,c} = \sum_{g in G} y_{g}^{H,GEN,new}\times c_{g}^{H,INV} + \sum_{g in G} y_{g}^{H,GEN,total} \times c_{g}^{H,FOM}
+	\textrm{C}^{\textrm{H,GEN,c}} = \sum_{g in \mathcal{G}} y_{g}^{\textrm{H,GEN,new}}\times \textrm{c}_{g}^{\textrm{H,INV}} + \sum_{g in \mathcal{G}} y_{g}^{\textrm{H,GEN,total}} \times \textrm{c}_{g}^{\textrm{H,FOM}}
 \end{equation*}
 ```
 
@@ -65,7 +66,7 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \quad \forall g \in \mathcal{G}
+	0 \leq y_{g}^{\textrm{H,GEN,retired}} \leq y_{g}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}
 \end{equation*}
 ```
 """

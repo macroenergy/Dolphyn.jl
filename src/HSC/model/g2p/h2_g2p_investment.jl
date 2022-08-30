@@ -17,15 +17,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
-This function defines the expressions and constraints keeping track of total available hydrogen to power generation capacity $y_{k}^{H,G2P}$ as well as constraints on capacity retirements.
+This function defines the expressions and constraints keeping track of total available hydrogen to power generation capacity $y_{k}^{\textrm{H,G2P}}$ as well as constraints on capacity retirements.
 
 The total capacity of hydrogen to power generation is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
 \begin{equation*}
 	\begin{split}
-	y_{g}^{H,G2P} &= y_{g}^{H,G2P,total} \\ 
-	& = y_{g}^{H,G2P,existing}+y_{g}^{H,G2P,new}-y_{g}^{H,G2P,retired}
+	y_{g}^{\textrm{H,G2P}} &= y_{g}^{\textrm{H,G2P},total} \\ 
+	& = y_{g}^{\textrm{H,G2P},existing}+y_{g}^{\textrm{H,G2P},new}-y_{g}^{\textrm{H,G2P},retired}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
 \end{equation*}
@@ -37,7 +37,7 @@ This module additionally defines contributions to the objective function from in
 
 ```math
 \begin{equation*}
-	C^{H,G2P,c} = \sum_{g in G} y_{g}^{H,G2P,new}\times c_{g}^{E,INV} + \sum_{g in G} y_{g}^{H,G2P,total}\times c_{g}^{E,FOM}
+	C^{\textrm{H,G2P},c} = \sum_{g in G} y_{g}^{\textrm{H,G2P},new}\times c_{g}^{\textrm{E,INV}} + \sum_{g in G} y_{g}^{\textrm{H,G2P},total}\times c_{g}^{E,FOM}
 \end{equation*}
 ```
 """

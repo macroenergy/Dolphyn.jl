@@ -36,7 +36,7 @@ The resulting constraint is given as:
 
 ```math
 \begin{equation*}
-    \sum_{z \in \mathcal{Z}_{p,mass}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{E,GEN}\right) \leq \sum_{z \in \mathcal{Z}_{p,mass}^{CO_2}} \epsilon_{z,p,mass}^{CO_{2}} \forall p \in \mathcal{P}_{mass}^{CO_2}
+    \sum_{z \in \mathcal{Z}_{p,mass}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{\textrm{E,GEN}}\right) \leq \sum_{z \in \mathcal{Z}_{p,mass}^{CO_2}} \epsilon_{z,p,mass}^{CO_{2}} \forall p \in \mathcal{P}_{mass}^{CO_2}
 \end{equation*}
 ```
 
@@ -50,7 +50,7 @@ In the following constraint, total demand served takes into account non-served e
 
 ```math
 \begin{equation*}
-    \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{E,GEN} \right) \leq \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{t \in \mathcal{T}}  \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times D_{z,t}\right) + \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{o \in \mathcal{O}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times \left(x_{s,z,t}^{E,CHA} - x_{s,z,t}^{E,DIS}\right)\right) - \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{s \in \mathcal{SEG}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times x_{s,z,t}^{E,NSD}\right) \forall p \in \mathcal{P}_{load}^{CO_2}
+    \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{\textrm{E,GEN}} \right) \leq \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{t \in \mathcal{T}}  \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times D_{z,t}\right) + \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{o \in \mathcal{O}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times \left(x_{s,z,t}^{E,CHA} - x_{s,z,t}^{\textrm{E,DIS}}\right)\right) - \sum_{z \in \mathcal{Z}_{p,load}^{CO_2}} \sum_{s \in \mathcal{SEG}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,load}^{CO_2} \times \omega_t \times x_{s,z,t}^{\textrm{E,NSD}}\right) \forall p \in \mathcal{P}_{load}^{CO_2}
 \end{equation*}
 ```
 
@@ -60,7 +60,7 @@ Similarly, a generation based emission constraint is defined by setting the emis
 
 ```math
 \begin{equation*}
-	\sum_{z \in \mathcal{Z}_{p,gen}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{E,GEN} \right) \leq \sum_{z \in \mathcal{Z}_{p,gen}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,gen}^{CO_2} \times \omega_t \times x_{g,z,t} \right) \forall p \in \mathcal{P}_{gen}^{CO_2}
+	\sum_{z \in \mathcal{Z}_{p,gen}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{g,z}^{CO_2} \times \omega_t \times x_{g,z,t}^{\textrm{E,GEN}} \right) \leq \sum_{z \in \mathcal{Z}_{p,gen}^{CO_2}} \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \left(\epsilon_{z,p,gen}^{CO_2} \times \omega_t \times x_{g,z,t} \right) \forall p \in \mathcal{P}_{gen}^{CO_2}
 \end{equation*}
 ```
 

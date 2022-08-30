@@ -21,17 +21,17 @@ This module creates decision variables, expressions, and constraints related to 
 
 **G2P Unit commitment decision variables:**
 
-This module defines the commitment state variable $\n_{k,z,t}^{H,G2P}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+This module defines the commitment state variable $n_{k,z,t}^{\textrm{H,G2P}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-This module defines the number of startup decision variable $\n_{k,z,t}^{H,G2P,UP}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+This module defines the number of startup decision variable $n_{k,z,t}^{\textrm{H,G2P,UP}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-This module defines the number of shutdown decision variable $\n_{k,z,t}^{H,G2P,DN}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+This module defines the number of shutdown decision variable $n_{k,z,t}^{\textrm{H,G2P,DN}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-The variable defined in this file named after ```vH2G2PCOMMIT``` covers $\n_{k,z,t}^{H,G2P}$.
+The variable defined in this file named after ```vH2G2PCOMMIT``` covers $\n_{k,z,t}^{\textrm{H,G2P}}$.
 
-The variable defined in this file named after ```vH2G2PSTART``` covers $\n_{k,z,t}^{H,G2P,UP}$.
+The variable defined in this file named after ```vH2G2PSTART``` covers $\n_{k,z,t}^{\textrm{H,G2P,UP}}$.
 
-The variable defined in this file named after ```vH2G2PSHUT``` covers $\n_{k,z,t}^{H,G2P,DN}$.
+The variable defined in this file named after ```vH2G2PSHUT``` covers $\n_{k,z,t}^{\textrm{H,G2P,DN}}$.
 
 **Cost expressions:**
 
@@ -39,7 +39,7 @@ The total cost of start-ups across g2p generators subject to unit commitment ($h
 
 ```math
 \begin{equation*}
-	C^{H,G2P,start} = \sum_{k \in \mathcal{UC}, t \in \mathcal{T}} \omega_t \times c_{k}^{H,G2P,start} \times \n_{k,z,t}^{H,G2P,UP}
+	\textrm{C}^{\textrm{H,G2P,start}} = \sum_{k \in \mathcal{UC}, t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{H,G2P,start}} \times n_{k,z,t}^{\textrm{H,G2P,UP}}
 \end{equation*}
 ```
 
@@ -51,38 +51,38 @@ Hydrogen to power resources subject to unit commitment ($k \in \mathcal{UC}$) ad
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{H,G2P} \leq \frac{y_{k,z}^{H,G2P}}{\Omega^{H,G2P,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,G2P}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega^{\textrm{H,G2P,size}}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,G2P,UP} \leq \frac{y_{k,z}^{H,G2P}}{\Omega^{H,G2P,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,G2P,UP}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega^{\textrm{H,G2P,size}}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,G2P,DN} \leq \frac{y_{k,z}^{H,G2P}}{\Omega_{k,z}^{H,G2P,size}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,G2P,DN}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega_{k,z}^{\textrm{H,G2P,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
-where decision $n_{k,z,t}^{H,G2P}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
-decision $n_{k,z,t}^{H,G2P,UP}$ represents number of startup decisions, 
-decision $n_{k,z,t}^{H,G2P,DN}$ represents number of shutdown decisions, 
-$y_{k,z}^{H,G2P}$ is the total installed capacity, and parameter $\Omega_{k,z}^{H,G2P,size}$ is the unit size.
+where decision $n_{k,z,t}^{\textrm{H,G2P}}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
+decision $n_{k,z,t}^{\textrm{H,G2P,UP}}$ represents number of startup decisions, 
+decision $n_{k,z,t}^{\textrm{H,G2P,DN}}$ represents number of shutdown decisions, 
+$y_{k,z}^{\textrm{H,G2P}}$ is the total installed capacity, and parameter $\Omega_{k,z}^{\textrm{H,G2P,size}}$ is the unit size.
 (See Constraints 1-3 in the code)
 
 *Hydrogen to power commitment state constraint linking start-up and shut-down decisions*
 
 Additionally, the following constarint maintains the commitment state variable across time, 
-$n_{k,z,t}^{H,G2P}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{H,G2P}$, 
-period plus the number of units started in the current period, $n_{k,z,t}^{H,G2P,UP}$, 
-minus the number of units shut down in the current period, $n_{k,z,t}^{H,G2P,DN}$:
+$n_{k,z,t}^{\textrm{H,G2P}}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{\textrm{H,G2P}}$, 
+period plus the number of units started in the current period, $n_{k,z,t}^{\textrm{H,G2P,UP}}$, 
+minus the number of units shut down in the current period, $n_{k,z,t}^{\textrm{H,G2P,DN}}$:
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,G2P} &= n_{k,z,t-1}^{H,G2P} + n_{k,z,t}^{H,G2P,UP} - n_{k,z,t}^{H,G2P,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	n_{k,z,t}^{H,G2P} &= n_{k,z,t +\tau^{period}-1}^{H,G2P} + n_{k,z,t}^{H,G2P,UP} - n_{k,z,t}^{H,G2P,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	n_{k,z,t}^{\textrm{H,G2P}} &= n_{k,z,t-1}^{\textrm{H,G2P}} + n_{k,z,t}^{\textrm{H,G2P,UP}} - n_{k,z,t}^{\textrm{H,G2P,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	n_{k,z,t}^{\textrm{H,G2P}} &= n_{k,z,t +\tau^{period}-1}^{\textrm{H,G2P}} + n_{k,z,t}^{\textrm{H,G2P,UP}} - n_{k,z,t}^{\textrm{H,G2P,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 (See Constraint 4 in the code)
@@ -95,17 +95,17 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 
 ```math
 \begin{aligned}
-	x_{k,z,t-1}^{H,G2P} - x_{k,z,t}^{H,G2P} &\leq \kappa_{k,z}^{H,G2P,DN} \times \Omega_{k,z}^{H,G2P,size} \times \left(n_{k,z,t}^{H,G2P,UP} - n_{k,z,t}^{H,G2P,DN}\right) \\
-	\qquad &- \underline{\rho_{k,z,t}^{H,G2P}} \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,DN} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,G2P}}}, \text{max}(\underline{\rho_{k,z,t}^{H,G2P}}, \kappa_{k,z}^{H,G2P})) \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	x_{k,z,t-1}^{\textrm{H,G2P}} - x_{k,z,t}^{\textrm{H,G2P}} &\leq \kappa_{k,z}^{\textrm{H,G2P,DN}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times \left(n_{k,z,t}^{\textrm{H,G2P,UP}} - n_{k,z,t}^{\textrm{H,G2P,DN}}\right) \\
+	\qquad &- \underline{\rho_{k,z,t}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \\
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{H,G2P}}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{H,G2P}}}, \kappa_{k,z}^{\textrm{H,G2P}})) \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-	x_{k,z,t}^{H,G2P} - x_{k,z,t-1}^{H,G2P} &\leq \kappa_{k,z}^{H,G2P,UP} \times \Omega_{k,z}^{H,G2P,size} \times \left(n_{k,z,t}^{H,G2P,UP} - n_{k,z,t}^{H,G2P,DN}\right) \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,G2P}}, \text{max}(\underline{\rho_{k,z,t}^{H,G2P}}, \kappa_{k,z}^{H,G2P,UP})) \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,DN} \\
-	\qquad &- \underline{\rho_{k,z,t}^{H,G2P}} \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} - x_{k,z,t-1}^{\textrm{H,G2P}} &\leq \kappa_{k,z}^{\textrm{H,G2P,UP}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times \left(n_{k,z,t}^{\textrm{H,G2P,UP}} - n_{k,z,t}^{\textrm{H,G2P,DN}}\right) \\
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{H,G2P}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{H,G2P}}}, \kappa_{k,z}^{\textrm{H,G2P,UP}})) \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \\
+	\qquad &- \underline{\rho_{k,z,t}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
@@ -116,13 +116,13 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,G2P} \geq \underline{\rho_{k,z,t}^{H,G2P}} \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} \geq \underline{\rho_{k,z,t}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,G2P} \geq \overline{\rho_{k,z}^{H,G2P}} \times \Omega_{k,z}^{H,G2P,size} \times n_{k,z,t}^{H,G2P,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} \geq \overline{\rho_{k,z}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -134,18 +134,18 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{H,G2P} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,G2P,UP}}^t n_{k,z,\tau}^{H,G2P,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,G2P}} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{\textrm{H,G2P,UP}}}^t n_{k,z,\tau}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	\frac{y_{k,z}^{H,G2P}}{\Omega_{k,z}^{H,G2P,size}} - n_{k,z,t}^{H,G2P,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,G2P,DN}}^t n_{k,z,\tau}^{H,G2P,DN} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega_{k,z}^{\textrm{H,G2P,size}}} - n_{k,z,t}^{\textrm{H,G2P,UP}} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{\textrm{H,G2P,DN}}}^t n_{k,z,\tau}^{\textrm{H,G2P,DN}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 9-10 in the code)
 
-where $\tau_{k,z}^{H,G2P,UP}$ and $\tau_{k,z}^{DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
+where $\tau_{k,z}^{\textrm{H,G2P,UP}}$ and $\tau_{k,z}^{DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
 
 Like with the ramping constraints, the minimum up and down constraint time also wrap around from the start of each time period to the end of each period.
 It is recommended that users of GenX must use longer subperiods than the longest min up/down time if modeling UC. Otherwise, the model will report error.

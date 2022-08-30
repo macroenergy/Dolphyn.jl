@@ -20,47 +20,47 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This function establishes decision variables, expressions, and constraints related to transmission power flows between model zones and associated transmission losses (if modeled).
 
 The function adds transmission reinforcement or construction costs to the objective function. 
-Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $c_{l}^{E,NET}$, and the additional transmission capacity variable, $y_{l}^{E,NET,new}$.
+Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $\textrm{c}_{l}^{\textrm{E,NET}}$, and the additional transmission capacity variable, $y_{l}^{\textrm{E,NET,new}}$.
 
 ```math
 \begin{equation*}
-	\sum_{l \in \mathcal{L}}\left(c_{l}^{E,NET} \times y_{l}^{E,NET,new}\right)
+	\sum_{l \in \mathcal{L}}\left(\textrm{c}_{l}^{\textrm{E,NET}} \times y_{l}^{\textrm{E,NET,new}}\right)
 \end{equation*}
 ```
-Note that fixed OM and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the DOLPHYN objective function.
+Note that fixed O\&M and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the DOLPHYN objective function.
 
 Power flow and transmission loss terms are also added to the power balance constraint for each zone:
 ```math
 \begin{equation*}
-	- \sum_{l\in \mathcal{L}}{(f^{E,map}(\cdot) \times x_{l,t}^{E,NET})} - \frac{1}{2} \sum_{l\in \mathcal{L}}{(f^{E,map}(\cdot) \times f^{E,loss}(\cdot))}
+	- \sum_{l\in \mathcal{L}}{(f^{\textrm{E,map}}(\cdot) \times x_{l,t}^{\textrm{E,NET}})} - \frac{1}{2} \sum_{l\in \mathcal{L}}{(f^{\textrm{E,map}}(\cdot) \times f^{\textrm{E,loss}}(\cdot))}
 \end{equation*}
 ```
 
-Power flows, $x_{l,t}^{E,NET}$, on each line $l$ into or out of a zone (defined by the network map $f^{E,map}(\cdot): l \rightarrow z$), are considered in the demand balance equation for each zone. 
+Power flows, $x_{l,t}^{\textrm{E,NET}}$, on each line $l$ into or out of a zone (defined by the network map $f^{\textrm{E,map}}(\cdot): l \rightarrow z$), are considered in the demand balance equation for each zone. 
 By definition, power flows leaving their reference zone are positive, thus the minus sign is used for this term. 
 Losses due to power flows increase demand, and one-half of losses across a line linking two zones are attributed to each connected zone. 
 The losses function $f^{E,loss}(\cdot)$ will depend on the configuration used to model losses (see below).
 
 **Accounting for Transmission and Network Expansion Between Zones**
 
-Transmission flow constraints are modeled using a 'transport method', where power flow, $x_{l,t}^{E,NET}$, on each line (or more likely a 'path' aggregating flows across multiple parallel lines) is constrained to be less than or equal to the line's maximum power transfer capacity, $y_{l}^{E,NET,existing}$, plus any transmission capacity added on that line (for lines eligible for expansion in the set $\mathcal{E}$). 
-The additional transmission capacity, $y_{l}^{E,NET,new} $, is constrained by a maximum allowed reinforcement, $\overline{y_{l}^{E,NET,new}}$, for each line $l \in \mathcal{E}$.
+Transmission flow constraints are modeled using a 'transport method', where power flow, $x_{l,t}^{\textrm{E,NET}}$, on each line (or more likely a 'path' aggregating flows across multiple parallel lines) is constrained to be less than or equal to the line's maximum power transfer capacity, $y_{l}^{\textrm{E,NET,existing}}$, plus any transmission capacity added on that line (for lines eligible for expansion in the set $\mathcal{E}$). 
+The additional transmission capacity, $y_{l}^{\textrm{E,NET,new}}$, is constrained by a maximum allowed reinforcement, $\overline{y_{l}^{\textrm{E,NET,new}}}$, for each line $l \in \mathcal{E}$.
 
 ```math
 \begin{equation*}
-	-y_{l}^{E,NET,existing} \leq x_{l,t}^{E,NET} \leq y_{l}^{E,NET,existing} \quad \forall l \in (\mathcal{L} \setminus \mathcal{E}), t \in \mathcal{T}
+	-y_{l}^{\textrm{E,NET,existing}} \leq x_{l,t}^{\textrm{E,NET}} \leq y_{l}^{\textrm{E,NET,existing}} \quad \forall l \in (\mathcal{L} \setminus \mathcal{E}), t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	-(y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}) \leq x_{l,t}^{E,NET} \leq (y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}) \quad \forall l \in \mathcal{E}, t \in \mathcal{T}
+	-(y_{l}^{\textrm{E,NET,existing}} + y_{l}^{\textrm{E,NET,new}}) \leq x_{l,t}^{\textrm{E,NET}} \leq (y_{l}^{\textrm{E,NET,existing}} + y_{l}^{\textrm{E,NET,new}}) \quad \forall l \in \mathcal{E}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	y_{l}^{E,NET,new} \leq \overline{y_{l}^{E,NET,new}} \quad \forall l \in \mathcal{E}
+	y_{l}^{\textrm{E,NET,new}} \leq \overline{y_{l}^{\textrm{E,NET,new}}} \quad \forall l \in \mathcal{E}
 \end{equation*}
 ```
 
@@ -70,16 +70,16 @@ Transmission losses due to power flows can be accounted for in three different w
 
 {\textbf The first option} is to neglect losses entirely, setting the value of the losses function to zero for all lines at all hours. 
 
-{\textbf The second option} is to assume that losses are a fixed percentage, $\eta_{l}^{E,NET}$, of the magnitude of power flow on each line, $\mid x_{l,t}^{E,NET} \mid$ (e.g., losses are a linear function of power flows). 
+{\textbf The second option} is to assume that losses are a fixed percentage, $\eta_{l}^{\textrm{E,NET}}$, of the magnitude of power flow on each line, $\mid x_{l,t}^{\textrm{E,NET}} \mid$ (e.g., losses are a linear function of power flows). 
 
 {\textbf the third option} is to calculate losses, $\ell_{l,t}$, by approximating a quadratic-loss function of power flow across the line using a piecewise-linear function with total number of segments equal to the size of the set $\mathcal{M}$.
 
 ```math
 \begin{equation*}
-	f^{E,loss}(\cdot) = 
+	f^{\textrm{E,loss}}(\cdot) = 
 	\begin{cases} 
 	0 & \text{if~} \text{losses.~0} \\
-	\eta_{l}^{E,NET}\times \mid x_{l,t}^{E,NET} \mid & \text{if~} \text{losses.~1} \\
+	\eta_{l}^{\textrm{E,NET}}\times \mid x_{l,t}^{\textrm{E,NET}} \mid & \text{if~} \text{losses.~1} \\
 	\ell_{l,t} &\text{if~} \text{losses.~2} 
 	\end{cases}
 	\quad \forall l \in \mathcal{L}, t \in \mathcal{T}
@@ -87,42 +87,42 @@ Transmission losses due to power flows can be accounted for in three different w
 ```
 
 For the second option, an absolute value approximation is utilized to calculate the magnitude of the power flow on each line (reflecting the fact that negative power flows for a line linking nodes $z$ and $z^{\prime}$ represents flows from node $z^{\prime}$ to $z$ and causes the same magnitude of losses as an equal power flow from $i$ to $j$). 
-This absolute value function is linearized such that the flow in the line must be equal to the subtraction of the auxiliary variable for flow in the positive direction, $x_{l,t}^{E,NET+}$, and the auxiliary variable for flow in the negative direction, $x_{l,t}^{E,NET-}$, of the line. 
+This absolute value function is linearized such that the flow in the line must be equal to the subtraction of the auxiliary variable for flow in the positive direction, $x_{l,t}^{\textrm{E,NET+}}$, and the auxiliary variable for flow in the negative direction, $x_{l,t}^{\textrm{E,NET-}}$, of the line. 
 Then, the magnitude of the flow is calculated as the sum of the two auxiliary variables. 
 The sum of positive and negative directional flows are also constrained by the maximum line flow capacity.
 
 ```math
 \begin{aligned}
-	&x_{l,t}^{E,NET} = x_{l,t}^{E,NET+} - x_{l,t}^{E,NET-}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\mid x_{l,t}^{E,NET} \mid =  x_{l,t}^{E,NET+}  + x_{l,t}^{E,NET-}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&x_{l,t}^{E,NET+} + x_{l,t}^{E,NET-} \leq y_{l}^{E,NET,existing}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T}
+	&x_{l,t}^{\textrm{E,NET}} = x_{l,t}^{\textrm{E,NET+}} - x_{l,t}^{\textrm{E,NET-}}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\mid x_{l,t}^{\textrm{E,NET}} \mid =  x_{l,t}^{\textrm{E,NET+}}  + x_{l,t}^{\textrm{E,NET-}}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&x_{l,t}^{\textrm{E,NET+}} + x_{l,t}^{\textrm{E,NET-}} \leq y_{l}^{\textrm{E,NET,existing}}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T}
 \end{aligned}
 ```
 
-If discrete unit commitment decisions are modeled, ``phantom losses'' can be observed wherein the auxiliary variables for flows in both directions ($x_{l,t}^{E,NET+}$ and $x_{l,t}^{E,NET-}$) are both increased to produce increased losses so as to avoid cycling a thermal generator and incurring start-up costs or opportunity costs related to minimum down times. 
-This unrealistic behavior can be eliminated via inclusion of additional constraints and a set of auxiliary binary variables, $ON_{l,t}^{E,NET+} \in {0,1} \forall l \in \mathcal{L}$. Then the following additional constraints are created:
+If discrete unit commitment decisions are modeled, ``phantom losses'' can be observed wherein the auxiliary variables for flows in both directions ($x_{l,t}^{\textrm{E,NET+}}$ and $x_{l,t}^{\textrm{E,NET-}}$) are both increased to produce increased losses so as to avoid cycling a thermal generator and incurring start-up costs or opportunity costs related to minimum down times. 
+This unrealistic behavior can be eliminated via inclusion of additional constraints and a set of auxiliary binary variables, $ON_{l,t}^{\textrm{E,NET+}} \in {0,1} \forall l \in \mathcal{L}$. Then the following additional constraints are created:
 ```math
 \begin{aligned}
-	x_{l,t}^{E,NET+} \leq TransON_{l,t}^{E,NET+},  &\quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	x_{l,t}^{E,NET-} \leq (y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}) - TransON_{l,t}^{E,NET+}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T}
+	x_{l,t}^{\textrm{E,NET+}} \leq TransON_{l,t}^{\textrm{E,NET+}},  &\quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	x_{l,t}^{\textrm{E,NET-}} \leq (y_{l}^{\textrm{E,NET,existing}} + y_{l}^{\textrm{E,NET,new}}) - TransON_{l,t}^{\textrm{E,NET+}}, &\quad \forall l \in \mathcal{L}, t \in \mathcal{T}
 \end{aligned}
 ```
-where $TransON_{l,t}^{E,NET+}$ is a continuous variable, representing the product of the binary variable $ON_{l,t}^{E,NET+}$ and the expression, $(y_{l}^{E,NET,existing} + y_{l}^{E,NET,new})$. 
+where $TransON_{l,t}^{\textrm{E,NET+}}$ is a continuous variable, representing the product of the binary variable $ON_{l,t}^{\textrm{E,NET+}}$ and the expression, $(y_{l}^{\textrm{E,NET,existing}} + y_{l}^{\textrm{E,NET,new}})$. 
 This product cannot be defined explicitly, since it will lead to a bilinear expression involving two variables. 
 Instead, we enforce this definition via the Glover's Linearization as shown below (also the McCormick Envelopes constraints for bilinear expressions, which is exact when one of the variables is binary).
 
 ```math
 \begin{aligned}
-	TransON_{l,t}^{E,NET+} \leq (y_{l}^{E,NET,existing} + \overline{y_{l}^{E,NET,new}}) \times TransON_{l,t}^{E,NET+},  & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	TransON_{l,t}^{E,NET+} \leq (y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}),  & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	TransON_{l,t}^{E,NET+} \leq (y_{l}^{E,NET,existing} + y_{l}^{E,NET,new}) - (y_{l}^{E,NET,existing} + \overline{y_{l}^{E,NET,new}}) \times(1- TransON_{l,t}^{E,NET+}), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T}
+	TransON_{l,t}^{\textrm{E,NET+}} \leq (y_{l}^{\textrm{E,NET,existing}} + \overline{y_{l}^{\textrm{E,NET,new}}}) \times TransON_{l,t}^{\textrm{E,NET+}},  & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	TransON_{l,t}^{\textrm{E,NET+}} \leq (y_{l}^{\textrm{E,NET,existing}} + y_{l}^{\textrm{E,NET,new}}),  & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	TransON_{l,t}^{\textrm{E,NET+}} \leq (y_{l}^{\textrm{E,NET,existing}} + y_{l}^{\textrm{E,NET,new}}) - (y_{l}^{\textrm{E,NET,existing}} + \overline{y_{l}^{\textrm{E,NET,new}}}) \times(1- TransON_{l,t}^{\textrm{E,NET+}}), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T}
 \end{aligned}
 ```
 
 These constraints permit only the positive or negative auxiliary flow variables to be non-zero at a given time period, not both.
 
 For the third option, losses are calculated as a piecewise-linear approximation of a quadratic function of power flows. 
-In order to do this, we represent the absolute value of the line flow variable by the sum of positive stepwise flow variables $(\mathcal{S}_{m,l,t}^{E,NET+}, \mathcal{S}_{m,l,t}^{E,NET-})$, associated with each partition of line losses computed using the corresponding linear expressions. 
+In order to do this, we represent the absolute value of the line flow variable by the sum of positive stepwise flow variables $(\mathcal{S}_{m,l,t}^{\textrm{E,NET+}}, \mathcal{S}_{m,l,t}^{\textrm{E,NET-}})$, associated with each partition of line losses computed using the corresponding linear expressions. 
 This can be understood as a segmentwise linear fitting (or first order approximation) of the quadratic losses function. 
 The first constraint below computes the losses a the accumulated sum of losses for each linear stepwise segment of the approximated quadratic function, including both positive domain and negative domain segments. 
 A second constraint ensures that the stepwise variables do not exceed the maximum size per segment. 
@@ -130,42 +130,42 @@ The slope and maximum size for each segment are calculated as per the method in 
 
 ```math
 \begin{aligned}
-	& \ell_{l,t} = \frac{\varphi^{ohm}_{l}}{(\varphi^{volt}_{l})^2}\bigg( \sum_{m \in \mathcal{M}}( S^{+}_{m,l}\times \mathcal{S}_{m,l,t}^{E,NET+} + S^{-}_{m,l}\times \mathcal{S}_{m,l,t}^{E,NET-}) \bigg), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	& \ell_{l,t} = \frac{\varphi^{ohm}_{l}}{(\varphi^{volt}_{l})^2}\bigg( \sum_{m \in \mathcal{M}}( S^{+}_{m,l}\times \mathcal{S}_{m,l,t}^{\textrm{E,NET+}} + S^{-}_{m,l}\times \mathcal{S}_{m,l,t}^{\textrm{E,NET-}}) \bigg), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
 	& \text{\quad Where:} \\
-	& \quad S_{m,l}^{E,NET+} = \frac{2+4 \times \sqrt{2}\times (m-1)}{1+\sqrt{2} \times (2 \times M-1)} (y_{l}^{E,NET,existing} + \overline{y_{l}^{E,NET,new}}) & \quad \forall m \in [1 \colon M], l \in \mathcal{L} \\
-	& \quad S_{m,l}^{E,NET-} = \frac{2+4 \times \sqrt{2}\times (m-1)}{1+\sqrt{2} \times (2 \times M-1)} (y_{l}^{E,NET,existing} + \overline{y_{l}^{E,NET,new}}) & \quad \forall m \in [1 \colon M], l \in \mathcal{L} \\
+	& \quad S_{m,l}^{\textrm{E,NET+}} = \frac{2+4 \times \sqrt{2}\times (m-1)}{1+\sqrt{2} \times (2 \times M-1)} (y_{l}^{\textrm{E,NET,existing}} + \overline{y_{l}^{\textrm{E,NET,new}}}) & \quad \forall m \in [1 \colon M], l \in \mathcal{L} \\
+	& \quad S_{m,l}^{\textrm{E,NET-}} = \frac{2+4 \times \sqrt{2}\times (m-1)}{1+\sqrt{2} \times (2 \times M-1)} (y_{l}^{\textrm{E,NET,existing}} + \overline{y_{l}^{\textrm{E,NET,new}}}) & \quad \forall m \in [1 \colon M], l \in \mathcal{L} \\
 	& \\
-	& \mathcal{S}_{m,l,t}^{E,NET+}, \mathcal{S}_{m,l,t}^{E,NET-} <= \overline{\mathcal{S}_{m,l}} & \quad \forall m \in [1:M], l \in \mathcal{L}, t \in \mathcal{T} \\
+	& \mathcal{S}_{m,l,t}^{\textrm{E,NET+}}, \mathcal{S}_{m,l,t}^{\textrm{E,NET-}} <= \overline{\mathcal{S}_{m,l}} & \quad \forall m \in [1:M], l \in \mathcal{L}, t \in \mathcal{T} \\
 	& \text{\quad Where:} \\
-	& \quad \overline{S_{l,z}} =  \begin{cases} \frac{(1+\sqrt{2})}{1+\sqrt{2} \times (2 \times M-1)}  (y_{l}^{E,NET,existing} + \overline{y_{l}^{E,NET,new}}) & \text{if~} m = 1 \\
-	\frac{2 \times \sqrt{2} }{1+\sqrt{2} \times (2 \times M-1)} (y_{l}^{E,NET,existing} + \overline{y_{l}^{E,NET,new}}) & \text{if~} m > 1 \end{cases}
+	& \quad \overline{S_{l,z}} =  \begin{cases} \frac{(1+\sqrt{2})}{1+\sqrt{2} \times (2 \times M-1)}  (y_{l}^{\textrm{E,NET,existing}} + \overline{y_{l}^{\textrm{E,NET,new}}}) & \text{if~} m = 1 \\
+	\frac{2 \times \sqrt{2} }{1+\sqrt{2} \times (2 \times M-1)} (y_{l}^{\textrm{E,NET,existing}} + \overline{y_{l}^{\textrm{E,NET,new}}}) & \text{if~} m > 1 \end{cases}
 \end{aligned}
 ```
 
 Next, a constraint ensures that the sum of auxiliary segment variables ($m \geq 1$) minus the "zero" segment (which allows values to go into the negative domain) from both positive and negative domains must total the actual power flow across the line, and a constraint ensures that the sum of negative and positive flows do not exceed the maximum flow for the line.
 ```math
 \begin{aligned}
-	&\sum_{m \in [1:M]} (\mathcal{S}_{m,l,t}^{E,NET+}) - \mathcal{S}_{0,l,t}^{E,NET+} =  x_{l,t}^{E,NET}, & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\sum_{m \in [1:M]} (\mathcal{S}_{m,l,t}^{E,NET-}) - \mathcal{S}_{0,l,t}^{E,NET-} =  - x_{l,t}^{E,NET}
+	&\sum_{m \in [1:M]} (\mathcal{S}_{m,l,t}^{\textrm{E,NET+}}) - \mathcal{S}_{0,l,t}^{\textrm{E,NET+}} =  x_{l,t}^{\textrm{E,NET}}, & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\sum_{m \in [1:M]} (\mathcal{S}_{m,l,t}^{\textrm{E,NET-}}) - \mathcal{S}_{0,l,t}^{\textrm{E,NET-}} =  - x_{l,t}^{\textrm{E,NET}}
 \end{aligned}
 ```
 
 As with losses option 2, this segment-wise approximation of a quadratic loss function also permits 'phantom losses' to avoid cycling thermal units when discrete unit commitment decisions are modeled. 
 In this case, the additional constraints below are also added to ensure that auxiliary segments variables do not exceed maximum value per segment and that they are filled in order; i.e., one segment cannot be non-zero unless prior segment is at its maximum value. 
 Binary constraints deal with absolute value of power flow on each line. 
-If the flow is positive, $\mathcal{S}^{+}_{0,l,t}$ must be zero; if flow is negative, $\mathcal{S}_{0,l,t}^{E,NET+}$ must be positive and takes on value of the full negative flow, forcing all $\mathcal{S}_{m,l,t}^{E,NET+}$ other segments ($m \geq 1$) to be zero. 
-Conversely, if the flow is negative, $\mathcal{S}_{0,l,t}^{E,NET-}$ must be zero; if flow is positive, $\mathcal{S}_{0,l,t}^{E,NET-}$ must be positive and takes on value of the full positive flow, forcing all $\mathcal{S}_{m,l,t}^{E,NET-}$ other segments ($m \geq 1$) to be zero. 
+If the flow is positive, $\mathcal{S}^{+}_{0,l,t}$ must be zero; if flow is negative, $\mathcal{S}_{0,l,t}^{\textrm{E,NET+}}$ must be positive and takes on value of the full negative flow, forcing all $\mathcal{S}_{m,l,t}^{\textrm{E,NET+}}$ other segments ($m \geq 1$) to be zero. 
+Conversely, if the flow is negative, $\mathcal{S}_{0,l,t}^{\textrm{E,NET-}}$ must be zero; if flow is positive, $\mathcal{S}_{0,l,t}^{\textrm{E,NET-}}$ must be positive and takes on value of the full positive flow, forcing all $\mathcal{S}_{m,l,t}^{\textrm{E,NET-}}$ other segments ($m \geq 1$) to be zero. 
 Requiring segments to fill in sequential order and binary variables to ensure variables reflect the actual direction of power flows are both necessary to eliminate ``phantom losses'' from the solution. 
 These constraints and binary decisions are ommited if the model is fully linear.
 
 ```math
 \begin{aligned}
-	&\mathcal{S}_{m,l,t}^{E,NET+} <=    \overline{\mathcal{S}_{m,l}} \times ON_{m,l,t}^{E,NET+}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\mathcal{S}_{m,l,t}^{E,NET-} <=    \overline{\mathcal{S}_{m,l}} \times ON_{m,l,t}^{E,NET-}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\mathcal{S}_{m,l,t}^{E,NET+} \geq ON_{m+1,l,t}^{E,NET+} \times \overline{\mathcal{S}_{m,l}}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\mathcal{S}_{m,l,t}^{E,NET-} \geq ON_{m+1,l,t}^{E,ENT-} \times \overline{\mathcal{S}_{m,l}}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\mathcal{S}_{0,l,t}^{E,NET+} \leq y_{l}^{E,NET,existing} \times (1 - ON_{1,l,t}^{E,ENT+}), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
-	&\mathcal{S}_{0,l,t}^{E,NET-} \leq y_{l}^{E,NET,existing} \times (1 - ON_{1,l,t}^{E,ENT-}), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T}
+	&\mathcal{S}_{m,l,t}^{\textrm{E,NET+}} <=    \overline{\mathcal{S}_{m,l}} \times ON_{m,l,t}^{\textrm{E,NET+}}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\mathcal{S}_{m,l,t}^{\textrm{E,NET-}} <=    \overline{\mathcal{S}_{m,l}} \times ON_{m,l,t}^{\textrm{E,NET-}}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\mathcal{S}_{m,l,t}^{\textrm{E,NET+}} \geq ON_{m+1,l,t}^{\textrm{E,NET+}} \times \overline{\mathcal{S}_{m,l}}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\mathcal{S}_{m,l,t}^{\textrm{E,NET-}} \geq ON_{m+1,l,t}^{E,ENT-} \times \overline{\mathcal{S}_{m,l}}, & \quad \forall m \in [1:M], \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\mathcal{S}_{0,l,t}^{\textrm{E,NET+}} \leq y_{l}^{\textrm{E,NET,existing}} \times (1 - ON_{1,l,t}^{E,ENT+}), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T} \\
+	&\mathcal{S}_{0,l,t}^{\textrm{E,NET-}} \leq y_{l}^{\textrm{E,NET,existing}} \times (1 - ON_{1,l,t}^{E,ENT-}), & \quad \forall l \in \mathcal{L}, t \in \mathcal{T}
 \end{aligned}
 ```
 """

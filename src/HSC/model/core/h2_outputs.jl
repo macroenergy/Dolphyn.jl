@@ -19,18 +19,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables common to all hydrogen generation resources.
 
-This module defines the hydrogen generation decision variable $x_{k,z,t}^{H,GEN} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen injected into the grid by hydrogen generation resource $k$ in zone $z$ at time period $t$.
+This module defines the hydrogen generation decision variable $x_{k,z,t}^{\textrm{H,GEN}} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen injected into the grid by hydrogen generation resource $k$ in zone $z$ at time period $t$.
 
-This module defines the gydrogen discharge decision variable $x_{s,z,t}^{H,DIS} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen injected into the grid by hydrogen storage resource $s$ in zone $z$ at time period $t$.
+This module defines the gydrogen discharge decision variable $x_{s,z,t}^{\textrm{\textrm{H,DIS}}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen injected into the grid by hydrogen storage resource $s$ in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vH2Gen``` covers all variables $x_{k,z,t}^{H,GEN}, x_{s,z,t}^{H,DIS}$.
+The variable defined in this file named after ```vH2Gen``` covers all variables $x_{k,z,t}^{\textrm{H,GEN}}, x_{s,z,t}^{\textrm{\textrm{H,DIS}}}$.
 
 ```math
 \begin{equation*}
-	x_{g,z,t}^{H,GEN} = 
+	x_{g,z,t}^{\textrm{H,GEN}} = 
 	\begin{cases}
-		x_{k,z,t}^{H,THE} if g \in \mathcal{K} \\
-		x_{s,z,t}^{H,DIS} if g \in \mathcal{S}
+		x_{k,z,t}^{\textrm{H,THE}} if g \in \mathcal{K} \\
+		x_{s,z,t}^{\textrm{\textrm{H,DIS}}} if g \in \mathcal{S}
 	\end{cases}
 	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
@@ -42,7 +42,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	C^{H,GEN,o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{H,GEN}
+	\textrm{C}^{\textrm{H,GEN,o}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{H,VOM}} + \textrm{c}_{g}^{\textrm{H,FUEL}}\right) \times x_{g,z,t}^{\textrm{H,GEN}}
 \end{equation*}
 ```
 """

@@ -25,7 +25,7 @@ Contributions to the hydrogen balance expression from each thermal resources wit
 
 ```math
 \begin{equation*}
-	HydrogenBal_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{H,GEN} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBal_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{\textrm{H,GEN}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -37,38 +37,38 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{H,GEN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,GEN}} \leq \frac{y_{k,z}^{\textrm{H,GEN}}}{\Omega_{k,z}^{\textrm{H,GEN,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	n_{k,z,t}^{H,UP} \leq \frac{y_{k,z}^{H,GEN}}{\Omega^{H,GEN,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	n_{k,z,t}^{\textrm{H,UP}} \leq \frac{y_{k,z}^{\textrm{H,GEN}}}{\Omega_{k,z}^{\textrm{H,GEN,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	n_{k,z,t}^{H,DN} \leq \frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	n_{k,z,t}^{\textrm{H,DN}} \leq \frac{y_{k,z}^{\textrm{H,GEN}}}{\Omega_{k,z}^{\textrm{H,GEN,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
-where decision $n_{k,z,t}^{H,GEN}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
-decision $n_{k,z,t}^{H,UP}$ represents number of startup decisions, 
-decision $n_{k,z,t}^{H,DN}$ represents number of shutdown decisions, 
-$y_{k,z}^{H,GEN}$ is the total installed capacity, and parameter $\Omega_{k,z}^{H,GEN,size}$ is the unit size.
+where decision $n_{k,z,t}^{\textrm{H,GEN}}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
+decision $n_{k,z,t}^{\textrm{H,UP}}$ represents number of startup decisions, 
+decision $n_{k,z,t}^{\textrm{H,DN}}$ represents number of shutdown decisions, 
+$y_{k,z}^{\textrm{H,GEN}}$ is the total installed capacity, and parameter $\Omega_{k,z}^{\textrm{H,GEN},size}$ is the unit size.
 (See Constraints 1-3 in the code)
 
 *Commitment state constraint linking start-up and shut-down decisions*
 
 Additionally, the following constarint maintains the commitment state variable across time, 
-$n_{k,z,t}^{H,GEN}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{H,GEN}$, 
+$n_{k,z,t}^{\textrm{H,GEN}}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{\textrm{H,GEN}}$, 
 period plus the number of units started in the current period, $n_{k,z,t}^{H,UP}$, 
 minus the number of units shut down in the current period, $n_{k,z,t}^{H,DN}$:
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{H,GEN} &= n_{k,z,t-1} + n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	n_{k,z,t}^{H,GEN} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	n_{k,z,t}^{\textrm{H,GEN}} &= n_{k,z,t-1}^{\textrm{H,GEN}} + n_{k,z,t}^{\textrm{H,UP}} - n_{k,z,t}^{\textrm{H,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	n_{k,z,t}^{\textrm{H,GEN}} &= n_{k,z,t +\tau^{period}-1}^{\textrm{H,GEN}} + n_{k,z,t}^{\textrm{H,UP}} - n_{k,z,t}^{\textrm{H,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 (See Constraint 4 in the code)
@@ -81,33 +81,33 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 
 ```math
 \begin{aligned}
-	x_{k,z,t-1}^{H,GEN} - x_{k,z,t}^{H,GEN} &\leq \kappa_{k,z}^{H,DN} \times \Omega_{k,z}^{H,GEN,size} \times \left(n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN}\right) \\
-	\qquad &- \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,GEN}}}, \text{max}(\underline{\rho_{k,z,t}^{H,GEN}}, \kappa_{k,z}^{H,GEN})) \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	x_{k,z,t-1}^{\textrm{H,GEN}} - x_{k,z,t}^{\textrm{H,GEN}} &\leq \kappa_{k,z}^{\textrm{H,DN}} \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times \left(n_{k,z,t}^{\textrm{H,UP}} - n_{k,z,t}^{\textrm{H,DN}}\right) \\
+	\qquad &- \underline{\rho_{k,z,t}^{\textrm{H,GEN}}} \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times n_{k,z,t}^{\textrm{H,DN}} \\
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{H,GEN}}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{H,GEN}}}, \kappa_{k,z}^{\textrm{H,GEN}})) \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times n_{k,z,t}^{\textrm{H,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-	x_{k,z,t}^{H,GEN} - x_{k,z,t-1}^{H,GEN} &\leq \kappa_{k,z}^{H,UP} \times \Omega_{k,z}^{H,GEN,size} \times \left(n_{k,z,t}^{H,UP} - n_{k,z,t}^{H,DN}\right) \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{H,GEN}}, \text{max}(\underline{\rho_{k,z,t}^{H,GEN}}, \kappa_{k,z}^{H,UP})) \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \\
-	\qquad &- \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,GEN}} - x_{k,z,t-1}^{\textrm{H,GEN}} &\leq \kappa_{k,z}^{\textrm{H,UP}} \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times \left(n_{k,z,t}^{\textrm{H,UP}} - n_{k,z,t}^{\textrm{H,DN}}\right) \\
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{H,GEN}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{H,GEN}}}, \kappa_{k,z}^{\textrm{H,UP}})) \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times n_{k,z,t}^{\textrm{H,DN}} \\
+	\qquad &- \underline{\rho_{k,z,t}^{\textrm{H,GEN}}} \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times n_{k,z,t}^{\textrm{H,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
 
-where decision $x_{k,z,t}^{H,GEN}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{k,z,t}^{H,UP}$, $\kappa_{k,z,t}^{H,DN}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\underline{\rho_{k,z}^{H,GEN}}$ is the minimum stable power output per unit of installed capacity, 
-and parameter $\overline{\rho_{k,z,t}^{H,GEN}}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
+where decision $x_{k,z,t}^{\textrm{H,GEN}}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{k,z,t}^{\textrm{H,UP}}$, $\kappa_{k,z,t}^{\textrm{H,DN}}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\underline{\rho_{k,z}^{\textrm{H,GEN}}}$ is the minimum stable power output per unit of installed capacity, 
+and parameter $\overline{\rho_{k,z,t}^{\textrm{H,GEN}}}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,GEN} \geq \underline{\rho_{k,z,t}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,GEN}} \geq \underline{\rho_{k,z,t}^{\textrm{H,GEN}}} \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times n_{k,z,t}^{\textrm{H,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,GEN} \geq \overline{\rho_{k,z}^{H,GEN}} \times \Omega_{k,z}^{H,GEN,size} \times n_{k,z,t}^{H,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,GEN}} \geq \overline{\rho_{k,z}^{\textrm{H,GEN}}} \times \Omega_{k,z}^{\textrm{H,GEN,size}} \times n_{k,z,t}^{\textrm{H,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -119,18 +119,18 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{H,GEN} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,UP}}^t n_{k,z,\tau}^{H,UP} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,GEN}} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{\textrm{H,UP}}}^t n_{k,z,\tau}^{\textrm{H,UP}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	\frac{y_{k,z}^{H,GEN}}{\Omega_{k,z}^{H,GEN,size}} - n_{k,z,t}^{H,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{H,DN}}^t n_{k,z,\tau}^{H,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\frac{y_{k,z}^{\textrm{H,GEN}}}{\Omega_{k,z}^{\textrm{H,GEN,size}}} - n_{k,z,t}^{\textrm{H,UP}} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{\textrm{H,DN}}}^t n_{k,z,\tau}^{\textrm{H,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 9-10 in the code)
 
-where $\tau_{k,z}^{UP}$ and $\tau_{k,z}^{DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
+where $\tau_{k,z}^{\textrm{H,UP}}$ and $\tau_{k,z}^{\textrm{H,DN}}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
 
 Like with the ramping constraints, the minimum up and down constraint time also wrap around from the start of each time period to the end of each period.
 It is recommended that users of DOLPHYN must use longer subperiods than the longest min up/down time if modeling unit commitment. Otherwise, the model will report error.

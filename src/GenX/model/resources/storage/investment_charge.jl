@@ -24,7 +24,7 @@ The total capacity of each storage resource is defined as the sum of the existin
 
 ```math
 \begin{equation*}
-	y_{s,z}^{E,CHA,total} = y_{s,z}^{E,CHA,existing} + y_{s,z}^{E,CHA,new} - y_{s,z}^{E,CHA,retired} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	y_{s,z}^{\textrm{E,CHA,total}} = y_{s,z}^{\textrm{E,CHA,existing}} + y_{s,z}^{\textrm{E,CHA,new}} - y_{s,z}^{\textrm{E,CHA,retired}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -33,7 +33,7 @@ The total capacity of each storage resource is defined as the sum of the existin
 In addition, this module adds investment and fixed OM costs related to charge capacity to the objective function:
 ```math
 \begin{equation*}
-	\sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{E,CHA,INV} \times y_{s,z}^{E,CHA,new} + c_{s,z}^{E,CHA,FOM} \times y_{y,z}^{E,CHA,total})
+	\sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{E,CHA,INV}} \times y_{s,z}^{\textrm{E,CHA,new}} + \textrm{c}_{s,z}^{\textrm{E,CHA,FOM}} \times y_{s,z}^{\textrm{E,CHA,total}})
 \end{equation*}
 ```
 
@@ -42,14 +42,14 @@ In addition, this module adds investment and fixed OM costs related to charge ca
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-	0 \leq y_{s,z}^{E,CHA,retired} \leq y_{s,z}^{E,CHA,existing} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	0 \leq y_{s,z}^{\textrm{E,CHA,retired}} \leq y_{s,z}^{\textrm{E,CHA,existing}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
-For storage resources where upper bound $\overline{R_{s,z}^{E,CHA}}$ and lower bound $\underline{R_{s,z}^{E,CHA}}$ is defined, then we impose constraints on minimum and maximum storage charge capacity.
+For storage resources where upper bound $\overline{R_{s,z}^{\textrm{E,CHA}}}$ and lower bound $\underline{R_{s,z}^{\textrm{E,CHA}}}$ is defined, then we impose constraints on minimum and maximum storage charge capacity.
 ```math
 \begin{equation*}
-	\underline{R_{s,z}^{E,CHA}} \leq y_{s,z}^{E,CHA} \leq \overline{R_{s,z}^{E,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	\underline{R_{s,z}^{\textrm{E,CHA}}} \leq y_{s,z}^{\textrm{E,CHA}} \leq \overline{R_{s,z}^{\textrm{E,CHA}}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """

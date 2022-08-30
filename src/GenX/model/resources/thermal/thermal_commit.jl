@@ -21,7 +21,7 @@ This function defines the operating constraints for thermal power plants subject
 
 We model capacity investment decisions and commitment and cycling (start-up, shut-down) of thermal generators using the integer clustering technique developed in [Palmintier, 2011](https://pennstate.pure.elsevier.com/en/publications/impact-of-unit-commitment-constraints-on-generation-expansion-pla), [Palmintier, 2013](https://dspace.mit.edu/handle/1721.1/79147), and [Palmintier, 2014](https://ieeexplore.ieee.org/document/6684593). 
 In a typical binary unit commitment formulation, each unit is either on or off. 
-With the clustered unit commitment formulation, one or more cluster(s) of similar generators are clustered by type and zone (typically using heat rate and fixed OM cost to create clusters), and the integer commitment state variable for each cluster varies from zero to the number of units in the cluster, $\frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}}$. 
+With the clustered unit commitment formulation, one or more cluster(s) of similar generators are clustered by type and zone (typically using heat rate and fixed OM cost to create clusters), and the integer commitment state variable for each cluster varies from zero to the number of units in the cluster, $\frac{y_{k,z}^{\textrm{E,THE}}}{\Omega_{k,z}^{\textrm{E,THE,size}}}$. 
 As discussed in \cite{Palmintier2014}, this approach replaces the large set of binary commitment decisions and associated constraints, which scale directly with the number of individual units, with a smaller set of integer commitment states and  constraints, one for each cluster $k$. 
 The dimensionality of the problem thus scales with the number of units of a given type in each zone, rather than by the number of discrete units, significantly improving computational efficiency. 
 However, this method entails the simplifying assumption that all clustered units have identical parameters (e.g., capacity size, ramp rates, heat rate) and that all committed units in a given time step $t$ are operating at the same power output per unit.
@@ -32,7 +32,7 @@ Contributions to the power balance expression from each thermal resources with u
 
 ```math
 \begin{equation*}
-	PowerBal_{THE} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{E,THE} \forall k \in \mathcal{UC}
+	PowerBal_{THE} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{\textrm{E,THE}} \forall k \in \mathcal{UC}
 \end{equation*}
 ```
 
@@ -44,39 +44,39 @@ Thermal resources subject to unit commitment $k \in \mathcal{UC}$ adhere to the 
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{E,THE} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{E,THE}} \leq \frac{y_{k,z}^{\textrm{E,THE}}}{\Omega^{\textrm{E,THE,size}}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{E,UP} \leq \frac{y_{k,z}^{E,THE}}{\Omega^{E,THE,size}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{E,UP}} \leq \frac{y_{k,z}^{\textrm{E,THE}}}{\Omega^{\textrm{E,THE,size}}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{E,DN} \leq \frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{E,DN}} \leq \frac{y_{k,z}^{\textrm{E,THE}}}{\Omega_{k,z}^{\textrm{E,THE,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
-where decision $n_{k,z,t}^{E,THE}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
-decision $n_{k,z,t}^{E,UP}$ represents number of startup decisions, 
-decision $n_{k,z,t}^{E,DN}$ represents number of shutdown decisions, 
-$y_{k,z}^{E,THE}$ is the total installed capacity, and parameter $\Omega_{k,z}^{E,THE,size}$ is the unit size.
+where decision $n_{k,z,t}^{\textrm{E,THE}}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
+decision $n_{k,z,t}^{\textrm{E,UP}}$ represents number of startup decisions, 
+decision $n_{k,z,t}^{\textrm{E,DN}}$ represents number of shutdown decisions, 
+$y_{k,z}^{\textrm{E,THE}}$ is the total installed capacity, and parameter $\Omega_{k,z}^{\textrm{E,THE,size}}$ is the unit size.
 (See Constraints 1-3 in the code)
 
 *Commitment state constraint linking start-up and shut-down decisions*
 
 Additionally, the following constarint maintains the commitment state variable across time, 
-$n_{k,z,t}^{E,THE}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{E,THE}$, 
-period plus the number of units started in the current period, $n_{k,z,t}^{E,UP}$, 
-minus the number of units shut down in the current period, $n_{k,z,t}^{E,DN}$:
+$n_{k,z,t}^{\textrm{E,THE}}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{\textrm{E,THE}}$, 
+period plus the number of units started in the current period, $n_{k,z,t}^{\textrm{E,UP}}$, 
+minus the number of units shut down in the current period, $n_{k,z,t}^{\textrm{E,DN}}$:
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{E,THE} &= n_{k,z,t-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	n_{k,z,t}^{E,THE} &= n_{k,z,t +\tau^{period}-1} + n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	n_{k,z,t}^{\textrm{E,THE}} &= n_{k,z,t-1}^{\textrm{E,THE}} + n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	n_{k,z,t}^{\textrm{E,THE}} &= n_{k,z,t +\tau^{period}-1}^{\textrm{E,THE}} + n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 (See Constraint 4 in the code)
@@ -89,23 +89,23 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 
 ```math
 \begin{aligned}
-	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} &\leq \kappa_{k,z}^{E,DN} \times \Omega_{k,z}^{E,THE,size} \times \left(n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN}\right) \\
-	\qquad &- \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{E,THE}}}, \text{max}(\underline{\rho_{k,z,t}^{E,THE}}, \kappa_{k,z}^{E,THE})) \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,DN}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
+	\qquad &- \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,DN}} \\
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,THE}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} &\leq \kappa_{k,z}^{E,UP} \times \Omega_{k,z}^{E,THE,size} \times \left(n_{k,z,t}^{E,UP} - n_{k,z,t}^{E,DN}\right) \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{E,THE}}, \text{max}(\underline{\rho_{k,z,t}^{E,THE}}, \kappa_{k,z}^{E,UP})) \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \\
-	\qquad &- \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,DN} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,UP}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
+	\qquad &- \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
 
-where decision $x_{k,z,t}^{E,THE}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{k,z,t}^{E,UP}$, $\kappa_{k,z,t}^{E,DN}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\underline{\rho_{k,z}^{E,THE}}$ is the minimum stable power output per unit of installed capacity, 
-and parameter $\overline{\rho_{k,z,t}^{E,THE}}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
+where decision $x_{k,z,t}^{\textrm{E,THE}}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{k,z,t}^{\textrm{E,UP}}$, $\kappa_{k,z,t}^{\textrm{E,DN}}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\underline{\rho_{k,z}^{\textrm{E,THE}}}$ is the minimum stable power output per unit of installed capacity, 
+and parameter $\overline{\rho_{k,z,t}^{\textrm{E,THE}}}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
 
 **Minimum and maximum power output**
 
@@ -113,13 +113,13 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} \geq \underline{\rho_{k,z,t}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} \geq \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} \geq \overline{\rho_{k,z}^{E,THE}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} \geq \overline{\rho_{k,z}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -133,18 +133,18 @@ Thermal resources subject to unit commitment adhere to the following constraints
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{E,THE} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,UP}}^t n_{k,z,\tau}^{E,UP} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{E,THE}} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{\textrm{E,UP}}}^t n_{k,z,\tau}^{\textrm{E,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	\frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}} - n_{k,z,t}^{E,UP} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{E,DN}}^t n_{k,z,\tau}^{E,DN} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\frac{y_{k,z}^{\textrm{E,THE}}}{\Omega_{k,z}^{\textrm{E,THE,size}}} - n_{k,z,t}^{\textrm{E,UP}} \geq \displaystyle \sum_{\tau = t-\tau_{k,z}^{\textrm{E,DN}}}^t n_{k,z,\tau}^{\textrm{E,DN}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 9-10 in the code)
 
-where $\tau_{k,z}^{E,UP}$ and $\tau_{k,z}^{E,DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
+where $\tau_{k,z}^{\textrm{E,UP}}$ and $\tau_{k,z}^{\textrm{E,DN}}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
 
 Like with the ramping constraints, the minimum up and down constraint time also wrap around from the start of each time period to the end of each period.
 It is recommended that users of DOLPHYN must use longer subperiods than the longest min up/down time if modeling unit commitment. Otherwise, the model will report error.
@@ -268,21 +268,21 @@ This function is called by the ```thermal_commit()``` function when regulation a
 
 **Maximum contributions to frequency regulation and reserves**
 
-When modeling frequency regulation and reserves contributions, thermal units subject to unit commitment adhere to the following constraints which limit the maximum contribution to regulation and reserves in each time step to a specified maximum fraction ($,\upsilon^{rsv}_{y,z}$) of the commitment capacity in that time step ($(\Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP})$):
+When modeling frequency regulation and reserves contributions, thermal units subject to unit commitment adhere to the following constraints which limit the maximum contribution to regulation and reserves in each time step to a specified maximum fraction ($,\upsilon^{rsv}_{y,z}$) of the commitment capacity in that time step ($(\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}})$):
 
 ```math
 \begin{equation*}
-	f_{k,z,t}^{E,THE} \leq \upsilon^{reg}_{k,z} \times \overline{\rho_{k,z,t}^{E,THE}}} (\Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	f_{k,z,t}^{\textrm{E,THE}} \leq \upsilon^{reg}_{k,z} \times \overline{\rho_{k,z,t}^{\textrm{E,THE}}}} (\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	r_{k,z,t}^{E,THE} \leq \upsilon^{rsv}_{y,z} \times \overline{\rho_{k,z,t}^{E,THE}}} (\Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	r_{k,z,t}^{\textrm{E,THE}} \leq \upsilon^{rsv}_{y,z} \times \overline{\rho_{k,z,t}^{\textrm{E,THE}}}} (\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
-where $f_{k,z,t}^{E,THE}$ is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon^{reg}_{k,z}$, and $r_{k,z,t}^{E,THE}$ is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$. 
+where $f_{k,z,t}^{\textrm{E,THE}}$ is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon^{reg}_{k,z}$, and $r_{k,z,t}^{\textrm{E,THE}}$ is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$. 
 Limits on reserve contributions reflect the maximum ramp rate for the thermal resource in whatever time interval defines the requisite response time for the regulation or reserve products (e.g., 5 mins or 15 mins or 30 mins). 
 These response times differ by system operator and reserve product, and so the user should define these parameters in a self-consistent way for whatever system context they are modeling.
 
@@ -292,13 +292,13 @@ When modeling frequency regulation and spinning reserves contributions, thermal 
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} - f_{k,z,t}^{E,THE} \geq \underline{\rho_{k,z,t}^{E,THE}} \times Omega^{size}_{y,z} \times n_{k,z,t}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} - f_{k,z,t}^{\textrm{E,THE}} \geq \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times Omega^{size}_{y,z} \times n_{k,z,t}^{\textrm{E,UP}} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} + f_{k,z,t}^{E,THE} + r_{k,z,t}^{E,THE} \leq \overline{\rho_{k,z,t}^{E,THE}}} \times \Omega_{k,z}^{E,THE,size} \times n_{k,z,t}^{E,UP} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} + f_{k,z,t}^{\textrm{E,THE}} + r_{k,z,t}^{\textrm{E,THE}} \leq \overline{\rho_{k,z,t}^{\textrm{E,THE}}}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 

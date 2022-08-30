@@ -25,7 +25,7 @@ Contributions to the power balance expression from each thermal resources withou
 	
 ```math
 \begin{equation*}
-	HydrogenBal_{G2P} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{H,G2P} \quad \forall k \in \mathcal{G2P} \setminus \mathcal{UC}
+	HydrogenBal_{G2P} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{G2P} \setminus \mathcal{UC}
 \end{equation*}
 ```	
 
@@ -33,13 +33,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation*}
-	x_{k,z,t-1}^{H,G2P} - x_{k,z,t}^{H,G2P} \leq \kappa_{k,z}^{G2P,DN} y_{k,z}^{H,G2P} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t-1}^{\textrm{H,G2P}} - x_{k,z,t}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{G2P,DN} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,G2P} - x_{k,z,t-1}^{H,G2P} \leq \kappa_{k,z}^{G2P,UP} y_{k,z}^{H,G2P} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} - x_{k,z,t-1}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{G2P,UP} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 1-2 in the code)
@@ -50,13 +50,13 @@ When not modeling regulation and reserves, thermal units not subject to unit com
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,G2P} \geq \underline{R_{k,z}^{H,G2P}} \times y_{k,z}^{H,G2P} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} \geq \underline{R_{k,z}^{\textrm{H,G2P}}} \times y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{H,G2P} \leq \overline{R_{k,z}^{H,G2P}} \times y_{k,z}^{H,G2P} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} \leq \overline{R_{k,z}^{\textrm{H,G2P}}} \times y_{k,z}^{\textrm{H,G2P}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 3-4 in the code)

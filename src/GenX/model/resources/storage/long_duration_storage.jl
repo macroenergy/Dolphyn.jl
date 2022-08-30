@@ -23,25 +23,25 @@ This function creates variables and constraints enabling modeling of long durati
 
 **Long duration storage initial inventory and change decision variables**
 
-This module defines the initial storage energy inventory level variable $U_{s,z,t}^{E,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial energy stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
+This module defines the initial storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial energy stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
 
-This module defines the change of storage energy inventory level during each representative period $\Delta U_{s,z,m}^{E,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage energy inventory level of the storage device $s$ in zone $z$ during each representative period $m$.
+This module defines the change of storage energy inventory level during each representative period $\Delta U_{s,z,m}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage energy inventory level of the storage device $s$ in zone $z$ during each representative period $m$.
 
-The variable defined in this file named after ```vSOCw``` covers $U_{s,z,t}^{E,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$.
+The variable defined in this file named after ```vSOCw``` covers $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$.
 
-The variable defined in this file named after ```vdSOC``` covers $\Delta U_{s,z,m}^{E,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$.
+The variable defined in this file named after ```vdSOC``` covers $\Delta U_{s,z,m}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$.
 
 **Storage inventory balance at beginning of each representative period**
 
 The constraints in this section are used to approximate the behavior of long-duration energy storage technologies when approximating annual grid operations by modeling operations over representative periods. 
 Previously, the state of charge balance for storage (as defined in ```storage_all()```) assumed that state of charge at the beginning and end of each representative period has to be the same. 
-In other words, the amount of energy built up or consumed by storage technology $s$ in zone $z$ over the representative period $m$, $\Delta U_{s,z,m}^{E,STO} = 0$. 
+In other words, the amount of energy built up or consumed by storage technology $s$ in zone $z$ over the representative period $m$, $\Delta U_{s,z,m}^{\textrm{E,STO}} = 0$. 
 This assumption implicitly excludes the possibility of transferring energy from one representative period to the other which could be cost-optimal when the capital cost of energy storage capacity is relatively small. 
-To model long-duration energy storage using representative periods, we replace the state of charge equation, such that the first term on the right hand side accounts for change in storage inventory associated with representative period $m$ ($\Delta U_{s,z,m}^{E,STO}$), which could be positive (net accumulation) or negative (net reduction).
+To model long-duration energy storage using representative periods, we replace the state of charge equation, such that the first term on the right hand side accounts for change in storage inventory associated with representative period $m$ ($\Delta U_{s,z,m}^{\textrm{E,STO}}$), which could be positive (net accumulation) or negative (net reduction).
 
 ```math
 \begin{equation*}
-	U_{s,z,(m-1)\times\tau^{period}+1} = \left(1-\eta_{s,z}^{E,STO,loss}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{E,STO,DIS}}x_{s,z,(m-1)\times \tau^{period}+1}^{E,STO} + \eta_{s,z}^{E,STO,CHA}x_{s,z,(m-1)\times \tau^{period}+1}^{E,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
+	U_{s,z,(m-1)\times\tau^{period}+1} = \left(1-\eta_{s,z}^{\textrm{E,STO,loss}}\right) \times \left(U_{s,z,m\times \tau^{period}} - \Delta U_{s,z,m}\right) - \frac{1}{\eta_{s,z}^{\textrm{\textrm{E,STO,DIS}}}}x_{s,z,(m-1)\times \tau^{period}+1}^{\textrm{E,STO}} + \eta_{s,z}^{\textrm{E,STO,CHA}}x_{s,z,(m-1)\times \tau^{period}+1}^{\textrm{E,STO}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, m \in \mathcal{M}
 \end{equation*}
 ```
 
@@ -64,19 +64,19 @@ Note that $|N|$ refers to the last modeled period.
 
 ```math
 \begin{equation*}
-	U_{s,z,n+1}^{E,STO} = U_{s,z,n}^{E,STO} + \Delta U_{s,z,f(n)} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}\setminus\{|N|\}
+	U_{s,z,n+1}^{\textrm{E,STO}} = U_{s,z,n}^{\textrm{E,STO}} + \Delta U_{s,z,f(n)} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}\setminus\{|N|\}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	U_{s,z,1}^{E,STO} = U_{s,z,|N|}^{E,STO} + \Delta U_{s,z,f(|N|)}^{E,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n = |N|
+	U_{s,z,1}^{\textrm{E,STO}} = U_{s,z,|N|}^{\textrm{E,STO}} + \Delta U_{s,z,f(|N|)}^{\textrm{E,STO}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n = |N|
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	U_{s,z,n}^{E,STO} = U_{s,z,f(n) \times \tau^{period}}^{E,STO} - \Delta U_{s,z,m}^{E,STO} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}^{rep},
+	U_{s,z,n}^{\textrm{E,STO}} = U_{s,z,f(n) \times \tau^{period}}^{\textrm{E,STO}} - \Delta U_{s,z,m}^{\textrm{E,STO}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}^{rep},
 \end{equation*}
 ```
 
@@ -85,7 +85,7 @@ This constraint ensures that installed energy storage capacity is consistent wit
 
 ```math
 \begin{equation*}
-    U_{s,z,n}^{E,STO} \leq y_{s,z}^{E,STO,ENE} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}
+    U_{s,z,n}^{\textrm{E,STO}} \leq y_{s,z}^{\textrm{E,STO,ENE}} \quad \forall s \in \mathcal{S}^{LDES}, z \in \mathcal{Z}, n \in \mathcal{N}
 \end{equation*}
 ```
 """

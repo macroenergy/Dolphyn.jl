@@ -23,12 +23,12 @@ This function includes LongDurationtruck only when modeling representative perio
 
 State of charge of truck at beginning of each modeled period n.
 \begin{align}
-    v_{j, t}^{\mathrm{F}}+v_{j, t}^{\mathrm{E}} & = V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+    v_{j, t}^{\textrm{F}}+v_{j, t}^{\textrm{E}} & = V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
 \end{align}
 
 ```math
 \begin{aligned}
-    v_{n}^{SOC} \geqslant 0,v_{z,j,n}^{SOC}\leqslant v_{j}^{TRU}
+    v_{n}^{\textrm{SOC}} \geqslant 0,v_{z,j,n}^{\textrm{SOC}} \leqslant v_{j}^{\textrm{H,TRU}}
 \end{aligned}
 ```
 
@@ -37,7 +37,7 @@ State of charge of truck at beginning of each modeled period n.
 State of charge of truck at beginning of each modeled period cannot exceed installed energy capacity
 ```math
 \begin{aligned}
-    v_{z,j,n}^{SOC}< v_{j}^{TRU}
+    v_{z,j,n}^{\textrm{SOC}} \leq v_{j}^{\textrm{TRU}}
 \end{aligned}
 ```
 """

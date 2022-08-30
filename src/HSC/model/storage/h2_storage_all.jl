@@ -21,13 +21,13 @@ Sets up variables and constraints common to all hydrogen storage resources.
 
 **Hydrogen storage discharge and inventory level decision variables**
 
-This module defines the hydrogen storage energy inventory level variable $U_{s,z,t}^{H,STO} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen stored in the storage device $s$ in zone $z$ at time period $t$.
+This module defines the hydrogen storage energy inventory level variable $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen stored in the storage device $s$ in zone $z$ at time period $t$.
 
-This module defines the power charge decision variable $x_{s,z,t}^{H,CHA}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged hydrogen into the storage device $s$ in zone $z$ at time period $t$.
+This module defines the power charge decision variable $x_{s,z,t}^{\textrm{H,CHA}}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged hydrogen into the storage device $s$ in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vH2S``` covers $U_{s,z,t}^{H,STO}$.
+The variable defined in this file named after ```vH2S``` covers $U_{s,z,t}^{\textrm{H,STO}}$.
 
-The variable defined in this file named after ```vH2_CHARGE_STOR``` covers $x_{s,z,t}^{H,CHA}$.
+The variable defined in this file named after ```vH2_CHARGE_STOR``` covers $x_{s,z,t}^{\textrm{H,CHA}}$.
 
 **Cost expressions**
 
@@ -35,7 +35,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	C^{H,STO,o} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z} \sum_{t \in \mathcal{T} \omega_t \times c_{s,z,t}^{H,STO,o} \times x_{s,z,t}^{H,CHA}
+	\textrm{C}^{\textrm{H,STO,o}} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z} \sum_{t \in \mathcal{T} \omega_t \times \textrm{c}_{s,z,t}^{\textrm{H,STO,o}} \times x_{s,z,t}^{\textrm{H,CHA}}
 \end{equation*}
 ```
 
@@ -45,7 +45,7 @@ Contributions to the power balance expression from compression due to storage ch
 
 ```math
 \begin{equation*}
-	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{H,CHA}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{\textrm{H,CHA}}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -55,7 +55,7 @@ Contributions to the power balance expression from storage charging and discharg
 
 ```math
 \begin{equation*}
-	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{H,DIS} - x_{s,z,t}^{H,CHA}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS}} - x_{s,z,t}^{\textrm{H,CHA}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -63,13 +63,13 @@ Contributions to the power balance expression from storage charging and discharg
 
 The following constraints apply to all storage resources, $s \in \mathcal{S}$, regardless of whether the charge/discharge capacities are symmetric or asymmetric.
 
-The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{H,STO}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{H,STO}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{H,CHA}, x_{s,z,t}^{H,DIS}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{H,loss}$. 
+The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{\textrm{H,STO}}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{\textrm{H,STO}}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{\textrm{H,CHA}}, x_{s,z,t}^{\textrm{H,DIS}}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{H,loss}$. 
 The first of these two constraints enforces storage inventory balance for interior time steps $(t \in \mathcal{T}^{interior})$, while the second enforces storage balance constraint for the initial time step $(t \in \mathcal{T}^{start})$.
 
 ```math
 \begin{aligned}
-	U_{s,z,t}^{H,STO} &= U_{s,z,t-1}^{H,STO} - \frac{1}{\eta_{s,z}^{H,STO}}x_{s,z,t}^{H,DIS} + \eta_{s,z}^{H,STO}x_{s,z,t}^{H,STO} - \eta_{s,z}^{H,loss}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	U_{s,z,t}^{H,STO} &= U_{s,z,t+\tau^{period}-1}^{H,STO} - \frac{1}{\eta_{s,z}^{H,STO}}x_{s,z,t}^{H,DIS} + \eta_{s,z}^{H,STO}x_{s,z,t}^{H,CHA} - \eta_{s,z}^{H,loss}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,STO}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,CHA}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 
@@ -79,27 +79,27 @@ The storage power capacity sets lower and upper bounds on the storage energy cap
 
 ```math
 \begin{aligned}
-	y_{s,z}^{H,STO,POW} \times \tau_{s,z}^{MinDuration} &\leq y_{s,z}^{H,STO,ENE} \\
-	y_{s,z}^{H,STO,POW} \times \tau_{s,z}^{MaxDuration} &\geq y_{s,z}^{H,STO,ENE}
+	y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MinDuration} &\leq y_{s,z}^{\textrm{H,STO,ENE}} \\
+	y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MaxDuration} &\geq y_{s,z}^{\textrm{H,STO,ENE}}
 \end{aligned}
 ```
 
-It limits the volume of energy $U_{s,z,t}^{H,STO}$ at any time $t$ to be less than the installed energy storage capacity $y_{s,z}^{H,STO,ENE}$.
+It limits the volume of energy $U_{s,z,t}^{\textrm{H,STO}}$ at any time $t$ to be less than the installed energy storage capacity $y_{s,z}^{\textrm{H,STO,ENE}}$.
 
 ```math
 \begin{equation*}
-	0 \leq U_{s,z,t}^{H,STO} \leq y_{s,z}^{H,STO,ENE} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq U_{s,z,t}^{\textrm{H,STO}} \leq y_{s,z}^{\textrm{H,STO,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
-It also limits the discharge power $x_{s,z,t}^{H,DIS}$ at any time to be less than the installed power capacity $y_{s,z}^{H,STO,POW}$.
-Finally, the maximum discharge rate for storage resources, $x_{s,z,t}^{H,STO}$, is constrained to be less than the discharge power capacity, $y_{s,z}^{H,STO,POW}$ or the state of charge at the end of the last period, $U{s,z,t-1}^{H,STO}$, whichever is less.
+It also limits the discharge power $x_{s,z,t}^{\textrm{H,DIS}}$ at any time to be less than the installed power capacity $y_{s,z}^{\textrm{H,STO,POW}}$.
+Finally, the maximum discharge rate for storage resources, $x_{s,z,t}^{\textrm{H,STO}}$, is constrained to be less than the discharge power capacity, $y_{s,z}^{\textrm{H,STO,POW}}$ or the state of charge at the end of the last period, $U{s,z,t-1}^{\textrm{H,STO}}$, whichever is less.
 
 ```math
 \begin{aligned}
-	0 &\leq x_{s,z,t}^{H,DIS} \leq y_{s,z}^{H,STO,POW} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	0 &\leq x_{s,z,t}^{H,DIS} \leq U_{s,z,t-1}^{H,STO}*\eta_{s,z}^{H,DIS} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	0 &\leq x_{s,z,t}^{H,DIS} \leq U_{s,z,t+\tau^{period}-1}^{H,STO}*\eta_{s,z}^{H,DIS} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq y_{s,z}^{\textrm{H,STO,POW}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 """

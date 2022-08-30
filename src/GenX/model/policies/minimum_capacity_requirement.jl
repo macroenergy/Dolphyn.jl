@@ -22,7 +22,7 @@ The default unit of the constraint is in MW. For each requirement $p \in \mathca
 
 ```math
 \begin{equation*}
-	\sum_{g \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \left(\epsilon_{g,z,p}^{MinCapReq} \times y_{g,z}^{E,GEN} \right) \geq REQ_{p}^{MinCapReq} \forall p \in \mathcal{P}^{MinCapReq}
+	\sum_{g \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \left(\epsilon_{g,z,p}^{MinCapReq} \times y_{g,z}^{\textrm{E,GEN}} \right) \geq REQ_{p}^{MinCapReq} \forall p \in \mathcal{P}^{MinCapReq}
 \end{equation*}
 ```
 

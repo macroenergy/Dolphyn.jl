@@ -25,7 +25,7 @@ Contributions to the power balance expression from each thermal resources withou
 	
 ```math
 \begin{equation*}
-	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}
+	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}
 \end{equation*}
 ```	
 
@@ -35,13 +35,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation*}
-	x_{k,z,t-1}^{E,THE} - x_{k,z,t}^{E,THE} \leq \kappa_{k,z}^{E,DN} y_{k,z}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,DN}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} - x_{k,z,t-1}^{E,THE} \leq \kappa_{k,z}^{E,UP} y_{k,z}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,UP}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 1-2 in the code)
@@ -54,13 +54,13 @@ When not modeling regulation and reserves, thermal units not subject to unit com
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} \geq \underline{R_{k,z}^{E,THE}} \times y_{k,z}^{E,THE} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} \geq \underline{R_{k,z}^{\textrm{E,THE}}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{E,THE} \leq \overline{R_{k,z}^{E,THE}} \times y_{k,z}^{E,THE} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} \leq \overline{R_{k,z}^{\textrm{E,THE}}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 3-4 in the code)

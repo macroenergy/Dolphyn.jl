@@ -17,13 +17,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
-This function defines the non-served hydrogen demand decision variable $x_{s,z,t}^{H,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of hydrogen demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
-The first segment of non-served hydrogen, $s=1$, is used to denote the cost of involuntary hydrogen demand curtailment, specified as the value of $c_{1}^{H,NSD}$.
+This function defines the non-served hydrogen demand decision variable $x_{s,z,t}^{\textrm{H,NSD}} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of hydrogen demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
+The first segment of non-served hydrogen, $s=1$, is used to denote the cost of involuntary hydrogen demand curtailment, specified as the value of $c_{1}^{\textrm{H,NSD}}$.
 Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic hydrogen demand curve, or segments of price-responsive curtailable hydrogen loads.
-Each segment denotes a price/cost at which the segment of hydrogen demand is willing to curtail consumption, $n_{s}^{H,NSD}$, representing the marginal willingness to pay for hydrogen demand of this segment of demand (or opportunity cost incurred when demand is not served) 
-and a maximum quantity of demand in this segment, $n_{s}^{H,NSD}$, specified as a share of hydrogen demand in each zone in each time step, $D_{z, t}^{H}$. Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
+Each segment denotes a price/cost at which the segment of hydrogen demand is willing to curtail consumption, $\textrm{n}_{s}^{\textrm{H,NSD}}$, representing the marginal willingness to pay for hydrogen demand of this segment of demand (or opportunity cost incurred when demand is not served) 
+and a maximum quantity of demand in this segment, $\textrm{n}_{s}^{\textrm{H,NSD}}$, specified as a share of hydrogen demand in each zone in each time step, $\textrm{D}_{z, t}^{\textrm{H}}$. Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
 
-The variable defined in this file named after ```vH2NSE``` covers the variable $x_{s,z,t}^{H2,NSD}$.
+The variable defined in this file named after ```vH2NSE``` covers the variable $x_{s,z,t}^{\textrm{H,NSD}}$.
 
 **Cost expressions**
 
@@ -31,7 +31,7 @@ This function defines contributions to the objective function from the cost of n
 
 ```math
 \begin{equation*}
-	C^{H,NSD,o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{H,NSD} \times x_{s,z,t}^{H,NSD}
+    \textrm{C}^{\textrm{H,NSD},o} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{n}_{s}^{\textrm{H,NSD}} \times x_{s,z,t}^{\textrm{H,NSD}}
 \end{equation*}
 ```
 
@@ -39,7 +39,7 @@ Contributions to the hydrogen balance expression from non-served hydrogen/curtai
 
 ```math
 \begin{equation*}
-	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -49,7 +49,7 @@ Hydrogen demand curtailed in each segment of curtailable demands $s \in \mathcal
 
 ```math
 \begin{equation*}
-	x_{s,z,t}^{H,NSD} \leq n_{s}^{H,NSD} \times D_{z,t}^{H} \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{s,z,t}^{\textrm{H,NSD}} \leq \textrm{n}_{s}^{\textrm{H,NSD}} \times \textrm{D}_{z,t}^{\textrm{H}} \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -57,7 +57,7 @@ Additionally, total demand curtailed in each time step cannot exceed total hydro
 
 ```math
 \begin{equation*}
-	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{H,NSD} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 """

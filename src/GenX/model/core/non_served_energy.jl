@@ -19,13 +19,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables of non served power demand.
 
-This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{E,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
-The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $c_{1}^{E,NSD}$.
+This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{\textrm{E,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
+The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $\textrm{c}_{1}^{\textrm{E,NSD}}$.
 Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response).
-Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $n_{s}^{E,NSD}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
-and a maximum quantity of demand in this segment, $n_{s}^{E,NSD}$, specified as a share of demand in each zone in each time step, $D_{z, t}^{E}.$ Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
+Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $\textrm{n}_{s}^{\textrm{E,NSD}}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
+and a maximum quantity of demand in this segment, $\textrm{n}_{s}^{\textrm{E,NSD}}$, specified as a share of demand in each zone in each time step, $\textrm{D}_{z, t}^{\textrm{E}}$. Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
 
-The variable defined in this file named after ```vNSE``` covers the variable $x_{s,z,t}^{E,NSD}$.
+The variable defined in this file named after ```vNSE``` covers the variable $x_{s,z,t}^{\textrm{E,NSD}}$.
 
 **Cost expressions**
 
@@ -33,7 +33,7 @@ This function defines contributions to the objective function from the cost of n
 
 ```math
 \begin{equation*}
-	C^{E,NSD} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times n_{s}^{E,NSD} \times x_{s,z,t}^{E,NSD}
+	\textrm{C}^{\textrm{E,NSD}} = \sum_{s \in \mathcal{SEG}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{n}_{s}^{\textrm{E,NSD}} \times x_{s,z,t}^{\textrm{E,NSD}}
 \end{equation*}
 ```
 
@@ -43,7 +43,7 @@ Contributions to the power balance expression from non-served energy/curtailed d
 
 ```math
 \begin{equation*}
-	PowerBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	PowerBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{E,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -53,7 +53,7 @@ Demand curtailed in each segment of curtailable demands $s \in \mathcal{S}$ cann
 
 ```math
 \begin{equation*}
-	0 \leq x_{s,z,t}^{E,NSD} \leq (n_{s}^{E,NSD} \times D_{z,t}) \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{s,z,t}^{\textrm{E,NSD}} \leq (\textrm{n}_{s}^{\textrm{E,NSD}} \times \textrm{D}_{z, t}^{\textrm{E}}) \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -61,7 +61,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 
 ```math
 \begin{aligned}
-	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{E,NSD} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{E,NSD}} \leq \textrm{D}_{z, t}^{\textrm{E}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 """

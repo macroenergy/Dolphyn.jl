@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 
-This module defines the power consumption decision variable $x_{z,t}^{E,H-GEN} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by electrolyzers in zone $z$ at time period $t$.
+This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,H-GEN}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by electrolyzers in zone $z$ at time period $t$.
 
 The variable defined in this file named after ```vP2G``` cover variable $x_{z,t}^{E,H-GEN}$.
 
@@ -28,15 +28,15 @@ The variable defined in this file named after ```vP2G``` cover variable $x_{z,t}
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-	0 \leq y_{g}^{H,GEN,retired} \leq y_{g}^{H,GEN,existing} \quad \forall g \in \mathcal{G}
+	0 \leq y_{g}^{\textrm{H,GEN,retired}} \leq y_{g}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}
 \end{equation*}
 ```
 
-For resources where upper bound $\overline{y_{g}^{H,GEN}}$ and lower bound $\underline{y_{g}^{H,GEN}}$ of capacity is defined, then we impose constraints on minimum and maximum generation capacity.
+For resources where upper bound $\overline{y_{g}^{\textrm{H,GEN}}}$ and lower bound $\underline{y_{g}^{\textrm{H,GEN}}}$ of capacity is defined, then we impose constraints on minimum and maximum generation capacity.
 
 ```math
 \begin{equation*}
-	\underline{y_{g}^{H,GEN}} \leq y_{g}^{H,GEN} \leq \overline{y_{g}^{H,GEN}} \quad \forall g \in \mathcal{G}
+	\underline{y_{g}^{\textrm{H,GEN}}} \leq y_{g}^{\textrm{H,GEN}} \leq \overline{y_{g}^{\textrm{H,GEN}}} \quad \forall g \in \mathcal{G}
 \end{equation*}
 ```
 """

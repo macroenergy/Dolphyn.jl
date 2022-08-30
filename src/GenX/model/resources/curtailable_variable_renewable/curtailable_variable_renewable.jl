@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function defines the constraints for operation of variable renewable energy (VRE) resources whose output can be curtailed ($r \in \mathcal{VRE}$), such as utility-scale solar PV or wind power resources or run-of-river hydro resources that can spill water.
 
-The operational constraints for VRE resources are a function of each technology's time-dependent hourly capacity factor (or availability factor, $R_{r,z,t}^{E,VRE}$), in per unit terms, and the total available capacity ($y_{r,z}^{E,VRE,total}$).
+The operational constraints for VRE resources are a function of each technology's time-dependent hourly capacity factor (or availability factor, $R_{r,z,t}^{\textrm{E,VRE}}$), in per unit terms, and the total available capacity ($y_{r,z}^{\textrm{E,VRE},total}$).
 
 **Power balance expressions**
 
@@ -27,21 +27,21 @@ Contributions to the power balance expression from renewable energy from each re
 
 ```math
 \begin{equation*}
-	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{E,VRE} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{\textrm{E,VRE}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 **Variable renewable power output in each time step**
 
-For each VRE technology type $r$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($R_{r,z,t}^{E,VRE}$), maximum availability ($\overline{y_{r,z}^{E,VRE}}$) and investment cost ($C_{r,z}^{E,INV}$, for example, due to interconnection cost differences). 
-We define variables related to installed capacity ($y_{r,z}^{E,VRE,new}$) and retired capacity ($y_{r,z}^{E,VRE,retired}$) for all resource bins for a particular VRE resource type $r$ and zone $z$. 
+For each VRE technology type $r$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($R_{r,z,t}^{\textrm{E,VRE}}$), maximum availability ($\overline{y_{r,z}^{\textrm{E,VRE}}}$) and investment cost ($C_{r,z}^{\textrm{E,INV}}$, for example, due to interconnection cost differences). 
+We define variables related to installed capacity ($y_{r,z}^{\textrm{E,VRE},new}$) and retired capacity ($y_{r,z}^{\textrm{E,VRE},retired}$) for all resource bins for a particular VRE resource type $r$ and zone $z$. 
 However, the variable corresponding to power output in each timestep is only defined for the first bin. Parameter $VREIndex_{r,z}$, is used to keep track of the first bin, where $VREIndex_{r,z}=1$ for the first bin and $VREIndex_{r,z}=0$ for the remaining bins. 
 This approach allows for modeling many different bins per VRE technology type and zone while significantly reducing the number of operational variable (related to power output for each time step from each bin) added to the model with every additional bin. 
 Thus, the maximum power output for each VRE resource type in each zone is given by the following equation:
 
 ```math
 \begin{equation*}
-	x_{r,z,t}^{E,VRE} \leq \sum_{(r,z)\in \overline{\mathcal{VRE}}^{r,z}}{R_{r,z,t}^{E,VRE} \times y_{r,z,t}^{E,VRE,total}} \forall r,z \in \{(r,z)|VREIndex_{r,z}=1, z \in \mathcal{Z}\},t \in \mathcal{T}
+	x_{r,z,t}^{\textrm{E,VRE}} \leq \sum_{(r,z)\in \overline{\mathcal{VRE}}^{r,z}}{R_{r,z,t}^{\textrm{E,VRE}} \times y_{r,z,t}^{\textrm{E,VRE,total}}} \forall r,z \in \{(r,z)|VREIndex_{r,z}=1, z \in \mathcal{Z}\},t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -50,7 +50,7 @@ This adds the possibility of introducing VRE curtailment as an extra degree of f
 
 ```math
 \begin{equation*}
-	0 \leq x_{r,z,t}^{E,CUR} \leq x_{r,z,t}^{E,VRE} \quad \forall r \in \mathcal{VRE}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{r,z,t}^{\textrm{E,CUR}} \leq x_{r,z,t}^{\textrm{E,VRE}} \quad \forall r \in \mathcal{VRE}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 

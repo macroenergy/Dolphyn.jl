@@ -17,9 +17,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the power generation decision variable $x_{k,z,t}^{H,G2P} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by hydrogen to power resource $k$ in zone $z$ at time period $t$.
+This module defines the power generation decision variable $x_{k,z,t}^{\textrm{H,G2P}} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$, representing energy injected into the grid by hydrogen to power resource $k$ in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vP``` covers all variables $x_{k,z,t}^{E,THE}, x_{r,z,t}^{E,VRE}, x_{s,z,t}^{E,DIS}$.
+The variable defined in this file named after ```vP``` covers all variables $x_{k,z,t}^{\textrm{E,THE}}, x_{r,z,t}^{\textrm{E,VRE}}, x_{s,z,t}^{\textrm{E,DIS}}$.
 
 **Cost expressions**
 
@@ -27,7 +27,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	C^{H,G2P,o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{H,G2P}
+	C^{\textrm{H,G2P},o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{\textrm{H,G2P}}
 \end{equation*}
 ```
 """

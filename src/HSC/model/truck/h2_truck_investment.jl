@@ -24,25 +24,25 @@ This function includes investment variables, expressions and related constraints
 ## Truck capacity built and retired
 ```math
 \begin{equation*}
-    0 \leq v_{CAP,j}^{TRU}
+    0 \leq v_{CAP,j}^{\textrm{H,TRU}}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-    0 \leq v_{RETCAP,j}^{TRU}
+    0 \leq v_{RETCAP,j}^{\textrm{H,TRU}}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-    0 \leq v_{CAP,j}^{TRU}
+    0 \leq v_{CAP,j}^{\textrm{H,TRU}}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-    0 \leq v_{NEWCAP,j}^{TRU}
+    0 \leq v_{NEWCAP,j}^{\textrm{H,TRU}}
 \end{equation*}
 ```
 
@@ -51,21 +51,21 @@ This function includes investment variables, expressions and related constraints
 Truck retirements cannot retire more charge capacity than existing charge capacity
 ```math
 \begin{equation*}
-    v_{RETCAPNUM,j}^{TRU} \leq v_{ExistNum,j}^{TRU} \quad \forall j \in \mathbb{J}
+    v_{RETCAPNUM,j}^{\textrm{H,TRU}} \leq v_{ExistNum,j}^{\textrm{H,TRU}} \quad \forall j \in \mathbb{J}
 \end{equation*}
 ```
 Truck compression energyCannot retire more energy capacity than existing energy capacity
 ```math
 \begin{equation*}
-    v_{RETCAPEnergy,j}^{TRU} \leq v_{ExistEnergyCap,j}^{TRU} \quad \forall j \in \mathbb{J}
+    v_{RETCAPEnergy,j}^{\textrm{H,TRU}} \leq v_{ExistEnergyCap,j}^{\textrm{H,TRU}} \quad \forall j \in \mathbb{J}
 \end{equation*}
 ```
 
 **Expressions**
 ```math
 \begin{equation*}
-    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \mathrm{~L}_{z \rightarrow z^{\prime}} \\
-    & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
+    C_{\textrm{\textrm{H,TRU}}}^{\textrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \textrm{~L}_{z \rightarrow z^{\prime}} \\
+    & \times\left(\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\textrm{F}}+\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\textrm{E}}\right)
 \end{equation*}
 ```
 """
