@@ -19,27 +19,43 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 function load_syn_fuels_demand(path::AbstractString, inputs::Dict, setup::Dict)
-    
-	if setup["TimeDomainReduction"] == 1
-		Syn_fuels_demand_in = DataFrame(CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header=true), copycols=true)
-	else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
-		Syn_fuels_demand_in = DataFrame(CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header=true), copycols=true)
-	end
 
-    # Demand in MMBTU per hour for each zone
-	#println(names(load_in))
-	start = findall(s -> s == "Load_mmbtu_z1", names(Syn_fuels_demand_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
-	
-	# Demand in Tonnes per hour
-	inputs["Syn_fuels_D"] =Matrix(Syn_fuels_demand_in[1:inputs["T"],start:start-1+inputs["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
-    
-    inputs["Conventional_fuel_co2_per_mmbtu"] = Syn_fuels_demand_in[!, "Conventional_fuel_co2_per_mmbtu"][1]
-    inputs["Conventional_fuel_price_per_mmbtu"] = Syn_fuels_demand_in[!, "Conventional_fuel_price_per_mmbtu"][1]
-    inputs["Syn_fuel_co2_per_mmbtu"] = Syn_fuels_demand_in[!, "Syn_fuel_co2_per_mmbtu"][1]
+    if setup["TimeDomainReduction"] == 1
+        Syn_fuels_demand_in = DataFrame(
+            CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header = true),
+            copycols = true,
+        )
+    else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
+        Syn_fuels_demand_in = DataFrame(
+            CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header = true),
+            copycols = true,
+        )
+    end
 
-	println("Syn_Fuels_demand.csv Successfully Read!")
+    # Number of demand curtailment/lost load segments
+    inputs["Syn_SEG"] = size(collect(skipmissing(Syn_fuels_demand_in[!, :Demand_Segment])), 1)
+
+    # Max value of non-served energy in $/(tonne)
+    inputs["Syn_Voll"] = collect(skipmissing(Syn_fuels_demand_in[!, :Voll]))
+    # Demand in Tonnes per hour
+    inputs["Syn_D"] = Matrix(Syn_fuels_demand_in[1:T, ["Load_MMBTU_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+
+    # Cost of non-served energy/demand curtailment (for each segment)
+    Syn_SEG = inputs["Syn_SEG"]  # Number of demand segments
+    inputs["pC_Syn_D_Curtail"] = zeros(Syn_SEG)
+    inputs["pMax_Syn_D_Curtail"] = zeros(Syn_SEG)
+    for s = 1:Syn_SEG
+        # Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
+        inputs["pC_Syn_D_Curtail"][s] =
+            collect(skipmissing(Syn_fuels_demand_in[!, :Cost_of_Demand_Curtailment_per_Tonne]))[s] *
+            inputs["Voll"][1]
+        # Maximum hourly demand curtailable as % of the max demand (for each segment)
+        inputs["pMax_Syn_D_Curtail"][s] =
+            collect(skipmissing(Syn_fuels_demand_in[!, :Max_Demand_Curtailment]))[s]
+    end
+
+    println("Syn_Fuels_demand.csv Successfully Read!")
 
     return inputs
 
 end
-
