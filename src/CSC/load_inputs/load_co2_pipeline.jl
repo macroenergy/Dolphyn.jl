@@ -15,18 +15,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_co2_pipeline_data((path::AbstractString, setup::Dict, inputs::Dict)
+    load_co2_pipeline(path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for reading input parameters related to the hydrogen transmission network
 """
-function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
+function load_co2_pipeline(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
         CSV.File(joinpath(path, "CSC_pipelines.csv"), header = true),
         copycols = true,
     )
-    
+
     # Number of zones in the network
     Z = inputs["Z"]
     Zones = inputs["Zones"]
@@ -51,13 +51,13 @@ function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Create pipe number column
     pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
-    
+
     # Pivot table
     pipe_map = stack(pipe_map, Zones)
 
     # Create zone column
     pipe_map[!, :Zone] = parse.(Int32, SubString.(pipe_map[!, :variable], 2))
-    
+
     # Remove redundant rows
     pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
 
@@ -136,7 +136,7 @@ function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :CO2PipeCompEnergy]))
-        ) .+ 
+        ) .+
         inputs["no_booster_CO2_comp_stations"] .* convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),

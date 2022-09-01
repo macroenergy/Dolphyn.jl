@@ -38,11 +38,11 @@ function load_h2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	# Read input data about power network topology, operating and expansion attributes
 
 	if setup["ModelH2Pipelines"] == 1
-		inputs  = load_h2_pipeline_data(path, setup, inputs)
+		inputs  = load_h2_pipeline(path, setup, inputs)
 	else
 		inputs["H2_P"] = 0
 	end
-	
+
 	# Read input data about hydrogen transport truck types
 	if setup["ModelH2Trucks"] == 1
 		inputs = load_h2_truck(path, setup, inputs)
@@ -53,14 +53,14 @@ function load_h2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 		inputs = load_h2_g2p(path, setup, inputs)
 		inputs = load_h2_g2p_variability(path, setup, inputs)
 	end
-	
+
 	# If emissions flag is on, read in emissions related inputs
 	if setup["H2CO2Cap"] >= 1
 		inputs = load_co2_cap_hsc(path, setup, inputs)
 	end
 
 	#Check whether or not there is LDS for trucks and H2 storage
-	if !haskey(inputs, "Period_Map") && 
+	if !haskey(inputs, "Period_Map") &&
 		(setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end

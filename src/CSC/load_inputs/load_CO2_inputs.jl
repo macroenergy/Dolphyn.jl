@@ -44,12 +44,12 @@ function load_co2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	end
 
 	# Read input data about power network topology, operating and expansion attributes
-    if setup["ModelCO2Pipelines"] == 1 
-		inputs  = load_co2_pipeline_data(path, setup, inputs)
+    if setup["ModelCO2Pipelines"] == 1
+		inputs  = load_co2_pipeline(path, setup, inputs)
 	else
 		inputs["CO2_P"] = 0
 	end
-	
+
 	# Read input data about carbon transport truck types
 	if setup["ModelCO2Trucks"] == 1
 		inputs = load_co2_truck(path, setup, inputs)

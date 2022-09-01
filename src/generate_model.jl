@@ -286,6 +286,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
+	###### START OF SYNTHESIS FUELS INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
+
+    if setup["ModelSyn"] == 0
+
+    end
 	################  Policies #####################3
 
 	if setup["ModelH2"] == 0

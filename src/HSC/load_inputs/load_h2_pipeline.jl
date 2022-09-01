@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to the hydrogen transmission network
 """
-function load_h2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
+function load_h2_pipeline(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
@@ -30,7 +30,7 @@ function load_h2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
     # Number of zones in the network
     Z = inputs["Z"]
     Zones = inputs["Zones"]
-    
+
     # Filter pipelines in modeled zones
     pipeline_var = filter(row -> (row.StartZone in ["z$z" for z in Zones] && row.EndZone in ["z$z" for z in Zones]), pipeline_var)
 
@@ -51,20 +51,20 @@ function load_h2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Create pipe number column
     pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
-    
+
     # Pivot table
     pipe_map = stack(pipe_map, Zones)
 
     # Create zone column
     pipe_map[!, :Zone] = parse.(Int32, SubString.(pipe_map[!, :variable], 2))
-    
+
     # Remove redundant rows
     pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
 
     # Rename column
     colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(pipe_map, Symbol.(colnames_pipe_map))
-    
+
     inputs["H2_Pipe_Map"] = pipe_map
 
     # Length in miles of each pipeline
@@ -133,7 +133,7 @@ function load_h2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :H2PipeCompEnergy]))
-        ) .+ 
+        ) .+
         inputs["no_booster_comp_stations"] .* convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
