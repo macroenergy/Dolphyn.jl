@@ -46,9 +46,9 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	MaxCapacity_tonne_p_hr = dfSynFuels[!,:MaxCapacity_tonne_p_hr] # t/h
 
 	#General variables for non-piecewise and piecewise cost functions
-	@variable(EP,vCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL]) #Capacity of units in co2 input mtonnes/hr 
+	@variable(EP,vCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL]>=0) #Capacity of units in co2 input mtonnes/hr 
 	#@variable(EP,vDummy_Capacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL, t in 1:T]) #To linearize UC constraint
-	@variable(EP,vCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL])
+	#@variable(EP,vCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL])
 
 	if setup["Syn_Fuel_CAPEX_Piecewise"] ==1 
 
@@ -152,7 +152,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP,eFixed_Cost_Syn_Fuel_total, sum(EP[:eFixed_Cost_Syn_Fuels_per_type][i] for i in 1:SYN_FUELS_RES_ALL))
 
 	# Add term to objective function expression
-	EP[:eObj] += EP[:eFixed_Cost_Syn_Fuel_total]
+	EP[:eObj] += eFixed_Cost_Syn_Fuel_total
 
     return EP
 

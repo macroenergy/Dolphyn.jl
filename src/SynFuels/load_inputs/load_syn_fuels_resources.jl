@@ -38,8 +38,21 @@ function load_syn_fuels_resources(setup::Dict, path::AbstractString, sep::Abstra
 	inputs["dfSynFuelsByProdPrice"] = Matrix{Float64}(inputs["dfSynFuels"][:,first_col:last_col])
 
 	#Return error if number of byproducts does not match
-    if Nby_prod_price != Nby_prod_price
+    if Nby_prod_excess != Nby_prod_price
         error("Syn Fuel no. of cols for syn fuel byprod diff for price and excess")
+    end
+
+	#Columns identifying price of byproduct output
+    Nby_prod_emissions = count(s -> startswith(String(s), "co2_out_p_mmbtu"), names(inputs["dfSynFuels"]))
+	first_col = findall(s -> s == "co2_out_p_mmbtu_p1", names(inputs["dfSynFuels"]))[1]
+	last_col = findall(s -> s == "co2_out_p_mmbtu_p$Nby_prod_emissions", names(inputs["dfSynFuels"]))[1]
+
+	#Saving byproduct price
+	inputs["dfSynFuelsByProdEmissions"] = Matrix{Float64}(inputs["dfSynFuels"][:,first_col:last_col])
+
+	#Return error if number of byproducts does not match
+    if Nby_prod_emissions != Nby_prod_excess
+        error("Syn Fuel no. of cols for syn fuel byprod diff for emission and excess")
     end
 
 	# Name of Synfuel resources resources

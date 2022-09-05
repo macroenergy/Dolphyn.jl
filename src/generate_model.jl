@@ -299,7 +299,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
-
 	# Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
 		EP = energy_share_requirement(EP, inputs, setup)

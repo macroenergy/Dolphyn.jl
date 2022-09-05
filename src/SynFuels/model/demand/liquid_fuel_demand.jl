@@ -23,6 +23,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
     dfSynFuels = inputs["dfSynFuels"]
     Liquid_Fuels_D = inputs["Liquid_Fuels_D"]
     SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
+    dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
 
 	#Define sets
     Z = inputs["Z"]     # Number of zones
@@ -51,12 +52,12 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eTotalCLFVarOut, sum(eTotalCLFVarOutT[t] for t in 1:T))
 
     #Liquid Fuel Balance
-    EP[:eLFBalance] -= vConvLFDemand
+    EP[:eLFBalance] += vConvLFDemand
     EP[:eObj] += eTotalCLFVarOut
 
-    # ### Constraints ###
-    # @constraints(EP, begin [z in 1:Z, t=1:T, k in 1:SYN_FUELS_RES_ALL], EP[:vSFByProd][k,b,t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[!,b][k]
-	# end)
+    ### Constraints ###
+    @constraints(EP, begin [ t=1:T, k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd], EP[:vSFByProd][k,b,t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
+	end)
 
 	return EP
 

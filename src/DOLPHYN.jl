@@ -28,6 +28,7 @@ export solve_model
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
+export write_synfuel_outputs
 export cluster_inputs
 export mga
 
@@ -315,6 +316,15 @@ include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
 include("CSC/write_outputs/write_co2_pipeline_loss.jl")
 include("CSC/write_outputs/write_co2_pipeline_power_consumption.jl")
 include("CSC/write_outputs/write_co2_pipeline_power_consumption_comp.jl")
+
+#Write SynFuel Outputs
+include("SynFuels/write_outputs/write_synfuel_outputs.jl")
+include("SynFuels/write_outputs/write_liquid_fuel_demand_balance.jl")
+include("SynFuels/write_outputs/write_synfuel_balance.jl")
+include("SynFuels/write_outputs/write_synfuel_capacity.jl")
+include("SynFuels/write_outputs/write_synfuel_costs.jl")
+include("SynFuels/write_outputs/write_synfuel_gen.jl")
+include("SynFuels/write_outputs/write_synfuel_emissions.jl")
 
 # Modeling to generator alternatives
 include("GenX/modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")

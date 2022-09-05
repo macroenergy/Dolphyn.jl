@@ -36,7 +36,7 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
     @expression(EP, eSynFuelProdNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vSFProd][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))#intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eLFBalance] -= eSynFuelProdNoCommit
+    EP[:eLFBalance] += eSynFuelProdNoCommit
 
 	#H2 Balance expressions
 	@expression(EP, eSynFuelH2ConsNoCommit[t=1:T, z=1:Z],
@@ -50,7 +50,7 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	EP[:eCaptured_CO2_Balance] -= eSynFuelCO2ConsNoCommit
 
-    #Power Consumption for Syn Fuel Production
+	#Power Balance Expression
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
 		@expression(EP, ePowerBalanceSynFuelResNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vSFPin][k,t]/ModelScalingFactor for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]))) 
@@ -63,22 +63,29 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	EP[:ePowerBalance] += -ePowerBalanceSynFuelResNoCommit
 
 	###Constraints###
+
+	#SynFuel Production Equal to CO2 in * Synf Fuel Production to CO2 in Ratio
+	@constraints(EP, begin 
+		[k in SYN_FUEL_RES_NO_COMMIT, t = 1:T], EP[:vSFProd][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_p_tonne_co2][k]
+ 	end)
+
 	# Power and natural gas consumption associated with Syn Fuel Production in each time step
 	@constraints(EP, begin
-		#Power Balance
-		[k in SYN_FUEL_RES_NO_COMMIT, t = 1:T], EP[:vSFPin][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
+		[k in SYN_FUEL_RES_NO_COMMIT, t = 1:T], EP[:vSFPin][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_p_tonne_co2][k]
+	end)
+
+	#Hydrogen Consumption
+	@constraints(EP, begin
+		[k in SYN_FUEL_RES_NO_COMMIT, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
 	end)
 	
-    # By-product produced cosntraint
+    # By-product produced constraint
     @constraints(EP, begin
 	[k in SYN_FUEL_RES_NO_COMMIT, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
 	end)
 
     # Production must be smaller than available capacity
-	@constraints(EP, begin [k in SYN_FUEL_RES_NO_COMMIT, t=1:T], EP[:vSFCO2in][k,t] <= EP[:vCapacity_Syn_Fuel_per_type][k]
-	end)
-
-	#Add ramping constraints later
+	@constraints(EP, begin [k in SYN_FUEL_RES_NO_COMMIT, t=1:T], EP[:vSFCO2in][k,t] <= EP[:vCapacity_Syn_Fuel_per_type][k] end)
 
 	return EP
 
