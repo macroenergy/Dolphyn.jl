@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -37,17 +37,20 @@ using YAML
 
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
+csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC model
+
 mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
+mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CO2 supply chain-specific parameters
+
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
 mysetup = Dict()
-mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+mysetup = merge( mysetup_csc, mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
 ## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
-
     if mysetup["ModelH2"] == 1
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
             println("Clustering Time Series Data...")
@@ -63,7 +66,6 @@ if mysetup["TimeDomainReduction"] == 1
             println("Time Series Data Already Clustered.")
         end
     end
-
 end
 
 # ### Configure solver
@@ -80,6 +82,11 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 # ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inpath)
+end
+
+# ### Load CO2 inputs if modeling the carbon supply chain
+if mysetup["ModelCO2"] == 1
+    myinputs = load_co2_inputs(myinputs, mysetup, inpath)
 end
 
 # ### Generate model
@@ -101,6 +108,12 @@ outpath=write_outputs(EP, outpath, mysetup, myinputs)
 if mysetup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
+end
+
+# Write carbon supply chain outputs
+if mysetup["ModelCO2"] == 1
+    outpath_CO2 = "$outpath/Results_CSC"
+    write_CSC_outputs(EP, outpath_CO2, mysetup, myinputs)
 end
 
 # Run MGA if the MGA flag is set to 1 else only save the least cost solution
