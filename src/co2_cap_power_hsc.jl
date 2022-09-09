@@ -43,10 +43,11 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 		# Constraint type to be imposed is read from genx_settings.yml 
 		# NOTE: constraint type denoted by setup parameter H2CO2Cap ignored
 
-		if setup["ModelCO2"] == 1 & setup["ModelSynFuels"] != 1#Include DAC captured carbon
+		if setup["ModelCO2"] == 1 && setup["ModelSynFuels"] != 1#Include DAC captured carbon
 
 			## Mass-based: Emissions constraint in absolute emissions limit (tons)
 			if setup["CO2Cap"] == 1
+				
 				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 					sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)+
 					sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)

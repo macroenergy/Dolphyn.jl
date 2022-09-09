@@ -152,7 +152,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP,eFixed_Cost_Syn_Fuel_total, sum(EP[:eFixed_Cost_Syn_Fuels_per_type][i] for i in 1:SYN_FUELS_RES_ALL))
 
 	# Add term to objective function expression
-	EP[:eObj] += eFixed_Cost_Syn_Fuel_total
+	EP[:eObj] += EP[:eFixed_Cost_Syn_Fuel_total]
 
     return EP
 

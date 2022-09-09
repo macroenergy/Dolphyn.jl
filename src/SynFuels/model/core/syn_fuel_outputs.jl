@@ -61,7 +61,8 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
     else
         #Variable Cost of Syn Fuel Production
 		@expression(EP, eCSFProdVar_out[k = 1:SYN_FUELS_RES_ALL,t = 1:T], 
-		(inputs["omega"][t] * ((dfSynFuels[!,:Var_OM_cost_p_tonne_co2][k] + inputs["fuel_costs"][dfSynFuels[!,:Fuel][k]][t] * dfSynFuels[!,:mmbtu_ng_p_tonne_co2][k])) * vSFCO2in[k,t]))
+		(inputs["omega"][t] * 
+		((dfSynFuels[!,:Var_OM_cost_p_tonne_co2][k] + inputs["fuel_costs"][dfSynFuels[!,:Fuel][k]][t] * dfSynFuels[!,:mmbtu_ng_p_tonne_co2][k])) * vSFCO2in[k,t]))
 		
         #Revenue from by-product
         @expression(EP, eCSFByProdRevenue_out[k = 1:SYN_FUELS_RES_ALL, t = 1:T, b = 1:NSFByProd], 
