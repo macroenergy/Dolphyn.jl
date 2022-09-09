@@ -24,13 +24,15 @@ println(pwd())
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Solvers" => "solvers.md",
+    "Model Introduction" => "model_introduction.md", # Should cover both HSC and GenX model overview
+    # Cover Model inputs and outputs documentation
+    "Model Inputs/Outputs Documentation" =>  ["genx_data_documentation.md",  
+    "hsc_data_documentation.md"],
+    "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
-        "GenX Introduction" => "model_introduction.md",
-        "Model Inputs/Outputs Documentation" => "data_documentation.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" => "write_outputs.md",
         "GenX Notation" => "genx_notation.md",
-        "Objective Function" => "objective_function.md",
         "Power Balance" => "power_balance.md",
         "GenX Function Reference" => [
             "Core" => "core.md",
@@ -57,6 +59,7 @@ pages = OrderedDict(
         "HSC Inputs Functions" => "load_h2_inputs.md",
         "HSC Outputs Functions" => "write_h2_outputs.md",
         "Hydrogen Notation" => "hsc_notation.md",
+        "HSC supply-demand Balance" => "h2_balance.md",
         "HSC Function Reference" => [
             "Hydrogen Core" => "h2_core.md",
             "Hydrogen Flexible Demand" => "h2_flexible_demand.md",
