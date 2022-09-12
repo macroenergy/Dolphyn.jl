@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,10 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for reporting time-dependent CO$_2$ emissions by zone.
-
+Function for reporting time-dependent CO$_2$ emissions by zone in hydrogen supply chain.
 """
 function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
@@ -52,14 +51,14 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 		if setup["ParameterScale"]==1
 			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])*ModelScalingFactor
 		else
-			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])/ModelScalingFactor
+			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])
 		end
 	end
 
 	if setup["ParameterScale"]==1
 		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])*ModelScalingFactor, :auto))
 	else
-		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])/ModelScalingFactor, :auto))
+		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone]), :auto))
 	end
 
 
@@ -70,7 +69,7 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 		for t in 1:T
 			if v"1.3" <= VERSION < v"1.4"
 				total[!,t+inputs["H2NCO2Cap"]+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-			elseif v"1.4" <= VERSION < v"1.7"
+			elseif v"1.4" <= VERSION < v"1.8"
 				total[:,t+inputs["H2NCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 			end
 		end
@@ -83,7 +82,7 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 		for t in 1:T
 			if v"1.3" <= VERSION < v"1.4"
 				total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-			elseif v"1.4" <= VERSION < v"1.7"
+			elseif v"1.4" <= VERSION < v"1.8"
 				total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 			end
 		end

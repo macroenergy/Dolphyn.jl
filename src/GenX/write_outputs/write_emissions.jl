@@ -18,7 +18,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
-
 """
 function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
@@ -58,14 +57,14 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 			if setup["ParameterScale"]==1
 				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])*ModelScalingFactor
 			else
-				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])/ModelScalingFactor
+				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])
 			end
 		end
 
 		if setup["ParameterScale"]==1
 			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])*ModelScalingFactor, :auto))
 		else
-			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])/ModelScalingFactor, :auto))
+			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone]), :auto))
 		end
 
 
@@ -76,7 +75,7 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 			for t in 1:T
 				if v"1.3" <= VERSION < v"1.4"
 					total[!,t+inputs["NCO2Cap"]+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-				elseif v"1.4" <= VERSION < v"1.7"
+				elseif v"1.4" <= VERSION < v"1.8"
 					total[:,t+inputs["NCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 				end
 			end
@@ -89,7 +88,7 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 			for t in 1:T
 				if v"1.3" <= VERSION < v"1.4"
 					total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-				elseif v"1.4" <= VERSION < v"1.7"
+				elseif v"1.4" <= VERSION < v"1.8"
 					total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 				end
 			end
@@ -106,13 +105,13 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 			if setup["ParameterScale"]==1
 				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:]) *ModelScalingFactor
 			else
-				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])/ModelScalingFactor
+				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])
 			end
 		end
 		if setup["ParameterScale"]==1
 			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])*ModelScalingFactor, :auto))
 		else
-			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])/ModelScalingFactor, :auto))
+			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone]), :auto))
 		end
 		auxNew_Names=[Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 		rename!(dfEmissions,auxNew_Names)
@@ -120,7 +119,7 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 		for t in 1:T
 			if v"1.3" <= VERSION < v"1.4"
 				total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-			elseif v"1.4" <= VERSION < v"1.7"
+			elseif v"1.4" <= VERSION < v"1.8"
 				total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 			end
 		end

@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_period_map(setup::Dict,path::AbstractString,sep::AbstractString, inputs::Dict)
 
-Function for reading input parameters related to mapping of representative time periods to full chronological time series
+Function for reading input parameters related to mapping of representative time periods to full chronological time series.
 """
 function load_period_map(setup::Dict,path::AbstractString,sep::AbstractString, inputs::Dict)
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])

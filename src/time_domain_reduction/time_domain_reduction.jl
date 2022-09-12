@@ -335,7 +335,6 @@ function RemoveConstCols(all_profiles, all_col_names, v=false)
 end
 
 @doc raw"""
-
     get_extreme_period(DF, GDF, profKey, typeKey, statKey,
        ConstCols, load_col_names, solar_col_names, wind_col_names)
 
@@ -345,7 +344,6 @@ measurement type (absolute (timestep with min/max value) vs. integral
 I.e., the user could want the hour with the most load across the whole
 system to be included among the extreme periods. They would select
 "Load", "System, "Absolute, and "Max".
-
 
 """
 function get_extreme_period(DF, GDF, profKey, typeKey, statKey,
@@ -381,7 +379,6 @@ end
 
 
 @doc raw"""
-
     get_integral_extreme(GDF, statKey, col_names, ConstCols)
 
 Get the period index with the minimum or maximum load or capacity factor
@@ -400,7 +397,6 @@ function get_integral_extreme(GDF, statKey, col_names, ConstCols)
 end
 
 @doc raw"""
-
     get_absolute_extreme(DF, statKey, col_names, ConstCols)
 
 Get the period index of the single timestep with the minimum or maximum load or capacity factor.
@@ -421,7 +417,6 @@ end
 
 
 @doc raw"""
-
     scale_weights(W, H)
 
 Linearly scale weights W such that they sum to the desired number of timesteps (hours) H.
@@ -443,7 +438,6 @@ end
 
 
 @doc raw"""
-
     get_load_multipliers(ClusterOutputData, ModifiedData, M, W, LoadCols, TimestepsPerRepPeriod, NewColNames, NClusters, Ncols)
 
 Get multipliers to linearly scale clustered load profiles L zone-wise such that their weighted sum equals the original zonal total load.

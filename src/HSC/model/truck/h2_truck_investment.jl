@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,9 +14,64 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
+
+This function includes investment variables, expressions and related constraints for H2 trucks.
+
+**Variables**
+
+## Truck capacity built and retired
+```math
+\begin{aligned}
+    v_{CAP,j}^{TRU} \geq 0
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+    v_{RETCAP,j}^{TRU} \geq 0
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+   v_{CAP,j}^{TRU} \geq 0
+\end{aligned}
+```
+
+```math
+\begin{aligned}
+    v_{NEWCAP,j}^{TRU} \geq 0
+\end{aligned}
+```
+
+**Constraints**
+
+Truck retirements cannot retire more charge capacity than existing charge capacity
+```math
+\begin{aligned}
+    v_{RETCAPNUM,j}^{TRU} \le v_{ExistNum,j}^{TRU}
+\end{aligned}
+```
+Truck compression energy: Cannot retire more energy capacity than existing energy capacity
+```math
+\begin{aligned}
+    v_{RETCAPEnergy,j}^{TRU} \le v_{ExistEnergyCap,j}^{TRU} 
+\end{aligned}
+```
+
+**Expressions**
+```math
+\begin{aligned}
+    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \Omega_{t} \mathrm{~L}_{z \rightarrow z^{\prime}} \\
+    & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
+\end{aligned}
+```
+"""
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 truck Investment Module")
+    println("H2 Truck Investment Module")
 
     dfH2Truck = inputs["dfH2Truck"]
 
@@ -89,7 +144,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	if setup["ParameterScale"] ==1
         @expression(EP, eCFixH2TruckCharge[j in H2_TRUCK_TYPES],
             if j in NEW_CAP_H2_TRUCK_CHARGE # Truck types eligible for new charge capacity
-                (dfH2Truck[!,:H2TruckUnitCapex_per_unit][j]*vH2TruckNumber[j])/ModelScalingFactor^2
+                (dfH2Truck[!,:Inv_Cost_p_unit_p_yr][j]*vH2TruckNumber[j])/ModelScalingFactor^2
             else
                 EP[:vZERO]
             end
@@ -97,7 +152,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     else
         @expression(EP, eCFixH2TruckCharge[j in H2_TRUCK_TYPES],
             if j in NEW_CAP_H2_TRUCK_CHARGE # Truck types eligible for new charge capacity
-                dfH2Truck[!,:H2TruckUnitCapex_per_unit][j]*vH2TruckNumber[j]
+                dfH2Truck[!,:Inv_Cost_p_unit_p_yr][j]*vH2TruckNumber[j]
             else
                 EP[:vZERO]
             end

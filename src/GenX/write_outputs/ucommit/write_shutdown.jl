@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+Function for reporting the shutdown action of resources at each time step.
+"""
 function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
@@ -36,7 +41,7 @@ function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict,
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfShutdown[!,Symbol("t$t")][1:G])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+3] .= sum(dfShutdown[:,Symbol("t$t")][1:G])
 		end
 	end

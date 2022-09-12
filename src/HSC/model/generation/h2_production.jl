@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,14 +15,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_generation(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_production(EP::Model, inputs::Dict, setup::Dict)
 
-The h2_production module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.)
+This module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.)
 
-This module uses the following 'helper' functions in separate files: ```h2_generation_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```h2_generation_no_commit()``` for resources not subject to unit commitment (if any).
 """
 function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
+	println("Hydrogen Production Module")
+	
 	if !isempty(inputs["H2_GEN"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies
 		EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)

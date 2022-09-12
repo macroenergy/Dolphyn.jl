@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
+
+Function for reading input parameters related to hydrogen trucks.
+"""
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 
     Z = inputs_truck["Z"]
@@ -53,12 +58,12 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     # Store DataFrame of truck input data for use in model
     inputs_truck["dfH2Truck"] = h2_truck_in
 
+
     # Average truck travel time between zones
     inputs_truck["TD"] = Dict()
     for j in inputs_truck["H2_TRUCK_TYPES"]
         inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
     end
-
     println("HSC_trucks.csv Successfully Read!")
     return inputs_truck
 end

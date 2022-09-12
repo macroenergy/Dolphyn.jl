@@ -1,5 +1,8 @@
 # Hydro Resources
 ```@autodocs
-Modules = [GenX]
-Pages = ["hydro_res.jl"]
+Modules = [DOLPHYN]
+Pages = [
+    "GenX/model/resources/hydro/hydro_res.jl",
+    "GenX/model/resources/hydro/hydro_inter_period_linkage.jl"
+]
 ```

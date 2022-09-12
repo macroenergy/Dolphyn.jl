@@ -1,5 +1,5 @@
 # Investment Energy
 ```@autodocs
-Modules = [GenX]
-Pages = ["investment_energy.jl"]
+Modules = [DOLPHYN]
+Pages = ["src/GenX/model/resources/storage/investment_energy.jl"]
 ```

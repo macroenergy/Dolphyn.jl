@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,11 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    H2_G2Peration(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
-The h2_production module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.)
-
-This module uses the following 'helper' functions in separate files: ```H2_G2Peration_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```H2_G2Peration_no_commit()``` for resources not subject to unit commitment (if any).
+This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies as well as carbon emission policy constraints.
 """
 function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
@@ -44,7 +42,7 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 		EP = h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
 
-	##For CO2 Polcy constraint right hand side development - H2 Generation by zone and each time step
+	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
 		@expression(EP, eGenerationByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
 		sum(EP[:vPG2P][y,t] for y in intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==z,:R_ID]))
 	)

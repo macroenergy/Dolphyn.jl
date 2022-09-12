@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
 Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -14,19 +14,18 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 @doc raw"""
-	load_inputs(setup::Dict,path::AbstractString)
+	load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
+inputs - dict object containing input data
 setup - dict object containing setup parameters
 path - string path to working directory
 
-returns: Dict (dictionary) object containing all data inputs
+returns: Dict (dictionary) object containing all data inputs of hydrogen sector.
 """
-
 function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config
@@ -48,12 +47,13 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     inputs = load_h2_generators_variability(setup, path, sep, inputs)
 
 	# Read input data about power network topology, operating and expansion attributes
-    if isfile(string(path,sep,"HSC_pipelines.csv")) 		
-		inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
-		setup["ModelH2Pipelines"] = 1
-	else
-		setup["ModelH2Pipelines"] = 0
-		inputs["H2_P"] = 0 # Why is this here?
+
+	if setup["ModelH2Pipelines"] == 1
+	    if isfile(string(path,sep,"HSC_pipelines.csv")) 		
+			inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
+		else
+			inputs["H2_P"] = 0
+		end
 	end
 	
 

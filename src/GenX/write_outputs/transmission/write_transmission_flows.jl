@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	write_transmission_flows(path::AbstractString, sep::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+
+Function for reporting electricity flow via transmision lines.
+"""
 function write_transmission_flows(path::AbstractString, sep::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	# Transmission related values
 	T = inputs["T"]     # Number of time steps (hours)
@@ -38,7 +43,7 @@ function write_transmission_flows(path::AbstractString, sep::AbstractString, set
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+2] .= sum(dfFlow[!,Symbol("t$t")][1:L])
-		elseif v"1.4" <= VERSION < v"1.7"
+		elseif v"1.4" <= VERSION < v"1.8"
 			total[:,t+2] .= sum(dfFlow[:,Symbol("t$t")][1:L])
 		end
 		

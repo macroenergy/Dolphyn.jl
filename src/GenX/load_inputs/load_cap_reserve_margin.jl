@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict, network_var::DataFrame)
+	load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)
 
-Function for reading input parameters related to planning reserve margin constraints
+Function for reading input parameters related to planning reserve margin constraints.
 """
 function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)
+
 	# Definition of capacity reserve margin (crm) by locational deliverability area (LDA)
 	println("About to read Capacity_reserve_margin.csv")
 
@@ -36,8 +37,6 @@ function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::Abstrac
 	inputs_crm["NCapacityReserveMargin"] = res
 
 	println("Capacity_reserve_margin.csv Successfully Read!")
-
-
 
 	return inputs_crm
 end
