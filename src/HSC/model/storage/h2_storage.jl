@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -28,22 +28,19 @@ function h2_storage(EP::Model, inputs::Dict, setup::Dict)
         # investment variables expressions and related constraints for H2 storage tehcnologies
         EP = h2_storage_investment_energy(EP, inputs, setup)
 
+        #  Investment corresponding to charging component of storage (e.g. Liquefier, compressor)
+        EP = h2_storage_investment_charge(EP, inputs, setup)
+
         # Operating variables, expressions and constraints related to H2 storage
+        # Applies to all H2 storage resources
         EP = h2_storage_all(EP, inputs, setup)
+
+        # DEV NOTE: add if conditions here for other types of storage technologies
 
         # Include LongDurationStorage only when modeling representative periods and long-duration storage
         if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"])
             EP = h2_long_duration_storage(EP, inputs)
         end
-    end
-
-    if !isempty(inputs["H2_STOR_ASYMMETRIC"])
-        EP = h2_storage_investment_charge(EP, inputs, setup)
-        EP = h2_storage_asymmetric(EP, inputs)
-    end
-
-    if !isempty(inputs["H2_STOR_SYMMETRIC"])
-        EP = h2_storage_symmetric(EP, inputs)
     end
 
     return EP

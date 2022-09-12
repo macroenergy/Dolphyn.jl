@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -98,11 +98,4 @@ outpath=write_outputs(EP, outpath, mysetup, myinputs)
 if mysetup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
-end
-
-# Run MGA if the MGA flag is set to 1 else only save the least cost solution
-# Only valid for power system analysis at this point
-if mysetup["ModelingToGenerateAlternatives"] == 1
-    println("Starting Model to Generate Alternatives (MGA) Iterations")
-    mga(EP,inpath,mysetup,myinputs,outpath)
 end

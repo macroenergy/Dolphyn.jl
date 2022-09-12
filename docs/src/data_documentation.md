@@ -54,10 +54,6 @@ Model settings parameters are specified in a `GenX_Settings.yml` file which shou
 |ParameterScale | Flag to turn on parameter scaling wherein load, capacity and power variables defined in GW rather than MW. This flag aides in improving the computational performance of the model. |
 ||1 = Scaling is activated. |
 ||0 = Scaling is not activated. |
-|ModelingToGenerateAlternatives | Modeling to Generate Alternative Algorithm. |
-||1 = Use the algorithm. |
-||0 = Do not use the algorithm. |
-|ModelingtoGenerateAlternativeSlack | value used to define the maximum deviation from the least-cost solution as a part of Modeling to Generate Alternative Algorithm. Can take any real value between 0 and 1. |
 |WriteShadowPrices | Get dual of various model related constraints, including to estimate electricity prices, stored value of energy and the marginal CO2 prices.|
 |**Miscellaneous**|
 |PrintModel | Flag for printnig the model equations as .lp file.|
@@ -326,11 +322,6 @@ This file contains cost and performance parameters for various generators and ot
 ||0- excluded|
 |**CapacityReserveMargin > 0**||
 |CapRes\_* |[0,1], Fraction of the resource capacity eligible for contributing to the capacity reserve margin constraint (e.g. derate factor).|
-|**ModelingToGenerateAlternatives = 1**||
-|MGA |Eligibility of the technology for Modeling To Generate Alternative (MGA) run. |
-||1 = Technology is available for the MGA run.|
-||0 = Technology is unavailable for the MGA run (e.g. storage technologies).|
-|Resource\_Type |For the MGA run, we categorize all the resources in a few resource types. We then find maximally different generation portfolio based on these resource types. For example, existing solar and new solar resources could be represented by a resource type names `Solar`. Categorization of resources into resource types is user dependent.|
 |**MinCapReq = 1**|
 |MinCapTag\_*| Eligibility of resources to participate in Minimum Technology Carveout constraint. \* corresponds to the ith row of the file `Minimum_capacity_requirement.csv`.|
 

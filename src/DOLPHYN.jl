@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -156,8 +156,6 @@ include("HSC/model/truck/h2_long_duration_truck.jl")
 include("HSC/model/storage/h2_storage_investment_energy.jl")
 include("HSC/model/storage/h2_storage_investment_charge.jl")
 include("HSC/model/storage/h2_storage.jl")
-include("HSC/model/storage/h2_storage_asymmetric.jl")
-include("HSC/model/storage/h2_storage_symmetric.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")
 
@@ -243,8 +241,5 @@ include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
-
-# Modeling to generate alternatives
-include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end

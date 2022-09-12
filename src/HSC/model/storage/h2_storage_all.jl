@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -53,6 +53,12 @@ The next constraint limits the volume of energy stored at any time, $\Gamma_{o,z
 	&  \Gamma_{o,z,t} \leq \Delta^{total, energy}_{o,z} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
 	&  \Theta_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
 	&  \Theta_{o,z,t} \leq \Gamma_{o,z,t-1} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{aligned}
+```
+The next constraint limits the rate of charging to the installed storage capacity.
+```math
+\begin{aligned}
+	&  \Pi_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -161,6 +167,14 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 		cH2SoCBalInterior[t in INTERIOR_SUBPERIODS, y in H2_STOR_ALL], EP[:vH2S][y,t] ==
 			EP[:vH2S][y,t-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t-1])
 	end)
+
+
+    # Hydrogen storage discharge and charge power (and reserve contribution) related constraints for symmetric storage resources:
+    # Maximum charging rate must be less than charge power rating
+    @constraint(EP,
+        [y in H2_STOR_ALL, t in 1:T],
+        EP[:vH2_CHARGE_STOR][y, t] <= EP[:eTotalH2CapCharge][y]
+    )
 
     ### End Constraints ###
     return EP
