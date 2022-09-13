@@ -51,7 +51,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	inputs_gen["H2_STOR_ABOVEGROUND_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
 	#inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
 	# DEV NOTE: Duplicated currently since we have only one storage option can define it as a union when we have more storage options
-	inputs_gen["H2_STOR_ALL"] =  inputs_gen["H2_STOR_GAS"]
+	inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
 
 	# Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
 	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
