@@ -20,8 +20,8 @@ cd(dirname(@__FILE__))
 
 settings_path = joinpath(pwd(), "Settings")
 
-#environment_path = "../../../package_activate.jl"
-#include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+environment_path = "../../../package_activate.jl"
+include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 
 ### Set relevant directory paths
 src_path = "../../../src/"
@@ -79,7 +79,7 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # ### Load inputs for modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
-    myinputs, mysetup = load_h2_inputs(myinputs, mysetup, inpath)
+    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end
 
 # ### Generate model
