@@ -76,6 +76,8 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 	  
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"] # Index of interior subperiod for each representative period
+    H2_STOR_SHORT_DURATION = inputs["H2_STOR_SHORT_DURATION"] # Set of H2 storage modeled as short-duration (no energy carryover from one rep. week to the next)
+    H2_STOR_LONG_DURATION = inputs["H2_STOR_LONG_DURATION"] # Set of H2 storage modeled as long-duration (energy carry over allowed)
 
     hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
@@ -144,7 +146,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 	# Links state of charge in first time step with decisions in last time step of each subperiod
 	# We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
 	
-	if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"]) # Apply constraints to those storage technologies with short duration only
+	if setup["OperationWrapping"] == 1 && !isempty(H2_STOR_LONG_DURATION) # Apply constraints to those storage technologies with short duration only
 		@constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_SHORT_DURATION], EP[:vH2S][y,t] ==
 			EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
 			+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))

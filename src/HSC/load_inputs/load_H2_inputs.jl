@@ -58,11 +58,8 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	
 
 	# Read input data about hydrogen transport truck types
-	if isfile(string(path,sep,"HSC_trucks.csv"))
+	if setup["ModelH2Trucks"] ==1
 		inputs = load_h2_truck(path, sep, inputs)
-		setup["ModelH2Trucks"] =1
-	else
-		setup["ModelH2Trucks"] = 0
 	end
 	
 
