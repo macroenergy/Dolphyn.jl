@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -44,15 +44,18 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# Set of flexible demand-side resources
 	inputs_gen["H2_FLEX"] = h2_gen_in[h2_gen_in.H2_FLEX.==1,:R_ID]
 
-	# To do - will add a list of storage resources or we can keep them separate
 	# Set of H2 storage resources
-	inputs_gen["H2_STOR_SYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
-	inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
-	inputs_gen["H2_STOR_ALL"] = union(inputs_gen["H2_STOR_SYMMETRIC"],inputs_gen["H2_STOR_ASYMMETRIC"])
+	# DEV NOTE: if we want to model other types of H2 storage (liquified or LOHC)  where discharging capacity is constrained  
+	# then we need to create another storage type to account for discharging capacity limits and costs
+	# H2_STOR = 1 : Charging and energy capacity sized and modeled but discharging capacity not sized or modeled. Mimicks gas storage
+	inputs_gen["H2_STOR_ABOVEGROUND_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	#inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
+	# DEV NOTE: Duplicated currently since we have only one storage option can define it as a union when we have more storage options
+	inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
 
 	# Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
-	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.==1),:R_ID]
-	inputs_gen["H2_STOR_SHORT_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==0) .& (h2_gen_in.H2_STOR.==1),:R_ID]
+	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
+	inputs_gen["H2_STOR_SHORT_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==0) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
 
 	# Set of all storage resources eligible for new energy capacity
 	inputs_gen["NEW_CAP_H2_ENERGY"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Energy_Cap_tonne.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
@@ -60,10 +63,10 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	inputs_gen["RET_CAP_H2_ENERGY"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Energy_Cap_tonne.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
 
 	# Set of asymmetric charge/discharge storage resources eligible for new charge capacity, which for H2 storage refers to compression power requirements
-	inputs_gen["NEW_CAP_H2_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Charge_Cap_tonne_p_hr.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
+	inputs_gen["NEW_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Charge_Cap_tonne_p_hr.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
 	# Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
-	inputs_gen["RET_CAP_H2_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Charge_Cap_tonne_p_hr.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
-	
+	inputs_gen["RET_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Charge_Cap_tonne_p_hr.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
+
 	# Set of H2 generation resources
 	# Set of h2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["H2GenCommit"]
 	inputs_gen["H2_GEN_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])

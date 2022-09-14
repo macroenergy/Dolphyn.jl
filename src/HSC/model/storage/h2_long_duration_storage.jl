@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -95,11 +95,11 @@ function h2_long_duration_storage(EP::Model, inputs::Dict)
 	# Variables to define inter-period energy transferred between modeled periods
 
 	# State of charge of H2 storage at beginning of each modeled period n
-	@variable(EP, vH2SOCw[y in STOR_LONG_DURATION, n in MODELED_PERIODS_INDEX] >= 0)
+	@variable(EP, vH2SOCw[y in H2_STOR_LONG_DURATION, n in MODELED_PERIODS_INDEX] >= 0)
 
 	# Build up in storage inventory over each representative period w
 	# Build up inventory can be positive or negative
-	@variable(EP, vdH2SOC[y in STOR_LONG_DURATION, w=1:REP_PERIOD])
+	@variable(EP, vdH2SOC[y in H2_STOR_LONG_DURATION, w=1:REP_PERIOD])
 
 	### Constraints ###
 

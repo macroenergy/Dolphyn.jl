@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -55,6 +55,12 @@ The next constraint limits the volume of energy stored at any time, $\Gamma_{o,z
 	&  \Theta_{o,z,t} \leq \Gamma_{o,z,t-1} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
+The next constraint limits the rate of charging to the installed storage capacity.
+```math
+\begin{aligned}
+	&  \Pi_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{aligned}
+```
 
 The above constraints are established in ```h2_storage_all()``` in ```h2_storage_all.jl```.
 """
@@ -70,6 +76,8 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 	  
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"] # Index of interior subperiod for each representative period
+    H2_STOR_SHORT_DURATION = inputs["H2_STOR_SHORT_DURATION"] # Set of H2 storage modeled as short-duration (no energy carryover from one rep. week to the next)
+    H2_STOR_LONG_DURATION = inputs["H2_STOR_LONG_DURATION"] # Set of H2 storage modeled as long-duration (energy carry over allowed)
 
     hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
@@ -138,7 +146,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 	# Links state of charge in first time step with decisions in last time step of each subperiod
 	# We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
 	
-	if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"]) # Apply constraints to those storage technologies with short duration only
+	if setup["OperationWrapping"] == 1 && !isempty(H2_STOR_LONG_DURATION)  && !isempty(H2_STOR_SHORT_DURATION) # Apply constraints to those storage technologies with short duration only (if non-empty)
 		@constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_SHORT_DURATION], EP[:vH2S][y,t] ==
 			EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
 			+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))
@@ -161,6 +169,14 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 		cH2SoCBalInterior[t in INTERIOR_SUBPERIODS, y in H2_STOR_ALL], EP[:vH2S][y,t] ==
 			EP[:vH2S][y,t-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t-1])
 	end)
+
+
+    # Hydrogen storage discharge and charge power (and reserve contribution) related constraints for symmetric storage resources:
+    # Maximum charging rate must be less than charge power rating
+    @constraint(EP,
+        [y in H2_STOR_ALL, t in 1:T],
+        EP[:vH2_CHARGE_STOR][y, t] <= EP[:eTotalH2CapCharge][y]
+    )
 
     ### End Constraints ###
     return EP

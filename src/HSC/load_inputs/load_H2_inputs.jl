@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -55,13 +55,14 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 			inputs["H2_P"] = 0
 		end
 	end
+	
 
 	# Read input data about hydrogen transport truck types
-	if setup["ModelH2Trucks"] == 1
-		if isfile(string(path,sep,"HSC_trucks.csv"))
-			inputs = load_h2_truck(path, sep, inputs)
-		end
+	if setup["ModelH2Trucks"] ==1
+		inputs = load_h2_truck(path, sep, inputs)
 	end
+	
+
 
 	# Read input data about G2P Resources
 	if isfile(string(path,sep,"HSC_g2p.csv"))
