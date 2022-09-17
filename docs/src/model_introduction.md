@@ -1,6 +1,22 @@
-# GenX Model Introduction
+# DOLPHYN Model Introduction
 
-## Introduction
+DOLPHYN is a Julia package developed for coupled multi energy sectors modeling with advanced technologies like large-scale electricity energy storage in power sector and electrolysis and hydrogen storage in hydrogen sector. DOLPHYN is highly extensible and scalable for other possible energy sectors in future macro energy systems to form a blueprint of energy internet or energy hub.
+
+This project is developed on the basis of **GenX** package with little modifications and improvements are introduced in the DOLPHYN by adding more energy sectors like hydrogen as submodules.
+
+Modules developed:
+- **GenX** module for power sector modeling including power generation from conventional and renewable sources, power transimission via lines, power storage and power consumption.
+
+Modules in testing:
+- **HSC** module for hydrogen sector modeling including hydrogen generation from fossil fuels and electrolysis, hydrogen transimission via pipelines and trucks, hydrogen storage.
+  
+Modules in development:
+- **CSC** module for carbon sector modeling including carbon capture of direct air capture (DAC) and point source capture (PSC), carbon transmission via pipelines and trucks, carbon storage and potential carbon utilization.
+  
+Modules in perspective:
+- to be considered...
+
+## GenX Introduction
 
 GenX allows for the simultaneous co-optimization of several interlinked power system decision layers, described below:
 
@@ -33,6 +49,18 @@ With appropriate configuration of the model, GenX thus allows the user to tracta
 *Figure. Range of configurations currently implemented in GenX along three key dimensions of model resolution*
 
 The model is usually configured to consider a single future planning year. In this sense, the current formulation is *static* because its objective is not to determine when investments should take place over time, but rather to produce a snapshot of the minimum-cost generation capacity mix under some pre-specified future conditions. However, the current implementation of the model can be run in sequence (with outputs from one planning year used as inputs for another subsequent planning year) to represent a step-wise or myopic expansion of the electricity system. Future updates of the model will include the option to allow simultaneous co-optimization of sequential planning decisions over multiple investment periods, where we leverage dual dynamic programming techniques to improve computational tractability.
+
+## HSC Introduction
+
+HSC allows for the simultaneous co-optimization of several interlinked hydrogen system decision layers, described below:
+
+1. Capacity expansion planning (e.g., investment and retirement decisions for a full range of centralized and distributed hydrogen generation, transmission and storage),
+2. Hourly dispatch of generation, storage,
+3. Unit commitment decisions and operational constraints for grey hydrogen generators,
+4. Transmission pipeline network and network expansion decisions, and
+5. Several optional policy constraints
+
+More description should be added after consideration from above perspective taking DOLPHYN as a whole.
 
 ## Uses
 
