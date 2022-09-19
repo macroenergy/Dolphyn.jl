@@ -26,8 +26,11 @@ pages = OrderedDict(
     "Solvers" => "solvers.md",
     "Model Introduction" => "model_introduction.md", # Should cover both HSC and GenX model overview
     # Cover Model inputs and outputs documentation
-    "Model Inputs/Outputs Documentation" =>  ["genx_data_documentation.md",  
-    "hsc_data_documentation.md"],
+    "Model Inputs/Outputs Documentation" =>  [
+        "global_data_documentation.md",
+        "genx_data_documentation.md",  
+        "hsc_data_documentation.md"
+    ],
     "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
         "GenX Inputs Functions" => "load_inputs.md",

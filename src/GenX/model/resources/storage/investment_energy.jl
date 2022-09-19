@@ -33,7 +33,7 @@ The total energy capacity of storage resource is defined as the sum of the exist
 In addition, this module adds investment and fixed OM costs related to energy capacity to the objective function:
 ```math
 \begin{equation*}
-	\sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{E,ENE,INV}}} \times y_{s,z}^{\textrm{E,ENE,new}} + \textrm{c}_{s,z}^{\textrm{E,ENE,FOM}} \times y_{s,z}^{\textrm{E,ENE,total}})
+	\textrm{C}^{\textrm{E,ENE,c}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{E,ENE,INV}}} \times y_{s,z}^{\textrm{E,ENE,new}} + \textrm{c}_{s,z}^{\textrm{E,ENE,FOM}} \times y_{s,z}^{\textrm{E,ENE,total}})
 \end{equation*}
 ```
 
