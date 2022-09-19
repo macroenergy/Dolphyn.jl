@@ -27,6 +27,7 @@ pages = OrderedDict(
     "Model Introduction" => "model_introduction.md", # Should cover both HSC and GenX model overview
     # Cover Model inputs and outputs documentation
     "Model Inputs/Outputs Documentation" =>  [
+        "global_data_documentation.md",
         "genx_data_documentation.md",  
         "hsc_data_documentation.md"
     ],
