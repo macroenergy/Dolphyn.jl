@@ -217,12 +217,10 @@ This file contains cost and performance parameters for various hydrogen to power
 |Existing\_Cap\_MW |The existing capacity of a power plant in tonne/hr.|
 |**Capacity/Energy requirements**|
 |Max\_Cap\_MW |-1 (default) – no limit on maximum discharge capacity of the resource. If non-negative, represents maximum allowed discharge capacity (in tonne/hr) of the resource.|
-|Min\_Cap\_MW | -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in tonne) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
-Cap_Size_MW
+|Min\_Cap\_MW | -1 (default) – no limit on minimum energy capacity of the resource.|
 |**Cost parameters**|
 |Inv\_Cost\_p\_MW\_p\_yr | Annualized capacity investment cost of a technology ($/MW/year). |
 |Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a technology ($/MW/year). |
-`H2_STOR = 2`. |
 |Var\_OM\_Cost\_p\_MWh | Variable operations and maintenance cost of a technology ($/tonne). |
 |**Technical performance parameters**|
 |etaFuel\_MMBtu\_p\_tonne  |Heat rate of a generator or MMBtu of fuel consumed per tonne of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
@@ -250,5 +248,47 @@ This file contains the time-series of capacity factors / availability of each re
 • first column: The first column contains the time index of each row (starting in the second row) from 1 to N.
 
 • Second column onwards: Resources are listed from the second column onward with headers matching each resource name in the `HSC_generators_data.csv` file in any order. The availability for each resource at each time step is defined as a fraction of installed capacity and should be between 0 and 1.
+
+#### 2.2.4 HSC\_trucks.csv
+
+This file contains cost and performance parameters for various hydrogen to power resources included in the model formulation.
+
+###### Table 7: Mandatory columns in the HSC\_G2P.csv file
+---
+|**Column Name** | **Description**|
+| :------------ | :-----------|
+|H2TruckType | This column contains **unique** names of hydrogen truck resources available to the model.|
+|**Technology type flags**|
+|New\_Build | {-1, 0, 1}, Flag for resource (storage, generation) eligibility for capacity expansion.|
+||New\_Build = 1: eligible for capacity expansion and retirement. |
+||New\_Build = 0: not eligible for capacity expansion, eligible for retirement.|
+||New\_Build = -1: not eligible for capacity expansion or retirement.|
+|TruckCap\_tonne\_per\_unit | Size (tonne/unit) of a single truck unit. |
+|**Existing technology capacity**|
+|Existing\_Number |The existing capacity of a type of hydrogen truck. |
+|Existing\_Energy\_Cap\_tonne\_z* | The existing capacity of truck loading station compression in tonne. |
+|**Capacity/Energy requirements**|
+|Max\_Energy\_Cap\_tonne | -1 (default) – no limit on maximum compression capacity of the resource. If non-negative, represents maximum allowed compression capacity (in tonne/hr) of the resource.|
+|Min\_Energy\_Cap\_tonne | 0 (default) – minimum compression capacity of the resource. If non-negative, represents minimum allowed compression capacity (in tonne/hr) of the resource. |
+|H2TruckCompressionEnergy | Compression energy requirements for hydrogen per tonne.|
+
+|**Cost parameters**|
+|Inv\_Cost\_p\_unit\_p\_yr | Annualized capacity investment cost of a type of truck ($/unit/year). |
+|Inv\_Cost\_Energy\_p\_tonne\_yr | Annualized capacity investment cost of compression stations for trucks. | 
+|Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a truck ($/unit/year). |
+|Fixed\_OM\_Cost\_Energy\_p\_tonne\_yr | Fixed operations and maintenance cost of compression stations for trucks. |
+|H2TruckCompressionUnitOpex | Variable cost for compression for hydrogen per tonne.|
+|H2TruckUnitOpex\_per\_mile\_full | Variable cost for full truck operation. |
+|H2TruckUnitOpex\_per\_mile\_empty | Variable cost for empty truck operation. |
+|**Technical performance parameters**|
+|Full\_weight\_tonne\_per\_unit | Full truck weight per unit in tonne. |
+|Empty\_weight\_tonne\_per\_unit | Empty truck weight per unit in tonne. |
+|AvgTruckSpeed\_mile\_per\_hour | Average truck speed mile per hour. |
+|H2TLoss\_per\_mile | Hydrogen loss percentage per mile in operation. |
+|lifetime | Lifetime of truck. |
+|Fuel | Fuel type of truck. |
+|Fuel\_MMBTU\_per\_mile | Fuel consumption for truck in operation per mile if it burns fuels. |
+|Power\_MW\_per\_mile | Power consumption for truck in operation per mile if it feeds on pwoer. |
+|H2\_tonne\_per\_mile | H2 consumption for truck in operation per mile if it feeds on hydrogen. |
 
 ## 3 Outputs
