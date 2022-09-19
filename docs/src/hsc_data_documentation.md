@@ -181,7 +181,9 @@ This file contains cost and performance parameters for various generators and ot
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
 |Start\_Cost\_per\_tonne\_p\_hr |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 
-#### 2.1.6 HSC\_CO2\_cap.csv
+### 2.2 Optional input data
+
+#### 2.2.1 HSC\_CO2\_cap.csv
 
 This file contains inputs specifying CO2 emission limits policies (e.g. emissions cap and permit trading programs). This file is needed if `H2CO2Cap` flag is activated in the YAML file `hsc_settings.yml`. `h2CO2Cap` flag set to 1 represents mass-based (tCO2 ) emission target. `CO2Cap` flag set to 2 is specified when emission target is given in terms of rate (tCO2/tonne-H2) and is based on total demand met. `H2CO2Cap` flag set to 3 is specified when emission target is given in terms of rate (tCO2 /tonne-H2) and is based on total generation.
 
@@ -194,5 +196,59 @@ This file contains inputs specifying CO2 emission limits policies (e.g. emission
 |CO\_2\_Max\_tons\_ton* |Emission limit in terms of rate|
 |CO\_2\_Max\_Mtons* |Emission limit in absolute values, in Million of tons |
 | | where in the above inputs, * represents the number of the emission limit constraints. For example, if the model has 2 emission limit constraints applied separately for 2 zones, the above CSV file will have 2 columns for specifying emission limit in terms on rate: CO\_2\_Max\_tons\_ton\_1 and CO\_2\_Max\_tons\_ton_\_2.|
+
+#### 2.2.2 HSC\_G2P.csv
+
+This file contains cost and performance parameters for various hydrogen to power resources included in the model formulation.
+
+###### Table 7: Mandatory columns in the HSC\_G2P.csv file
+---
+|**Column Name** | **Description**|
+| :------------ | :-----------|
+|H2_Resource | This column contains **unique** names of resources available to the model. Resources can include generators, storage.|
+|Zone | Integer representing zone number where the resource is located. |
+|**Technology type flags**|
+|New\_Build | {-1, 0, 1}, Flag for resource (storage, generation) eligibility for capacity expansion.|
+||New\_Build = 1: eligible for capacity expansion and retirement. |
+||New\_Build = 0: not eligible for capacity expansion, eligible for retirement.|
+||New\_Build = -1: not eligible for capacity expansion or retirement.|
+||Cap\_size\_MW | Size (MW) of a single generating unit. This is used only for resources with integer unit commitment - not relevant for other resources.|
+|**Existing technology capacity**|
+|Existing\_Cap\_MW |The existing capacity of a power plant in tonne/hr.|
+|**Capacity/Energy requirements**|
+|Max\_Cap\_MW |-1 (default) – no limit on maximum discharge capacity of the resource. If non-negative, represents maximum allowed discharge capacity (in tonne/hr) of the resource.|
+|Min\_Cap\_MW | -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in tonne) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
+Cap_Size_MW
+|**Cost parameters**|
+|Inv\_Cost\_p\_MW\_p\_yr | Annualized capacity investment cost of a technology ($/MW/year). |
+|Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a technology ($/MW/year). |
+`H2_STOR = 2`. |
+|Var\_OM\_Cost\_p\_MWh | Variable operations and maintenance cost of a technology ($/tonne). |
+|**Technical performance parameters**|
+|etaFuel\_MMBtu\_p\_tonne  |Heat rate of a generator or MMBtu of fuel consumed per tonne of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
+|etaG2P\_MWh\_p\_tonne | Power generation per tonne of hydrogen consumption.|
+|G2P\_min\_output |[0,1], The minimum generation level for a unit as a fraction of total capacity. |
+|Ramp\_Up\_Percentage |[0,1], Maximum increase in power output from between two periods (typically hours), reported as a fraction of nameplate capacity. Applies to thermal plants.|
+|Ramp\_Dn\_Percentage |[0,1], Maximum decrease in power output from between two periods (typically hours), reported as a fraction of nameplate capacity. Applies to thermal plants.|
+|**Required for writing outputs**|
+|region | Name of the model region|
+|cluster | Number of the cluster when representing multiple clusters of a given technology in a given region.  |
+
+###### Table 8: Settings-specific columns in the HSC\_G2P.csv file
+---
+|**Column Name** | **Description**|
+| :------------ | :-----------|
+|**H2G2PCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints.|
+|Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
+|Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
+|Start\_Cost\_per\_MW |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+
+#### 2.2.3 HSC\_g2p\_generators\_variability.csv
+
+This file contains the time-series of capacity factors / availability of each resource included in the `HSC_G2P.csv` file for each time step (e.g. hour) modeled.
+
+• first column: The first column contains the time index of each row (starting in the second row) from 1 to N.
+
+• Second column onwards: Resources are listed from the second column onward with headers matching each resource name in the `HSC_generators_data.csv` file in any order. The availability for each resource at each time step is defined as a fraction of installed capacity and should be between 0 and 1.
 
 ## 3 Outputs
