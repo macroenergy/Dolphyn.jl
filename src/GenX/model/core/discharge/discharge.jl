@@ -28,7 +28,7 @@ The variable defined in this file named after ```vP``` covers all variables $x_{
 
 ```math
 \begin{equation*}
-	x_{g,z,t}^{\textrm{E,GEN}} = 
+	x_{g,z,t}^{\textrm{E,GEN}} =
 	\begin{cases}
 		x_{k,z,t}^{\textrm{E,THE}} \quad if \quad g \in \mathcal{K} \\
 		x_{r,z,t}^{\textrm{E,VRE}} \quad if \quad g \in \mathcal{R} \\
@@ -44,7 +44,8 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{E,GEN,o}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{E,VOM}} + \textrm{c}_{g}^{\textrm{E,FUEL}}\right) \times x_{g,z,t}^{\textrm{E,GEN}}
+	%\textrm{C}^{\textrm{E,GEN,o}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{E,VOM}} + \textrm{c}_{g}^{\textrm{E,FUEL}}\right) \times x_{g,z,t}^{\textrm{E,GEN}}
+	\textrm{C}^{\textrm{E,GEN}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{E,VOM}} + \textrm{c}_{g}^{\textrm{E,FUEL}}\right) \times x_{g,z,t}^{\textrm{E,GEN}}
 \end{equation*}
 ```
 """

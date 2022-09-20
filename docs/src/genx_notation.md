@@ -7,9 +7,9 @@
 |$t \in \mathcal{T}$ | where $t$ denotes an time step and $\mathcal{T}$ is the set of time steps over which grid operations are modeled|
 $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of zones in the network|
 |$z \rightarrow z^{\prime} \in \mathcal{B}$ |where $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity, hydrogen flow via pipelines and trucks, carbon flow via pipelines and trucks and $\mathcal{B}$ is the set of all possible routes|
-|$s \in \mathcal{SEG}$| <Documentation Missing> |
-|$z \in \mathcal{Z}^{CRM}_{p}$| each subset stands for a locational deliverability area (LDA) or a reserve sharing group|
-|$\mathcal{Z}_{p,mass}^{CO_2}$|then the set will contain only one zone with no possibility of trading|
+|$s \in \mathcal{SEG}$| where $s$ denotes a segment and $\mathcal{SEG}$ is the set of consumers segments for price-responsive demand curtailment |
+|$z \in \mathcal{Z}^{CRM}_{p}$| set of zones from the locational deliverability area (LDA) for capacity reserve margin constraints|
+|$\mathcal{Z}_{p,mass}^{CO_2}$|set of zones that are under the emission cap mass-based cap-and-trade policy constraint|
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$|
 ---
 
@@ -29,10 +29,11 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$C^{E,EMI}$|cost of add the CO2 emissions by plants in each zone|
 |$x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$|the non-served energy/curtailed demand decision variable representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$|
 |$n_{s}^{E,NSD}$|representing the marginal willingness to pay for electricity of this segment of demand|
+|$\pi^{TCAP}_{l}$| Transmission reinforcement or construction cots for a transmission line [$/MW-yr] |
 |$D_{z, t}^{E}$ |Note that the current implementation assumes demand segments are an equal share of hourly load in all zones|
 |$f_{y,t,z}$|$f_{y,t,z} \geq 0$ is the contribution of generation or storage resource $y \in Y$ in time $t \in T$ and zone $z \in Z$ to frequency regulation|
 |$r_{y,t,z}$|$r_{y,t,z} \geq 0$ is the contribution of generation or storage resource $y \in Y$ in time $t \in T$ and zone $z \in Z$ to operating reserves up|
-|$unmet\_rsv_{t}$|$unmet\_rsv_{t} \geq 0$ denotes any shortfall in provision of operating reserves during each time period $t \in T$|
+|$unmet\_rsv_{t}$|$unmet\_rsv_{t} \geq 0$ denotes any shortfall in provision of operating reserves [MW] during each time period $t \in T$|
 |$C^{rsv}$|There is a penalty added to the objective function to penalize reserve shortfalls|
 |$\mathcal{D}_{z,t}$| is the forecasted electricity demand in zone $z$ at time $t$ (before any demand flexibility)|
 |$\rho^{max}_{y,z,t}$| is the forecasted capacity factor for variable renewable resource $y \in VRE$ and zone $z$ in time step $t$|
@@ -83,8 +84,9 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |G = inputs["G"]     | Number of resources (generators, storage, DR, and DERs)|
 |T = inputs["T"]     | Number of time steps|
 |Z = inputs["Z"]     | Number of zones|
-|$c_{g}^{E,INV}$|<Documentation Missing>|
-|$c_{g}^{E,FOM}$|<Documentation Missing>|
+|$c_{g}^{E,INV}$|Investment cost (annual ammortization of total construction cost) for power capacity of generator/storage g |
+|$c_{g}^{E,FOM}$|Fixed O&M cost of generator/storage g|
+|$C^{E,GEN,c}$|Total (Investment cost in new technology and existing operational costs) annual fixed cost of generator/storage |
 |$\epsilon^{load}_{reg}$ and $\epsilon^{vre}_{reg}$ |are parameters specifying the required frequency regulation as a fraction of forecasted demand and variable renewable generation|
 |$\epsilon_{y,z,p}^{CRM}$|the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter|
 |$\epsilon_{g,z}^{CO_2}$|For every generator $g$, the parameter reflects the specific $CO_2$ emission intensity in t$CO_2$/MWh associated with its operation|

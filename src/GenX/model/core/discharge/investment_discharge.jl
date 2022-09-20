@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up constraints common to all generation resources.
 
-This function defines the expressions and constraints keeping track of: 
+This function defines the expressions and constraints keeping track of:
 - total available thermal generation capacity $y_{k}^{\textrm{E,THE}}$ as well as constraints on capacity retirements.
 - total available renewable generation capacity $y_{r}^{\textrm{E,VRE}}$ as well as constraints on capacity retirements.
 - total available storage discharge capacity $y_{s}^{\textrm{\textrm{E,STO},DIS}}$ as well as constraints on capacity retirements.
@@ -28,7 +28,7 @@ The expression defined in this file named after ```eTotalCap``` covers all varia
 
 ```math
 \begin{equation*}
-	y_{g}^{\textrm{E,GEN}} = 
+	y_{g}^{\textrm{E,GEN}} =
 	\begin{cases}
 		y_{k}^{\textrm{E,THE}} \quad if \quad k \in \mathcal{K} \\
 		y_{r}^{\textrm{E,VRE}} \quad if \quad r \in \mathcal{R} \\
@@ -38,14 +38,15 @@ The expression defined in this file named after ```eTotalCap``` covers all varia
 \end{equation*}
 ```
 
-The total capacity of each resource (thermal, renewable, storage, DR, flexible demand resources and hydro) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. 
+The total capacity of each resource (thermal, renewable, storage, DR, flexible demand resources and hydro) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 Note for energy storage resources in power sector, additional energy and charge power capacity decisions and constraints are defined in the storage module.
 
 ```math
 \begin{equation*}
 	\begin{split}
-	y_{g}^{\textrm{E,GEN}} &= y_{g}^{\textrm{E,GEN,total}} \\ 
-	& = y_{g}^{\textrm{E,GEN,existing}}+y_{g}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
+	%y_{g}^{\textrm{E,GEN}} &= y_{g}^{\textrm{E,GEN,total}} \\
+	%& y_{g}^{\textrm{E,GEN}} &=
+	y_{g}^{\textrm{E,GEN,total}}= y_{g}^{\textrm{E,GEN,existing}}+y_{g}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
 \end{equation*}
@@ -57,7 +58,7 @@ This module additionally defines contributions to the objective function from in
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{E,GEN,c}} = \sum_{g in G} y_{g}^{\textrm{E,GEN,new}}\times \textrm{c}_{g}^{\textrm{E,INV}} + \sum_{g in G} y_{g}^{\textrm{E,GEN,total}}\times \textrm{c}_{g}^{\textrm{E,FOM}}
+	\textrm{C}^{\textrm{E,GEN,c}} = \sum_{g \in G} y_{g}^{\textrm{E,GEN,new}}\times \textrm{c}_{g}^{\textrm{E,INV}} + \sum_{g \in G} y_{g}^{\textrm{E,GEN,total}}\times \textrm{c}_{g}^{\textrm{E,FOM}}
 \end{equation*}
 ```
 
