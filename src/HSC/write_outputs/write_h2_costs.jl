@@ -76,12 +76,15 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	end
 
 	if Z >1
-		if setup["ParameterScale"]==1 # Convert costs in millions to $
-			cH2NetworkExpCost = value(EP[:eCH2Pipe])*ModelScalingFactor^2
+		if setup["ModelH2Pipelines"] == 1
+			if setup["ParameterScale"]==1 # Convert costs in millions to $
+				cH2NetworkExpCost = value(EP[:eCH2Pipe])*ModelScalingFactor^2
+			else
+				cH2NetworkExpCost = value(EP[:eCH2Pipe])
+			end
 		else
-			cH2NetworkExpCost = value(EP[:eCH2Pipe])
+			cH2NetworkExpCost=0
 		end
-		cH2NetworkExpCost=0
 	end
 
 	 
