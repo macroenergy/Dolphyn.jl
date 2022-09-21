@@ -57,9 +57,6 @@ genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
 hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml")
 ## Settings YAML file path for CSC modelgrated model
 csc_settings = joinpath(sectors_settings_path, "csc_settings.yml")
-## Settings YAML file path for Syn modelgrated model
-syn_settings = joinpath(sectors_settings_path, "syn_settings.yml")
-
 
 ## Setup dictionary stores GenX-specific parameters
 setup_genx = YAML.load(open(genx_settings))
@@ -67,11 +64,9 @@ setup_genx = YAML.load(open(genx_settings))
 setup_hsc = YAML.load(open(hsc_settings))
 ## Setup dictionary stores CO2 supply chain-specific parameters
 setup_csc = YAML.load(open(csc_settings))
-## Setup dictionary stores synthesis fuels -specific parameters
-setup_syn = YAML.load(open(syn_settings))
 
 ## Merge dictionary - value of common keys will be overwritten by value in global_model_settings
-setup = merge(setup_global, setup_genx, setup_hsc, setup_csc, setup_syn)
+setup = merge(setup_global, setup_genx, setup_hsc, setup_csc)
 
 ### Cluster time series inputs if necessary and if specified by the user
 if setup["TimeDomainReduction"] == 1
