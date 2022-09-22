@@ -35,7 +35,7 @@ For resources where upper bound $\overline{y_{g}^{\textrm{\textrm{H,G2P}}}}$ and
 ```math
 \begin{equation*}
 	\underline{y_{g}^{\textrm{\textrm{H,G2P}}}} \leq y_{g}^{\textrm{\textrm{H,G2P}}} \leq \overline{y_{g}^{\textrm{\textrm{H,G2P}}}} \quad \forall g \in \mathcal{G}
-\end{equatio
+\end{equation*}
 """
 function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
 
