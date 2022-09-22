@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
-This function defines a series of operationg variables,expresstions and constraints in truck scheduling and routing model.
+This function defines a series of operating variables,expressions and constraints in truck scheduling and routing model.
 
 **Variables**
 
