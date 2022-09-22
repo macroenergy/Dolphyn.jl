@@ -33,13 +33,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation*}
-	x_{k,z,t-1}^{\textrm{H,G2P}} - x_{k,z,t}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{G2P,DN} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t-1}^{\textrm{H,G2P}} - x_{k,z,t}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{G2P,DN} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{H,G2P}} - x_{k,z,t-1}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{G2P,UP} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} - x_{k,z,t-1}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{G2P,UP} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 1-2 in the code)
