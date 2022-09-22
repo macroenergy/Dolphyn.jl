@@ -44,9 +44,8 @@ Note for energy storage resources in power sector, additional energy and charge 
 ```math
 \begin{equation*}
 	\begin{split}
-	%y_{g}^{\textrm{E,GEN}} &= y_{g}^{\textrm{E,GEN,total}} \\
-	%& y_{g}^{\textrm{E,GEN}} &=
-	y_{g}^{\textrm{E,GEN,total}}= y_{g}^{\textrm{E,GEN,existing}}+y_{g}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
+	y_{g}^{\textrm{E,GEN}} &= y_{g}^{\textrm{E,GEN,total}} \quad \text{(No new generators are added or retired)} \\
+	& = y_{g}^{\textrm{E,GEN,existing}}+y_{g}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
 	\end{split}
 	\quad \forall g \in \mathcal{G}
 \end{equation*}
@@ -54,7 +53,7 @@ Note for energy storage resources in power sector, additional energy and charge 
 
 **Cost expressions**
 
-This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
+This module additionally defines contributions to the objective function from investment costs of generation (fixed O\&M plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
 
 ```math
 \begin{equation*}
