@@ -23,11 +23,11 @@ This function creates variables and constraints enabling modeling of long durati
 
 **Long duration hydrogen storage initial inventory and change decision variables**
 
-This module defines the initial storage hydrogen inventory level variable $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial hydrogen stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
+This module defines the initial storage hydrogen inventory level variable $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}_{p}^{start}$, representing initial hydrogen stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
 
 This module defines the change of storage hydrogen inventory level during each representative period $\Delta U_{s,z,m}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage hydrogen inventory level of the storage device $s$ in zone $z$ during each representative period $m$.
 
-The variable defined in this file named after ```vH2SOCw``` covers $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$.
+The variable defined in this file named after ```vH2SOCw``` covers $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in t \in \mathcal{T}_{p}^{start}$.
 
 The variable defined in this file named after ```vdH2SOC``` covers $\Delta U_{s,z,m}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$.
 
