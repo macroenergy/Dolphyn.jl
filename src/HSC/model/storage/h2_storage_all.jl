@@ -35,7 +35,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{H,STO,o}} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z} \sum_{t \in \mathcal{T} \omega_t \times \textrm{c}_{s,z,t}^{\textrm{H,STO,o}} \times x_{s,z,t}^{\textrm{H,CHA}}
+	\textrm{C}^{\textrm{H,STO,o}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s,z,t}^{\textrm{H,STO,o}} \times x_{s,z,t}^{\textrm{H,CHA}}
 \end{equation*}
 ```
 
