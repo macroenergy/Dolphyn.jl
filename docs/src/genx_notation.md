@@ -18,14 +18,16 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 ---
 |**Notation** | **Description**|
 | :------------ | :-----------|
-|$x_{k,z,t}^{E,THE} k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$| representing energy injected into the grid by thermal resource $k$ in zone $z$ at time period $t$|
+|$x_{k,z,t}^{E,THE} \forall k \in \mathcal{K}, z\in \mathcal{Z}, t \in \mathcal{T}$| representing energy injected into the grid by thermal resource $k$ in zone $z$ at time period $t$|
 |$x_{r,z,t}^{E,VRE} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$| representing energy injected into the grid by renewable resource $r$ in zone $z$ at time period $t$|
-|$x_{s,z,t}^{E,DIS} \forall s \in \mathcal{S}, z t \in \mathcal{T}$| representing energy injected into the grid by storage resource $s$ in zone $z$ at time period $t$|
+|$x_{s,z,t}^{E,DIS} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$| representing energy injected into the grid by storage resource $s$ in zone $z$ at time period $t$|
+|$x_{g,z,t}^{E,GEN} \forall g \in \mathcal{G}, z \in \mathcal{Z}, t \in \mathcal{T}$| representing generation resource $g$ in zone $z$ at time period $t$|
 |$y_{k}^{E,THE}$|total available thermal generation capacity |
 |$y_{r}^{E,VRE}$|total available renewable generation capacity|
 |$y_{s}^{E,STO,DIS}$|total available storage discharge capacity |
-|$y_{g}^{E,GEN}$|the sum of the existing capacity plus the newly invested capacity minus any retired capacity|
+|$y_{g}^{E,GEN, total}$|the total existing generator capacity|
 |$C^{E,GEN,c}$|investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro)|
+|$C^{E,GEN,o}$|Variable costs of generation (variable O&M plus fuel cost) from all generation resources over all time periods|
 |$C^{E,EMI}$|cost of add the CO2 emissions by plants in each zone|
 |$x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$|the non-served energy/curtailed demand decision variable representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$|
 |$n_{s}^{E,NSD}$|representing the marginal willingness to pay for electricity of this segment of demand|
@@ -86,7 +88,7 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |Z = inputs["Z"]     | Number of zones|
 |$c_{g}^{E,INV}$|Investment cost (annual ammortization of total construction cost) for power capacity of generator/storage g |
 |$c_{g}^{E,FOM}$|Fixed O&M cost of generator/storage g|
-|$C^{E,GEN,c}$|Total (Investment cost in new technology and existing operational costs) annual fixed cost of generator/storage |
+|$C^{E,GEN,c}$|investment costs of generation (fixed O\&M plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro)|
 |$\epsilon^{load}_{reg}$ and $\epsilon^{vre}_{reg}$ |are parameters specifying the required frequency regulation as a fraction of forecasted demand and variable renewable generation|
 |$\epsilon_{y,z,p}^{CRM}$|the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter|
 |$\epsilon_{g,z}^{CO_2}$|For every generator $g$, the parameter reflects the specific $CO_2$ emission intensity in t$CO_2$/MWh associated with its operation|
