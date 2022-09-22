@@ -37,7 +37,7 @@ This module additionally defines contributions to the objective function from in
 
 ```math
 \begin{equation*}
-	C^{\textrm{H,G2P},c} = \sum_{g in G} y_{g}^{\textrm{H,G2P},new}\times c_{g}^{\textrm{E,INV}} + \sum_{g in G} y_{g}^{\textrm{H,G2P},total}\times c_{g}^{E,FOM}
+	C^{\textrm{H,G2P},c} = \sum_{g \in G} y_{g}^{\textrm{H,G2P},new}\times c_{g}^{\textrm{E,INV}} + \sum_{g \in G} y_{g}^{\textrm{H,G2P},total}\times c_{g}^{E,FOM}
 \end{equation*}
 ```
 """
