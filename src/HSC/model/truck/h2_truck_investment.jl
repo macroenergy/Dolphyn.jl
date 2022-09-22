@@ -54,7 +54,7 @@ Truck retirements cannot retire more charge capacity than existing charge capaci
     v_{RETCAPNUM,j}^{\textrm{H,TRU}} \leq v_{ExistNum,j}^{\textrm{H,TRU}} \quad \forall j \in \mathbb{J}
 \end{equation*}
 ```
-Truck compression energyCannot retire more energy capacity than existing energy capacity
+Truck compression energy cannot retire more energy capacity than existing energy capacity
 ```math
 \begin{equation*}
     v_{RETCAPEnergy,j}^{\textrm{H,TRU}} \leq v_{ExistEnergyCap,j}^{\textrm{H,TRU}} \quad \forall j \in \mathbb{J}
