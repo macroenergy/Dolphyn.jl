@@ -18,7 +18,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
-This function creates expression to add the CO2 emissions by plants in each zone, which is subsequently added to the total emissions.
+This function creates expression to add the CO$_2$ emissions by plants in each zone, which is subsequently added to the total emissions.
 """
 function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
@@ -44,7 +44,7 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
  	# If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
  	# then need to add cost penalty due to CO2 prices
-	if (setup["CO2Cap"] == 4) 
+	if (setup["CO2Cap"] == 4)
 		# Use CO2 price for power system as the global CO2 price
 		# Emissions penalty by zone - needed to report zonal cost breakdown
 		@expression(EP,eCEmissionsPenaltybyZone[z = 1:Z],

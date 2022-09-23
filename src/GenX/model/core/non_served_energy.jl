@@ -19,10 +19,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables of non served power demand.
 
-This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{\textrm{E,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
+This function defines the non-served energy/curtailed demand decision variable $x_{s,z,t}^{\textrm{E,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$.
 The first segment of non-served energy, $s=1$, is used to denote the cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts), specified as the value of $\textrm{c}_{1}^{\textrm{E,NSD}}$.
 Additional segments, $s \geq 2$ can be used to specify a segment-wise approximation of a price elastic demand curve, or segments of price-responsive curtailable loads (aka demand response).
-Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $\textrm{n}_{s}^{\textrm{E,NSD}}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served) 
+Each segment denotes a price/cost at which the segment of demand is willing to curtail consumption, $\textrm{n}_{s}^{\textrm{E,NSD}}$, representing the marginal willingness to pay for electricity of this segment of demand (or opportunity cost incurred when demand is not served)
 and a maximum quantity of demand in this segment, $\textrm{n}_{s}^{\textrm{E,NSD}}$, specified as a share of demand in each zone in each time step, $\textrm{D}_{z, t}^{\textrm{E}}$. Note that the current implementation assumes demand segments are an equal share of hourly load in all zones.
 
 The variable defined in this file named after ```vNSE``` covers the variable $x_{s,z,t}^{\textrm{E,NSD}}$.

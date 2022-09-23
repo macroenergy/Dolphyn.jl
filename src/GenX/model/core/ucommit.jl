@@ -39,7 +39,7 @@ The total cost of start-ups across all generators subject to unit commitment ($k
 
 ```math
 \begin{equation}
-	\textrm{C}^{\textrm{E,start}} = \sum_{k \in \mathcal{UC} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{E,start}} \times \n_{k,z,t}^{\textrm{E,UP}}
+	\textrm{C}^{\textrm{E,start}} = \sum_{k \in \mathcal{UC}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{E,start}} \times \n_{k,z,t}^{\textrm{E,UP}}
 \end{equation}
 ```
 

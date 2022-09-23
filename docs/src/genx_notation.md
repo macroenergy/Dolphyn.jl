@@ -29,6 +29,8 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$C^{E,GEN,c}$|investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro)|
 |$C^{E,GEN,o}$|Variable costs of generation (variable O&M plus fuel cost) from all generation resources over all time periods|
 |$C^{E,EMI}$|cost of add the CO2 emissions by plants in each zone|
+|$C^{{E,NSD}}$|Cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T} and all zones $z \in \mathcal{Z}$|
+|$C^{E,NET,c}$|Transmission reinforcement costs|
 |$x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$|the non-served energy/curtailed demand decision variable representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$|
 |$n_{s}^{E,NSD}$|representing the marginal willingness to pay for electricity of this segment of demand|
 |$\pi^{TCAP}_{l}$| Transmission reinforcement or construction cots for a transmission line [$/MW-yr] |
@@ -57,6 +59,8 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$y_{r,z}^{E,VRE,total}$|VRE resources are a function of each technology's time-dependent hourly capacity factor, in per unit terms, and the total available capacity ($y_{r,z}^{E,VRE,total}$).|
 |$y_{r,z}^{E,VRE,new}$|variables related to installed capacity ($y_{r,z}^{E,VRE,new}$) for all resource bins for a particular VRE resource type $r$ and zone $z$|
 |$y_{r,z}^{E,VRE,retired}$|retired capacity ($y_{r,z}^{E,VRE,retired}$) for all resource bins for a particular VRE resource type $r$ and zone $z$|
+|$y_l^{E,NET,new}$|The additional transmission capacity required|
+|$y_{l}^{{E, NET, Existing}}|The maximum power transfer capacity of a given line|
 |$R_{f,z,t}^{E,FLEX}$|maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $R_{f,z,t}^{E,FLEX}$|
 |$\eta_{f,z}^{E,FLEX}$|the energy losses associated with shifting demand|
 |$x_{f,z,t}^{E,FLEX}$|the amount of deferred demand remaining to be served depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$)|
@@ -79,6 +83,8 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$\tau_{k,z}^{E,UP/DN}$|is the minimum up or down time for units in generating cluster $k$ in zone $z$|
 ||$f_{k,z,t}^{E,THE}$| is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon^{reg}_{k,z}$|
 |$r_{k,z,t}^{E,THE}$| is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$|
+|$ON_{l,t}^{E, NET+} \in [0, 1]$|Binary variable to activate positive flows on line $l$ at time $t$|
+|$TransON_{l,t}^{E, NET+} \forall l \in \mathcal{L}, t \in \mathcal{T}$|Variable defining maximum positive flow in line l in time t [MW]|
 ## Parameters
 ---
 |**Notation** | **Description**|
@@ -86,20 +92,29 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |G = inputs["G"]     | Number of resources (generators, storage, DR, and DERs)|
 |T = inputs["T"]     | Number of time steps|
 |Z = inputs["Z"]     | Number of zones|
+|\omega_t|weight of each model time step $\omega_t = 1 \forall t \in \mathcal{T}$ when modeling each time step of the year at an hourly resolution [1/year]|
 |$c_{g}^{E,INV}$|Investment cost (annual ammortization of total construction cost) for power capacity of generator/storage g |
 |$c_{g}^{E,FOM}$|Fixed O&M cost of generator/storage g|
 |$C^{E,GEN,c}$|investment costs of generation (fixed O\&M plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro)|
+|$c_1^{{E, NSD}}$|Cost of involuntary demand curtailment (e.g. emergency load shedding or rolling blackouts)|
+|$c_l^{E, NET}$|transmission reinforcement/construction cost|
 |$\epsilon^{load}_{reg}$ and $\epsilon^{vre}_{reg}$ |are parameters specifying the required frequency regulation as a fraction of forecasted demand and variable renewable generation|
 |$\epsilon_{y,z,p}^{CRM}$|the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter|
 |$\epsilon_{g,z}^{CO_2}$|For every generator $g$, the parameter reflects the specific $CO_2$ emission intensity in t$CO_2$/MWh associated with its operation|
 |$VREIndex_{r,z}$|Parameter $VREIndex_{r,z}$, is used to keep track of the first bin, where $VREIndex_{r,z}=1$ for the first bin and $VREIndex_{r,z}=0$ for the remaining bins|
 |$\tau^{advance/delay}_{f,z}$|the maximum time this demand can be advanced and delayed, defined by parameters, $\tau^{advance}_{f,z}$ and $\tau^{delay}_{f,z}$, respectively|
+|$M_y$|`Big M' constant equal to the largest possible capacity that can be installed for generation cluster $y$|
+|$\alpha^{Contingency, Aux}_{y,z} \in [0,1]| is a binary auxiliary variable that reflects the total installed capacity for generator $y$ in zone $z$|
+|f^{E, map}(.)|The power network structure is defined by $f^{E, map}(\cdot)$|
 |$\mu^{stor}_{y,z}$|referring to the ratio of energy capacity to discharge power capacity, is used to define the available reservoir storage capacity|
 |$\overline{R_{s,z}^{E,ENE}}$|For storage resources where upper bound $\overline{R_{s,z}^{E,ENE}}$ is defined, then we impose constraints on maximum storage energy capacity|
 |$\underline{R_{s,z}^{E,ENE}}$|For storage resources where lower bound $\underline{R_{s,z}^{E,ENE}}$ is defined, then we impose constraints on minimum storage energy capacity|
 |$\Omega_{k,z}^{E,THE,size}$|is the thermal unit size|
+|$\Omega^{size}_{y,z} \forall y \in \mathcal{G} \forall z \in \mathcal{Z}$|unit size of generator $y$ in zone $z$|
 |$\kappa_{k,z,t}^{E,UP/DN}$|is the maximum ramp-up or ramp-down rate as a percentage of installed capacity|
 |$\underline{\rho_{k,z}^{E,THE}}$|is the minimum stable power output per unit of installed capacity|
 |$\overline{\rho_{k,z,t}^{E,THE}}$|is the maximum available generation per unit of installed capacity|
+|$\eta_{l}^{{E,NET}}$|Fixed percentage of power losses along the line|
+|$\ell_{l,t}$|Piece-wise linear approximation of quadratic power losses|
 |||
 ---
