@@ -7,10 +7,12 @@
 |$t \in \mathcal{T}$ | where $t$ denotes an time step and $\mathcal{T}$ is the set of time steps over which grid operations are modeled|
 $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of zones in the network|
 |$z \rightarrow z^{\prime} \in \mathcal{B}$ |where $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity, hydrogen flow via pipelines and trucks, carbon flow via pipelines and trucks and $\mathcal{B}$ is the set of all possible routes|
+|$m \in \mathcal{M}$| Representative period over which a storage unit operates|
 |$s \in \mathcal{SEG}$| where $s$ denotes a segment and $\mathcal{SEG}$ is the set of consumers segments for price-responsive demand curtailment |
 |$z \in \mathcal{Z}^{CRM}_{p}$| set of zones from the locational deliverability area (LDA) for capacity reserve margin constraints|
 |$\mathcal{Z}_{p,mass}^{CO_2}$|set of zones that are under the emission cap mass-based cap-and-trade policy constraint|
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$|
+|$y \in \mathcal{W}$|Set of hydroelectric generators with water storage reservoirs|
 ---
 
 
@@ -43,6 +45,7 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$\mathcal{D}_{z,t}$| is the forecasted electricity demand in zone $z$ at time $t$ (before any demand flexibility)|
 |$\rho^{max}_{y,z,t}$| is the forecasted capacity factor for variable renewable resource $y \in VRE$ and zone $z$ in time step $t$|
 |$\Delta^{\text{total}}_{y,z}$| is the total installed capacity of variable renewable resources $y \in VRE$ and zone $z$|
+|$\Delta Q_{o,z,m}$|The change in storage inventory $o$ associated with zone $z$ over the representative period $m$|
 |$\alpha^{Contingency,Aux}_{y,z}$|$\alpha^{Contingency,Aux}_{y,z} \in [0,1]$ is a binary auxiliary variable that is forced by the second and third equations above to be 1 if the total installed capacity $\Delta^{\text{total}}_{y,z} > 0$ for any generator $y \in \mathcal{UC}$ and zone $z$, and can be 0 otherwise|
 |$x_{l,t}^{E,NET}$|Power flows on each line $l$ into or out of a zone (defined by the network map $f^{E,map}(\cdot): l \rightarrow z$), are considered in the demand balance equation for each zone|
 |$f^{E,loss}(\cdot)$|The losses function $f^{E,loss}(\cdot)$ will depend on the configuration used to model losses (see below)|
@@ -121,5 +124,9 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$\ell_{l,t}$|Piece-wise linear approximation of quadratic power losses|
 |$R_{r,z,t}^{E, VRE}$| Time dependent hourly capacity factor of a resource $r$ in zone $z$ at time $t$ |
 |$\rho_{y,z}^{max}$|The maximum availability factor for technology $y$ in zone $z$|
+|$\eta_{y,z}^{down}$|Generation efficiency of hydroelectric generators with unknown reservoir capacity|
+|$\mu^{stor}_{y,z}$|Ratio of energy capacity to discharge power capacity for a hydroelectric generator|
+|$\kappa^{down}_{y,z}$|Maximum ramp-down for hydroelectric generator $y$ in zone $z$|
+|$\kappa^{up}_{y,z}$|Maximum ramp-up for hydroelectric generator $y$ in zone $z$|
 |||
 ---
