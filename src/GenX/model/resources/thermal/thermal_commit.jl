@@ -90,16 +90,16 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 ```math
 \begin{aligned}
 	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,DN}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
-	\qquad &- \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,DN}} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,THE}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	\qquad &- \underline{\rho}_{k,z,t}^{\textrm{E,THE}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
+	\qquad &+ \text{min}(\overline{\rho}_{k,z,t}^{\textrm{E,THE}}}, \text{max}(\underline{\rho}_{k,z,t}^{\textrm{E,THE}}, \kappa_{k,z}^{\textrm{E,THE}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
 	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,UP}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
-	\qquad &- \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\qquad &+ \text{min}(\overline{\rho}_{k,z,t}^{\textrm{E,THE}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
+	\qquad &- \underline{\rho}_{k,z,t}^{\textrm{E,THE}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
@@ -272,13 +272,13 @@ When modeling frequency regulation and reserves contributions, thermal units sub
 
 ```math
 \begin{equation*}
-	f_{k,z,t}^{\textrm{E,THE}} \leq \upsilon^{reg}_{k,z} \times \overline{\rho_{k,z,t}^{\textrm{E,THE}}}} (\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	f_{k,z,t}^{\textrm{E,THE}} \leq \upsilon_{k,z}^{reg} \times \overline{\rho}_{k,z,t}^{\textrm{E,THE}} (\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	r_{k,z,t}^{\textrm{E,THE}} \leq \upsilon^{rsv}_{y,z} \times \overline{\rho_{k,z,t}^{\textrm{E,THE}}}} (\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	r_{k,z,t}^{\textrm{E,THE}} \leq \upsilon_{y,z}^{rsv} \times \overline{\rho}_{k,z,t}^{\textrm{E,THE}} (\Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}}) \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -292,13 +292,13 @@ When modeling frequency regulation and spinning reserves contributions, thermal 
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{E,THE}} - f_{k,z,t}^{\textrm{E,THE}} \geq \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times Omega^{size}_{y,z} \times n_{k,z,t}^{\textrm{E,UP}} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} - f_{k,z,t}^{\textrm{E,THE}} \geq \underline{\rho}_{k,z,t}^{\textrm{E,THE}} \times Omega^{size}_{y,z} \times n_{k,z,t}^{\textrm{E,UP}} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{E,THE}} + f_{k,z,t}^{\textrm{E,THE}} + r_{k,z,t}^{\textrm{E,THE}} \leq \overline{\rho_{k,z,t}^{\textrm{E,THE}}}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} + f_{k,z,t}^{\textrm{E,THE}} + r_{k,z,t}^{\textrm{E,THE}} \leq \overline{\rho}_{k,z,t}^{\textrm{E,THE}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,UP}} \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 

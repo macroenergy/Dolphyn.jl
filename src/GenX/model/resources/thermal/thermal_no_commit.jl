@@ -54,13 +54,13 @@ When not modeling regulation and reserves, thermal units not subject to unit com
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{E,THE}} \geq \underline{R_{k,z}^{\textrm{E,THE}}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} \geq \underline{R}_{k,z}^{\textrm{E,THE}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{E,THE}} \leq \overline{R_{k,z}^{\textrm{E,THE}}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} \leq \overline{R}_{k,z}^{\textrm{E,THE}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 3-4 in the code)
