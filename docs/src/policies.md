@@ -22,5 +22,3 @@ Pages = ["GenX/model/policies/energy_share_requirement.jl"]
 Modules = [DOLPHYN]
 Pages = ["GenX/model/policies/minimum_capacity_requirement.jl"]
 ```
-
-## 

@@ -46,10 +46,10 @@ One cannot retire more capacity than existing capacity.
 \end{equation*}
 ```
 
-For storage resources where upper bound $\overline{R_{s,z}^{\textrm{E,ENE}}}$ and lower bound $\underline{R_{s,z}^{\textrm{E,ENE}}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
+For storage resources where upper bound $\overline{\textrm{R}}_{s,z}^{\textrm{E,ENE}}$ and lower bound $\underline{\textrm{R}}_{s,z}^{\textrm{E,ENE}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
 ```math
 \begin{equation*}
-	\underline{R}_{s,z}^{\textrm{E,ENE}} \leq y_{s,z}^{\textrm{E,ENE}} \leq \overline{R}_{s,z}^{\textrm{E,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	\underline{\textrm{R}}_{s,z}^{\textrm{E,ENE}} \leq y_{s,z}^{\textrm{E,ENE}} \leq \overline{\textrm{R}}_{s,z}^{\textrm{E,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """

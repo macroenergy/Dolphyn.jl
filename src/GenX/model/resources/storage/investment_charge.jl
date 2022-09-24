@@ -46,10 +46,11 @@ One cannot retire more capacity than existing capacity.
 \end{equation*}
 ```
 
-For storage resources where upper bound $\overline{R_{s,z}^{\textrm{E,CHA}}}$ and lower bound $\underline{R_{s,z}^{\textrm{E,CHA}}}$ is defined, then we impose constraints on minimum and maximum storage charge capacity.
+For storage resources where upper bound $\overline{\textrm{R}}_{s,z}^{\textrm{E,CHA}}$ and lower bound $\underline{\textrm{R}}_{s,z}^{\textrm{E,CHA}}$ is defined, then we impose constraints on minimum and maximum storage charge capacity.
+
 ```math
 \begin{equation*}
-	\underline{R}_{s,z}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,CHA}} \leq \overline{R}_{s,z}^{\textrm{E,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	\underline{\textrm{R}}_{s,z}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,CHA}} \leq \overline{\textrm{R}}_{s,z}^{\textrm{E,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """

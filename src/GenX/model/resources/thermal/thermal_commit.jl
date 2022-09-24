@@ -98,7 +98,7 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 ```math
 \begin{aligned}
 	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,UP}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
-	\qquad &+ \text{min}(\overline{\rho}_{k,z,t}^{\textrm{E,THE}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
+	\qquad &+ \text{min}(\overline{\rho}_{k,z,t}^{\textrm{E,THE}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
 	\qquad &- \underline{\rho}_{k,z,t}^{\textrm{E,THE}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
