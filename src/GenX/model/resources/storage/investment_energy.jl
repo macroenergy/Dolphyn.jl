@@ -33,7 +33,7 @@ The total energy capacity of storage resource is defined as the sum of the exist
 In addition, this module adds investment and fixed OM costs related to energy capacity to the objective function:
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{E,ENE,c}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{E,ENE,INV}}} \times y_{s,z}^{\textrm{E,ENE,new}} + \textrm{c}_{s,z}^{\textrm{E,ENE,FOM}} \times y_{s,z}^{\textrm{E,ENE,total}})
+	\textrm{C}^{\textrm{E,ENE,c}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \left(\textrm{c}_{s,z}^{\textrm{E,ENE,INV}}} \times y_{s,z}^{\textrm{E,ENE,new}} + \textrm{c}_{s,z}^{\textrm{E,ENE,FOM}} \times y_{s,z}^{\textrm{E,ENE,total}}\right)
 \end{equation*}
 ```
 
@@ -49,7 +49,7 @@ One cannot retire more capacity than existing capacity.
 For storage resources where upper bound $\overline{R_{s,z}^{\textrm{E,ENE}}}$ and lower bound $\underline{R_{s,z}^{\textrm{E,ENE}}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
 ```math
 \begin{equation*}
-	\underline{R_{s,z}^{\textrm{E,ENE}}} \leq y_{s,z}^{\textrm{E,ENE}} \leq \overline{R_{s,z}^{\textrm{E,ENE}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	\underline{R}_{s,z}^{\textrm{E,ENE}} \leq y_{s,z}^{\textrm{E,ENE}} \leq \overline{R}_{s,z}^{\textrm{E,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """
