@@ -21,9 +21,9 @@ Sets up variables and constraints common to all storage resources.
 
 **Storage discharge and inventory level decision variables**
 
-This module defines the storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy stored in the storage device $s$ in zone $z$ at time period $t$.
+This module defines the storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}}\quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy stored in the storage device $s$ in zone $z$ at time period $t$.
 
-This module defines the power charge decision variable $x_{s,z,t}^{\textrm{E,CHA}}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$.
+This module defines the power charge decision variable $x_{s,z,t}^{\textrm{E,CHA}}\quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$.
 
 The variable defined in this file named after ```vS``` covers $U_{s,z,t}^{\textrm{E,STO}}$.
 
@@ -35,7 +35,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{E,STO,o}} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z} \sum_{t \in \mathcal{T}\omega_t \times \textrm{c}_{s,z,t}^{\textrm{E,STO,o}} \times x_{s,z,t}^{\textrm{E,CHA}}
+	\textrm{C}^{\textrm{E,STO,o}} = \sum_{s \in \mathcal{S} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\omega_t \times \textrm{c}_{s,z,t}^{\textrm{E,STO,o}} \times x_{s,z,t}^{\textrm{E,CHA}}
 \end{equation*}
 ```
 
@@ -58,7 +58,7 @@ The first of these two constraints enforces storage inventory balance for interi
 
 ```math
 \begin{aligned}
-	U_{s,z,t}^{\textrm{E,STO}} &= U_{s,z,t-1}^{\textrm{E,STO}} - \frac{1}{\eta_{s,z}^{\textrm{E,STO}}}x_{s,z,t}^{\textrm{E,DIS}} + \eta_{s,z}^{\textrm{E,STO}}x_{s,z,t}^{\textrm{E,STO}} - \eta_{s,z}^{E,loss}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	U_{s,z,t}^{\textrm{E,STO}} &= U_{s,z,t-1}^{\textrm{E,STO}} - \frac{1}{\eta_{s,z}^{\textrm{E,STO}}}x_{s,z,t}^{\textrm{E,DIS}} + \eta_{s,z}^{\textrm{E,STO}}x_{s,z,t}^{\textrm{E,STO}} - \eta_{s,z}^{\textrm{E,loss}}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
 	U_{s,z,t}^{\textrm{E,STO}} &= U_{s,z,t+\tau^{period}-1}^{\textrm{E,STO}} - \frac{1}{\eta_{s,z}^{\textrm{E,STO}}}x_{s,z,t}^{\textrm{E,DIS}} + \eta_{s,z}^{\textrm{E,STO}}x_{s,z,t}^{\textrm{E,CHA}} - \eta_{s,z}^{\textrm{E,loss}} U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
