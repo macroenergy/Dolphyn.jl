@@ -32,6 +32,7 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$C^{{E,NSD}}$|Cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T} and all zones $z \in \mathcal{Z}$|
 |$C^{E,NET,c}$|Transmission reinforcement costs|
 |$x_{s,z,t}^{E,NSD} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$|the non-served energy/curtailed demand decision variable representing the total amount of demand curtailed in demand segment $s$ at time period $t$ in zone $z$|
+|$x_{r,z,t}^{E, CUR}$|The amount of variable energy resource $r$ in zone $z$ that needs to be curtailed at time $t$|
 |$n_{s}^{E,NSD}$|representing the marginal willingness to pay for electricity of this segment of demand|
 |$\pi^{TCAP}_{l}$| Transmission reinforcement or construction cots for a transmission line [$/MW-yr] |
 |$D_{z, t}^{E}$ |Note that the current implementation assumes demand segments are an equal share of hourly load in all zones|
@@ -56,14 +57,14 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$overline{\epsilon_{z,p,load}^{CO_2}}$| denotes the emission limit in terms on t$CO_2$/MWh|
 |$\mathcal{Z}_{p}^{ESR}$|For each constraint $p \in \mathcal{P}^{ESR}$, we define a subset of zones $z \in \mathcal{Z}_{p}^{ESR} \subset \mathcal{Z}$ that are eligible for trading renewable/clean energy credits to meet the corresponding renewable/clean energy requirement.|
 |$\epsilon_{g,z,p}^{MinCapReq}$| is the eligibility of a generator of technology $g$ in zone $z$ of requirement $p$ and will be equal to $1$ for eligible generators and will be zero for ineligible resources|
-|$y_{r,z}^{E,VRE,total}$|VRE resources are a function of each technology's time-dependent hourly capacity factor, in per unit terms, and the total available capacity ($y_{r,z}^{E,VRE,total}$).|
+|$y_{r,z}^{E,VRE,total}$|VRE resources are a function of each technology's time-dependent hourly capacity factor, in per unit terms, and the total available capacity ( $y_{r,z}^{E,VRE,total}$ ).|
 |$y_{r,z}^{E,VRE,new}$|variables related to installed capacity ($y_{r,z}^{E,VRE,new}$) for all resource bins for a particular VRE resource type $r$ and zone $z$|
 |$y_{r,z}^{E,VRE,retired}$|retired capacity ($y_{r,z}^{E,VRE,retired}$) for all resource bins for a particular VRE resource type $r$ and zone $z$|
 |$y_l^{E,NET,new}$|The additional transmission capacity required|
 |$y_{l}^{{E, NET, Existing}}|The maximum power transfer capacity of a given line|
 |$R_{f,z,t}^{E,FLEX}$|maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $R_{f,z,t}^{E,FLEX}$|
 |$\eta_{f,z}^{E,FLEX}$|the energy losses associated with shifting demand|
-|$x_{f,z,t}^{E,FLEX}$|the amount of deferred demand remaining to be served depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$)|
+|$x_{f,z,t}^{E,FLEX}$|the amount of deferred demand remaining to be served depends on the amount in the previous time step minus the served demand during time step $t$ ( $\Theta_{y,z,t}$ ) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ( $\Pi_{y,z,t}$ )|
 |$Q_{o,z, n}$|models inventory of storage technology $o \in O$ in zone $z$ in each input period $n \in \mathcal{N}$|
 |$\kappa^{down/up}_{y,z}$|the maximum ramp rates ($\kappa^{down}_{y,z}$ and $\kappa^{up}_{y,z}$ ) in per unit terms|
 |$\upsilon^{reg/rsv}_{y,z}$|The amount of frequency regulation and operating reserves procured in each time step is bounded by the user-specified fraction ($\upsilon^{reg}_{y,z}$,$\upsilon^{rsv}_{y,z}$) of nameplate capacity for each reserve type|
@@ -74,6 +75,7 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$x_{s,z,t}^{E,CHA}$|This module defines the power charge decision variable $x_{s,z,t}^{E,CHA}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$|
 |$f_{s,z,t}^{E,CHA/DIS}$|where is the contribution of storage resources to frequency regulation while charging or discharging|
 |$r_{s,z,t}^{E,CHA/DIS}$|$r_{s,z,t}^{E,CHA/DIS}$ are created for storage resources, to denote the contribution of storage resources to  reserves while charging or discharging|
+|$\Delta_{y,z,t}$|The available capacity of technology $y$ in zone $z$ at time interval $t$|
 |$\frac{y_{k,z}^{E,THE}}{\Omega_{k,z}^{E,THE,size}}$|<Documentation Missing>|
 |$n_{k,z,t}^{E,THE}$|designates the commitment state of generator cluster $k$ in zone $z$ at time $t$|
 |$n_{k,z,t}^{E,UP}$|represents number of startup decisions|
@@ -100,9 +102,10 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$c_l^{E, NET}$|transmission reinforcement/construction cost|
 |$\epsilon^{load}_{reg}$ and $\epsilon^{vre}_{reg}$ |are parameters specifying the required frequency regulation as a fraction of forecasted demand and variable renewable generation|
 |$\epsilon_{y,z,p}^{CRM}$|the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter|
+|$\overline{y_{r,z}^{E, VRE}}$|Maximum availability of a variable energy resource $r$ in zone $z$ |
 |$\epsilon_{g,z}^{CO_2}$|For every generator $g$, the parameter reflects the specific $CO_2$ emission intensity in t$CO_2$/MWh associated with its operation|
 |$VREIndex_{r,z}$|Parameter $VREIndex_{r,z}$, is used to keep track of the first bin, where $VREIndex_{r,z}=1$ for the first bin and $VREIndex_{r,z}=0$ for the remaining bins|
-|$\tau^{advance/delay}_{f,z}$|the maximum time this demand can be advanced and delayed, defined by parameters, $\tau^{advance}_{f,z}$ and $\tau^{delay}_{f,z}$, respectively|
+|$\tau^{advance/delay}_{f,z}$|the maximum time this demand can be advanced and delayed, defined by parameters, $\tau_{f,z}^{advance}$ and $\tau_{f,z}^{delay}$ respectively|
 |$M_y$|`Big M' constant equal to the largest possible capacity that can be installed for generation cluster $y$|
 |$\alpha^{Contingency, Aux}_{y,z} \in [0,1]| is a binary auxiliary variable that reflects the total installed capacity for generator $y$ in zone $z$|
 |f^{E, map}(.)|The power network structure is defined by $f^{E, map}(\cdot)$|
@@ -116,5 +119,7 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$\overline{\rho_{k,z,t}^{E,THE}}$|is the maximum available generation per unit of installed capacity|
 |$\eta_{l}^{{E,NET}}$|Fixed percentage of power losses along the line|
 |$\ell_{l,t}$|Piece-wise linear approximation of quadratic power losses|
+|$R_{r,z,t}^{E, VRE}$| Time dependent hourly capacity factor of a resource $r$ in zone $z$ at time $t$ |
+|$\rho_{y,z}^{max}$|The maximum availability factor for technology $y$ in zone $z$|
 |||
 ---
