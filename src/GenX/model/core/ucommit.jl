@@ -21,11 +21,11 @@ This function creates decision variables and cost expressions associated with th
 
 **Unit commitment decision variables**
 
-Commitment state variable $n_{k,z,t}^{\textrm{E,THE}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Commitment state variable $n_{k,z,t}^{\textrm{E,THE}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-Startup decision variable $n_{k,z,t}^{\textrm{E,UP}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Startup decision variable $n_{k,z,t}^{\textrm{E,UP}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-Shutdown decision variable $n_{k,z,t}^{\textrm{E,DN}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+Shutdown decision variable $n_{k,z,t}^{\textrm{E,DN}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
 The variable defined in this file named after ```vCOMMIT``` covers $n_{k,z,t}^{\textrm{E,THE}}$.
 
@@ -38,9 +38,9 @@ The variable defined in this file named after ```vSHUT``` covers $n_{k,z,t}^{\te
 The total cost of start-ups across all generators subject to unit commitment ($k \in \mathcal{UC}, \mathcal{UC} \subseteq \mathcal{G}$) and all time periods $t$ is expressed as:
 
 ```math
-\begin{equation}
-	\textrm{C}^{\textrm{E,start}} = \sum_{k \in \mathcal{UC} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{E,start}} \times \n_{k,z,t}^{\textrm{E,UP}}
-\end{equation}
+\begin{equation*}
+	\textrm{C}^{\textrm{E,start}} = \sum_{k \in \mathcal{UC} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{E,start}} \times n_{k,z,t}^{\textrm{E,UP}}
+\end{equation*}
 ```
 
 If set ```UCommit``` to 1, the unit commitment variables are set to integer types. IF ```UCommit``` =2, these variables are treated as continuous.
