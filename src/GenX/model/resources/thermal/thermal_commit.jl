@@ -19,11 +19,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function defines the operating constraints for thermal power plants subject to unit commitment constraints on power plant start-ups and shut-down decision ($k \in \mathcal{UC}$).
 
-We model capacity investment decisions and commitment and cycling (start-up, shut-down) of thermal generators using the integer clustering technique developed in [Palmintier, 2011](https://pennstate.pure.elsevier.com/en/publications/impact-of-unit-commitment-constraints-on-generation-expansion-pla), [Palmintier, 2013](https://dspace.mit.edu/handle/1721.1/79147), and [Palmintier, 2014](https://ieeexplore.ieee.org/document/6684593). 
-In a typical binary unit commitment formulation, each unit is either on or off. 
-With the clustered unit commitment formulation, one or more cluster(s) of similar generators are clustered by type and zone (typically using heat rate and fixed OM cost to create clusters), and the integer commitment state variable for each cluster varies from zero to the number of units in the cluster, $\frac{y_{k,z}^{\textrm{E,THE}}}{\Omega_{k,z}^{\textrm{E,THE,size}}}$. 
-As discussed in \cite{Palmintier2014}, this approach replaces the large set of binary commitment decisions and associated constraints, which scale directly with the number of individual units, with a smaller set of integer commitment states and  constraints, one for each cluster $k$. 
-The dimensionality of the problem thus scales with the number of units of a given type in each zone, rather than by the number of discrete units, significantly improving computational efficiency. 
+We model capacity investment decisions and commitment and cycling (start-up, shut-down) of thermal generators using the integer clustering technique developed in [Palmintier, 2011](https://pennstate.pure.elsevier.com/en/publications/impact-of-unit-commitment-constraints-on-generation-expansion-pla), [Palmintier, 2013](https://dspace.mit.edu/handle/1721.1/79147), and [Palmintier, 2014](https://ieeexplore.ieee.org/document/6684593).
+In a typical binary unit commitment formulation, each unit is either on or off.
+With the clustered unit commitment formulation, one or more cluster(s) of similar generators are clustered by type and zone (typically using heat rate and fixed O\&M cost to create clusters), and the integer commitment state variable for each cluster varies from zero to the number of units in the cluster, $\frac{y_{k,z}^{\textrm{E,THE}}}{\Omega_{k,z}^{\textrm{E,THE,size}}}$.
+As discussed in \cite{Palmintier2014}, this approach replaces the large set of binary commitment decisions and associated constraints, which scale directly with the number of individual units, with a smaller set of integer commitment states and  constraints, one for each cluster $k$.
+The dimensionality of the problem thus scales with the number of units of a given type in each zone, rather than by the number of discrete units, significantly improving computational efficiency.
 However, this method entails the simplifying assumption that all clustered units have identical parameters (e.g., capacity size, ramp rates, heat rate) and that all committed units in a given time step $t$ are operating at the same power output per unit.
 
 **Power balance expressions**
@@ -60,17 +60,17 @@ Thermal resources subject to unit commitment $k \in \mathcal{UC}$ adhere to the 
 \end{equation*}
 ```
 
-where decision $n_{k,z,t}^{\textrm{E,THE}}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$, 
-decision $n_{k,z,t}^{\textrm{E,UP}}$ represents number of startup decisions, 
-decision $n_{k,z,t}^{\textrm{E,DN}}$ represents number of shutdown decisions, 
+where decision $n_{k,z,t}^{\textrm{E,THE}}$ designates the commitment state of generator cluster $k$ in zone $z$ at time $t$,
+decision $n_{k,z,t}^{\textrm{E,UP}}$ represents number of startup decisions,
+decision $n_{k,z,t}^{\textrm{E,DN}}$ represents number of shutdown decisions,
 $y_{k,z}^{\textrm{E,THE}}$ is the total installed capacity, and parameter $\Omega_{k,z}^{\textrm{E,THE,size}}$ is the unit size.
 (See Constraints 1-3 in the code)
 
 *Commitment state constraint linking start-up and shut-down decisions*
 
-Additionally, the following constarint maintains the commitment state variable across time, 
-$n_{k,z,t}^{\textrm{E,THE}}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{\textrm{E,THE}}$, 
-period plus the number of units started in the current period, $n_{k,z,t}^{\textrm{E,UP}}$, 
+Additionally, the following constarint maintains the commitment state variable across time,
+$n_{k,z,t}^{\textrm{E,THE}}$, as the sum of the commitment state in the prior, $n_{k,z,t-1}^{\textrm{E,THE}}$,
+period plus the number of units started in the current period, $n_{k,z,t}^{\textrm{E,UP}}$,
 minus the number of units shut down in the current period, $n_{k,z,t}^{\textrm{E,DN}}$:
 
 ```math
@@ -91,20 +91,20 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 \begin{aligned}
 	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,DN}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
 	\qquad &- \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times n_{k,z,t}^{\textrm{E,DN}} \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,THE}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T} 
+	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,THE}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,UP}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{E,THE}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{E,THE}}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
-	\qquad &- \underline{\rho_{k,z,t}^{\textrm{E,THE}}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} &\leq \kappa_{k,z}^{\textrm{E,UP}} \times \Omega_{k,z}^{\textrm{E,THE},size} \times \left(n_{k,z,t}^{\textrm{E,UP}} - n_{k,z,t}^{\textrm{E,DN}}\right) \\
+\qquad &+ \text{min}(\overline{\rho}_{k,z,t}^{\textrm{E,THE}}, \text{max}(\underline{\rho}_{k,z,t}^{\textrm{E,THE}}, \kappa_{k,z}^{\textrm{E,UP}})) \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \\
+\qquad &- \underline{\rho}_{k,z,t}^{\textrm{E,THE}} \times \Omega_{k,z}^{\textrm{E,THE,size}} \times n_{k,z,t}^{\textrm{E,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
 
-where decision $x_{k,z,t}^{\textrm{E,THE}}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{k,z,t}^{\textrm{E,UP}}$, $\kappa_{k,z,t}^{\textrm{E,DN}}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\underline{\rho_{k,z}^{\textrm{E,THE}}}$ is the minimum stable power output per unit of installed capacity, 
+where decision $x_{k,z,t}^{\textrm{E,THE}}$ is the energy injected into the grid by technology $y$ in zone $z$ at time $t$, parameter $\kappa_{k,z,t}^{\textrm{E,UP}}$, $\kappa_{k,z,t}^{\textrm{E,DN}}$ is the maximum ramp-up or ramp-down rate as a percentage of installed capacity, parameter $\underline{\rho_{k,z}^{\textrm{E,THE}}}$ is the minimum stable power output per unit of installed capacity,
 and parameter $\overline{\rho_{k,z,t}^{\textrm{E,THE}}}$ is the maximum available generation per unit of installed capacity. These constraints account for the ramping limits for committed (online) units as well as faster changes in power enabled by units starting or shutting down in the current time step.
 
 **Minimum and maximum power output**
@@ -254,7 +254,7 @@ function thermal_commit(EP::Model, inputs::Dict, Reserves::Int)
 	@constraint(EP, [y in THERM_COMMIT, t in 1:T],
 		EP[:eTotalCap][y]/dfGen[y,:Cap_Size]-EP[:vCOMMIT][y,t] >= sum(EP[:vSHUT][y, hoursbefore(p, t, 0:(Down_Time[y] - 1))])
 	)
-	
+
 
 	## END Constraints for thermal units subject to integer (discrete) unit commitment decisions
 
@@ -282,8 +282,8 @@ When modeling frequency regulation and reserves contributions, thermal units sub
 \end{equation*}
 ```
 
-where $f_{k,z,t}^{\textrm{E,THE}}$ is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon^{reg}_{k,z}$, and $r_{k,z,t}^{\textrm{E,THE}}$ is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$. 
-Limits on reserve contributions reflect the maximum ramp rate for the thermal resource in whatever time interval defines the requisite response time for the regulation or reserve products (e.g., 5 mins or 15 mins or 30 mins). 
+where $f_{k,z,t}^{\textrm{E,THE}}$ is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon^{reg}_{k,z}$, and $r_{k,z,t}^{\textrm{E,THE}}$ is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$.
+Limits on reserve contributions reflect the maximum ramp rate for the thermal resource in whatever time interval defines the requisite response time for the regulation or reserve products (e.g., 5 mins or 15 mins or 30 mins).
 These response times differ by system operator and reserve product, and so the user should define these parameters in a self-consistent way for whatever system context they are modeling.
 
 **Minimum and maximum power output**

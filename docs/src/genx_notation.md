@@ -13,6 +13,8 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$\mathcal{Z}_{p,mass}^{CO_2}$|set of zones that are under the emission cap mass-based cap-and-trade policy constraint|
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$|
 |$y \in \mathcal{W}$|Set of hydroelectric generators with water storage reservoirs|
+|$y \in \mathcal{MR}$|set of generator/technology that are must-run resources. For these resources their output $t$ in each time interval must be exactly equal to their available capacity factor times the installed capacity and not allow for curtailment. These resources are also not eligible for contributing to anciliary services.|
+|$k \in \mathcal{UC}$|Set of decisions pertaining to Unit commitment|
 ---
 
 
@@ -90,6 +92,7 @@ $z \in \mathcal{Z}$ | where $z$ denotes a zone and $\mathcal{Z}$ is the set of z
 |$r_{k,z,t}^{E,THE}$| is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$|
 |$ON_{l,t}^{E, NET+} \in [0, 1]$|Binary variable to activate positive flows on line $l$ at time $t$|
 |$TransON_{l,t}^{E, NET+} \forall l \in \mathcal{L}, t \in \mathcal{T}$|Variable defining maximum positive flow in line l in time t [MW]|
+|$R_{k,z} \forall k \in \mathcal{K} \forall z \in \mathcal{Z}$|Contribution of thermal resource $k$ in zone $z$ |
 ## Parameters
 ---
 |**Notation** | **Description**|

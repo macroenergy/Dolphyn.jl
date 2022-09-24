@@ -22,12 +22,12 @@ This function defines the operating constraints for thermal power plants NOT sub
 **Power balance expressions**
 
 Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
-	
+
 ```math
 \begin{equation*}
 	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}
 \end{equation*}
-```	
+```
 
 **Ramping limits**
 
@@ -35,13 +35,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation*}
-	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,DN}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,DN}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,UP}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,UP}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 1-2 in the code)
