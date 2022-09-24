@@ -20,21 +20,22 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Sets up constraints common to all generation resources.
 
 This function defines the expressions and constraints keeping track of: 
-- total available thermal generation capacity $y_{k}^{\textrm{E,THE}}$ as well as constraints on capacity retirements.
-- total available renewable generation capacity $y_{r}^{\textrm{E,VRE}}$ as well as constraints on capacity retirements.
-- total available storage discharge capacity $y_{s}^{\textrm{\textrm{E,STO},DIS}}$ as well as constraints on capacity retirements.
+- total available thermal generation capacity $y_{k, z}^{\textrm{E,THE}}$ as well as constraints on capacity retirements.
+- total available renewable generation capacity $y_{r, z}^{\textrm{E,VRE}}$ as well as constraints on capacity retirements.
+- total available storage discharge capacity $y_{s, z}^{\textrm{\textrm{E,STO},DIS}}$ as well as constraints on capacity retirements.
 
-The expression defined in this file named after ```eTotalCap``` covers all variables $y_{k}^{\textrm{E,THE}}, y_{r}^{\textrm{E,VRE}}, y_{s}^{\textrm{\textrm{E,STO},DIS}}$.
+The expression defined in this file named after ```eTotalCap``` covers all variables $y_{k, z}^{\textrm{E,THE}}, y_{r, z}^{\textrm{E,VRE}}, 
+y_{s, z}^{\textrm{\textrm{E,STO},DIS}}$.
 
 ```math
 \begin{equation*}
-	y_{g}^{\textrm{E,GEN}} = 
+	y_{g, z}^{\textrm{E,GEN}} = 
 	\begin{cases}
-		y_{k}^{\textrm{E,THE}} \quad if \quad k \in \mathcal{K} \\
-		y_{r}^{\textrm{E,VRE}} \quad if \quad r \in \mathcal{R} \\
-		y_{s}^{\textrm{\textrm{E,STO},DIS}} \quad if \quad s \in \mathcal{S}
+		y_{k, z}^{\textrm{E,THE}} \quad if \quad k \in \mathcal{K} \\
+		y_{r, z}^{\textrm{E,VRE}} \quad if \quad r \in \mathcal{R} \\
+		y_{s, z}^{\textrm{\textrm{E,STO},DIS}} \quad if \quad s \in \mathcal{S}
 	\end{cases}
-	\quad \forall g \in \mathcal{G}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -44,10 +45,10 @@ Note for energy storage resources in power sector, additional energy and charge 
 ```math
 \begin{equation*}
 	\begin{split}
-	y_{g}^{\textrm{E,GEN}} &= y_{g}^{\textrm{E,GEN,total}} \\ 
-	& = y_{g}^{\textrm{E,GEN,existing}}+y_{g}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
+	y_{g, z}^{\textrm{E,GEN}} &= y_{g, z}^{\textrm{E,GEN,total}} \\ 
+	& = y_{g, z}^{\textrm{E,GEN,existing}}+y_{g, z}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
 	\end{split}
-	\quad \forall g \in \mathcal{G}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -57,7 +58,7 @@ This module additionally defines contributions to the objective function from in
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{E,GEN,c}} = \sum_{g in G} y_{g}^{\textrm{E,GEN,new}}\times \textrm{c}_{g}^{\textrm{E,INV}} + \sum_{g in G} y_{g}^{\textrm{E,GEN,total}}\times \textrm{c}_{g}^{\textrm{E,FOM}}
+	\textrm{C}^{\textrm{E,GEN,c}} = \sum_{z \in \mathcal{Z}}\left(\sum_{g \in \mathcal{G}} y_{g, z}^{\textrm{E,GEN,new}}\times \textrm{c}_{g, z}^{\textrm{E,INV}} + \sum_{g \in \mathcal{G}} y_{g, z}^{\textrm{E,GEN,total}}\times \textrm{c}_{g, z}^{\textrm{E,FOM}}\right)
 \end{equation*}
 ```
 
@@ -66,15 +67,15 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-	0 \leq y_{g}^{\textrm{E,GEN,retired}} \leq y_{g}^{\textrm{E,GEN,existing}} \quad \forall g \in \mathcal{G}
+	0 \leq y_{g, z}^{\textrm{E,GEN,retired}} \leq y_{g, z}^{\textrm{E,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
-For resources where upper bound $\overline{y_{g}^{\textrm{E,GEN}}}$ and lower bound $\underline{y_{g}^{\textrm{E,GEN}}}$ of capacity is defined, then we impose constraints on minimum and maximum power capacity.
+For resources where upper bound $\overline{y}_{g, z}^{\textrm{E,GEN}}$ and lower bound $\underline{y}_{g, z}^{\textrm{E,GEN}}$ of capacity is defined, then we impose constraints on minimum and maximum power capacity.
 
 ```math
 \begin{equation*}
-	\underline{y_{g}^{\textrm{E,GEN}}} \leq y_{g}^{\textrm{E,GEN}} \leq \overline{y_{g}^{\textrm{E,GEN}}} \quad \forall g \in \mathcal{G}
+	\underline{y}_{g, z}^{\textrm{E,GEN}} \leq y_{g, z}^{\textrm{E,GEN}} \leq \overline{y}_{g, z}^{\textrm{E,GEN}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """
