@@ -32,14 +32,14 @@ Note that fixed O\&M and replacement capital costs (depreciation) for existing t
 Power flow and transmission loss terms are also added to the power balance constraint for each zone:
 ```math
 \begin{equation*}
-	- \sum_{l\in \mathcal{L}}{(f^{\textrm{E,map}}(\cdot) \times x_{l,t}^{\textrm{E,NET}})} - \frac{1}{2} \sum_{l\in \mathcal{L}}{(f^{\textrm{E,map}}(\cdot) \times f^{\textrm{E,loss}}(\cdot))}
+	- \sum_{l\in \mathcal{L}}{(f^{\textrm{E,map}}(x_{l,t}^{\textrm{E,NET}}))} - \frac{1}{2} \sum_{l\in \mathcal{L}}{(f^{\textrm{E,map}}(\cdot) \times f^{\textrm{E,loss}}(x_{l,t}^{\textrm{E,NET}}))}
 \end{equation*}
 ```
 
 Power flows, $x_{l,t}^{\textrm{E,NET}}$, on each line $l$ into or out of a zone (defined by the network map $f^{\textrm{E,map}}(\cdot): l \rightarrow z$), are considered in the demand balance equation for each zone. 
 By definition, power flows leaving their reference zone are positive, thus the minus sign is used for this term. 
 Losses due to power flows increase demand, and one-half of losses across a line linking two zones are attributed to each connected zone. 
-The losses function $f^{E,loss}(\cdot)$ will depend on the configuration used to model losses (see below).
+The losses function $f^{\textrm{E,loss}}(\cdot)$ will depend on the configuration used to model losses (see below).
 
 **Accounting for Transmission and Network Expansion Between Zones**
 
@@ -60,7 +60,7 @@ The additional transmission capacity, $y_{l}^{\textrm{E,NET,new}}$, is constrain
 
 ```math
 \begin{equation*}
-	y_{l}^{\textrm{E,NET,new}} \leq \overline{y_{l}^{\textrm{E,NET,new}}} \quad \forall l \in \mathcal{E}
+	y_{l}^{\textrm{E,NET,new}} \leq \overline{y}_{l}^{\textrm{E,NET,new}} \quad \forall l \in \mathcal{E}
 \end{equation*}
 ```
 
