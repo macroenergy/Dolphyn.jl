@@ -76,13 +76,13 @@ If reserves are modeled, the following two constraints replace those above:
 
 ```math
 \begin{aligned}
-	x_{s,z,t}^{E,CHA} + f_{s,z,t}^{E,CHA} &\leq y_{s,z}^{\textrm{E,STO},POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	x_{s,z,t}^{E,CHA} + f_{s,z,t}^{E,CHA} + x_{s,z,t}^{\textrm{E,DIS}} + f_{s,z,t}^{\textrm{E,DIS}} + r_{s,z,t}^{E,CHA} \leq y_{s,z}^{\textrm{E,STO},POW} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{s,z,t}^{\textrm{E,CHA}} + f_{s,z,t}^{\textrm{E,CHA}} &\leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	x_{s,z,t}^{\textrm{E,CHA}} + f_{s,z,t}^{\textrm{E,CHA}} + x_{s,z,t}^{\textrm{E,DIS}} + f_{s,z,t}^{\textrm{E,DIS}} + r_{s,z,t}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
-where $f_{s,z,t}^{E,CHA}$ is the contribution of storage resources to frequency regulation while charging, $f_{s,z,t}^{\textrm{E,DIS}}$ is the contribution of storage resources to frequency regulation while discharging, and $r_{s,z,t}^{\textrm{E,DIS}}$ is the contribution of storage resources to upward reserves while discharging. 
-Note that as storage resources can contribute to regulation and reserves while either charging or discharging, the proxy variables $f_{s,z,t}^{E,CHA}, f_{s,z,t}^{\textrm{E,DIS}}$ and $r_{s,z,t}^{E,CHA}, r_{s,z,t}^{\textrm{E,DIS}}$ are created for storage resources where the total contribution to regulation and reserves, $f_{s,z,t}^{\textrm{E,STO}}, r_{s,z,t}^{\textrm{E,STO}}$ is the sum of the proxy variables.
+where $f_{s,z,t}^{\textrm{E,CHA}}$ is the contribution of storage resources to frequency regulation while charging, $f_{s,z,t}^{\textrm{E,DIS}}$ is the contribution of storage resources to frequency regulation while discharging, and $r_{s,z,t}^{\textrm{E,DIS}}$ is the contribution of storage resources to upward reserves while discharging. 
+Note that as storage resources can contribute to regulation and reserves while either charging or discharging, the proxy variables $f_{s,z,t}^{\textrm{E,CHA}}, f_{s,z,t}^{\textrm{E,DIS}}$ and $r_{s,z,t}^{\textrm{E,CHA}}, r_{s,z,t}^{\textrm{E,DIS}}$ are created for storage resources where the total contribution to regulation and reserves, $f_{s,z,t}^{\textrm{E,STO}}, r_{s,z,t}^{\textrm{E,STO}}$ is the sum of the proxy variables.
 """
 function storage_symmetric_reserves(EP::Model, inputs::Dict)
 

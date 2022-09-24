@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Sets up variables and constraints specific to storage resources with asymmetric charge and discharge capacities.
 
-For storage technologies with asymmetric charge and discharge capacities (all $s \in \mathcal{S}^{asym}$), charge rate $x_{s,z,t}^{E,CHA}$, is constrained by the total installed charge capacity $y_{s,z}^{\textrm{E,STO},CHA}$, as follows:
+For storage technologies with asymmetric charge and discharge capacities (all $s \in \mathcal{S}^{asym}$), charge rate $x_{s,z,t}^{\textrm{E,CHA}}$, is constrained by the total installed charge capacity $y_{s,z}^{\textrm{E,STO,CHA}}$, as follows:
 
 ```math
 \begin{equation*}
@@ -68,13 +68,13 @@ end
 
 Sets up variables and constraints specific to storage resources with asymmetric charge and discharge capacities when reserves are modeled.
 
-If reserves are modeled, two pairs of proxy variables $f_{s,z,t}^{E,CHA}, f_{s,z,t}^{\textrm{E,DIS}}$ and $r_{s,z,t}^{E,CHA}, r_{s,z,t}^{\textrm{E,DIS}}$ are created for storage resources, to denote the contribution of storage resources to regulation or reserves while charging or discharging, respectively. 
+If reserves are modeled, two pairs of proxy variables $f_{s,z,t}^{\textrm{E,CHA}}, f_{s,z,t}^{\textrm{E,DIS}}$ and $r_{s,z,t}^{\textrm{E,CHA}}, r_{s,z,t}^{\textrm{E,DIS}}$ are created for storage resources, to denote the contribution of storage resources to regulation or reserves while charging or discharging, respectively. 
 The total contribution to regulation and reserves, $f_{s,z,t}^{\textrm{E,STO}}, r_{s,z,t}^{\textrm{E,STO}}$ is then the sum of the proxy variables:
 
 ```math
 \begin{aligned}
-	f_{s,z,t}^{\textrm{E,STO}} &= f_{s,z,t}^{E,CHA} + f_{s,z,t}^{\textrm{E,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	r_{s,z,t}^{\textrm{E,STO}} &= r_{s,z,t}^{E,CHA} + r_{s,z,t}^{\textrm{E,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	f_{s,z,t}^{\textrm{E,STO}} &= f_{s,z,t}^{\textrm{E,CHA}} + f_{s,z,t}^{\textrm{E,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	r_{s,z,t}^{\textrm{E,STO}} &= r_{s,z,t}^{\textrm{E,CHA}} + r_{s,z,t}^{\textrm{E,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -83,8 +83,8 @@ These response times differ by system operator and reserve product, and so the u
 
 ```math
 \begin{aligned}
-	f_{s,z,t}^{\textrm{E,STO}} &\leq \upsilon^{reg}_{s,z} \times y_{s,z}^{\textrm{E,STO},POW} \forall s \in \mathcal{W}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	r_{s,z,t}^{\textrm{E,STO}} &\leq \upsilon^{rsv}_{s,z} \times y_{s,z}^{\textrm{E,STO},POW} \forall s \in \mathcal{W}, z \in \mathcal{Z}, t \in \mathcal{T}
+	f_{s,z,t}^{\textrm{E,STO}} &\leq \upsilon^{reg}_{s,z} \times y_{s,z}^{\textrm{E,STO,POW}} \forall s \in \mathcal{W}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	r_{s,z,t}^{\textrm{E,STO}} &\leq \upsilon^{rsv}_{s,z} \times y_{s,z}^{\textrm{E,STO,POW}} \forall s \in \mathcal{W}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -94,8 +94,8 @@ Additionally, the discharge rate plus the contribution to regulation must be gre
 
 ```math
 \begin{aligned}
-	0 \leq x_{s,z,t}^{E,CHA} - f_{s,z,t}^{E,CHA} - r_{s,z,t}^{E,CHA} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	0 \leq x_{s,z,t}^{\textrm{E,DIS}} - f_{s,z,t}^{\textrm{E,DIS}} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{s,z,t}^{\textrm{E,CHA}} - f_{s,z,t}^{\textrm{E,CHA}} - r_{s,z,t}^{\textrm{E,CHA}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	0 \leq x_{s,z,t}^{\textrm{E,DIS}} - f_{s,z,t}^{\textrm{E,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -104,7 +104,7 @@ Note that for storage to contribute to reserves down while charging, the storage
 
 ```math
 \begin{equation*}
-	x_{s,z,t}^{E,CHA} + f_{s,z,t}^{E,CHA} \leq y_{s,z}^{\textrm{E,STO},ENE} - U_{s,z,t-1}^{\textrm{E,STO}} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{s,z,t}^{\textrm{E,CHA}} + f_{s,z,t}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,STO,ENE}} - U_{s,z,t-1}^{\textrm{E,STO}} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -112,7 +112,7 @@ Finally, the constraints on maximum discharge rate are replaced by the following
 
 ```math
 \begin{aligned}
-	x_{s,z,t}^{\textrm{E,DIS}} + f_{s,z,t}^{\textrm{E,DIS}} + r_{s,z,t}^{\textrm{E,DIS}} &\leq y_{s,z}^{\textrm{E,STO},POW} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	x_{s,z,t}^{\textrm{E,DIS}} + f_{s,z,t}^{\textrm{E,DIS}} + r_{s,z,t}^{\textrm{E,DIS}} &\leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T} \\
 	x_{s,z,t}^{\textrm{E,DIS}} + f_{s,z,t}^{\textrm{E,DIS}} + r_{s,z,t}^{\textrm{E,DIS}} &\leq U_{s,z,t-1}^{\textrm{E,STO}} \quad \forall s \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
