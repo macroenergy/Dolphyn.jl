@@ -33,8 +33,8 @@ Contributions to the power balance expression from renewable energy from each re
 
 **Variable renewable power output in each time step**
 
-For each VRE technology type $r$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($R_{r,z,t}^{\textrm{E,VRE}}$), maximum availability ($\overline{y_{r,z}^{\textrm{E,VRE}}}$) and investment cost ($C_{r,z}^{\textrm{E,INV}}$, for example, due to interconnection cost differences). 
-We define variables related to installed capacity ($y_{r,z}^{\textrm{E,VRE},new}$) and retired capacity ($y_{r,z}^{\textrm{E,VRE},retired}$) for all resource bins for a particular VRE resource type $r$ and zone $z$. 
+For each VRE technology type $r$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($\textrm{R}_{r,z,t}^{\textrm{E,VRE}}$), maximum availability ($\overline{y}_{r,z}^{\textrm{E,VRE}}$) and investment cost ($\textrm{C}_{r,z}^{\textrm{E,INV}}$, for example, due to interconnection cost differences). 
+We define variables related to installed capacity ($y_{r,z}^{\textrm{E,VRE,new}}$) and retired capacity ($y_{r,z}^{\textrm{E,VRE,retired}}$) for all resource bins for a particular VRE resource type $r$ and zone $z$. 
 However, the variable corresponding to power output in each timestep is only defined for the first bin. Parameter $VREIndex_{r,z}$, is used to keep track of the first bin, where $VREIndex_{r,z}=1$ for the first bin and $VREIndex_{r,z}=0$ for the remaining bins. 
 This approach allows for modeling many different bins per VRE technology type and zone while significantly reducing the number of operational variable (related to power output for each time step from each bin) added to the model with every additional bin. 
 Thus, the maximum power output for each VRE resource type in each zone is given by the following equation:
