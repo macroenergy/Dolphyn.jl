@@ -95,7 +95,7 @@ pages = OrderedDict(
 
 makedocs(;
     modules = [DOLPHYN],
-    authors = "Dharik Mallapragada, Guannan He, Yuheng Zhang",
+    authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
     pages = [p for p in pages],
