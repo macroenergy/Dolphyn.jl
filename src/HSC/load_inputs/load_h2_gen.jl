@@ -66,9 +66,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	
 	# Set of H2 generation resources
 	# Set of h2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["H2GenCommit"]
-	inputs_gen["H2_GEN_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
+	inputs_gen["H2_GEN_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1,:R_ID]
 	# Set of h2 resources eligible for unit committment
-	inputs_gen["H2_GEN_NO_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
+	inputs_gen["H2_GEN_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2,:R_ID]
 
     #Set of all H2 production Units - can be either commit or new commit
     inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
@@ -84,21 +84,6 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	start_cost = convert(Array{Float64}, collect(skipmissing(inputs_gen["dfH2Gen"][!,:Start_Cost_per_tonne_p_hr])))
 	
 	inputs_gen["C_H2_Start"] = inputs_gen["dfH2Gen"][!,:Cap_Size_tonne_p_hr].* start_cost
-
-    
-	# Direct CO2 emissions per tonne of H2 produced for various technologies
-	inputs_gen["dfH2Gen"][!,:CO2_per_tonne] = zeros(Float64, inputs_gen["H2_RES_ALL"])
-
-	
-	#### TO DO LATER ON - CO2 constraints
-
-	# for k in 1:inputs_gen["H2_RES_ALL"]
-	# 	# NOTE: When Setup[ParameterScale] =1, fuel costs and emissions are scaled in fuels_data.csv, so no if condition needed to scale C_Fuel_per_MWh
-	# 	# IF ParameterScale = 1, then CO2 emissions intensity Units ktonne/tonne
-	# 	# If ParameterScale = 0 , then CO2 emission intensity units is tonne/tonne
-	# 	inputs_gen["dfH2Gen"][!,:CO2_per_tonne][g] =inputs_gen["fuel_CO2"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]))
-
-	# end
 
 	println("HSC_generation.csv Successfully Read!")
 
