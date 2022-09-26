@@ -57,7 +57,7 @@ Additionally, total demand curtailed in each time step cannot exceed total hydro
 
 ```math
 \begin{equation*}
-	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \leq D_{z,t} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \leq \textrm{D}_{z,t}^{\textrm{H}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 """

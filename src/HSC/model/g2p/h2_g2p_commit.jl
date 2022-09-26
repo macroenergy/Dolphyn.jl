@@ -21,11 +21,11 @@ This module creates decision variables, expressions, and constraints related to 
 
 **G2P Unit commitment decision variables:**
 
-This module defines the commitment state variable $n_{k,z,t}^{\textrm{H,G2P}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+This module defines the commitment state variable $n_{k,z,t}^{\textrm{H,G2P}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-This module defines the number of startup decision variable $n_{k,z,t}^{\textrm{H,G2P,UP}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+This module defines the number of startup decision variable $n_{k,z,t}^{\textrm{H,G2P,UP}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-This module defines the number of shutdown decision variable $n_{k,z,t}^{\textrm{H,G2P,DN}}$ of generator cluster $k$ in zone $z$ at time $t$ \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
+This module defines the number of shutdown decision variable $n_{k,z,t}^{\textrm{H,G2P,DN}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
 The variable defined in this file named after ```vH2G2PCOMMIT``` covers $\n_{k,z,t}^{\textrm{H,G2P}}$.
 
@@ -39,7 +39,7 @@ The total cost of start-ups across g2p generators subject to unit commitment ($h
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{H,G2P,start}} = \sum_{k \in \mathcal{UC}, t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{H,G2P,start}} \times n_{k,z,t}^{\textrm{H,G2P,UP}}
+	\textrm{C}^{\textrm{H,G2P,start}} = \sum_{k \in \mathcal{UC}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{H,G2P,start}} \times n_{k,z,t}^{\textrm{H,G2P,UP}}
 \end{equation*}
 ```
 
@@ -51,13 +51,13 @@ Hydrogen to power resources subject to unit commitment ($k \in \mathcal{UC}$) ad
 
 ```math
 \begin{equation*}
-	n_{k,z,t}^{\textrm{H,G2P}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega^{\textrm{H,G2P,size}}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,G2P}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega_{k,z}^{\textrm{H,G2P,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{aligned}
-	n_{k,z,t}^{\textrm{H,G2P,UP}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega^{\textrm{H,G2P,size}}_{k,z}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	n_{k,z,t}^{\textrm{H,G2P,UP}} \leq \frac{y_{k,z}^{\textrm{H,G2P}}}{\Omega_{k,z}^{\textrm{H,G2P,size}}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -104,8 +104,8 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 ```math
 \begin{aligned}
 	x_{k,z,t}^{\textrm{H,G2P}} - x_{k,z,t-1}^{\textrm{H,G2P}} &\leq \kappa_{k,z}^{\textrm{H,G2P,UP}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times \left(n_{k,z,t}^{\textrm{H,G2P,UP}} - n_{k,z,t}^{\textrm{H,G2P,DN}}\right) \\
-	\qquad &+ \text{min}(\overline{\rho_{k,z,t}^{\textrm{H,G2P}}}, \text{max}(\underline{\rho_{k,z,t}^{\textrm{H,G2P}}}, \kappa_{k,z}^{\textrm{H,G2P,UP}})) \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \\
-	\qquad &- \underline{\rho_{k,z,t}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\qquad &+ \text{min}(\overline{\rho}_{k,z,t}^{\textrm{H,G2P}}, \text{max}(\underline{\rho}_{k,z,t}^{\textrm{H,G2P}}, \kappa_{k,z}^{\textrm{H,G2P,UP}})) \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \\
+	\qquad &- \underline{\rho}_{k,z,t}^{\textrm{H,G2P}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,DN}} \quad \forall k \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 (See Constraints 5-6 in the code)
@@ -116,13 +116,13 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{H,G2P}} \geq \underline{\rho_{k,z,t}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} \geq \underline{\rho}_{k,z,t}^{\textrm{H,G2P}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{H,G2P}} \geq \overline{\rho_{k,z}^{\textrm{H,G2P}}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{k,z,t}^{\textrm{H,G2P}} \geq \overline{\rho}_{k,z}^{\textrm{H,G2P}} \times \Omega_{k,z}^{\textrm{H,G2P,size}} \times n_{k,z,t}^{\textrm{H,G2P,UP}} \quad \forall y \in \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 

@@ -27,7 +27,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	C^{\textrm{H,G2P},o} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(c_{g}^{H,VOM} + c_{g}^{H,FUEL}\right) \times x_{g,z,t}^{\textrm{H,G2P}}
+	\textrm{C}^{\textrm{H,G2P,o}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{H,VOM}} + \textrm{c}_{g}^{\textrm{H,FUEL}}\right) \times x_{g,z,t}^{\textrm{H,G2P}}
 \end{equation*}
 ```
 """

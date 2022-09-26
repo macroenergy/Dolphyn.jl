@@ -26,7 +26,7 @@ The variable defined in this file named after ```vH2G2P``` covers .
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-	0 \leq y_{g}^{\textrm{\textrm{H,G2P},retired}} \leq y_{g}^{\textrm{\textrm{H,G2P},existing}} \quad \forall g \in \mathcal{G}
+	0 \leq y_{g, z}^{\textrm{\textrm{H,G2P,retired}} \leq y_{g, z}^{\textrm{\textrm{H,G2P,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -34,7 +34,7 @@ For resources where upper bound $\overline{y_{g}^{\textrm{\textrm{H,G2P}}}}$ and
 
 ```math
 \begin{equation*}
-	\underline{y_{g}^{\textrm{\textrm{H,G2P}}}} \leq y_{g}^{\textrm{\textrm{H,G2P}}} \leq \overline{y_{g}^{\textrm{\textrm{H,G2P}}}} \quad \forall g \in \mathcal{G}
+	\underline{y}_{g, z}^{\textrm{\textrm{H,G2P}}} \leq y_{g, z}^{\textrm{\textrm{H,G2P}} \leq \overline{y}_{g, z}^{\textrm{\textrm{H,G2P}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 """
 function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
