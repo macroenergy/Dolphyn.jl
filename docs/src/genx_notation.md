@@ -14,6 +14,9 @@
 |$z \in \mathcal{Z}^{CRM}_{p}$| each subset stands for a locational deliverability area (LDA) or a reserve sharing group|
 |$\mathcal{Z}_{p,mass}^{CO_2}$|then the set will contain only one zone with no possibility of trading|
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$|
+|$y \in \mathcal{W}$|Set of hydroelectric generators with water storage reservoirs|
+|$y \in \mathcal{MR}$|set of generator/technology that are must-run resources. For these resources their output $t$ in each time interval must be exactly equal to their available capacity factor times the installed capacity and not allow for curtailment. These resources are also not eligible for contributing to anciliary services.|
+|$k \in \mathcal{UC}$|Set of decisions pertaining to Unit commitment|
 ---
 
 
@@ -78,12 +81,22 @@
 |$\tau_{k,z}^{\textrm{E,UP/DN}}$|is the minimum up or down time for units in generating cluster $k$ in zone $z$|
 ||$f_{k,z,t}^{\textrm{E,THE}}$| is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon_{k,z}^{reg}$|
 |$r_{k,z,t}^{\textrm{E,THE}}$| is the reserves contribution limited by the maximum reserves contribution $\upsilon_{k,z}^{rsv}$|
+|$y_{g}^{\textrm{E,GEN, total}}$|the total existing generator capacity|
+|$\textrm{C}^{\textrm{E,NSD}}$|Cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T} and all zones $z \in \mathcal{Z}$|
+|$\textrm{C}^{\textrm{E,NET,c}}$|Transmission reinforcement costs|
+|$x_{r,z,t}^{\textrm{E, CUR}}$|The amount of variable energy resource $r$ in zone $z$ that needs to be curtailed at time $t$|
+|$\pi^{\textrm{TCAP}}_{l}$| Transmission reinforcement or construction cots for a transmission line [$/MW-yr] |
+|$y_l^{\textrm{E,NET,new}}$|The additional transmission capacity required|
+|$y_{l}^{\textrm{E, NET, Existing}}|The maximum power transfer capacity of a given line|
+|$r_{k,z,t}^{\textrm{E,THE}}$| is the reserves contribution limited by the maximum reserves contribution $\upsilon^{rsv}_{k,z}$|
+|$ON_{l,t}^{\textrm{E, NET+}} \in [0, 1]$|Binary variable to activate positive flows on line $l$ at time $t$|
+|$TransON_{l,t}^{\textrm{E, NET+}} \forall l \in \mathcal{L}, t \in \mathcal{T}$|Variable defining maximum positive flow in line l in time t [MW]|
 ## Parameters
 ---
 |**Notation** | **Description**|
 | :------------ | :-----------|
-|$\textrm{c}_{g}^{\textrm{E,INV}}$||
-|$\textrm{c}_{g}^{\textrm{E,FOM}}$||
+|$\textrm{c}_{g}^{\textrm{E,INV}}$|Investment cost (annual ammortization of total construction cost) for power capacity of generator/storage $g$ |
+|$\textrm{c}_{g}^{\textrm{E,FOM}}$| Fixed O&M cost of generator/storage $g$ |
 |$\epsilon_{reg}^{load}$ and $\epsilon_{reg}^{vre}$ |are parameters specifying the required frequency regulation as a fraction of forecasted demand and variable renewable generation|
 |$\epsilon_{y,z,p}^{CRM}$|the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter|
 |$\epsilon_{g,z}^{CO_2}$|For every generator $g$, the parameter reflects the specific $CO_2$ emission intensity in t$CO_2$/MWh associated with its operation|
@@ -96,5 +109,5 @@
 |$\kappa_{k,z,t}^{\textrm{E,UP/DN}}$|is the maximum ramp-up or ramp-down rate as a percentage of installed capacity|
 |$\underline{\rho}_{k,z}^{\textrm{E,THE}}$|is the minimum stable power output per unit of installed capacity|
 |$\overline{\rho}_{k,z,t}^{\textrm{E,THE}}$|is the maximum available generation per unit of installed capacity|
+|\omega_t|weight of each model time step $\omega_t = 1 \forall t \in \mathcal{T}$ when modeling each time step of the year at an hourly resolution [1/year]|
 ---
-
