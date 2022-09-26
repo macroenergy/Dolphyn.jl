@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the capacities for the different hydrogen resources (starting capacities or, existing capacities, retired capacities, and new-built capacities).
+Function for reporting the capacities for the different hydrogen resources (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
 function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
@@ -42,11 +42,11 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 	capcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	retcapcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in inputs["H2_STOR_ASYMMETRIC"]
-		if i in inputs["NEW_CAP_H2_CHARGE"]
+	for i in inputs["H2_STOR_ALL"]
+		if i in inputs["NEW_CAP_H2_STOR_CHARGE"]
 			capcharge[i] = value(EP[:vH2CAPCHARGE][i])
 		end
-		if i in inputs["RET_CAP_H2_CHARGE"]
+		if i in inputs["RET_CAP_H2_STOR_CHARGE"]
 			retcapcharge[i] = value(EP[:vH2RETCAPCHARGE][i])
 		end
 	end

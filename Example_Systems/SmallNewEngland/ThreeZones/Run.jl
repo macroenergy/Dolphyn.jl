@@ -72,12 +72,12 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # #### Running a case
 
-# ### Load inputs
+# ### Load power system inputs
 # println("Loading Inputs")
  myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
  myinputs = load_inputs(mysetup, inpath)
 
-# ### Load H2 inputs if modeling the hydrogen supply chain
+# ### Load inputs for modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end
@@ -103,9 +103,3 @@ if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
 
-# Run MGA if the MGA flag is set to 1 else only save the least cost solution
-# Only valid for power system analysis at this point
-if mysetup["ModelingToGenerateAlternatives"] == 1
-    println("Starting Model to Generate Alternatives (MGA) Iterations")
-    mga(EP,inpath,mysetup,myinputs,outpath)
-end

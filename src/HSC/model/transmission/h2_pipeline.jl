@@ -17,9 +17,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-This function includes the variables, expressions and objective funtion of pipeline.
+This function includes the variables, expressions and objective funtion of hydrogen pipeline.
 
-This function expresses H2 change at zone z through pipeline i between two zones and can be split into H2 delivering and flowing out.
+This function expresses hydrogen exchange through pipeline i between two zones and can be split into H2 delivering and flowing out.
 
 This module defines the hydrogen pipeline construction decision variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}$, representing newly constructed hydrogen pipeline of type $i$ through path $z \rightarrow z^{\prime}$.
 

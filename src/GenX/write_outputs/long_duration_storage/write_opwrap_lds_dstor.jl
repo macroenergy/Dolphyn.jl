@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_opwrap_lds_dstor(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing long duration storage related operations.
+Function for reporting long duration storage related operations.
 """
 function write_opwrap_lds_dstor(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	

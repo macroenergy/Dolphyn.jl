@@ -31,7 +31,7 @@ Contributions to the hydrogen balance expression from each thermal resources wit
 
 **Startup and shutdown events (thermal plant cycling)**
 
-*Capacitated limits on unit commitment decision variables*
+*Capacity limits on unit commitment decision variables*
 
 Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to the following constraints on commitment states, startup events, and shutdown events, which limit each decision to be no greater than the maximum number of discrete units installed (as per the following three constraints):
 

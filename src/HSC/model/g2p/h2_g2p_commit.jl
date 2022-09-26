@@ -112,7 +112,7 @@ Thermal resources subject to unit commitment ($k \in \mathcal{UC}$) adhere to th
 
 **Minimum and maximum power output**
 
-If not modeling regulation and spinning reserves, thermal resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
+If not modeling regulation and spinning reserves, hydrogen to power resources subject to unit commitment adhere to the following constraints that ensure power output does not exceed minimum and maximum feasible levels:
 
 ```math
 \begin{equation*}
@@ -130,7 +130,7 @@ If not modeling regulation and spinning reserves, thermal resources subject to u
 
 **Minimum and maximum up and down time**
 
-Thermal resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
+Hydrogen to power resources subject to unit commitment adhere to the following constraints on the minimum time steps after start-up before a unit can shutdown again (minimum up time) and the minimum time steps after shut-down before a unit can start-up again (minimum down time):
 
 ```math
 \begin{equation*}
@@ -148,7 +148,7 @@ Thermal resources subject to unit commitment adhere to the following constraints
 where $\tau_{k,z}^{\textrm{H,G2P,UP}}$ and $\tau_{k,z}^{DN}$ is the minimum up or down time for units in generating cluster $k$ in zone $z$.
 
 Like with the ramping constraints, the minimum up and down constraint time also wrap around from the start of each time period to the end of each period.
-It is recommended that users of GenX must use longer subperiods than the longest min up/down time if modeling UC. Otherwise, the model will report error.
+It is recommended that users of DOLPHYN must use longer subperiods than the longest min up/down time if modeling UC. Otherwise, the model will report error.
 """
 function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 

@@ -115,7 +115,6 @@ Get load, solar, wind, and other curves from the input data.
 function parse_data(myinputs, mysetup)
     
     model_h2_flag = mysetup["ModelH2"]
-    
     RESOURCES = myinputs["RESOURCE_ZONES"]
     ZONES = myinputs["R_ZONES"]
 
@@ -134,6 +133,7 @@ function parse_data(myinputs, mysetup)
     h2_load_col_names = []
     h2_load_profiles = []
 
+    # What does this mean? Is this default value
     AllHRVarConst = true
     AllHG2PVarConst = true
 
@@ -592,12 +592,14 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     # If ParameterScale =1 then make it zero, since clustered inputs will be scaled prior to generating model
     mysetup_local["ParameterScale"]=0  # Performing cluster and report outputs in user-provided units
     if v println("Loading inputs") end
+
     myinputs=Dict()
     myinputs = load_inputs(mysetup_local,inpath)
 
     if mysetup["ModelH2"] == 1
       myinputs = load_h2_inputs(myinputs, mysetup_local, inpath)
     end
+    println(myinputs["RESOURCE_ZONES"])
 
     if v println() end
 
@@ -610,8 +612,8 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     # Parse input data into useful structures divided by type (load, wind, solar, fuel, groupings thereof, etc.)
     # TO DO LATER: Replace these with collections of col_names, profiles, zones
-    load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
-    fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
+    load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names, fuel_col_names, 
+    all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
     fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst = parse_data(myinputs, mysetup)
 
     # Remove Constant Columns - Add back later in final output
@@ -1083,16 +1085,20 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         insertcols!(HRVOutputData, 1, :Time_Index => 1:size(HRVOutputData,1))
         NewHRVColNames = [HRVColMap[string(c)] for c in names(HRVOutputData)]
         if v println("Writing resource file...") end
+        println(NewHRVColNames)
         CSV.write(string(inpath,sep,H2RVar_Outfile), HRVOutputData, header=NewHRVColNames)
 
         if mysetup["ModelH2G2P"] == 1
             #Write HSC Resource Variability 
             # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
-            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => myinputs["H2_G2P_NAME"][i] for i in 1:length(myinputs["H2_G2P_NAME"]))
+            # Dharik - string conversion needed to change from inlinestring to string type
+            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => string(myinputs["H2_G2P_NAME"][i]) for i in 1:length(myinputs["H2_G2P_NAME"]))
+            println(HG2PVColMap)
             HG2PVColMap["Time_Index"] = "Time_Index"
             HG2POutputData = HG2POutputData[!, Symbol.(myinputs["H2_G2P_RESOURCE_ZONES"])]
             insertcols!(HG2POutputData, 1, :Time_Index => 1:size(HG2POutputData,1))
             NewHG2PVColNames = [HG2PVColMap[string(c)] for c in names(HG2POutputData)]
+            println(NewHG2PVColNames)
             if v println("Writing resource file...") end
             CSV.write(string(inpath,sep,H2G2PVar_Outfile), HG2POutputData, header=NewHG2PVColNames)
         end

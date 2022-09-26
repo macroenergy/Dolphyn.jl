@@ -61,30 +61,30 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources - all have asymmetric (separate) charge/discharge capacity components
 
-    NEW_CAP_H2_CHARGE = inputs["NEW_CAP_H2_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity
-    RET_CAP_H2_CHARGE = inputs["RET_CAP_H2_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
+    NEW_CAP_H2_STOR_CHARGE = inputs["NEW_CAP_H2_STOR_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity
+    RET_CAP_H2_STOR_CHARGE = inputs["RET_CAP_H2_STOR_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
 
     ### Variables ###
 
-    ## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
+    ## Storage capacity built and retired for storage resources with independent charge and discharge charge capacities (STOR=2)
 
     # New installed charge capacity of resource "y"
-    @variable(EP, vH2CAPCHARGE[y in NEW_CAP_H2_CHARGE] >= 0)
+    @variable(EP, vH2CAPCHARGE[y in NEW_CAP_H2_STOR_CHARGE] >= 0)
 
     # Retired charge capacity of resource "y" from existing capacity
-    @variable(EP, vH2RETCAPCHARGE[y in RET_CAP_H2_CHARGE] >= 0)
+    @variable(EP, vH2RETCAPCHARGE[y in RET_CAP_H2_STOR_CHARGE] >= 0)
 
     ### Expressions ###
     # Total available charging capacity in tonnes/hour
     @expression(
         EP,
         eTotalH2CapCharge[y in H2_STOR_ALL],
-        if (y in intersect(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
+        if (y in intersect(NEW_CAP_H2_STOR_CHARGE, RET_CAP_H2_STOR_CHARGE))
             dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y] -
             EP[:vH2RETCAPCHARGE][y]
-        elseif (y in setdiff(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
+        elseif (y in setdiff(NEW_CAP_H2_STOR_CHARGE, RET_CAP_H2_STOR_CHARGE))
             dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y]
-        elseif (y in setdiff(RET_CAP_H2_CHARGE, NEW_CAP_H2_CHARGE))
+        elseif (y in setdiff(RET_CAP_H2_STOR_CHARGE, NEW_CAP_H2_STOR_CHARGE))
             dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y] - EP[:vH2RETCAPCHARGE][y]
         else
             dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y]
@@ -99,11 +99,10 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     #  ParameterScale = 0 --> objective function is in $
     if setup["ParameterScale"] == 1
-
         @expression(
             EP,
             eCFixH2Charge[y in H2_STOR_ALL],
-            if y in NEW_CAP_H2_CHARGE # Resources eligible for new charge capacity
+            if y in NEW_CAP_H2_STOR_CHARGE # Resources eligible for new charge capacity
                 1 / ModelScalingFactor^2 * (
                     dfH2Gen[!, :Inv_Cost_Charge_p_tonne_p_hr_yr][y] * vH2CAPCHARGE[y] +
                     dfH2Gen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] *
@@ -116,12 +115,11 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
                 )
             end
         )
-
     else
         @expression(
             EP,
             eCFixH2Charge[y in H2_STOR_ALL],
-            if y in NEW_CAP_H2_CHARGE # Resources eligible for new charge capacity
+            if y in NEW_CAP_H2_STOR_CHARGE # Resources eligible for new charge capacity
                 dfH2Gen[!, :Inv_Cost_Charge_p_tonne_p_hr_yr][y] * vH2CAPCHARGE[y] +
                 dfH2Gen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] * eTotalH2CapCharge[y]
             else
@@ -142,7 +140,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     #Cannot retire more charge capacity than existing charge capacity
     @constraint(
         EP,
-        cMaxRetH2Charge[y in RET_CAP_H2_CHARGE],
+        cMaxRetH2Charge[y in RET_CAP_H2_STOR_CHARGE],
         vH2RETCAPCHARGE[y] <= dfH2Gen[!, :Existing_Cap_Charge_tonne_p_hr][y]
     )
 

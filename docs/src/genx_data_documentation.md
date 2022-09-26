@@ -241,11 +241,6 @@ This file contains cost and performance parameters for various generators and ot
 ||0- excluded|
 |**CapacityReserveMargin > 0**||
 |CapRes\_* |[0,1], Fraction of the resource capacity eligible for contributing to the capacity reserve margin constraint (e.g. derate factor).|
-|**ModelingToGenerateAlternatives = 1**||
-|MGA |Eligibility of the technology for Modeling To Generate Alternative (MGA) run. |
-||1 = Technology is available for the MGA run.|
-||0 = Technology is unavailable for the MGA run (e.g. storage technologies).|
-|Resource\_Type |For the MGA run, we categorize all the resources in a few resource types. We then find maximally different generation portfolio based on these resource types. For example, existing solar and new solar resources could be represented by a resource type names `Solar`. Categorization of resources into resource types is user dependent.|
 |**MinCapReq = 1**|
 |MinCapTag\_*| Eligibility of resources to participate in Minimum Technology Carveout constraint. \* corresponds to the ith row of the file `Minimum_capacity_requirement.csv`.|
 

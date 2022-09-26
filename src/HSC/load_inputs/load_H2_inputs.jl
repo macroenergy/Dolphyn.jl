@@ -20,6 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
+inputs - dict object containing input data
 setup - dict object containing setup parameters
 path - string path to working directory
 
@@ -54,13 +55,14 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 			inputs["H2_P"] = 0
 		end
 	end
+	
 
 	# Read input data about hydrogen transport truck types
-	if setup["ModelH2Trucks"] == 1
-		if isfile(string(path,sep,"HSC_trucks.csv"))
-			inputs = load_h2_truck(path, sep, inputs)
-		end
+	if setup["ModelH2Trucks"] ==1
+		inputs = load_h2_truck(path, sep, inputs)
 	end
+	
+
 
 	# Read input data about G2P Resources
 	if isfile(string(path,sep,"HSC_g2p.csv"))

@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	h2_storage_investment_energy(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines the expressions and constraints keeping track of total available storage energy capacity as well as constraints on capacity retirements. 
 The function also adds investment and fixed OM costs related to energy capacity to the objective function.

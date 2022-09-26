@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_esr_prices(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function to write prices under energy share requirements.	
+Function for reporting prices under energy share requirements.	
 """
 function write_esr_prices(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	

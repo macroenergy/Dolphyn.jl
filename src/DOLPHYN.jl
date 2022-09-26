@@ -93,7 +93,7 @@ include("HSC/load_inputs/load_h2_demand.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_truck.jl")
-include("HSC/load_inputs/load_H2_inputs.jl")
+include("HSC/load_inputs/load_h2_inputs.jl")
 include("HSC/load_inputs/load_co2_cap_hsc.jl")
 include("HSC/load_inputs/load_h2_g2p.jl")
 include("HSC/load_inputs/load_h2_g2p_variability.jl")
@@ -153,12 +153,9 @@ include("HSC/model/truck/h2_truck_all.jl")
 include("HSC/model/truck/h2_long_duration_truck.jl")
 
 # H2 storage
-include("HSC/model/storage/h2_storage_investment.jl")
 include("HSC/model/storage/h2_storage_investment_energy.jl")
 include("HSC/model/storage/h2_storage_investment_charge.jl")
 include("HSC/model/storage/h2_storage.jl")
-include("HSC/model/storage/h2_storage_asymmetric.jl")
-include("HSC/model/storage/h2_storage_symmetric.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")
 
@@ -244,8 +241,5 @@ include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
-
-# Modeling to generate alternatives
-include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end

@@ -100,9 +100,3 @@ if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
 
-# Run MGA if the MGA flag is set to 1 else only save the least cost solution
-# Only valid for power system analysis at this point
-if mysetup["ModelingToGenerateAlternatives"] == 1
-    println("Starting Model to Generate Alternatives (MGA) Iterations")
-    mga(EP,inpath,mysetup,myinputs,outpath)
-end

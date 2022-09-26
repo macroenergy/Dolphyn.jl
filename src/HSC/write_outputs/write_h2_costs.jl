@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the costs of hydrogen supply chain pertaining to the objective function (fixed, variable O&M etc.).
+Function for reporting the costs of hydrogen supply chain pertaining to the objective function (fixed, variable O&M etc.).
 """
 function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
