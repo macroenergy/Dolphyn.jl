@@ -79,7 +79,6 @@
 |$y_{k,z}^{\textrm{E,THE}}$| is the Thermal resources total installed capacity|
 |$x_{k,z,t}^{\textrm{E,THE}}$|is the energy injected into the grid by technology $y$ in zone $z$ at time $t$|
 |$\tau_{k,z}^{\textrm{E,UP/DN}}$|is the minimum up or down time for units in generating cluster $k$ in zone $z$|
-#||$f_{k,z,t}^{\textrm{E,THE}}$| is the frequency regulation contribution limited by the maximum regulation contribution $\upsilon_{k,z}^{reg}$|
 |$r_{k,z,t}^{\textrm{E,THE}}$| is the reserves contribution limited by the maximum reserves contribution $\upsilon_{k,z}^{rsv}$|
 |$y_{g}^{\textrm{E,GEN, total}}$|the total existing generator capacity|
 |$\textrm{C}^{\textrm{E,NSD}}$|Cost of non-served energy/curtailed demand from all demand curtailment segments $s \in \mathcal{SEG}$ over all time periods $t \in \mathcal{T} and all zones $z \in \mathcal{Z}$|
