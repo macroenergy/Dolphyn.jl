@@ -17,7 +17,7 @@
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period)|
 |$y \in \mathcal{W}$|Set of hydroelectric generators with water storage reservoirs|
 |$y \in \mathcal{MR}$|set of generator/technology that are must-run resources. For these resources their output $t$ in each time interval must be exactly equal to their available capacity factor times the installed capacity and not allow for curtailment. These resources are also not eligible for contributing to anciliary services.|
-|$k \in \mathcal{UC}$|Set of decisions pertaining to Unit commitment|
+|$p \in \mathcal{P}$| where $p$ denotes an instance in the policy set $\mathcal{P}$|
 ---
 
 
@@ -54,7 +54,7 @@
 |$\textrm{C}^{\textrm{E,start}}$|this is the total cost of start-ups across all generators subject to unit commitment ($k \in \mathcal{UC}, \mathcal{UC} \subseteq \mathcal{G}$) and all time periods $t$|
 | $p \in \mathcal{P}_{mass}^{CO_2}$ |Input data for each constraint requires the $CO_2$ allowance budget for each model zone|
 |$\epsilon_{z,p,mass}^{CO_2}$|to be provided in terms of million metric tonnes|
-|$overline{\epsilon_{z,p,load}^{CO_2}}$| denotes the emission limit in terms on t$CO_2$/MWh|
+|$\overline{\epsilon_{z,p,load}^{CO_2}}$| denotes the emission limit in terms on t$CO_2$/MWh|
 |$\mathcal{Z}_{p}^{ESR}$|For each constraint $p \in \mathcal{P}^{ESR}$, we define a subset of zones $z \in \mathcal{Z}_{p}^{ESR} \subset \mathcal{Z}$ that are eligible for trading renewable/clean energy credits to meet the corresponding renewable/clean energy requirement.|
 |$\epsilon_{g,z,p}^{MinCapReq}$| is the eligiblity of a generator of technology $g$ in zone $z$ of requirement $p$ and will be equal to $1$ for eligible generators and will be zero for ineligible resources|
 |$y_{r,z}^{\textrm{E,VRE,total}}$|VRE resources are a function of each technology's time-dependent hourly capacity factor , in per unit terms, and the total available capacity ($y_{r,z}^{\textrm{E,VRE,total}}$).|
@@ -62,15 +62,15 @@
 |$y_{r,z}^{\textrm{E,VRE,retired}}$|retired capacity ($y_{r,z}^{\textrm{E,VRE,retired}}$) for all resource bins for a particular VRE resource type $r$ and zone $z$|
 |$\textrm{R}_{f,z,t}^{\textrm{E,FLEX}}$|maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $\textrm{R}_{f,z,t}^{\textrm{E,FLEX}}$|
 |$\eta_{f,z}^{\textrm{E,FLEX}}$|the energy losses associated with shifting demand|
-|$x_{f,z,t}^{\textrm{E,FLEX}}$|the amount of deferred demand remaining to be served depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$)|
+|$x_{f,z,t}^{\textrm{E,FLEX}}$|the amount of deferred demand remaining to be served depends on the amount in the previous time step minus the served demand during time step $t$ ( $\Theta_{y,z,t}$ ) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ( $\Pi_{y,z,t}$ )|
 |$Q_{s,z, n}$|models inventory of storage technology $s \in \mathcal{S}$ in zone $z$ in each input period $n \in \mathcal{N}$|
-|$\kappa_{y,z}^{\textrm{UP/DN}}$|the maximum ramp rates ($\kappa_{y,z}^{\textrm{E,DN}}$ and $\kappa_{y,z}^{\textrm{E,UP}}$ ) in per unit terms|
+|$\kappa_{y,z}^{\textrm{UP/DN}}$|the maximum ramp rates ( $\kappa_{y,z}^{\textrm{E,DN}}$ and $\kappa_{y,z}^{\textrm{E,UP}}$ ) in per unit terms|
 |$\upsilon_{y,z}^{\textrm{reg/rsv}}$|The amount of frequency regulation and operating reserves procured in each time step is bounded by the user-specified fraction ($\upsilon_{y,z}^{\textrm{reg}}$,$\upsilon_{y,z}^{\textrm{rsv}}$) of nameplate capacity for each reserve type|
 |$U_{s,z,t}^{\textrm{E,STO}}$|This module defines the initial storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial energy stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods|
 |$\Delta U_{s,z,m}^{\textrm{E,STO}}$|This module defines the change of storage energy inventory level during each representative period $\Delta U_{s,z,m}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage energy inventory level of the storage device $s$ in zone $z$ during each representative period $m$|
 |$U_{s,z,n}$|this variable models inventory of storage technology $s \in \mathcal{S}$ in zone $z$ in each input period $n \in \mathcal{N}$. |
 |$U_{s,z,t}^{\textrm{E,STO}}$|This module defines the storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing energy stored in the storage device $s$ in zone $z$ at time period $t$|
-|$x_{s,z,t}^{\textrm{E,CHA}}$|This module defines the power charge decision variable $x_{s,z,t}^{\textrm{E,CHA}}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$|
+|$x_{s,z,t}^{\textrm{E,CHA}}$|This module defines the power charge decision variable $x_{s,z,t}^{\textrm{E,CHA}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged power into the storage device $s$ in zone $z$ at time period $t$|
 |$f_{s,z,t}^{\textrm{E,CHA/DIS}}$|where is the contribution of storage resources to frequency regulation while charging or discharging|
 |$r_{s,z,t}^{\textrm{E,CHA/DIS}}$|$r_{s,z,t}^{\textrm{E,CHA/DIS}}$ are created for storage resources, to denote the contribution of storage resources to  reserves while charging or discharging|
 |$\Omega_{k,z}^{\textrm{E,THE,size}}$| Unit capacity for a thermal plant with unit commitment constraint|
