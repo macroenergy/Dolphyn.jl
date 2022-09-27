@@ -17,8 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	investment_charge(EP::Model, inputs::Dict)
 
-This function defines the expressions and constraints keeping track of total available storage charge capacity ($s \in \mathcal{S}^{asym}, \mathcal{S}^{asym} \subseteq \mathcal{S}$) as well as constraints on capacity retirements. 
-The function also adds investment and fixed OM costs related to charge capacity to the objective function.
+This function defines the expressions and constraints keeping track of total available storage charge capacity ($s \in \mathcal{S}^{asym}, \mathcal{S}^{asym} \subseteq \mathcal{S}$) as well as constraints on capacity retirements.
+The function also adds investment and fixed O\&M costs related to charge capacity to the objective function.
 
 The total capacity of each storage resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
@@ -30,7 +30,7 @@ The total capacity of each storage resource is defined as the sum of the existin
 
 **Cost expressions**
 
-In addition, this module adds investment and fixed OM costs related to charge capacity to the objective function:
+In addition, this module adds investment and fixed O\&M costs related to charge capacity to the objective function:
 ```math
 \begin{equation*}
 	\textrm{C}^{\textrm{E,CHA,c}} = \sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (\textrm{c}_{s,z}^{\textrm{E,CHA,INV}} \times y_{s,z}^{\textrm{E,CHA,new}} + \textrm{c}_{s,z}^{\textrm{E,CHA,FOM}} \times y_{s,z}^{\textrm{E,CHA,total}})

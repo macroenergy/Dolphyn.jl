@@ -11,6 +11,7 @@
 |$r \in \mathcal{R}$ | $r$ denotes a variable renewable energy resource and $\mathcal{R}$ is the set of all renewable energy resources|
 |$s \in \mathcal{S}$ | $s$ denotes an energy storage system (ESS) and $\mathcal{S}$ is the set of all energy storage systems|
 |$s \in \mathcal{SEG}$| $s$ denotes the segment of load shedding |
+|$\mathcal{S}^{asym} \subseteq \mathcal{S}$| where $\mathcal{S}^{asym}$ corresponds to set of energy storage technologies with independtly sized (or assymetric) charge and discharge power capacities|
 |$z \in \mathcal{Z}^{CRM}_{p}$| each subset stands for a locational deliverability area (LDA) or a reserve sharing group|
 |$z \in \mathcal{Z}_{p,mass}^{CO_2}$|Set of zones with no possibility for energy trading|
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period)|
