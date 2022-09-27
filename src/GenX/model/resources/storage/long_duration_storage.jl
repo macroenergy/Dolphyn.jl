@@ -16,27 +16,27 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 @doc raw"""
 	long_duration_storage(EP::Model, inputs::Dict)
-	
+
 Sets up variables and constraints common to all long duration storage resources.
 
 This function creates variables and constraints enabling modeling of long duration storage resources when modeling representative time periods.
 
 **Long duration storage initial inventory and change decision variables**
 
-This module defines the initial storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$, representing initial energy stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
+This module defines the initial storage energy inventory level variable $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}_{p}^{start}$, representing initial energy stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods.
 
 This module defines the change of storage energy inventory level during each representative period $\Delta U_{s,z,m}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$, representing the change of storage energy inventory level of the storage device $s$ in zone $z$ during each representative period $m$.
 
-The variable defined in this file named after ```vSOCw``` covers $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T_{p}^{start}}$.
+The variable defined in this file named after ```vSOCw``` covers $U_{s,z,t}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}_{p}^{start}$.
 
 The variable defined in this file named after ```vdSOC``` covers $\Delta U_{s,z,m}^{\textrm{E,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, m \in \mathcal{M}$.
 
 **Storage inventory balance at beginning of each representative period**
 
-The constraints in this section are used to approximate the behavior of long-duration energy storage technologies when approximating annual grid operations by modeling operations over representative periods. 
-Previously, the state of charge balance for storage (as defined in ```storage_all()```) assumed that state of charge at the beginning and end of each representative period has to be the same. 
-In other words, the amount of energy built up or consumed by storage technology $s$ in zone $z$ over the representative period $m$, $\Delta U_{s,z,m}^{\textrm{E,STO}} = 0$. 
-This assumption implicitly excludes the possibility of transferring energy from one representative period to the other which could be cost-optimal when the capital cost of energy storage capacity is relatively small. 
+The constraints in this section are used to approximate the behavior of long-duration energy storage technologies when approximating annual grid operations by modeling operations over representative periods.
+Previously, the state of charge balance for storage (as defined in ```storage_all()```) assumed that state of charge at the beginning and end of each representative period has to be the same.
+In other words, the amount of energy built up or consumed by storage technology $s$ in zone $z$ over the representative period $m$, $\Delta U_{s,z,m}^{\textrm{E,STO}} = 0$.
+This assumption implicitly excludes the possibility of transferring energy from one representative period to the other which could be cost-optimal when the capital cost of energy storage capacity is relatively small.
 To model long-duration energy storage using representative periods, we replace the state of charge equation, such that the first term on the right hand side accounts for change in storage inventory associated with representative period $m$ ($\Delta U_{s,z,m}^{\textrm{E,STO}}$), which could be positive (net accumulation) or negative (net reduction).
 
 ```math
@@ -49,17 +49,17 @@ By definition $\mathcal{T}^{start}=\{\left(m-1\right) \times \tau^{period}+1 | m
 
 **Storage inventory change input periods**
 
-We need additional variables and constraints to approximate energy exchange between representative periods, while accounting for their chronological occurence in the original input time series data and the possibility that two representative periods may not be adjacent to each other (see Figure below). 
-To implement this, we introduce a new variable $U_{s,z,n}$ that models inventory of storage technology $s \in \mathcal{S}$ in zone $z$ in each input period $n \in \mathcal{N}$. 
+We need additional variables and constraints to approximate energy exchange between representative periods, while accounting for their chronological occurence in the original input time series data and the possibility that two representative periods may not be adjacent to each other (see Figure below).
+To implement this, we introduce a new variable $U_{s,z,n}$ that models inventory of storage technology $s \in \mathcal{S}$ in zone $z$ in each input period $n \in \mathcal{N}$.
 Additionally we define a function mapping, $f: n \rightarrow m$, that uniquely maps each input period $n$ to its corresponding representative period $m$. This mapping is available as an output of the process used to identify representative periods (E.g. k-means clustering [Mallapragada et al., 2018](https://www.sciencedirect.com/science/article/pii/S0360544218315238?casa_token=I-6GVNMtAVIAAAAA:G8LFXFqXxRGrXHtrzmiIGm02BusIUmm83zKh8xf1BXY81-dTnA9p2YI1NnGuzlYBXsxK12by)).
 
 ![Modeling inter-period energy exchange via long-duration storage when using representative period temporal resolution to approximate annual grid operations](assets/LDES_approach.png)
 *Figure. Modeling inter-period energy exchange via long-duration storage when using representative period temporal resolution to approximate annual grid operations*
 
-The following two equations define the storage inventory at the beginning of each input period $n+1$ as the sum of storage inventory at begining of previous input period $n$ plus change in storage inventory for that period. 
-The latter is approximated by the change in storage inventory in the corresponding representative period, identified per the mapping $f(n)$. 
-The second constraint relates the storage level of the last input period, $|N|$, with the storage level at the beginning of the first input period. 
-Finally, if the input period is also a representative period, then a third constraint enforces that initial storage level estimated by the intra-period storage balance constraint should equal the initial storage level estimated from the inter-period storage balance constraints. 
+The following two equations define the storage inventory at the beginning of each input period $n+1$ as the sum of storage inventory at begining of previous input period $n$ plus change in storage inventory for that period.
+The latter is approximated by the change in storage inventory in the corresponding representative period, identified per the mapping $f(n)$.
+The second constraint relates the storage level of the last input period, $|N|$, with the storage level at the beginning of the first input period.
+Finally, if the input period is also a representative period, then a third constraint enforces that initial storage level estimated by the intra-period storage balance constraint should equal the initial storage level estimated from the inter-period storage balance constraints.
 Note that $|N|$ refers to the last modeled period.
 
 ```math
@@ -80,7 +80,7 @@ Note that $|N|$ refers to the last modeled period.
 \end{equation*}
 ```
 
-Finally, the next constraint enforces that the initial storage level for each input period $n$ must be less than the installed energy capacity limit. 
+Finally, the next constraint enforces that the initial storage level for each input period $n$ must be less than the installed energy capacity limit.
 This constraint ensures that installed energy storage capacity is consistent with the state of charge during both the operational time periods $t$ during each sample period $m$ as well as at the start of each chronologically ordered input period $n$ in the full annual time series.
 
 ```math
