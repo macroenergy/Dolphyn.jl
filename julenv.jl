@@ -19,6 +19,7 @@ using Pkg
 # Pkg.activate("DOLPHYNJulEnv")
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="0.8.0"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="0.8.4"))
+Pkg.add(Pkg.PackageSpec(name="HiGHS", version="1.1.4"))
 Pkg.add(Pkg.PackageSpec(name="DataStructures", version="0.18.9"))
 Pkg.add(Pkg.PackageSpec(name="Dates"))
 Pkg.add(Pkg.PackageSpec(name="GLPK", version="0.14.12"))
