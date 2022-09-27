@@ -31,7 +31,7 @@ The variable defined in this file named after ```vCHARGE``` covers $x_{s,z,t}^{\
 
 **Cost expressions**
 
-This module additionally defines contributions to the objective function from variable costs (variable O&M plus fuel cost) of charging action of storage devices $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$:
+This module additionally defines contributions to the objective function from variable costs (variable O\&M plus fuel cost) of charging action of storage devices $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$:
 
 ```math
 \begin{equation*}
@@ -53,7 +53,7 @@ Contributions to the power balance expression from storage charging and discharg
 
 The following constraints apply to all storage resources, $s \in \mathcal{S}$, regardless of whether the charge/discharge capacities are symmetric or asymmetric.
 
-The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{\textrm{E,STO}}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{\textrm{E,STO}}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{\textrm{E,CHA}}, x_{s,z,t}^{\textrm{E,DIS}}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{\textrm{E,loss}}$. 
+The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{\textrm{E,STO}}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{\textrm{E,STO}}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{\textrm{E,CHA}}, x_{s,z,t}^{\textrm{E,DIS}}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{\textrm{E,loss}}$.
 The first of these two constraints enforces storage inventory balance for interior time steps $(t \in \mathcal{T}^{interior})$, while the second enforces storage balance constraint for the initial time step $(t \in \mathcal{T}^{start})$.
 
 ```math
@@ -63,9 +63,9 @@ The first of these two constraints enforces storage inventory balance for interi
 \end{aligned}
 ```
 
-When modeling the entire year as a single chronological period with total number of time steps of $\tau^{period}$, storage inventory in the first time step is linked to storage inventory at the last time step of the period representing the year. 
-Alternatively, when modeling the entire year with multiple representative periods, this constraint relates storage inventory in the first timestep of the representative period with the inventory at the last time step of the representative period, where each representative period is made of $\tau^{period}$ time steps. 
-In this implementation, energy exchange between representative periods is not permitted. When modeling representative time periods, DOLPHYN enables modeling of long duration energy storage which tracks state of charge between representative periods enable energy to be moved throughout the year. 
+When modeling the entire year as a single chronological period with total number of time steps of $\tau^{period}$, storage inventory in the first time step is linked to storage inventory at the last time step of the period representing the year.
+Alternatively, when modeling the entire year with multiple representative periods, this constraint relates storage inventory in the first timestep of the representative period with the inventory at the last time step of the representative period, where each representative period is made of $\tau^{period}$ time steps.
+In this implementation, energy exchange between representative periods is not permitted. When modeling representative time periods, DOLPHYN enables modeling of long duration energy storage which tracks state of charge between representative periods enable energy to be moved throughout the year.
 If ```LongDurationStorage=1``` and ```OperationWrapping=1```, this function calls ```long_duration_storage()``` in ```long_duration_storage.jl``` to enable this feature.
 
 **Bounds on storage power and energy capacity**
@@ -155,7 +155,7 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 
 	# Links state of charge in first time step with decisions in last time step of each subperiod
 	# We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
-	
+
 	if OperationWrapping ==1 && !isempty(inputs["STOR_LONG_DURATION"])
 		@constraint(EP, cSoCBalStart[t in START_SUBPERIODS, y in STOR_SHORT_DURATION], EP[:vS][y,t] ==
 			EP[:vS][y,t+hours_per_subperiod-1]-(1/dfGen[!,:Eff_Down][y]*EP[:vP][y,t])
@@ -165,9 +165,9 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 			EP[:vS][y,t+hours_per_subperiod-1]-(1/dfGen[!,:Eff_Down][y]*EP[:vP][y,t])
 			+(dfGen[!,:Eff_Up][y]*EP[:vCHARGE][y,t])-(dfGen[!,:Self_Disch][y]*EP[:vS][y,t+hours_per_subperiod-1]))
 	end
-	
+
 	# Energy stored for the next hour
-	@constraint(EP, 
+	@constraint(EP,
 		cSoCBalInterior[t in INTERIOR_SUBPERIODS, y in STOR_ALL],
 		EP[:vS][y,t] == EP[:vS][y,t-1]-(1/dfGen[!,:Eff_Down][y]*EP[:vP][y,t])+(dfGen[!,:Eff_Up][y]*EP[:vCHARGE][y,t])-(dfGen[!,:Self_Disch][y]*EP[:vS][y,t-1])
 	)
@@ -181,7 +181,7 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 
 	# Maximum energy stored must be less than energy capacity
 	@constraint(EP,
-		cSocBound[y in STOR_ALL, t in 1:T], 
+		cSocBound[y in STOR_ALL, t in 1:T],
 		EP[:vS][y,t] <= EP[:eTotalCapEnergy][y]
 	)
 
