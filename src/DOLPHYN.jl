@@ -44,6 +44,7 @@ using Documenter
 using Revise
 # Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
 using Gurobi
+using HiGHS
 #using CPLEX
 
 using Clp
@@ -65,6 +66,7 @@ include("configure_settings/configure_settings.jl")
 
 # Configure optimizer instance
 include("configure_solver/configure_gurobi.jl")
+include("configure_solver/configure_highs.jl")
 include("configure_solver/configure_cplex.jl")
 include("configure_solver/configure_clp.jl")
 include("configure_solver/configure_cbc.jl")
