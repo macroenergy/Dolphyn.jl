@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -25,19 +25,19 @@ Documentation to follow ******
 function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	println("H2 Production (Unit Commitment) Module")
-	
+
 	# Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]
 	H2GenCommit = setup["H2GenCommit"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H"]		#NUmber of hydrogen generation units 
-	
+	H = inputs["H"]		#NUmber of hydrogen generation units
+
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
-	H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"] 
-	H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"] 
-	
+	H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
+	H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
+
 	#Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
@@ -58,7 +58,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	# Startup costs of "generation" for resource "y" during hour "t"
 	#  ParameterScale = 1 --> objective function is in million $
 	#  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"] ==1 
+	if setup["ParameterScale"] ==1
 		@expression(EP, eH2GenCStart[k in H2_GEN_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_H2_Start"][k]*vH2GenStart[k,t]/ModelScalingFactor^2))
 	else
 		@expression(EP, eH2GenCStart[k in H2_GEN_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_H2_Start"][k]*vH2GenStart[k,t]))
@@ -77,13 +77,13 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eH2Balance] += eH2GenCommit
 
 	#Power Consumption for H2 Generation
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
 		@expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
-		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
 		@expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
-		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceH2GenCommit
@@ -102,7 +102,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 			if k in H2_GEN_RET_CAP
 				set_integer(EP[:vH2GenRetCap][k])
 			end
-			if k in H2_GEN_NEW_CAP 
+			if k in H2_GEN_NEW_CAP
 				set_integer(EP[:vH2GenNewCap][k])
 			end
 		end

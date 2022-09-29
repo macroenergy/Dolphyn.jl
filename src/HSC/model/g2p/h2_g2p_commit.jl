@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -30,12 +30,12 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H"]		#NUmber of hydrogen generation units 
-	
+	H = inputs["H"]		#NUmber of hydrogen generation units
+
 	H2_G2P_COMMIT = inputs["H2_G2P_COMMIT"]
-	H2_G2P_NEW_CAP = inputs["H2_G2P_NEW_CAP"] 
-	H2_G2P_RET_CAP = inputs["H2_G2P_RET_CAP"] 
-	
+	H2_G2P_NEW_CAP = inputs["H2_G2P_NEW_CAP"]
+	H2_G2P_RET_CAP = inputs["H2_G2P_RET_CAP"]
+
 	#Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
@@ -56,7 +56,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 	# Startup costs of "generation" for resource "y" during hour "t"
 	#  ParameterScale = 1 --> objective function is in million $
 	#  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"] ==1 
+	if setup["ParameterScale"] ==1
 		@expression(EP, eH2G2PCStart[k in H2_G2P_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_G2P_Start"][k]*vH2G2PStart[k,t]/ModelScalingFactor^2))
 	else
 		@expression(EP, eH2G2PCStart[k in H2_G2P_COMMIT, t=1:T],(inputs["omega"][t]*inputs["C_G2P_Start"][k]*vH2G2PStart[k,t]))
@@ -75,13 +75,13 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eH2Balance] -= eH2G2PCommit
 
 	#Power Consumption for H2 Generation
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
 		@expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-		sum(EP[:vPG2P][k,t]/ModelScalingFactor for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vPG2P][k,t]/ModelScalingFactor for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
 		@expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-		sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += ePowerBalanceH2G2PCommit
@@ -96,7 +96,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 			if k in H2_G2P_RET_CAP
 				set_integer(EP[:vH2G2PRetCap][k])
 			end
-			if k in H2_G2P_NEW_CAP 
+			if k in H2_G2P_NEW_CAP
 				set_integer(EP[:vH2G2PNewCap][k])
 			end
 		end

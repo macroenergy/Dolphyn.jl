@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting time-dependent CO$_2$ emissions by zone.
 """
 function write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
-	
+
 	dfCO2Capture = inputs["dfCO2Capture"]
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -35,7 +35,7 @@ function write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 		end
 	end
 
-	if setup["ParameterScale"] == 1 
+	if setup["ParameterScale"] == 1
 		dfDACEmissions = hcat(dfDACEmissions, DataFrame(value.(EP[:eCO2NegativeEmissionsByZone])*ModelScalingFactor, :auto))
 	else
 		dfDACEmissions = hcat(dfDACEmissions, DataFrame(value.(EP[:eCO2NegativeEmissionsByZone])/ModelScalingFactor, :auto))
@@ -55,7 +55,7 @@ function write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 	dfEmissions = vcat(dfDACEmissions, total)
 
 	CSV.write(joinpath(path, "DAC_net_emissions.csv"), dftranspose(dfDACEmissions, false), writeheader=false)
-	
+
 	# PSC emissions
 	dfPSCEmission = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
 
@@ -67,7 +67,7 @@ function write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 		end
 	end
 
-	if setup["ParameterScale"] == 1 
+	if setup["ParameterScale"] == 1
 		dfPSCEmission = hcat(dfPSCEmission, DataFrame(value.(EP[:eCO2PSCEmissionsByZone])*ModelScalingFactor, :auto))
 	else
 		dfPSCEmission = hcat(dfPSCEmission, DataFrame(value.(EP[:eCO2PSCEmissionsByZone])/ModelScalingFactor, :auto))
@@ -99,7 +99,7 @@ function write_co2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 		end
 	end
 
-	if setup["ParameterScale"] == 1 
+	if setup["ParameterScale"] == 1
 		dfPSCCaptured = hcat(dfPSCCaptured, DataFrame(value.(EP[:eCO2PSCCaptureByZone])*ModelScalingFactor, :auto))
 	else
 		dfPSCCaptured = hcat(dfPSCCaptured, DataFrame(value.(EP[:eCO2PSCCaptureByZone])/ModelScalingFactor, :auto))

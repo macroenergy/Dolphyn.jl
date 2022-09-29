@@ -1,24 +1,24 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
     co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the variables and constraints with carbon transimission via pipelines.
- 
+
 """
 function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
@@ -53,7 +53,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     )
 
     ## Objective Function Expressions ##
-    # Capital cost of pipelines 
+    # Capital cost of pipelines
     # DEV NOTE: To add fixed cost of existing + new pipelines
     #  ParameterScale = 1 --> objective function is in million $
     #  ParameterScale = 0 --> objective function is in $
@@ -101,7 +101,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ## Balance Expressions ##
     # CO2 PowCOr Consumption COalanCOe
 
-    if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
         @expression(
             EP,
             ePowerBalanceCO2PipeCompression[t = 1:T, z = 1:Z],
@@ -128,11 +128,11 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     ## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
     # if setup["ParameterScale"]==1 # Power consumption in GW
-    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
+    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T],
     # 	sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
 
     # else  # Power consumption in MW
-    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
+    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T],
     # 	sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
 
     # end
@@ -146,7 +146,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eCO2PipeZoneDemand[t = 1:T, z = 1:Z],
         sum(
-            eCO2PipeFlow_net[p, t, CO2_Pipe_Map[(CO2_Pipe_Map[!, :Zone].==z).&(CO2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
+            eCO2PipeFlow_net[p, t, CO2_Pipe_Map[(CO2_Pipe_Map[!, :Zone].==z).&(CO2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]]
             for p in CO2_Pipe_Map[CO2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
         )
     )
@@ -167,12 +167,12 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     # Modeling expansion of the pipleline network
     if setup["CO2NetworkExpansion"] == 1
-        # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe 
+        # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe
         @constraints(EP, begin
             [p in 1:CO2_P], EP[:eCO2NPipeNew][p] >= 0
         end)
     else
-        # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe 
+        # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe
         @constraints(EP, begin
             [p in 1:CO2_P], EP[:eCO2NPipeNew][p] == 0
         end)

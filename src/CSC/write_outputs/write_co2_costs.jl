@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -53,7 +53,7 @@ function write_co2_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 	    	cCO2Start += value(EP[:eTotalCO2CaptureCStart])
 		end
 	end
-	 
+
     cCO2Total = cCO2Var + cCO2Fix + cCO2Start
 
     dfCO2Cost[!,Symbol("Total")] = [cCO2Total, cCO2Fix, cCO2Var, cCO2Start]
@@ -80,7 +80,7 @@ function write_co2_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 			end
 		end
 
-		
+
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCFix = tempCFix * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)

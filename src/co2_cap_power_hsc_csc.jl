@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -26,7 +26,7 @@ function co2_cap_power_hsc_csc(EP::Model, inputs::Dict, setup::Dict)
 
 	println("C02 Policies Module for power and hydrogen and carbon system combined")
 
-	
+
 	SEG = inputs["SEG"]  # Number of non-served energy segments for power demand
 	H2_SEG = inputs["H2_SEG"]  # Number of non-served energy segments for H2 demand
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
@@ -42,28 +42,28 @@ function co2_cap_power_hsc_csc(EP::Model, inputs::Dict, setup::Dict)
 
 	elseif setup["SystemCO2Constraint"] ==2 # Joint emissions constraint for power and HSC and CSC sector
 		# In this case, we impose a single emissions constraint across both sectors
-		# Constraint type to be imposed is read from genx_settings.yml 
+		# Constraint type to be imposed is read from genx_settings.yml
 		# NOTE: constraint type denoted by setup parameter H2CO2Cap ignored
 
-		
+
 		## Mass-based: Emissions constraint in absolute emissions limit (tons)
 		if setup["CO2Cap"] == 1
 			@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 				sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) +
 				sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) -
-				sum(inputs["omega"][t] * EP[:eCO2NegativeEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) 
+				sum(inputs["omega"][t] * EP[:eCO2NegativeEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 				<=
 				sum(inputs["dfMaxCO2"][z,cap] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 			)
 
 		## Load + Rate-based: Emissions constraint in terms of rate (tons/MWh)
-		# Emissions from power + Emissions from HSC - Negative Emissions from CSC < = 
-		# Emissions intensity * (Power demand served + storage losses) +  
+		# Emissions from power + Emissions from HSC - Negative Emissions from CSC < =
+		# Emissions intensity * (Power demand served + storage losses) +
 		# Emissions intensity * H2 LHV * (H2 demand served)
-		# Carbon capture not considered in the RHS as the purpose of carbon capture is to offset the emissions of power and H2 generation	
+		# Carbon capture not considered in the RHS as the purpose of carbon capture is to offset the emissions of power and H2 generation
 
 		### Emissions intensity adjusted from tonnes/MWh to tonnes/ Tonne H2 using H2_LHV
-		elseif setup["CO2Cap"] == 2 
+		elseif setup["CO2Cap"] == 2
 			if setup["ParameterScale"] ==1 # MaxCO2Rate is kton/MWH, so need to adjust H2 demand to be in ktonne as well  on RHS of constraint if ParameterScale=1
 				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 					sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) +
@@ -75,7 +75,7 @@ function co2_cap_power_hsc_csc(EP::Model, inputs::Dict, setup::Dict)
 					sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV/ModelScalingFactor * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 				)
 
-			else 
+			else
 				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
 				sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) +
 				sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) -
@@ -91,8 +91,8 @@ function co2_cap_power_hsc_csc(EP::Model, inputs::Dict, setup::Dict)
 
 		## Generation + Rate-based: Emissions constraint in terms of rate (tons/MWh)
 		### Emissions intensity adjusted from tonnes/MWh to tonnes/ Tonne H2 using H2_LHV
-		# Emissions from power + Emissions from HSC - Negative Emissions from CSC < = 
-		# Emissions intensity * (Power Generation) +  
+		# Emissions from power + Emissions from HSC - Negative Emissions from CSC < =
+		# Emissions intensity * (Power Generation) +
 		# Emissions intensity * H2 LHV * (H2 generation)
 
 		elseif (setup["CO2Cap"]==3)
@@ -116,12 +116,12 @@ function co2_cap_power_hsc_csc(EP::Model, inputs::Dict, setup::Dict)
 				)
 			end
 
-		end 
+		end
 
-		
-	
+
+
 	end
-		
+
 
 	return EP
 

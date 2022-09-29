@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -29,7 +29,7 @@ function co2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     CO2_STOR_ALL = inputs["CO2_STOR_ALL"] # Set of all co2 storage resources
 
     Z = inputs["Z"]     # Number of zones
-    T = inputs["T"] # Number of time steps (hours) 
+    T = inputs["T"] # Number of time steps (hours)
 
 
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
@@ -38,7 +38,7 @@ function co2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
     ### Variables ###
-    # Storage level of resource "y" at hour "t" [tonne] on zone "z" 
+    # Storage level of resource "y" at hour "t" [tonne] on zone "z"
     @variable(EP, vCO2S[y in CO2_STOR_ALL, t = 1:T] >= 0)
 
     # Rate of carbon withdrawn from CSC by resource "y" at hour "t" [tonne/hour] on zone "z"
@@ -71,7 +71,7 @@ function co2_storage_all(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCVarCO2Stor_in[y in CO2_STOR_ALL, t = 1:T],
-            if (dfCO2Stor[!, :CO2Stor_Charge_MMBtu_p_tonne][y] > 0) # Charging consumes fuel 
+            if (dfCO2Stor[!, :CO2Stor_Charge_MMBtu_p_tonne][y] > 0) # Charging consumes fuel
                 inputs["omega"][t] *
                 dfCO2Stor[!, :Var_OM_Cost_Charge_p_tonne][y] *
                 (vCO2CHARGE_STOR[y, t] + vCO2DISCHARGE_STOR[y, t]) +
@@ -99,7 +99,7 @@ function co2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         ePowerBalanceCO2Stor[t = 1:T, z = 1:Z],
-        if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+        if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
             sum(
                 EP[:vCO2CHARGE_STOR][y, t] * dfCO2Stor[!, :CO2Stor_Charge_MWh_p_tonne][y] /
                 ModelScalingFactor for

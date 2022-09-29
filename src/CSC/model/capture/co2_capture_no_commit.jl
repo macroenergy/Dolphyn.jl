@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -28,9 +28,9 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	
+
 	CO2_CAPTURE_NO_COMMIT = inputs["CO2_CAPTURE_NO_COMMIT"]
-	
+
 	# Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
@@ -45,13 +45,13 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	# Power Consumption for CO2 Capture
 	@expression(EP, ePowerBalanceCO2CaptureNoCommit[t=1:T, z=1:Z],
-	sum(EP[:vPCO2][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID]))) 
+	sum(EP[:vPCO2][k,t] for k in intersect(CO2_CAPTURE_NO_COMMIT, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:ePowerBalance] += -ePowerBalanceCO2CaptureNoCommit
 
 	## For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCO2NetpowerConsumptionByAll] += ePowerBalanceCO2CaptureNoCommit
-	
+
 	# Power and natural gas consumption associated with CO2 generation in each time step
 	@constraint(EP, [k in CO2_CAPTURE_NO_COMMIT, t = 1:T], EP[:vPCO2][k,t] == EP[:vCO2Capture][k,t] * dfCO2Capture[!,:etaPCO2_MWh_p_tonne][k])
 
@@ -63,7 +63,7 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 		[k in CO2_CAPTURE_NO_COMMIT, t=1:T], EP[:vCO2Capture][k,t] >= EP[:eCO2CaptureTotalCap][k]* dfCO2Capture[!, :CO2Capture_min_output][k]
 	end)
 
-	# Ramping cosntraints 
+	# Ramping cosntraints
 	@constraints(EP, begin
 		## Maximum ramp up between consecutive hours
 		# Start Hours: Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
@@ -79,9 +79,9 @@ function co2_capture_no_commit(EP::Model, inputs::Dict, setup::Dict)
 
 		# Interior Hours
 		[k in CO2_CAPTURE_NO_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vCO2Capture][k,t-1] - EP[:vCO2Capture][k,t] <= dfCO2Capture[!,:Ramp_Down_Percentage][k] * EP[:eCO2CaptureTotalCap][k]
-	
+
 	end)
 
 	return EP
-	
+
 end

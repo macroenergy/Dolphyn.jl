@@ -1,17 +1,17 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -107,7 +107,7 @@ EP[:eH2Balance] += eH2BalanceDemandFlex
 # Variable costs of "charging" for technologies "k" during hour "t" in zone "z"
 #  ParameterScale = 1 --> objective function is in million $
 #  ParameterScale = 0 --> objective function is in $
-if setup["ParameterScale"] ==1 
+if setup["ParameterScale"] ==1
     @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t]/ModelScalingFactor^2)
 else
     @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t])
@@ -133,7 +133,7 @@ EP[:eObj] += eTotalCH2VarFlexIn
 # Maximum charging rate
 # NOTE: the maximum amount that can be shifted is given by hourly availability of the resource times the maximum capacity of the resource
 #Removed generator variability
-[k in H2_FLEX, t=1:T], EP[:vH2_CHARGE_FLEX][k,t] <= inputs["pH2_Max"][k,t] * EP[:eH2GenTotalCap][k] 
+[k in H2_FLEX, t=1:T], EP[:vH2_CHARGE_FLEX][k,t] <= inputs["pH2_Max"][k,t] * EP[:eH2GenTotalCap][k]
 # NOTE: no maximum discharge rate unless constrained by other factors like transmission, etc.
 end)
 
