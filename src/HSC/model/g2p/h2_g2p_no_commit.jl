@@ -93,10 +93,6 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	EP[:ePowerBalance] += ePowerBalanceH2G2PNoCommit
 
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2G2PNoCommit
-
-
 	###Constraints###
 	# Power and natural gas consumption associated with H2 generation in each time step
 	@constraints(EP, begin
