@@ -46,8 +46,9 @@ using Distances
 using Combinatorics
 using Documenter
 using Revise
-using Gurobi
 
+using Gurobi
+using HiGHS
 using Clp
 using Cbc
 
