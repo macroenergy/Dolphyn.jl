@@ -295,13 +295,13 @@ This file contains cost and performance parameters for various hydrogen to power
 |lifetime | Lifetime of truck. |
 |Fuel | Fuel type of truck. |
 |Fuel\_MMBTU\_per\_mile | Fuel consumption for truck in operation per mile if it burns fuels. |
-|Power\_MW\_per\_mile | Power consumption for truck in operation per mile if it feeds on pwoer. |
+|Power\_MW\_per\_mile | Power consumption for truck in operation per mile if it feeds on power. |
 |H2\_tonne\_per\_mile | H2 consumption for truck in operation per mile if it feeds on hydrogen. |
 
 
 ## 3 Outputs
 
-The table below summarizes the units of each output variable reported as part of the various CSV files produced after each model run. The reported units are also provided. If a result file includes time-dependent values, the value will not include the hour weight in it. An annual sum ("AnnualSum") column/row will be provided whenever it is possible (e.g., `emissions.csv`).
+The table below summarizes the output variables reported as part of the various CSV files produced after each model run. The reported units are also provided. When the model is run with time domain reduction, if a result file includes time-dependent values (e.g. for each model time step), the value will not include the hour weight in it. An annual sum ("AnnualSum") column/row will be provided whenever it is possible (e.g., `emissions.csv`), and this value takes the time-weights into account. 
 
 ### 3.1 Default output files
 
@@ -322,16 +322,15 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 | RetEnergyCap |Retired H2 energy capacity of each resource type in each zone; applies only to H2 storage tech. |Tonnes |
 | NewEnergyCap| Installed energy capacity of each resource type in each zone; applies only to H2 storage tech. |Tonnes |
 | EndEnergyCap |Total installed energy capacity of each resource type in each zone; applies only to H2 storage tech. |Tonnes |
-| StartChargeCap| Initial H2 charging capacity of `H2_STOR = 2` resource type in each zone; this is an input |Tonnes / Hr |
-| RetChargeCap |Retired H2 charging capacity of `H2_STOR = 2` resource type in each zone |Tonnes / Hr |
+| StartChargeCap| Initial H2 charging capacity of `H2_STOR = 1` resource type in each zone; this is an input |Tonnes / Hr |
+| RetChargeCap |Retired H2 charging capacity of `H2_STOR = 1` resource type in each zone |Tonnes / Hr |
 | NewChargeCap |Installed H2 charging capacity of each resource type in each zone |Tonnes / Hr |
 | EndChargeCap |Total H2 charging capacity of each resource type in each zone |Tonnes / Hr|
 
 
 #### 3.1.2 HSC_emissions.csv
 
-Reports CO2 emissions by zone at each hour by H2 Resources; an annual sum row will be provided. 
-
+Reports CO2 emissions for each zone and each hour by H2 Resources; an annual sum row will be provided (in tonnes). 
 
 #### 3.1.4 HSC_nse.csv
 
@@ -339,15 +338,21 @@ Reports H2 non-served energy for every model zone, time step and cost-segment.
 
 #### 3.1.5 HSC_generation_discharge.csv
 
-Reports H2 discharged by each H2 production resource (generation, storage) in each model time step.
+Reports H2 discharged by each H2 production resource (generation, storage) in each model time step, as well as the annual sum (in tonnes). 
 
 #### 3.1.6 HSC_h2_balance.csv
+
+Reports the use (tonnes/hour or tonnes) of each H2 resource type (Generation, Flexible Demand, Storage Charge & Discharge, Nonserved Energy, H2 Pipeline Import/Export, H2 Truck Import/Export, G2P Demand, and Demand) for each zone and each time step, as well as the annual sum. 
+
+#### 3.1.7 HSC_costs.csv
+
+Reports HSC costs for each zone, including sum of fixed costs, variable costs, NSE (non-served energy) costs, start-up costs (for generators), network expansion cost of pipelines, and total costs. 
 
 ### 3.2 HSC Optional Output Files
 
 #### 3.2.1 HSC_g2p_capacity.csv
 
-Reports optimal values of investment variables (except StartCap, which is an input)
+Reports optimal values of investment variables (except StartCap, which is an input) for each G2P resource. 
 
 ###### Table 9: Structure of the HSC_g2p_capacity.csv file
 ---
@@ -360,16 +365,23 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 
 #### 3.2.2 HSC_G2P_H2_consumption.csv
 
-Reports H2 required by G2P in each model time step.
+Reports H2 required (in tonnes) by G2P for each zone and each model time step, as well as the annual sum. 
 
 #### 3.2.3 HSC_charge.csv
 
+Reports H2 charging (i.e flow in tonnes for each hour) for storage resources for each zone and time step, as well as the annual sum. 
+
 #### 3.2.4 HSC_storage.csv
+
+Reports storage level (i.e amount of H2 in tonnes) for storage resources for each zone and time step. 
 
 #### 3.2.5 HSC_h2_pipeline_flow.csv
 
+Reports H2 level (in tonnes/hour) in each pipeline for each time step, as well as the amount of hydrogen (in tonnes) sent from the source or arrived at the sink. 
+
 #### 3.2.6 HSC_h2_pipeline_level.csv
 
-#### 3.2.7 TRUCKS
+Reports H2 level (in tonnes/hour) in each pipeline for each time step. 
 
+#### 3.2.7 TRUCKS
 
