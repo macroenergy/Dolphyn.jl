@@ -271,6 +271,22 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
+	if setup["ModelSynFuels"] == 1
+
+		# Initialize Liquid Fuel Balance
+		@expression(EP, eLFBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLiquidFuelsConsumptionByAll[t=1:T,z=1:Z], 0)
+		
+		EP = syn_fuel_outputs(EP, inputs, setup)
+		EP = syn_fuel_investment(EP, inputs, setup)
+		EP = syn_fuel_resources(EP, inputs, setup)
+		EP = liquid_fuel_demand(EP, inputs, setup)
+		EP = emissions_liquid_fuels(EP, inputs, setup)
+
+		###HLiquid Fuel Demand Constraints
+		@constraint(EP, cLFBalance[t=1:T, z=1:Z], EP[:eLFBalance][t,z] == inputs["Liquid_Fuels_D"][t,z])
+
+	end
 
 
 	################  Policies #####################3

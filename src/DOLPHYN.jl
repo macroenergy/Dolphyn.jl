@@ -29,6 +29,8 @@ export write_HSC_outputs
 export write_CSC_outputs
 export cluster_inputs
 export mga
+export load_syn_fuel_inputs
+export write_synfuel_outputs
 
 
 using JuMP # used for mathematical programming
@@ -108,6 +110,11 @@ include("CSC/load_inputs/load_co2_storage.jl")
 include("CSC/load_inputs/load_co2_capture_compression.jl")
 include("CSC/load_inputs/load_co2_pipeline_data.jl")
 
+#Load input data - syn fuels
+include("SynFuels/load_inputs/load_syn_fuels_inputs.jl")
+include("SynFuels/load_inputs/load_syn_fuels_resources.jl")
+include("SynFuels/load_inputs/load_liquid_fuel_demand.jl")
+
 #Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
 include("GenX/model/core/discharge/investment_discharge.jl")
@@ -128,6 +135,7 @@ include("GenX/model/resources/storage/long_duration_storage.jl")
 include("GenX/model/resources/storage/investment_charge.jl")
 include("GenX/model/resources/storage/storage_asymmetric.jl")
 include("GenX/model/resources/storage/storage_symmetric.jl")
+include("GenX/model/resources/hydro/hydro_inter_period_linkage.jl")
 
 include("GenX/model/resources/thermal/thermal.jl")
 include("GenX/model/resources/thermal/thermal_commit.jl")
@@ -201,6 +209,17 @@ include("CSC/model/compression/co2_capture_compression.jl")
 
 # CO2 Pipeline
 include("CSC/model/transmission/co2_pipeline.jl")
+
+#Syn Fuels
+include("SynFuels/model/core/syn_fuel_investment.jl")
+include("SynFuels/model/core/liquid_fuel_emissions.jl")
+include("SynFuels/model/core/syn_fuel_outputs.jl")
+
+include("SynFuels/model/demand/liquid_fuel_demand.jl")
+
+include("SynFuels/model/resources/syn_fuel_res_all.jl")
+include("SynFuels/model/resources/syn_fuel_resources.jl")
+include("SynFuels/model/resources/syn_fuels_res_no_commit.jl")
 
 
 # Load model generation and solving scripts
@@ -306,6 +325,15 @@ include("CSC/write_outputs/write_power_zone_co2_captured.jl")
 
 include("CSC/write_outputs/write_hydrogen_plant_co2_captured.jl")
 include("CSC/write_outputs/write_hydrogen_zone_co2_captured.jl")
+
+#Write SynFuel Outputs
+include("SynFuels/write_outputs/write_synfuel_outputs.jl")
+include("SynFuels/write_outputs/write_liquid_fuel_demand_balance.jl")
+include("SynFuels/write_outputs/write_synfuel_balance.jl")
+include("SynFuels/write_outputs/write_synfuel_capacity.jl")
+include("SynFuels/write_outputs/write_synfuel_costs.jl")
+include("SynFuels/write_outputs/write_synfuel_gen.jl")
+include("SynFuels/write_outputs/write_synfuel_emissions.jl")
 
 # Modeling to generate alternatives
 include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")

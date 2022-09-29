@@ -64,6 +64,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2Gen = inputs["dfH2Gen"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of all h2 storage resources
+    H2_STOR_LONG_DURATION = inputs["H2_STOR_LONG_DURATION"]
 
     Z = inputs["Z"]     # Number of zones
     T = inputs["T"] # Number of time steps (hours) 
@@ -109,7 +110,6 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCVarH2StorIn, sum(eTotalCVarH2StorInT[t] for t in 1:T))
     EP[:eObj] += eTotalCVarH2StorIn
 
-
     # Term to represent electricity consumption associated with H2 storage charging and discharging
 	@expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
     if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
@@ -139,7 +139,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 	# We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
 	
 	if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"]) # Apply constraints to those storage technologies with short duration only
-		@constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_SHORT_DURATION], EP[:vH2S][y,t] ==
+		@constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_LONG_DURATION], EP[:vH2S][y,t] ==
 			EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
 			+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))
 	else # Apply constraints to all storage technologies

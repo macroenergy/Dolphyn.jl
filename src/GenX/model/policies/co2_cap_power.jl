@@ -70,7 +70,8 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 
 	### Constraints ###
 
-	if setup["ModelCO2"] == 1 #Include DAC captured carbon
+	if setup["ModelCO2"] == 1 && setup["ModelSynFuels"] != 1 #Include DAC captured carbon
+
 		## Mass-based: Emissions constraint in absolute emissions limit (tons)
 		if setup["CO2Cap"] == 1
 			@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
@@ -111,6 +112,58 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 			)
 		end 
 
+	elseif setup["ModelCO2"] == 1 && setup["ModelSynFuels"] == 1 #Include DAC captured carbon
+
+		@expression(EP, eSynFuelEmissions[cap=1:inputs["NCO2Cap"]], sum(inputs["omega"][t] * EP[:eSyn_Fuels_Cons_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+			+ sum(inputs["omega"][t] * EP[:eLiquid_Fuels_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+			+ sum(inputs["omega"][t] * EP[:eSynFuelProdEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) 
+			+ sum(inputs["omega"][t] * EP[:eByProdConsCO2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+		## Mass-based: Emissions constraint in absolute emissions limit (tons)
+		if setup["CO2Cap"] == 1
+			@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
+				sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+				+ sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+				- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+				+ EP[:eSynFuelEmissions][cap] <=
+				sum(inputs["dfMaxCO2"][z,cap] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+			)
+
+		## Load + Rate-based: Emissions constraint in terms of rate (tons/MWh)
+		elseif setup["CO2Cap"] == 2 
+			if setup["ModelH2"] == 0
+				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
+					sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+					+ sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+					- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+					+ EP[:eSynFuelEmissions] <=
+					sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] + EP[:eDACNetpowerConsumptionByAll][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
+					sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+				)
+			elseif setup["ModelH2"] == 1 # Add NetPowerConsumption term to Demand side - could positive or negative
+				@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
+					sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+					+ sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+					- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+					+ EP[:eSynFuelEmissions] <=
+					sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] + EP[:eH2NetpowerConsumptionByAll][t,z] + EP[:eDACNetpowerConsumptionByAll][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
+					sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+				)
+			end
+
+
+		## Generation + Rate-based: Emissions constraint in terms of rate (tons/MWh)
+		elseif (setup["CO2Cap"]==3)
+			@constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
+				sum(inputs["omega"][t] * EP[:eEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+				+ sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+				- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+				+ EP[:eSynFuelEmissions] <=
+				sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+			)
+		end 
+	
+		
 	elseif setup["ModelCO2"] == 0
 
 		## Mass-based: Emissions constraint in absolute emissions limit (tons)
