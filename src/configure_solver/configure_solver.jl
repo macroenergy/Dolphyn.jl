@@ -52,4 +52,5 @@ function configure_solver(solver_settings_path::String, solver::String)
     end
 
     return OPTIMIZER
+
 end
