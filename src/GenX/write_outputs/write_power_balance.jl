@@ -21,7 +21,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 function write_power_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
-	
+
 	if setup["ModelH2"] == 1
 		if setup["ModelH2G2P"] == 1
 			dfH2G2P = inputs["dfH2G2P"]
@@ -49,11 +49,11 @@ function write_power_balance(path::AbstractString, setup::Dict, inputs::Dict, EP
 		 		sum(value.(EP[:vP][dfGen[(dfGen[!,:VRE].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
 				sum(value.(EP[:vP][dfGen[(dfGen[!,:MUST_RUN].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
 				sum(value.(EP[:vP][dfGen[(dfGen[!,:HYDRO].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
-	     	
+
 			if setup["ModelH2"] == 1
 				if setup["ModelH2G2P"] == 1
 					dfH2G2P = inputs["dfH2G2P"]
-					dfTemp1[t+rowoffset,2] = sum(value.(EP[:vPG2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
+					dfTemp1[t+rowoffset,2] = sum(value.(EP[:vPG2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
 				else
 					dfTemp1[t+rowoffset,2] = 0
 				end
@@ -70,21 +70,21 @@ function write_power_balance(path::AbstractString, setup::Dict, inputs::Dict, EP
 	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
 	     	    dfTemp1[t+rowoffset,5] = sum(value.(EP[:vCHARGE_FLEX][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
 	     	end
-	     	dfTemp1[t+rowoffset,6] = -sum(value.(EP[:vP][dfGen[(dfGen[!,:FLEX].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,6] = -sum(value.(EP[:vP][dfGen[(dfGen[!,:FLEX].>=1) .& (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	if SEG>1
-	       		dfTemp1[t+rowoffset,7] = sum(value.(EP[:vNSE][2:SEG,t,z]))
+	       		dfTemp1[t+rowoffset,7] = sum(value.(EP[:vNSE][2:SEG,z,t]))
 	     	else
-	       		dfTemp1[t+rowoffset,7]=0
+	       		dfTemp1[t+rowoffset,7] = 0
 	     	end
-	     	dfTemp1[t+rowoffset,8] = value(EP[:vNSE][1,t,z])
+	     	dfTemp1[t+rowoffset,8] = value(EP[:vNSE][1,z,t])
 	     	dfTemp1[t+rowoffset,9] = 0
 	     	dfTemp1[t+rowoffset,10] = 0
 
 			if Z>=2
-				dfTemp1[t+rowoffset,9] = value(EP[:ePowerBalanceNetExportFlows][t,z])
+				dfTemp1[t+rowoffset,9] = value(EP[:ePowerBalanceNetExportFlows][z,t])
 				dfTemp1[t+rowoffset,10] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 			end
-	     	dfTemp1[t+rowoffset,11] = -inputs["pD"][t,z]
+	     	dfTemp1[t+rowoffset,11] = -inputs["pD"][z,t]
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
@@ -111,6 +111,6 @@ function write_power_balance(path::AbstractString, setup::Dict, inputs::Dict, EP
 	   	dfPowerBalance[rowoffset,c]=sum(inputs["omega"].*dfPowerBalance[(rowoffset+1):size(dfPowerBalance,1),c])
 	end
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	
+
 	CSV.write(joinpath(path, "power_balance.csv"), dfPowerBalance, writeheader=false)
 end

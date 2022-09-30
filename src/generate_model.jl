@@ -320,7 +320,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	#          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
 	if setup["ModelPower"] == 1
 		### Power balance constraints
-		@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
+		@constraint(EP, cPowerBalance[z=1:Z, t=1:T], EP[:ePowerBalance][z,t] == inputs["pD"][z, t])
 	end
 
 	if setup["ModelH2"] == 1

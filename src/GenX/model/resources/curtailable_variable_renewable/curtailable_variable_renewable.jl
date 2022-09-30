@@ -65,7 +65,7 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 	for r in VRE_POWER_OUT
 		# Define the set of generator indices corresponding to the different sites (or bins) of a particular VRE technology (E.g. wind or solar) in a particular zone.
 		# For example the wind resource in a particular region could be include three types of bins corresponding to different sites with unique interconnection, hourly capacity factor and maximim available capacity limits.
-		VRE_BINS = intersect(dfGen[dfGen[!,:R_ID].>=y,:R_ID], dfGen[dfGen[!,:R_ID].<=y+dfGen[!,:Num_VRE_Bins][r]-1,:R_ID])
+		VRE_BINS = intersect(dfGen[dfGen[!,:R_ID].>=r,:R_ID], dfGen[dfGen[!,:R_ID].<=r+dfGen[!,:Num_VRE_Bins][r]-1,:R_ID])
 
 		# Constraints on contribution to regulation and reserves
 		if Reserves == 1
