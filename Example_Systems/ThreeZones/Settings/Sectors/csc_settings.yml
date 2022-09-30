@@ -1,0 +1,11 @@
+# To be edited and added in future modules
+CO2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
+ModelCO2Pipelines: 1 # Whether to model pipeline in CO2 supply chain - 0 - not included, 1 - included
+CO2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer - 0 - continuous capacity, 1- discrete capacity
+
+ModelCO2Trucks: 0 # Whether to model truck in carbon supply chain - 0 - not included, 1 - included
+
+CO2CaptureCommit: 0 # Continuous or discrete capacity representation of CO2 capture technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as integer variables;
+CO2CostOffset: 0 # Emissions offset via a carbon price; 0 = not active ; 1 = active
+
+CO2CO2Cap: 4 # CO2 emissions cap for CSC only; 0 = not active (no CO2 emission limit); 1 = mass-based emission limit constraint; 2 = load + rate-based emission limit constraint; 3 = generation + rate-based emission limit constraint; 4 = emissions penalized via a carbon price
