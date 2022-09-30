@@ -36,7 +36,7 @@ function write_HSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::
     write_h2_capacity(path, setup, inputs, EP)
     write_h2_gen(path, setup, inputs, EP)
     write_h2_nse(path, setup, inputs, EP)
-    # write_h2_costs(path, sep, setup, inputs, EP)
+    write_h2_costs(path, setup, inputs, EP)
     write_h2_balance(path, setup, inputs, EP)
     if setup["ModelH2Pipelines"] == 1
         write_h2_pipeline_flow(path, setup, inputs, EP)
