@@ -127,7 +127,7 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 ### Writing output
 println("Writing Output")
 output_path = joinpath(root_path, "Results")
-write_basic_outputs(output_path, setup, inputs, EP)
+output_path = write_basic_outputs(output_path, setup, inputs, EP)
 
 ## Write power system output
 if setup["ModelPower"] == 1

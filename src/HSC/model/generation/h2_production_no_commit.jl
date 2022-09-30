@@ -20,7 +20,6 @@ received this license file. If not, see <http://www.gnu.org/licenses/>.
 The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
 
 """
-
 function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	println("H2 Production (No Unit Commitment) Module")
@@ -42,7 +41,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	###Expressions###
 
 	#H2 Balance expressions
-	@expression(EP, eH2GenNoCommit[t=1:T, z=1:Z],
+	@expression(EP, eH2GenNoCommit[z=1:Z, t=1:T],
 	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] += eH2GenNoCommit
@@ -50,20 +49,18 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	#Power Consumption for H2 Generation
 	#Power Consumption for H2 Generation
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
-		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
+		@expression(EP, ePowerBalanceH2GenNoCommit[z=1:Z, t=1:T],
 		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
-		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
+		@expression(EP, ePowerBalanceH2GenNoCommit[z=1:Z, t=1:T],
 		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
 
-
 	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
 	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
-
 
 	###Constraints###
 	# Power and natural gas consumption associated with H2 generation in each time step

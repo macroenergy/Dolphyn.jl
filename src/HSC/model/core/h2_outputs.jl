@@ -33,18 +33,13 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 	H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
 	T = inputs["T"]     # Number of time steps (hours)
 
-
 	### Variables ###
-
     #H2 injected to hydrogen grid from hydrogen generation resource k (tonnes of H2/hr) in time t
 	@variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0)
 
 	### Expressions ###
-
 	## Objective Function Expressions ##
-
     # Variable costs of "generation" for resource "y" during hour "t" = variable O&M plus fuel cost
-
 	#  ParameterScale = 1 --> objective function is in million $ .
 	## In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.

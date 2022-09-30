@@ -34,8 +34,8 @@ function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
 		@constraint(EP, cH2CO2Emissions_systemwide[cap=1:inputs["H2NCO2Cap"]],
 			sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) <=
 			sum(inputs["dfH2MaxCO2Rate"][z,cap] * sum(inputs["omega"][t] *
-			(inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] -
-			 sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]))
+			(inputs["H2_D"][z,t] + EP[:eH2DemandByZoneG2P][z,t] -
+			 sum(EP[:vH2NSE][s,z,t] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]))
 		)
 
 	## Generation + Rate-based: Emissions constraint in terms of rate (tonne CO2/tonne H2)

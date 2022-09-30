@@ -55,4 +55,7 @@ function write_basic_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP
 	println(elapsed_time_time_weights)
 
     println("Wrote basic outputs to $path")
+
+    return path
+
 end

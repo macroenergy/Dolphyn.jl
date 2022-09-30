@@ -71,23 +71,22 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eObj] += eTotalH2GenCStart
 
 	#H2 Balance expressions
-	@expression(EP, eH2GenCommit[t=1:T, z=1:Z],
+	@expression(EP, eH2GenCommit[z=1:Z, t=1:T],
 	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] += eH2GenCommit
 
 	#Power Consumption for H2 Generation
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
-		@expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
+		@expression(EP, ePowerBalanceH2GenCommit[z=1:Z, t=1:T],
 		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
-		@expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
+		@expression(EP, ePowerBalanceH2GenCommit[z=1:Z, t=1:T],
 		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceH2GenCommit
-
 
 	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
 	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenCommit
@@ -107,7 +106,6 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 			end
 		end
 	end #END unit commitment configuration
-
 		###Constraints###
 		@constraints(EP, begin
 		#Power Balance

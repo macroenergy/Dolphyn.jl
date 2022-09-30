@@ -58,7 +58,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
 			end
 
-	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
+	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,z,t])
 
 			if setup["ModelH2Pipelines"] == 1
 			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
@@ -79,7 +79,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 				dfTemp1[t+rowoffset,9] = 0
 			end
 
-	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][z,t]
 	   	end
 
 		if z == 1

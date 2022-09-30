@@ -193,7 +193,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if setup["ModelH2"] == 1
 
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)
+		@expression(EP, eH2NetpowerConsumptionByAll[z=1:Z, t=1:T], 0)
 
 		# Infrastructure
 		EP = h2_outputs(EP, inputs, setup)
@@ -325,13 +325,13 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	if setup["ModelH2"] == 1
 		### Hydrogen Balance constraints
-		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+		@constraint(EP, cH2Balance[z=1:Z, t=1:T], EP[:eH2Balance][z, t] == inputs["H2_D"][z, t])
 	end
 
 	## Only activate when carbon capture utilization is online
 	if setup["ModelCO2"] == 1
 		###Carbon Balanace constraints
-		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
+		@constraint(EP, cCO2Balance[z=1:Z, t=1:T], EP[:eCO2Balance][z, t] == inputs["CO2_D"][z, t])
 	end
 
     ## Record pre-solver time
