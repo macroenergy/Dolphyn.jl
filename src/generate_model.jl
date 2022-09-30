@@ -104,21 +104,21 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	# Initialize Power Balance Expression
 	# Expression for "baseline" power balance constraint
-	@expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
+	@expression(EP, ePowerBalance[z=1:Z, t=1:T], 0)
 
 	# Initialize Hydrogen Balance Expression
 	# Expression for "baseline" H2 balance constraint
-	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eH2Balance[z=1:Z, t=1:T], 0)
 
 	# Initialize Carbon Balance Expression
 	# Expression for "baseline" CO2 balance constraint
-	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eCO2Balance[z=1:Z, t=1:T], 0)
 
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
 	# Power supply by z and timestep - used in emissions constraints
-	@expression(EP, eGenerationByZone[t=1:T, z=1:Z], 0)
+	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
 
 	# PSC emissions by zone and time
 	@expression(EP, eCO2PSCEmissionsByZone[z = 1:Z, t = 1:T], 0)

@@ -40,10 +40,10 @@ function storage_symmetric(EP::Model, inputs::Dict, Reserves::Int)
 	else
 		@constraints(EP, begin
 			# Maximum charging rate must be less than symmetric power rating
-			[y in STOR_SYMMETRIC, t in 1:T], EP[:vCHARGE][y,t] <= EP[:eTotalCap][y]
+			[s in STOR_SYMMETRIC, t in 1:T], EP[:vCHARGE][s,t] <= EP[:eTotalCap][s]
 
 			# Max simultaneous charge and discharge cannot be greater than capacity
-			[y in STOR_SYMMETRIC, t in 1:T], EP[:vP][y,t]+EP[:vCHARGE][y,t] <= EP[:eTotalCap][y]
+			[s in STOR_SYMMETRIC, t in 1:T], EP[:vP][s,t]+EP[:vCHARGE][s,t] <= EP[:eTotalCap][s]
 		end)
 	end
 

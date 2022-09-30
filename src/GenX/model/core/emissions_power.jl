@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	emissions(EP::Model, inputs::Dict, UCommit::Int)
+	emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the CO2 emissions by plants in each zone, which is subsequently added to the total emissions
 """
@@ -28,43 +28,47 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
     G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
-    COMMIT = inputs["COMMIT"] # For not, thermal resources are the only ones eligible for Unit Committment
+    COMMIT = inputs["COMMIT"]
     Power_CCS = inputs["Power_CCS"]
 
+    ### Expressions ###
+    # Thermal resources are the only ones eligible for Unit Committment which have start action and correspondind emissions
     @expression(
         EP,
-        eEmissionsByPlant[y = 1:G, t = 1:T],
-        if y in inputs["COMMIT"]
-            dfGen[!, :CO2_per_MWh][y] * EP[:vP][y, t] +
-            dfGen[!, :CO2_per_Start][y] * EP[:vSTART][y, t]
+        eEmissionsByPlant[g = 1:G, t = 1:T],
+        if g in COMMIT
+            dfGen[!, :CO2_per_MWh][g] * EP[:vP][g, t] +
+            dfGen[!, :CO2_per_Start][g] * EP[:vSTART][g, t]
         else
-            dfGen[!, :CO2_per_MWh][y] * EP[:vP][y, t]
+            dfGen[!, :CO2_per_MWh][g] * EP[:vP][g, t]
         end
     )
 
-    @expression(
-        EP,
-        eCO2CapturePowerByPlant[y in Power_CCS, t = 1:T],
-        dfGen[!, :CCS_Percentage][y] / (1 - dfGen[!, :CCS_Percentage][y]) *
-        eEmissionsByPlant[y, t]
-    )
-
+    # Carbon emission calculated over each modeled zone
     @expression(
         EP,
         eEmissionsByZone[z = 1:Z, t = 1:T],
-        sum(eEmissionsByPlant[y, t] for y in dfGen[(dfGen[!, :Zone].==z), :R_ID])
+        sum(eEmissionsByPlant[g, t] for g in dfGen[(dfGen[!, :Zone].==z), :R_ID])
     )
 
-	# This expression is used to denote the amount of CO2 captured by the power plant with CCS
+    # Generation plants with CCS are the only ones eligible for carbon capture
+    @expression(
+        EP,
+        eCO2CapturePowerByPlant[g in Power_CCS, t = 1:T],
+        dfGen[!, :CCS_Percentage][g] / (1 - dfGen[!, :CCS_Percentage][g]) *
+        eEmissionsByPlant[g, t]
+    )
+
+	# Captured carbon calculated over each zone
 	@expression(
 		EP,
 		eCO2CapturePowerByZone[z = 1:Z, t = 1:T],
-		sum(eCO2CapturePowerByPlant[y, t] for y in intersect(dfGen[(dfGen[!, :Zone].==z), :R_ID], Power_CCS))
+		sum(eCO2CapturePowerByPlant[g, t] for g in intersect(dfGen[(dfGen[!, :Zone].==z), :R_ID], Power_CCS))
 	)
 
     EP[:eCO2PSCEmissionsByZone] += eEmissionsByZone
     EP[:eCO2PSCCaptureByZone] += eCO2CapturePowerByZone
-    
+
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
     # then need to add cost penalty due to CO2 prices
     if (setup["CO2Cap"] == 4)
@@ -103,4 +107,5 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
     end
 
     return EP
+
 end

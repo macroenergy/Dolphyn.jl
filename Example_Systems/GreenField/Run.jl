@@ -45,28 +45,36 @@ inputs_path = joinpath(root_path, "Inputs")
 ### Starters Settings
 starters_settings_path = joinpath(settings_path, "Starters")
 ## Global settings for model
-global_settings = joinpath(starters_settings_path, "global_model_settings.yml")
+global_settings = joinpath(starters_settings_path, "global_settings.yml")
 ## Setup dictionary stores global settings
 setup_global = YAML.load(open(global_settings))
+setup = setup_global
 
 ### Sector Specific Settings
 sectors_settings_path = joinpath(settings_path, "Sectors")
-## Settings YAML file path for GenX of power sector
-genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
-## Settings YAML file path for HSC modelgrated model
-hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml")
-## Settings YAML file path for CSC modelgrated model
-csc_settings = joinpath(sectors_settings_path, "csc_settings.yml")
+if setup["ModelPower"] == 1
+    ## Settings YAML file path for GenX of power sector
+    genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
+    ## Setup dictionary stores GenX-specific parameters
+    setup_genx = YAML.load(open(genx_settings))
+    setup = merge(setup, setup_genx)
+end
 
-## Setup dictionary stores GenX-specific parameters
-setup_genx = YAML.load(open(genx_settings))
-## Setup dictionary stores H2 supply chain-specific parameters
-setup_hsc = YAML.load(open(hsc_settings))
-## Setup dictionary stores CO2 supply chain-specific parameters
-setup_csc = YAML.load(open(csc_settings))
+if setup["ModelH2"] == 1
+    ## Settings YAML file path for HSC modelgrated model
+    hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml")
+    ## Setup dictionary stores H2 supply chain-specific parameters
+    setup_hsc = YAML.load(open(hsc_settings))
+    setup = merge(setup, setup_hsc)
+end
 
-## Merge dictionary - value of common keys will be overwritten by value in global_model_settings
-setup = merge(setup_global, setup_genx, setup_hsc, setup_csc)
+if setup["ModelCO2"] == 1
+    ## Settings YAML file path for CSC modelgrated model
+    csc_settings = joinpath(sectors_settings_path, "csc_settings.yml")
+    ## Setup dictionary stores CO2 supply chain-specific parameters
+    setup_csc = YAML.load(open(csc_settings))
+    setup = merge(setup, setup_csc)
+end
 
 ### Cluster time series inputs if necessary and if specified by the user
 if setup["TimeDomainReduction"] == 1

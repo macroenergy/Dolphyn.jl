@@ -41,12 +41,12 @@ function load_load_data(path::AbstractString, setup::Dict, inputs::Dict)
 		# Max value of non-served energy
 		inputs["Voll"] = collect(skipmissing(load_in[!,:Voll])) / ModelScalingFactor # convert from $/MWh $ million/GWh (assuming objective is divided by 1000)
 		# Demand in MW
-		inputs["pD"] = Matrix(load_in[1:T, ["Load_MW_z$z" for z in Zones]])/ModelScalingFactor  # convert to GW
+		inputs["pD"] = transpose(Matrix(load_in[1:T, ["Load_MW_z$z" for z in Zones]]))/ModelScalingFactor  # convert to GW
 	else # No scaling
 		# Max value of non-served energy
 		inputs["Voll"] = collect(skipmissing(load_in[!,:Voll]))
 		# Demand in MW
-		inputs["pD"] =Matrix(load_in[1:T, ["Load_MW_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load MW values and rows as the hours
+		inputs["pD"] = transpose(Matrix(load_in[1:T, ["Load_MW_z$z" for z in Zones]])) #form a matrix with columns as the different zonal load MW values and rows as the hours
 	end
 
 	# Cost of non-served energy/demand curtailment (for each segment)

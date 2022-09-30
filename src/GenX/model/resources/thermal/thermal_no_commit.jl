@@ -76,30 +76,28 @@ function thermal_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 	### Expressions ###
 
 	## Power Balance Expressions ##
-	@expression(EP, ePowerBalanceThermNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t] for y in intersect(THERM_NO_COMMIT, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
+	@expression(EP, ePowerBalanceThermNoCommit[z=1:Z, t=1:T],
+		sum(EP[:vP][k,t] for k in intersect(THERM_NO_COMMIT, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceThermNoCommit
 
 	### Constraints ###
-
 	### Maximum ramp up and down between consecutive hours (Constraints #1-2)
 	@constraints(EP, begin
-
 		## Maximum ramp up between consecutive hours
 		# Start Hours: Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
 		# NOTE: We should make wrap-around a configurable option
-		[y in THERM_NO_COMMIT, t in START_SUBPERIODS], EP[:vP][y,t]-EP[:vP][y,(t+hours_per_subperiod-1)] <= dfGen[!,:Ramp_Up_Percentage][y]*EP[:eTotalCap][y]
+		[k in THERM_NO_COMMIT, t in START_SUBPERIODS], EP[:vP][k,t]-EP[:vP][k,(t+hours_per_subperiod-1)] <= dfGen[!,:Ramp_Up_Percentage][k]*EP[:eTotalCap][k]
 
 		# Interior Hours
-		[y in THERM_NO_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vP][y,t]-EP[:vP][y,t-1] <= dfGen[!,:Ramp_Up_Percentage][y]*EP[:eTotalCap][y]
+		[k in THERM_NO_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vP][k,t]-EP[:vP][k,t-1] <= dfGen[!,:Ramp_Up_Percentage][k]*EP[:eTotalCap][k]
 
 		## Maximum ramp down between consecutive hours
 		# Start Hours: Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
-		[y in THERM_NO_COMMIT, t in START_SUBPERIODS], EP[:vP][y,(t+hours_per_subperiod-1)] - EP[:vP][y,t] <= dfGen[!,:Ramp_Dn_Percentage][y]*EP[:eTotalCap][y]
+		[k in THERM_NO_COMMIT, t in START_SUBPERIODS], EP[:vP][k,(t+hours_per_subperiod-1)] - EP[:vP][k,t] <= dfGen[!,:Ramp_Dn_Percentage][k]*EP[:eTotalCap][k]
 
 		# Interior Hours
-		[y in THERM_NO_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vP][y,t-1] - EP[:vP][y,t] <= dfGen[!,:Ramp_Dn_Percentage][y]*EP[:eTotalCap][y]
+		[k in THERM_NO_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vP][k,t-1] - EP[:vP][k,t] <= dfGen[!,:Ramp_Dn_Percentage][k]*EP[:eTotalCap][k]
 	end)
 
 	### Minimum and maximum power output constraints (Constraints #3-4)
@@ -109,10 +107,10 @@ function thermal_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 	else
 		@constraints(EP, begin
 			# Minimum stable power generated per technology "y" at hour "t" Min_Power
-			[y in THERM_NO_COMMIT, t=1:T], EP[:vP][y,t] >= dfGen[!,:Min_Power][y]*EP[:eTotalCap][y]
+			[k in THERM_NO_COMMIT, t=1:T], EP[:vP][k,t] >= dfGen[!,:Min_Power][k]*EP[:eTotalCap][k]
 
 			# Maximum power generated per technology "y" at hour "t"
-			[y in THERM_NO_COMMIT, t=1:T], EP[:vP][y,t] <= inputs["pP_Max"][y,t]*EP[:eTotalCap][y]
+			[k in THERM_NO_COMMIT, t=1:T], EP[:vP][k,t] <= inputs["pP_Max"][k,t]*EP[:eTotalCap][k]
 		end)
 
 	end

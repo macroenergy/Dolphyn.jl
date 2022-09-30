@@ -39,10 +39,11 @@ function storage_asymmetric(EP::Model, inputs::Dict, Reserves::Int)
 		EP = storage_asymmetric_reserves(EP, inputs)
 	else
 		# Maximum charging rate must be less than charge power rating
-		@constraint(EP, [y in STOR_ASYMMETRIC, t in 1:T], EP[:vCHARGE][y,t] <= EP[:eTotalCapCharge][y])
+		@constraint(EP, [s in STOR_ASYMMETRIC, t in 1:T], EP[:vCHARGE][s,t] <= EP[:eTotalCapCharge][s])
 	end
 
 	return EP
+
 end
 
 @doc raw"""
