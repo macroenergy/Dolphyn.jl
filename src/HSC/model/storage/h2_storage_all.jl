@@ -75,7 +75,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
 
     # Term to represent electricity consumption associated with H2 storage charging and discharging
-	@expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
+	@expression(EP, ePowerBalanceH2Stor[z=1:Z, t=1:T],
     if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
         sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
     else
@@ -89,7 +89,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2Stor
 
    	# H2 Balance expressions
-	@expression(EP, eH2BalanceStor[t=1:T, z=1:Z],
+	@expression(EP, eH2BalanceStor[z=1:Z, t=1:T],
 	sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_ALL, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] += eH2BalanceStor

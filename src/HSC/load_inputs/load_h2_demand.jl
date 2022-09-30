@@ -36,7 +36,7 @@ function load_h2_demand(path::AbstractString, setup::Dict, inputs::Dict)
 	# Max value of non-served energy in $/(tonne)
 	inputs["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
 	# Demand in Tonnes per hour
-	inputs["H2_D"] = Matrix(H2_load_in[1:T, ["Load_H2_tonne_per_hr_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+	inputs["H2_D"] = transpose(Matrix(H2_load_in[1:T, ["Load_H2_tonne_per_hr_z$z" for z in Zones]])) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
 
     # Cost of non-served energy/demand curtailment (for each segment)
 	H2_SEG = inputs["H2_SEG"]  # Number of demand segments

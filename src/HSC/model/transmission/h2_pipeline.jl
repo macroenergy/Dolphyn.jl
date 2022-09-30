@@ -101,7 +101,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
         @expression(
             EP,
-            ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
+            ePowerBalanceH2PipeCompression[z = 1:Z, t = 1:T],
             sum(
                 vH2PipeFlow_neg[
                     p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
@@ -111,7 +111,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
         @expression(
             EP,
-            ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
+            ePowerBalanceH2PipeCompression[z = 1:Z, t = 1:T],
             sum(
                 vH2PipeFlow_neg[
                     p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
@@ -141,7 +141,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
     @expression(
         EP,
-        ePipeZoneDemand[t = 1:T, z = 1:Z],
+        ePipeZoneDemand[z = 1:Z, t = 1:T],
         sum(
             eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]]
             for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]

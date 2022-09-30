@@ -39,7 +39,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 	#Define variables needed across both commit and no commit sets
 
     #Power required by hydrogen generation resource k to make hydrogen (MW)
-	@variable(EP, vP2G[k in H2_GEN, t = 1:T] >= 0 )
+	@variable(EP, vP2G[k in H2_GEN, t = 1:T] >= 0)
 
 	### Constratints ###
 
