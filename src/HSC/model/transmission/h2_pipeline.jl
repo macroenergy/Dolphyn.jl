@@ -148,7 +148,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     end
 
     EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
-
+    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2PipeCompression
 
     ## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
     # if setup["ParameterScale"]==1 # Power consumption in GW
