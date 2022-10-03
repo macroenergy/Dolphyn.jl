@@ -26,7 +26,7 @@ The file `julenv.jl` in the parent directory lists all of the packages and their
 
 Download or clone the DOLPHYN repository on your machine in a directory named 'DOLPHYN-dev'. Create this new directory in a location where you wish to store the DOLPHYNJulEnv environment.
 
-The Run.jl file in each of the example sub-folders within `Example_Systems/` provides an example of how to use DOLPHYN.jl for capacity expansion modeling. The following are the main steps performed in the Run.jl script:
+The Run.jl file in each of the example sub-folders within `Example_Systems/` provides an example of how to use DOLPHYN.jl for capacity expansion modeling. Descriptions of each example system is included in the next section. The following are the main steps performed in the Run.jl script:
 
 1. Establish path to environment setup files and DOLPHYN source files.
 2. Read in model settings `genx_settings.yml` for electricity sector and other setting files for H2 supply chain from the example directory.
@@ -35,6 +35,23 @@ The Run.jl file in each of the example sub-folders within `Example_Systems/` pro
 5. Generate a DOLPHYN model instance.
 6. Solve the model.
 7. Write the output files to a specified directory.
+
+To run the model, first navigate to the example directory within `DOLPHYN- dev/Example_Systems/{desired-example-directory}`:
+  `cd("Example_Systems/{desired-example-directory}`")`
+
+Next, ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `hsc_settings` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more.
+
+Once the settings are confirmed, run the model with the `Run.jl` script in the example directory:
+  `include("Run.jl")`
+Once the model has complete, results will be write in the 'Results' directory. 
+
+## Example Systems
+
+**SmallNewEngland: OneZone** is a one-year example with hourly resolution representing Massachusetts. The ten represented resources include only natural gas, solar PV, wind, and lithium-ion battery storage. A rate-based carbon cap of 50 gCO<sub>2</sub> per kWh is specified in the `CO2_cap.csv` input file. Expect a run time of ~5 seconds.
+
+**SmallNewEngland: ThreeZones** is similar to the above example but contains zones representing Massachusetts, Connecticut, and Maine.
+
+**2030_CombEC_DETrans** is a combined power and hydrogen model for the EU for the year 2030. It contains a power model with hourly resolution, contains zones representing Belgium, Germany, Denmark, France, Great Britain, the Netherlands, Sweden, and Norway. The represented resources include nuclear, coal, hydro, oil, PHS, natural gas, solar PV, lithium-ion batteries, and wind. On the hydrogen side, resources such as fuel cells, electrolyzers, SMRs, SMRs w CCS, and H2 CCGTs are included. The demand for the model includes significant non-transportation electrification, as well as hydrogen demand resulting from transportation decarbonization. The model also includes a CO2 constraint representing 30% of 2015 power sector CO2 emissions applied to the hydrogen and power sector jointly. Expect a run time of ~5 minutes.
 
 ## DOLPHYN Team
 The model was originally [developed](https://pubs.rsc.org/en/content/articlehtml/2021/ee/d1ee00627d) by [Guannan He](https://www.guannanhe.com/) while at the MIT Energy Initiative, and is now maintained by a team contributors at [MITEI](https://energy.mit.edu/) led by [Dharik Mallapragada](http://mallapragada.mit.edu/) as welll as Guannan He's research group at Peking University. Key contributors include Dharik S. Mallapragada, Guannan He, Yuheng Zheng, Youssef Shaker, Jun Wen Law, Nicole Shi and Anna Cybulsky. 
