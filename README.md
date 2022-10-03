@@ -38,7 +38,7 @@ The Run.jl file in each of the example sub-folders within `Example_Systems/` pro
 
 To run the model, first navigate to the example directory within `DOLPHYN- dev/Example_Systems/{desired-example-directory}`:
 
-`cd("Example_Systems/{desired-example-directory}`")`
+`cd("Example_Systems/{desired-example-directory}")`
 
 Next, ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `hsc_settings` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more.
 
