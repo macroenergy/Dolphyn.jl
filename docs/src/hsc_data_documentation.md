@@ -385,3 +385,19 @@ Reports H2 level (in tonnes/hour) in each pipeline for each time step.
 
 #### 3.2.7 TRUCKS
 
+Reports hydrogen transmission trucks related variables in several subfolders including
+- H2TruckTransit: recording different truck transition status of arrive, depart and travel according to types
+- H2TruckFlow: recording hydrogen flow according to types 
+- H2TruckNumber: recording the number of different truck states of full and empty according to types
+- H2TruckState: recording the different truck states of available full and available empty and charged or discharged at each zone
+##### H2TruckTransit Folder
+This folder contains output files reporting variables of different transition statuses (arrive, depart and travel) in combination with loading statuses (full and empty). Each file is named after the pattern like H2Truck{transition}{loading}.csv like H2TruckArriveFull.csv reports total number of arriving trucks. The columns are separated by truck types and indexed with time steps. Other files have the same logic of reporting outputs.
+
+##### H2TruckFlow Folder
+This folder contains output files reporting variables of hydrogen flow through different types of trucks. Each file is named after the pattern like H2TruckFlow_{type}.csv like H2TruckFlow_Gas.csv. H2TruckFlow_Gas.csv reports hydrogen flow through different types of hydrogen trucks. The columns are separated by zones and indexed with time steps. Other files have the same logic of reporting outputs.
+
+##### H2TruckNumber Folder
+This folder contains output files reporting variables of total hydrogen truck number in different loading statuses. Each file is named after the pattern like H2TruckNumber{loading}.csv like H2TruckNumberFull.csv. The columns are separated by different truck types and indexed with time steps. Other files have the same logic of reporting outputs.
+
+##### H2TruckState Folder
+This folder contains output files reporting variables of total hydrogen truck state in different statuses. Each file is named after the pattern like H2Truck{state}.csv. Candidate states are in *AvailEmpty*, *AvailFull*, *Charged* and *Discharged*. The columns are separated by combination of zones and different truck types and indexed with time steps. Other files have the same logic of reporting outputs.
