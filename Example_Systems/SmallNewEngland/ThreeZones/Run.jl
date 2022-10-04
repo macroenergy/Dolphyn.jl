@@ -51,7 +51,7 @@ src_path = "../../../src/"
 inpath = pwd()
 
 ### Load DOLPHYN
-# print_and_log("Loading packages")
+println("Loading packages")
 push!(LOAD_PATH, src_path)
 
 using DOLPHYN
