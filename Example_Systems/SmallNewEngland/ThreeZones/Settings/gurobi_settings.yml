@@ -16,5 +16,5 @@ PreDual: 0                    # Decides whether presolve should pass the primal 
 AggFill: 10                   # Allowed fill during presolve aggregation.
 
 # Gurobi log file
-GurobiLog: 1  # Flag whether record gurobi log into file
+GurobiLog: true  # Flag whether record gurobi log into file
 GurobiLogFile: "gurobi.log"   # Fulename for gurobi log
