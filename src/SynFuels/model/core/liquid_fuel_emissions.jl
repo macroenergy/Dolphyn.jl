@@ -42,8 +42,12 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
     # Adjustment of Fuel_CO2 units carried out in load_fuels_data.jl
 
     #CO2 emitted by fuel usage per type of resource "k"
-    @expression(EP,eSyn_Fuels_CO2_Emissions_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
+    @expression(EP,eSyn_Fuels_CO2_Emissions_Fuel_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
         inputs["fuel_CO2"][dfSynFuels[!,:Fuel][k]] * dfSynFuels[!,:mmbtu_ng_p_tonne_co2][k] * EP[:vSFCO2in][k,t])
+
+    #CO2 emitted per type of resource "k"
+    @expression(EP,eSyn_Fuels_CO2_Emissions_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
+    inputs["fuel_CO2"][dfSynFuels[!,:Fuel][k]] * dfSynFuels[!,:co2_out_p_co2_in][k] * EP[:vSFCO2in][k,t])
 
     #CO2 emitted by fuel usage per zone
     @expression(EP, eSynFuelProdEmissionsByZone[z=1:Z, t=1:T], 

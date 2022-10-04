@@ -35,10 +35,12 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		cSFVar = value(EP[:eTotalCSFProdVarOut])* (ModelScalingFactor^2)
 		cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])*ModelScalingFactor^2
 		cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])*ModelScalingFactor^2
+		cSFConvFuelCost = value(EP[:eTotalCLFVarOut])*ModelScalingFactor^2
 	else
 		cSFVar = value(EP[:eTotalCSFProdVarOut])
 		cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])
 		cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])
+		cSFConvFuelCost = value(EP[:eTotalCLFVarOut])
 	end
 
 	if setup["CO2Cap"]==4 
@@ -51,15 +53,19 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 	#	cSFVar  = cSFVar + value(EP[:eCH2GenTotalEmissionsPenalty])
 	#end
 	 
-    cSFTotal = cSFVar + cSFFix + cSFByProdRev
+    cSFTotal = cSFVar + cSFFix + cSFByProdRev + cSFConvFuelCost
 
-    dfSynFuelsCost[!,Symbol("Total")] = [cSFTotal, cSFFix, cSFVar, cSFByProdRev]
+    dfSynFuelsCost[!,Symbol("Total")] = [cSFTotal, cSFFix, cSFVar, cSFByProdRev, cSFConvFuelCost]
 
 	for z in 1:Z
 		tempCTotal = 0
 		tempCFix = 0
 		tempCVar = 0
 		tempCByProd = 0
+		tempCConvFuel = 0
+
+		tempCConvFuel = sum(value.(EP[:eCLFVar_out])[z,:])
+
 		for y in dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]
 			tempCFix = tempCFix +
 				value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y]
@@ -69,18 +75,23 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 
 			tempCByProd = tempCByProd + -sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y])
 
+
 			tempCTotal = tempCTotal +
 					value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y] +
 					sum(value.(EP[:eCSFProdVar_out])[y,:]) +
-					-sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y])
+					-sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y]) 
+					
 
 			
 		end
+
+		tempCTotal = tempCTotal +  tempCConvFuel
 
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCFix = tempCFix * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)
 			tempCByProd = tempCByProd * (ModelScalingFactor^2)
+			tempCConvFuel = tempCConvFuel * (ModelScalingFactor^2)
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 		end
 
@@ -95,7 +106,7 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		#	tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		#end
 
-		dfSynFuelsCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCByProd]
+		dfSynFuelsCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCByProd, tempCConvFuel]
 	end
 	CSV.write(string(path,sep,"SynFuel_costs.csv"), dfSynFuelsCost)
 end

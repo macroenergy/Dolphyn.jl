@@ -117,7 +117,8 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP, eSynFuelEmissions[cap=1:inputs["NCO2Cap"]], sum(inputs["omega"][t] * EP[:eSyn_Fuels_Cons_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 			+ sum(inputs["omega"][t] * EP[:eLiquid_Fuels_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 			+ sum(inputs["omega"][t] * EP[:eSynFuelProdEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) 
-			+ sum(inputs["omega"][t] * EP[:eByProdConsCO2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+			+ sum(inputs["omega"][t] * EP[:eByProdConsCO2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+			+ sum(inputs["omega"][t] * EP[:eSyn_Fuels_CO2_Emissions_Fuel_By_Res][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
 
 		## Mass-based: Emissions constraint in absolute emissions limit (tons)
 		if setup["CO2Cap"] == 1

@@ -52,7 +52,10 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eTotalCLFVarOut, sum(eTotalCLFVarOutT[t] for t in 1:T))
 
     #Liquid Fuel Balance
-    EP[:eLFBalance] += vConvLFDemand
+    if setup["AllowConventionalFuels"] == 1
+        EP[:eLFBalance] += vConvLFDemand
+    end
+    
     EP[:eObj] += eTotalCLFVarOut
 
     ### Constraints ###
