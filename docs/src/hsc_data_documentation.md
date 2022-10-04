@@ -385,19 +385,41 @@ Reports H2 level (in tonnes/hour) in each pipeline for each time step.
 
 #### 3.2.7 TRUCKS
 
-Reports hydrogen transmission trucks related variables in several subfolders including
+Reports hydrogen transmission trucks related variables in ```h2_truck_capacity.csv``` and other outputs in several subfolders including
 - H2TruckTransit: recording different truck transition status of arrive, depart and travel according to types
 - H2TruckFlow: recording hydrogen flow according to types 
 - H2TruckNumber: recording the number of different truck states of full and empty according to types
 - H2TruckState: recording the different truck states of available full and available empty and charged or discharged at each zone
-##### H2TruckTransit Folder
+
+##### 3.2.7.1 H2 Truck Capacity
+
+This file reports truck capacity and related compression capacity. The columns are separated by different truck types and ended with a total column recording total capacity over different types of trucks.
+
+###### Table 10: Structure of the h2_truck_capacity.csv file
+---
+|**Output** |**Description** |**Units** |
+| :------------ | :-----------|:-----------|
+| StartTruck | Initial truck capacity of each truck type; this is an input |tonne-H2 |
+| NewTruck | Newly invested truck capacity of each truck type; this is a decision variable |tonne-H2|
+| RetTruck | Retired truck capacity of each truck type; this is a decision variable |tonne-H2 |
+| EndTruck | Total truck capacity of each truck type |tonne-H2 |
+|StartTruckEnergyZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |tonne-H2/hour|
+|NewTruckEnergyZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H2/hour|
+|RetTruckEnergyZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H2/hour|
+|EndTruckEnergyZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index}|tonne-H2/hour|
+|StartTruckEnergy| Total initial truck compression capacity of each truck type; this is an input|tonne-H2/hour|
+|NewTruckEnergy| Total newly invested truck compression capacity of each truck type; this is a decision variable |tonne-H2/hour|
+|RetTruckEnergy| Total retired truck compression capacity of each truck type; this is a decision variable|tonne-H2/hour|
+|EndTruckEnergy| Total truck compreession capacity of each truck type|tonne-H2/hour|
+
+##### 3.2.7.2 H2TruckTransit Folder
 This folder contains output files reporting variables of different transition statuses (arrive, depart and travel) in combination with loading statuses (full and empty). Each file is named after the pattern like H2Truck{transition}{loading}.csv like H2TruckArriveFull.csv reports total number of arriving trucks. The columns are separated by truck types and indexed with time steps. Other files have the same logic of reporting outputs.
 
-##### H2TruckFlow Folder
+##### 3.2.7.3 H2TruckFlow Folder
 This folder contains output files reporting variables of hydrogen flow through different types of trucks. Each file is named after the pattern like H2TruckFlow_{type}.csv like H2TruckFlow_Gas.csv. H2TruckFlow_Gas.csv reports hydrogen flow through different types of hydrogen trucks. The columns are separated by zones and indexed with time steps. Other files have the same logic of reporting outputs.
 
-##### H2TruckNumber Folder
+##### 3.2.7.4 H2TruckNumber Folder
 This folder contains output files reporting variables of total hydrogen truck number in different loading statuses. Each file is named after the pattern like H2TruckNumber{loading}.csv like H2TruckNumberFull.csv. The columns are separated by different truck types and indexed with time steps. Other files have the same logic of reporting outputs.
 
-##### H2TruckState Folder
+##### 3.2.7.5 H2TruckState Folder
 This folder contains output files reporting variables of total hydrogen truck state in different statuses. Each file is named after the pattern like H2Truck{state}.csv. Candidate states are in *AvailEmpty*, *AvailFull*, *Charged* and *Discharged*. The columns are separated by combination of zones and different truck types and indexed with time steps. Other files have the same logic of reporting outputs.
