@@ -79,6 +79,6 @@ function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString
             # when not scaled, the constraint unit is ton
         end
     end
-    println("HSC_CO2_cap.csv Successfully Read!")
+    print_and_log("HSC_CO2_cap.csv Successfully Read!")
     return inputs_co2_hsc
 end

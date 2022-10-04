@@ -22,7 +22,7 @@ This function includes three parts of the Truck Model.The details can be found s
 """
 function h2_truck(EP::Model, inputs::Dict, setup::Dict)
 
-    println("Hydrogen Truck Module")
+    print_and_log("Hydrogen Truck Module")
 
     # investment variables expressions and related constraints for H2 trucks
     EP = h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)

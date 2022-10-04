@@ -274,7 +274,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			filepath = joinpath(modeloutput, "YourModel.lp")
 			JuMP.write_to_file(EP, filepath)
 		end
-		println("Model Printed")
+		print_and_log("Model Printed")
     end
 
     return EP
