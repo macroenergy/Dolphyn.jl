@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -63,6 +63,8 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	#Amount of carbon injected into geological sequestration in zone z at time t
 	@expression(EP, eCO2_Injected_per_zone[z=1:Z, t=1:T], sum(EP[:vCO2_Injected][k,t] for k in dfCO2Storage[(dfCO2Storage[!,:Zone].==z),:R_ID]))
 
+	#Amount of carbon injected into geological sequestration in zone z at time t
+	@expression(EP, eCO2_Injected_per_year[k=1:CO2_STOR_ALL], sum(inputs["omega"][t]*EP[:vCO2_Injected][k,t] for t in 1:T))
 
 	###############################################################################################################################
 	##Constraints
@@ -70,10 +72,10 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	@constraint(EP,cPower_Consumption_CO2_Injection[k=1:CO2_STOR_ALL, t = 1:T], EP[:vPower_CO2_Injection][k,t] == EP[:vCO2_Injected][k,t] * dfCO2Storage[!,:etaPCO2_MWh_per_tonne][k])
 
 	#Include constraint of min injection operation
-	@constraint(EP,cMin_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL, t=1:T], EP[:vCO2_Injected][k,t] >= EP[:vCapacity_CO2_Injection_per_type][k] * dfCO2Storage[!,:CO2_Injection_Min_Output][k])
+	@constraint(EP,cMin_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL], EP[:eCO2_Injected_per_year][k] >= EP[:vCapacity_CO2_Injection_per_type][k] * dfCO2Storage[!,:CO2_Injection_Min_Output][k])
 
 	#Max carbon injected into geological sequestration per resoruce type k at hour T
-	@constraint(EP,cMax_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL, t=1:T], EP[:vCO2_Injected][k,t] <= EP[:vCapacity_CO2_Injection_per_type][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
+	@constraint(EP,cMax_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL], EP[:eCO2_Injected_per_year][k] <= EP[:vCapacity_CO2_Injection_per_type][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
 
 	###############################################################################################################################
 

@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -36,11 +36,11 @@ function co2_injection_investment(EP::Model, inputs::Dict, setup::Dict)
 	@variable(EP,vCAPEX_CO2_Injection_per_type[i in 1:CO2_STOR_ALL])
 
 	if setup["ParameterScale"] == 1
-		CO2_Injection_Capacity_Min_Limit = dfCO2Storage[!,:Min_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
-		CO2_Injection_Capacity_Max_Limit = dfCO2Storage[!,:Max_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
+		CO2_Injection_Capacity_Min_Limit = dfCO2Storage[!,:Min_capacity_tonne_per_yr]/ModelScalingFactor # kt/h
+		CO2_Injection_Capacity_Max_Limit = dfCO2Storage[!,:Max_capacity_tonne_per_yr]/ModelScalingFactor # kt/h
 	else
-		CO2_Injection_Capacity_Min_Limit = dfCO2Storage[!,:Min_capacity_tonne_per_hr] # t/h
-		CO2_Injection_Capacity_Max_Limit = dfCO2Storage[!,:Max_capacity_tonne_per_hr] # t/h
+		CO2_Injection_Capacity_Min_Limit = dfCO2Storage[!,:Min_capacity_tonne_per_yr] # t/h
+		CO2_Injection_Capacity_Max_Limit = dfCO2Storage[!,:Max_capacity_tonne_per_yr] # t/h
 	end
 
 	if setup["CSC_Nonlinear_CAPEX"] == 1
@@ -53,11 +53,11 @@ function co2_injection_investment(EP::Model, inputs::Dict, setup::Dict)
 		if setup["ParameterScale"] ==1 
 			RefCAPEX_per_t_per_h_y = dfCO2Storage[!,:Ref_CAPEX_per_yr]/ModelScalingFactor^2 # $M
 			RefFixed_OM_per_t_per_h_y = dfCO2Storage[!,:Ref_Fixed_OM_per_yr]/ModelScalingFactor^2 # $M
-			RefCapacity_t_per_h = dfCO2Storage[!,:Ref_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
+			RefCapacity_t_per_h = dfCO2Storage[!,:Ref_capacity_tonne_per_yr]/ModelScalingFactor # kt/h
 		else
 			RefCAPEX_per_t_per_h_y = dfCO2Storage[!,:Ref_CAPEX_per_yr] # $
 			RefFixed_OM_per_t_per_h_y = dfCO2Storage[!,:Ref_Fixed_OM_per_yr] # $
-			RefCapacity_t_per_h = dfCO2Storage[!,:Ref_capacity_tonne_per_hr] # t/h
+			RefCapacity_t_per_h = dfCO2Storage[!,:Ref_capacity_tonne_per_yr] # t/h
 		end
 
 		if setup["CO2_Injection_CAPEX_Piecewise_Segments"] > 1 
@@ -139,19 +139,19 @@ function co2_injection_investment(EP::Model, inputs::Dict, setup::Dict)
 	elseif setup["CSC_Nonlinear_CAPEX"] == 0
 	
 		if setup["ParameterScale"] ==1 
-			CO2_Capture_Stor_Inv_Cost_per_tonne_per_hr_yr = dfCO2Storage[!,:Inv_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-			CO2_Capture_Stor_Fixed_OM_Cost_per_tonne_per_hr_yr = dfCO2Storage[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
+			CO2_Capture_Stor_Inv_Cost_per_tonne_per_yr_yr = dfCO2Storage[!,:Inv_Cost_per_tonne_per_yr_yr]/ModelScalingFactor # $M/kton
+			CO2_Capture_Stor_Fixed_OM_Cost_per_tonne_per_yr_yr = dfCO2Storage[!,:Fixed_OM_Cost_per_tonne_per_yr_yr]/ModelScalingFactor # $M/kton
 		else
-			CO2_Capture_Stor_Inv_Cost_per_tonne_per_hr_yr = dfCO2Storage[!,:Inv_Cost_per_tonne_per_hr_yr]
-			CO2_Capture_Stor_Fixed_OM_Cost_per_tonne_per_hr_yr = dfCO2Storage[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
+			CO2_Capture_Stor_Inv_Cost_per_tonne_per_yr_yr = dfCO2Storage[!,:Inv_Cost_per_tonne_per_yr_yr]
+			CO2_Capture_Stor_Fixed_OM_Cost_per_tonne_per_yr_yr = dfCO2Storage[!,:Fixed_OM_Cost_per_tonne_per_yr_yr]
 		end
 	
 		#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
 		#Consider using constraint for vCAPEX_CO2_Injection_per_type? Or expression is better
-		@expression(EP, eCAPEX_CO2_Injection_per_type[i in 1:CO2_STOR_ALL], EP[:vCapacity_CO2_Injection_per_type][i] * CO2_Capture_Stor_Inv_Cost_per_tonne_per_hr_yr[i])
+		@expression(EP, eCAPEX_CO2_Injection_per_type[i in 1:CO2_STOR_ALL], EP[:vCapacity_CO2_Injection_per_type][i] * CO2_Capture_Stor_Inv_Cost_per_tonne_per_yr_yr[i])
 		
 		#Fixed OM cost #Check again to match capacity
-		@expression(EP, eFixed_OM_CO2_Injection_per_type[i in 1:CO2_STOR_ALL], EP[:vCapacity_CO2_Injection_per_type][i] * CO2_Capture_Stor_Fixed_OM_Cost_per_tonne_per_hr_yr[i])
+		@expression(EP, eFixed_OM_CO2_Injection_per_type[i in 1:CO2_STOR_ALL], EP[:vCapacity_CO2_Injection_per_type][i] * CO2_Capture_Stor_Fixed_OM_Cost_per_tonne_per_yr_yr[i])
 	
 	end
 	
