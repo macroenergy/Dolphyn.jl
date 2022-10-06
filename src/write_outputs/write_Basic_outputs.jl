@@ -25,34 +25,39 @@ function write_basic_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP
         # Overwrite existing results if dir exists
         # This is the default behaviour when there is no flag, to avoid breaking existing code
         if !isdir(path)
-		    mkdir(path)
-	    end
+            mkdir(path)
+        end
     else
         # Find closest unused ouput directory name and create it
         path = choose_output_dir(path)
         mkdir(path)
     end
-    
+
     # https://jump.dev/MathOptInterface.jl/v0.9.10/apireference/#MathOptInterface.TerminationStatusCode
-	status = termination_status(EP)
+    status = termination_status(EP)
 
-	## Check if solved sucessfully - time out is included
-	if status != MOI.OPTIMAL && status != MOI.LOCALLY_SOLVED
-		if status != MOI.TIME_LIMIT # Model failed to solve, so record solver status and exit
-			write_status(path, setup, inputs, EP)
-			return
-		elseif isnan(objective_value(EP))==true
-			# Model failed to solve, so record solver status and exit
-			write_status(path, setup, inputs, EP)
-			return
-		end
-	end
+    ## Check if solved sucessfully - time out is included
+    if status != MOI.OPTIMAL && status != MOI.LOCALLY_SOLVED
+        if status != MOI.TIME_LIMIT # Model failed to solve, so record solver status and exit
+            write_status(path, setup, inputs, EP)
+            return
+        elseif isnan(objective_value(EP)) == true
+            # Model failed to solve, so record solver status and exit
+            write_status(path, setup, inputs, EP)
+            return
+        end
+    end
 
-	write_status(path, setup, inputs, EP)
+    elapsed_time_status = write_status(path, setup, inputs, EP)
+
+    println("Time elapsed for writing status is $elapsed_time_status")
 
     elapsed_time_time_weights = @elapsed write_time_weights(path, setup, inputs)
-	println("Time elapsed for writing time weights is")
-	println(elapsed_time_time_weights)
+
+    println("Time elapsed for writing time weights is $elapsed_time_time_weights")
 
     println("Wrote basic outputs to $path")
+
+    return path
+
 end

@@ -45,33 +45,44 @@ inputs_path = joinpath(root_path, "Inputs")
 ### Starters Settings
 starters_settings_path = joinpath(settings_path, "Starters")
 ## Global settings for model
-global_settings = joinpath(starters_settings_path, "global_model_settings.yml")
+global_settings = joinpath(starters_settings_path, "global_settings.yml")
 ## Setup dictionary stores global settings
 setup_global = YAML.load(open(global_settings))
+setup = setup_global
 
 ### Sector Specific Settings
 sectors_settings_path = joinpath(settings_path, "Sectors")
-## Settings YAML file path for GenX of power sector
-genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
-## Settings YAML file path for HSC modelgrated model
-hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml")
-## Settings YAML file path for CSC modelgrated model
-csc_settings = joinpath(sectors_settings_path, "csc_settings.yml")
-## Settings YAML file path for Syn modelgrated model
-syn_settings = joinpath(sectors_settings_path, "syn_settings.yml")
+if setup["ModelPower"] == 1
+    ## Settings YAML file path for GenX of power sector
+    genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
+    ## Setup dictionary stores GenX-specific parameters
+    setup_genx = YAML.load(open(genx_settings))
+    setup = merge(setup, setup_genx)
+end
 
+if setup["ModelH2"] == 1
+    ## Settings YAML file path for HSC model
+    hsc_settings = joinpath(sectors_settings_path, "hsc_settings.yml")
+    ## Setup dictionary stores H2 supply chain-specific parameters
+    setup_hsc = YAML.load(open(hsc_settings))
+    setup = merge(setup, setup_hsc)
+end
 
-## Setup dictionary stores GenX-specific parameters
-setup_genx = YAML.load(open(genx_settings))
-## Setup dictionary stores H2 supply chain-specific parameters
-setup_hsc = YAML.load(open(hsc_settings))
-## Setup dictionary stores CO2 supply chain-specific parameters
-setup_csc = YAML.load(open(csc_settings))
-## Setup dictionary stores synthesis fuels -specific parameters
-setup_syn = YAML.load(open(syn_settings))
+if setup["ModelCO2"] == 1
+    ## Settings YAML file path for CSC model
+    csc_settings = joinpath(sectors_settings_path, "csc_settings.yml")
+    ## Setup dictionary stores CO2 supply chain-specific parameters
+    setup_csc = YAML.load(open(csc_settings))
+    setup = merge(setup, setup_csc)
+end
 
-## Merge dictionary - value of common keys will be overwritten by value in global_model_settings
-setup = merge(setup_global, setup_genx, setup_hsc, setup_csc, setup_syn)
+if setup["ModelSyn"] == 1
+    ## Settings YAML file path for synthesis fuels model
+    syn_settings = joinpath(sectors_settings_path, "syn_settings.yml")
+    ## Setup dictionary stores synthesis fuels supply chain-specific parameters
+    setup_syn = YAML.load(open(syn_settings))
+    setup = merge(setup, setup_syn)
+end
 
 ### Cluster time series inputs if necessary and if specified by the user
 if setup["TimeDomainReduction"] == 1
@@ -112,6 +123,12 @@ if setup["ModelCO2"] == 1
     inputs = load_co2_inputs(co2_inputs_path, setup, inputs)
 end
 
+## Load CO2 inputs if modeling the carbon supply chain
+if setup["ModelSyn"] == 1
+    syn_inputs_path = joinpath(inputs_path, "Syn")
+    inputs = load_syn_inputs(syn_inputs_path, setup, inputs)
+end
+
 ### Generate model
 println("Generating the Optimization Model")
 EP = generate_model(setup, inputs, OPTIMIZER)
@@ -124,7 +141,7 @@ inputs["solve_time"] = solve_time # Store the model solve time in inputs
 ### Writing output
 println("Writing Output")
 output_path = joinpath(root_path, "Results")
-write_basic_outputs(output_path, setup, inputs, EP)
+output_path = write_basic_outputs(output_path, setup, inputs, EP)
 
 ## Write power system output
 if setup["ModelPower"] == 1
@@ -142,6 +159,12 @@ end
 if setup["ModelCO2"] == 1
     outpath_CO2 = joinpath(output_path, "Results_CSC")
     write_CSC_outputs(outpath_CO2, setup, inputs, EP)
+end
+
+## Write carbon supply chain outputs
+if setup["ModelSyn"] == 1
+    outpath_Syn = joinpath(output_path, "Results_Syn")
+    write_Syn_outputs(outpath_Syn, setup, inputs, EP)
 end
 
 # ### Run MGA if the MGA flag is set to 1 else only save the least cost solution
