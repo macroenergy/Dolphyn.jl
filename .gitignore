@@ -85,6 +85,7 @@ ipython_config.py
 **/DOLPHYNJulEnv
 gurobi.log
 YourModel.lp
+**/TDR_Results
 **/Results*
 
 ## Slurm cache files
