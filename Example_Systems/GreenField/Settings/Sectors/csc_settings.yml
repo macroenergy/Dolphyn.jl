@@ -1,5 +1,3 @@
-ModelCO2: 1 #Flag to turn or off Carbon Supply Chain modelling capabilities - 0 - no CSC, 1- CSC modeled
-
 # To be edited and added in future modules
 CO2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
 ModelCO2Pipelines: 1 # Whether to model pipeline in CO2 supply chain - 0 - not included, 1 - included

@@ -1,4 +1,3 @@
-ModelH2: 1 # Flag to turn or off Hydrogen Supply Chain modelling capabilities - 0 - no HSC, 1- HSC modeled
 H2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
 
 ModelH2Pipelines: 1 # Whether to model pipeline in hydrogen supply chain - 0 - not included, 1 - included
