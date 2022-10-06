@@ -7,7 +7,7 @@
 deps/deps.jl
 .vscode/
 GenXJulEnv/
-DOLPHYNJulEnv/
+**/DOLPHYNJulEnv/
 output_data/
 MGAResults_min/
 MGAResults_max/
