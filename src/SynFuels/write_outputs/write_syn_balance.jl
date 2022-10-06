@@ -20,42 +20,38 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-	dfH2Gen = inputs["dfH2Gen"]
-	if setup["ModelH2G2P"] == 1
-		dfH2G2P = inputs["dfH2G2P"]
-	end
-	
+	dfSynGen = inputs["dfSynGen"]
+
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
-	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
-	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
+	SYN_FLEX = inputs["SYN_FLEX"] # Set of demand flexibility resources
+	SYN_STOR_ALL = inputs["SYN_STOR_ALL"] # Set of H2 storage resources
 	## Hydrogen balance for each zone
-	dfH2Balance = Array{Any}
+	dfSynBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
-               "Nonserved_Energy",
-			   "H2_Pipeline_Import/Export",
-			   "H2_Truck_Import/Export","G2P Demand",
+               "Non_served_Energy",
+			   "Syn_Pipeline_Import/Export",
+			   "Syn_Truck_Import/Export",
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfSynGen[(dfSynGen[!,:SYN_GEN_TYPE].>0) .&  (dfSynGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
 			dfTemp1[t+rowoffset,4] = 0
             dfTemp1[t+rowoffset,5] = 0
-	     	if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
-	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
-                dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_FLEX].>=1) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	if !isempty(intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_FLEX))
+	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_FLEX))
+                dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfSynGen[(dfSynGen[!,:SYN_FLEX].>=1) .&  (dfSynGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	end
-			 if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
-				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
-			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+			 if !isempty(intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
+				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
+			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
 			end
 
 	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
@@ -74,7 +70,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 			end
 
 			if setup["ModelH2G2P"] == 1
-				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
+				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
 			else
 				dfTemp1[t+rowoffset,9] = 0
 			end
@@ -83,17 +79,17 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	   	end
 
 		if z == 1
-			dfH2Balance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
+			dfSynBalance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
 		else
-		    dfH2Balance = hcat(dfH2Balance, dfTemp1)
+		    dfSynBalance = hcat(dfSynBalance, dfTemp1)
 		end
 	end
 
-	for c in 2:size(dfH2Balance,2)
-		dfH2Balance[rowoffset,c]=sum(inputs["omega"].*dfH2Balance[(rowoffset+1):size(dfH2Balance,1),c])
+	for c in 2:size(dfSynBalance,2)
+		dfSynBalance[rowoffset,c]=sum(inputs["omega"].*dfSynBalance[(rowoffset+1):size(dfSynBalance,1),c])
 	end
-	
-	dfH2Balance = DataFrame(dfH2Balance, :auto)
 
-	CSV.write(joinpath(path, "HSC_h2_balance.csv"), dfH2Balance, writeheader=false)
+	dfSynBalance = DataFrame(dfSynBalance, :auto)
+
+	CSV.write(joinpath(path, "HSC_h2_balance.csv"), dfSynBalance, writeheader=false)
 end

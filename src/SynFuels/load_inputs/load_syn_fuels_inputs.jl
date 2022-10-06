@@ -29,21 +29,27 @@ returns: Dict (dictionary) object containing all data inputs
 
 function load_syn_fuel_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
-	## Use appropriate directory separator depending on Mac or Windows config
-	if Sys.isunix()
-		sep = "/"
-    elseif Sys.iswindows()
-		sep = "\U005c"
-    else
-        sep = "/"
-	end
-
-	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
-
 	## Read input files
 	println("Reading Syn Fuel Input CSV Files")
-    inputs = load_syn_fuels_resources(setup, path, sep, inputs)
-	inputs = load_liquid_fuel_demand(setup, path, sep, inputs)
+    inputs = load_syn_fuels_gen(setup, path, inputs)
+	inputs = load_syn_fuels_generators_variability(setup, path, inputs)
+    inputs = load_syn_fuels_demand(setup, path, inputs)
+
+    if setup["ModelSynPipelines"] == 1
+        inputs = load_syn_fuels_pipeline(setup, path, inputs)
+    else
+        inputs["Syn_P"] = 0
+    end
+
+    if setup["ModelSynTrucks"] == 1
+        inputs = load_syn_fuels_truck(setup, path, inputs)
+    end
+
+    if setup["SynCO2Cap"] >= 1
+		inputs = load_co2_cap_syn(setup, path, inputs)
+	end
+
+    println("Synthesis Fuels Input CSV Files Successfully Read In From $path")
 
 	return inputs
 end
