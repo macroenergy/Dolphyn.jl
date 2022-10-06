@@ -52,6 +52,7 @@ setup = setup_global
 
 ### Sector Specific Settings
 sectors_settings_path = joinpath(settings_path, "Sectors")
+
 if setup["ModelPower"] == 1
     ## Settings YAML file path for GenX of power sector
     genx_settings = joinpath(sectors_settings_path, "genx_settings.yml")
