@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -27,7 +27,7 @@ function load_co2_truck(path::AbstractString, setup::Dict, inputs::Dict)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
 	inputs["CO2TruckRouteLength"] = RouteLength
-    
+
     println("zone-distances-miles.csv Successfully Read!")
 
     # Carbon truck type inputs
@@ -53,7 +53,7 @@ function load_co2_truck(path::AbstractString, setup::Dict, inputs::Dict)
     inputs["NEW_CAP_CO2_TRUCK_ENERGY"] = co2_truck_in[co2_truck_in.New_Build .== 1, :T_TYPE]
     # Set of carbon truck types eligible for energy capacity retirement
     inputs["RET_CAP_CO2_TRUCK_ENERGY"] = intersect(co2_truck_in[co2_truck_in.New_Build .!= -1, :T_TYPE], co2_truck_in[co2_truck_in.Existing_Number .> 0, :T_TYPE])
-        
+
     # Store DataFrame of truck input data for use in model
     inputs["dfCO2Truck"] = co2_truck_in
 
@@ -65,6 +65,6 @@ function load_co2_truck(path::AbstractString, setup::Dict, inputs::Dict)
     end
 
     println("CSC_trucks.csv Successfully Read!")
-    
+
     return inputs
 end

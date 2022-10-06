@@ -1,17 +1,17 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -104,21 +104,21 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	# Initialize Power Balance Expression
 	# Expression for "baseline" power balance constraint
-	@expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
+	@expression(EP, ePowerBalance[z=1:Z, t=1:T], 0)
 
 	# Initialize Hydrogen Balance Expression
 	# Expression for "baseline" H2 balance constraint
-	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eH2Balance[z=1:Z, t=1:T], 0)
 
 	# Initialize Carbon Balance Expression
 	# Expression for "baseline" CO2 balance constraint
-	@expression(EP, eCO2Balance[t=1:T, z=1:Z], 0)
+	@expression(EP, eCO2Balance[z=1:Z, t=1:T], 0)
 
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
 	# Power supply by z and timestep - used in emissions constraints
-	@expression(EP, eGenerationByZone[t=1:T, z=1:Z], 0)
+	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
 
 	# PSC emissions by zone and time
 	@expression(EP, eCO2PSCEmissionsByZone[z = 1:Z, t = 1:T], 0)
@@ -193,7 +193,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if setup["ModelH2"] == 1
 
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)
+		@expression(EP, eH2NetpowerConsumptionByAll[z=1:Z, t=1:T], 0)
 
 		# Infrastructure
 		EP = h2_outputs(EP, inputs, setup)
@@ -320,18 +320,18 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	#          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
 	if setup["ModelPower"] == 1
 		### Power balance constraints
-		@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
+		@constraint(EP, cPowerBalance[z=1:Z, t=1:T], EP[:ePowerBalance][z,t] == inputs["pD"][z, t])
 	end
 
 	if setup["ModelH2"] == 1
 		### Hydrogen Balance constraints
-		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+		@constraint(EP, cH2Balance[z=1:Z, t=1:T], EP[:eH2Balance][z, t] == inputs["H2_D"][z, t])
 	end
 
 	## Only activate when carbon capture utilization is online
 	if setup["ModelCO2"] == 1
 		###Carbon Balanace constraints
-		@constraint(EP, cCO2Balance[t=1:T, z=1:Z], EP[:eCO2Balance][t,z] == inputs["CO2_D"][t,z])
+		@constraint(EP, cCO2Balance[z=1:Z, t=1:T], EP[:eCO2Balance][z, t] == inputs["CO2_D"][z, t])
 	end
 
     ## Record pre-solver time

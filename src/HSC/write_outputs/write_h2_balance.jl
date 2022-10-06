@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -24,7 +24,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	if setup["ModelH2G2P"] == 1
 		dfH2G2P = inputs["dfH2G2P"]
 	end
-	
+
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
@@ -35,7 +35,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	rowoffset=3
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
                "Nonserved_Energy",
@@ -58,28 +58,27 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
 			end
 
-	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
+	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,z,t])
 
 			if setup["ModelH2Pipelines"] == 1
-			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
+			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][z,t])
 			else
 				dfTemp1[t+rowoffset,7] = 0
 			end
 
-
 			if setup["ModelH2Trucks"] == 1
-				dfTemp1[t+rowoffset,8] = value.(EP[:eH2TruckFlow][t,z])
+				dfTemp1[t+rowoffset,8] = value.(EP[:eH2TruckFlow][z,t])
 			else
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
 			if setup["ModelH2G2P"] == 1
-				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
+				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
 			else
 				dfTemp1[t+rowoffset,9] = 0
 			end
 
-	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][z,t]
 	   	end
 
 		if z == 1
@@ -92,7 +91,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	for c in 2:size(dfH2Balance,2)
 		dfH2Balance[rowoffset,c]=sum(inputs["omega"].*dfH2Balance[(rowoffset+1):size(dfH2Balance,1),c])
 	end
-	
+
 	dfH2Balance = DataFrame(dfH2Balance, :auto)
 
 	CSV.write(joinpath(path, "HSC_h2_balance.csv"), dfH2Balance, writeheader=false)

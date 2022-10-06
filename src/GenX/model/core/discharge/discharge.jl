@@ -27,36 +27,39 @@ This module additionally defines contributions to the objective function from va
 	\sum_{y \in \mathcal{G} } \sum_{t \in \mathcal{T}}\omega_{t}\times(\pi^{VOM}_{y} + \pi^{FUEL}_{y})\times \Theta_{y,t}
 \end{aligned}
 ```
-
 """
 function discharge(EP::Model, inputs::Dict)
 
-	println("Discharge Module")
+    println("Discharge Module")
 
-	dfGen = inputs["dfGen"]
+    dfGen = inputs["dfGen"]
 
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps
-	Z = inputs["Z"]     # Number of zones
-	### Variables ###
+    G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
+    T = inputs["T"]     # Number of time steps
 
-	# Energy injected into the grid by resource "y" at hour "t"
-	@variable(EP, vP[y=1:G,t=1:T] >=0);
+    ### Variables ###
+    # Energy injected into the grid by resource "y" at hour "t"
+    @variable(EP, vP[g = 1:G, t = 1:T] >= 0)
 
-	### Expressions ###
+    ### Expressions ###
+    ## Objective Function Expressions ##
+    # Variable costs of "generation" for resource "g" during hour "t" = variable O&M plus fuel cost
+    @expression(
+        EP,
+        eCVar_out[g = 1:G, t = 1:T],
+        (
+            inputs["omega"][t] *
+            (dfGen[!, :Var_OM_Cost_per_MWh][g] + inputs["C_Fuel_per_MWh"][g, t]) *
+            vP[g, t]
+        )
+    )
+    # Sum individual resource contributions to variable discharging costs to get total variable discharging costs
+    @expression(EP, eTotalCVarOutT[t = 1:T], sum(eCVar_out[g, t] for g = 1:G))
+    @expression(EP, eTotalCVarOut, sum(eTotalCVarOutT[t] for t = 1:T))
 
-	## Objective Function Expressions ##
+    # Add total variable discharging cost contribution to the objective function
+    EP[:eObj] += eTotalCVarOut
 
-	# Variable costs of "generation" for resource "y" during hour "t" = variable O&M plus fuel cost
-	@expression(EP, eCVar_out[y=1:G,t=1:T], (inputs["omega"][t]*(dfGen[!,:Var_OM_Cost_per_MWh][y]+inputs["C_Fuel_per_MWh"][y,t])*vP[y,t]))
-	#@expression(EP, eCVar_out[y=1:G,t=1:T], (round(inputs["omega"][t]*(dfGen[!,:Var_OM_Cost_per_MWh][y]+inputs["C_Fuel_per_MWh"][y,t]), digits=RD)*vP[y,t]))
-	# Sum individual resource contributions to variable discharging costs to get total variable discharging costs
-	@expression(EP, eTotalCVarOutT[t=1:T], sum(eCVar_out[y,t] for y in 1:G))
-	@expression(EP, eTotalCVarOut, sum(eTotalCVarOutT[t] for t in 1:T))
-
-	# Add total variable discharging cost contribution to the objective function
-	EP[:eObj] += eTotalCVarOut
-
-	return EP
+    return EP
 
 end

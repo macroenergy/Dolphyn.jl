@@ -44,15 +44,15 @@ function write_storagedual(path::AbstractString, setup::Dict, inputs::Dict, EP::
 		if y in inputs["STOR_ALL"]
 			if setup["OperationWrapping"]==1 && y in inputs["STOR_LONG_DURATION"]
 				for w in 1:REP_PERIOD
-					x1[y,hours_per_subperiod*(w-1)+1] = dual.(EP[:cSoCBalLongDurationStorageStart][w,y])
+					x1[y,hours_per_subperiod*(w-1)+1] = dual.(EP[:cSoCBalLongDurationStorageStart][y,w])
 				end
 			else
 				for t in START_SUBPERIODS
-					x1[y,t] = dual.(EP[:cSoCBalStart][t,y])
+					x1[y,t] = dual.(EP[:cSoCBalStart][y,t])
 				end
 			end
 			for t in INTERIOR_SUBPERIODS
-				x1[y,t] = dual.(EP[:cSoCBalInterior][t,y]) #Use this for getting dual values and put in the extracted codes from PJM
+				x1[y,t] = dual.(EP[:cSoCBalInterior][y,t]) #Use this for getting dual values and put in the extracted codes from PJM
 			end
 		else
 			x1[y,:] = zeros(T,1) # Empty values for the resource with no ability to store energy

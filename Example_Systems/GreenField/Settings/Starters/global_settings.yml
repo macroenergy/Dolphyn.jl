@@ -1,0 +1,25 @@
+# Sector modeling flags
+ModelPower: 1 # Flag to turn on or off Power sector modeling; 0 = not active, 1 = active -- not implemented
+ModelH2: 0 # Flag to turn or off Hydrogen Supply Chain modeling; 0 = not active, 1 = active
+ModelCO2: 0 # Flag to turn or off Carbon Supply Chain sector modeling; 0 = not active, 1 = active
+
+#! Unit handling - should find another way to handle this
+ParameterScale: 1 # Turn on parameter scaling wherein load, capacity and power variables are defined in GW rather than MW. 0 = not active; 1 = active systemwide
+
+# Model details
+TotalLength: 168 # Total length of time scale in model, equals to sum of weights
+Zones: [1, 2, 3] # List of zones modelled
+SystemCO2Constraint: 2 # CO2 emissions constraint representation; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
+
+# Solver choices
+Solver: "Gurobi" # Available solvers: Gurobi, CPLEX, CLP, Cbc, HiGHS
+
+# Model results
+PrintModel: 0 # Write the model formulation as an output; 0 = active; 1 = not active
+WriteShadowPrices: 1 # Write shadow prices of LP or relaxed MILP; 0 = not active; 1 = active
+OverwriteResults: 0 # Overwrite existing results in output folder or create a new one; 0 = create new folder; 1 = overwrite existing results
+
+# Time aggregation
+OperationWrapping: 0 # Sets temporal resolution of the model; 0 = single period to represent the full year, with first-last time step linked; 1 = multiple representative periods
+TimeDomainReduction: 1 # Time domain reduce (i.e. cluster) inputs based on Load_data.csv, Generators_variability.csv, and Fuels_data.csv; 0 = not active (use input data as provided); 1 = active (cluster input data, or use data that has already been clustered)
+TimeDomainReductionFolder: "Inputs" # Directory name where results from time domain reduction will be saved. If results already exist here, these will be used without running time domain reduction script again.

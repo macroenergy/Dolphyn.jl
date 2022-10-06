@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 function load_co2_storage(path::AbstractString, setup::Dict, inputs::Dict)
-	
+
 	# Set indices for internal use
 	T = inputs["T"]   # Number of time steps (hours)
 	Zones = inputs["Zones"] # List of modeled zones
@@ -30,7 +30,7 @@ function load_co2_storage(path::AbstractString, setup::Dict, inputs::Dict)
 
 	# Filter resources in modeled zones
 	co2_storage_in = filter(row -> (row.Zone in Zones), co2_storage_in)
-	
+
     # Add Resource IDs after reading to prevent user errors
 	co2_storage_in[!,:R_ID] = 1:size(collect(skipmissing(co2_storage_in[!,1])),1)
 
@@ -42,7 +42,7 @@ function load_co2_storage(path::AbstractString, setup::Dict, inputs::Dict)
 
 	# Name of CO2 Storage
 	inputs["CO2_STORAGE_NAME"] = collect(skipmissing(co2_storage_in[!,:CO2_Storage]))
-	
+
 	# Defining whether CO2 storage is modeled as long-duration (inter-period carbon transfer allowed) or short-duration storage (inter-period carbon transfer disallowed)
 	inputs["CO2_STOR_LONG_DURATION"] = co2_storage_in[(co2_storage_in.LDS.==1),:R_ID]
 	inputs["CO2_STOR_SHORT_DURATION"] = co2_storage_in[(co2_storage_in.LDS.==0),:R_ID]

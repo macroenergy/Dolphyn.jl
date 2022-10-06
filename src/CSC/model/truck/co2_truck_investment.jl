@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -24,7 +24,7 @@ function co2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfCO2Truck = inputs["dfCO2Truck"]
 
-	Z = inputs["Z"] # Model zones - assumed to be same for H2 and electricity 
+	Z = inputs["Z"] # Model zones - assumed to be same for H2 and electricity
     CO2_TRUCK_TYPES = inputs["CO2_TRUCK_TYPES"] # Set of all truck types
 
     NEW_CAP_CO2_TRUCK_CHARGE = inputs["NEW_CAP_CO2_TRUCK_CHARGE"] # Set of hydrogen truck types eligible for new capacity
@@ -152,7 +152,7 @@ function co2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
 
   	## Constraints on truck compression energy
-		
+
 	# Cannot retire more energy capacity than existing energy capacity
 	@constraint(EP, cMaxRetCO2TruckEnergy[z = 1:Z, j in RET_CAP_CO2_TRUCK_ENERGY], vCO2RetTruckEnergy[z,j] <= dfCO2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j])
 

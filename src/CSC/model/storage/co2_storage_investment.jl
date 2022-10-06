@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -38,7 +38,7 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	# New installed charge capacity of resource "y"
 	@variable(EP, vCO2CAPCHARGE[y in NEW_CAP_CO2_CHARGE] >= 0)
-    
+
 	# New installed carbon capacity of resource "y"
 	@variable(EP, vCO2CAPCARBON[y in NEW_CAP_CO2_STORAGE] >= 0)
 
@@ -90,7 +90,7 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	### Constratints ###
 
   	#Constraints on new built capacity
-	  
+
 	# Constraint on maximum charge capacity (if applicable) [set input to -1 if no constraint on maximum charge capacity]
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasabilty
 	@constraint(EP, cMaxCapCO2Charge[y in intersect(dfCO2Stor[!,:Max_Charge_Cap_tonne_p_hr].>0, CO2_STOR_ALL)], eTotalCO2CapCharge[y] <= dfCO2Stor[!,:Max_Charge_Cap_tonne_p_hr][y])

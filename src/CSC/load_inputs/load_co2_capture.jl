@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 function load_co2_capture(path::AbstractString, setup::Dict, inputs::Dict)
-	
+
 	# Set indices for internal use
 	T = inputs["T"]   # Number of time steps (hours)
 	Zones = inputs["Zones"] # List of modeled zones
@@ -39,7 +39,7 @@ function load_co2_capture(path::AbstractString, setup::Dict, inputs::Dict)
 
 	# Name of CO2 capture resources
 	inputs["CO2_RESOURCES_NAME"] = collect(skipmissing(co2_capture[!,:CO2_Resource]))
-	
+
 	# Set of CO2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["CO2captureCommit"]
 	inputs["CO2_CAPTURE_COMMIT"] = co2_capture[co2_capture.CO2_CAPTURE_TYPE.==1 ,:R_ID]
 	# Set of CO2 resources eligible for unit committment
@@ -53,11 +53,11 @@ function load_co2_capture(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Set of all resources eligible for new capacity - includes both storage and capture
 	# DEV NOTE: Should we allow investment in flexible demand capacity later on?
-	inputs["CO2_CAPTURE_NEW_CAP"] = intersect(co2_capture[co2_capture.New_Build.==1 ,:R_ID], co2_capture[co2_capture.Max_Cap_tonne_p_hr.!=0,:R_ID]) 
+	inputs["CO2_CAPTURE_NEW_CAP"] = intersect(co2_capture[co2_capture.New_Build.==1 ,:R_ID], co2_capture[co2_capture.Max_Cap_tonne_p_hr.!=0,:R_ID])
 
 	# Fixed cost per start-up ($ per MW per start) if unit commitment is modelled
 	start_cost = convert(Array{Float64}, collect(skipmissing(inputs["dfCO2Capture"][!,:Start_Cost_per_tonne_p_hr])))
-	
+
 	inputs["C_CO2_Start"] = inputs["dfCO2Capture"][!,:Cap_Size_tonne_p_hr].* start_cost
 
 	println("CSC_capture.csv Successfully Read!")

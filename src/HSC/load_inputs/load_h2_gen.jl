@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
@@ -23,7 +23,7 @@ function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 	# Set indices for internal use
 	T = inputs["T"]   # Number of time steps (hours)
 	Zones = inputs["Zones"] # List of modeled zones
-	
+
 	# Read in H2 generation related inputs
     h2_gen_in = DataFrame(CSV.File(joinpath(path, "HSC_generation.csv"), header=true), copycols=true)
 
@@ -41,7 +41,7 @@ function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 
 	# Name of H2 Generation resources
 	inputs["H2_RESOURCES_NAME"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs["H2_RES_ALL"]]))
-	
+
 	# Resource identifiers by zone (just zones in resource order + resource and zone concatenated)
 	h2_zones = collect(skipmissing(h2_gen_in[!,:Zone][1:inputs["H2_RES_ALL"]]))
 	inputs["H2_R_ZONES"] = h2_zones
@@ -62,7 +62,7 @@ function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 
 	# Set of hydrogen generation plants with CCS
 	inputs["H2_CCS"] = h2_gen_in[h2_gen_in.CCS .== 1,:R_ID]
-	
+
 	# Set of all storage resources eligible for new energy capacity
 	inputs["NEW_CAP_H2_ENERGY"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Energy_Cap_tonne.!=0,:R_ID], inputs["H2_STOR_ALL"])
 	# Set of all storage resources eligible for energy capacity retirements
@@ -72,7 +72,7 @@ function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 	inputs["NEW_CAP_H2_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Charge_Cap_tonne_p_hr.!=0,:R_ID], inputs["H2_STOR_ALL"])
 	# Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
 	inputs["RET_CAP_H2_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Charge_Cap_tonne_p_hr.>0,:R_ID], inputs["H2_STOR_ALL"])
-	
+
 	# Set of H2 generation resources
 	# Set of h2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["H2GenCommit"]
 	inputs["H2_GEN_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
@@ -84,20 +84,20 @@ function load_h2_gen(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Set of all resources eligible for new capacity - includes both storage and generation
 	# DEV NOTE: Should we allow investment in flexible demand capacity later on?
-	inputs["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_tonne_p_hr.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID]) 
+	inputs["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_tonne_p_hr.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID])
 	# Set of all resources eligible for capacity retirements
 	# DEV NOTE: Should we allow retirement of flexible demand capacity later on?
 	inputs["H2_GEN_RET_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_tonne_p_hr.>=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1,:R_ID])
 
 	# Fixed cost per start-up ($ per MW per start) if unit commitment is modelled
 	start_cost = convert(Array{Float64}, collect(skipmissing(inputs["dfH2Gen"][!,:Start_Cost_per_tonne_p_hr])))
-	
+
 	inputs["C_H2_Start"] = inputs["dfH2Gen"][!,:Cap_Size_tonne_p_hr].* start_cost
 
 	# Direct CO2 emissions per tonne of H2 produced for various technologies
 	inputs["dfH2Gen"][!,:CO2_per_tonne] = zeros(Float64, inputs["H2_RES_ALL"])
 
-	
+
 	#### TO DO LATER ON - CO2 constraints
 
 	# for k in 1:inputs["H2_RES_ALL"]

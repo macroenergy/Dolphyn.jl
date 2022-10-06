@@ -25,7 +25,7 @@ function write_power_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP
     if !isdir(path)
         mkdir(path)
     end
-	
+
 	elapsed_time_costs = @elapsed write_costs(path, setup, inputs, EP)
 	println("Time elapsed for writing costs is")
 	println(elapsed_time_costs)
@@ -55,7 +55,7 @@ function write_power_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP
 			println(elapsed_time_expansion)
 		end
 	end
-	
+
 	if setup["CO2Cap"] == 1
 		elapsed_time_emissions = @elapsed write_emissions(path, setup, inputs, EP)
 		println("Time elapsed for writing emissions is")

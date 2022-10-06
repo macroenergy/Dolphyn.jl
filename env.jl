@@ -1,17 +1,17 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt. Users uncompressing this from an archive may not have
+received this license file. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import Pkg
@@ -22,10 +22,9 @@ Pkg.add(Pkg.PackageSpec(name="MathOptInterface"))
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="0.8.0"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="0.8.4"))
 Pkg.add(Pkg.PackageSpec(name="GLPK", version="0.14.12"))
+Pkg.add(Pkg.PackageSpec(name="HiGHS", version="1.1.4"))
 Pkg.add(Pkg.PackageSpec(name="Ipopt", version="0.7.0"))
 Pkg.add(Pkg.PackageSpec(name="JuMP", version="0.21.8"))
-Pkg.add(Pkg.PackageSpec(name="SCIP"))
-Pkg.build("SCIP")
 Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.9.14"))
 # Julia environment variable GUROBI_HOME set to your running machine location
 # ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"

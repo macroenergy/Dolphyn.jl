@@ -39,65 +39,61 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 
 	### Variables ###
 
-	# Storage level of resource "y" at hour "t" [MWh] on zone "z" - unbounded
-	@variable(EP, vS[y in STOR_ALL, t=1:T] >= 0);
+	# Storage level of resource "s" at hour "t" [MWh] on zone "z" - unbounded
+	@variable(EP, vS[s in STOR_ALL, t=1:T] >= 0)
 
-	# Energy withdrawn from grid by resource "y" at hour "t" [MWh] on zone "z"
-	@variable(EP, vCHARGE[y in STOR_ALL, t=1:T] >= 0);
+	# Energy withdrawn from grid by resource "s" at hour "t" [MWh] on zone "z"
+	@variable(EP, vCHARGE[s in STOR_ALL, t=1:T] >= 0)
 
 	### Expressions ###
 
 	# Energy losses related to technologies (increase in effective demand)
-	@expression(EP, eELOSS[y in STOR_ALL], sum(inputs["omega"][t]*EP[:vCHARGE][y,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vP][y,t] for t in 1:T))
+	@expression(EP, eELOSS[s in STOR_ALL], sum(inputs["omega"][t]*EP[:vCHARGE][s,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vP][s,t] for t in 1:T))
 
 	## Objective Function Expressions ##
 
 	#Variable costs of "charging" for technologies "y" during hour "t" in zone "z"
-	@expression(EP, eCVar_in[y in STOR_ALL,t=1:T], inputs["omega"][t]*dfGen[!,:Var_OM_Cost_per_MWh_In][y]*vCHARGE[y,t])
+	@expression(EP, eCVar_in[s in STOR_ALL,t=1:T], inputs["omega"][t]*dfGen[!,:Var_OM_Cost_per_MWh_In][s]*vCHARGE[s,t])
 
 	# Sum individual resource contributions to variable charging costs to get total variable charging costs
-	@expression(EP, eTotalCVarInT[t=1:T], sum(eCVar_in[y,t] for y in STOR_ALL))
+	@expression(EP, eTotalCVarInT[t=1:T], sum(eCVar_in[s,t] for s in STOR_ALL))
 	@expression(EP, eTotalCVarIn, sum(eTotalCVarInT[t] for t in 1:T))
 	EP[:eObj] += eTotalCVarIn
 
 	## Power Balance Expressions ##
-
 	# Term to represent net dispatch from storage in any period
-	@expression(EP, ePowerBalanceStor[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t]-EP[:vCHARGE][y,t] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)))
+	@expression(EP, ePowerBalanceStor[z=1:Z, t=1:T],
+		sum(EP[:vP][s,t]-EP[:vCHARGE][s,t] for s in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)))
 
 	EP[:ePowerBalance] += ePowerBalanceStor
 
 	### Constraints ###
-
 	## Storage energy capacity and state of charge related constraints:
 
 	# Links state of charge in first time step with decisions in last time step of each subperiod
 	# We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
-	
 	if OperationWrapping ==1 && !isempty(inputs["STOR_LONG_DURATION"])
-		@constraint(EP, cSoCBalStart[t in START_SUBPERIODS, y in STOR_SHORT_DURATION], EP[:vS][y,t] ==
-			EP[:vS][y,t+hours_per_subperiod-1]-(1/dfGen[!,:Eff_Down][y]*EP[:vP][y,t])
-			+(dfGen[!,:Eff_Up][y]*EP[:vCHARGE][y,t])-(dfGen[!,:Self_Disch][y]*EP[:vS][y,t+hours_per_subperiod-1]))
+		@constraint(EP, cSoCBalStart[s in STOR_SHORT_DURATION, t in START_SUBPERIODS], EP[:vS][s,t] ==
+			EP[:vS][s,t+hours_per_subperiod-1]-(1/dfGen[!,:Eff_Down][s]*EP[:vP][s,t])
+			+(dfGen[!,:Eff_Up][s]*EP[:vCHARGE][s,t])-(dfGen[!,:Self_Disch][s]*EP[:vS][s,t+hours_per_subperiod-1]))
 	else
-		@constraint(EP, cSoCBalStart[t in START_SUBPERIODS, y in STOR_ALL], EP[:vS][y,t] ==
-			EP[:vS][y,t+hours_per_subperiod-1]-(1/dfGen[!,:Eff_Down][y]*EP[:vP][y,t])
-			+(dfGen[!,:Eff_Up][y]*EP[:vCHARGE][y,t])-(dfGen[!,:Self_Disch][y]*EP[:vS][y,t+hours_per_subperiod-1]))
+		@constraint(EP, cSoCBalStart[s in STOR_ALL, t in START_SUBPERIODS], EP[:vS][s,t] ==
+			EP[:vS][s,t+hours_per_subperiod-1]-(1/dfGen[!,:Eff_Down][s]*EP[:vP][s,t])
+			+(dfGen[!,:Eff_Up][s]*EP[:vCHARGE][s,t])-(dfGen[!,:Self_Disch][s]*EP[:vS][s,t+hours_per_subperiod-1]))
 	end
-	
+
 
 	@constraints(EP, begin
-
 		# Max and min constraints on energy storage capacity built (as proportion to discharge power capacity)
-		[y in STOR_ALL, t in 1:T], EP[:eTotalCapEnergy][y] >= dfGen[!,:Min_Duration][y] * EP[:eTotalCap][y]
-		[y in STOR_ALL, t in 1:T], EP[:eTotalCapEnergy][y] <= dfGen[!,:Max_Duration][y] * EP[:eTotalCap][y]
+		[s in STOR_ALL, t in 1:T], EP[:eTotalCapEnergy][s] >= dfGen[!,:Min_Duration][s] * EP[:eTotalCap][s]
+		[s in STOR_ALL, t in 1:T], EP[:eTotalCapEnergy][s] <= dfGen[!,:Max_Duration][s] * EP[:eTotalCap][s]
 
 		# Maximum energy stored must be less than energy capacity
-		[y in STOR_ALL, t in 1:T], EP[:vS][y,t] <= EP[:eTotalCapEnergy][y]
+		[s in STOR_ALL, t in 1:T], EP[:vS][s,t] <= EP[:eTotalCapEnergy][s]
 
 		# energy stored for the next hour
-		cSoCBalInterior[t in INTERIOR_SUBPERIODS, y in STOR_ALL], EP[:vS][y,t] ==
-			EP[:vS][y,t-1]-(1/dfGen[!,:Eff_Down][y]*EP[:vP][y,t])+(dfGen[!,:Eff_Up][y]*EP[:vCHARGE][y,t])-(dfGen[!,:Self_Disch][y]*EP[:vS][y,t-1])
+		cSoCBalInterior[s in STOR_ALL, t in INTERIOR_SUBPERIODS], EP[:vS][s,t] ==
+			EP[:vS][s,t-1]-(1/dfGen[!,:Eff_Down][s]*EP[:vP][s,t])+(dfGen[!,:Eff_Up][s]*EP[:vCHARGE][s,t])-(dfGen[!,:Self_Disch][s]*EP[:vS][s,t-1])
 	end)
 
 	# Storage discharge and charge power (and reserve contribution) related constraints:
@@ -110,16 +106,19 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 		# Maximum discharging rate must be less than power rating OR available stored energy in the prior period, whichever is less
 		# wrapping from end of sample period to start of sample period for energy capacity constraint
 		@constraints(EP, begin
-			[y in STOR_ALL, t=1:T], EP[:vP][y,t] <= EP[:eTotalCap][y]
-			[y in STOR_ALL, t in INTERIOR_SUBPERIODS], EP[:vP][y,t] <= EP[:vS][y,t-1]*dfGen[!,:Eff_Down][y]
-			[y in STOR_ALL, t in START_SUBPERIODS], EP[:vP][y,t] <= EP[:vS][y,t+hours_per_subperiod-1]*dfGen[!,:Eff_Down][y]
+			[s in STOR_ALL, t=1:T], EP[:vP][s,t] <= EP[:eTotalCap][s]
+			[s in STOR_ALL, t in INTERIOR_SUBPERIODS], EP[:vP][s,t] <= EP[:vS][s,t-1]*dfGen[!,:Eff_Down][s]
+			[s in STOR_ALL, t in START_SUBPERIODS], EP[:vP][s,t] <= EP[:vS][s,t+hours_per_subperiod-1]*dfGen[!,:Eff_Down][s]
 		end)
 	end
-	#From co2 Policy module
+
+	# From co2 Policy module
 	@expression(EP, eELOSSByZone[z=1:Z],
-		sum(EP[:eELOSS][y] for y in intersect(inputs["STOR_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
+		sum(EP[:eELOSS][s] for s in intersect(inputs["STOR_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
 	)
-	return EP
+
+    return EP
+
 end
 
 function storage_all_reserves(EP::Model, inputs::Dict)

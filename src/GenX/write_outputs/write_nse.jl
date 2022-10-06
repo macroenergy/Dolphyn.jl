@@ -22,11 +22,11 @@ Function for reporting non-served energy for every model zone, time step and cos
 function write_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfGen = inputs["dfGen"]
-	
+
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
     SEG = inputs["SEG"] # Number of load curtailment segments
-	
+
 	# Non-served energy/demand curtailment by segment in each time step
 	dfNse = DataFrame()
 	dfTemp = Dict()
@@ -35,15 +35,15 @@ function write_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 		dfTemp[!,:Segment] = (1:SEG)
 		dfTemp[!,:Zone] = fill(z,(SEG))
 		if setup["ParameterScale"]==1
-			for i in 1:SEG
-				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vNSE])[i,:,z]))* ModelScalingFactor
+			for s in 1:SEG
+				dfTemp[!,:AnnualSum][s] = sum(inputs["omega"].* (value.(EP[:vNSE])[s,z,:]))* ModelScalingFactor
 			end
-			dfTemp = hcat(dfTemp, DataFrame((value.(EP[:vNSE])[:,:,z])* ModelScalingFactor, :auto))
+			dfTemp = hcat(dfTemp, DataFrame((value.(EP[:vNSE])[:,z,:])* ModelScalingFactor, :auto))
 		else
-			for i in 1:SEG
-				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vNSE])[i,:,z]))
+			for s in 1:SEG
+				dfTemp[!,:AnnualSum][s] = sum(inputs["omega"].* (value.(EP[:vNSE])[s,z,:]))
 			end
-			dfTemp = hcat(dfTemp, DataFrame(value.(EP[:vNSE])[:,:,z], :auto))
+			dfTemp = hcat(dfTemp, DataFrame(value.(EP[:vNSE])[:,z,:], :auto))
 		end
 		if z == 1
 			dfNse = dfTemp
@@ -66,6 +66,6 @@ function write_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 	dfNse = vcat(dfNse, total)
 
 	CSV.write(joinpath(path, "nse.csv"),  dftranspose(dfNse, false), writeheader=false)
-	
+
 	return dfNse
 end
