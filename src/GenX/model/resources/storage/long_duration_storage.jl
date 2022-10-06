@@ -73,7 +73,7 @@ Finally, the next constraint enforces that the initial storage level for each in
 """
 function long_duration_storage(EP::Model, inputs::Dict)
 
-	println("Long Duration Storage Module")
+	print_and_log("Long Duration Storage Module")
 
 	dfGen = inputs["dfGen"]
 

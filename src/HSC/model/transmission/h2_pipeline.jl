@@ -46,7 +46,7 @@ The pipeline has storage capacity via line packing:
 """
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-    println("Hydrogen Pipeline Module")
+    print_and_log("Hydrogen Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity

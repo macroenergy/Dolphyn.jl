@@ -56,7 +56,7 @@ The numbers of units starting up and shutting down are modeled as:
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 Production Core Module")
+	print_and_log("H2 Production Core Module")
 	
 	dfH2Gen = inputs["dfH2Gen"]
 

@@ -22,7 +22,7 @@ This module creates decision variables, expressions, and constraints related to 
 """
 function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Hydrogen Production Module")
+	print_and_log("Hydrogen Production Module")
 	
 	if !isempty(inputs["H2_GEN"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies

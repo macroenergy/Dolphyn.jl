@@ -56,7 +56,7 @@ In addition, this function adds investment and fixed O\&M related costs related 
 """
 function investment_discharge(EP::Model, inputs::Dict)
 
-	println("Investment Discharge Module")
+	print_and_log("Investment Discharge Module")
 
 	dfGen = inputs["dfGen"]
 
