@@ -221,7 +221,7 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 		end
 	end
 	
-	println("Generators_data.csv Successfully Read!")
+	print_and_log("Generators_data.csv Successfully Read!")
 
 	return inputs_gen
 end

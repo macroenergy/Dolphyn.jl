@@ -130,7 +130,7 @@ As with losses option 2, this segment-wise approximation of a quadratic loss fun
 """
 function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::Int)
 
-	println("Transmission Module")
+	print_and_log("Transmission Module")
 
 	dfGen = inputs["dfGen"]
 

@@ -85,6 +85,14 @@ function configure_gurobi(solver_settings_path::String)
     if (haskey(solver_settings, "NumericFocus"))
         MyNumericFocus = solver_settings["NumericFocus"]
     end
+    
+    MyGurobiLogFile = "" # Gurobi log file. See https://www.gurobi.com/documentation/9.5/refman/logfile.html#parameter:LogFile
+    if (haskey(solver_settings, "GurobiLog"))
+        MyGurobiLog = solver_settings["GurobiLog"]
+        if MyGurobiLog
+            MyGurobiLogFile = solver_settings["GurobiLogFile"]
+        end
+    end
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
@@ -100,6 +108,7 @@ function configure_gurobi(solver_settings_path::String)
         "BarConvTol" => MyBarConvTol,
         "NumericFocus" => MyNumericFocus,
         "Crossover" => MyCrossover,
+        "LogFile" => MyGurobiLogFile
     )
 
     return OPTIMIZER

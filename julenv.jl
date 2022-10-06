@@ -52,3 +52,7 @@ Pkg.add(Pkg.PackageSpec(name="StatsBase", version="0.33.8"))
 Pkg.add(Pkg.PackageSpec(name="YAML", version="0.4.7"))
 Pkg.add(Pkg.PackageSpec(name="LinearAlgebra"))
 Pkg.add(Pkg.PackageSpec(name="Revise"))
+
+# Logging
+Pkg.add(Pkg.PackageSpec(name="Logging"))
+Pkg.add(Pkg.PackageSpec(name="LoggingExtras"))

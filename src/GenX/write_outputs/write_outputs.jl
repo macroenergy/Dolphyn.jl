@@ -61,63 +61,48 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 
 	write_status(path, sep, inputs, setup, EP)
 	elapsed_time_costs = @elapsed write_costs(path, sep, inputs, setup, EP)
-	println("Time elapsed for writing costs is")
-	println(elapsed_time_costs)
+	print_and_log("Time elapsed for writing costs is $elapsed_time_costs")
 	dfCap = write_capacity(path, sep, inputs, setup, EP)
 	dfPower = write_power(path, sep, inputs, setup, EP)
 	dfCharge = write_charge(path, sep, inputs, setup, EP)
 	elapsed_time_storage = @elapsed write_storage(path, sep, inputs, setup, EP)
-	println("Time elapsed for writing storage is")
-	println(elapsed_time_storage)
+	print_and_log("Time elapsed for writing storage is $elapsed_time_storage")
 	dfCurtailment = write_curtailment(path, sep, inputs, setup, EP)
 	elapsed_time_nse = @elapsed write_nse(path, sep, inputs, setup, EP)
-	println("Time elapsed for writing nse is")
-	println(elapsed_time_nse)
+	print_and_log("Time elapsed for writing nse is $elapsed_time_nse")
 	elapsed_time_power_balance = @elapsed write_power_balance(path, sep, inputs, setup, EP)
-	println("Time elapsed for writing power balance is")
-	println(elapsed_time_power_balance)
+	print_and_log("Time elapsed for writing power balance is $elapsed_time_power_balance")
 	if inputs["Z"] > 1
 		elapsed_time_flows = @elapsed write_transmission_flows(path, sep, setup, inputs, EP)
-		println("Time elapsed for writing transmission flows is")
-		println(elapsed_time_flows)
+		print_and_log("Time elapsed for writing transmission flows is $elapsed_time_flows")
 		elapsed_time_losses = @elapsed write_transmission_losses(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing transmission losses is")
-		println(elapsed_time_losses)
+		print_and_log("Time elapsed for writing transmission losses is $elapsed_time_losses")
 		if setup["NetworkExpansion"] == 1
 			elapsed_time_expansion = @elapsed write_nw_expansion(path, sep, inputs, setup, EP)
-			println("Time elapsed for writing network expansion is")
-			println(elapsed_time_expansion)
+			print_and_log("Time elapsed for writing network expansion is $elapsed_time_expansion")
 		end
 	end
 	elapsed_time_emissions = @elapsed write_emissions(path, sep, inputs, setup, EP)
-	println("Time elapsed for writing emissions is")
-	println(elapsed_time_emissions)
+	print_and_log("Time elapsed for writing emissions is $elapsed_time_emissions")
 	if has_duals(EP) == 1
 		elapsed_time_reliability = @elapsed write_reliability(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing reliability is")
-		println(elapsed_time_reliability)
+		print_and_log("Time elapsed for writing reliability is $elapsed_time_reliability")
 		elapsed_time_stordual = @elapsed write_storagedual(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing storage duals is")
-		println(elapsed_time_stordual)
+		print_and_log("Time elapsed for writing storage duals is $elapsed_time_stordual")
 	end
 
 	if setup["UCommit"] >= 1
 		elapsed_time_commit = @elapsed write_commit(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing commitment is")
-		println(elapsed_time_commit)
+		print_and_log("Time elapsed for writing commitment is $elapsed_time_commit")
 		elapsed_time_start = @elapsed write_start(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing startup is")
-		println(elapsed_time_start)
+		print_and_log("Time elapsed for writing startup is $elapsed_time_start")
 		elapsed_time_shutdown = @elapsed write_shutdown(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing shutdown is")
-		println(elapsed_time_shutdown)
+		print_and_log("Time elapsed for writing shutdown is $elapsed_time_shutdown")
 		if setup["Reserves"] == 1
 			elapsed_time_reg = @elapsed write_reg(path, sep, inputs, setup, EP)
-			println("Time elapsed for writing regulation is")
-			println(elapsed_time_reg)
+			print_and_log("Time elapsed for writing regulation is $elapsed_time_reg")
 			elapsed_time_rsv = @elapsed write_rsv(path, sep, inputs, setup, EP)
-			println("Time elapsed for writing reserves is")
-			println(elapsed_time_rsv)
+			print_and_log("Time elapsed for writing reserves is $elapsed_time_rsv")
 		end
 	end
 
@@ -125,11 +110,9 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	# Output additional variables related inter-period energy transfer via storage
 	if setup["OperationWrapping"] == 1 && !isempty(inputs["STOR_LONG_DURATION"])
 		elapsed_time_lds_init = @elapsed write_opwrap_lds_stor_init(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing lds init is")
-		println(elapsed_time_lds_init)
+		print_and_log("Time elapsed for writing lds init is $elapsed_time_lds_init")
 		elapsed_time_lds_dstor = @elapsed write_opwrap_lds_dstor(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing lds dstor is")
-		println(elapsed_time_lds_dstor)
+		print_and_log("Time elapsed for writing lds dstor is $elapsed_time_lds_dstor")
 	end
 
 	dfPrice = DataFrame()
@@ -145,8 +128,7 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	end
 
 	elapsed_time_time_weights = @elapsed write_time_weights(path, sep, inputs)
-	println("Time elapsed for writing time weights is")
-	println(elapsed_time_time_weights)
+	print_and_log("Time elapsed for writing time weights is $elapsed_time_time_weights")
 	dfESR = DataFrame()
 	dfESRRev = DataFrame()
 	if setup["EnergyShareRequirement"]==1 && has_duals(EP) == 1
@@ -158,19 +140,16 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	if setup["CapacityReserveMargin"]==1 && has_duals(EP) == 1
 		dfResMar = write_reserve_margin(path, sep, setup, EP)
 		elapsed_time_rsv_margin = @elapsed write_reserve_margin_w(path, sep, inputs, setup, EP)
-		println("Time elapsed for writing reserve margin is")
-		println(elapsed_time_rsv_margin)
+		print_and_log("Time elapsed for writing reserve margin is $elapsed_time_rsv_margin")
 		dfResRevenue = write_reserve_margin_revenue(path, sep, inputs, setup, dfPower, dfCharge, dfResMar, dfCap)
 		elapsed_time_cap_value = @elapsed write_capacity_value(path, sep, inputs, setup, dfPower, dfCharge, dfResMar, dfCap)
-		println("Time elapsed for writing capacity value is")
-		println(elapsed_time_cap_value)
+		print_and_log("Time elapsed for writing capacity value is $elapsed_time_cap_value")
 	end
 
 	elapsed_time_net_rev = @elapsed write_net_revenue(path, sep, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
-	println("Time elapsed for writing net revenue is")
-	println(elapsed_time_net_rev)
+	print_and_log("Time elapsed for writing net revenue is $elapsed_time_net_rev")
 	## Print confirmation
-	println("Wrote outputs to $path$sep")
+	print_and_log("Wrote outputs to $path$sep")
 
 	return path
 

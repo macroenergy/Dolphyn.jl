@@ -27,7 +27,7 @@ src_path = "../../src/"
 inpath = pwd()
 
 ### Load GenX
-println("Loading packages")
+print_and_log("Loading packages")
 push!(LOAD_PATH, src_path)
 
 using DOLPHYN
@@ -47,30 +47,30 @@ if mysetup["TimeDomainReduction"] == 1
 
     if mysetup["ModelH2"] == 1
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-            println("Clustering Time Series Data...")
+            print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
-            println("Time Series Data Already Clustered.")
+            print_and_log("Time Series Data Already Clustered.")
         end
     else
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
-            println("Clustering Time Series Data...")
+            print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
-            println("Time Series Data Already Clustered.")
+            print_and_log("Time Series Data Already Clustered.")
         end
     end
 
 end
 
 # ### Configure solver
-println("Configuring Solver")
+print_and_log("Configuring Solver")
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # #### Running a case
 
 # ### Load inputs
-# println("Loading Inputs")
+# print_and_log("Loading Inputs")
  myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
  myinputs = load_inputs(mysetup, inpath)
 
@@ -80,17 +80,17 @@ if mysetup["ModelH2"] == 1
 end
 
 # ### Generate model
-# println("Generating the Optimization Model")
+# print_and_log("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
-println("Solving Model")
+print_and_log("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 ### Write power system output
 
-println("Writing Output")
+print_and_log("Writing Output")
 outpath = "$inpath/Results"
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 

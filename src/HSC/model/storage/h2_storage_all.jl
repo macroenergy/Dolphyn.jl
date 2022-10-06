@@ -66,7 +66,7 @@ The above constraints are established in ```h2_storage_all()``` in ```h2_storage
 """
 function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources
-    println("H2 Storage Core Resources Module")
+    print_and_log("H2 Storage Core Resources Module")
 
     dfH2Gen = inputs["dfH2Gen"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of all h2 storage resources

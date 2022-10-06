@@ -146,7 +146,7 @@ The above reserve related constraints are established by ```storage_all_reserves
 """
 function storage(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::Int)
 
-	println("Storage Resources Module")
+	print_and_log("Storage Resources Module")
 
 	if !isempty(inputs["STOR_ALL"]) #&& OperationWrapping == 1
 		EP = investment_energy(EP, inputs)

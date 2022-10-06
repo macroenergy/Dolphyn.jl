@@ -34,7 +34,7 @@ The final term in the summation above adds roundtrip storage losses to the total
 """
 function energy_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Energy Share Requirement Policies Module")
+	print_and_log("Energy Share Requirement Policies Module")
 
 	dfGen = inputs["dfGen"]
 
