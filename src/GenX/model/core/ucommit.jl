@@ -40,7 +40,7 @@ The sum of start-up costs is added to the objective function.
 """
 function ucommit(EP::Model, inputs::Dict, UCommit::Int)
 
-	println("Unit Commitment Module")
+	print_and_log("Unit Commitment Module")
 
 	dfGen = inputs["dfGen"]
 

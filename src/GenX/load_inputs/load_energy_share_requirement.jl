@@ -32,6 +32,6 @@ function load_energy_share_requirement(setup::Dict, path::AbstractString, sep::A
 	inputs_ESR["dfESR"] = Matrix{Float64}(inputs_ESR["dfESR"][:,first_col:last_col])
 	inputs_ESR["nESR"] = ESR
 
-	println("Energy_share_requirement.csv Successfully Read!")
+	print_and_log("Energy_share_requirement.csv Successfully Read!")
 	return inputs_ESR
 end

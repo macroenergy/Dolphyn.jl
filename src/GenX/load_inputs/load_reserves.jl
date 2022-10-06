@@ -58,7 +58,7 @@ function load_reserves(setup::Dict,path::AbstractString,sep::AbstractString, inp
 		end
 	end
 
-	println("Reserves.csv Successfully Read!")
+	print_and_log("Reserves.csv Successfully Read!")
 
 	return inputs_res
 end

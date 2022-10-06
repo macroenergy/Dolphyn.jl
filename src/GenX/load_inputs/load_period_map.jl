@@ -27,7 +27,7 @@ function load_period_map(setup::Dict,path::AbstractString,sep::AbstractString, i
 		inputs["Period_Map"] = DataFrame(CSV.File(string(path,sep,"Period_map.csv"), header=true), copycols=true)
 	end
 
-	println("Period_map.csv Successfully Read!")
+	print_and_log("Period_map.csv Successfully Read!")
 
 	return inputs
 end

@@ -94,7 +94,7 @@ The charging capability of truck stations is limited by their compression or liq
 function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     # Setup variables, constraints, and expressions common to all hydrogen truck resources
-    println("H2 Truck Core Resources Module")
+    print_and_log("H2 Truck Core Resources Module")
 
     dfH2Truck = inputs["dfH2Truck"]
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"] # Set of h2 truck types
@@ -220,6 +220,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
 
     EP[:ePowerBalance] += -ePowerbalanceH2TruckCompression
+    EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckCompression
     
     # H2 Power Truck Travelling Consumption balance
     @expression(
@@ -243,6 +244,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
 
     EP[:ePowerBalance] += -ePowerbalanceH2TruckTravel
+    EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckTravel
 
     # H2 balance
     @expression(

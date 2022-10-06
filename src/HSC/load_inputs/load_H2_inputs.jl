@@ -40,7 +40,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading H2 Input CSV Files")
+	print_and_log("Reading H2 Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
     inputs = load_h2_gen(setup, path, sep, inputs)
     inputs = load_h2_demand(setup, path, sep, inputs)
@@ -84,7 +84,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 		(setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
-	println("HSC Input CSV Files Successfully Read In From $path$sep")
+	print_and_log("HSC Input CSV Files Successfully Read In From $path$sep")
 
 	return inputs
 end

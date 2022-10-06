@@ -106,7 +106,7 @@ function load_network_data(setup::Dict, path::AbstractString, sep::AbstractStrin
         inputs_nw["NO_EXPANSION_LINES"] = findall(inputs_nw["pMax_Line_Reinforcement"].<0)
     end
 
-    println("Network.csv Successfully Read!")
+    print_and_log("Network.csv Successfully Read!")
 
     return inputs_nw, network_var
 end

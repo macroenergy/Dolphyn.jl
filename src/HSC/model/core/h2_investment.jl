@@ -60,7 +60,7 @@ In addition, this function adds investment and fixed O\&M related costs related 
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Hydrogen Investment Discharge Module")
+	print_and_log("Hydrogen Investment Discharge Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

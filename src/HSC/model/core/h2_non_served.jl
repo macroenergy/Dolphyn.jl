@@ -61,7 +61,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 """
 function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
 
-    println("Hydrogen Non-served Energy Module")
+    print_and_log("Hydrogen Non-served Energy Module")
 
     T = inputs["T"]     # Number of time steps
     Z = inputs["Z"]     # Number of zones

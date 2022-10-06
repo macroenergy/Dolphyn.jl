@@ -36,7 +36,7 @@ function load_h2_g2p_variability(setup::Dict, path::AbstractString, sep::Abstrac
 	# Maximum power output and variability of each energy resource
 	inputs_genvar["pH2_g2p_Max"] = transpose(Matrix{Float64}(gen_var[1:inputs_genvar["T"],2:(inputs_genvar["H2_G2P_ALL"]+1)]))
 
-	println("HSC_g2p_variability.csv Successfully Read!")
+	print_and_log("HSC_g2p_variability.csv Successfully Read!")
 
 	return inputs_genvar
 end
