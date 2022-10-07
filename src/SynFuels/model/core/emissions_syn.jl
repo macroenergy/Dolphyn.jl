@@ -15,64 +15,64 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
+	emissions_syn(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the CO2 emissions by plants in each zone, which is subsequently added to the total emissions
 """
-function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
+function emissions_syn(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 Emissions Module for CO2 Policy modularization")
+    println("Synthesis Fuels Emissions Module for CO2 Policy modularization")
 
-    dfH2Gen = inputs["dfH2Gen"]
+    dfSynGen = inputs["dfSynGen"]
 
-    H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
+    H = inputs["SYN_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
-    H2_CCS = inputs["H2_CCS"]
+    Syn_CCS = inputs["Syn_CCS"]
 
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
     # Adjustment of Fuel_CO2 units carried out in load_fuels_data.jl
-  
+
     @expression(
         EP,
-        eH2EmissionsByPlant[k = 1:H, t = 1:T],
-        if (dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] > 0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
-            inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
-            dfH2Gen[!, :etaFuel_MMBtu_p_tonne][k] *
-            EP[:vH2Gen][k, t] +
-            inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
-            dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] *
-            EP[:vH2_CHARGE_STOR][k, t]
+        eSynEmissionsByPlant[k = 1:H, t = 1:T],
+        if (dfSynGen[!, :SynStor_Charge_MMBtu_p_tonne][k] > 0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
+            inputs["fuel_CO2"][dfSynGen[!, :Fuel][k]] *
+            dfSynGen[!, :etaFuel_MMBtu_p_tonne][k] *
+            EP[:vSynGen][k, t] +
+            inputs["fuel_CO2"][dfSynGen[!, :Fuel][k]] *
+            dfSynGen[!, :SynStor_Charge_MMBtu_p_tonne][k] *
+            EP[:vSyn_CHARGE_STOR][k, t]
         else
-            inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
-            dfH2Gen[!, :etaFuel_MMBtu_p_tonne][k] *
-            EP[:vH2Gen][k, t]
+            inputs["fuel_CO2"][dfSynGen[!, :Fuel][k]] *
+            dfSynGen[!, :etaFuel_MMBtu_p_tonne][k] *
+            EP[:vSynGen][k, t]
         end
     )
 
     @expression(
         EP,
-        eCO2CaptureH2ByPlant[y in H2_CCS, t = 1:T],
-        dfH2Gen[!, :CCS_Percentage][y] / (1 - dfH2Gen[!, :CCS_Percentage][y]) *
-        eH2EmissionsByPlant[y, t]
+        eCO2CaptureSynByPlant[y in SYN_CCS, t = 1:T],
+        dfSynGen[!, :CCS_Percentage][y] / (1 - dfSynGen[!, :CCS_Percentage][y]) *
+        eSynEmissionsByPlant[y, t]
     )
 
     @expression(
         EP,
-        eH2EmissionsByZone[z = 1:Z, t = 1:T],
-        sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
+        eSynEmissionsByZone[z = 1:Z, t = 1:T],
+        sum(eSynEmissionsByPlant[y, t] for y in dfSynGen[(dfSynGen[!, :Zone].==z), :R_ID])
     )
 
     # This expression is used for hydrogen plant with CCS
     @expression(
 		EP,
-		eCO2CaptureH2ByZone[z = 1:Z, t = 1:T],
-		sum(eCO2CaptureH2ByPlant[y, t] for y in intersect(dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID], H2_CCS))
+		eCO2CaptureSynByZone[z = 1:Z, t = 1:T],
+		sum(eCO2CaptureSynByPlant[y, t] for y in intersect(dfSynGen[(dfSynGen[!, :Zone].==z), :R_ID], SYN_CCS))
 	)
 
-    EP[:eCO2PSCEmissionsByZone] += eH2EmissionsByZone
-    EP[:eCO2PSCCaptureByZone] += eCO2CaptureH2ByZone
+    EP[:eCO2PSCEmissionsByZone] += eSynEmissionsByZone
+    EP[:eCO2PSCCaptureByZone] += eCO2CaptureSynByZone
 
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices
     if (setup["CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 1)
@@ -80,10 +80,10 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         # Emissions penalty by zone - needed to report zonal cost breakdown
         @expression(
             EP,
-            eCH2EmissionsPenaltybyZone[z = 1:Z],
+            eCSynEmissionsPenaltybyZone[z = 1:Z],
             sum(
                 inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfH2CO2Price"][z, cap] for
+                    eSynEmissionsByZone[z, t] * inputs["dfH2CO2Price"][z, cap] for
                     cap in findall(x -> x == 1, inputs["dfH2CO2CapZones"][z, :])
                 ) for t = 1:T
             )
@@ -91,10 +91,10 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         # Sum over each policy type, each zone and each time step
         @expression(
             EP,
-            eCH2EmissionsPenaltybyPolicy[cap = 1:inputs["H2NCO2Cap"]],
+            eCSynEmissionsPenaltybyPolicy[cap = 1:inputs["H2NCO2Cap"]],
             sum(
                 inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfH2CO2Price"][z, cap] for
+                    eSynEmissionsByZone[z, t] * inputs["dfH2CO2Price"][z, cap] for
                     z in findall(x -> x == 1, inputs["dfH2CO2CapZones"][:, cap])
                 ) for t = 1:T
             )
@@ -102,12 +102,12 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         # Total emissions penalty across all policy constraints
         @expression(
             EP,
-            eCH2GenTotalEmissionsPenalty,
-            sum(eCH2EmissionsPenaltybyPolicy[cap] for cap = 1:inputs["H2NCO2Cap"])
+            eCSynGenTotalEmissionsPenalty,
+            sum(eCSynEmissionsPenaltybyPolicy[cap] for cap = 1:inputs["H2NCO2Cap"])
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies
-        EP[:eObj] += eCH2GenTotalEmissionsPenalty
+        EP[:eObj] += eCSynGenTotalEmissionsPenalty
 
 
     elseif (setup["CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 2)
@@ -115,10 +115,10 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         # Emissions penalty by zone - needed to report zonal cost breakdown
         @expression(
             EP,
-            eCH2EmissionsPenaltybyZone[z = 1:Z],
+            eCSynEmissionsPenaltybyZone[z = 1:Z],
             sum(
                 inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
+                    eSynEmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
                     cap in 1:inputs["NCO2Cap"]
                 ) for t = 1:T
             )
@@ -126,22 +126,22 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         # Sum over each policy type, each zone and each time step
         @expression(
             EP,
-            eCH2EmissionsPenaltybyPolicy[cap = 1:inputs["NCO2Cap"]],
+            eCSynEmissionsPenaltybyPolicy[cap = 1:inputs["NCO2Cap"]],
             sum(
                 inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
+                    eSynEmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
                     z in findall(x -> x == 1, inputs["dfCO2CapZones"][:, cap])
                 ) for t = 1:T
             )
         )
         @expression(
             EP,
-            eCH2GenTotalEmissionsPenalty,
-            sum(eCH2EmissionsPenaltybyZone[z] for z = 1:Z)
+            eCSynGenTotalEmissionsPenalty,
+            sum(eCSynEmissionsPenaltybyZone[z] for z = 1:Z)
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies
-        EP[:eObj] += eCH2GenTotalEmissionsPenalty
+        EP[:eObj] += eCSynGenTotalEmissionsPenalty
 
     end
 

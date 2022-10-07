@@ -59,18 +59,18 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 ```
 
 """
-function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
+function syn_fuels_non_served(EP::Model, inputs::Dict, setup::Dict)
 
-    println("Hydrogen Non-served Energy Module")
+    println("Synthesis Fuels Non-served Energy Module")
 
     T = inputs["T"]     # Number of time steps
     Z = inputs["Z"]     # Number of zones
-    H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
+    SYN_SEG = inputs["SYN_SEG"] # Number of load curtailment segments
 
     ### Variables ###
 
     # Non-served energy/curtailed demand in the segment "s" at hour "t" in zone "z"
-    @variable(EP, vH2NSE[s = 1:H2_SEG, t = 1:T, z = 1:Z] >= 0)
+    @variable(EP, SynNSE[s = 1:SYN_SEG, t = 1:T, z = 1:Z] >= 0)
 
     ### Expressions ###
 
@@ -79,55 +79,55 @@ function h2_non_served_energy(EP::Model, inputs::Dict, setup::Dict)
     # Cost of non-served energy/curtailed demand at hour "t" in zone "z"
     @expression(
         EP,
-        eH2CNSE[s = 1:H2_SEG, t = 1:T, z = 1:Z],
-        (inputs["omega"][t] * inputs["pC_H2_D_Curtail"][s] * vH2NSE[s, t, z])
+        eSynCNSE[s = 1:SYN_SEG, t = 1:T, z = 1:Z],
+        (inputs["omega"][t] * inputs["pC_SYN_D_Curtail"][s] * vSynNSE[s, t, z])
     )
 
     # Sum individual demand segment contributions to non-served energy costs to get total non-served energy costs
     # Julia is fastest when summing over one row one column at a time
     @expression(
         EP,
-        eTotalH2CNSETS[t = 1:T, z = 1:Z],
-        sum(eH2CNSE[s, t, z] for s = 1:H2_SEG)
+        eTotalSynCNSETS[t = 1:T, z = 1:Z],
+        sum(eSynCNSE[s, t, z] for s = 1:SYN_SEG)
     )
-    @expression(EP, eTotalH2CNSET[t = 1:T], sum(eTotalH2CNSETS[t, z] for z = 1:Z))
+    @expression(EP, eTotalSynCNSET[t = 1:T], sum(eTotalSynCNSETS[t, z] for z = 1:Z))
 
     #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     #  ParameterScale = 0 --> objective function is in $
     if setup["ParameterScale"] == 1
         @expression(
             EP,
-            eTotalH2CNSE,
-            sum(eTotalH2CNSET[t] / (ModelScalingFactor)^2 for t = 1:T)
+            eTotalSynCNSE,
+            sum(eTotalSynCNSET[t] / (ModelScalingFactor)^2 for t = 1:T)
         )
     else
-        @expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t] for t = 1:T))
+        @expression(EP, eTotalSynCNSE, sum(eTotalSynCNSET[t] for t = 1:T))
     end
 
 
     # Add total cost contribution of non-served energy/curtailed demand to the objective function
-    EP[:eObj] += eTotalH2CNSE
+    EP[:eObj] += eTotalSynCNSE
 
     ## Power Balance Expressions ##
-    @expression(EP, eH2BalanceNse[t = 1:T, z = 1:Z], sum(vH2NSE[s, t, z] for s = 1:H2_SEG))
+    @expression(EP, eSynBalanceNse[t = 1:T, z = 1:Z], sum(vSynNSE[s, t, z] for s = 1:SYN_SEG))
 
     # Add non-served energy/curtailed demand contribution to power balance expression
-    EP[:eH2Balance] += eH2BalanceNse
+    EP[:eSynBalance] += eSynBalanceNse
 
     ### Constratints ###
 
     # Demand curtailed in each segment of curtailable demands cannot exceed maximum allowable share of demand
     @constraint(
         EP,
-        cH2NSEPerSeg[s = 1:H2_SEG, t = 1:T, z = 1:Z],
-        vH2NSE[s, t, z] <= inputs["pMax_H2_D_Curtail"][s] * inputs["H2_D"][t, z]
+        cSynNSEPerSeg[s = 1:SYN_SEG, t = 1:T, z = 1:Z],
+        vSynNSE[s, t, z] <= inputs["pMax_Syn_D_Curtail"][s] * inputs["Syn_D"][t, z]
     )
 
     # Total demand curtailed in each time step (hourly) cannot exceed total demand
     @constraint(
         EP,
-        cMaxH2NSE[t = 1:T, z = 1:Z],
-        sum(vH2NSE[s, t, z] for s = 1:H2_SEG) <= inputs["H2_D"][t, z]
+        cMaxSynNSE[t = 1:T, z = 1:Z],
+        sum(vSynNSE[s, t, z] for s = 1:SYN_SEG) <= inputs["Syn_D"][t, z]
     )
 
     return EP

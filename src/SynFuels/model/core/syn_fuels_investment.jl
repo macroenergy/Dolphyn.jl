@@ -15,65 +15,65 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    syn_fuels_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
 This module defines the production decision variable  representing hydrogen injected into the network by resource $y$ by at time period $t$.
 
 This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
 
 """
-function h2_investment(EP::Model, inputs::Dict, setup::Dict)
+function syn_fuels_investment(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Hydrogen Investment Discharge Module")
+	println("Synthesis Fuels Investment Discharge Module")
 
-    dfH2Gen = inputs["dfH2Gen"]
+    dfSynGen = inputs["dfSynGen"]
 
     # Define sets
-    H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
-    H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
-    H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+    SYN_GEN_NEW_CAP = inputs["SYN_GEN_NEW_CAP"]
+    SYN_GEN_RET_CAP = inputs["SYN_GEN_RET_CAP"]
+    SYN_GEN_COMMIT = inputs["SYN_GEN_COMMIT"]
 
-    H = inputs["H2_RES_ALL"]
+    H = inputs["SYN_RES_ALL"]
 
-    # Capacity of New H2 Gen units (tonnes/hr)
-    # For generation with unit commitment, this variable refers to the number of units, not capacity. 
-    @variable(EP, vH2GenNewCap[k in H2_GEN_NEW_CAP] >= 0)
-    # Capacity of Retired H2 Gen units bui(tonnes/hr)
-    # For generation with unit commitment, this variable refers to the number of units, not capacity. 
-    @variable(EP, vH2GenRetCap[k in H2_GEN_RET_CAP] >= 0)
+    # Capacity of New Synthesis Gen units (tonnes/hr)
+    # For generation with unit commitment, this variable refers to the number of units, not capacity.
+    @variable(EP, vSynGenNewCap[k in SYN_GEN_NEW_CAP] >= 0)
+    # Capacity of Retired Synthesis Gen units bui(tonnes/hr)
+    # For generation with unit commitment, this variable refers to the number of units, not capacity.
+    @variable(EP, vSynGenRetCap[k in SYN_GEN_RET_CAP] >= 0)
 
     ### Expressions ###
     # Cap_Size is set to 1 for all variables when unit UCommit == 0
     # When UCommit > 0, Cap_Size is set to 1 for all variables except those where THERM == 1
     @expression(
         EP,
-        eH2GenTotalCap[k in 1:H],
-        if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
-            if k in H2_GEN_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
-                (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
+        eSynGenTotalCap[k in 1:H],
+        if k in intersect(SYN_GEN_NEW_CAP, SYN_GEN_RET_CAP) # Resources eligible for new capacity and retirements
+            if k in SYN_GEN_COMMIT
+                dfSynGen[!, :Existing_Cap_tonne_p_hr][k] +
+                dfSynGen[!, :Cap_Size_tonne_p_hr][k] *
+                (EP[:vSynGenNewCap][k] - EP[:vSynGenRetCap][k])
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k] -
-                EP[:vH2GenRetCap][k]
+                dfSynGen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vSynGenNewCap][k] -
+                EP[:vSynGenRetCap][k]
             end
-        elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
-            if k in H2_GEN_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
+        elseif k in setdiff(SYN_GEN_NEW_CAP, SYN_GEN_RET_CAP) # Resources eligible for only new capacity
+            if k in SYN_GEN_COMMIT
+                dfSynGen[!, :Existing_Cap_tonne_p_hr][k] +
+                dfSynGen[!, :Cap_Size_tonne_p_hr][k] * EP[:vSynGenNewCap][k]
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k]
+                dfSynGen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vSynGenNewCap][k]
             end
-        elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
-            if k in H2_GEN_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] -
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
+        elseif k in setdiff(SYN_GEN_RET_CAP, SYN_GEN_NEW_CAP) # Resources eligible for only capacity retirements
+            if k in SYN_GEN_COMMIT
+                dfSynGen[!, :Existing_Cap_tonne_p_hr][k] -
+                dfSynGen[!, :Cap_Size_tonne_p_hr][k] * EP[:SynGenRetCap][k]
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] - EP[:vH2GenRetCap][k]
+                dfSynGen[!, :Existing_Cap_tonne_p_hr][k] - EP[:vSynGenRetCap][k]
             end
         else
             # Resources not eligible for new capacity or retirements
-            dfH2Gen[!, :Existing_Cap_tonne_p_hr][k]
+            dfSynGen[!, :Existing_Cap_tonne_p_hr][k]
         end
     )
 
@@ -87,23 +87,23 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         # If resource is not eligible for new capacity, fixed costs are only O&M costs
         @expression(
             EP,
-            eH2GenCFix[k in 1:H],
-            if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_GEN_COMMIT
+            eSynGenCFix[k in 1:H],
+            if k in SYN_GEN_NEW_CAP # Resources eligible for new capacity
+                if k in SYN_GEN_COMMIT
                     1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                        dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
-                        EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                        dfSynGen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
+                        dfSynGen[!, :Cap_Size_tonne_p_hr][k] *
+                        EP[:vSynGenNewCap][k] +
+                        dfSynGen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eSynGenTotalCap[k]
                     )
                 else
                     1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                        dfSynGen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vSynGenNewCap][k] +
+                        dfSynGen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eSynGenTotalCap[k]
                     )
                 end
             else
-                (dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]) /
+                (dfSynGen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eSynGenTotalCap[k]) /
                 ModelScalingFactor^2
             end
         )
@@ -112,27 +112,27 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         # If resource is not eligible for new capacity, fixed costs are only O&M costs
         @expression(
             EP,
-            eH2GenCFix[k in 1:H],
-            if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_GEN_COMMIT
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                    dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
-                    EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+            eSynGenCFix[k in 1:H],
+            if k in SYN_GEN_NEW_CAP # Resources eligible for new capacity
+                if k in SYN_GEN_COMMIT
+                    dfSynGen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
+                    dfSynGen[!, :Cap_Size_tonne_p_hr][k] *
+                    EP[:vSynGenNewCap][k] +
+                    dfSynGen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eSynGenTotalCap[k]
                 else
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                    dfSynGen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vSynGenNewCap][k] +
+                    dfSynGen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eSynGenTotalCap[k]
                 end
             else
-                dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                dfSynGen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eSynGenTotalCap[k]
             end
         )
     end
 
-    @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k = 1:H))
+    @expression(EP, eTotalSynGenCFix, sum(EP[:eSynGenCFix][k] for k = 1:H))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalH2GenCFix
+    EP[:eObj] += eTotalSynGenCFix
 
     return EP
 
