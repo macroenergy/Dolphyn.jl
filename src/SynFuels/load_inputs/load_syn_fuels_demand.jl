@@ -42,7 +42,7 @@ function load_syn_fuels_demand(path::AbstractString, setup::Dict, inputs::Dict)
     # Max value of non-served energy in $/(tonne)
     inputs["Syn_Voll"] = collect(skipmissing(Syn_fuels_demand_in[!, :Voll]))
     # Demand in Tonnes per hour
-    inputs["Syn_D"] = Matrix(Syn_fuels_demand_in[1:T, ["Load_MMBTU_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+    inputs["SynFuel_D"] = Matrix(Syn_fuels_demand_in[1:T, ["Load_MMBTU_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
 
     # Cost of non-served energy/demand curtailment (for each segment)
     Syn_SEG = inputs["Syn_SEG"]  # Number of demand segments
