@@ -1,4 +1,4 @@
-Voll,Demand_Segment,Cost_of_Demand_Curtailment_per_Tonne,Max_Demand_Curtailment,Rep_Periods,Timesteps_per_Rep_Period,Sub_Weights,Time_Index,Load_MMBTU_z1,Load_MMBTU_z1,Load_MMBTU_z3,Load_MMBTU_z4,Load_MMBTU_z5,Load_MMBTU_z6,Load_MMBTU_z7
+Voll,Demand_Segment,Cost_of_Demand_Curtailment_per_Tonne,Max_Demand_Curtailment,Rep_Periods,Timesteps_per_Rep_Period,Sub_Weights,Time_Index,Load_MMBTU_z1,Load_MMBTU_z2,Load_MMBTU_z3,Load_MMBTU_z4,Load_MMBTU_z5,Load_MMBTU_z6,Load_MMBTU_z7
 50000000,1,1,0,1,168,1,1,1.62,9.51,3.58,7.38,2.52,5.36,0
 ,,,,,,,2,1.22,7.17,2.7,5.57,1.9,4.04,0
 ,,,,,,,3,1.75,10.29,3.88,7.98,2.73,5.8,0

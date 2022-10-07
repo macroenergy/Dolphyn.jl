@@ -44,7 +44,7 @@ function load_syn_fuels_gen(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Name of H2 Generation resources
     inputs["SYN_RESOURCES_NAME"] =
-        collect(skipmissing(Syn_gen_in[!, :H2_Resource][1:inputs["H2_RES_ALL"]]))
+        collect(skipmissing(Syn_gen_in[!, :SYN_Resource][1:inputs["SYN_RES_ALL"]]))
 
     # Resource identifiers by zone (just zones in resource order + resource and zone concatenated)
     syn_zones = collect(skipmissing(Syn_gen_in[!, :Zone][1:inputs["SYN_RES_ALL"]]))

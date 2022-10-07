@@ -20,6 +20,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 function load_syn_fuels_demand(path::AbstractString, setup::Dict, inputs::Dict)
 
+    # Set indices for internal use
+	T = inputs["T"]   # Number of time steps (hours)
+	Zones = inputs["Zones"] # List of modeled zones
+
     if setup["TimeDomainReduction"] == 1
         Syn_fuels_demand_in = DataFrame(
             CSV.File(joinpath(path, "Syn_fuels_demand.csv"), header = true),

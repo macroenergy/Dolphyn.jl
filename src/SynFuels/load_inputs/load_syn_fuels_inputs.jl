@@ -32,7 +32,7 @@ function load_syn_fuels_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	## Read input files
 	println("Reading Syn Fuel Input CSV Files")
     inputs = load_syn_fuels_gen(path, setup, inputs)
-	inputs = load_syn_fuels_generators_variability(path, setup, inputs)
+	inputs = load_syn_generators_variability(path, setup, inputs)
     inputs = load_syn_fuels_demand(path, setup, inputs)
 
     if setup["ModelSynPipelines"] == 1

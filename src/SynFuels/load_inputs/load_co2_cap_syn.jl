@@ -80,7 +80,7 @@ function load_co2_cap_syn(path::AbstractString, setup::Dict, inputs::Dict)
         end
     end
 
-    println("HSC_CO2_cap.csv Successfully Read!")
+    println("Syn_CO2_cap.csv Successfully Read!")
 
     return inputs
 end

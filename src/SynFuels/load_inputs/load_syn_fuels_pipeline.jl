@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reading input parameters related to the synthesis fuels transmission network.
 """
-function load_syn_fuels_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
+function load_syn_fuels_pipeline(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
