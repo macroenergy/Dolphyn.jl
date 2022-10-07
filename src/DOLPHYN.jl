@@ -24,12 +24,14 @@ export load_basic_inputs
 export load_power_inputs
 export load_h2_inputs
 export load_co2_inputs
+export load_syn_fuels_inputs
 export generate_model
 export solve_model
 export write_basic_outputs
 export write_power_outputs
 export write_HSC_outputs
 export write_CSC_outputs
+export write_Syn_outputs
 export mga
 
 
@@ -252,7 +254,7 @@ include("SynFuels/model/transmission/syn_fuels_pipeline.jl")
 
 # Synthesis fuels truck
 include("SynFuels/model/truck/syn_fuels_truck.jl")
-incldue("SynFuels/model/truck/syn_fuels_truck_investment.jl")
+include("SynFuels/model/truck/syn_fuels_truck_investment.jl")
 include("SynFuels/model/truck/syn_fuels_truck_all.jl")
 include("SynFuels/model/truck/syn_fuels_long_duration_truck.jl")
 

@@ -18,7 +18,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 
 """
-function load_syn_fuels_demand(path::AbstractString, inputs::Dict, setup::Dict)
+function load_syn_fuels_demand(path::AbstractString, setup::Dict, inputs::Dict)
 
     if setup["TimeDomainReduction"] == 1
         Syn_fuels_demand_in = DataFrame(

@@ -27,26 +27,26 @@ path - string path to working directory
 returns: Dict (dictionary) object containing all data inputs
 """
 
-function load_syn_fuels_inputs(inputs::Dict,setup::Dict,path::AbstractString)
+function load_syn_fuels_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 
 	## Read input files
 	println("Reading Syn Fuel Input CSV Files")
-    inputs = load_syn_fuels_gen(setup, path, inputs)
-	inputs = load_syn_fuels_generators_variability(setup, path, inputs)
-    inputs = load_syn_fuels_demand(setup, path, inputs)
+    inputs = load_syn_fuels_gen(path, setup, inputs)
+	inputs = load_syn_fuels_generators_variability(path, setup, inputs)
+    inputs = load_syn_fuels_demand(path, setup, inputs)
 
     if setup["ModelSynPipelines"] == 1
-        inputs = load_syn_fuels_pipeline(setup, path, inputs)
+        inputs = load_syn_fuels_pipeline(path, setup, inputs)
     else
         inputs["Syn_P"] = 0
     end
 
     if setup["ModelSynTrucks"] == 1
-        inputs = load_syn_fuels_truck(setup, path, inputs)
+        inputs = load_syn_fuels_truck(path, setup, inputs)
     end
 
     if setup["SynCO2Cap"] >= 1
-		inputs = load_co2_cap_syn(setup, path, inputs)
+		inputs = load_co2_cap_syn(path, setup, inputs)
 	end
 
     println("Synthesis Fuels Input CSV Files Successfully Read In From $path")
