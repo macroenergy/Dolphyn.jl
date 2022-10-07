@@ -288,11 +288,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	###### START OF SYNTHESIS FUELS INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 
-    if setup["ModelSyn"] == 0
+    if setup["ModelSyn"] == 1
 
         EP = syn_fuels_outputs(EP, inputs, setup)
 
-        EP = syn_fuels_investment(Ep, inputs, setup)
+        EP = syn_fuels_investment(EP, inputs, setup)
 
         EP = syn_fuels_non_served(EP, inputs, setup)
 

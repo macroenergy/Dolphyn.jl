@@ -37,7 +37,7 @@ function load_syn_fuels_demand(path::AbstractString, setup::Dict, inputs::Dict)
     end
 
     # Number of demand curtailment/lost load segments
-    inputs["Syn_SEG"] = size(collect(skipmissing(Syn_fuels_demand_in[!, :Demand_Segment])), 1)
+    inputs["SYN_SEG"] = size(collect(skipmissing(Syn_fuels_demand_in[!, :Demand_Segment])), 1)
 
     # Max value of non-served energy in $/(tonne)
     inputs["Syn_Voll"] = collect(skipmissing(Syn_fuels_demand_in[!, :Voll]))
@@ -45,12 +45,12 @@ function load_syn_fuels_demand(path::AbstractString, setup::Dict, inputs::Dict)
     inputs["SynFuel_D"] = Matrix(Syn_fuels_demand_in[1:T, ["Load_MMBTU_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
 
     # Cost of non-served energy/demand curtailment (for each segment)
-    Syn_SEG = inputs["Syn_SEG"]  # Number of demand segments
-    inputs["pC_Syn_D_Curtail"] = zeros(Syn_SEG)
-    inputs["pMax_Syn_D_Curtail"] = zeros(Syn_SEG)
-    for s = 1:Syn_SEG
+    SYN_SEG = inputs["SYN_SEG"]  # Number of demand segments
+    inputs["pC_SYN_D_Curtail"] = zeros(SYN_SEG)
+    inputs["pMax_Syn_D_Curtail"] = zeros(SYN_SEG)
+    for s = 1:SYN_SEG
         # Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
-        inputs["pC_Syn_D_Curtail"][s] =
+        inputs["pC_SYN_D_Curtail"][s] =
             collect(skipmissing(Syn_fuels_demand_in[!, :Cost_of_Demand_Curtailment_per_Tonne]))[s] *
             inputs["Voll"][1]
         # Maximum hourly demand curtailable as % of the max demand (for each segment)

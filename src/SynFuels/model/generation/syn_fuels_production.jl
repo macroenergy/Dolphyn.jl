@@ -21,11 +21,11 @@ The h2_production module creates decision variables, expressions, and constraint
 
 This module uses the following 'helper' functions in separate files: ```h2_generation_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```h2_generation_no_commit()``` for resources not subject to unit commitment (if any).
 """
-function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
+function syn_fuels_production(EP::Model, inputs::Dict, setup::Dict)
 
 	if !isempty(inputs["SYN_FUELS_RES_ALL"])
 	# expressions, variables and constraints common to all types of syn fuels
-		EP = syn_fuel_res_all(EP::Model, inputs::Dict, setup::Dict)
+		EP = syn_fuels_production_all(EP::Model, inputs::Dict, setup::Dict)
 	end
 
     SYN_FUEL_RES_COMMIT = inputs["SYN_FUEL_RES_COMMIT"]

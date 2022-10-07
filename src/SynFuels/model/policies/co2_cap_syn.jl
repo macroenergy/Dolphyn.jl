@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 function co2_cap_syn(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"]     # Number of time steps (hours)
-    Syn_SEG = inputs["Syn_SEG"] # Number of demand response segments for Synthesis fuels demand
+    SYN_SEG = inputs["SYN_SEG"] # Number of demand response segments for Synthesis fuels demand
 
     # NOTE: If ParameterScale = 1 , then emisisons constraint written in units of ktonnes, else emissions constraint units is tonnes
     ## Mass-based: Emissions constraint in absolute emissions limit (tons)
@@ -51,7 +51,7 @@ function co2_cap_syn(EP::Model, inputs::Dict, setup::Dict)
                 inputs["dfSynMaxCO2Rate"][z, cap] * sum(
                     inputs["omega"][t] * (
                         inputs["SynFuel_D"][t, z] -
-                        sum(EP[:vSynNSE][s, t, z] for s = 1:Syn_SEG)
+                        sum(EP[:vSynNSE][s, t, z] for s = 1:SYN_SEG)
                     ) for t = 1:T
                 ) for z in findall(x -> x == 1, inputs["dfSynCO2CapZones"][:, cap])
             )

@@ -52,7 +52,7 @@ function syn_fuels_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 	if setup["ParameterScale"] ==1
 		@expression(EP, eCSynGenVar_out[k = 1:H,t = 1:T],
-		(inputs["omega"][t] * (dfSynGen[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfSynGen[!,:Fuel][k]][t] * dfSynGen[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vH2Gen[k,t]))
+		(inputs["omega"][t] * (dfSynGen[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfSynGen[!,:Fuel][k]][t] * dfSynGen[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vSynGen[k,t]))
 	else
 		@expression(EP, eCSynGenVar_out[k = 1:H,t = 1:T],
 		(inputs["omega"][t] * ((dfSynGen[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfSynGen[!,:Fuel][k]][t] * dfSynGen[!,:etaFuel_MMBtu_p_tonne][k])) * vSynGen[k,t]))
