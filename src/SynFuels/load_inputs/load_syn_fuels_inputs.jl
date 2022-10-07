@@ -27,7 +27,7 @@ path - string path to working directory
 returns: Dict (dictionary) object containing all data inputs
 """
 
-function load_syn_fuel_inputs(inputs::Dict,setup::Dict,path::AbstractString)
+function load_syn_fuels_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 	## Read input files
 	println("Reading Syn Fuel Input CSV Files")

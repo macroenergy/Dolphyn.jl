@@ -126,7 +126,7 @@ end
 ## Load CO2 inputs if modeling the carbon supply chain
 if setup["ModelSyn"] == 1
     syn_inputs_path = joinpath(inputs_path, "Syn")
-    inputs = load_syn_inputs(syn_inputs_path, setup, inputs)
+    inputs = load_syn_fuels_inputs(syn_inputs_path, setup, inputs)
 end
 
 ### Generate model
