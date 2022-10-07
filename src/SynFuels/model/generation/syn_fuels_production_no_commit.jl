@@ -15,10 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-   
+
 """
 
-function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
+function syn_fuels_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename H2Gen dataframe
 	dfSynFuels = inputs["dfSynFuels"]
@@ -27,11 +27,11 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
     NSFByProd = inputs["NSFByProd"]
-	
+
 	SYN_FUEL_RES_NO_COMMIT = inputs["SYN_FUEL_RES_NO_COMMIT"]
 
 	###Expressions###
-	
+
     #Liquid Fuel Balance Expression
     @expression(EP, eSynFuelProdNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vSFProd][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))#intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
@@ -51,13 +51,13 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	EP[:eCaptured_CO2_Balance] -= eSynFuelCO2ConsNoCommit
 
     #Power Consumption for Syn Fuel Production
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
 		@expression(EP, ePowerBalanceSynFuelResNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vSFPin][k,t]/ModelScalingFactor for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vSFPin][k,t]/ModelScalingFactor for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling
 		@expression(EP, ePowerBalanceSynFuelResNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vSFPin][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vSFPin][k,t] for k in intersect(SYN_FUEL_RES_NO_COMMIT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceSynFuelResNoCommit
@@ -68,7 +68,7 @@ function syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
 		#Power Balance
 		[k in SYN_FUEL_RES_NO_COMMIT, t = 1:T], EP[:vSFPin][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
 	end)
-	
+
     # By-product produced cosntraint
     @constraints(EP, begin
 	[k in SYN_FUEL_RES_NO_COMMIT, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
