@@ -231,7 +231,7 @@ include("CSC/model/truck/co2_long_duration_truck.jl")
 include("SynFuels/model/core/emissions_syn.jl")
 include("SynFuels/model/core/syn_fuels_investment.jl")
 include("SynFuels/model/core/syn_fuels_nsd.jl")
-incldue("SynFuels/model/core/syn_fuels_outputs.jl")
+include("SynFuels/model/core/syn_fuels_outputs.jl")
 
 # Synthesis fuels generation
 include("SynFuels/model/generation/syn_fuels_production.jl")
@@ -254,7 +254,7 @@ include("SynFuels/model/transmission/syn_fuels_pipeline.jl")
 include("SynFuels/model/truck/syn_fuels_truck.jl")
 incldue("SynFuels/model/truck/syn_fuels_truck_investment.jl")
 include("SynFuels/model/truck/syn_fuels_truck_all.jl")
-incldue("SynFuels/model/truck/syn_fuels_long_duration_truck.jl")
+include("SynFuels/model/truck/syn_fuels_long_duration_truck.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")

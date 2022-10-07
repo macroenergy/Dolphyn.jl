@@ -1,4 +1,4 @@
-function hsyn_fuels_storage(EP::Model, inputs::Dict, setup::Dict)
+function syn_fuels_storage(EP::Model, inputs::Dict, setup::Dict)
 
     println("Synthesis Fuels Storage Module")
 

@@ -26,7 +26,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-function write_HSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_Syn_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     # Create directory if it does not exist
     if !isdir(path)

@@ -19,7 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_syn_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
 	dfH2Gen = inputs["dfH2Gen"]
 
@@ -84,7 +84,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		cH2NetworkExpCost=0
 	end
 
-	 
+
     cH2Total = cH2Var + cH2Fix + cH2Start + value(EP[:eTotalH2CNSE]) +cH2NetworkExpCost
 
     dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix, cH2Var, value(EP[:eTotalH2CNSE]), cH2Start,cH2NetworkExpCost]
@@ -134,8 +134,8 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 					if !isempty(inputs["H2_G2P_COMMIT"])
 						if y in inputs["H2_G2P_COMMIT"]
-							tempCStart += value.(EP[:eTotalH2G2PCStart]) 
-							tempCTotal += value.(EP[:eTotalH2G2PCStart]) 
+							tempCStart += value.(EP[:eTotalH2G2PCStart])
+							tempCTotal += value.(EP[:eTotalH2G2PCStart])
 						end
 					end
 				end
@@ -143,7 +143,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 		end
 
-		
+
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCFix = tempCFix * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)
@@ -157,7 +157,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 			tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		end
-		
+
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])* (ModelScalingFactor^2)
 		else

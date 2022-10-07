@@ -18,11 +18,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	write_h2_truck_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_h2_truck_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_syn_truck_flow(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
 	H2_TRUCK_TYPE_NAMES = inputs["H2_TRUCK_TYPE_NAMES"]
-    
+
 	Z = inputs["Z"]
 	T = inputs["T"]
 

@@ -19,10 +19,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for writing the capacities of different H2 storage technologies, including hydro reservoir, flexible storage tech etc.
 """
-function write_h2_storage(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_syn_storage(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfH2Gen = inputs["dfH2Gen"]
-	
+
 	T = inputs["T"]     # Number of time steps (hours)
 	H = inputs["H2_RES_ALL"]  # Set of H2 storage resources
 

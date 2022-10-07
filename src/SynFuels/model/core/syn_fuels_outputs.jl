@@ -23,7 +23,7 @@ This module additionally defines contributions to the objective function from va
 
 """
 
-function synthesis_fuels_outputs(EP::Model, inputs::Dict, setup::Dict)
+function syn_fuels_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Synthesis Fuels Generation and Storage Discharge Module")
 

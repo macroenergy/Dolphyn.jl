@@ -17,10 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 
 """
-function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
+function co2_cap_syn(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"]     # Number of time steps (hours)
-    H2_SEG = inputs["Syn_SEG"] # Number of demand response segments for Synthesis fuels demand
+    Syn_SEG = inputs["Syn_SEG"] # Number of demand response segments for Synthesis fuels demand
 
     # NOTE: If ParameterScale = 1 , then emisisons constraint written in units of ktonnes, else emissions constraint units is tonnes
     ## Mass-based: Emissions constraint in absolute emissions limit (tons)
@@ -28,7 +28,7 @@ function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
     if setup["SynCO2Cap"] == 1
         @constraint(
             EP,
-            cH2CO2Emissions_systemwide[cap = 1:inputs["SynNCO2Cap"]],
+            cSynCO2Emissions_systemwide[cap = 1:inputs["SynNCO2Cap"]],
             sum(
                 inputs["omega"][t] * EP[:eSynEmissionsByZone][z, t] for
                 z in findall(x -> x == 1, inputs["dfSynCO2CapZones"][:, cap]), t = 1:T
@@ -40,7 +40,7 @@ function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
 
         ## Load + Rate-based: Emissions constraint in terms of rate (tons/tonnes)
         ## DEV NOTE: Add demand from H2 consumption by power sector after adding gas to power module
-    elseif setup["H2CO2Cap"] == 2
+    elseif setup["SynCO2Cap"] == 2
         @constraint(
             EP,
             cSynCO2Emissions_systemwide[cap = 1:inputs["SynNCO2Cap"]],

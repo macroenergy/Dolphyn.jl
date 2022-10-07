@@ -18,7 +18,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_syn_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfSynGen = inputs["dfSynGen"]
 

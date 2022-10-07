@@ -1,7 +1,3 @@
-
-## Q. for Guannan -
-# 2. Issue with H2PipeCap usage and units is it on a per mile basis or cumulative basis?
-
 function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     println("Synthesis Fuels Pipeline Module")

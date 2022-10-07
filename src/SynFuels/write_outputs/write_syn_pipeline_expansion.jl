@@ -18,7 +18,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 """
-function write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_syn_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
     L = inputs["H2_P"]     # Number of H2 pipelines
 
@@ -34,6 +34,6 @@ function write_h2_pipeline_expansion(path::AbstractString, setup::Dict, inputs::
         Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"] .* inputs["pH2_Pipe_No_Curr"],
         New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap),
     )
-    
+
     CSV.write(joinpath(path, "HSC_pipeline_expansion.csv"), dfTransCap)
 end

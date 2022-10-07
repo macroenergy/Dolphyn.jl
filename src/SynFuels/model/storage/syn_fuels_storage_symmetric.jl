@@ -1,4 +1,4 @@
-function h2_storage_symmetric(EP::Model, inputs::Dict)
+function syn_fuels_storage_symmetric(EP::Model, inputs::Dict)
     # Set up additional variables, constraints, and expressions associated with hydrogen storage resources with symmetric charge & discharge capacity
     # STOR = 1 corresponds to storage with distinct power and energy capacity decisions but symmetric charge/discharge power ratings
 

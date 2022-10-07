@@ -15,14 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_h2 charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+	write_h2_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 Function for writing the h2 storage charging energy values of the different storage technologies.
 """
-function write_h2_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+function write_syn_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
 	dfH2Gen = inputs["dfH2Gen"]
-	
+
 	H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	# Power withdrawn to charge each resource in each time step
@@ -30,11 +30,11 @@ function write_h2_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 	charge = zeros(H,T)
 	for i in 1:H
         if i in inputs["H2_STOR_ALL"]
-            charge[i,:] = value.(EP[:vH2_CHARGE_STOR])[i,:] 
+            charge[i,:] = value.(EP[:vH2_CHARGE_STOR])[i,:]
         elseif i in inputs["H2_FLEX"]
             charge[i,:] = value.(EP[:vH2_CHARGE_FLEX])[i,:]
         end
-	
+
 		dfCharge[!,:AnnualSum][i] = sum(inputs["omega"].* charge[i,:])
 	end
 	dfCharge = hcat(dfCharge, DataFrame(charge, :auto))
@@ -52,6 +52,6 @@ function write_h2_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 	dfCharge = vcat(dfCharge, total)
 
 	CSV.write(joinpath(path, "HSC_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
-	
+
 	return dfCharge
 end
