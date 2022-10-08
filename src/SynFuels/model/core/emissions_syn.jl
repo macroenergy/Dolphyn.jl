@@ -28,7 +28,7 @@ function emissions_syn(EP::Model, inputs::Dict, setup::Dict)
     H = inputs["SYN_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
-    Syn_CCS = inputs["Syn_CCS"]
+    SYN_CCS = inputs["SYN_CCS"]
 
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
