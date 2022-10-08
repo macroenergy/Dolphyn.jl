@@ -32,11 +32,11 @@ function syn_fuels_production(EP::Model, inputs::Dict, setup::Dict)
 	SYN_GEN_NO_COMMIT = inputs["SYN_GEN_NO_COMMIT"]
 
 	if !isempty(SYN_GEN_COMMIT)
-		EP = syn_fuel_production_commit(EP::Model, inputs::Dict, setup::Dict)
+		EP = syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	if !isempty(SYN_GEN_NO_COMMIT)
-		EP = syn_fuel_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
+		EP = syn_fuels_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
 
 	return EP

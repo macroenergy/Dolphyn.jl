@@ -82,7 +82,7 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
     EP[:eObj] += eTotalSynGenCStart
 
-    #Syn Balance expressions
+    # Synthesis fuels balance expressions
     @expression(
         EP,
         eSynGenCommit[t = 1:T, z = 1:Z],
@@ -94,23 +94,22 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
     EP[:eSynBalance] += eSynGenCommit
 
-    #Power Consumption for Syn Generation
+    # Power Consumption for Syn Generation
     if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
         @expression(
             EP,
             ePowerBalanceSynGenCommit[t = 1:T, z = 1:Z],
             sum(
-                EP[:vP2G][k, t] / ModelScalingFactor for k in
+                EP[:vP2F][k, t] / ModelScalingFactor for k in
                 intersect(SYN_GEN_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
             )
         )
-
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of Syn related power consumption
         @expression(
             EP,
             ePowerBalanceSynGenCommit[t = 1:T, z = 1:Z],
             sum(
-                EP[:vP2G][k, t] for k in
+                EP[:vP2F][k, t] for k in
                 intersect(SYN_GEN_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
             )
         )
@@ -118,13 +117,36 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
     EP[:ePowerBalance] += -ePowerBalanceSynGenCommit
 
-
     ##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
     EP[:eSynNetpowerConsumptionByAll] += ePowerBalanceSynGenCommit
 
+    # Hydrogen Consumption for Syn Generation
+    @expression(
+        EP,
+        eH2BalanceSynGenCommit[t = 1:T, z = 1:Z],
+        sum(
+            EP[:vP2H][k, t] for k in
+            intersect(SYN_GEN_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
+        )
+    )
+
+    EP[:eH2Balance] += -eH2BalanceSynGenCommit
+
+    # Carbon Consumption for Syn Generation
+    @expression(
+        EP,
+        eCO2BalanceSynGenCommit[t = 1:T, z = 1:Z],
+        sum(
+            EP[:vP2C][k, t] for k in
+            intersect(SYN_GEN_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
+        )
+    )
+
+    EP[:eCO2Balance] += -eCO2BalanceSynGenCommit
+
     ### Constraints ###
     ## Declaration of integer/binary variables
-    if SynGenCommit == 1 # Integer UC constraints
+    if setup["SynGenCommit"] == 1 # Integer UC constraints
         for k in SYN_GEN_COMMIT
             set_integer.(vSynGenCOMMIT[k, :])
             set_integer.(vSynGenStart[k, :])
@@ -144,7 +166,7 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
         begin
             #Power Balance
             [k in SYN_GEN_COMMIT, t = 1:T],
-            EP[:vP2G][k, t] == EP[:vSynGen][k, t] * dfSynGen[!, :etaP2G_MWh_p_tonne][k]
+            EP[:vP2F][k, t] == EP[:vSynGen][k, t] * dfSynGen[!, :etaP2F_MWh_p_tonne][k]
         end
     )
 

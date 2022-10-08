@@ -290,20 +290,29 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     if setup["ModelSyn"] == 1
 
+        # Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
+		@expression(EP, eSynNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)
+
+        # Infrastractures
         EP = syn_fuels_outputs(EP, inputs, setup)
 
+        # Infrastructures investment
         EP = syn_fuels_investment(EP, inputs, setup)
 
+        # Synthesis fuels non-served
         EP = syn_fuels_non_served(EP, inputs, setup)
 
+        # Synthesis fuels production
         if !isempty(inputs["SYN_GEN"])
             EP = syn_fuels_production(EP, inputs, setup)
         end
 
+        # Synthesis fuels storage
         if !isempty(inputs["SYN_STOR_ALL"])
             EP = syn_fuels_storage(EP, inputs, setup)
         end
 
+        # Synthesis fuels transmission
         if Z > 1
 			if setup["ModelSynPipelines"] == 1
 				# Model carbon transmission via pipelines
