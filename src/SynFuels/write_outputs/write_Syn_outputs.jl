@@ -36,7 +36,7 @@ function write_Syn_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::
     write_syn_capacity(path, setup, inputs, EP)
     write_syn_gen(path, setup, inputs, EP)
     write_syn_nse(path, setup, inputs, EP)
-    write_syn_costs(path, sep, setup, inputs, EP)
+    write_syn_costs(path, setup, inputs, EP)
     write_syn_balance(path, setup, inputs, EP)
     if setup["ModelSynPipelines"] == 1
         write_syn_pipeline_flow(path, setup, inputs, EP)
