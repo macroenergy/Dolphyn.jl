@@ -129,10 +129,10 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
             set_integer.(vSynGenCOMMIT[k, :])
             set_integer.(vSynGenStart[k, :])
             set_integer.(vSynGenShut[k, :])
-            if k in Syn_GEN_RET_CAP
+            if k in SYN_GEN_RET_CAP
                 set_integer(EP[:vSynGenRetCap][k])
             end
-            if k in Syn_GEN_NEW_CAP
+            if k in SYN_GEN_NEW_CAP
                 set_integer(EP[:vSynGenNewCap][k])
             end
         end

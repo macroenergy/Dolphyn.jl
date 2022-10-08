@@ -23,21 +23,20 @@ This module uses the following 'helper' functions in separate files: ```h2_gener
 """
 function syn_fuels_production(EP::Model, inputs::Dict, setup::Dict)
 
-	if !isempty(inputs["SYN_FUELS_RES_ALL"])
+	if !isempty(inputs["SYN_RES_ALL"])
 	# expressions, variables and constraints common to all types of syn fuels
 		EP = syn_fuels_production_all(EP::Model, inputs::Dict, setup::Dict)
 	end
 
-    SYN_FUEL_RES_COMMIT = inputs["SYN_FUEL_RES_COMMIT"]
-	SYN_FUEL_RES_NO_COMMIT = inputs["SYN_FUEL_RES_NO_COMMIT"]
+    SYN_GEN_COMMIT = inputs["SYN_GEN_COMMIT"]
+	SYN_GEN_NO_COMMIT = inputs["SYN_GEN_NO_COMMIT"]
 
-	if !isempty(SYN_FUEL_RES_COMMIT)
-        error("Synthesis Fuel Commit Not Yet Implemented")
-		EP = syn_fuel_res_commit(EP::Model, inputs::Dict, setup::Dict)
+	if !isempty(SYN_GEN_COMMIT)
+		EP = syn_fuel_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	end
 
-	if !isempty(SYN_FUEL_RES_NO_COMMIT)
-		EP = syn_fuel_res_no_commit(EP::Model, inputs::Dict,setup::Dict)
+	if !isempty(SYN_GEN_NO_COMMIT)
+		EP = syn_fuel_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
 
 	return EP

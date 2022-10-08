@@ -27,11 +27,11 @@ function syn_fuels_production_all(EP::Model, inputs::Dict, setup::Dict)
     dfSynGen = inputs["dfSynGen"]
 
     #Define sets
-    Syn_GEN_NO_COMMIT = inputs["Syn_GEN_NO_COMMIT"]
-    Syn_GEN_COMMIT = inputs["Syn_GEN_COMMIT"]
-    Syn_GEN = inputs["Syn_GEN"]
-    Syn_GEN_RET_CAP = inputs["Syn_GEN_RET_CAP"]
-    H = inputs["Syn_RES_ALL"]
+    SYN_GEN_NO_COMMIT = inputs["SYN_GEN_NO_COMMIT"]
+    SYN_GEN_COMMIT = inputs["SYN_GEN_COMMIT"]
+    SYN_GEN = inputs["SYN_GEN"]
+    SYN_GEN_RET_CAP = inputs["SYN_GEN_RET_CAP"]
+    H = inputs["SYN_RES_ALL"]
 
     T = inputs["T"]     # Number of time steps (hours)
 
@@ -39,13 +39,13 @@ function syn_fuels_production_all(EP::Model, inputs::Dict, setup::Dict)
     #Define variables needed across both commit and no commit sets
 
     #Power required by Synthesis fuels generation resource k to make Synthesis fuels (MW)
-    @variable(EP, vP2F[k in Syn_GEN, t = 1:T] >= 0)
+    @variable(EP, vP2F[k in SYN_GEN, t = 1:T] >= 0)
 
     #Hydrogen required by Synthesis fuels generation resource k to make Synthesis fuels (Tonne-H2)
-    @variable(EP, vH2F[k in Syn_GEN, t in 1:T] >= 0)
+    @variable(EP, vH2F[k in SYN_GEN, t in 1:T] >= 0)
 
     #Carbon required by Synthesis fuels generation resource k to make Synthesis fuels (Tonne-CO2)
-    @variable(EP, vC2F[k in Syn_GEN, t in 1:T] >= 0)
+    @variable(EP, vC2F[k in SYN_GEN, t in 1:T] >= 0)
 
     ### Constratints ###
 
@@ -53,12 +53,12 @@ function syn_fuels_production_all(EP::Model, inputs::Dict, setup::Dict)
     # Cannot retire more capacity than existing capacity
     @constraint(
         EP,
-        cSynGenMaxRetNoCommit[k in setdiff(Syn_GEN_RET_CAP, Syn_GEN_NO_COMMIT)],
+        cSynGenMaxRetNoCommit[k in setdiff(SYN_GEN_RET_CAP, SYN_GEN_NO_COMMIT)],
         EP[:vSynGenRetCap][k] <= dfSynGen[!, :Existing_Cap_tonne_p_hr][k]
     )
     @constraint(
         EP,
-        cSynGenMaxRetCommit[k in intersect(Syn_GEN_RET_CAP, Syn_GEN_COMMIT)],
+        cSynGenMaxRetCommit[k in intersect(SYN_GEN_RET_CAP, SYN_GEN_COMMIT)],
         dfSynGen[!, :Cap_Size_tonne_p_hr][k] * EP[:vSynGenRetCap][k] <=
         dfSynGen[!, :Existing_Cap_tonne_p_hr][k]
     )
