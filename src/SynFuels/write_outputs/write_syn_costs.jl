@@ -27,6 +27,7 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 	T = inputs["T"]     # Number of time steps (hours)
 	SYN_GEN_COMMIT = inputs["SYN_GEN_COMMIT"] # H2 production technologies with unit commitment
 
+    cSynStart = 0
 	dfSynCost = DataFrame(Costs = ["cSynTotal", "cSynFix", "cSynVar", "cSynNSE", "cSynStart", "cNetworkExp"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cSynVar = (value(EP[:eTotalCSynGenVarOut])+ (!isempty(inputs["SYN_FLEX"]) ? value(EP[:eTotalCSynVarFlexIn]) : 0) + (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCVarSynStorIn]) : 0))* (ModelScalingFactor^2)
@@ -56,14 +57,13 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 		else
 			cSynNetworkExpCost = value(EP[:eCSynPipe])
 		end
+    else
 		cSynNetworkExpCost=0
 	end
-
 
     cSynTotal = cSynVar + cSynFix + cSynStart + value(EP[:eTotalSynCNSE]) +cSynNetworkExpCost
 
     dfSynCost[!,Symbol("Total")] = [cSynTotal, cSynFix, cSynVar, value(EP[:eTotalSynCNSE]), cSynStart,cSynNetworkExpCost]
-
 
 	for z in 1:Z
 		tempCTotal = 0
@@ -73,7 +73,7 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 		for y in dfSynGen[dfSynGen[!,:Zone].==z,:][!,:R_ID]
 			tempCFix = tempCFix +
 				(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynEnergy])[y] : 0) +
-				(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
+				(y in inputs["SYN_STOR_ASYMMETRIC"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
 				value.(EP[:eSynGenCFix])[y]
 			tempCVar = tempCVar +
 				(y in inputs["SYN_STOR_ALL"] ? sum(value.(EP[:eCVarSynStor_in])[y,:]) : 0) +
@@ -83,7 +83,7 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 				tempCTotal = tempCTotal +
 					value.(EP[:eSynGenCFix])[y] +
 					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynEnergy])[y] : 0) +
-					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
+					(y in inputs["SYN_STOR_ASYMMETRIC"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
 					(y in inputs["SYN_STOR_ALL"] ? sum(value.(EP[:eCVarSynStor_in])[y,:]) : 0) +
 					(y in inputs["SYN_FLEX"] ? sum(value.(EP[:eCSynVarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCSynGenVar_out])[y,:]) +
@@ -94,7 +94,7 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 				tempCTotal = tempCTotal +
 					value.(EP[:eSynGenCFix])[y] +
 					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynEnergy])[y] : 0) +
-					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
+					(y in inputs["SYN_STOR_ASYMMETRIC"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
 					(y in inputs["SYN_STOR_ALL"] ? sum(value.(EP[:eCVarSynStor_in])[y,:]) : 0) +
 					(y in inputs["SYN_FLEX"] ? sum(value.(EP[:eCSynVarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCSynGenVar_out])[y,:])
