@@ -323,6 +323,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 				EP = syn_fuels_truck(EP, inputs, setup)
 			end
 		end
+
+        EP = emissions_syn(EP, inputs, setup)
     end
 	################  Policies #####################3
 

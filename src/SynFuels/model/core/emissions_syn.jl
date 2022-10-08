@@ -75,7 +75,7 @@ function emissions_syn(EP::Model, inputs::Dict, setup::Dict)
     EP[:eCO2PSCCaptureByZone] += eCO2CaptureSynByZone
 
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices
-    if (setup["CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 1)
+    if (setup["SynCO2Cap"] == 4 && setup["SystemCO2Constraint"] == 1)
         # Use CO2 price for HSC supply chain
         # Emissions penalty by zone - needed to report zonal cost breakdown
         @expression(
