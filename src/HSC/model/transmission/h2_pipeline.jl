@@ -1,5 +1,5 @@
 
-## Q. for Guannan - 
+## Q. for Guannan -
 # 2. Issue with H2PipeCap usage and units is it on a per mile basis or cumulative basis?
 
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
@@ -35,7 +35,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     )
 
     ## Objective Function Expressions ##
-    # Capital cost of pipelines 
+    # Capital cost of pipelines
     # DEV NOTE: To add fixed cost of existing + new pipelines
     #  ParameterScale = 1 --> objective function is in million $
     #  ParameterScale = 0 --> objective function is in $
@@ -83,7 +83,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ## Balance Expressions ##
     # H2 Power Consumption balance
 
-    if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
         @expression(
             EP,
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
@@ -110,11 +110,11 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     ## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
     # if setup["ParameterScale"]==1 # Power consumption in GW
-    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
+    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T],
     # 	sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
 
     # else  # Power consumption in MW
-    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
+    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T],
     # 	sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
 
     # end
@@ -126,14 +126,14 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
     @expression(
         EP,
-        ePipeZoneDemand[t = 1:T, z = 1:Z],
+        eH2PipeZoneDemand[t = 1:T, z = 1:Z],
         sum(
-            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
+            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]]
             for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
         )
     )
 
-    EP[:eH2Balance] += ePipeZoneDemand
+    EP[:eH2Balance] += eH2PipeZoneDemand
 
     ## End Balance Expressions ##
     ### End Expressions ###
@@ -149,12 +149,12 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     # Modeling expansion of the pipleline network
     if setup["H2NetworkExpansion"] == 1
-        # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe 
+        # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe
         @constraints(EP, begin
             [p in 1:H2_P], EP[:eH2NPipeNew][p] >= 0
         end)
     else
-        # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe 
+        # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe
         @constraints(EP, begin
             [p in 1:H2_P], EP[:eH2NPipeNew][p] == 0
         end)

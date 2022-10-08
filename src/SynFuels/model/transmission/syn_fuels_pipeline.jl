@@ -145,7 +145,7 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
     @expression(
         EP,
-        ePipeZoneDemand[t = 1:T, z = 1:Z],
+        eSynPipeZoneDemand[t = 1:T, z = 1:Z],
         sum(
             eSynPipeFlow_net[
                 p,
@@ -161,7 +161,7 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     )
 
-    EP[:eSynBalance] += ePipeZoneDemand
+    EP[:eSynBalance] += eSynPipeZoneDemand
 
     ## End Balance Expressions ##
     ### End Expressions ###
