@@ -10,7 +10,7 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     hours_per_subperiod = inputs["hours_per_subperiod"]
 
     SYN_P = inputs["SYN_P"] # Number of Hydrogen Pipelines
-    SYN_Pipe_Map = inputs["SYN_Pipe_Map"]
+    Syn_Pipe_Map = inputs["Syn_Pipe_Map"]
 
     ### Variables ###
     @variable(EP, vSynNPipe[p = 1:SYN_P] >= 0) # Number of Pipes
@@ -92,15 +92,15 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
                 vSynPipeFlow_neg[
                     p,
                     t,
-                    SYN_Pipe_Map[
-                        (SYN_Pipe_Map[!, :Zone].==z).&(SYN_Pipe_Map[!, :pipe_no].==p),
+                    Syn_Pipe_Map[
+                        (Syn_Pipe_Map[!, :Zone].==z).&(Syn_Pipe_Map[!, :pipe_no].==p),
                         :,
                     ][
                         !,
                         :d,
                     ][1],
                 ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for
-                p in SYN_Pipe_Map[SYN_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+                p in Syn_Pipe_Map[Syn_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
             ) / ModelScalingFactor
         )
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
@@ -111,15 +111,15 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
                 vSynPipeFlow_neg[
                     p,
                     t,
-                    SYN_Pipe_Map[
-                        (SYN_Pipe_Map[!, :Zone].==z).&(SYN_Pipe_Map[!, :pipe_no].==p),
+                    Syn_Pipe_Map[
+                        (Syn_Pipe_Map[!, :Zone].==z).&(Syn_Pipe_Map[!, :pipe_no].==p),
                         :,
                     ][
                         !,
                         :d,
                     ][1],
                 ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for
-                p in SYN_Pipe_Map[SYN_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+                p in Syn_Pipe_Map[Syn_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
             )
         )
     end
@@ -150,14 +150,14 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
             eSynPipeFlow_net[
                 p,
                 t,
-                SYN_Pipe_Map[
-                    (SYN_Pipe_Map[!, :Zone].==z).&(SYN_Pipe_Map[!, :pipe_no].==p),
+                Syn_Pipe_Map[
+                    (Syn_Pipe_Map[!, :Zone].==z).&(Syn_Pipe_Map[!, :pipe_no].==p),
                     :,
                 ][
                     !,
                     :d,
                 ][1],
-            ] for p in SYN_Pipe_Map[SYN_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+            ] for p in Syn_Pipe_Map[Syn_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
         )
     )
 

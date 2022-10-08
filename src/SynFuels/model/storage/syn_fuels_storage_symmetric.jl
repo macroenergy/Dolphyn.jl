@@ -15,7 +15,7 @@ function syn_fuels_storage_symmetric(EP::Model, inputs::Dict)
         EP,
         begin
             # Maximum charging rate must be less than symmetric power rating
-            [y in SYN_STOR_SYMMETRIC, t in 1:T], EP[:vSYN_CHARGE_STOR][y,t] <= EP[:eSYNGenTotalCap][y] * inputs["pSyn_Max"][y,t]
+            [y in SYN_STOR_SYMMETRIC, t in 1:T], EP[:vSYN_CHARGE_STOR][y,t] <= EP[:eSynGenTotalCap][y] * inputs["pSyn_Max"][y,t]
         end
     )
 

@@ -41,7 +41,7 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
     # Total available energy capacity in tonnes
     @expression(
         EP,
-        eSYNTotalCapEnergy[y in SYN_STOR_ALL],
+        eSynTotalCapEnergy[y in SYN_STOR_ALL],
         if (y in intersect(NEW_CAP_SYN_ENERGY, RET_CAP_SYN_ENERGY))
             dfSynGen[!, :Existing_Energy_Cap_tonne][y] + EP[:vSYNCAPENERGY][y] -
             EP[:vSYNRETCAPENERGY][y]
@@ -68,11 +68,11 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
             if y in NEW_CAP_SYN_ENERGY # Resources eligible for new capacity
                 1 / ModelScalingFactor^2 * (
                     dfSynGen[!, :Inv_Cost_Energy_p_tonne_yr][y] * vSYNCAPENERGY[y] +
-                    dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSYNTotalCapEnergy[y]
+                    dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSynTotalCapEnergy[y]
                 )
             else
                 1 / ModelScalingFactor^2 *
-                (dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSYNTotalCapEnergy[y])
+                (dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSynTotalCapEnergy[y])
             end
         )
     else
@@ -81,9 +81,9 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
             eCFixSYNEnergy[y in SYN_STOR_ALL],
             if y in NEW_CAP_SYN_ENERGY # Resources eligible for new capacity
                 dfSynGen[!, :Inv_Cost_Energy_p_tonne_yr][y] * vSYNCAPENERGY[y] +
-                dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSYNTotalCapEnergy[y]
+                dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSynTotalCapEnergy[y]
             else
-                dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSYNTotalCapEnergy[y]
+                dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSynTotalCapEnergy[y]
             end
         )
     end
@@ -111,7 +111,7 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
             dfSynGen[dfSynGen.Max_Energy_Cap_tonne.>0, :R_ID],
             SYN_STOR_ALL,
         )],
-        eSYNTotalCapEnergy[y] <= dfSynGen[!, :Max_Energy_Cap_tonne][y]
+        eSynTotalCapEnergy[y] <= dfSynGen[!, :Max_Energy_Cap_tonne][y]
     )
 
     # Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
@@ -122,7 +122,7 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
             dfSynGen[dfSynGen.Min_Energy_Cap_tonne.>0, :R_ID],
             SYN_STOR_ALL,
         )],
-        eSYNTotalCapEnergy[y] >= dfSynGen[!, :Min_Energy_Cap_tonne][y]
+        eSynTotalCapEnergy[y] >= dfSynGen[!, :Min_Energy_Cap_tonne][y]
     )
 
     return EP
