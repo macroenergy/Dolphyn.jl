@@ -27,42 +27,42 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 	T = inputs["T"]     # Number of time steps (hours)
 	SYN_GEN_COMMIT = inputs["SYN_GEN_COMMIT"] # H2 production technologies with unit commitment
 
-	dfSynCost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
+	dfSynCost = DataFrame(Costs = ["cSynTotal", "cSynFix", "cSynVar", "cSynNSE", "cSynStart", "cNetworkExp"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar)* (ModelScalingFactor^2)
-		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0) + cG2PFix )*ModelScalingFactor^2
+		cSynVar = (value(EP[:eTotalCSynGenVarOut])+ (!isempty(inputs["SYN_FLEX"]) ? value(EP[:eTotalCSynVarFlexIn]) : 0) + (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCVarSynStorIn]) : 0))* (ModelScalingFactor^2)
+		cSynFix = (value(EP[:eTotalSynGenCFix])+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCFixSynEnergy]) +value(EP[:eTotalCFixSynCharge]) : 0))*ModelScalingFactor^2
 	else
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar)
-		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0) + cG2PFix)
+		cSynVar = (value(EP[:eTotalCSynGenVarOut])+ (!isempty(inputs["SYN_FLEX"]) ? value(EP[:eTotalCSynVarFlexIn]) : 0)+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCVarSynStorIn]) : 0))
+		cSynFix = (value(EP[:eTotalSynGenCFix])+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCFixSynEnergy]) +value(EP[:eTotalCFixSynCharge]) : 0))
 	end
 
 	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
 	# Emissions penalty is already scaled by adjusting the value of carbon price used in emissions_HSC.jl
-	if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
-		cH2Var  = cH2Var + value(EP[:eCH2GenTotalEmissionsPenalty])
+	if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["SynCO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
+		cSynVar  = cSynVar + value(EP[:eCSynGenTotalEmissionsPenalty])
 	end
 
 	if !isempty(inputs["SYN_GEN_COMMIT"])
 		if setup["ParameterScale"]==1 # Convert costs in millions to $
-			cH2Start += value(EP[:eTotalH2GenCStart])*ModelScalingFactor^2
+			cSynStart += value(EP[:eTotalSynGenCStart])*ModelScalingFactor^2
 		else
-	    	cH2Start += value(EP[:eTotalH2GenCStart])
+	    	cSynStart += value(EP[:eTotalSynGenCStart])
 		end
 	end
 
 	if Z >1
 		if setup["ParameterScale"]==1 # Convert costs in millions to $
-			cH2NetworkExpCost = value(EP[:eCH2Pipe])*ModelScalingFactor^2
+			cSynNetworkExpCost = value(EP[:eCSynPipe])*ModelScalingFactor^2
 		else
-			cH2NetworkExpCost = value(EP[:eCH2Pipe])
+			cSynNetworkExpCost = value(EP[:eCSynPipe])
 		end
-		cH2NetworkExpCost=0
+		cSynNetworkExpCost=0
 	end
 
 
-    cH2Total = cH2Var + cH2Fix + cH2Start + value(EP[:eTotalH2CNSE]) +cH2NetworkExpCost
+    cSynTotal = cSynVar + cSynFix + cSynStart + value(EP[:eTotalSynCNSE]) +cSynNetworkExpCost
 
-    dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix, cH2Var, value(EP[:eTotalH2CNSE]), cH2Start,cH2NetworkExpCost]
+    dfSynCost[!,Symbol("Total")] = [cSynTotal, cSynFix, cSynVar, value(EP[:eTotalSynCNSE]), cSynStart,cSynNetworkExpCost]
 
 
 	for z in 1:Z
@@ -72,50 +72,33 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 		tempCStart = 0
 		for y in dfSynGen[dfSynGen[!,:Zone].==z,:][!,:R_ID]
 			tempCFix = tempCFix +
-				(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
-				(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
-				value.(EP[:eH2GenCFix])[y]
+				(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynEnergy])[y] : 0) +
+				(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
+				value.(EP[:eSynGenCFix])[y]
 			tempCVar = tempCVar +
-				(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
-				(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
-				sum(value.(EP[:eCH2GenVar_out])[y,:])
+				(y in inputs["SYN_STOR_ALL"] ? sum(value.(EP[:eCVarSynStor_in])[y,:]) : 0) +
+				(y in inputs["SYN_FLEX"] ? sum(value.(EP[:eCSynVarFlex_in])[y,:]) : 0) +
+				sum(value.(EP[:eCSynGenVar_out])[y,:])
 			if !isempty(SYN_GEN_COMMIT)
 				tempCTotal = tempCTotal +
-					value.(EP[:eH2GenCFix])[y] +
-					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
-					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
-					(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
-					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
-					sum(value.(EP[:eCH2GenVar_out])[y,:]) +
-					(y in inputs["SYN_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
+					value.(EP[:eSynGenCFix])[y] +
+					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynEnergy])[y] : 0) +
+					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
+					(y in inputs["SYN_STOR_ALL"] ? sum(value.(EP[:eCVarSynStor_in])[y,:]) : 0) +
+					(y in inputs["SYN_FLEX"] ? sum(value.(EP[:eCSynVarFlex_in])[y,:]) : 0) +
+					sum(value.(EP[:eCSynGenVar_out])[y,:]) +
+					(y in inputs["SYN_GEN_COMMIT"] ? sum(value.(EP[:eSynGenCStart])[y,:]) : 0)
 				tempCStart = tempCStart +
-					(y in inputs["SYN_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
+					(y in inputs["SYN_GEN_COMMIT"] ? sum(value.(EP[:eSynGenCStart])[y,:]) : 0)
 			else
 				tempCTotal = tempCTotal +
-					value.(EP[:eH2GenCFix])[y] +
-					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
-					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
-					(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
-					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
-					sum(value.(EP[:eCH2GenVar_out])[y,:])
+					value.(EP[:eSynGenCFix])[y] +
+					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynEnergy])[y] : 0) +
+					(y in inputs["SYN_STOR_ALL"] ? value.(EP[:eCFixSynCharge])[y] : 0) +
+					(y in inputs["SYN_STOR_ALL"] ? sum(value.(EP[:eCVarSynStor_in])[y,:]) : 0) +
+					(y in inputs["SYN_FLEX"] ? sum(value.(EP[:eCSynVarFlex_in])[y,:]) : 0) +
+					sum(value.(EP[:eCSynGenVar_out])[y,:])
 			end
-
-			if setup["ModelH2G2P"] == 1
-				for  y in dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]
-
-					tempCFix += value.(EP[:eTotalH2G2PCFix])
-					tempCVar += value.(EP[:eTotalCH2G2PVarOut])
-					tempCTotal += value.(EP[:eTotalH2G2PCFix]) + value.(EP[:eTotalCH2G2PVarOut])
-
-					if !isempty(inputs["H2_G2P_COMMIT"])
-						if y in inputs["H2_G2P_COMMIT"]
-							tempCStart += value.(EP[:eTotalH2G2PCStart])
-							tempCTotal += value.(EP[:eTotalH2G2PCStart])
-						end
-					end
-				end
-			end
-
 		end
 
 
@@ -128,18 +111,20 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 
 		# Add emisions penalty related costs if the constraints are active
 		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
-		if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
-			tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
-			tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
+		if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["SynCO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
+			tempCVar  = tempCVar + value.(EP[:eCSynEmissionsPenaltybyZone])[z]
+			tempCTotal = tempCTotal +value.(EP[:eCSynEmissionsPenaltybyZone])[z]
 		end
 
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
-			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])* (ModelScalingFactor^2)
+			tempCNSE = sum(value.(EP[:eSynCNSE])[:,:,z])* (ModelScalingFactor^2)
 		else
-			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])
+			tempCNSE = sum(value.(EP[:eSynCNSE])[:,:,z])
 		end
 
-		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart,"-"]
+		dfSynCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart,"-"]
 	end
-	CSV.write(string(path,sep,"HSC_costs.csv"), dfH2Cost)
+
+	CSV.write(joinpath(path,"Syn_fuels_costs.csv"), dfSynCost)
+
 end
