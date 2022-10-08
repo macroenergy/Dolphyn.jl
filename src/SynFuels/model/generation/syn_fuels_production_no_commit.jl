@@ -26,6 +26,10 @@ function syn_fuels_production_no_commit(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
 
+    #Define start subperiods and interior subperiods
+    START_SUBPERIODS = inputs["START_SUBPERIODS"]
+    INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
+    hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
     SYN_GEN_NO_COMMIT = inputs["SYN_GEN_NO_COMMIT"]
 
     ###Expressions###
@@ -121,20 +125,20 @@ function syn_fuels_production_no_commit(EP::Model, inputs::Dict, setup::Dict)
             dfSynGen[!, :Ramp_Up_Percentage][k] * EP[:eSynGenTotalCap][k]
 
             # Interior Hours
-            [k in SYN_GEN_NO_COMMIIT, t in INTERIOR_SUBPERIODS],
+            [k in SYN_GEN_NO_COMMIT, t in INTERIOR_SUBPERIODS],
             EP[:vSynGen][k, t] - EP[:vSynGen][k, t-1] <=
-            dfH2Gen[!, :Ramp_Up_Percentage][k] * EP[:eSynGenTotalCap][k]
+            dfSynGen[!, :Ramp_Up_Percentage][k] * EP[:eSynGenTotalCap][k]
 
             ## Maximum ramp down between consecutive hours
             # Start Hours: Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
-            [k in SYN_GEN_NO_COMMIIT, t in START_SUBPERIODS],
+            [k in SYN_GEN_NO_COMMIT, t in START_SUBPERIODS],
             EP[:vSynGen][k, (t+hours_per_subperiod-1)] - EP[:vSynGen][k, t] <=
-            dfH2Gen[!, :Ramp_Down_Percentage][k] * EP[:eSynGenTotalCap][k]
+            dfSynGen[!, :Ramp_Down_Percentage][k] * EP[:eSynGenTotalCap][k]
 
             # Interior Hours
-            [k in SYN_GEN_NO_COMMIIT, t in INTERIOR_SUBPERIODS],
+            [k in SYN_GEN_NO_COMMIT, t in INTERIOR_SUBPERIODS],
             EP[:vSynGen][k, t-1] - EP[:vSynGen][k, t] <=
-            dfH2Gen[!, :Ramp_Down_Percentage][k] * EP[:eSynGenTotalCap][k]
+            dfSynGen[!, :Ramp_Down_Percentage][k] * EP[:eSynGenTotalCap][k]
 
         end
     )

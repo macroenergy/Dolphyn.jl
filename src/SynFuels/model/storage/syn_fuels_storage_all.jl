@@ -21,7 +21,6 @@ This module defines the basic decision variables and common expressions related 
 capability.
 
 """
-
 function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources
     println("Synthesis Fuels Storage Core Resources Module")

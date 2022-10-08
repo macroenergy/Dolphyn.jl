@@ -243,6 +243,7 @@ include("SynFuels/model/generation/syn_fuels_production_all.jl")
 
 # Synthesis fuels storage
 include("SynFuels/model/storage/syn_fuels_storage.jl")
+include("SynFuels/model/storage/syn_fuels_storage_all.jl")
 include("SynFuels/model/storage/syn_fuels_storage_investment_charge.jl")
 include("SynFuels/model/storage/syn_fuels_storage_investment_energy.jl")
 include("SynFuels/model/storage/syn_fuels_storage_symmetric.jl")
