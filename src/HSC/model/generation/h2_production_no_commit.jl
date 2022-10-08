@@ -24,16 +24,16 @@ The h2_generation module creates decision variables, expressions, and constraint
 function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	println("H2 Production (No Unit Commitment) Module")
-	
+
 	#Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H2_GEN"]		#NUmber of hydrogen generation units 
-	
+	H = inputs["H2_GEN"]		#NUmber of hydrogen generation units
+
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
-	
+
 	#Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
@@ -47,23 +47,20 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	EP[:eH2Balance] += eH2GenNoCommit
 
-	#Power Consumption for H2 Generation
-	#Power Consumption for H2 Generation
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+	# Power Consumption for H2 Generation
+	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
 		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
 		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
 
-
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	## For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
 	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
-
 
 	###Constraints###
 	# Power and natural gas consumption associated with H2 generation in each time step
@@ -71,13 +68,13 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 		#Power Balance
 		[k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
 	end)
-	
+
 	@constraints(EP, begin
 	# Maximum power generated per technology "k" at hour "t"
 	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k]* inputs["pH2_Max"][k,t]
 	end)
 
-	#Ramping cosntraints 
+	#Ramping cosntraints
 	@constraints(EP, begin
 
 		## Maximum ramp up between consecutive hours
@@ -94,7 +91,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 		# Interior Hours
 		[k in H2_GEN_NO_COMMIT, t in INTERIOR_SUBPERIODS], EP[:vH2Gen][k,t-1] - EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k] * EP[:eH2GenTotalCap][k]
-	
+
 	end)
 
 	return EP
