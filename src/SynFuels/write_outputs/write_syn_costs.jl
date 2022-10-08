@@ -30,10 +30,10 @@ function write_syn_costs(path::AbstractString, setup::Dict, inputs::Dict, EP::Mo
 	dfSynCost = DataFrame(Costs = ["cSynTotal", "cSynFix", "cSynVar", "cSynNSE", "cSynStart", "cNetworkExp"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cSynVar = (value(EP[:eTotalCSynGenVarOut])+ (!isempty(inputs["SYN_FLEX"]) ? value(EP[:eTotalCSynVarFlexIn]) : 0) + (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCVarSynStorIn]) : 0))* (ModelScalingFactor^2)
-		cSynFix = (value(EP[:eTotalSynGenCFix])+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCFixSynEnergy]) +value(EP[:eTotalCFixSynCharge]) : 0))*ModelScalingFactor^2
+		cSynFix = (value(EP[:eTotalSynGenCFix])+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCFixSynEnergy]) + (!isempty(inputs["SYN_STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixSynCharge]) : 0) : 0))*ModelScalingFactor^2
 	else
 		cSynVar = (value(EP[:eTotalCSynGenVarOut])+ (!isempty(inputs["SYN_FLEX"]) ? value(EP[:eTotalCSynVarFlexIn]) : 0)+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCVarSynStorIn]) : 0))
-		cSynFix = (value(EP[:eTotalSynGenCFix])+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCFixSynEnergy]) +value(EP[:eTotalCFixSynCharge]) : 0))
+		cSynFix = (value(EP[:eTotalSynGenCFix])+ (!isempty(inputs["SYN_STOR_ALL"]) ? value(EP[:eTotalCFixSynEnergy]) + (!isempty(inputs["SYN_STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixSynCharge]) : 0) : 0))
 	end
 
 	# Adding emissions penalty to variable cost depending on type of emissions policy constraint

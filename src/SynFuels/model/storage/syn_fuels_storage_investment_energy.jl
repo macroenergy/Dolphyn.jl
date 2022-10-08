@@ -20,7 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 This module defines the  decision variable representing energy components of hydrogen storage technologies
 
 """
-
 function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
     println("Synthesis Fuels Storage Energy Investment Module")
@@ -64,7 +63,7 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
     if setup["ParameterScale"] == 1
         @expression(
             EP,
-            eCFixSYNEnergy[y in SYN_STOR_ALL],
+            eCFixSynEnergy[y in SYN_STOR_ALL],
             if y in NEW_CAP_SYN_ENERGY # Resources eligible for new capacity
                 1 / ModelScalingFactor^2 * (
                     dfSynGen[!, :Inv_Cost_Energy_p_tonne_yr][y] * vSYNCAPENERGY[y] +
@@ -78,7 +77,7 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
     else
         @expression(
             EP,
-            eCFixSYNEnergy[y in SYN_STOR_ALL],
+            eCFixSynEnergy[y in SYN_STOR_ALL],
             if y in NEW_CAP_SYN_ENERGY # Resources eligible for new capacity
                 dfSynGen[!, :Inv_Cost_Energy_p_tonne_yr][y] * vSYNCAPENERGY[y] +
                 dfSynGen[!, :Fixed_OM_Cost_Energy_p_tonne_yr][y] * eSynTotalCapEnergy[y]
@@ -89,7 +88,7 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
     end
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixSYNEnergy, sum(EP[:eCFixSYNEnergy][y] for y in SYN_STOR_ALL))
+    @expression(EP, eTotalCFixSYNEnergy, sum(EP[:eCFixSynEnergy][y] for y in SYN_STOR_ALL))
 
     # Add term to objective function expression
     EP[:eObj] += eTotalCFixSYNEnergy
