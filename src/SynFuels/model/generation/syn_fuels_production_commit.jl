@@ -125,7 +125,7 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eH2BalanceSynGenCommit[t = 1:T, z = 1:Z],
         sum(
-            EP[:vP2H][k, t] for k in
+            EP[:vH2F][k, t] for k in
             intersect(SYN_GEN_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
         )
     )
@@ -137,7 +137,7 @@ function syn_fuels_production_commit(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eCO2BalanceSynGenCommit[t = 1:T, z = 1:Z],
         sum(
-            EP[:vP2C][k, t] for k in
+            EP[:vC2F][k, t] for k in
             intersect(SYN_GEN_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
         )
     )

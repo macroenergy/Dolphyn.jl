@@ -35,7 +35,7 @@ function syn_fuels_production_no_commit(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eSynGenNoCommit[t = 1:T, z = 1:Z],
         sum(
-            EP[:vSFProd][k, t] for
+            EP[:vSynGen][k, t] for
             k in intersect(SYN_GEN_NO_COMMIT, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
         )
     )#intersect(SYN_GEN_NO_COMMIT, dfSynGen[dfSynGen[!,:Zone].==z,:][!,:R_ID])))
