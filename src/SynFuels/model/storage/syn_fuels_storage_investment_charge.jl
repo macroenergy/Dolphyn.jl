@@ -88,7 +88,7 @@ function syn_fuels_storage_investment_charge(EP::Model, inputs::Dict, setup::Dic
     else
         @expression(
             EP,
-            eCFixSYNCharge[y in SYN_STOR_ALL],
+            eCFixSynCharge[y in SYN_STOR_ALL],
             if y in NEW_CAP_SYN_CHARGE # Resources eligible for new charge capacity
                 dfSynGen[!, :Inv_Cost_Charge_p_tonne_p_hr_yr][y] * vSYNCAPCHARGE[y] +
                 dfSynGen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] *
@@ -101,10 +101,10 @@ function syn_fuels_storage_investment_charge(EP::Model, inputs::Dict, setup::Dic
     end
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixSYNCharge, sum(EP[:eCFixSYNCharge][y] for y in SYN_STOR_ALL))
+    @expression(EP, eTotalCFixSynCharge, sum(EP[:eCFixSynCharge][y] for y in SYN_STOR_ALL))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixSYNCharge
+    EP[:eObj] += eTotalCFixSynCharge
 
     ### Constratints ###
 

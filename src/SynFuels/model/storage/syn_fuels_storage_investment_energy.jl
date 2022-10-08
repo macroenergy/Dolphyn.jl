@@ -88,10 +88,10 @@ function syn_fuels_storage_investment_energy(EP::Model, inputs::Dict, setup::Dic
     end
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixSYNEnergy, sum(EP[:eCFixSynEnergy][y] for y in SYN_STOR_ALL))
+    @expression(EP, eTotalCFixSynEnergy, sum(EP[:eCFixSynEnergy][y] for y in SYN_STOR_ALL))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixSYNEnergy
+    EP[:eObj] += eTotalCFixSynEnergy
 
     ### Constratints ###
     # Cannot retire more energy capacity than existing energy capacity
