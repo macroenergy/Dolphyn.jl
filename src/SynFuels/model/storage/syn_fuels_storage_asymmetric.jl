@@ -17,7 +17,7 @@ function syn_fuels_storage_asymmetric(EP::Model, inputs::Dict)
     @constraint(
         EP,
         [y in SYN_STOR_ASYMMETRIC, t in 1:T],
-        EP[:vSYN_CHARGE_STOR][y, t] <= EP[:eTotalSYNCapCharge][y]
+        EP[:vSyn_CHARGE_STOR][y, t] <= EP[:eTotalSYNCapCharge][y]
     )
 
     return EP

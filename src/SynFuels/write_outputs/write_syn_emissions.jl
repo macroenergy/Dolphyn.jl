@@ -21,17 +21,14 @@ Function for reporting time-dependent CO$_2$ emissions by zone.
 """
 function write_syn_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-	dfH2Gen = inputs["dfH2Gen"]
-
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps (hours)
+    T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
-	if ((setup["H2CO2Cap"]==1||setup["H2CO2Cap"]==2||setup["H2CO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
+	if ((setup["SynCO2Cap"]==1||setup["SynCO2Cap"]==2||setup["SynCO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
 		# Dual variable of CO2 constraint = shadow price of CO2
-		tempCO2Price = zeros(Z,inputs["H2NCO2Cap"])
+		tempCO2Price = zeros(Z,inputs["SynNCO2Cap"])
 		if has_duals(EP) == 1
-			for cap in 1:inputs["H2NCO2Cap"]
+			for cap in 1:inputs["SynNCO2Cap"]
 				for z in findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap])
 					tempCO2Price[z,cap] = dual.(EP[:cH2CO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
@@ -42,7 +39,7 @@ function write_syn_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 			end
 		end
 		dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(tempCO2Price, :auto), DataFrame(AnnualSum = Array{Union{Missing,Float64}}(undef, Z)))
-		auxNew_Names=[Symbol("Zone"); [Symbol("CO2_Price_$cap") for cap in 1:inputs["H2NCO2Cap"]]; Symbol("AnnualSum")]
+		auxNew_Names=[Symbol("Zone"); [Symbol("CO2_Price_$cap") for cap in 1:inputs["SynNCO2Cap"]]; Symbol("AnnualSum")]
 		rename!(dfEmissions,auxNew_Names)
 	else
 		dfEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
@@ -62,15 +59,15 @@ function write_syn_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])/ModelScalingFactor, :auto))
 	end
 
-	if ((setup["H2CO2Cap"]==1||setup["H2CO2Cap"]==2||setup["H2CO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
-		auxNew_Names=[Symbol("Zone");[Symbol("CO2_Price_$cap") for cap in 1:inputs["H2NCO2Cap"]];Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
+	if ((setup["SynCO2Cap"]==1||setup["SynCO2Cap"]==2||setup["SynCO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
+		auxNew_Names=[Symbol("Zone");[Symbol("CO2_Price_$cap") for cap in 1:inputs["SynNCO2Cap"]];Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 		rename!(dfEmissions,auxNew_Names)
-		total = DataFrame(["Total" zeros(1,inputs["H2NCO2Cap"]) sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+		total = DataFrame(["Total" zeros(1,inputs["SynNCO2Cap"]) sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 		for t in 1:T
 			if v"1.3" <= VERSION < v"1.4"
-				total[!,t+inputs["H2NCO2Cap"]+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
+				total[!,t+inputs["SynNCO2Cap"]+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
 			elseif v"1.4" <= VERSION < v"1.8"
-				total[:,t+inputs["H2NCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
+				total[:,t+inputs["SynNCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 			end
 		end
 		rename!(total,auxNew_Names)
@@ -90,5 +87,5 @@ function write_syn_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP
 		dfEmissions = vcat(dfEmissions, total)
 	end
 
-	CSV.write(joinpath(path, "HSC_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+	CSV.write(joinpath(path, "Syn_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
 end

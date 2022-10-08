@@ -21,20 +21,20 @@ Function for writing the capacities of different H2 storage technologies, includ
 """
 function write_syn_storage(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-	dfH2Gen = inputs["dfH2Gen"]
+	dfSynGen = inputs["dfSynGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
-	H = inputs["H2_RES_ALL"]  # Set of H2 storage resources
+	H = inputs["SYN_RES_ALL"]  # Set of H2 storage resources
 
 	# Storage level (state of charge) of each resource in each time step
-	dfH2Storage = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone])
+	dfSynStorage = DataFrame(Resource = inputs["SYN_RESOURCES_NAME"], Zone = dfSynGen[!,:Zone])
 	s = zeros(H,T)
 	storagevcapvalue = zeros(H,T)
 	for i in 1:H
-		if i in inputs["H2_STOR_ALL"]
-			s[i,:] = value.(EP[:vH2S])[i,:]
-		elseif i in inputs["H2_FLEX"]
-			s[i,:] = value.(EP[:vS_H2_FLEX])[i,:]
+		if i in inputs["SYN_STOR_ALL"]
+			s[i,:] = value.(EP[:vSynS])[i,:]
+		elseif i in inputs["SYN_FLEX"]
+			s[i,:] = value.(EP[:vS_Syn_FLEX])[i,:]
 		end
 	end
 
@@ -43,9 +43,9 @@ function write_syn_storage(path::AbstractString, setup::Dict, inputs::Dict, EP::
 		storagevcapvalue[y,:] = s[y,:]
 	end
 
-	dfH2Storage = hcat(dfH2Storage, DataFrame(storagevcapvalue, :auto))
+	dfSynStorage = hcat(dfSynStorage, DataFrame(storagevcapvalue, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
-	rename!(dfH2Storage,auxNew_Names)
+	rename!(dfSynStorage,auxNew_Names)
 
-	CSV.write(joinpath(path, "h2_storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
+	CSV.write(joinpath(path, "Syn_storage.csv"), dftranspose(dfSynStorage, false), writeheader=false)
 end

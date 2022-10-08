@@ -41,7 +41,7 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vSynS[y in SYN_STOR_ALL, t = 1:T] >= 0)
 
     # Rate of energy withdrawn from HSC by resource "y" at hour "t" [tonne/hour] on zone "z"
-    @variable(EP, vSYN_CHARGE_STOR[y in SYN_STOR_ALL, t = 1:T] >= 0)
+    @variable(EP, vSyn_CHARGE_STOR[y in SYN_STOR_ALL, t = 1:T] >= 0)
 
     # Energy losses related to storage technologies (increase in effective demand)
     #@expression(EP, eEH2LOSS[y in SYN_STOR_ALL], sum(inputs["omega"][t]*EP[:vH2_CHARGE_STOR][y,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vH2Gen][y,t] for t in 1:T))
@@ -56,14 +56,14 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
             if (dfSynGen[!, :SynStor_Charge_MMBtu_p_tonne][y] > 0) # Charging consumes fuel - fuel divided by 1000 since fuel cost already scaled in load_fuels_data.jl when ParameterScale =1
                 inputs["omega"][t] *
                 dfSynGen[!, :Var_OM_Cost_Charge_p_tonne][y] *
-                vSYN_CHARGE_STOR[y, t] / ModelScalingFactor^2 +
+                vSyn_CHARGE_STOR[y, t] / ModelScalingFactor^2 +
                 inputs["fuel_costs"][dfSynGen[!, :Fuel][k]][t] *
                 dfSynGen[!, :SynStor_Charge_MMBtu_p_tonne][k] *
-                vSYN_CHARGE_STOR[y, t] / ModelScalingFactor
+                vSyn_CHARGE_STOR[y, t] / ModelScalingFactor
             else
                 inputs["omega"][t] *
                 dfSynGen[!, :Var_OM_Cost_Charge_p_tonne][y] *
-                vSYN_CHARGE_STOR[y, t] / ModelScalingFactor^2
+                vSyn_CHARGE_STOR[y, t] / ModelScalingFactor^2
             end
         )
     else
@@ -73,13 +73,13 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
             if (dfSynGen[!, :SynStor_Charge_MMBtu_p_tonne][y] > 0) # Charging consumes fuel
                 inputs["omega"][t] *
                 dfSynGen[!, :Var_OM_Cost_Charge_p_tonne][y] *
-                vSYN_CHARGE_STOR[y, t] +
+                vSyn_CHARGE_STOR[y, t] +
                 inputs["fuel_costs"][dfSynGen[!, :Fuel][k]][t] *
                 dfSynGen[!, :SynStor_Charge_MMBtu_p_tonne][k]
             else
                 inputs["omega"][t] *
                 dfSynGen[!, :Var_OM_Cost_Charge_p_tonne][y] *
-                vSYN_CHARGE_STOR[y, t]
+                vSyn_CHARGE_STOR[y, t]
             end
         )
     end
@@ -100,14 +100,14 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
         ePowerBalanceSynStor[t = 1:T, z = 1:Z],
         if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
             sum(
-                EP[:vSYN_CHARGE_STOR][y, t] * dfSynGen[!, :SynStor_Charge_MWh_p_tonne][y] /
+                EP[:vSyn_CHARGE_STOR][y, t] * dfSynGen[!, :SynStor_Charge_MWh_p_tonne][y] /
                 ModelScalingFactor for
                 y in intersect(dfSynGen[dfSynGen.Zone.==z, :R_ID], SYN_STOR_ALL);
                 init = 0.0,
             )
         else
             sum(
-                EP[:vSYN_CHARGE_STOR][y, t] * dfSynGen[!, :SynStor_Charge_MWh_p_tonne][y]
+                EP[:vSyn_CHARGE_STOR][y, t] * dfSynGen[!, :SynStor_Charge_MWh_p_tonne][y]
                 for y in intersect(dfSynGen[dfSynGen.Zone.==z, :R_ID], SYN_STOR_ALL);
                 init = 0.0,
             )
@@ -124,7 +124,7 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eSynBalanceStor[t = 1:T, z = 1:Z],
         sum(
-            EP[:vSynGen][y, t] - EP[:vSYN_CHARGE_STOR][y, t] for
+            EP[:vSynGen][y, t] - EP[:vSyn_CHARGE_STOR][y, t] for
             y in intersect(SYN_STOR_ALL, dfSynGen[dfSynGen[!, :Zone].==z, :][!, :R_ID])
         )
     )
@@ -146,7 +146,7 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
             EP[:vSynS][y, t] ==
             EP[:vSynS][y, t+hours_per_subperiod-1] -
             (1 / dfSynGen[!, :SynStor_eff_discharge][y] * EP[:vSynGen][y, t]) +
-            (dfSynGen[!, :SynStor_eff_charge][y] * EP[:vSYN_CHARGE_STOR][y, t]) - (
+            (dfSynGen[!, :SynStor_eff_charge][y] * EP[:vSyn_CHARGE_STOR][y, t]) - (
                 dfSynGen[!, :SynStor_self_discharge_rate_p_hour][y] *
                 EP[:vSynS][y, t+hours_per_subperiod-1]
             )
@@ -158,7 +158,7 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
             EP[:vSynS][y, t] ==
             EP[:vSynS][y, t+hours_per_subperiod-1] -
             (1 / dfSynGen[!, :SynStor_eff_discharge][y] * EP[:vSynGen][y, t]) +
-            (dfSynGen[!, :SynStor_eff_charge][y] * EP[:vSYN_CHARGE_STOR][y, t]) - (
+            (dfSynGen[!, :SynStor_eff_charge][y] * EP[:vSyn_CHARGE_STOR][y, t]) - (
                 dfSynGen[!, :SynStor_self_discharge_rate_p_hour][y] *
                 EP[:vSynS][y, t+hours_per_subperiod-1]
             )
@@ -181,7 +181,7 @@ function syn_fuels_storage_all(EP::Model, inputs::Dict, setup::Dict)
             EP[:vSynS][y, t] ==
             EP[:vSynS][y, t-1] -
             (1 / dfSynGen[!, :SynStor_eff_discharge][y] * EP[:vSynGen][y, t]) +
-            (dfSynGen[!, :SynStor_eff_charge][y] * EP[:vSYN_CHARGE_STOR][y, t]) -
+            (dfSynGen[!, :SynStor_eff_charge][y] * EP[:vSyn_CHARGE_STOR][y, t]) -
             (dfSynGen[!, :SynStor_self_discharge_rate_p_hour][y] * EP[:vSynS][y, t-1])
         end
     )

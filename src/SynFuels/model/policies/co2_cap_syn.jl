@@ -50,7 +50,7 @@ function co2_cap_syn(EP::Model, inputs::Dict, setup::Dict)
             ) <= sum(
                 inputs["dfSynMaxCO2Rate"][z, cap] * sum(
                     inputs["omega"][t] * (
-                        inputs["SynFuel_D"][t, z] -
+                        inputs["Syn_D"][t, z] -
                         sum(EP[:vSynNSE][s, t, z] for s = 1:SYN_SEG)
                     ) for t = 1:T
                 ) for z in findall(x -> x == 1, inputs["dfSynCO2CapZones"][:, cap])

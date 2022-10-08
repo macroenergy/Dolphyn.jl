@@ -21,21 +21,20 @@ Function for reporting non-served energy for every model zone, time step and cos
 """
 function write_syn_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-	dfGen = inputs["dfGen"]
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-    H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
+    SYN_SEG = inputs["SYN_SEG"] # Number of load curtailment segments
 	# Non-served energy/demand curtailment by segment in each time step
 	dfNse = DataFrame()
 	dfTemp = Dict()
 	for z in 1:Z
-		dfTemp = DataFrame(Segment=zeros(H2_SEG), Zone=zeros(H2_SEG), AnnualSum = Array{Union{Missing,Float32}}(undef, H2_SEG))
-		dfTemp[!,:Segment] = (1:H2_SEG)
-		dfTemp[!,:Zone] = fill(z,(H2_SEG))
-			for i in 1:H2_SEG
-				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2NSE])[i,:,z]))
+		dfTemp = DataFrame(Segment=zeros(SYN_SEG), Zone=zeros(SYN_SEG), AnnualSum = Array{Union{Missing,Float32}}(undef, SYN_SEG))
+		dfTemp[!,:Segment] = (1:SYN_SEG)
+		dfTemp[!,:Zone] = fill(z,(SYN_SEG))
+			for i in 1:SYN_SEG
+				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vSynNSE])[i,:,z]))
 			end
-			dfTemp = hcat(dfTemp, DataFrame(value.(EP[:vH2NSE])[:,:,z], :auto))
+			dfTemp = hcat(dfTemp, DataFrame(value.(EP[:vSynNSE])[:,:,z], :auto))
 		if z == 1
 			dfNse = dfTemp
 		else
@@ -56,7 +55,7 @@ function write_syn_nse(path::AbstractString, setup::Dict, inputs::Dict, EP::Mode
 	rename!(total,auxNew_Names)
 	dfNse = vcat(dfNse, total)
 
-	CSV.write(joinpath(path, "HSC_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
+	CSV.write(joinpath(path, "Syn_nse.csv"),  dftranspose(dfNse, false), writeheader=false)
 
 	return dfTemp
 end

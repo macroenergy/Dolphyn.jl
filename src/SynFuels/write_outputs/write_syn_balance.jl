@@ -40,21 +40,21 @@ function write_syn_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfSynGen[(dfSynGen[!,:SYN_GEN_TYPE].>0) .&  (dfSynGen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vSynGen][dfSynGen[(dfSynGen[!,:SYN_GEN_TYPE].>0) .&  (dfSynGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
 			dfTemp1[t+rowoffset,4] = 0
             dfTemp1[t+rowoffset,5] = 0
 	     	if !isempty(intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_FLEX))
-	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_FLEX))
-                dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfSynGen[(dfSynGen[!,:SYN_FLEX].>=1) .&  (dfSynGen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vSYN_CHARGE_FLEX][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_FLEX))
+                dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vSynGen][dfSynGen[(dfSynGen[!,:SYN_FLEX].>=1) .&  (dfSynGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	end
 			 if !isempty(intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
-				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
-			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
+				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vSynGen][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
+			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vSyn_CHARGE_STOR][y,t]) for y in intersect(dfSynGen[dfSynGen.Zone.==z,:R_ID],SYN_STOR_ALL))
 			end
 
-	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
+	     	dfTemp1[t+rowoffset,6] = value(EP[:vSynNSE][1,t,z])
 
 			if setup["ModelH2Pipelines"] == 1
 			 	dfTemp1[t+rowoffset,7] = value.(EP[:eSynPipeZoneDemand][t,z])
@@ -64,18 +64,12 @@ function write_syn_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::
 
 
 			if setup["ModelH2Trucks"] == 1
-				dfTemp1[t+rowoffset,8] = value.(EP[:eH2TruckFlow][t,z])
+				dfTemp1[t+rowoffset,8] = value.(EP[:eSynTruckFlow][t,z])
 			else
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
-			if setup["ModelH2G2P"] == 1
-				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
-			else
-				dfTemp1[t+rowoffset,9] = 0
-			end
-
-	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,9] = -inputs["Syn_D"][t,z]
 	   	end
 
 		if z == 1
@@ -91,5 +85,5 @@ function write_syn_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::
 
 	dfSynBalance = DataFrame(dfSynBalance, :auto)
 
-	CSV.write(joinpath(path, "HSC_h2_balance.csv"), dfSynBalance, writeheader=false)
+	CSV.write(joinpath(path, "Syn_fuels_balance.csv"), dfSynBalance, writeheader=false)
 end

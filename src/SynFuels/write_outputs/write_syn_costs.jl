@@ -21,38 +21,13 @@ Function for writing the costs pertaining to the objective function (fixed, vari
 """
 function write_syn_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
-	dfH2Gen = inputs["dfH2Gen"]
+	dfSynGen = inputs["dfSynGen"]
 
-	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
-	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
+	SYN_GEN_COMMIT = inputs["SYN_GEN_COMMIT"] # H2 production technologies with unit commitment
 
-	if setup["ModelH2G2P"] == 1
-		dfH2G2P = inputs["dfH2G2P"]
-
-		cG2PFix = value.(EP[:eTotalH2G2PCFix])
-		cG2PVar = value.(EP[:eTotalCH2G2PVarOut])
-
-		if !isempty(inputs["H2_G2P_COMMIT"])
-			if setup["ParameterScale"] == 1
-				cH2Start = value.(EP[:eTotalH2G2PCStart]) * (ModelScalingFactor^2)
-			else
-				cH2Start = value.(EP[:eTotalH2G2PCStart])
-			end
-
-		else
-			cH2Start = 0
-		end
-
-	else
-		cG2PFix = 0
-		cH2Start = 0
-		cG2PVar = 0
-	end
-
-
-	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
+	dfSynCost = DataFrame(Costs = ["cH2Total", "cH2Fix", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar)* (ModelScalingFactor^2)
 		cH2Fix = (value(EP[:eTotalH2GenCFix])+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0) + cG2PFix )*ModelScalingFactor^2
@@ -67,7 +42,7 @@ function write_syn_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		cH2Var  = cH2Var + value(EP[:eCH2GenTotalEmissionsPenalty])
 	end
 
-	if !isempty(inputs["H2_GEN_COMMIT"])
+	if !isempty(inputs["SYN_GEN_COMMIT"])
 		if setup["ParameterScale"]==1 # Convert costs in millions to $
 			cH2Start += value(EP[:eTotalH2GenCStart])*ModelScalingFactor^2
 		else
@@ -95,7 +70,7 @@ function write_syn_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		tempCFix = 0
 		tempCVar = 0
 		tempCStart = 0
-		for y in dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
+		for y in dfSynGen[dfSynGen[!,:Zone].==z,:][!,:R_ID]
 			tempCFix = tempCFix +
 				(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
 				(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0) +
@@ -104,7 +79,7 @@ function write_syn_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 				(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
 				(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 				sum(value.(EP[:eCH2GenVar_out])[y,:])
-			if !isempty(H2_GEN_COMMIT)
+			if !isempty(SYN_GEN_COMMIT)
 				tempCTotal = tempCTotal +
 					value.(EP[:eH2GenCFix])[y] +
 					(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
@@ -112,9 +87,9 @@ function write_syn_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 					(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
 					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCH2GenVar_out])[y,:]) +
-					(y in inputs["H2_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
+					(y in inputs["SYN_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
 				tempCStart = tempCStart +
-					(y in inputs["H2_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
+					(y in inputs["SYN_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
 			else
 				tempCTotal = tempCTotal +
 					value.(EP[:eH2GenCFix])[y] +

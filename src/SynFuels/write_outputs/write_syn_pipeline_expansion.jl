@@ -20,20 +20,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 function write_syn_pipeline_expansion(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-    L = inputs["H2_P"]     # Number of H2 pipelines
+    L = inputs["Syn_P"]     # Number of H2 pipelines
 
     transcap = zeros(L) # Transmission network reinforcements in tonne/hour
     for i = 1:L
         transcap[i] =
-            (value.(EP[:vH2NPipe][i]) - inputs["pH2_Pipe_No_Curr"][i]) .*
-            inputs["pH2_Pipe_Max_Flow"][i]
+            (value.(EP[:vSynNPipe][i]) - inputs["pSyn_Pipe_No_Curr"][i]) .*
+            inputs["pSyn_Pipe_Max_Flow"][i]
     end
 
     dfTransCap = DataFrame(
         Line = 1:L,
-        Existing_Trans_Capacity = inputs["pH2_Pipe_Max_Flow"] .* inputs["pH2_Pipe_No_Curr"],
+        Existing_Trans_Capacity = inputs["pSyn_Pipe_Max_Flow"] .* inputs["pSyn_Pipe_No_Curr"],
         New_Trans_Capacity = convert(Array{Union{Missing,Float32}}, transcap),
     )
 
-    CSV.write(joinpath(path, "HSC_pipeline_expansion.csv"), dfTransCap)
+    CSV.write(joinpath(path, "Syn_pipeline_expansion.csv"), dfTransCap)
 end

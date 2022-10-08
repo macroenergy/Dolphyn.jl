@@ -120,14 +120,14 @@ function syn_fuels_non_served(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cSynNSEPerSeg[s = 1:SYN_SEG, t = 1:T, z = 1:Z],
-        vSynNSE[s, t, z] <= inputs["pMax_Syn_D_Curtail"][s] * inputs["SynFuel_D"][t, z]
+        vSynNSE[s, t, z] <= inputs["pMax_Syn_D_Curtail"][s] * inputs["Syn_D"][t, z]
     )
 
     # Total demand curtailed in each time step (hourly) cannot exceed total demand
     @constraint(
         EP,
         cMaxSynNSE[t = 1:T, z = 1:Z],
-        sum(vSynNSE[s, t, z] for s = 1:SYN_SEG) <= inputs["SynFuel_D"][t, z]
+        sum(vSynNSE[s, t, z] for s = 1:SYN_SEG) <= inputs["Syn_D"][t, z]
     )
 
     return EP

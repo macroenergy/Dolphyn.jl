@@ -21,18 +21,18 @@ Function for writing the h2 storage charging energy values of the different stor
 """
 function write_syn_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-	dfH2Gen = inputs["dfH2Gen"]
+	dfSynGen = inputs["dfSynGen"]
 
-	H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)
+	H = inputs["SYN_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	# Power withdrawn to charge each resource in each time step
-	dfCharge = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
+	dfCharge = DataFrame(Resource = inputs["SYN_RESOURCES_NAME"], Zone = dfSynGen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 	charge = zeros(H,T)
 	for i in 1:H
-        if i in inputs["H2_STOR_ALL"]
-            charge[i,:] = value.(EP[:vH2_CHARGE_STOR])[i,:]
-        elseif i in inputs["H2_FLEX"]
-            charge[i,:] = value.(EP[:vH2_CHARGE_FLEX])[i,:]
+        if i in inputs["SYN_STOR_ALL"]
+            charge[i,:] = value.(EP[:vSyn_CHARGE_STOR])[i,:]
+        elseif i in inputs["SYN_FLEX"]
+            charge[i,:] = value.(EP[:vSyn_CHARGE_FLEX])[i,:]
         end
 
 		dfCharge[!,:AnnualSum][i] = sum(inputs["omega"].* charge[i,:])
@@ -43,15 +43,15 @@ function write_syn_charge(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	total = DataFrame(["Total" 0 sum(dfCharge[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
-			total[!,t+3] .= sum(dfCharge[!,Symbol("t$t")][union(inputs["H2_STOR_ALL"],inputs["H2_FLEX"])])
+			total[!,t+3] .= sum(dfCharge[!,Symbol("t$t")][union(inputs["SYN_STOR_ALL"],inputs["SYN_FLEX"])])
 		elseif v"1.4" <= VERSION < v"1.8"
-			total[:,t+3] .= sum(dfCharge[:,Symbol("t$t")][union(inputs["H2_STOR_ALL"],inputs["H2_FLEX"])])
+			total[:,t+3] .= sum(dfCharge[:,Symbol("t$t")][union(inputs["SYN_STOR_ALL"],inputs["SYN_FLEX"])])
 		end
 	end
 	rename!(total,auxNew_Names)
 	dfCharge = vcat(dfCharge, total)
 
-	CSV.write(joinpath(path, "HSC_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
+	CSV.write(joinpath(path, "Syn_fuels_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
 
 	return dfCharge
 end

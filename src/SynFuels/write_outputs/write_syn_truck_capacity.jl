@@ -20,87 +20,87 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 function write_syn_truck_capacity(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
 
-    H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
-    NEW_CAP_H2_TRUCK_CHARGE = inputs["NEW_CAP_H2_TRUCK_CHARGE"]
-    RET_CAP_H2_TRUCK_CHARGE = inputs["RET_CAP_H2_TRUCK_CHARGE"]
-    NEW_CAP_H2_TRUCK_ENERGY = inputs["NEW_CAP_H2_TRUCK_ENERGY"]
-    RET_CAP_H2_TRUCK_ENERGY = inputs["RET_CAP_H2_TRUCK_ENERGY"]
+    SYN_TRUCK_TYPES = inputs["SYN_TRUCK_TYPES"]
+    NEW_CAP_SYN_TRUCK_CHARGE = inputs["NEW_CAP_SYN_TRUCK_CHARGE"]
+    RET_CAP_SYN_TRUCK_CHARGE = inputs["RET_CAP_SYN_TRUCK_CHARGE"]
+    NEW_CAP_SYN_TRUCK_ENERGY = inputs["NEW_CAP_SYN_TRUCK_ENERGY"]
+    RET_CAP_SYN_TRUCK_ENERGY = inputs["RET_CAP_SYN_TRUCK_ENERGY"]
 
-    dfH2Truck = inputs["dfH2Truck"]
+    dfSynTruck = inputs["dfSynTruck"]
     Z = inputs["Z"]
 
     # H2 truck capacity
-    capNumber = zeros(size(H2_TRUCK_TYPES))
-    retNumber = zeros(size(H2_TRUCK_TYPES))
-    endNumber = zeros(size(H2_TRUCK_TYPES))
-    for j in H2_TRUCK_TYPES
-        if j in NEW_CAP_H2_TRUCK_CHARGE
-            capNumber[j] = value(EP[:vH2TruckNumber][j])
+    capNumber = zeros(size(SYN_TRUCK_TYPES))
+    retNumber = zeros(size(SYN_TRUCK_TYPES))
+    endNumber = zeros(size(SYN_TRUCK_TYPES))
+    for j in SYN_TRUCK_TYPES
+        if j in NEW_CAP_SYN_TRUCK_CHARGE
+            capNumber[j] = value(EP[:vSynTruckNumber][j])
         end
-        if j in RET_CAP_H2_TRUCK_CHARGE
-            retNumber[j] = value(EP[:vH2RetTruckNumber][j])
+        if j in RET_CAP_SYN_TRUCK_CHARGE
+            retNumber[j] = value(EP[:vSynRetTruckNumber][j])
         end
-        endNumber[j] = value(EP[:eTotalH2TruckNumber][j])
+        endNumber[j] = value(EP[:eTotalSynTruckNumber][j])
     end
 
-    dfH2TruckCap = DataFrame(
-        TruckType = inputs["H2_TRUCK_TYPE_NAMES"],
-        StartTruck = dfH2Truck[!, :Existing_Number],
+    dfSynTruckCap = DataFrame(
+        TruckType = inputs["SYN_TRUCK_TYPE_NAMES"],
+        StartTruck = dfSynTruck[!, :Existing_Number],
         NewTruck = capNumber,
         RetTruck = retNumber,
         EndTruck = endNumber
     )
 
     for z in 1:Z
-        dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in NEW_CAP_H2_TRUCK_ENERGY
-                tempEnergy[j] = value(EP[:vH2TruckEnergy][z,j])
+        dfSynTruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfSynTruck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
+        tempEnergy = zeros(size(SYN_TRUCK_TYPES))
+        for j in SYN_TRUCK_TYPES
+            if j in NEW_CAP_SYN_TRUCK_ENERGY
+                tempEnergy[j] = value(EP[:vSynTruckEnergy][z,j])
             end
         end
-        dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
+        dfSynTruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
 
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in RET_CAP_H2_TRUCK_ENERGY
-                tempEnergy[j] = value(EP[:vH2RetTruckEnergy][z,j])
+        tempEnergy = zeros(size(SYN_TRUCK_TYPES))
+        for j in SYN_TRUCK_TYPES
+            if j in RET_CAP_SYN_TRUCK_ENERGY
+                tempEnergy[j] = value(EP[:vSynRetTruckEnergy][z,j])
             end
         end
-        dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
+        dfSynTruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
 
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            tempEnergy[j] = value(EP[:eTotalH2TruckEnergy][z,j])
+        tempEnergy = zeros(size(SYN_TRUCK_TYPES))
+        for j in SYN_TRUCK_TYPES
+            tempEnergy[j] = value(EP[:eTotalSynTruckEnergy][z,j])
         end
-        dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")] = tempEnergy
+        dfSynTruckCap[!,Symbol("EndTruckEnergyZone$z")] = tempEnergy
     end
 
-    dfH2TruckCap[!,:StartTruckEnergy] = sum(dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:NewTruckEnergy] = sum(dfH2TruckCap[!, Symbol("NewTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:RetTruckEnergy] = sum(dfH2TruckCap[!, Symbol("RetTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:EndTruckEnergy] = sum(dfH2TruckCap[!, Symbol("EndTruckEnergyZone$z")] for z in 1:Z)
+    dfSynTruckCap[!,:StartTruckEnergy] = sum(dfSynTruckCap[!, Symbol("StartTruckEnergyZone$z")] for z in 1:Z)
+    dfSynTruckCap[!,:NewTruckEnergy] = sum(dfSynTruckCap[!, Symbol("NewTruckEnergyZone$z")] for z in 1:Z)
+    dfSynTruckCap[!,:RetTruckEnergy] = sum(dfSynTruckCap[!, Symbol("RetTruckEnergyZone$z")] for z in 1:Z)
+    dfSynTruckCap[!,:EndTruckEnergy] = sum(dfSynTruckCap[!, Symbol("EndTruckEnergyZone$z")] for z in 1:Z)
 
-    dfH2TruckTotal = DataFrame(
+    dfSynTruckTotal = DataFrame(
         TruckType = "Total",
-        StartTruck = sum(dfH2TruckCap[!,:StartTruck]),
-        NewTruck = sum(dfH2TruckCap[!,:NewTruck]),
-        RetTruck = sum(dfH2TruckCap[!,:RetTruck]),
-        EndTruck = sum(dfH2TruckCap[!,:EndTruck]),
-        StartTruckEnergy = sum(dfH2TruckCap[!,:StartTruckEnergy]),
-        NewTruckEnergy = sum(dfH2TruckCap[!,:NewTruckEnergy]),
-        RetTruckEnergy = sum(dfH2TruckCap[!,:RetTruckEnergy]),
-        EndTruckEnergy = sum(dfH2TruckCap[!,:EndTruckEnergy])
+        StartTruck = sum(dfSynTruckCap[!,:StartTruck]),
+        NewTruck = sum(dfSynTruckCap[!,:NewTruck]),
+        RetTruck = sum(dfSynTruckCap[!,:RetTruck]),
+        EndTruck = sum(dfSynTruckCap[!,:EndTruck]),
+        StartTruckEnergy = sum(dfSynTruckCap[!,:StartTruckEnergy]),
+        NewTruckEnergy = sum(dfSynTruckCap[!,:NewTruckEnergy]),
+        RetTruckEnergy = sum(dfSynTruckCap[!,:RetTruckEnergy]),
+        EndTruckEnergy = sum(dfSynTruckCap[!,:EndTruckEnergy])
     )
 
     for z in 1:Z
-        dfH2TruckTotal[!,Symbol("StartTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("NewTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("RetTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("EndTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")])]
+        dfSynTruckTotal[!,Symbol("StartTruckEnergyZone$z")] = [sum(dfSynTruckCap[!,Symbol("StartTruckEnergyZone$z")])]
+        dfSynTruckTotal[!,Symbol("NewTruckEnergyZone$z")] = [sum(dfSynTruckCap[!,Symbol("NewTruckEnergyZone$z")])]
+        dfSynTruckTotal[!,Symbol("RetTruckEnergyZone$z")] = [sum(dfSynTruckCap[!,Symbol("RetTruckEnergyZone$z")])]
+        dfSynTruckTotal[!,Symbol("EndTruckEnergyZone$z")] = [sum(dfSynTruckCap[!,Symbol("EndTruckEnergyZone$z")])]
     end
 
-    dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)
+    dfSynTruckCap = vcat(dfSynTruckCap, dfSynTruckTotal)
 
-    CSV.write(joinpath(path, "h2_truck_capacity.csv"), dfH2TruckCap)
+    CSV.write(joinpath(path, "Syn_fuels_truck_capacity.csv"), dfSynTruckCap)
 end

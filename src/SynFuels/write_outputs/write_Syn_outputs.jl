@@ -33,36 +33,27 @@ function write_Syn_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::
         mkdir(path)
     end
 
-    write_h2_capacity(path, setup, inputs, EP)
-    write_h2_gen(path, setup, inputs, EP)
-    write_h2_nse(path, setup, inputs, EP)
-    # write_h2_costs(path, sep, setup, inputs, EP)
-    write_h2_balance(path, setup, inputs, EP)
-    if setup["ModelH2Pipelines"] == 1
-        write_h2_pipeline_flow(path, setup, inputs, EP)
-        write_h2_pipeline_expansion(path, setup, inputs, EP)
-        write_h2_pipeline_level(path, setup, inputs, EP)
+    write_syn_capacity(path, setup, inputs, EP)
+    write_syn_gen(path, setup, inputs, EP)
+    write_syn_nse(path, setup, inputs, EP)
+    write_syn_costs(path, sep, setup, inputs, EP)
+    write_syn_balance(path, setup, inputs, EP)
+    if setup["ModelSynPipelines"] == 1
+        write_syn_pipeline_flow(path, setup, inputs, EP)
+        write_syn_pipeline_expansion(path, setup, inputs, EP)
+        write_syn_pipeline_level(path, setup, inputs, EP)
     end
 
-    if setup["H2CO2Cap"] == 1
-        write_h2_emissions(path, setup, inputs, EP)
-    end
+    write_syn_emissions(path, setup, inputs, EP)
+    write_syn_charge(path, setup, inputs, EP)
+    write_syn_storage(path, setup, inputs, EP)
 
-    write_h2_charge(path, setup, inputs, EP)
-    write_h2_storage(path, setup, inputs, EP)
-
-    if setup["ModelH2Trucks"] == 1
-        write_h2_truck_capacity(path, setup, inputs, EP)
-        write_h2_truck_flow(path, setup, inputs, EP)
-    end
-
-    if setup["ModelH2G2P"] == 1
-        write_h2_g2p(path, setup, inputs, EP)
-        write_p_g2p(path, setup, inputs, EP)
-        write_g2p_capacity(path, setup, inputs, EP)
+    if setup["ModelSynTrucks"] == 1
+        write_syn_truck_capacity(path, setup, inputs, EP)
+        write_syn_truck_flow(path, setup, inputs, EP)
     end
 
     ## Print confirmation
-    println("Wrote HSC outputs to $path")
+    println("Wrote Syn outputs to $path")
 
 end # END output()
