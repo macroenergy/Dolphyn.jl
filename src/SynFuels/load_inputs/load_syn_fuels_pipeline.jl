@@ -86,46 +86,46 @@ function load_syn_fuels_pipeline(path::AbstractString, setup::Dict, inputs::Dict
         inputs["pPipe_length_miles"] ./ inputs["len_bw_comp_mile"]
     # floor.(inputs["pPipe_length_miles"] ./ inputs["len_bw_comp_mile"])
     #Maximum number of pipelines
-    inputs["pH2_Pipe_No_Max"] =
+    inputs["pSyn_Pipe_No_Max"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Max_No_Pipe])))
 
     #Current number of pipelines
-    inputs["pH2_Pipe_No_Curr"] =
+    inputs["pSyn_Pipe_No_Curr"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Existing_No_Pipe])))
 
     #Maxiumum Pipe Flow per Pipe
-    inputs["pH2_Pipe_Max_Flow"] = convert(
+    inputs["pSyn_Pipe_Max_Flow"] = convert(
         Array{Float64},
         collect(skipmissing(pipeline_var[!, :Max_Flow_Tonne_p_Hr_Per_Pipe])),
     )
 
     #Maximum Pipeline storage capacity in tonnes per pipe
-    inputs["pH2_Pipe_Max_Cap"] =
+    inputs["pSyn_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2PipeCap_tonne_per_mile])),
+            collect(skipmissing(pipeline_var[!, :SynPipeCap_tonne_per_mile])),
         ) .* inputs["pPipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
-    inputs["pH2_Pipe_Min_Cap"] =
+    inputs["pSyn_Pipe_Min_Cap"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :Min_pipecap_stor_frac])),
-        ) .* inputs["pH2_Pipe_Max_Cap"]
+        ) .* inputs["pSyn_Pipe_Max_Cap"]
 
     #Capital Cost Per Pipe
-    inputs["pCAPEX_H2_Pipe"] =
+    inputs["pCAPEX_Syn_Pipe"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2Pipe_Inv_Cost_per_mile_yr])),
+            collect(skipmissing(pipeline_var[!, :SynPipe_Inv_Cost_per_mile_yr])),
         ) .* inputs["pPipe_length_miles"]
 
     #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
-    inputs["pCAPEX_Comp_H2_Pipe"] =
-        inputs["pH2_Pipe_Max_Flow"] .* (
+    inputs["pCAPEX_Comp_Syn_Pipe"] =
+        inputs["pSyn_Pipe_Max_Flow"] .* (
             convert(
                 Array{Float64},
-                collect(skipmissing(pipeline_var[!, :H2PipeCompCapex])),
+                collect(skipmissing(pipeline_var[!, :SynPipeCompCapex])),
             ) .+
             inputs["no_booster_comp_stations"] .* convert(
                 Array{Float64},
@@ -135,7 +135,7 @@ function load_syn_fuels_pipeline(path::AbstractString, setup::Dict, inputs::Dict
 
     #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
     inputs["pComp_MWh_per_tonne_Pipe"] =
-        convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :H2PipeCompEnergy]))) .+
+        convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :SynPipeCompEnergy]))) .+
         inputs["no_booster_comp_stations"] .* convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
