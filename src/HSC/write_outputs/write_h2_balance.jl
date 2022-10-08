@@ -24,7 +24,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	if setup["ModelH2G2P"] == 1
 		dfH2G2P = inputs["dfH2G2P"]
 	end
-	
+
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
@@ -35,7 +35,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	rowoffset=3
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
                "Nonserved_Energy",
@@ -61,7 +61,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
 
 			if setup["ModelH2Pipelines"] == 1
-			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
+			 	dfTemp1[t+rowoffset,7] = value.(EP[:eH2PipeZoneDemand][t,z])
 			else
 				dfTemp1[t+rowoffset,7] = 0
 			end
@@ -74,7 +74,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 			end
 
 			if setup["ModelH2G2P"] == 1
-				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
+				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
 			else
 				dfTemp1[t+rowoffset,9] = 0
 			end
@@ -92,7 +92,7 @@ function write_h2_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::M
 	for c in 2:size(dfH2Balance,2)
 		dfH2Balance[rowoffset,c]=sum(inputs["omega"].*dfH2Balance[(rowoffset+1):size(dfH2Balance,1),c])
 	end
-	
+
 	dfH2Balance = DataFrame(dfH2Balance, :auto)
 
 	CSV.write(joinpath(path, "HSC_h2_balance.csv"), dfH2Balance, writeheader=false)
