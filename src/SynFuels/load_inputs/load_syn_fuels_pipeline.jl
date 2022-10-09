@@ -40,8 +40,8 @@ function load_syn_fuels_pipeline(path::AbstractString, setup::Dict, inputs::Dict
     )
 
     # Number of H2 Pipelines
-    inputs["SYN_P"] = size(collect(skipmissing(pipeline_var[!, :Syn_Pipelines])), 1)
-    L = inputs["SYN_P"]
+    inputs["Syn_P"] = size(collect(skipmissing(pipeline_var[!, :Syn_Pipelines])), 1)
+    L = inputs["Syn_P"]
 
     # Topology of the pipeline network source-sink matrix
     pipe_map = zeros(Int64, L, Z)

@@ -9,28 +9,28 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
     hours_per_subperiod = inputs["hours_per_subperiod"]
 
-    SYN_P = inputs["SYN_P"] # Number of Hydrogen Pipelines
+    Syn_P = inputs["Syn_P"] # Number of Hydrogen Pipelines
     Syn_Pipe_Map = inputs["Syn_Pipe_Map"]
 
     ### Variables ###
-    @variable(EP, vSynNPipe[p = 1:SYN_P] >= 0) # Number of Pipes
-    @variable(EP, vSynPipeLevel[p = 1:SYN_P, t = 1:T] >= 0) # Storage in the pipe
-    @variable(EP, vSynPipeFlow_pos[p = 1:SYN_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow
-    @variable(EP, vSynPipeFlow_neg[p = 1:SYN_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
+    @variable(EP, vSynNPipe[p = 1:Syn_P] >= 0) # Number of Pipes
+    @variable(EP, vSynPipeLevel[p = 1:Syn_P, t = 1:T] >= 0) # Storage in the pipe
+    @variable(EP, vSynPipeFlow_pos[p = 1:Syn_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow
+    @variable(EP, vSynPipeFlow_neg[p = 1:Syn_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
 
 
     ### Expressions ###
     # Calculate the number of new pipes
     @expression(
         EP,
-        eSynNPipeNew[p = 1:SYN_P],
+        eSynNPipeNew[p = 1:Syn_P],
         vSynNPipe[p] - inputs["pSyn_Pipe_No_Curr"][p]
     )
 
     # Calculate net flow at each pipe-zone interfrace
     @expression(
         EP,
-        eSynPipeFlow_net[p = 1:SYN_P, t = 1:T, d = [-1, 1]],
+        eSynPipeFlow_net[p = 1:Syn_P, t = 1:T, d = [-1, 1]],
         vSynPipeFlow_pos[p, t, d] - vSynPipeFlow_neg[p, t, d]
     )
 
@@ -45,14 +45,14 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
             eCSynPipe,
             sum(
                 eSynNPipeNew[p] * inputs["pCAPEX_Syn_Pipe"][p] / (ModelScalingFactor)^2 for
-                p = 1:SYN_P
+                p = 1:Syn_P
             )
         )
     else
         @expression(
             EP,
             eCSynPipe,
-            sum(eSynNPipeNew[p] * inputs["pCAPEX_Syn_Pipe"][p] for p = 1:SYN_P)
+            sum(eSynNPipeNew[p] * inputs["pCAPEX_Syn_Pipe"][p] for p = 1:Syn_P)
         )
     end
 
@@ -66,14 +66,14 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCSynCompPipe,
-            sum(eSynNPipeNew[p] * inputs["pCAPEX_Comp_Syn_Pipe"][p] for p = 1:SYN_P) /
+            sum(eSynNPipeNew[p] * inputs["pCAPEX_Comp_Syn_Pipe"][p] for p = 1:Syn_P) /
             ModelScalingFactor^2
         )
     else
         @expression(
             EP,
             eCSynCompPipe,
-            sum(eSynNPipeNew[p] * inputs["pCAPEX_Comp_Syn_Pipe"][p] for p = 1:SYN_P)
+            sum(eSynNPipeNew[p] * inputs["pCAPEX_Comp_Syn_Pipe"][p] for p = 1:Syn_P)
         )
     end
 
@@ -170,7 +170,7 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     # Constraints
     if setup["SynPipeInteger"] == 1
-        for p = 1:SYN_P
+        for p = 1:Syn_P
             set_integer.(vSynNPipe[p])
         end
     end
@@ -179,12 +179,12 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     if setup["SynNetworkExpansion"] == 1
         # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe
         @constraints(EP, begin
-            [p in 1:SYN_P], EP[:eSynNPipeNew][p] >= 0
+            [p in 1:Syn_P], EP[:eSynNPipeNew][p] >= 0
         end)
     else
         # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe
         @constraints(EP, begin
-            [p in 1:SYN_P], EP[:eSynNPipeNew][p] == 0
+            [p in 1:Syn_P], EP[:eSynNPipeNew][p] == 0
         end)
     end
 
@@ -192,10 +192,10 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [p in 1:SYN_P, t = 1:T, d in [-1, 1]],
+            [p in 1:Syn_P, t = 1:T, d in [-1, 1]],
             EP[:eSynPipeFlow_net][p, t, d] <=
             EP[:vSynNPipe][p] * inputs["pSyn_Pipe_Max_Flow"][p]
-            [p in 1:SYN_P, t = 1:T, d in [-1, 1]],
+            [p in 1:Syn_P, t = 1:T, d in [-1, 1]],
             -EP[:eSynPipeFlow_net][p, t, d] <=
             EP[:vSynNPipe][p] * inputs["pSyn_Pipe_Max_Flow"][p]
         end
@@ -205,9 +205,9 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [p in 1:SYN_P, t = 1:T, d in [-1, 1]],
+            [p in 1:Syn_P, t = 1:T, d in [-1, 1]],
             vSynNPipe[p] * inputs["pSyn_Pipe_Max_Flow"][p] >= vSynPipeFlow_pos[p, t, d]
-            [p in 1:SYN_P, t = 1:T, d in [-1, 1]],
+            [p in 1:Syn_P, t = 1:T, d in [-1, 1]],
             vSynNPipe[p] * inputs["pSyn_Pipe_Max_Flow"][p] >= vSynPipeFlow_neg[p, t, d]
         end
     )
@@ -216,9 +216,9 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [p in 1:SYN_P, t = 1:T],
+            [p in 1:Syn_P, t = 1:T],
             vSynPipeLevel[p, t] >= inputs["pSyn_Pipe_Min_Cap"][p] * vSynNPipe[p]
-            [p in 1:SYN_P, t = 1:T],
+            [p in 1:Syn_P, t = 1:T],
             inputs["pSyn_Pipe_Max_Cap"][p] * vSynNPipe[p] >= vSynPipeLevel[p, t]
         end
     )
@@ -227,7 +227,7 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [p in 1:SYN_P, t in START_SUBPERIODS],
+            [p in 1:Syn_P, t in START_SUBPERIODS],
             vSynPipeLevel[p, t] ==
             vSynPipeLevel[p, t+hours_per_subperiod-1] - eSynPipeFlow_net[p, t, -1] -
             eSynPipeFlow_net[p, t, 1]
@@ -237,14 +237,14 @@ function syn_fuels_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @constraints(
         EP,
         begin
-            [p in 1:SYN_P, t in INTERIOR_SUBPERIODS],
+            [p in 1:Syn_P, t in INTERIOR_SUBPERIODS],
             vSynPipeLevel[p, t] ==
             vSynPipeLevel[p, t-1] - eSynPipeFlow_net[p, t, -1] - eSynPipeFlow_net[p, t, 1]
         end
     )
 
     @constraints(EP, begin
-        [p in 1:SYN_P], vSynNPipe[p] <= inputs["pSyn_Pipe_No_Max"][p]
+        [p in 1:Syn_P], vSynNPipe[p] <= inputs["pSyn_Pipe_No_Max"][p]
     end)
 
     return EP

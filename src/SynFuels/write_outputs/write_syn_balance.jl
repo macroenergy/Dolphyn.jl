@@ -30,7 +30,7 @@ function write_syn_balance(path::AbstractString, setup::Dict, inputs::Dict, EP::
 	dfSynBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
