@@ -1,7 +1,8 @@
 # Sector modeling flags
 ModelPower: 1 # Flag to turn on or off Power sector modeling; 0 = not active, 1 = active -- not implemented
-ModelH2: 0 # Flag to turn or off Hydrogen Supply Chain modeling; 0 = not active, 1 = active
-ModelCO2: 0 # Flag to turn or off Carbon Supply Chain sector modeling; 0 = not active, 1 = active
+ModelH2: 1 # Flag to turn or off Hydrogen Supply Chain modeling; 0 = not active, 1 = active
+ModelCO2: 1 # Flag to turn or off Carbon Supply Chain sector modeling; 0 = not active, 1 = active
+ModelSyn: 1 # Flag to turn or off Carbon Supply Chain sector modeling; 0 = not active, 1 = active
 
 #! Unit handling - should find another way to handle this
 ParameterScale: 1 # Turn on parameter scaling wherein load, capacity and power variables are defined in GW rather than MW. 0 = not active; 1 = active systemwide

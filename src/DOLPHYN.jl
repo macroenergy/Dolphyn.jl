@@ -24,12 +24,14 @@ export load_basic_inputs
 export load_power_inputs
 export load_h2_inputs
 export load_co2_inputs
+export load_syn_fuels_inputs
 export generate_model
 export solve_model
 export write_basic_outputs
 export write_power_outputs
 export write_HSC_outputs
 export write_CSC_outputs
+export write_Syn_outputs
 export mga
 
 
@@ -101,7 +103,7 @@ include("time_domain_reduction/time_domain_reduction.jl")
 include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
-include("HSC/load_inputs/load_h2_pipeline_data.jl")
+include("HSC/load_inputs/load_h2_pipeline.jl")
 include("HSC/load_inputs/load_h2_truck.jl")
 include("HSC/load_inputs/load_co2_cap_hsc.jl")
 include("HSC/load_inputs/load_h2_g2p.jl")
@@ -115,10 +117,20 @@ include("CSC/load_inputs/load_co2_capture.jl")
 include("CSC/load_inputs/load_co2_capture_variability.jl")
 include("CSC/load_inputs/load_co2_price_csc.jl")
 include("CSC/load_inputs/load_co2_storage.jl")
-include("CSC/load_inputs/load_co2_pipeline_data.jl")
+include("CSC/load_inputs/load_co2_pipeline.jl")
 include("CSC/load_inputs/load_co2_truck.jl")
 
 include("CSC/load_inputs/load_CO2_inputs.jl")
+
+# Load input data - Synthesis fuels
+include("SynFuels/load_inputs/load_syn_fuels_demand.jl")
+include("SynFuels/load_inputs/load_syn_fuels_gen.jl")
+include("SynFuels/load_inputs/load_syn_generators_variability.jl")
+include("SynFuels/load_inputs/load_syn_fuels_pipeline.jl")
+include("SynFuels/load_inputs/load_syn_fuels_truck.jl")
+include("SynFuels/load_inputs/load_co2_cap_syn.jl")
+
+include("SynFuels/load_inputs/load_syn_fuels_inputs.jl")
 
 # Core GenX features
 include("GenX/model/core/discharge/discharge.jl")
@@ -218,6 +230,36 @@ include("CSC/model/truck/co2_truck.jl")
 include("CSC/model/truck/co2_truck_all.jl")
 include("CSC/model/truck/co2_long_duration_truck.jl")
 
+# Core synthesis fuels features
+include("SynFuels/model/core/emissions_syn.jl")
+include("SynFuels/model/core/syn_fuels_investment.jl")
+include("SynFuels/model/core/syn_fuels_nsd.jl")
+include("SynFuels/model/core/syn_fuels_outputs.jl")
+
+# Synthesis fuels generation
+include("SynFuels/model/generation/syn_fuels_production.jl")
+include("SynFuels/model/generation/syn_fuels_production_commit.jl")
+include("SynFuels/model/generation/syn_fuels_production_no_commit.jl")
+include("SynFuels/model/generation/syn_fuels_production_all.jl")
+
+# Synthesis fuels storage
+include("SynFuels/model/storage/syn_fuels_storage.jl")
+include("SynFuels/model/storage/syn_fuels_storage_all.jl")
+include("SynFuels/model/storage/syn_fuels_storage_investment_charge.jl")
+include("SynFuels/model/storage/syn_fuels_storage_investment_energy.jl")
+include("SynFuels/model/storage/syn_fuels_storage_symmetric.jl")
+include("SynFuels/model/storage/syn_fuels_storage_asymmetric.jl")
+include("SynFuels/model/storage/syn_fuels_long_duration_storage.jl")
+
+# Synthesis fuels transmission
+include("SynFuels/model/transmission/syn_fuels_pipeline.jl")
+
+# Synthesis fuels truck
+include("SynFuels/model/truck/syn_fuels_truck.jl")
+include("SynFuels/model/truck/syn_fuels_truck_investment.jl")
+include("SynFuels/model/truck/syn_fuels_truck_all.jl")
+include("SynFuels/model/truck/syn_fuels_long_duration_truck.jl")
+
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
 include("co2_cap_power_csc.jl")
@@ -310,6 +352,22 @@ include("CSC/write_outputs/write_co2_truck_capacity.jl")
 include("CSC/write_outputs/write_co2_truck_flow.jl")
 include("CSC/write_outputs/write_CSC_outputs.jl")
 
+# Write Synthesis fuels output
+include("SynFuels/write_outputs/write_syn_balance.jl")
+include("SynFuels/write_outputs/write_syn_capacity.jl")
+include("SynFuels/write_outputs/write_syn_charge.jl")
+include("SynFuels/write_outputs/write_syn_costs.jl")
+include("SynFuels/write_outputs/write_syn_emissions.jl")
+include("SynFuels/write_outputs/write_syn_gen.jl")
+include("SynFuels/write_outputs/write_syn_nse.jl")
+include("SynFuels/write_outputs/write_syn_pipeline_expansion.jl")
+include("SynFuels/write_outputs/write_syn_pipeline_level.jl")
+include("SynFuels/write_outputs/write_syn_pipeline_flow.jl")
+include("SynFuels/write_outputs/write_syn_storage.jl")
+include("SynFuels/write_outputs/write_syn_truck_capacity.jl")
+include("SynFuels/write_outputs/write_syn_truck_flow.jl")
+
+include("SynFuels/write_outputs/write_Syn_outputs.jl")
 # Modeling to generate alternatives
 include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 

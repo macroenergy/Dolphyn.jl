@@ -56,18 +56,18 @@ In addition, this function adds investment and fixed O&M related costs related t
 """
 function investment_charge(EP::Model, inputs::Dict)
 
-	println("Charge Investment Module")
+    println("Charge Investment Module")
 
-	dfGen = inputs["dfGen"]
+    dfGen = inputs["dfGen"]
 
-	STOR_ASYMMETRIC = inputs["STOR_ASYMMETRIC"] # Set of storage resources with asymmetric (separte) charge/discharge capacity components
+    STOR_ASYMMETRIC = inputs["STOR_ASYMMETRIC"] # Set of storage resources with asymmetric (separte) charge/discharge capacity components
 
-	NEW_CAP_CHARGE = inputs["NEW_CAP_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity
-	RET_CAP_CHARGE = inputs["RET_CAP_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
+    NEW_CAP_CHARGE = inputs["NEW_CAP_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity
+    RET_CAP_CHARGE = inputs["RET_CAP_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
 
-	### Variables ###
+    ### Variables ###
 
-	## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
+    ## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
 
 	# New installed charge capacity of resource "y"
 	@variable(EP, vCAPCHARGE[s in NEW_CAP_CHARGE] >= 0)
@@ -75,7 +75,7 @@ function investment_charge(EP::Model, inputs::Dict)
 	# Retired charge capacity of resource "y" from existing capacity
 	@variable(EP, vRETCAPCHARGE[s in RET_CAP_CHARGE] >= 0)
 
-	### Expressions ###
+    ### Expressions ###
 
 	@expression(EP, eTotalCapCharge[s in STOR_ASYMMETRIC],
 		if (s in intersect(NEW_CAP_CHARGE, RET_CAP_CHARGE))
@@ -103,10 +103,10 @@ function investment_charge(EP::Model, inputs::Dict)
 	# Sum individual resource contributions to fixed costs to get total fixed costs
 	@expression(EP, eTotalCFixCharge, sum(EP[:eCFixCharge][s] for s in STOR_ASYMMETRIC))
 
-	# Add term to objective function expression
-	EP[:eObj] += eTotalCFixCharge
+    # Add term to objective function expression
+    EP[:eObj] += eTotalCFixCharge
 
-	### Constratints ###
+    ### Constratints ###
 
 	## Constraints on retirements and capacity additions
 	#Cannot retire more charge capacity than existing charge capacity
@@ -121,5 +121,6 @@ function investment_charge(EP::Model, inputs::Dict)
 	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasabilty
 	@constraint(EP, cMinCapCharge[s in intersect(dfGen[!,:Min_Charge_Cap_MW].>0, STOR_ASYMMETRIC)], eTotalCapCharge[s] >= dfGen[!,:Min_Charge_Cap_MW][s])
 
-	return EP
+    return EP
+
 end

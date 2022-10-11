@@ -29,7 +29,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H = inputs["H2_GEN"]		#NUmber of hydrogen generation units
+	H = inputs["H2_GEN"]# Number of hydrogen generation units
 
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
 
@@ -41,25 +41,25 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	###Expressions###
 
 	#H2 Balance expressions
-	@expression(EP, eH2GenNoCommit[z=1:Z, t=1:T],
+	@expression(EP, eH2GenNoCommit[z = 1:Z, t = 1:T],
 	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] += eH2GenNoCommit
 
 	#Power Consumption for H2 Generation
 	#Power Consumption for H2 Generation
-	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
-		@expression(EP, ePowerBalanceH2GenNoCommit[z=1:Z, t=1:T],
+	if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW
+		@expression(EP, ePowerBalanceH2GenNoCommit[z = 1:Z, t = 1:T],
 		sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
-		@expression(EP, ePowerBalanceH2GenNoCommit[z=1:Z, t=1:T],
+		@expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
 		sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 	end
 
 	EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
 
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+	## For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
 	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
 
 	###Constraints###
@@ -74,7 +74,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k]* inputs["pH2_Max"][k,t]
 	end)
 
-	#Ramping cosntraints
+	# Ramping cosntraints
 	@constraints(EP, begin
 
 		## Maximum ramp up between consecutive hours

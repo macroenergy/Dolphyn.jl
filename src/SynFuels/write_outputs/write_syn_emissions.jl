@@ -1,0 +1,91 @@
+"""
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2021,  Massachusetts Institute of Technology
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A complete copy of the GNU General Public License v2 (GPLv2) is available
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+@doc raw"""
+	write_h2_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+
+Function for reporting time-dependent CO$_2$ emissions by zone.
+"""
+function write_syn_emissions(path::AbstractString, setup::Dict, inputs::Dict, EP::Model)
+
+    T = inputs["T"]     # Number of time steps (hours)
+	Z = inputs["Z"]     # Number of zones
+
+	if ((setup["SynCO2Cap"]==1||setup["SynCO2Cap"]==2||setup["SynCO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
+		# Dual variable of CO2 constraint = shadow price of CO2
+		tempCO2Price = zeros(Z,inputs["SynNCO2Cap"])
+		if has_duals(EP) == 1
+			for cap in 1:inputs["SynNCO2Cap"]
+				for z in findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap])
+					tempCO2Price[z,cap] = dual.(EP[:cH2CO2Emissions_systemwide])[cap]
+					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
+					if setup["ParameterScale"] ==1
+						tempCO2Price[z,cap] = tempCO2Price[z,cap]* ModelScalingFactor
+					end
+				end
+			end
+		end
+		dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(tempCO2Price, :auto), DataFrame(AnnualSum = Array{Union{Missing,Float64}}(undef, Z)))
+		auxNew_Names=[Symbol("Zone"); [Symbol("CO2_Price_$cap") for cap in 1:inputs["SynNCO2Cap"]]; Symbol("AnnualSum")]
+		rename!(dfEmissions,auxNew_Names)
+	else
+		dfEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
+	end
+
+	for i in 1:Z
+		if setup["ParameterScale"]==1
+			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])*ModelScalingFactor
+		else
+			dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])/ModelScalingFactor
+		end
+	end
+
+	if setup["ParameterScale"]==1
+		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])*ModelScalingFactor, :auto))
+	else
+		dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])/ModelScalingFactor, :auto))
+	end
+
+	if ((setup["SynCO2Cap"]==1||setup["SynCO2Cap"]==2||setup["SynCO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
+		auxNew_Names=[Symbol("Zone");[Symbol("CO2_Price_$cap") for cap in 1:inputs["SynNCO2Cap"]];Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
+		rename!(dfEmissions,auxNew_Names)
+		total = DataFrame(["Total" zeros(1,inputs["SynNCO2Cap"]) sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+		for t in 1:T
+			if v"1.3" <= VERSION < v"1.4"
+				total[!,t+inputs["SynNCO2Cap"]+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
+			elseif v"1.4" <= VERSION < v"1.8"
+				total[:,t+inputs["SynNCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
+			end
+		end
+		rename!(total,auxNew_Names)
+		dfEmissions = vcat(dfEmissions, total)
+	else
+		auxNew_Names=[Symbol("Zone"); Symbol("AnnualSum"); [Symbol("t$t") for t in 1:T]]
+		rename!(dfEmissions,auxNew_Names)
+		total = DataFrame(["Total" sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+		for t in 1:T
+			if v"1.3" <= VERSION < v"1.4"
+				total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
+			elseif v"1.4" <= VERSION < v"1.8"
+				total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
+			end
+		end
+		rename!(total,auxNew_Names)
+		dfEmissions = vcat(dfEmissions, total)
+	end
+
+	CSV.write(joinpath(path, "Syn_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+end

@@ -1,29 +1,29 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021, Massachusetts Institute of Technology and Peking University
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt. Users uncompressing this from an archive may not have
-received this license file. If not, see <http://www.gnu.org/licenses/>.
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_co2_pipeline_data((path::AbstractString, setup::Dict, inputs::Dict)
+    load_syn_fuels_pipeline(path::AbstractString, setup::Dict, inputs::Dict)
 
-Function for reading input parameters related to the hydrogen transmission network
+Function for reading input parameters related to the synthesis fuels transmission network.
 """
-function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
+function load_syn_fuels_pipeline(path::AbstractString, setup::Dict, inputs::Dict)
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
-        CSV.File(joinpath(path, "CSC_pipelines.csv"), header = true),
+        CSV.File(joinpath(path, "Syn_pipelines.csv"), header = true),
         copycols = true,
     )
 
@@ -32,15 +32,20 @@ function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
     Zones = inputs["Zones"]
 
     # Filter pipelines in modeled zones
-    pipeline_var = filter(row -> (row.StartZone in ["z$z" for z in Zones] && row.EndZone in ["z$z" for z in Zones]), pipeline_var)
+    pipeline_var = filter(
+        row -> (
+            row.StartZone in ["z$z" for z in Zones] && row.EndZone in ["z$z" for z in Zones]
+        ),
+        pipeline_var,
+    )
 
-    # Number of H2 Pipelines = L
-    inputs["CO2_P"] = size(collect(skipmissing(pipeline_var[!, :CO2_Pipelines])), 1)
-    L = inputs["CO2_P"]
+    # Number of H2 Pipelines
+    inputs["Syn_P"] = size(collect(skipmissing(pipeline_var[!, :Syn_Pipelines])), 1)
+    L = inputs["Syn_P"]
 
     # Topology of the pipeline network source-sink matrix
     pipe_map = zeros(Int64, L, Z)
-    for l in 1:L
+    for l = 1:L
         z_start = parse(Int32, pipeline_var[!, :StartZone][l][2:end])
         z_end = parse(Int32, pipeline_var[!, :EndZone][l][2:end])
         pipe_map[l, z_start] = 1
@@ -61,71 +66,68 @@ function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
     # Remove redundant rows
     pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
 
-    #Rename column
+    # Rename column
     colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(pipe_map, Symbol.(colnames_pipe_map))
 
-    inputs["CO2_Pipe_Map"] = pipe_map
-
-    # Number of pipelines routes in the network
-    inputs["CO2_P"] = size(collect(skipmissing(pipeline_var[!, :CO2_Pipelines])), 1)
+    inputs["Syn_Pipe_Map"] = pipe_map
 
     # Length in miles of each pipeline
-    inputs["pCO2Pipe_length_miles"] =
+    inputs["pPipe_length_miles"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Pipe_length_miles])))
 
     # Length between two booster compressor stations in miles
-    inputs["len_bw_CO2_comp_mile"] =
+    inputs["len_bw_comp_mile"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :len_bw_comp_mile])))
 
     # Number of booster compressors between source and sink
     # DEV NOTE: we should make the total number of compressors if the ratio is less than 1 for a particular line
-    inputs["no_booster_CO2_comp_stations"] =
-        inputs["pCO2Pipe_length_miles"] ./ inputs["len_bw_CO2_comp_mile"]
+    inputs["no_booster_comp_stations"] =
+        inputs["pPipe_length_miles"] ./ inputs["len_bw_comp_mile"]
     # floor.(inputs["pPipe_length_miles"] ./ inputs["len_bw_comp_mile"])
     #Maximum number of pipelines
-    inputs["pCO2_Pipe_No_Max"] =
+    inputs["pSyn_Pipe_No_Max"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Max_No_Pipe])))
 
     #Current number of pipelines
-    inputs["pCO2_Pipe_No_Curr"] =
+    inputs["pSyn_Pipe_No_Curr"] =
         convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :Existing_No_Pipe])))
 
     #Maxiumum Pipe Flow per Pipe
-    inputs["pCO2_Pipe_Max_Flow"] = convert(
+    inputs["pSyn_Pipe_Max_Flow"] = convert(
         Array{Float64},
         collect(skipmissing(pipeline_var[!, :Max_Flow_Tonne_p_Hr_Per_Pipe])),
     )
 
     #Maximum Pipeline storage capacity in tonnes per pipe
-    inputs["pCO2_Pipe_Max_Cap"] =
+    inputs["pSyn_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :CO2PipeCap_tonne_per_mile])),
+            collect(skipmissing(pipeline_var[!, :SynPipeCap_tonne_per_mile])),
         ) .* inputs["pPipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
-    inputs["pCO2_Pipe_Min_Cap"] =
+    inputs["pSyn_Pipe_Min_Cap"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :Min_pipecap_stor_frac])),
-        ) .* inputs["pCO2_Pipe_Max_Cap"]
+        ) .* inputs["pSyn_Pipe_Max_Cap"]
 
     #Capital Cost Per Pipe
-    inputs["pCAPEX_CO2_Pipe"] =
+    inputs["pCAPEX_Syn_Pipe"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :CO2Pipe_Inv_Cost_per_mile_yr])),
-        ) .* inputs["pCO2Pipe_length_miles"]
+            collect(skipmissing(pipeline_var[!, :SynPipe_Inv_Cost_per_mile_yr])),
+        ) .* inputs["pPipe_length_miles"]
 
     #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
-    inputs["pCAPEX_Comp_CO2_Pipe"] =
-        inputs["pCO2_Pipe_Max_Flow"] .* (
+    inputs["pCAPEX_Comp_Syn_Pipe"] =
+        inputs["pSyn_Pipe_Max_Flow"] .* (
             convert(
                 Array{Float64},
-                collect(skipmissing(pipeline_var[!, :CO2PipeCompCapex])),
+                collect(skipmissing(pipeline_var[!, :SynPipeCompCapex])),
             ) .+
-            inputs["no_booster_CO2_comp_stations"] .* convert(
+            inputs["no_booster_comp_stations"] .* convert(
                 Array{Float64},
                 collect(skipmissing(pipeline_var[!, :BoosterCompCapex_per_tonne_p_hr_yr])),
             )
@@ -133,16 +135,13 @@ function load_co2_pipeline_data(path::AbstractString, setup::Dict, inputs::Dict)
 
     #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
     inputs["pComp_MWh_per_tonne_Pipe"] =
-        convert(
-            Array{Float64},
-            collect(skipmissing(pipeline_var[!, :CO2PipeCompEnergy]))
-        ) .+
-        inputs["no_booster_CO2_comp_stations"] .* convert(
+        convert(Array{Float64}, collect(skipmissing(pipeline_var[!, :SynPipeCompEnergy]))) .+
+        inputs["no_booster_comp_stations"] .* convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
         )
 
-    println("CSC_pipelines.csv Successfully Read!")
+    println("Syn_pipelines.csv Successfully Read!")
 
     return inputs
 end

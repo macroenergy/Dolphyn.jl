@@ -44,9 +44,7 @@ function write_HSC_outputs(path::AbstractString, setup::Dict, inputs::Dict, EP::
         write_h2_pipeline_level(path, setup, inputs, EP)
     end
 
-    if setup["H2CO2Cap"] == 1
-        write_h2_emissions(path, setup, inputs, EP)
-    end
+    write_h2_emissions(path, setup, inputs, EP)
 
     write_h2_charge(path, setup, inputs, EP)
     write_h2_storage(path, setup, inputs, EP)

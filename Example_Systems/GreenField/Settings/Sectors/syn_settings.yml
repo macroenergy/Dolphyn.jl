@@ -1,0 +1,10 @@
+SynNetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
+
+ModelSynPipelines: 1 # Whether to model pipeline in synthesis fuels - 0 - not included, 1 - included
+SynPipeInteger: 0 # Whether to model pipeline capacity as discrete or integer - 0 - continuous capacity, 1- discrete capacity
+
+ModelSynTrucks: 0 # Whether to model truck for synthesis fuels - 0 - not included, 1 - included
+
+SynGenCommit: 0 # Continuous or discrete capacity representation of H2 production technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as integer variables;
+
+SynCO2Cap: 4 # CO2 emissions cap for synthesis only; 0 = not active (no CO2 emission limit); 1 = mass-based emission limit constraint; 2 = load + rate-based emission limit constraint; 3 = generation + rate-based emission limit constraint; 4 = emissions penalized via a carbon price

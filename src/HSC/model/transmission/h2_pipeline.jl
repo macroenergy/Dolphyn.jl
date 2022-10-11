@@ -148,7 +148,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     )
 
-    EP[:eH2Balance] += ePipeZoneDemand
+    EP[:eH2Balance] += eH2PipeZoneDemand
 
     ## End Balance Expressions ##
     ### End Expressions ###

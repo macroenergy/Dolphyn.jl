@@ -38,7 +38,7 @@ function load_h2_inputs(path::AbstractString, setup::Dict, inputs::Dict)
 	# Read input data about power network topology, operating and expansion attributes
 
 	if setup["ModelH2Pipelines"] == 1
-		inputs  = load_h2_pipeline_data(path, setup, inputs)
+		inputs  = load_h2_pipeline(path, setup, inputs)
 	else
 		inputs["H2_P"] = 0
 	end
