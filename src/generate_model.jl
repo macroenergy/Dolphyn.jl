@@ -284,7 +284,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = emissions_liquid_fuels(EP, inputs, setup)
 
 		###HLiquid Fuel Demand Constraints
-		@constraint(EP, cLFBalance[t=1:T, z=1:Z], EP[:eLFBalance][t,z] == inputs["Liquid_Fuels_D"][t,z])
+		@expression(EP, eGlobalLFBalance[t=1:T], sum(EP[:eLFBalance][t,z] for z = 1:Z) )
+		@expression(EP, eGlobalLFDemand[t=1:T], sum(inputs["Liquid_Fuels_D"][t,z] for z = 1:Z) )
+		@constraint(EP, cLFBalance[t=1:T], eGlobalLFBalance[t] == eGlobalLFDemand[t])
 
 	end
 

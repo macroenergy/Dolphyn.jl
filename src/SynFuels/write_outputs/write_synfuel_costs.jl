@@ -30,7 +30,7 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		ErrorException("Writing outputs for commit units not implemented")
 	end
 
-	dfSynFuelsCost = DataFrame(Costs = ["cSFTotal", "cSFFix", "cSFVar", "cSFByProdRev"])
+	dfSynFuelsCost = DataFrame(Costs = ["cSFTotal", "cSFFix", "cSFVar", "cSFByProdRev", "CSFConvFuelCost"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cSFVar = value(EP[:eTotalCSFProdVarOut])* (ModelScalingFactor^2)
 		cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])*ModelScalingFactor^2
