@@ -32,22 +32,47 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
     # Adjustment of Fuel_CO2 units carried out in load_fuels_data.jl
+    
     @expression(
         EP,
         eH2EmissionsByPlant[k = 1:H, t = 1:T],
         if (dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] > 0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
             inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
             dfH2Gen[!, :etaFuel_MMBtu_p_tonne][k] *
-            EP[:vH2Gen][k, t] +
+            EP[:vH2Gen][k, t] * 
+            (1-dfH2Gen[!, :CCS_Rate][k]) +
             inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
             dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] *
-            EP[:vH2_CHARGE_STOR][k, t]
+            EP[:vH2_CHARGE_STOR][k, t] * 
+            (1-dfH2Gen[!, :CCS_Rate][k])
         else
             inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
             dfH2Gen[!, :etaFuel_MMBtu_p_tonne][k] *
-            EP[:vH2Gen][k, t]
+            EP[:vH2Gen][k, t] * 
+            (1-dfH2Gen[!, :CCS_Rate][k])
         end
     )
+
+    @expression(
+        EP,
+        eCO2CaptureByH2Plant[k = 1:H, t = 1:T],
+        if (dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] > 0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
+            inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
+            dfH2Gen[!, :etaFuel_MMBtu_p_tonne][k] *
+            EP[:vH2Gen][k, t] * 
+            (dfH2Gen[!, :CCS_Rate][k]) +
+            inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
+            dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] *
+            EP[:vH2_CHARGE_STOR][k, t] * 
+            (dfH2Gen[!, :CCS_Rate][k])
+        else
+            inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
+            dfH2Gen[!, :etaFuel_MMBtu_p_tonne][k] *
+            EP[:vH2Gen][k, t] * 
+            (dfH2Gen[!, :CCS_Rate][k])
+        end
+    )
+    
 
     @expression(
         EP,
