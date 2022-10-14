@@ -31,7 +31,7 @@ function load_minimum_capacity_requirement(path::AbstractString,sep::AbstractStr
 		inputs["MinCapReq"] = inputs["MinCapReq"]/ModelScalingFactor # Convert to GW
 	end
 
-	println("Minimum_capacity_requirement.csv Successfully Read!")
+	print_and_log("Minimum_capacity_requirement.csv Successfully Read!")
 	
 	return inputs
 end

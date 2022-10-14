@@ -71,7 +71,7 @@ Truck compression energy: Cannot retire more energy capacity than existing energ
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 Truck Investment Module")
+    print_and_log("H2 Truck Investment Module")
 
     dfH2Truck = inputs["dfH2Truck"]
 

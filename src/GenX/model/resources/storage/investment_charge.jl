@@ -56,7 +56,7 @@ In addition, this function adds investment and fixed O&M related costs related t
 """
 function investment_charge(EP::Model, inputs::Dict)
 
-	println("Charge Investment Module")
+	print_and_log("Charge Investment Module")
 
 	dfGen = inputs["dfGen"]
 

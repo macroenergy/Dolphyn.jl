@@ -71,6 +71,6 @@ function load_co2_cap(setup::Dict, path::AbstractString, sep::AbstractString, in
 
 	end
 
-	println("CO2_cap.csv Successfully Read!")
+	print_and_log("CO2_cap.csv Successfully Read!")
 	return inputs_co2
 end

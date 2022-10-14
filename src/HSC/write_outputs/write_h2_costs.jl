@@ -81,6 +81,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		else
 			cH2NetworkExpCost = value(EP[:eCH2Pipe])
 		end
+	else
 		cH2NetworkExpCost=0
 	end
 

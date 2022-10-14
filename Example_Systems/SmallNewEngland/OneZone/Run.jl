@@ -16,20 +16,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 cd(dirname(@__FILE__))
 
-
-
 settings_path = joinpath(pwd(), "Settings")
 
-environment_path = "../../../package_activate.jl"
+environment_path = "../../package_activate.jl"
 include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 
 ### Set relevant directory paths
-src_path = "../../../src/"
+src_path = "../../src/"
 
 inpath = pwd()
 
 ### Load GenX
-println("Loading packages")
+print_and_log("Loading packages")
 push!(LOAD_PATH, src_path)
 
 using DOLPHYN
@@ -44,56 +42,55 @@ mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores gl
 mysetup = Dict()
 mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
-## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
 
     if mysetup["ModelH2"] == 1
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-            println("Clustering Time Series Data...")
+            print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
-            println("Time Series Data Already Clustered.")
+            print_and_log("Time Series Data Already Clustered.")
         end
     else
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
-            println("Clustering Time Series Data...")
+            print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
-            println("Time Series Data Already Clustered.")
+            print_and_log("Time Series Data Already Clustered.")
         end
     end
 
 end
 
 # ### Configure solver
-println("Configuring Solver")
+print_and_log("Configuring Solver")
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # #### Running a case
 
-# ### Load power system inputs
-# println("Loading Inputs")
+# ### Load inputs
+# print_and_log("Loading Inputs")
  myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
  myinputs = load_inputs(mysetup, inpath)
 
-# ### Load inputs for modeling the hydrogen supply chain
+# ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end
 
 # ### Generate model
-# println("Generating the Optimization Model")
+# print_and_log("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
-println("Solving Model")
+print_and_log("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 ### Write power system output
 
-println("Writing Output")
+print_and_log("Writing Output")
 outpath = "$inpath/Results"
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 
@@ -102,4 +99,3 @@ if mysetup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
-

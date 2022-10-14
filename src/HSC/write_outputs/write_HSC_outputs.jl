@@ -70,6 +70,6 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     end
 
     ## Print confirmation
-    println("Wrote outputs HSC outputs to $path$sep")
+    print_and_log("Wrote outputs HSC outputs to $path$sep")
 
 end # END output()

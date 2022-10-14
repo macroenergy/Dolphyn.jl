@@ -14,26 +14,13 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# Walk into current directory
 cd(dirname(@__FILE__))
 
-
+# Loading settings
+using YAML
 
 settings_path = joinpath(pwd(), "Settings")
-
-environment_path = "../../../package_activate.jl"
-include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
-
-### Set relevant directory paths
-src_path = "../../../src/"
-
-inpath = pwd()
-
-### Load GenX
-println("Loading packages")
-push!(LOAD_PATH, src_path)
-
-using DOLPHYN
-using YAML
 
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
@@ -42,38 +29,62 @@ mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 suppl
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
 mysetup = Dict()
-mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+
+# Start logging
+using LoggingExtras
+
+global Log = mysetup["Log"]
+
+if Log
+    logger = FileLogger(mysetup["LogFile"])
+    global_logger(logger)
+end
+
+# Activate environment
+environment_path = "../../../package_activate.jl"
+include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+
+### Set relevant directory paths
+src_path = "../../../src/"
+
+inpath = pwd()
+
+### Load DOLPHYN
+println("Loading packages")
+push!(LOAD_PATH, src_path)
+
+using DOLPHYN
 
 ## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
-
     if mysetup["ModelH2"] == 1
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-            println("Clustering Time Series Data...")
+            print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
-            println("Time Series Data Already Clustered.")
+            print_and_log("Time Series Data Already Clustered.")
         end
     else
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
-            println("Clustering Time Series Data...")
+            print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
-            println("Time Series Data Already Clustered.")
+            print_and_log("Time Series Data Already Clustered.")
         end
     end
 
 end
 
 # ### Configure solver
-println("Configuring Solver")
+print_and_log("Configuring Solver")
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # #### Running a case
 
 # ### Load power system inputs
-# println("Loading Inputs")
+# print_and_log("Loading Inputs")
  myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
  myinputs = load_inputs(mysetup, inpath)
 
@@ -83,17 +94,17 @@ if mysetup["ModelH2"] == 1
 end
 
 # ### Generate model
-# println("Generating the Optimization Model")
+# print_and_log("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
-println("Solving Model")
+print_and_log("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 ### Write power system output
 
-println("Writing Output")
+print_and_log("Writing Output")
 outpath = "$inpath/Results"
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 

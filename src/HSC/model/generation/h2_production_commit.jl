@@ -142,7 +142,7 @@ It is recommended that users of GenX must use longer subperiods than the longest
 """
 function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 Production (Unit Commitment) Module")
+	print_and_log("H2 Production (Unit Commitment) Module")
 	
 	# Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]
