@@ -17,6 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 module DOLPHYN
 
 #export package_activate
+export compare_results
 export print_and_log
 export configure_settings
 export configure_solver
@@ -66,6 +67,9 @@ Log = true
 
 # Auxiliary logging function
 include("print_and_log.jl")
+
+# Results comparison tools
+include("compare_results.jl")
 
 # Configure settings
 include("configure_settings/configure_settings.jl")
