@@ -39,7 +39,7 @@ function load_inputs(setup::Dict,path::AbstractString)
 	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading Input CSV Files")
+	print_and_log("Reading Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
 	inputs = Dict()
 	# Read input data about power network topology, operating and expansion attributes
@@ -88,7 +88,7 @@ function load_inputs(setup::Dict,path::AbstractString)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
 
-	println("CSV Files Successfully Read In From $path$sep")
+	print_and_log("CSV Files Successfully Read In From $path$sep")
 
 	return inputs
 end

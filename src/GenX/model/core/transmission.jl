@@ -171,7 +171,7 @@ These constraints and binary decisions are ommited if the model is fully linear.
 """
 function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::Int)
 
-	println("Transmission Module")
+	print_and_log("Transmission Module")
 
 	dfGen = inputs["dfGen"]
 

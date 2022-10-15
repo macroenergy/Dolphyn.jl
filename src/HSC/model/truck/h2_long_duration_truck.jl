@@ -42,8 +42,8 @@ State of charge of truck at beginning of each modeled period cannot exceed insta
 ```
 """
 function h2_long_duration_truck(EP::Model, inputs::Dict)
-    #!Yuheng Zhang: This function didn't satisfy the constraints described in the previous section.
-    println("H2 Long Duration Truck Module")
+
+    print_and_log("H2 Long Duration Truck Module")
 
     Z = inputs["Z"] # Number of zone locations
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]

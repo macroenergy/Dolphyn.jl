@@ -55,7 +55,7 @@ For storage resources where upper bound $\overline{R_{s,z}^{\textrm{H,ENE}}}$ an
 """
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 Storage Energy Investment Module")
+    print_and_log("H2 Storage Energy Investment Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

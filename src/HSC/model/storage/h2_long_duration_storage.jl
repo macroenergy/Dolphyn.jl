@@ -91,7 +91,7 @@ This constraint ensures that installed energy storage capacity is consistent wit
 """
 function h2_long_duration_storage(EP::Model, inputs::Dict)
 
-	println("Hydrogen Long Duration Storage Module")
+	print_and_log("Hydrogen Long Duration Storage Module")
 
 	dfH2Gen = inputs["dfH2Gen"]
 

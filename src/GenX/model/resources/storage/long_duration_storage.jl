@@ -91,7 +91,7 @@ This constraint ensures that installed energy storage capacity is consistent wit
 """
 function long_duration_storage(EP::Model, inputs::Dict)
 
-	println("Long Duration Storage Module")
+	print_and_log("Long Duration Storage Module")
 
 	dfGen = inputs["dfGen"]
 

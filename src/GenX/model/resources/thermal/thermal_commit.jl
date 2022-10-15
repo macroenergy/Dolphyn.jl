@@ -151,7 +151,7 @@ It is recommended that users of DOLPHYN must use longer subperiods than the long
 """
 function thermal_commit(EP::Model, inputs::Dict, Reserves::Int)
 
-	println("Thermal (Unit Commitment) Resources Module")
+	print_and_log("Thermal (Unit Commitment) Resources Module")
 
 	dfGen = inputs["dfGen"]
 
@@ -306,7 +306,7 @@ Note there are multiple versions of these constraints in the code in order to av
 """
 function thermal_commit_reserves(EP::Model, inputs::Dict)
 
-	println("Thermal Commit Reserves Module")
+	print_and_log("Thermal Commit Reserves Module")
 
 	dfGen = inputs["dfGen"]
 

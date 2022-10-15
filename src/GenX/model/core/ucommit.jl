@@ -47,7 +47,7 @@ If set ```UCommit``` to 1, the unit commitment variables are set to integer type
 """
 function ucommit(EP::Model, inputs::Dict, UCommit::Int)
 
-	println("Unit Commitment Module")
+	print_and_log("Unit Commitment Module")
 
 	dfGen = inputs["dfGen"]
 

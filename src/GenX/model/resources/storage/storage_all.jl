@@ -100,7 +100,7 @@ Finally, the maximum discharge rate for storage resources, $x_{s,z,t}^{\textrm{E
 """
 function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::Int)
 	# Setup variables, constraints, and expressions common to all storage resources
-	println("Storage Core Resources Module")
+	print_and_log("Storage Core Resources Module")
 
 	dfGen = inputs["dfGen"]
 

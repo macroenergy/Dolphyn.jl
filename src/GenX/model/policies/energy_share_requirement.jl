@@ -43,7 +43,7 @@ However, with 100% RPS or CES policies enacted in several jurisdictions, policy 
 """
 function energy_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Energy Share Requirement Policies Module")
+	print_and_log("Energy Share Requirement Policies Module")
 
 	dfGen = inputs["dfGen"]
 

@@ -81,7 +81,7 @@ For resources where upper bound $\overline{y}_{g, z}^{\textrm{E,GEN}}$ and lower
 """
 function investment_discharge(EP::Model, inputs::Dict)
 
-	println("Investment Discharge Module")
+	print_and_log("Investment Discharge Module")
 
 	dfGen = inputs["dfGen"]
 

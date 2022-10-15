@@ -35,7 +35,7 @@ function load_generators_variability(setup::Dict, path::AbstractString, sep::Abs
 	# Maximum power output and variability of each energy resource
 	inputs_genvar["pP_Max"] = transpose(Matrix{Float64}(gen_var[1:inputs_genvar["T"],2:(inputs_genvar["G"]+1)]))
 
-	println("Generators_variability.csv Successfully Read!")
+	print_and_log("Generators_variability.csv Successfully Read!")
 
 	return inputs_genvar
 end

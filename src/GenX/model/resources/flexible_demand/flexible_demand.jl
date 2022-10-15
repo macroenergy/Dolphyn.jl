@@ -73,7 +73,7 @@ This time-wrapping implementation is similar to the time-wrapping implementation
 function flexible_demand(EP::Model, inputs::Dict)
     ## Flexible demand resources available during all hours and can be either delayed or advanced (virtual storage-shiftable demand) - DR ==1
 
-    println("Flexible Demand Resources Module")
+    print_and_log("Flexible Demand Resources Module")
 
     dfGen = inputs["dfGen"]
 
@@ -141,12 +141,12 @@ function flexible_demand(EP::Model, inputs::Dict)
             FLEXIBLE_DEMAND_DELAY_HOURS = [] # Set of hours in the summation term of the maximum demand delay constraint for the first subperiod of each representative period
             for s in START_SUBPERIODS
                 flexible_demand_delay_start = s+hours_per_subperiod-max_flexible_demand_delay
-                println("Max flexible demand delay type")
-                println(typeof(max_flexible_demand_delay))
-                println("Hours per subperiod type")
-                println(typeof(hours_per_subperiod))
-                println("Type of s")
-                println(typeof(s))
+                print_and_log("Max flexible demand delay type")
+                print_and_log(typeof(max_flexible_demand_delay))
+                print_and_log("Hours per subperiod type")
+                print_and_log(typeof(hours_per_subperiod))
+                print_and_log("Type of s")
+                print_and_log(typeof(s))
                 FLEXIBLE_DEMAND_DELAY_HOURS = union(FLEXIBLE_DEMAND_DELAY_HOURS, flexible_demand_delay_start:(s+hours_per_subperiod-2))
             end
 

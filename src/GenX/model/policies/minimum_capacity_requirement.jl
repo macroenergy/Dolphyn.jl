@@ -33,7 +33,7 @@ The dual value of each minimum capacity constraint can be interpreted as the req
 """
 function minimum_capacity_requirement(EP::Model, inputs::Dict)
 
-	println("Minimum Capacity Requirement Module")
+	print_and_log("Minimum Capacity Requirement Module")
 
 	dfGen = inputs["dfGen"]
 	NumberOfMinCapReqs = inputs["NumberOfMinCapReqs"]

@@ -56,7 +56,7 @@ For storage resources where upper bound $\overline{\textrm{R}}_{s,z}^{\textrm{E,
 """
 function investment_charge(EP::Model, inputs::Dict)
 
-	println("Charge Investment Module")
+	print_and_log("Charge Investment Module")
 
 	dfGen = inputs["dfGen"]
 

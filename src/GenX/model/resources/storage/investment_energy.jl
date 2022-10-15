@@ -55,7 +55,7 @@ For storage resources where upper bound $\overline{\textrm{R}}_{s,z}^{\textrm{E,
 """
 function investment_energy(EP::Model, inputs::Dict)
 
-	println("Storage Investment Module")
+	print_and_log("Storage Investment Module")
 
 	dfGen = inputs["dfGen"]
 

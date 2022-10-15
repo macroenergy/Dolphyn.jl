@@ -23,7 +23,7 @@ A wide range of energy storage devices (all $s \in \mathcal{S}$) can be modeled 
 """
 function storage(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::Int)
 
-	println("Storage Resources Module")
+	print_and_log("Storage Resources Module")
 
 	if !isempty(inputs["STOR_ALL"]) #&& OperationWrapping == 1
 		EP = investment_energy(EP, inputs)

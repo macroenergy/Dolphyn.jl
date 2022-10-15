@@ -55,7 +55,7 @@ For storage resources where upper bound $\overline{R_{s,z}^{\textrm{H,CHA}}}$ an
 """
 function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 Storage Charging Investment Module")
+    print_and_log("H2 Storage Charging Investment Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 
