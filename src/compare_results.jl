@@ -14,12 +14,21 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    compare_results(path1::AbstractString, path2::AbstractString, output_filename::AbstractString="summary.txt")
 
+This function compares the contents of two directories and returns a summary file of the differences
+"""
 function compare_results(path1::AbstractString, path2::AbstractString, output_filename::AbstractString="summary.txt")
     lines_to_write = compare_dir(path1, path2)
     print_comparison(lines_to_write, output_filename)
 end
 
+@doc raw"""
+    print_comparison(path1::AbstractString, path2::AbstractString, output_filename::AbstractString="summary.txt")
+
+Takes a string array of differences between two directories and prints them to a file
+"""
 function print_comparison(lines_to_write::Array{Any,1}, output_filename::AbstractString="summary.txt")
     summary_file = open(output_filename, "w")
     write(summary_file, join(lines_to_write))
@@ -29,7 +38,7 @@ end
 @doc raw"""
     compare_dir(path1::AbstractString, path2::AbstractString)
 
-This function compares the contents of two directories and returns a summary file of the differences
+Compares the contents of two directories and returns a string array of the differences
 """
 function compare_dir(path1::AbstractString, path2::AbstractString, inset::String="")
     # Get the list of files in each directory
