@@ -6,8 +6,6 @@
 .Rhistory
 deps/deps.jl
 .vscode/
-GenXJulEnv/
-**/DOLPHYNJulEnv/
 output_data/
 MGAResults_min/
 MGAResults_max/
@@ -18,11 +16,23 @@ time_domain_reduction/TSC.jl
 gurobi.log
 **/output.log
 
+# Don't save the environment folder to avoid
+# problems between Julia versions
+GenXJulEnv/
+**/DOLPHYNJulEnv/
+
+# Don't store results files, except the example results
+# This requires a slightly awkward set of rules
+# as we want to keep the Results_HSC folder
+# !Results**/
 Results**/
 TDR_Results**/
 !Results_Example/
+!Results_Example/Results_HSC
 !TDR_Results_Example/
+!TDR_Results_Example/Results_HSC
 
+# Don't store summary files
 **/summary.txt
 
 src/test.jl
