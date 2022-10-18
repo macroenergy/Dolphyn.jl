@@ -25,7 +25,7 @@ GenXJulEnv/
 # This requires a slightly awkward set of rules
 # as we want to keep the Results_HSC folder
 # !Results**/
-Results**/*
+Results**/
 TDR_Results**/
 !Results_Example/
 !Results_Example/Results_HSC
