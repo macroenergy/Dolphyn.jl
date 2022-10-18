@@ -18,7 +18,8 @@ time_domain_reduction/TSC.jl
 gurobi.log
 **/output.log
 
-Results**/
+!Results**/
+Results**/*
 TDR_Results**/
 !Results_Example/
 !Results_Example/Results_HSC
