@@ -21,7 +21,9 @@ gurobi.log
 Results**/
 TDR_Results**/
 !Results_Example/
+!Results_Example/Results_HSC
 !TDR_Results_Example/
+!TDR_Results_Example/Results_HSC
 
 **/summary.txt
 
