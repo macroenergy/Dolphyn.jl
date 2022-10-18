@@ -1,8 +1,8 @@
 # Small New England: Three Zones
 
-**SmallNewEngland** is set of a simplified versions of the more detailed example system RealSystemExample. It is condensed for easy comprehension and quick testing of different components of the GenX. **SmallNewEngland/ThreeZones**, a one-year example with hourly resolution, contains zones representing Massachusetts, Connecticut, and Maine. The ten represented resources include only natural gas, solar PV, wind, and lithium-ion battery storage.
+**SmallNewEngland** is set of a simplified power and hydrogen models. It is condensed for easy comprehension and quick testing of different components of the DOLPHYN. **SmallNewEngland/ThreeZones**, a one-year example with hourly resolution, contains zones representing Massachusetts, Connecticut, and Maine. The ten represented power resources include only natural gas, solar PV, wind, and lithium-ion battery storage. The hydrogen resources include electrolyzers, SMRs, SMRs with CCS, and above ground storage in each zone. Pipelines allow for hydrogen transport between zones.
 
-To run the model, first navigate to the example directory at `GenX/Example_Systems/SmallNewEngland/ThreeZones`:
+To run the model, first navigate to the example directory at `DOLPHYN-dev/Example_Systems/SmallNewEngland/ThreeZones`:
 
 `cd("Example_Systems/SmallNewEngland/ThreeZones")`
    
@@ -12,4 +12,8 @@ Once the settings are confirmed, run the model with the `Run.jl` script in the e
 
 `include("Run.jl")`
 
-Once the model has completed, results will write to the `Results` directory.
+Once the model has completed, results will write to the `Results` directory. You can compare these results to example results (using the default settings provided here) in `Results_Example`, by running:
+
+`include("Check_results.jl")`
+
+If the example has run successfully, all of the files except `status.csv` should be identical

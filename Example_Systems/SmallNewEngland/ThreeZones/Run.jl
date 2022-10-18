@@ -43,7 +43,9 @@ end
 
 # Activate environment
 environment_path = "../../../package_activate.jl"
-include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+if !occursin("DOLPHYNJulEnv", Base.active_project())
+    include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+end
 
 ### Set relevant directory paths
 src_path = "../../../src/"
@@ -113,4 +115,3 @@ if mysetup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
-
