@@ -1,0 +1,11 @@
+#Only turn on when ModelCO2 = 1
+ModelBIO: 1 #Flag to turn or off Bioenergy Supply Chain modelling capabilities - 0 = no BESC, 1 = BESC modeled
+
+BIO_Nonlinear_CAPEX: 0
+BIO_Nonlinear_Supply: 0
+
+BIO_CAPEX_Piecewise_Segments: 1
+BIO_Supply_Piecewise_Segments: 1
+
+BIO_H2_On: 1
+BIO_Electricity_On: 1

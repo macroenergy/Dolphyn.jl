@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -60,7 +60,7 @@ function co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict
 			#####################################################################################################################################
 			##Piecewise Function for Investment Cost
 			#Define steps for piecewise function
-			Segments =  setup["CO2_Capture_Comp_CAPEX_Piecewise_Segments"]
+			Segments = setup["CO2_Capture_Comp_CAPEX_Piecewise_Segments"]
 			Intervals = Segments + 1
 			CAPEX_Intervals = zeros(CO2_CAPTURE_COMP_ALL,Intervals) #Parameter alpha
 			Capacity_Intervals = zeros(CO2_CAPTURE_COMP_ALL,Intervals) #Parameter X

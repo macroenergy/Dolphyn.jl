@@ -1,0 +1,4 @@
+CO2_Resource,Zone,CO2_CAPTURE_TYPE,New_Build,etaPCO2_MWh_per_tonne,etaFuel_MMBtu_per_tonne,Fuel,Max_Cap_tonne_p_hr,Min_Cap_tonne_p_hr,Inv_Cost_per_tonne_per_hr_yr,Fixed_OM_Cost_per_tonne_per_hr_yr,Min_capacity_tonne_per_hr,Max_capacity_tonne_per_hr,Ramp_Up_Percentage,Ramp_Down_Percentage,CO2_Capture_Min_Output,Start_Cost_per_tonne_p_hr,Up_Time,Down_Time,Ref_capacity_tonne_per_hr,Ref_CAPEX_per_yr,Ref_Fixed_OM_per_yr
+SE_Solid_DAC,1,2,1,0.23,3.9,SE_reference_naturalgas,-1,0,1165080,127896,0,11415.52511,1,1,0,0,0,0,114.1552511,133000000,14600000
+MIDAT_Solid_DAC,2,2,1,0.23,3.9,MIDAT_reference_naturalgas,-1,0,1165080,127896,0,11415.52511,1,1,0,0,0,0,114.1552511,133000000,14600000
+NE_Solid_DAC,3,2,1,0.23,3.9,NE_reference_naturalgas,-1,0,1165080,127896,0,11415.52511,1,1,0,0,0,0,114.1552511,133000000,14600000

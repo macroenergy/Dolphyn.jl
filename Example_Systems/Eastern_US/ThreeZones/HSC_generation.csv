@@ -1,0 +1,17 @@
+H2_Resource,Zone,H2_FLEX,H2_GEN_TYPE,H2_STOR,LDS,New_Build,etaP2G_MWh_p_tonne,etaFuel_MMBtu_p_tonne,Inv_Cost_p_tonne_p_hr_yr,Inv_Cost_Charge_p_tonne_p_hr_yr,Inv_Cost_Energy_p_tonne_yr,Fixed_OM_Cost_p_tonne_p_hr_yr,Fixed_OM_Cost_Charge_p_tonne_p_hr_yr,Fixed_OM_Cost_Energy_p_tonne_yr,Var_OM_Cost_p_tonne,Var_OM_Cost_Charge_p_tonne,Fuel,Max_Cap_tonne_p_hr,Min_Cap_tonne_p_hr,Max_Charge_Cap_tonne_p_hr,Min_Charge_Cap_tonne_p_hr,Max_Energy_Cap_tonne,Min_Energy_Cap_tonne,Existing_Cap_tonne_p_hr,Existing_Charge_Cap_tonne_p_hr,Existing_Energy_Cap_tonne,Cap_Size_tonne_p_hr,Ramp_Up_Percentage,Ramp_Down_Percentage,H2Gen_min_output,H2Stor_min_level,H2Stor_max_level,H2Stor_self_discharge_rate_p_hour,H2Stor_Charge_MWh_p_tonne,H2Stor_Charge_MMBtu_p_tonne,H2Stor_eff_charge,H2Stor_eff_discharge,Start_Cost_per_tonne_p_hr,Up_Time,Down_Time,Flexible_Demand_Energy_Eff,Max_Flexible_Demand_Delay,Max_Flexible_Demand_Advance,CCS_Rate
+SE_Flex_Demand,1,1,0,0,0,0,0,0,0,0,0,0,0,0,2,0,None,-1,0,-1,0,-1,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.9,3,3,0
+SE_Electrolyzer,1,0,2,0,0,1,45,0,1540542.017,0,0,535973.76,0,0,0,0,None,-1,0,-1,0,-1,0,0,0,0,0.04,1,1,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+MIDAT_Electrolyzer,2,0,2,0,0,1,45,0,1540542.017,0,0,535973.76,0,0,0,0,None,-1,0,-1,0,-1,0,0,0,0,0.04,1,1,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+NE_Electrolyzer,3,0,2,0,0,1,45,0,1540542.017,0,0,535973.76,0,0,0,0,None,-1,0,-1,0,-1,0,0,0,0,0.04,1,1,0.1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+SE_Large_SMR,1,0,1,0,0,1,0,166.68,2005507.525,0,0,1472522.77,0,0,0,0,SE_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.9,0,0,0,0,0,0,0,5,3,3,0,0,0,0
+MIDAT_Large_SMR,2,0,1,0,0,1,0,166.68,2005507.525,0,0,1472522.77,0,0,0,0,MIDAT_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.9,0,0,0,0,0,0,0,5,3,3,0,0,0,0
+NE_Large_SMR,3,0,1,0,0,1,0,166.68,2005507.525,0,0,1472522.77,0,0,0,0,NE_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.9,0,0,0,0,0,0,0,5,3,3,0,0,0,0
+SE_Large_SMR_wCCS_90pct,1,0,1,0,0,1,0,182.15,2820940.319,0,0,1322068.608,0,0,0,0,SE_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.9,0,0,0,0,0,0,0,100,3,3,0,0,0,0.9
+MIDAT_Large_SMR_wCCS_90pct,2,0,1,0,0,1,0,182.15,2820940.319,0,0,1322068.608,0,0,0,0,MIDAT_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.9,0,0,0,0,0,0,0,100,3,3,0,0,0,0.9
+NE_Large_SMR_wCCS_90pct,3,0,1,0,0,1,0,182.15,2820940.319,0,0,1322068.608,0,0,0,0,NE_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.9,0,0,0,0,0,0,0,100,3,3,0,0,0,0.9
+SE_ATR_wCCS_94pct,1,0,2,0,0,1,2.386587771,168.2513141,2032499.993,0,0,952556.3281,0,0,0,0,SE_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.5,0,0,0,0,0,0,0,10,22,12,0,0,0,0.94
+MIDAT_ATR_wCCS_94pct,2,0,2,0,0,1,2.386587771,168.2513141,2032499.993,0,0,952556.3281,0,0,0,0,MIDAT_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.5,0,0,0,0,0,0,0,10,22,12,0,0,0,0.94
+NE_ATR_wCCS_90pct,3,0,2,0,0,1,2.386587771,168.2513141,2032499.993,0,0,952556.3281,0,0,0,0,NE_reference_naturalgas,-1,0,-1,0,-1,0,0,0,0,2,0.5,0.5,0.5,0,0,0,0,0,0,0,10,22,12,0,0,0,0.94
+SE_Above_ground_storage,1,0,0,1,1,1,0,0,0,147687,32009,0,0,1011.3225,0,0,None,-1,0,-1,0,-1,0,0,0,0,0,1,1,0,0.3,1,0,0.71,0,1,1,0,0,0,0,0,0,0
+MIDAT_Above_ground_storage,2,0,0,1,1,1,0,0,0,147687,32009,0,0,1011.3225,0,0,None,-1,0,-1,0,-1,0,0,0,0,0,1,1,0,0.3,1,0,0.71,0,1,1,0,0,0,0,0,0,0
+NE_Above_ground_storage,3,0,0,1,1,1,0,0,0,147687,32009,0,0,1011.3225,0,0,None,-1,0,-1,0,-1,0,0,0,0,0,1,1,0,0.3,1,0,0.71,0,1,1,0,0,0,0,0,0,0

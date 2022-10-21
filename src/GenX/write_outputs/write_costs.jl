@@ -26,12 +26,6 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 
-	@expression(EP, eCFix_Thermal, sum(EP[:eCFix][y] for y in inputs["THERM_ALL"]))
-	@expression(EP, eCFix_VRE, sum(EP[:eCFix][y] for y in inputs["VRE"]))
-	@expression(EP, eCFix_Must_Run, sum(EP[:eCFix][y] for y in inputs["MUST_RUN"]))
-	@expression(EP, eCFix_Hydro, sum(EP[:eCFix][y] for y in inputs["HYDRO_RES"]))
-	@expression(EP, eCFix_Stor_Inv, sum(EP[:eCFix][y] for y in inputs["STOR_ALL"]))
-
 	dfCost = DataFrame(Costs = ["cTotal", "cFix_Thermal", "cFix_VRE", "cFix_Must_Run", "cFix_Hydro", "cFix_Stor", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp"])
 	if setup["ParameterScale"] == 1
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)) * (ModelScalingFactor^2)

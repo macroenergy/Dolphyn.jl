@@ -60,6 +60,7 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	end
 
 	write_status(path, sep, inputs, setup, EP)
+
 	elapsed_time_costs = @elapsed write_costs(path, sep, inputs, setup, EP)
 	print_and_log("Time elapsed for writing costs is $elapsed_time_costs")
 	dfCap = write_capacity(path, sep, inputs, setup, EP)
@@ -71,7 +72,9 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	elapsed_time_nse = @elapsed write_nse(path, sep, inputs, setup, EP)
 	print_and_log("Time elapsed for writing nse is $elapsed_time_nse")
 	elapsed_time_power_balance = @elapsed write_power_balance(path, sep, inputs, setup, EP)
-	print_and_log("Time elapsed for writing power balance is $elapsed_time_power_balance")
+	println("Time elapsed for writing power balance is")
+	println(elapsed_time_power_balance)
+	
 	if inputs["Z"] > 1
 		elapsed_time_flows = @elapsed write_transmission_flows(path, sep, setup, inputs, EP)
 		print_and_log("Time elapsed for writing transmission flows is $elapsed_time_flows")

@@ -113,6 +113,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Initialize CO2 Capture Balance Expression
 	@expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
 
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -234,17 +235,17 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
 	end
-	
+
 	if setup["ModelCO2"] == 1
 
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
 		# Variable costs and carbon captured per DAC resource "k" and time "t"
-		EP = co2_outputs(EP, inputs, setup)
+		EP = co2_capture_var_cost(EP, inputs, setup)
 
 		# Fixed costs of DAC
-		EP = co2_investment(EP, inputs, setup)
+		EP = co2_capture_investment(EP, inputs, setup)
 	
 		#model CO2 capture
 		EP = co2_capture(EP, inputs, setup)
@@ -277,6 +278,28 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
+	if setup["ModelBIO"] == 1
+
+		# Net Power consumption
+		@expression(EP, eBIONetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Variable costs
+		EP = biorefinery_var_cost(EP, inputs, setup)
+
+		# Fixed costs
+		EP = biorefinery_investment(EP, inputs, setup)
+	
+		# Supply costs
+		EP = bio_herb_supply(EP, inputs, setup)
+		EP = bio_wood_supply(EP, inputs, setup)
+
+		if !isempty(inputs["BIO_RES_ALL"])
+			EP = biorefinery(EP, inputs, setup)
+		end
+
+		# Direct emissions
+		EP = emissions_besc(EP, inputs,setup)
+	end
 
 
 	################  Policies #####################3

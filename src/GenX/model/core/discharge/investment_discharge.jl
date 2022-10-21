@@ -145,6 +145,11 @@ function investment_discharge(EP::Model, inputs::Dict)
 
 	# Sum individual resource contributions to fixed costs to get total fixed costs
 	@expression(EP, eTotalCFix, sum(EP[:eCFix][y] for y in 1:G))
+	@expression(EP, eCFix_Thermal, sum(EP[:eCFix][y] for y in inputs["THERM_ALL"]))
+	@expression(EP, eCFix_VRE, sum(EP[:eCFix][y] for y in inputs["VRE"]))
+	@expression(EP, eCFix_Must_Run, sum(EP[:eCFix][y] for y in inputs["MUST_RUN"]))
+	@expression(EP, eCFix_Hydro, sum(EP[:eCFix][y] for y in inputs["HYDRO_RES"]))
+	@expression(EP, eCFix_Stor_Inv, sum(EP[:eCFix][y] for y in inputs["STOR_ALL"]))
 
 	# Add term to objective function expression
 	EP[:eObj] += eTotalCFix

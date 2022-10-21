@@ -1,0 +1,7 @@
+H2_Resource,Zone,Commit,New_Build,etaG2P_MWh_p_tonne,Inv_Cost_p_MW_p_yr,Fixed_OM_p_MW_yr,Var_OM_Cost_p_MWh,Max_Cap_MW,Min_Cap_MW,Existing_Cap_MW,Cap_Size_MW,Ramp_Up_Percentage,Ramp_Down_Percentage,G2P_min_output,Start_Cost_per_MW,Up_Time,Down_Time
+SE_CCGT-H2,1,0,1,21.645,7.36E+04,1.28E+04,1.96E+00,-1,0,0,10,0.7,0.7,0.3,0,2,1
+MIDAT_CCGT-H2,2,0,1,21.645,7.36E+04,1.28E+04,1.96E+00,-1,0,0,10,0.7,0.7,0.3,0,2,1
+NE_CCGT-H2,3,0,1,21.645,7.36E+04,1.28E+04,1.96E+00,-1,0,0,10,0.7,0.7,0.3,0,2,1
+SE_Fuel_Cell,1,0,1,19.98,91360.7761,32406.077,0,-1,0,0,1,1,1,0.1,0,1,1
+MIDAT_Fuel_Cell,2,0,1,19.98,91360.7761,32406.077,0,-1,0,0,1,1,1,0.1,0,1,1
+NE_Fuel_Cell,3,0,1,19.98,91360.7761,32406.077,0,-1,0,0,1,1,1,0.1,0,1,1

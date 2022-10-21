@@ -47,7 +47,7 @@ function write_h2_g2p(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	# rename!(total,auxNew_Names)
 	# dfPower = vcat(dfH2G2POut, total)
 
- 	CSV.write(string(path,sep,"HSC_G2P_H2_consumption.csv"), dftranspose(dfH2G2POut, false), writeheader=false)
+ 	CSV.write(string(path,sep,"HSC_G2P_H2_Consumption.csv"), dftranspose(dfH2G2POut, false), writeheader=false)
 	return dfH2G2POut
 
 

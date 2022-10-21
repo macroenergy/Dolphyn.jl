@@ -1,0 +1,14 @@
+ModelCO2: 1 #Flag to turn or off Carbon Supply Chain modelling capabilities - 0 = no CSC, 1= CSC modeled
+
+CSC_Nonlinear_CAPEX: 0
+
+#Specify the number of piecewise segments if modeling nonlinear CAPEX based on 6/10 rule in CSC
+DAC_CAPEX_Piecewise_Segments: 3
+CO2_Injection_CAPEX_Piecewise_Segments: 1
+CO2_Capture_Comp_CAPEX_Piecewise_Segments: 1
+
+CO2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer 0 = continuous capacity, 1 = discrete capacity
+ModelCO2Pipelines: 1 # Whether to model pipeline in CO2 supply chain - 0 = not included, 1 = included
+CO2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
+
+CO2Pipeline_Loss: 1 #Loss of CO2 from pipelines

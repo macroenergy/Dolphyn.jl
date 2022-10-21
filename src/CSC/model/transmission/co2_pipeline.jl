@@ -1,3 +1,20 @@
+"""
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A complete copy of the GNU General Public License v2 (GPLv2) is available
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+
 function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
 	println("CO2 Pipeline Module")
@@ -107,15 +124,19 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         @expression(EP, eCO2Loss_Pipes_zt[z=1:Z,t=1:T], 0)
     end
 
-    EP[:eCaptured_CO2_Balance] -= eCO2Loss_Pipes
+    
 
     #Calculate net flow at each pipe-zone interfrace
     @expression(EP, eCO2PipeFlow_net[p = 1:CO2_P, t = 1:T, d = [-1,1]],  vCO2PipeFlow_pos[p,t,d] - vCO2PipeFlow_neg[p,t,d]*(1-inputs["pLoss_tonne_per_tonne_CO2_Pipe"][p]))
 
     # CO2 balance - net flows of CO2 from between z and zz via pipeline p over time period t
-    @expression(EP, ePipeZoneCO2Demand[t=1:T,z=1:Z],
+    @expression(EP, ePipeZoneCO2Demand_No_Loss[t=1:T,z=1:Z],
         sum(eCO2PipeFlow_net[p,t, CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] for p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
 
+    # CO2 balance - net flows of CO2 from between z and zz via pipeline p over time period t
+    @expression(EP, ePipeZoneCO2Demand[t=1:T,z=1:Z],ePipeZoneCO2Demand_No_Loss[t,z] - eCO2Loss_Pipes[t,z])
+
+    #EP[:eCaptured_CO2_Balance] -= eCO2Loss_Pipes #No need as we have already deducted the loss from the balance
     EP[:eCaptured_CO2_Balance] += ePipeZoneCO2Demand
 
     if setup["ParameterScale"] ==1 

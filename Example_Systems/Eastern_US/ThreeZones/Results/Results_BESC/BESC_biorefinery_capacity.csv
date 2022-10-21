@@ -1,0 +1,11 @@
+Resource,Zone,Capacity_tonne_biomass_per_h,Capacity_tonne_MWh_per_h,Capacity_tonne_h2_per_h,Annual_Electricity_Production,Annual_H2_Production,Max_Annual_Biomass_Consumption,Annual_Biomass_Consumption,CapacityFactor
+SE_Bio_Electricity_Combustion_Plant_Herb,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIDAT_Bio_Electricity_Combustion_Plant_Herb,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+NE_Bio_Electricity_Combustion_Plant_Herb,3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SE_Bio_Electricity_Combustion_Plant_Wood,1,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIDAT_Bio_Electricity_Combustion_Plant_Wood,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+NE_Bio_Electricity_Combustion_Plant_Wood,3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SE_Bio_Hydrogen_Plant,1,3678.475620542641,0.0,225.18389206220613,0.0,1.972610894464924e6,3.2223446435953535e7,3.2223446435953505e7,0.9999999999999991
+MIDAT_Bio_Hydrogen_Plant,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+NE_Bio_Hydrogen_Plant,3,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Total,n/a,3678.475620542641,0.0,225.18389206220613,0.0,1.972610894464924e6,3.2223446435953535e7,3.2223446435953505e7,-

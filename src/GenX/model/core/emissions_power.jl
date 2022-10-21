@@ -38,6 +38,7 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 		 	dfGen[!,:CO2_per_MWh][y]*EP[:vP][y,t]
 	 	end
  	)
+<<<<<<< HEAD
  	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z), :R_ID]))
 
 	## TO DO: add expression to keep track of captured emissions by zone and plant (Jun Wen)
@@ -45,6 +46,13 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
  	# If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
  	# then need to add cost penalty due to CO2 prices
 	if (setup["CO2Cap"] == 4)
+=======
+ 	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
+	
+ 	# If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
+ 	# then need to add cost penalty due to CO2 prices
+	if (setup["CO2Cap"] ==4) 
+>>>>>>> 3ecb9f54 (Completed Bioenergy Supply Chain for Power and H2)
 		# Use CO2 price for power system as the global CO2 price
 		# Emissions penalty by zone - needed to report zonal cost breakdown
 		@expression(EP,eCEmissionsPenaltybyZone[z = 1:Z],
