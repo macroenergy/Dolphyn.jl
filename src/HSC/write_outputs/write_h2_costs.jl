@@ -129,14 +129,14 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			if setup["ModelH2G2P"] == 1
 				for  y in dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]
 
-					tempCFix += value.(EP[:eTotalH2G2PCFix])
-					tempCVar += value.(EP[:eTotalCH2G2PVarOut])
-					tempCTotal += value.(EP[:eTotalH2G2PCFix]) + value.(EP[:eTotalCH2G2PVarOut])
+					tempCFix += value.(EP[:eH2G2PCFix])[y]
+					tempCVar += sum(value.(EP[:eCH2G2PVar_out])[y,:])
+					tempCTotal += value.(EP[:eH2G2PCFix])[y] + sum(value.(EP[:eCH2G2PVar_out])[y,:])
 
 					if !isempty(inputs["H2_G2P_COMMIT"])
 						if y in inputs["H2_G2P_COMMIT"]
-							tempCStart += value.(EP[:eTotalH2G2PCStart]) 
-							tempCTotal += value.(EP[:eTotalH2G2PCStart]) 
+							tempCStart += value.(EP[:eH2G2PCStart])[y]
+							tempCTotal += value.(EP[:eH2G2PCStart])[y]
 						end
 					end
 				end
