@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -26,8 +26,6 @@ Pkg.add(Pkg.PackageSpec(name="GLPK", version="0.14.12"))
 Pkg.add(Pkg.PackageSpec(name="Ipopt", version="0.7.0"))
 Pkg.add(Pkg.PackageSpec(name="JuMP", version="0.21.8"))
 Pkg.add("MathOptInterface")
-# Pkg.add(Pkg.PackageSpec(name="SCIP"))
-# Pkg.build("SCIP")
 #Pkg.add(Pkg.PackageSpec(name="CPLEX", version="0.7.7"))
 Pkg.add(Pkg.PackageSpec(name="CSV", version="0.8.5"))
 Pkg.add(Pkg.PackageSpec(name="Clustering", version="0.14.2"))

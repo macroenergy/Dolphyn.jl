@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,41 +17,66 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	investment_discharge(EP::Model, inputs::Dict)
 
-This function defines the expressions and constraints keeping track of total available power generation/discharge capacity across all resources as well as constraints on capacity retirements.
+Sets up constraints common to all generation resources.
 
-The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. Note for storage resources, additional energy and charge power capacity decisions and constraints are defined in the storage module.
+This function defines the expressions and constraints keeping track of: 
+- total available thermal generation capacity $y_{k, z}^{\textrm{E,THE}}$ as well as constraints on capacity retirements.
+- total available renewable generation capacity $y_{r, z}^{\textrm{E,VRE}}$ as well as constraints on capacity retirements.
+- total available storage discharge capacity $y_{s, z}^{\textrm{\textrm{E,STO},DIS}}$ as well as constraints on capacity retirements.
+
+The expression defined in this file named after ```eTotalCap``` covers all variables $y_{k, z}^{\textrm{E,THE}}, y_{r, z}^{\textrm{E,VRE}}, 
+y_{s, z}^{\textrm{\textrm{E,STO},DIS}}$.
 
 ```math
-\begin{aligned}
-& \Delta^{total}_{y,z} =(\overline{\Delta_{y,z}}+\Omega_{y,z}-\Delta_{y,z}) \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	y_{g, z}^{\textrm{E,GEN}} = 
+	\begin{cases}
+		y_{k, z}^{\textrm{E,THE}} \quad if \quad k \in \mathcal{K} \\
+		y_{r, z}^{\textrm{E,VRE}} \quad if \quad r \in \mathcal{R} \\
+		y_{s, z}^{\textrm{\textrm{E,STO},DIS}} \quad if \quad s \in \mathcal{S}
+	\end{cases}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
+
+The total capacity of each resource (thermal, renewable, storage, DR, flexible demand resources and hydro) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. 
+Note for energy storage resources in power sector, additional energy and charge power capacity decisions and constraints are defined in the storage module.
+
+```math
+\begin{equation*}
+	\begin{split}
+	y_{g, z}^{\textrm{E,GEN}} &= y_{g, z}^{\textrm{E,GEN,total}} \\ 
+	& = y_{g, z}^{\textrm{E,GEN,existing}}+y_{g, z}^{\textrm{E,GEN,new}}-y_{g}^{\textrm{E,GEN,retired}}
+	\end{split}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
+```
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{E,GEN,c}} = \sum_{z \in \mathcal{Z}}\left(\sum_{g \in \mathcal{G}} y_{g, z}^{\textrm{E,GEN,new}}\times \textrm{c}_{g, z}^{\textrm{E,INV}} + \sum_{g \in \mathcal{G}} y_{g, z}^{\textrm{E,GEN,total}}\times \textrm{c}_{g, z}^{\textrm{E,FOM}}\right)
+\end{equation*}
+```
+
+**Constraints on generation discharge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{aligned}
-&\Delta_{y,z} \leq \overline{\Delta_{y,z}}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	0 \leq y_{g, z}^{\textrm{E,GEN,retired}} \leq y_{g, z}^{\textrm{E,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
 
-For resources where $\overline{\Omega_{y,z}}$ and $\underline{\Omega_{y,z}}$ is defined, then we impose constraints on minimum and maximum power capacity.
-```math
-\begin{aligned}
-& \Delta^{total}_{y,z} \leq \overline{\Omega}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z} \\
-& \Delta^{total}_{y,z}  \geq \underline{\Omega}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
-```
+For resources where upper bound $\overline{y}_{g, z}^{\textrm{E,GEN}}$ and lower bound $\underline{y}_{g, z}^{\textrm{E,GEN}}$ of capacity is defined, then we impose constraints on minimum and maximum power capacity.
 
-In addition, this function adds investment and fixed O\&M related costs related to discharge/generation capacity to the objective function:
 ```math
-\begin{aligned}
-& 	\sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Omega_{y,z})
-	+ (\pi^{FOM}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Delta^{total}_{y,z})\right)
-\end{aligned}
+\begin{equation*}
+	\underline{y}_{g, z}^{\textrm{E,GEN}} \leq y_{g, z}^{\textrm{E,GEN}} \leq \overline{y}_{g, z}^{\textrm{E,GEN}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
 """
 function investment_discharge(EP::Model, inputs::Dict)

@@ -19,39 +19,25 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
 
-This module uses the following 'helper' functions in separate files: ```h2_generation_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```h2_generation_no_commit()``` for resources not subject to unit commitment (if any).
-- Investment and FOM cost expression, VOM cost expression, minimum and maximum capacity limits
+This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,H-GEN}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by electrolyzers in zone $z$ at time period $t$.
 
-**Constraints**
-The outputs of each type of H2 generation facilities have to be kept within their lower and upper bounds. q
+The variable defined in this file named after ```vP2G``` cover variable $x_{z,t}^{E,H-GEN}$.
+
+**Constraints on hydrogen generation capacity**
+
+One cannot retire more capacity than existing capacity.
 ```math
-\begin{aligned}
-	\overline{\mathrm{R}}_{k, z}^{\mathrm{GEN}} \mathrm{M}_{k, z}^{\mathrm{GEN}} n_{k, z, t} \geq h_{k, z, t}^{\mathrm{GEN}} \geq \underline{\mathrm{R}}_{k, z}^{\mathrm{GEN}} \mathbf{M}_{k, z}^{\mathrm{GEN}} n_{k, z, t} \\
-	\forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
-\end{aligned}
+\begin{equation*}
+	0 \leq y_{g}^{\textrm{H,GEN,retired}} \leq y_{g}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}
+\end{equation*}
 ```
 
-The number of online units has to be less than the available number of generation units.
-```math
-\begin{aligned}
-	n_{k, z, t} \leq N_{k, z} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
-\end{aligned}
-```
+For resources where upper bound $\overline{y_{g}^{\textrm{H,GEN}}}$ and lower bound $\underline{y_{g}^{\textrm{H,GEN}}}$ of capacity is defined, then we impose constraints on minimum and maximum generation capacity.
 
-There are limits on the period of time between when a unit starts up and when it can be shut-down again, and vice versa
 ```math
-\begin{aligned}
-	n_{k, z, t} \geq \sum_{\tau=t-\tau_{k, z}^{\mathrm{UP}}}^{t} n_{k, z, t}^{\mathrm{UP}} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
-	N_{k, z}-n_{k, z, t} \geq \sum_{\tau=t-\tau_{k, z}^{\mathrm{DOWN}}}^{t} n_{k, z, t}^{\mathrm{DOWN}} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
-\end{aligned}
-```
-
-**Expressions**
-The numbers of units starting up and shutting down are modeled as:
-```math
-\begin{aligned}
-	n_{k, z, t}-n_{k, z, t-1}=n_{k, z, t}^{\mathrm{UP}}-n_{k, z, t}^{\mathrm{DOWN}} \quad \forall k \in \mathbb{K}, z \in \mathbb{Z}, t \in \mathbb{T}
-\end{aligned}
+\begin{equation*}
+	\underline{y_{g}^{\textrm{H,GEN}}} \leq y_{g}^{\textrm{H,GEN}} \leq \overline{y_{g}^{\textrm{H,GEN}}} \quad \forall g \in \mathcal{G}
+\end{equation*}
 ```
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)

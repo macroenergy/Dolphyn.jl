@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,41 +17,41 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	investment_charge(EP::Model, inputs::Dict)
 
-This function defines the expressions and constraints keeping track of total available storage charge capacity across all resources as well as constraints on capacity retirements. The function also adds investment and fixed O\&M related costs related to charge capacity to the objective function.
+This function defines the expressions and constraints keeping track of total available storage charge capacity ($s \in \mathcal{S}^{asym}, \mathcal{S}^{asym} \subseteq \mathcal{S}$) as well as constraints on capacity retirements.
+The function also adds investment and fixed O\&M costs related to charge capacity to the objective function.
 
-The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+The total capacity of each storage resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
-\begin{aligned}
-& \Delta^{total,charge}_{y,z} =(\overline{\Delta^{charge}_{y,z}}+\Omega^{charge}_{y,z}-\Delta^{charge}_{y,z}) \forall y \in \mathcal{O}^{asym}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	y_{s,z}^{\textrm{E,CHA,total}} = y_{s,z}^{\textrm{E,CHA,existing}} + y_{s,z}^{\textrm{E,CHA,new}} - y_{s,z}^{\textrm{E,CHA,retired}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+\end{equation*}
 ```
+
+**Cost expressions**
+
+In addition, this module adds investment and fixed O\&M costs related to charge capacity to the objective function:
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{E,CHA,c}} = \sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (\textrm{c}_{s,z}^{\textrm{E,CHA,INV}} \times y_{s,z}^{\textrm{E,CHA,new}} + \textrm{c}_{s,z}^{\textrm{E,CHA,FOM}} \times y_{s,z}^{\textrm{E,CHA,total}})
+\end{equation*}
+```
+
+**Constraints on storage charge capacity**
 
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{aligned}
-&\Delta^{charge}_{y,z} \leq \overline{\Delta^{charge}_{y,z}}
-	\hspace{4 cm}  \forall y \in \mathcal{O}^{asym}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	0 \leq y_{s,z}^{\textrm{E,CHA,retired}} \leq y_{s,z}^{\textrm{E,CHA,existing}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+\end{equation*}
 ```
 
-For resources where $\overline{\Omega_{y,z}^{charge}}$ and $\underline{\Omega_{y,z}^{charge}}$ is defined, then we impose constraints on minimum and maximum power capacity.
-```math
-\begin{aligned}
-& \Delta^{total,charge}_{y,z} \leq \overline{\Omega}^{charge}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{O}^{asym}, z \in \mathcal{Z} \\
-& \Delta^{total,charge}_{y,z}  \geq \underline{\Omega}^{charge}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{O}^{asym}, z \in \mathcal{Z}
-\end{aligned}
-```
+For storage resources where upper bound $\overline{\textrm{R}}_{s,z}^{\textrm{E,CHA}}$ and lower bound $\underline{\textrm{R}}_{s,z}^{\textrm{E,CHA}}$ is defined, then we impose constraints on minimum and maximum storage charge capacity.
 
-In addition, this function adds investment and fixed O&M related costs related to charge capacity to the objective function:
 ```math
-\begin{aligned}
-& 	\sum_{y \in \mathcal{O}^{asym} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST,charge}_{y,z} \times    \Omega^{charge}_{y,z})
-	+ (\pi^{FOM,charge}_{y,z} \times  \Delta^{total,charge}_{y,z})\right)
-\end{aligned}
+\begin{equation*}
+	\underline{\textrm{R}}_{s,z}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,CHA}} \leq \overline{\textrm{R}}_{s,z}^{\textrm{E,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+\end{equation*}
 ```
 """
 function investment_charge(EP::Model, inputs::Dict)

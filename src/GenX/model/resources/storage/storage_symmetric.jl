@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,7 +17,24 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	storage_symmetric(EP::Model, inputs::Dict, Reserves::Int)
 
-Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities. See ```storage()``` in ```storage.jl``` for description of constraints.
+Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities.
+
+For storage technologies with symmetric charge and discharge capacity (all $s \in \mathcal{S}^{sym}$), charge rate, $x_{s,z,t}^{\textrm{E,CHA}}$, is constrained by the total installed power capacity $y_{s,z}^{\textrm{E,STO,POW}}$. 
+Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, DOLPHYN permits storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), 
+with the simultaenous sum of charge $x_{s,z,t}^{\textrm{E,CHA}}$, and discharge $x_{s,z,t}^{\textrm{E,DIS}}$, also limited by the total installed power capacity, $y_{s,z}^{\textrm{E,STO,POW}}$. 
+These two constraints are as follows:
+
+```math
+\begin{equation*}
+	x_{s,z,t}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+```math
+\begin{equation*}
+	x_{s,z,t}^{\textrm{E,CHA}} + x_{s,z,t}^{\textrm{E,DIS}} \leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
 """
 function storage_symmetric(EP::Model, inputs::Dict, Reserves::Int)
 	# Set up additional variables, constraints, and expressions associated with storage resources with symmetric charge & discharge capacity
@@ -53,7 +70,19 @@ end
 @doc raw"""
 	storage_symmetric_reserves(EP::Model, inputs::Dict)
 
-Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities when reserves are modeled. See ```storage()``` in ```storage.jl``` for description of constraints.
+Sets up variables and constraints specific to storage resources with symmetric charge and discharge capacities when reserves are modeled.
+
+If reserves are modeled, the following two constraints replace those above:
+
+```math
+\begin{aligned}
+	x_{s,z,t}^{\textrm{E,CHA}} + f_{s,z,t}^{\textrm{E,CHA}} &\leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	x_{s,z,t}^{\textrm{E,CHA}} + f_{s,z,t}^{\textrm{E,CHA}} + x_{s,z,t}^{\textrm{E,DIS}} + f_{s,z,t}^{\textrm{E,DIS}} + r_{s,z,t}^{\textrm{E,CHA}} \leq y_{s,z}^{\textrm{E,STO,POW}} \quad \forall s \in \mathcal{S}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{aligned}
+```
+
+where $f_{s,z,t}^{\textrm{E,CHA}}$ is the contribution of storage resources to frequency regulation while charging, $f_{s,z,t}^{\textrm{E,DIS}}$ is the contribution of storage resources to frequency regulation while discharging, and $r_{s,z,t}^{\textrm{E,DIS}}$ is the contribution of storage resources to upward reserves while discharging. 
+Note that as storage resources can contribute to regulation and reserves while either charging or discharging, the proxy variables $f_{s,z,t}^{\textrm{E,CHA}}, f_{s,z,t}^{\textrm{E,DIS}}$ and $r_{s,z,t}^{\textrm{E,CHA}}, r_{s,z,t}^{\textrm{E,DIS}}$ are created for storage resources where the total contribution to regulation and reserves, $f_{s,z,t}^{\textrm{E,STO}}, r_{s,z,t}^{\textrm{E,STO}}$ is the sum of the proxy variables.
 """
 function storage_symmetric_reserves(EP::Model, inputs::Dict)
 

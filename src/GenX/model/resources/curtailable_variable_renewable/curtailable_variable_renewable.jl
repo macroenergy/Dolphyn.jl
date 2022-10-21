@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,21 +17,42 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 
-This function defines the constraints for operation of variable renewable energy (VRE) resources whose output can be curtailed ($y \in \mathcal{VRE}$), such as utility-scale solar PV or wind power resources or run-of-river hydro resources that can spill water.
+This function defines the constraints for operation of variable renewable energy (VRE) resources whose output can be curtailed ($r \in \mathcal{VRE}$), such as utility-scale solar PV or wind power resources or run-of-river hydro resources that can spill water.
 
-The operational constraints for VRE resources are a function of each technology's time-dependent hourly capacity factor (or availability factor, $\rho^{max}_{y,z,t}$), in per unit terms, and the total available capacity ($\Delta^{total}_{y,z}$).
+The operational constraints for VRE resources are a function of each technology's time-dependent hourly capacity factor (or availability factor, $R_{r,z,t}^{\textrm{E,VRE}}$), in per unit terms, and the total available capacity ($y_{r,z}^{\textrm{E,VRE},total}$).
 
-**Power output in each time step**
+**Power balance expressions**
 
-For each VRE technology type $y$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($\rho^{max}_{y,z,t}$), maximum availability ($\overline{\Omega_{y,z}}$) and investment cost ($\Pi^{INVEST}_{y,z}$, for example, due to interconnection cost differences). We define variables related to installed capacity ($\Delta_{y,z}$) and retired capacity ($\Delta_{y,z}$) for all resource bins for a particular VRE resource type $y$ and zone $z$ ($\overline{\mathcal{VRE}}^{y,z}$). However, the variable corresponding to power output in each timestep is only defined for the first bin. Parameter $VREIndex_{y,z}$, is used to keep track of the first bin, where $VREIndex_{y,z}=1$ for the first bin and $VREIndex_{y,z}=0$ for the remaining bins. This approach allows for modeling many different bins per VRE technology type and zone while significantly reducing the number of operational variable (related to power output for each time step from each bin) added to the model with every additional bin. Thus, the maximum power output for each VRE resource type in each zone is given by the following equation:
+Contributions to the power balance expression from renewable energy from each renewable resources $r \in \mathcal{R}$ are also defined as:
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \leq \sum_{(x,z)\in \overline{\mathcal{VRE}}^{x,z}}{\rho^{max}_{x,z,t} \times \Delta^{total}_{x,z}}  \hspace{2 cm}  \forall y,z \in \{(y,z)|VREIndex_{y,z}=1, z \in \mathcal{Z}\},t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	PowerBal_{VRE} = \sum_{r \in \mathcal{R}} x_{r,z,t}^{\textrm{E,VRE}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
-The above constraint is defined as an inequality instead of an equality to allow for VRE power output to be curtailed if desired. This adds the possibility of introducing VRE curtailment as an extra degree of freedom to guarantee that generation exactly meets demand in each time step.
+**Variable renewable power output in each time step**
+
+For each VRE technology type $r$ and model zone $z$, the model allows for incorporating multiple bins with different parameters for resource quality ($\textrm{R}_{r,z,t}^{\textrm{E,VRE}}$), maximum availability ($\overline{y}_{r,z}^{\textrm{E,VRE}}$) and investment cost ($\textrm{C}_{r,z}^{\textrm{E,INV}}$, for example, due to interconnection cost differences). 
+We define variables related to installed capacity ($y_{r,z}^{\textrm{E,VRE,new}}$) and retired capacity ($y_{r,z}^{\textrm{E,VRE,retired}}$) for all resource bins for a particular VRE resource type $r$ and zone $z$. 
+However, the variable corresponding to power output in each timestep is only defined for the first bin. Parameter $VREIndex_{r,z}$, is used to keep track of the first bin, where $VREIndex_{r,z}=1$ for the first bin and $VREIndex_{r,z}=0$ for the remaining bins. 
+This approach allows for modeling many different bins per VRE technology type and zone while significantly reducing the number of operational variable (related to power output for each time step from each bin) added to the model with every additional bin. 
+Thus, the maximum power output for each VRE resource type in each zone is given by the following equation:
+
+```math
+\begin{equation*}
+	x_{r,z,t}^{\textrm{E,VRE}} \leq \sum_{(r,z)\in \overline{\mathcal{VRE}}^{r,z}}{R_{r,z,t}^{\textrm{E,VRE}} \times y_{r,z,t}^{\textrm{E,VRE,total}}} \forall r,z \in \{(r,z)|VREIndex_{r,z}=1, z \in \mathcal{Z}\},t \in \mathcal{T}
+\end{equation*}
+```
+
+The above constraint is defined as an inequality instead of an equality to allow for VRE power output to be curtailed if desired. 
+This adds the possibility of introducing VRE curtailment as an extra degree of freedom to guarantee that generation exactly meets demand in each time step.
+
+```math
+\begin{equation*}
+	0 \leq x_{r,z,t}^{\textrm{E,CUR}} \leq x_{r,z,t}^{\textrm{E,VRE}} \quad \forall r \in \mathcal{VRE}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
 
 Note that if ```Reserves=1``` indicating that frequency regulation and operating reserves are modeled, then this function calls ```curtailable_variable_renewable_reserves()```, which replaces the above constraints with a formulation inclusive of reserve provision.
 """
@@ -49,15 +70,14 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 
 	VRE = inputs["VRE"]
 
-	VRE_POWER_OUT = intersect(dfGen[dfGen.Num_VRE_Bins.>=1,:R_ID], VRE)
+	VRE_POWER_OUT = intersect(dfGen[dfGen.Num_VRE_Bins.>=1, :R_ID], VRE)
 	VRE_NO_POWER_OUT = setdiff(VRE, VRE_POWER_OUT)
 
 	### Expressions ###
 
 	## Power Balance Expressions ##
 
-	@expression(EP, ePowerBalanceDisp[t=1:T, z=1:Z],
-	sum(EP[:vP][y,t] for y in intersect(VRE, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
+	@expression(EP, ePowerBalanceDisp[t=1:T, z=1:Z], sum(EP[:vP][y,t] for y in intersect(VRE, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceDisp
 
@@ -85,10 +105,14 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 		fix.(EP[:vP][y,:], 0.0, force=true)
 	end
 	##CO2 Polcy Module VRE Generation by zone
-	@expression(EP, eGenerationByVRE[z=1:Z, t=1:T], # the unit is GW
+	@expression(EP, 
+		# the unit is GW
+		eGenerationByVRE[z=1:Z, t=1:T], 
 		sum(EP[:vP][y,t] for y in intersect(inputs["VRE"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
 	)
+	
 	EP[:eGenerationByZone] += eGenerationByVRE
+
 	return EP
 end
 

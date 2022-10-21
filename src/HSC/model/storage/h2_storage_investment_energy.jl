@@ -17,44 +17,40 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the decision variables representing energy components of hydrogen storage technologies.
+This function defines the expressions and constraints keeping track of total available storage energy capacity as well as constraints on capacity retirements. 
+The function also adds investment and fixed OM costs related to energy capacity to the objective function.
 
-The total capacity of each resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+The total energy capacity of storage resource is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
-\begin{aligned}
-& \Delta^{total,energy}_{y,z} =(\overline{\Delta^{energy}_{y,z}}+\Omega^{energy}_{y,z}-\Delta^{energy}_{y,z}) \forall y \in \mathcal{O}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	y_{s,z}^{\textrm{H,ENE,total}} = y_{s,z}^{\textrm{H,ENE,existing}} + y_{s,z}^{\textrm{H,ENE,new}} - y_{s,z}^{\textrm{H,ENE,retired}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+\end{equation*}
 ```
+
+**Cost expressions**
+
+In addition, this module adds investment and fixed OM costs related to energy capacity to the objective function:
+```math
+\begin{equation*}
+	\sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{H,ENE,INV}} \times y_{s,z}^{\textrm{H,ENE,new}} + \textrm{c}_{s,z}^{\textrm{H,ENE,FOM}} \times y_{y,z}^{\textrm{H,ENE,total}})
+\end{equation*}
+```
+
+**Constraints on storage energy capacity**
 
 One cannot retire more capacity than existing capacity.
-
 ```math
-\begin{aligned}
-&\Delta^{energy}_{y,z} \leq \overline{\Delta^{energy}_{y,z}}
-		\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	0 \leq y_{s,z}^{\textrm{H,ENE,retired}} \leq y_{s,z}^{\textrm{H,ENE,existing}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+\end{equation*}
 ```
 
-For resources where $\overline{\Omega_{y,z}^{energy}}$ and $\underline{\Omega_{y,z}^{energy}}$ is defined, then we impose constraints on minimum and maximum power capacity.
-
+For storage resources where upper bound $\overline{R_{s,z}^{\textrm{H,ENE}}}$ and lower bound $\underline{R_{s,z}^{\textrm{H,ENE}}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
 ```math
-\begin{aligned}
-& \Delta^{total,energy}_{y,z} \leq \overline{\Omega}^{energy}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
-& \Delta^{total,energy}_{y,z}  \geq \underline{\Omega}^{energy}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
-\end{aligned}
-```
-
-In addition, this function adds investment and fixed O\&M related costs related to charge capacity to the objective function:
-
-```math
-\begin{aligned}
-& 	\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST,energy}_{y,z} \times    \Omega^{energy}_{y,z})
-	+ (\pi^{FOM,energy}_{y,z} \times  \Delta^{total,energy}_{y,z})\right)
-\end{aligned}
+\begin{equation*}
+	\underline{R_{s,z}^{\textrm{H,ENE}}} \leq y_{s,z}^{\textrm{H,ENE}} \leq \overline{R_{s,z}^{\textrm{H,ENE}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+\end{equation*}
 ```
 """
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)

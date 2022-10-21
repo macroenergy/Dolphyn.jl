@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.)
 
+This module uses the following 'helper' functions in separate files: ```h2_production_commit()``` for thermal resources subject to unit commitment decisions and constraints (if any) and ```h2_production_no_commit()``` for thermal hydrogen generation resources not subject to unit commitment (if any).
 """
 function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
@@ -43,8 +44,8 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 		EP = h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
 
-	##For CO2 Polcy constraint right hand side development - H2 Generation by zone and each time step
-		@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
+	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
+	@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
 		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
 	)
 
