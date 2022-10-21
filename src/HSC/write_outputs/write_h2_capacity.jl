@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,8 @@ Function for reporting the capacities for the different hydrogen resources (star
 function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2Gen = inputs["dfH2Gen"]
+	H = inputs["H2_RES_ALL"]
+
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_NEW_CAP"]
 		if i in inputs["H2_GEN_COMMIT"]
@@ -42,11 +44,11 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 	capcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	retcapcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in inputs["H2_STOR_ASYMMETRIC"]
-		if i in inputs["NEW_CAP_H2_CHARGE"]
+	for i in inputs["H2_STOR_ALL"]
+		if i in inputs["NEW_CAP_H2_STOR_CHARGE"]
 			capcharge[i] = value(EP[:vH2CAPCHARGE][i])
 		end
-		if i in inputs["RET_CAP_H2_CHARGE"]
+		if i in inputs["RET_CAP_H2_STOR_CHARGE"]
 			retcapcharge[i] = value(EP[:vH2RETCAPCHARGE][i])
 		end
 	end
@@ -59,6 +61,25 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		end
 		if i in inputs["RET_CAP_H2_ENERGY"]
 			retcapenergy[i] = value(EP[:vH2RETCAPENERGY][i])
+		end
+	end
+
+	MaxGen = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	for i in 1:H
+		MaxGen[i] = value.(EP[:eH2GenTotalCap])[i] * 8760
+	end
+
+	AnnualGen = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	for i in 1:H
+		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vH2Gen])[i,:]))
+	end
+
+	CapFactor = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	for i in 1:H
+		if MaxGen[i] == 0
+			CapFactor[i] = 0
+		else
+			CapFactor[i] = AnnualGen[i]/MaxGen[i]
 		end
 	end
 	
@@ -76,7 +97,10 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr],
 		RetChargeCap = retcapcharge[:],
 		NewChargeCap = capcharge[:],
-		EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr]+capcharge[:]-retcapcharge[:]
+		EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr]+capcharge[:]-retcapcharge[:],
+		MaxAnnualGeneration = MaxGen[:],
+		AnnualGeneration = AnnualGen[:],
+		CapacityFactor = CapFactor[:]
 	)
 
 
@@ -87,7 +111,9 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		StartEnergyCap = sum(dfCap[!,:StartEnergyCap]), RetEnergyCap = sum(dfCap[!,:RetEnergyCap]),
 		NewEnergyCap = sum(dfCap[!,:NewEnergyCap]), EndEnergyCap = sum(dfCap[!,:EndEnergyCap]),
 		StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
-		NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap])
+		NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap]),
+		MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]),
+		CapacityFactor = "-"
 	)
 
 	dfCap = vcat(dfCap, total)

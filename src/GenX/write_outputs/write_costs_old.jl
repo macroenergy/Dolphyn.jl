@@ -26,31 +26,17 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 
-	@expression(EP, eCFix_Thermal, sum(EP[:eCFix][y] for y in inputs["THERM_ALL"]))
-	@expression(EP, eCFix_VRE, sum(EP[:eCFix][y] for y in inputs["VRE"]))
-	@expression(EP, eCFix_Must_Run, sum(EP[:eCFix][y] for y in inputs["MUST_RUN"]))
-	@expression(EP, eCFix_Hydro, sum(EP[:eCFix][y] for y in inputs["HYDRO_RES"]))
-	@expression(EP, eCFix_Stor_Inv, sum(EP[:eCFix][y] for y in inputs["STOR_ALL"]))
-
-	dfCost = DataFrame(Costs = ["cTotal", "cFix_Thermal", "cFix_VRE", "cFix_Must_Run", "cFix_Hydro", "cFix_Stor", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp"])
+	dfCost = DataFrame(Costs = ["cTotal", "cFix", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp"])
 	if setup["ParameterScale"] == 1
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)) * (ModelScalingFactor^2)
-		cFix_Thermal = value(EP[:eCFix_Thermal]) * (ModelScalingFactor^2)
-		cFix_VRE = value(EP[:eCFix_VRE]) * (ModelScalingFactor^2)
-		cFix_Must_Run = value(EP[:eCFix_Must_Run]) * (ModelScalingFactor^2)
-		cFix_Hydro = value(EP[:eCFix_Hydro]) * (ModelScalingFactor^2)
-		cFix_Stor = (value(EP[:eCFix_Stor_Inv]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)) * (ModelScalingFactor^2)
+		cFix = (value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)) * (ModelScalingFactor^2)
 		cNSE =  value(EP[:eTotalCNSE]) * (ModelScalingFactor^2)
 		#cTotal = cVar + cFix + cNSE
 		#dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, 0, 0, 0]
 	else
 		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0))
 		#cVar = value(EP[:eTotalCVarOut])+(!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)
-		cFix_Thermal = value(EP[:eCFix_Thermal])
-		cFix_VRE = value(EP[:eCFix_VRE])
-		cFix_Must_Run = value(EP[:eCFix_Must_Run])
-		cFix_Hydro = value(EP[:eCFix_Hydro])
-		cFix_Stor = (value(EP[:eCFix_Stor_Inv]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0))
+		cFix = value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)
 		cNSE = value(EP[:eTotalCNSE])
 		#cTotal = cVar + cFix + cNSE
 	end
@@ -99,51 +85,26 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	end
 
 	# Define total costs
-	cTotal = cFix_Thermal + cFix_VRE + cFix_Must_Run + cFix_Hydro + cFix_Stor + cVar + cNSE + cStartCost + cRsvCost + cNetworkExpansionCost
+	cTotal = cFix + cVar + cNSE + cStartCost+ cRsvCost+cNetworkExpansionCost
 
 	# Define total column, i.e. column 2
-	dfCost[!,Symbol("Total")] = [cTotal, cFix_Thermal, cFix_VRE, cFix_Must_Run, cFix_Hydro, cFix_Stor, cVar, cNSE, cStartCost, cRsvCost, cNetworkExpansionCost]
+	dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, cStartCost, cRsvCost, cNetworkExpansionCost]
 
 	# Computing zonal cost breakdown by cost category
 	for z in 1:Z
 		tempCTotal = 0
-		tempCFix_Thermal = 0
-		tempCFix_VRE = 0
-		tempCFix_Must_Run = 0
-		tempCFix_Hydro = 0
-		tempCFix_Stor = 0
+		tempCFix = 0
 		tempCVar = 0
 		tempCStart = 0
-
-		for y in intersect(inputs["THERM_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Thermal = tempCFix_Thermal + value.(EP[:eCFix])[y]
-		end
-
-		for y in intersect(inputs["VRE"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_VRE = tempCFix_VRE + value.(EP[:eCFix])[y]
-		end
-
-		for y in intersect(inputs["MUST_RUN"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Must_Run = tempCFix_Must_Run + value.(EP[:eCFix])[y]
-		end
-
-		for y in intersect(inputs["HYDRO_RES"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Hydro = tempCFix_Hydro + value.(EP[:eCFix])[y]
-		end
-
-		for y in intersect(inputs["STOR_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Stor = tempCFix_Stor + value.(EP[:eCFix])[y]
-		end
-
 		for y in dfGen[dfGen[!,:Zone].==z,:][!,:R_ID]
-				
+			tempCFix = tempCFix +
+				(y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) +
+				(y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0) +
+				value.(EP[:eCFix])[y]
 			tempCVar = tempCVar +
 				(y in inputs["STOR_ALL"] ? sum(value.(EP[:eCVar_in])[y,:]) : 0) +
 				(y in inputs["FLEX"] ? sum(value.(EP[:eCVarFlex_in])[y,:]) : 0) +
 				sum(value.(EP[:eCVar_out])[y,:])
-
-			tempCFix_Stor = tempCFix_Stor + (y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) + (y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0)
-				
 			if setup["UCommit"]>=1
 				tempCTotal = tempCTotal +
 					value.(EP[:eCFix])[y] +
@@ -167,13 +128,8 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 			end
 		end
 
-
 		if setup["ParameterScale"] == 1
-			tempCFix_Thermal = tempCFix_Thermal * (ModelScalingFactor^2)
-			tempCFix_VRE = tempCFix_VRE * (ModelScalingFactor^2)
-			tempCFix_Must_Run = tempCFix_Must_Run * (ModelScalingFactor^2)
-			tempCFix_Hydro = tempCFix_Hydro * (ModelScalingFactor^2)
-			tempCFix_Stor = tempCFix_Stor * (ModelScalingFactor^2)
+			tempCFix = tempCFix * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 			tempCStart = tempCStart * (ModelScalingFactor^2)
@@ -194,7 +150,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		# Update non-served energy cost for each zone
 		tempCTotal = tempCTotal +tempCNSE
 
-		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Thermal, tempCFix_VRE, tempCFix_Must_Run, tempCFix_Hydro, tempCFix_Stor, tempCVar, tempCNSE, tempCStart, "-", "-"]
+		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
 	end
 	CSV.write(string(path,sep,"costs.csv"), dfCost)
 end

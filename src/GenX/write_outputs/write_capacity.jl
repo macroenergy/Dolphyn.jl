@@ -22,6 +22,8 @@ Function for reporting the diferent capacities for the different generation tech
 function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfGen = inputs["dfGen"]
+	G = inputs["G"]
+
 	capdischarge = zeros(size(inputs["RESOURCES"]))
 	for i in inputs["NEW_CAP"]
 		if i in inputs["COMMIT"]
@@ -61,6 +63,25 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			retcapenergy[i] = value(EP[:vRETCAPENERGY][i])
 		end
 	end
+
+	MaxGen = zeros(size(inputs["RESOURCES"]))
+	for i in 1:G
+		MaxGen[i] = value.(EP[:eTotalCap])[i] * 8760
+	end
+
+	AnnualGen = zeros(size(inputs["RESOURCES"]))
+	for i in 1:G
+		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vP])[i,:]))
+	end
+
+	CapFactor = zeros(size(inputs["RESOURCES"]))
+	for i in 1:G
+		if MaxGen[i] == 0
+			CapFactor[i] = 0
+		else
+			CapFactor[i] = AnnualGen[i]/MaxGen[i]
+		end
+	end
 	
 	dfCap = DataFrame(
 		Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone],
@@ -75,7 +96,10 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 		StartChargeCap = dfGen[!,:Existing_Charge_Cap_MW],
 		RetChargeCap = retcapcharge[:],
 		NewChargeCap = capcharge[:],
-		EndChargeCap = dfGen[!,:Existing_Charge_Cap_MW]+capcharge[:]-retcapcharge[:]
+		EndChargeCap = dfGen[!,:Existing_Charge_Cap_MW]+capcharge[:]-retcapcharge[:],
+		MaxAnnualGeneration = MaxGen[:],
+		AnnualGeneration = AnnualGen[:],
+		CapacityFactor = CapFactor[:]
 	)
 	if setup["ParameterScale"] ==1
 		dfCap.StartCap = dfCap.StartCap * ModelScalingFactor
@@ -90,6 +114,8 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 		dfCap.RetChargeCap = dfCap.RetChargeCap * ModelScalingFactor
 		dfCap.NewChargeCap = dfCap.NewChargeCap * ModelScalingFactor
 		dfCap.EndChargeCap = dfCap.EndChargeCap * ModelScalingFactor
+		dfCap.MaxAnnualGeneration = dfCap.MaxAnnualGeneration * ModelScalingFactor
+		dfCap.AnnualGeneration = dfCap.AnnualGeneration * ModelScalingFactor
 	end
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
@@ -98,7 +124,9 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			StartEnergyCap = sum(dfCap[!,:StartEnergyCap]), RetEnergyCap = sum(dfCap[!,:RetEnergyCap]),
 			NewEnergyCap = sum(dfCap[!,:NewEnergyCap]), EndEnergyCap = sum(dfCap[!,:EndEnergyCap]),
 			StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
-			NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap])
+			NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap]),
+			MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]),
+			CapacityFactor = "-"
 		)
 
 	dfCap = vcat(dfCap, total)

@@ -277,35 +277,14 @@ include("HSC/write_outputs/write_g2p_capacity.jl")
 # CSC Write Outputs
 include("CSC/write_outputs/write_co2_capture_capacity.jl")
 include("CSC/write_outputs/write_co2_capture_costs.jl")
-include("CSC/write_outputs/write_co2_capture_plant.jl")
-include("CSC/write_outputs/write_co2_capture_zone.jl")
-include("CSC/write_outputs/write_co2_fuel_emission.jl")
-include("CSC/write_outputs/write_CSC_outputs.jl")
-include("CSC/write_outputs/write_co2_capture_power_consumption.jl")
-
-include("CSC/write_outputs/write_co2_storage_injection_power_consumption.jl")
-include("CSC/write_outputs/write_co2_storage_injection_plant.jl")
-include("CSC/write_outputs/write_co2_storage_injection_zone.jl")
-include("CSC/write_outputs/write_co2_storage_injection_costs.jl")
 include("CSC/write_outputs/write_co2_storage_injection_capacity.jl")
-
-include("CSC/write_outputs/write_co2_capture_compression_power_consumption.jl")
-include("CSC/write_outputs/write_co2_capture_compression_plant.jl")
-include("CSC/write_outputs/write_co2_capture_compression_zone.jl")
-include("CSC/write_outputs/write_co2_capture_compression_costs.jl")
-include("CSC/write_outputs/write_co2_capture_compression_capacity.jl")
-
 include("CSC/write_outputs/write_co2_pipeline_flow.jl")
 include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
-include("CSC/write_outputs/write_co2_pipeline_loss.jl")
-include("CSC/write_outputs/write_co2_pipeline_power_consumption.jl")
-include("CSC/write_outputs/write_co2_pipeline_power_consumption_comp.jl")
+include("CSC/write_outputs/write_co2_emission_balance.jl")
+include("CSC/write_outputs/write_co2_storage_balance.jl")
 
-include("CSC/write_outputs/write_power_plant_co2_captured.jl")
-include("CSC/write_outputs/write_power_zone_co2_captured.jl")
-
-include("CSC/write_outputs/write_hydrogen_plant_co2_captured.jl")
-include("CSC/write_outputs/write_hydrogen_zone_co2_captured.jl")
+include("CSC/write_outputs/write_CSC_outputs.jl")
+include("CSC/write_outputs/write_CSC_costs.jl")
 
 # Modeling to generate alternatives
 include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")

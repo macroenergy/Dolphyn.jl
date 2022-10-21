@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -22,6 +22,8 @@ Function for reporting the diferent capacities for the different hydrogen to pow
 function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2G2P = inputs["dfH2G2P"]
+	H = inputs["H2_G2P_ALL"]
+
 	capdischarge = zeros(size(inputs["H2_G2P_NAME"]))
 	for i in inputs["H2_G2P_NEW_CAP"]
 		if i in inputs["H2_G2P_COMMIT"]
@@ -40,6 +42,25 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		end
 	end
 
+	MaxGen = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		MaxGen[i] = value.(EP[:eH2G2PTotalCap])[i] * 8760
+	end
+
+	AnnualGen = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vPG2P])[i,:]))
+	end
+
+	CapFactor = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		if MaxGen[i] == 0
+			CapFactor[i] = 0
+		else
+			CapFactor[i] = AnnualGen[i]/MaxGen[i]
+		end
+	end
+
 	
 
 	dfCap = DataFrame(
@@ -48,13 +69,18 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		RetCap = retcapdischarge[:],
 		NewCap = capdischarge[:],
 		EndCap = value.(EP[:eH2G2PTotalCap]),
+		MaxAnnualGeneration = MaxGen[:],
+		AnnualGeneration = AnnualGen[:],
+		CapacityFactor = CapFactor[:]
 	)
 
 
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
 			StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
-			NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap])
+			NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap]),
+			MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]),
+			CapacityFactor = "-"
 		)
 
 	dfCap = vcat(dfCap, total)

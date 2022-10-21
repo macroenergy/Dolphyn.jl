@@ -44,6 +44,6 @@ function write_co2_storage_injection_capacity(path::AbstractString, sep::Abstrac
 		)
 
 	dfCap = vcat(dfCap, total)
-	CSV.write(string(path,sep,"CSC_co2_storage_injection_capacity.csv"), dfCap)
+	CSV.write(string(path,sep,"CSC_storage_injection_capacity.csv"), dfCap)
 	return dfCap
 end

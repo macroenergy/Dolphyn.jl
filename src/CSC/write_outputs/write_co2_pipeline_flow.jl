@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -53,5 +53,5 @@ function write_co2_pipeline_flow(path::AbstractString, sep::AbstractString, inpu
 	end
 
 	dfCO2Pipeline = DataFrame(dfCO2Pipeline, :auto)
-	CSV.write(string(path,sep,"CSC_co2_pipeline_flow.csv"), dfCO2Pipeline, writeheader=false)
+	CSV.write(string(path,sep,"CSC_pipeline_flow.csv"), dfCO2Pipeline, writeheader=false)
 end
