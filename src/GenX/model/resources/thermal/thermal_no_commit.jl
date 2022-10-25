@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,22 +17,32 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	thermal_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 
-This function defines the operating constraints for thermal power plants NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions ($y \in H \setminus UC$).
+This function defines the operating constraints for thermal power plants NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions $k \in \mathcal{THE} \setminus \mathcal{UC}$.
+
+**Power balance expressions**
+
+Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
+	
+```math
+\begin{equation*}
+	PowerBal_{THE} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}
+\end{equation*}
+```	
 
 **Ramping limits**
 
-Thermal resources not subject to unit commitment ($y \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
+Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t-1} - \Theta_{y,z,t} \leq \kappa_{y,z}^{down} \Delta^{\text{total}}_{y,z} \hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t-1}^{\textrm{E,THE}} - x_{k,z,t}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,DN}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} - \Theta_{y,z,t-1} \leq \kappa_{y,z}^{up} \Delta^{\text{total}}_{y,z} \hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{E,THE}} - x_{k,z,t-1}^{\textrm{E,THE}} \leq \kappa_{k,z}^{\textrm{E,UP}} y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 (See Constraints 1-2 in the code)
 
@@ -43,17 +53,15 @@ This set of time-coupling constraints wrap around to ensure the power output in 
 When not modeling regulation and reserves, thermal units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \geq \rho^{min}_{y,z} \times \Delta^{total}_{y,z}
-	\hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{E,THE}} \geq \underline{R}_{k,z}^{\textrm{E,THE}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \leq \rho^{max}_{y,z,t} \times \Delta^{total}_{y,z}
-	\hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{E,THE}} \leq \overline{R}_{k,z}^{\textrm{E,THE}} \times y_{k,z}^{\textrm{E,THE}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 (See Constraints 3-4 in the code)
 """

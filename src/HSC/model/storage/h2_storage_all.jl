@@ -17,52 +17,91 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
-Sets up variables and constraints common to all hydrogen storage resources. See ```h2_storage()``` in ```h2_storage.jl``` for description of constraints.
-**Hydrogen storage devices with symmetric charge and discharge capacity**
+Sets up variables and constraints common to all hydrogen storage resources.
 
-For hydrogen storage technologies with symmetric charge and discharge capacity (all $o \in \mathcal{O}^{sym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed power capacity, $\Omega_{o,z}$. Since storage resources generally represent a `cluster' of multiple similar storage devices of the same type/cost in the same zone, DOLPHYN permits hydrogen storage resources to simultaneously charge and discharge (as some units could be charging while others discharge), with the simultaenous sum of charge, $\Pi_{o,z,t}$, and discharge, $\Theta_{o,z,t}$, also limited by the total installed charge capacity, $\Delta^{total}_{o,z}$. These two constraints are as follows:
+**Hydrogen storage discharge and inventory level decision variables**
+
+This module defines the hydrogen storage energy inventory level variable $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen stored in the storage device $s$ in zone $z$ at time period $t$.
+
+This module defines the power charge decision variable $x_{s,z,t}^{\textrm{H,CHA}}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged hydrogen into the storage device $s$ in zone $z$ at time period $t$.
+
+The variable defined in this file named after ```vH2S``` covers $U_{s,z,t}^{\textrm{H,STO}}$.
+
+The variable defined in this file named after ```vH2_CHARGE_STOR``` covers $x_{s,z,t}^{\textrm{H,CHA}}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs (variable O&M plus fuel cost) of charging action of storage devices $s \in \mathcal{S}$ over all time periods $t \in \mathcal{T}$:
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{H,STO,o}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s,z,t}^{\textrm{H,STO,o}} \times x_{s,z,t}^{\textrm{H,CHA}}
+\end{equation*}
+```
+
+**Power balance expressions**
+
+Contributions to the power balance expression from compression due to storage charging action from storage devices $s \in \mathcal{S}$ are also defined as:
+
+```math
+\begin{equation*}
+	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{\textrm{H,CHA}}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+**Hydrogen balance expressions**
+
+Contributions to the power balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
+
+```math
+\begin{equation*}
+	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS}} - x_{s,z,t}^{\textrm{H,CHA}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+**Storage inventory level track constraints**
+
+The following constraints apply to all storage resources, $s \in \mathcal{S}$, regardless of whether the charge/discharge capacities are symmetric or asymmetric.
+
+The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of energy stored at the end of the time period, $U_{s,z,t}^{\textrm{H,STO}}$, to the state of charge at the end of the prior time period, $U_{s,z,t-1}^{\textrm{H,STO}}$, the charge and discharge decisions in the current time period, $x_{s,z,t}^{\textrm{H,CHA}}, x_{s,z,t}^{\textrm{H,DIS}}$, and the self discharge rate for the storage resource (if any), $\eta_{s,z}^{H,loss}$. 
+The first of these two constraints enforces storage inventory balance for interior time steps $(t \in \mathcal{T}^{interior})$, while the second enforces storage balance constraint for the initial time step $(t \in \mathcal{T}^{start})$.
 
 ```math
 \begin{aligned}
-	&  \Pi_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  \Pi_{o,z,t} + \Theta_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}^{sym}, z \in \mathcal{Z}, t \in \mathcal{T}
+	U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,STO}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,CHA}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 
-These constraints are created with the function ```h2_storage_symmetric()``` in ```h2_storage_symmetric.jl```.
+**Bounds on storage power and energy capacity**
 
-**All hydrogen storage resources**
-
-The following constraints apply to all hydrogen storage resources, $o \in \mathcal{O}$, regardless of whether the charge/discharge capacities are symmetric or asymmetric.
-
-The following two constraints track the state of charge of the storage resources at the end of each time period, relating the volume of hydrogen stored at the end of the time period, $\Gamma_{o,z,t}$, to the state of charge at the end of the prior time period, $\Gamma_{o,z,t-1}$, the charge and discharge decisions in the current time period, $\Pi_{o,z,t}, \Theta_{o,z,t}$, and the self discharge rate for the storage resource (if any), $\eta_{o,z}^{loss}$. The first of these two constraints enforces hydrogen storage inventory balance for interior time steps $(t \in \mathcal{T}^{interior})$, while the second enforces hydrogen storage balance constraint for the initial time step $(t \in \mathcal{T}^{start})$.
+The storage power capacity sets lower and upper bounds on the storage energy capacity due to charging or discharging duration.
 
 ```math
 \begin{aligned}
-	&  \Gamma_{o,z,t} =\Gamma_{o,z,t-1} - \frac{1}{\eta_{o,z}^{discharge}}\Theta_{o,z,t} + \eta_{o,z}^{charge}\Pi_{o,z,t} - \eta_{o,z}^{loss}\Gamma_{o,z,t-1}  \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior}\\
-	&  \Gamma_{o,z,t} =\Gamma_{o,z,t+\tau^{period}-1} - \frac{1}{\eta_{o,z}^{discharge}}\Theta_{o,z,t} + \eta_{o,z}^{charge}\Pi_{o,z,t} - \eta_{o,z}^{loss}\Gamma_{o,z,t+\tau^{period}-1}  \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+	y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MinDuration} &\leq y_{s,z}^{\textrm{H,STO,ENE}} \\
+	y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MaxDuration} &\geq y_{s,z}^{\textrm{H,STO,ENE}}
 \end{aligned}
 ```
 
-When modeling the entire year as a single chronological period with total number of time steps of $\tau^{period}$, hydrogen storage inventory in the first time step is linked to hydrogen storage inventory at the last time step of the period representing the year. Alternatively, when modeling the entire year with multiple representative periods, this constraint relates hydrogen storage inventory in the first timestep of the representative period with the inventory at the last time step of the representative period, where each representative period is made of $\tau^{period}$ time steps. In this implementation, energy exchange between representative periods is not permitted. When modeling representative time periods, DOLPHYN enables modeling of long duration energy storage which tracks state of charge between representative periods enable energy to be moved throughout the year. If ```LongDurationStorage=1``` and ```OperationWrapping=1```, this function calls ```h2_long_duration_storage()``` in ```h2_long_duration_storage.jl``` to enable this feature.
+It limits the volume of energy $U_{s,z,t}^{\textrm{H,STO}}$ at any time $t$ to be less than the installed energy storage capacity $y_{s,z}^{\textrm{H,STO,ENE}}$.
 
-The next constraint limits the volume of energy stored at any time, $\Gamma_{o,z,t}$, to be less than the installed energy storage capacity, $\Delta^{total, energy}_{o,z}$. Finally, the maximum discharge rate for storage resources, $\Pi_{o,z,t}$, is constrained to be less than the discharge power capacity, $\Omega_{o,z,t}$ or the state of charge at the end of the last period, $\Gamma_{o,z,t-1}$, whichever is lessor.
+```math
+\begin{equation*}
+	0 \leq U_{s,z,t}^{\textrm{H,STO}} \leq y_{s,z}^{\textrm{H,STO,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+It also limits the discharge power $x_{s,z,t}^{\textrm{H,DIS}}$ at any time to be less than the installed power capacity $y_{s,z}^{\textrm{H,STO,POW}}$.
+Finally, the maximum discharge rate for storage resources, $x_{s,z,t}^{\textrm{H,STO}}$, is constrained to be less than the discharge power capacity, $y_{s,z}^{\textrm{H,STO,POW}}$ or the state of charge at the end of the last period, $U{s,z,t-1}^{\textrm{H,STO}}$, whichever is less.
 
 ```math
 \begin{aligned}
-	&  \Gamma_{o,z,t} \leq \Delta^{total, energy}_{o,z} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  \Theta_{o,z,t} \leq \Delta^{total}_{o,z} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}\\
-	&  \Theta_{o,z,t} \leq \Gamma_{o,z,t-1} & \quad \forall o \in \mathcal{O}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq y_{s,z}^{\textrm{H,STO,POW}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
-The next constraint limits the rate of charging to the installed storage capacity.
-```math
-\begin{aligned}
-	&  \Pi_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
-```
-
-The above constraints are established in ```h2_storage_all()``` in ```h2_storage_all.jl```.
 """
 function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources

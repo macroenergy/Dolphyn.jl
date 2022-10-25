@@ -15,47 +15,59 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_discharge(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    h2_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the production decision variable representing hydrogen injected into the network by resource $y$ by at time period $t$.
+Sets up constraints common to all hydrogen generation resources.
 
-This module additionally defines contributions to the objective function from variable costs of generation (variable O&M plus fuel cost) from all resources over all time periods.
+This function defines the expressions and constraints keeping track of total available generation capacity $y_{k}^{\textrm{H,GEN}}$ as well as constraints on capacity retirements.
 
-**Variables**
-```math
-\begin{aligned}
-	\vartheta _{k}^{GenNewCap}\ge 0	
-\end{aligned}
-```	
+This function defines the expressions and constraints keeping track of total available storage discharge capacity $y_{s}^{\textrm{\textrm{H,STO},DIS}}$ as well as constraints on capacity retirements.
+
+The expression defined in this file named after ```eH2GenTotalCap``` covers all variables $y_{k}^{\textrm{H,THE}}, y_{s}^{\textrm{\textrm{H,STO},DIS}}$.
 
 ```math
-\begin{aligned}
-	\vartheta _{k}^{GenRetCap}\ge 0
-\end{aligned}
+\begin{equation*}
+	y_{g, z}^{\textrm{H,GEN}} = 
+	\begin{cases}
+		y_{k, z}^{\textrm{H,THE}} \quad if \quad g \in \mathcal{K} \\
+		y_{s, z}^{\textrm{\textrm{H,STO},DIS}} \quad if \quad g \in \mathcal{S}
+	\end{cases}
+    \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
 
+This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all resources over all time periods.
+
+The total capacity of each resource (SMR, storage, electrolysis) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. 
+Note for energy storage resources in hydrogen sector, additional energy and charge capacity decisions and constraints are defined in the storage module.
+
 ```math
-\begin{aligned}
-& \Delta^{total}_{y,z} =(\overline{\Delta_{y,z}}-\Delta_{y,z}) \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	\begin{split}
+	y_{g, z}^{\textrm{H,GEN}} &= y_{g}^{\textrm{H,GEN,total}} \\ 
+	& = y_{g, z}^{\textrm{H,GEN,existing}} + y_{g, z}^{\textrm{H,GEN,new}} - y_{g, z}^{\textrm{H,GEN,retired}}
+	\end{split}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
-	
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from investment costs of generation (fixed O\&M plus investment costs) from all generation resources $g \in \mathcal{G}$:
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{H,GEN,c}} = \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,new}}\times \textrm{c}_{g}^{\textrm{H,INV}} + \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,total}} \times \textrm{c}_{g}^{\textrm{H,FOM}}
+\end{equation*}
+```
+
+**Constraints on generation discharge capacity**
+
 One cannot retire more capacity than existing capacity.
 ```math
-\begin{aligned}
-&\Delta_{y,z} \leq \overline{\Delta_{y,z}}
-	\hspace{4 cm}  \forall y \in \mathcal{G}, z \in \mathcal{Z}
-\end{aligned}
-```
-	
-
-In addition, this function adds investment and fixed O\&M related costs related to discharge/generation capacity to the objective function:
-```math
-\begin{aligned}
-& 	\sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  )
-	+ (\pi^{FOM}_{y,z} \times \Delta^{total}_{y,z})\right)
-\end{aligned}
+\begin{equation*}
+	0 \leq y_{g, z}^{\textrm{H,GEN,retired}} \leq y_{g, z}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)

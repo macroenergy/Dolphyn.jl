@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,53 +17,58 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     flexible_demand(EP::Model, inputs::Dict)
 
-This function defines the operating constraints for flexible demand resources. As implemented, flexible demand resources ($y \in \mathcal{DF}$) are characterized by: a) maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $\rho^{max}_{y,z,t}$, b) the maximum time this demand can be advanced and delayed, defined by parameters, $\tau^{advance}_{y,z}$ and $\tau^{delay}_{y,z}$, respectively and c) the energy losses associated with shifting demand, $\eta_{y,z}^{dflex}$.
+This function defines the operating constraints for flexible demand resources. As implemented, flexible demand resources ($f \in \mathcal{DF}, \mathcal{DF} \subseteq \mathcal{G}$) are characterized by:
+a) maximum deferrable demand as a fraction of available capacity in a particular time step $t$, $R_{f,z,t}^{E,FLEX}$,
+b) the maximum time this demand can be advanced and delayed, defined by parameters, $\tau^{advance}_{f,z}$ and $\tau^{delay}_{f,z}$, respectively and
+c) the energy losses associated with shifting demand, $\eta_{f,z}^{E,FLEX}$.
 
-**Tracking total deferred demand**
+**Tracking total deferred power demand**
 
 The operational constraints governing flexible demand resources are as follows.
 
-The first two constraints model keep track of inventory of deferred demand in each time step.  Specifically, the amount of deferred demand remaining to be served ($\Gamma_{y,z,t}$) depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$). Note that variable $\Gamma_{y,z,t} \in \mathbb{R}$, $\forall y \in \mathcal{DF}, t  \in \mathcal{T}$. Similar to hydro inventory or storage state of charge constraints, for the first time step of the year (or each representative period), we define the deferred demand level based on level of deferred demand in the last time step of the year (or each representative period).
+The first two constraints model keep track of inventory of deferred demand in each time step.
+Specifically, the amount of deferred demand remaining to be served ($x_{f,z,t}^{E,FLEX}$) depends on the amount in the previous time step minus the served demand during time step $t$ ($\Theta_{y,z,t}$) while accounting for energy losses associated with demand flexibility, plus the demand that has been deferred during the current time step ($\Pi_{y,z,t}$).
+Note that variable $\Gamma_{f,z,t} \in \mathbb{R}$, $\forall f \in \mathcal{DF}, t \in \mathcal{T}$.
+Similar to hydro inventory or storage state of charge constraints, for the first time step of the year (or each representative period), we define the deferred demand level based on level of deferred demand in the last time step of the year (or each representative period).
 
 ```math
 \begin{aligned}
-\Gamma_{y,z,t} = \Gamma_{y,z,t-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \hspace{4 cm}  \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-\Gamma_{y,z,t} = \Gamma_{y,z,t +\tau^{period}-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \hspace{4 cm}  \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+\Gamma_{y,z,t} = \Gamma_{y,z,t-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \quad \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+\Gamma_{y,z,t} = \Gamma_{y,z,t +\tau^{period}-1} -\eta_{y,z}^{dflex}\Theta_{y,z,t} +\Pi_{y,z,t} \quad \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 
 **Bounds on available demand flexibility**
 
-At any given time step, the amount of demand that can be shifted or deferred cannot exceed the maximum deferrable demand, defined by product of the availability factor ($\rho^{max}_{y,t}$) times the available capacity($\Delta^{total}_{y,z}$).
+At any given time step, the amount of demand that can be shifted or deferred cannot exceed the maximum deferrable demand, defined by product of the availability factor ($\rho^{max}_{y,z}$) times the available capacity($\Delta^{total}_{y,z,t}$).
 
 ```math
 \begin{aligned}
-\Pi_{y,t} \leq \rho^{max}_{y,z,t}\Delta_{y,z} \hspace{4 cm}  \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
+    \Pi_{y,z,t} \leq \rho^{max}_{y,z,t}\Delta_{y,z} \quad \forall f \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{aligned}
 ```
 
 **Maximum time delay and advancements**
 
-Delayed demand must then be served within a fixed number of time steps. This is done by enforcing the sum of demand satisfied ($\Theta_{y,z,t}$) in the following $\tau^{delay}_{y,z}$ time steps (e.g., t + 1 to t + $\tau^{delay}_{y,z}$) to be greater than or equal to the level of energy deferred during time step $t$.
+Delayed demand must then be served within a fixed number of time steps. This is done by enforcing the sum of demand satisfied ($\Theta_{y,z,t}$) in the following $\tau_{f,z}^{delay}$ time steps (e.g., t + 1 to t + $\tau_{f,z}^{delay}$) to be greater than or equal to the level of energy deferred during time step $t$.
 
 ```math
-\begin{aligned}
-\sum_{e=t+1}^{t+\tau^{delay}_{y,z}}{\Theta_{y,z,e}} \geq \Gamma_{y,z,t}
-    \hspace{4 cm}  \forall y \in \mathcal{DF},z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+    \sum_{e=t+1}^{t+\tau_{f,z}^{delay}}{\Theta_{f,z,e}} \geq \Gamma_{f,z,t} \quad \forall f \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
-A similar constraints maximum time steps of demand advancement. This is done by enforcing the sum of demand deferred ($\Pi_{y,t}$) in the following $\tau^{advance}_{y}$ time steps (e.g., t + 1 to t + $\tau^{advance}_{y}$) to be greater than or equal to the total level of energy deferred during time $t$ (-$\Gamma_{y,t}$). The negative sign is included to account for the established sign convention that treat demand deferred in advance of the actual demand is defined to be negative.
+A similar constraints maximum time steps of demand advancement. This is done by enforcing the sum of demand deferred ($\Pi_{f,t}$) in the following $\tau_{y,z}^{advance}$ time steps (e.g., t + 1 to t + $\tau_{f,z}^{advance}$) to be greater than or equal to the total level of energy deferred during time $t$ (-$\Gamma_{f,t}$).
+The negative sign is included to account for the established sign convention that treat demand deferred in advance of the actual demand is defined to be negative.
 
 ```math
-\begin{aligned}
-\sum_{e=t+1}^{t+\tau^{advance}_{y,z}}{\Pi_{y,z,e}} \geq -\Gamma_{y,z,t}
-    \hspace{4 cm}  \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+    \sum_{e=t+1}^{t+\tau_{f,z}^{advance}}{\Pi_{y,z,e}} \geq -\Gamma_{y,z,t} \quad \forall y \in \mathcal{DF}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
-If $t$ is first time step of the year (or the first time step of the representative period), then the above two constraints are implemented to look back over the last n time steps, starting with the last time step of the year (or the last time step of the representative period). This time-wrapping implementation is similar to the time-wrapping implementations used for defining the storage balance constraints for hydropower reservoir resources and energy storage resources.
-
+If $t$ is first time step of the year (or the first time step of the representative period), then the above two constraints are implemented to look back over the last n time steps, starting with the last time step of the year (or the last time step of the representative period).
+This time-wrapping implementation is similar to the time-wrapping implementations used for defining the storage balance constraints for hydropower reservoir resources and energy storage resources.
 """
 function flexible_demand(EP::Model, inputs::Dict)
     ## Flexible demand resources available during all hours and can be either delayed or advanced (virtual storage-shiftable demand) - DR ==1
@@ -86,10 +91,10 @@ function flexible_demand(EP::Model, inputs::Dict)
     ### Variables ###
 
     # Variable tracking total advanced (negative) or deferred (positive) demand for demand flex resource y in period t
-    @variable(EP, vS_FLEX[y in FLEX, t=1:T]);
+    @variable(EP, vS_FLEX[y in FLEX, t=1:T])
 
     # Variable tracking demand deferred by demand flex resource y in period t
-    @variable(EP, vCHARGE_FLEX[y in FLEX, t=1:T] >= 0);
+    @variable(EP, vCHARGE_FLEX[y in FLEX, t=1:T] >= 0)
 
     ### Expressions ###
 

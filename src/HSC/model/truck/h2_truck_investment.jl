@@ -23,50 +23,50 @@ This function includes investment variables, expressions and related constraints
 
 ## Truck capacity built and retired
 ```math
-\begin{aligned}
-    v_{CAP,j}^{TRU} \geq 0
-\end{aligned}
+\begin{equation*}
+    0 \leq v_{CAP,j}^{\textrm{H,TRU}}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-    v_{RETCAP,j}^{TRU} \geq 0
-\end{aligned}
+\begin{equation*}
+    0 \leq v_{RETCAP,j}^{\textrm{H,TRU}}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-   v_{CAP,j}^{TRU} \geq 0
-\end{aligned}
+\begin{equation*}
+    0 \leq v_{CAP,j}^{\textrm{H,TRU}}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-    v_{NEWCAP,j}^{TRU} \geq 0
-\end{aligned}
+\begin{equation*}
+    0 \leq v_{NEWCAP,j}^{\textrm{H,TRU}}
+\end{equation*}
 ```
 
 **Constraints**
 
 Truck retirements cannot retire more charge capacity than existing charge capacity
 ```math
-\begin{aligned}
-    v_{RETCAPNUM,j}^{TRU} \le v_{ExistNum,j}^{TRU}
-\end{aligned}
+\begin{equation*}
+    v_{RETCAPNUM,j}^{\textrm{H,TRU}} \leq v_{ExistNum,j}^{\textrm{H,TRU}} \quad \forall j \in \mathbb{J}
+\end{equation*}
 ```
-Truck compression energy: Cannot retire more energy capacity than existing energy capacity
+Truck compression energy cannot retire more energy capacity than existing energy capacity
 ```math
-\begin{aligned}
-    v_{RETCAPEnergy,j}^{TRU} \le v_{ExistEnergyCap,j}^{TRU} 
-\end{aligned}
+\begin{equation*}
+    v_{RETCAPEnergy,j}^{\textrm{H,TRU}} \leq v_{ExistEnergyCap,j}^{\textrm{H,TRU}} \quad \forall j \in \mathbb{J}
+\end{equation*}
 ```
 
 **Expressions**
 ```math
-\begin{aligned}
-    C_{\mathrm{TRU}}^{\mathrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \Omega_{t} \mathrm{~L}_{z \rightarrow z^{\prime}} \\
-    & \times\left(\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}+\mathrm{o}_{j}^{\mathrm{TRU}, \mathrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\mathrm{E}}\right)
-\end{aligned}
+\begin{equation*}
+    C_{\textrm{\textrm{H,TRU}}}^{\textrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \textrm{~L}_{z \rightarrow z^{\prime}} \\
+    & \times\left(\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\textrm{F}}+\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\textrm{E}}\right)
+\end{equation*}
 ```
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)

@@ -18,6 +18,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the CO2 emissions for hydrogen supply chain in each zone, which is subsequently added to the total emissions.
+
+**Cost expressions**
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{H,EMI}} = \omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \textrm{c}_{z}^{\textrm{H,EMI}} x_{z,t}^{\textrm{H,EMI}}
+\end{equation*}
+```
 """
 function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
