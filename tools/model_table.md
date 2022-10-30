@@ -2,8 +2,6 @@
 ## Variables
 |Variable name|created|accessed|
 |:-|:-|:-|
-|0 >= vH2TruckSOCw|h2_long_duration_truck.jl|h2_long_duration_truck.jl|
-|0 >= vH2TruckdSOC|h2_long_duration_truck.jl|h2_long_duration_truck.jl|
 |vCAP|investment_discharge.jl|investment_discharge.jl, investment_energy.jl, ucommit.jl, investment_charge.jl, reserves.jl, write_capacity.jl|
 |vCAPCHARGE|investment_charge.jl|investment_charge.jl, write_capacity.jl|
 |vCAPENERGY|investment_energy.jl|investment_energy.jl, write_capacity.jl|
@@ -52,10 +50,11 @@
 |vH2TruckEnergy|h2_truck_investment.jl|write_h2_truck_capacity.jl, h2_truck_investment.jl|
 |vH2TruckFlow|h2_truck_all.jl|write_h2_truck_flow.jl, h2_truck_all.jl|
 |vH2TruckNumber|h2_truck_investment.jl|write_h2_truck_capacity.jl, h2_truck_investment.jl|
+|vH2TruckSOCw|h2_long_duration_truck.jl|h2_long_duration_truck.jl|
+|vH2TruckdSOC|h2_long_duration_truck.jl|h2_long_duration_truck.jl|
 |vH2_CHARGE_FLEX|h2_flexible_demand.jl|write_h2_balance.jl, write_h2_charge.jl, h2_flexible_demand.jl|
 |vH2_CHARGE_STOR|h2_storage_all.jl|h2_pipeline.jl, emissions_hsc.jl, h2_long_duration_storage.jl, write_h2_balance.jl, h2_storage_all.jl, write_h2_charge.jl, h2_storage_asymmetric.jl|
 |vLARGEST_CONTINGENCY|reserves.jl|reserves.jl|
-|vLARGEST_CONTINGENCY >= 0)# Auxiliary variable that is 0 if vCAP = 0|reserves.jl|reserves.jl|
 |vNEW_TRANS_CAP|transmission.jl|transmission.jl, write_nw_expansion.jl|
 |vNSE|non_served_energy.jl|cap_reserve_margin.jl, co2_cap_power.jl, non_served_energy.jl, write_nse.jl, write_power_balance.jl, co2_cap_power_hsc.jl|
 |vP|discharge.jl|h2_production_commit.jl, flexible_demand.jl, emissions_power.jl, write_curtailment.jl, h2_production_all.jl, discharge.jl, write_power.jl, cap_reserve_margin.jl, write_p_g2p.jl, energy_share_requirement.jl, storage_symmetric.jl, long_duration_storage.jl, thermal_no_commit.jl, h2_g2p.jl, transmission.jl, hydro_res.jl, h2_g2p_no_commit.jl, write_power_balance.jl, write_costs.jl, reserves.jl, h2_g2p_commit.jl, h2_g2p_discharge.jl, thermal_commit.jl, write_net_revenue.jl, must_run.jl, curtailable_variable_renewable.jl, h2_production_no_commit.jl, hydro_inter_period_linkage.jl, thermal.jl, storage_all.jl|
@@ -86,7 +85,7 @@
 |vTAUX_POS_ON|transmission.jl|transmission.jl|
 |vTLOSS|transmission.jl|write_transmission_losses.jl, transmission.jl|
 |vUNMET_RSV|reserves.jl|write_rsv.jl, reserves.jl|
-|vZERO == 0);# Initialize Power Balance Expression# Expression for "baseline" power balance constraint@expression(EP|generate_model.jl|generate_model.jl|
+|vZERO|generate_model.jl|investment_discharge.jl, investment_energy.jl, transmission.jl, investment_charge.jl, h2_truck_investment.jl, generate_model.jl|
 |vdH2SOC|h2_long_duration_storage.jl|h2_long_duration_storage.jl|
 |vdSOC|long_duration_storage.jl|long_duration_storage.jl, write_opwrap_lds_dstor.jl, hydro_inter_period_linkage.jl|
 |vdSOC_HYDRO|hydro_inter_period_linkage.jl|hydro_inter_period_linkage.jl|
