@@ -92,7 +92,6 @@
 ## Expressions
 |Expression name|created|accessed|
 |:-|:-|:-|
-|# the unit is GWeGenerationByVRE|curtailable_variable_renewable.jl|curtailable_variable_renewable.jl|
 |OPEX_Truck|h2_truck_all.jl|h2_truck_all.jl|
 |OPEX_Truck_Compression|h2_truck_all.jl|h2_truck_all.jl|
 |Truck_carbon_emission|h2_truck_all.jl|h2_truck_all.jl|
@@ -131,6 +130,7 @@
 |eGenerationByHydroRes|hydro_res.jl|hydro_res.jl|
 |eGenerationByMustRun|must_run.jl|must_run.jl|
 |eGenerationByThermAll|thermal.jl|thermal.jl|
+|eGenerationByVRE|curtailable_variable_renewable.jl|curtailable_variable_renewable.jl|
 |eGenerationByZone|generate_model.jl|h2_g2p.jl, co2_cap_power.jl, hydro_res.jl, co2_cap_power_hsc.jl, must_run.jl, generate_model.jl, curtailable_variable_renewable.jl, thermal.jl|
 |eGenerationByZoneG2P|h2_g2p.jl|h2_g2p.jl|
 |eH2Balance|generate_model.jl|h2_production_commit.jl, h2_pipeline.jl, h2_truck_all.jl, h2_non_served.jl, h2_g2p_no_commit.jl, h2_g2p_commit.jl, h2_storage_all.jl, generate_model.jl, h2_production_no_commit.jl, h2_flexible_demand.jl|
