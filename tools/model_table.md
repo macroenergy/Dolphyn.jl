@@ -2,7 +2,7 @@
 ## Variables
 |Variable name|created|accessed|
 |:-|:-|:-|
-|vCAP|investment_discharge.jl|investment_discharge.jl, investment_energy.jl, ucommit.jl, investment_charge.jl, reserves.jl, write_capacity.jl|
+|vCAP|investment_discharge.jl|investment_discharge.jl, investment_energy.jl, ucommit.jl, investment_charge.jl, write_capacity.jl|
 |vCAPCHARGE|investment_charge.jl|investment_charge.jl, write_capacity.jl|
 |vCAPENERGY|investment_energy.jl|investment_energy.jl, write_capacity.jl|
 |vCHARGE|storage_all.jl|flexible_demand.jl, write_charge.jl, cap_reserve_margin.jl, storage_symmetric.jl, long_duration_storage.jl, write_power_balance.jl, storage_asymmetric.jl, write_net_revenue.jl, storage_all.jl|
@@ -53,7 +53,7 @@
 |vH2TruckSOCw|h2_long_duration_truck.jl|h2_long_duration_truck.jl|
 |vH2TruckdSOC|h2_long_duration_truck.jl|h2_long_duration_truck.jl|
 |vH2_CHARGE_FLEX|h2_flexible_demand.jl|write_h2_balance.jl, write_h2_charge.jl, h2_flexible_demand.jl|
-|vH2_CHARGE_STOR|h2_storage_all.jl|h2_pipeline.jl, emissions_hsc.jl, h2_long_duration_storage.jl, write_h2_balance.jl, h2_storage_all.jl, write_h2_charge.jl, h2_storage_asymmetric.jl|
+|vH2_CHARGE_STOR|h2_storage_all.jl|emissions_hsc.jl, h2_long_duration_storage.jl, write_h2_balance.jl, h2_storage_all.jl, write_h2_charge.jl, h2_storage_asymmetric.jl|
 |vLARGEST_CONTINGENCY|reserves.jl|reserves.jl|
 |vNEW_TRANS_CAP|transmission.jl|transmission.jl, write_nw_expansion.jl|
 |vNSE|non_served_energy.jl|cap_reserve_margin.jl, co2_cap_power.jl, non_served_energy.jl, write_nse.jl, write_power_balance.jl, co2_cap_power_hsc.jl|
@@ -95,7 +95,7 @@
 |OPEX_Truck|h2_truck_all.jl|h2_truck_all.jl|
 |OPEX_Truck_Compression|h2_truck_all.jl|h2_truck_all.jl|
 |Truck_carbon_emission|h2_truck_all.jl|h2_truck_all.jl|
-|eAvail_Trans_Cap|transmission.jl|transmission.jl, generate_model.jl|
+|eAvail_Trans_Cap|transmission.jl|transmission.jl|
 |eCEmissionsPenaltybyPolicy|emissions_power.jl|emissions_power.jl|
 |eCEmissionsPenaltybyZone|emissions_power.jl|emissions_power.jl, write_costs.jl|
 |eCFix|investment_discharge.jl|investment_discharge.jl, investment_energy.jl, write_h2_costs.jl, h2_storage_investment_charge.jl, investment_charge.jl, test.jl, write_costs.jl, h2_truck_investment.jl, h2_storage_investment_energy.jl, h2_storage_investment.jl|
@@ -122,7 +122,6 @@
 |eCVar_in|storage_all.jl|write_costs.jl, storage_all.jl|
 |eCVar_out|discharge.jl|discharge.jl, test.jl, write_costs.jl|
 |eContingencyReq|reserves.jl|reserves.jl|
-|eEH2LOSS|h2_storage_all.jl|h2_storage_all.jl|
 |eELOSS|storage_all.jl|energy_share_requirement.jl, co2_cap_power.jl, co2_cap_power_hsc.jl, storage_all.jl|
 |eELOSSByZone|storage_all.jl|co2_cap_power.jl, co2_cap_power_hsc.jl, storage_all.jl|
 |eEmissionsByPlant|emissions_power.jl|emissions_power.jl, write_net_revenue.jl|
@@ -150,20 +149,19 @@
 |eH2GenCStart|h2_production_commit.jl|h2_production_commit.jl, write_h2_costs.jl|
 |eH2GenCommit|h2_production_commit.jl|h2_production_commit.jl, test.jl|
 |eH2GenNoCommit|h2_production_no_commit.jl|test.jl, h2_production_no_commit.jl|
-|eH2GenTotalCap|h2_investment.jl|h2_production_commit.jl, h2_production_all.jl, h2_investment.jl, h2_long_duration_storage.jl, write_h2_capacity.jl, test.jl, h2_storage_all.jl, h2_production_no_commit.jl, h2_flexible_demand.jl|
+|eH2GenTotalCap|h2_investment.jl|h2_production_commit.jl, h2_production_all.jl, h2_investment.jl, h2_long_duration_storage.jl, write_h2_capacity.jl, test.jl, h2_production_no_commit.jl, h2_flexible_demand.jl|
 |eH2GenerationByZone|h2_production.jl|co2_cap_hsc.jl, co2_cap_power_hsc.jl, h2_production.jl|
 |eH2NPipeNew|h2_pipeline.jl|h2_pipeline.jl|
 |eH2NetpowerConsumptionByAll|generate_model.jl|h2_production_commit.jl, h2_pipeline.jl, co2_cap_power.jl, h2_truck_all.jl, test.jl, write_power_balance.jl, h2_storage_all.jl, generate_model.jl, h2_production_no_commit.jl|
 |eH2PipeFlow_net|h2_pipeline.jl|h2_pipeline.jl, write_h2_pipeline_flow.jl|
-|eH2PowerConsumptionByPipe|h2_pipeline.jl|h2_pipeline.jl|
 |eH2TotalCapEnergy|h2_storage_investment_energy.jl|h2_storage_all.jl, h2_storage_investment_energy.jl|
 |eH2TruckFlow|h2_truck_all.jl|h2_truck_all.jl, write_h2_balance.jl|
 |eH2TruckTravelConsumption|h2_truck_all.jl|h2_truck_all.jl|
-|eLosses_By_Zone|transmission.jl|transmission.jl, write_h2_balance.jl, write_power_balance.jl|
+|eLosses_By_Zone|transmission.jl|transmission.jl, write_power_balance.jl|
 |eNet_Export_Flows|transmission.jl|transmission.jl|
 |eObj|generate_model.jl|h2_production_commit.jl, flexible_demand.jl, investment_discharge.jl, emissions_power.jl, h2_pipeline.jl, discharge.jl, investment_energy.jl, emissions_hsc.jl, h2_investment.jl, transmission.jl, ucommit.jl, h2_truck_all.jl, non_served_energy.jl, h2_storage_investment_charge.jl, investment_charge.jl, h2_non_served.jl, test.jl, h2_g2p_investment.jl, reserves.jl, h2_truck_investment.jl, h2_g2p_commit.jl, h2_g2p_discharge.jl, h2_storage_all.jl, generate_model.jl, h2_outputs.jl, h2_storage_investment_energy.jl, storage_all.jl, h2_storage_investment.jl, h2_flexible_demand.jl|
 |ePipeZoneDemand|h2_pipeline.jl|h2_pipeline.jl, write_h2_balance.jl|
-|ePowerBalance|generate_model.jl|h2_production_commit.jl, flexible_demand.jl, h2_pipeline.jl, thermal_no_commit.jl, transmission.jl, h2_truck_all.jl, non_served_energy.jl, write_h2_balance.jl, test.jl, hydro_res.jl, h2_g2p_no_commit.jl, write_power_balance.jl, h2_g2p_commit.jl, h2_storage_all.jl, thermal_commit.jl, must_run.jl, generate_model.jl, curtailable_variable_renewable.jl, h2_production_no_commit.jl, storage_all.jl|
+|ePowerBalance|generate_model.jl|h2_production_commit.jl, flexible_demand.jl, h2_pipeline.jl, thermal_no_commit.jl, transmission.jl, h2_truck_all.jl, non_served_energy.jl, test.jl, hydro_res.jl, h2_g2p_no_commit.jl, write_power_balance.jl, h2_g2p_commit.jl, h2_storage_all.jl, thermal_commit.jl, must_run.jl, generate_model.jl, curtailable_variable_renewable.jl, h2_production_no_commit.jl, storage_all.jl|
 |ePowerBalanceDemandFlex|flexible_demand.jl|flexible_demand.jl|
 |ePowerBalanceDisp|curtailable_variable_renewable.jl|curtailable_variable_renewable.jl|
 |ePowerBalanceH2G2PCommit|h2_g2p_commit.jl|h2_g2p_commit.jl|
@@ -175,7 +173,7 @@
 |ePowerBalanceHydroRes|hydro_res.jl|hydro_res.jl|
 |ePowerBalanceLossesByZone|transmission.jl|transmission.jl|
 |ePowerBalanceNdisp|must_run.jl|must_run.jl|
-|ePowerBalanceNetExportFlows|transmission.jl|transmission.jl, write_h2_balance.jl, write_power_balance.jl|
+|ePowerBalanceNetExportFlows|transmission.jl|transmission.jl, write_power_balance.jl|
 |ePowerBalanceNse|non_served_energy.jl|non_served_energy.jl|
 |ePowerBalanceStor|storage_all.jl|storage_all.jl|
 |ePowerBalanceThermCommit|thermal_commit.jl|thermal_commit.jl|
@@ -212,9 +210,9 @@
 |eTotalCVarInT|storage_all.jl|storage_all.jl|
 |eTotalCVarOut|discharge.jl|discharge.jl, write_costs.jl|
 |eTotalCVarOutT|discharge.jl|discharge.jl|
-|eTotalCap|investment_discharge.jl|flexible_demand.jl, investment_discharge.jl, write_curtailment.jl, cap_reserve_margin.jl, minimum_capacity_requirement.jl, storage_symmetric.jl, investment_energy.jl, long_duration_storage.jl, thermal_no_commit.jl, investment_charge.jl, test.jl, hydro_res.jl, reserves.jl, storage_asymmetric.jl, thermal_commit.jl, must_run.jl, generate_model.jl, curtailable_variable_renewable.jl, write_subsidy_revenue.jl, hydro_inter_period_linkage.jl, storage_all.jl, write_capacity.jl|
-|eTotalCapCharge|investment_charge.jl|investment_charge.jl, storage_asymmetric.jl, generate_model.jl|
-|eTotalCapEnergy|investment_energy.jl|investment_energy.jl, long_duration_storage.jl, generate_model.jl, storage_all.jl|
+|eTotalCap|investment_discharge.jl|flexible_demand.jl, investment_discharge.jl, write_curtailment.jl, cap_reserve_margin.jl, minimum_capacity_requirement.jl, storage_symmetric.jl, investment_energy.jl, long_duration_storage.jl, thermal_no_commit.jl, investment_charge.jl, test.jl, hydro_res.jl, reserves.jl, storage_asymmetric.jl, thermal_commit.jl, must_run.jl, curtailable_variable_renewable.jl, write_subsidy_revenue.jl, hydro_inter_period_linkage.jl, storage_all.jl, write_capacity.jl|
+|eTotalCapCharge|investment_charge.jl|investment_charge.jl, storage_asymmetric.jl|
+|eTotalCapEnergy|investment_energy.jl|investment_energy.jl, long_duration_storage.jl, storage_all.jl|
 |eTotalH2CNSE|h2_non_served.jl|write_h2_costs.jl, h2_non_served.jl|
 |eTotalH2CNSET|h2_non_served.jl|h2_non_served.jl|
 |eTotalH2CNSETS|h2_non_served.jl|h2_non_served.jl|
