@@ -121,11 +121,11 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
 end
     
 @doc raw"""
-    filecmp(path1::AbstractString, path2::AbstractString)
+    filecmp_byte(path1::AbstractString, path2::AbstractString)
 
 Compare two files on a byte-wise basis and return a boolean indicating whether they are identical
 """
-function filecmp(path1::AbstractString, path2::AbstractString)
+function filecmp_byte(path1::AbstractString, path2::AbstractString)
     stat1, stat2 = stat(path1), stat(path2)
     if !(isfile(stat1) && isfile(stat2)) || filesize(stat1) != filesize(stat2)
         return false # or should it throw if a file doesn't exist?
@@ -142,6 +142,35 @@ function filecmp(path1::AbstractString, path2::AbstractString)
                 0 != Base._memcmp(buf1, buf2, n1) && return false
             end
             return eof(file1) == eof(file2)
+        end
+    end
+end
+
+function filecmp_str(path1::AbstractString, path2::AbstractString)
+    open(path1, "r") do file1
+        open(path2, "r") do file2
+            while !eof(file1) && !eof(file2)
+                line1 = readline(file1)
+                line2 = readline(file2)
+                if line1 != line2
+                    return false
+                end
+            end
+            return eof(file1) == eof(file2)
+        end
+    end
+end
+
+function filecmp(path1::AbstractString, path2::AbstractString)
+    # First do quick (but slightly temperamental) byte comparison
+    if filecmp_byte(path1, path2)
+        return true
+    else
+        # If that fails, do a line-by-line comparison
+        if filecmp_str(path1, path2)
+            return true
+        else
+            return false
         end
     end
 end
