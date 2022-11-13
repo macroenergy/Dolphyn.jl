@@ -27,13 +27,13 @@ function write_h2_transmission_flow(path::AbstractString, sep::AbstractString, i
         if setup["ModelH2Pipelines"] == 1
             dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] = value.(EP[:ePipeZoneDemand])[:, z]
         else
-            dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] = 0
+            dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] .= 0
         end
 
         if setup["ModelH2Trucks"] == 1
             dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")] = value.(EP[:eH2TruckFlow])[:, z]
         else
-            dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")] = 0
+            dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")] .= 0
         end
 
         dfH2TransmissionFlow[!, Symbol("H2FlowToZone$z")] = dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] + dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")]
