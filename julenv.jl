@@ -39,6 +39,8 @@ Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.11.3"))
 # Julia environment variable GUROBI_HOME set to your running machine location
 # ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
 Pkg.build("Gurobi")
+Pkg.pin("Gurobi", "0.11.3")
+
 ##Add if elseif with Method of Morris for these
 Pkg.add(Pkg.PackageSpec(name="DiffEqSensitivity", version="6.52.1"))
 Pkg.add(Pkg.PackageSpec(name="Statistics"))
