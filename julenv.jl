@@ -16,6 +16,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 import Pkg
 using Pkg
+
+function get_gurobi_version()
+    try
+        res = read(`gurobi_cl --version`, String)
+        res = split(res, ".")
+        gurobi_ver = string("$(res[1][end]).$(res[2])")
+        gurobi_ver = parse(Float64, gurobi_ver)
+        return gurobi_ver
+    catch e
+        return 9.5
+    end
+end
+
 Pkg.activate("DOLPHYNJulEnv")
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="0.8.0"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="0.8.4"))
@@ -62,13 +75,3 @@ Pkg.add(Pkg.PackageSpec(name="Revise"))
 Pkg.add(Pkg.PackageSpec(name="Logging"))
 Pkg.add(Pkg.PackageSpec(name="LoggingExtras"))
 
-function get_gurobi_version()
-    try
-        res = read(`gurobi_cl --version`, String)
-        res = split(res, ".")
-        gurobi_ver = string("$(res[1][end]).$(res[2])")
-        gurobi_ver = parse(Float64, gurobi_ver)
-        return gurobi_ver
-    catch e
-        return 9.5
-end
