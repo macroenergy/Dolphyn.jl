@@ -63,9 +63,12 @@ Pkg.add(Pkg.PackageSpec(name="Logging"))
 Pkg.add(Pkg.PackageSpec(name="LoggingExtras"))
 
 function get_gurobi_version()
-    res = read(`gurobi_cl --version`, String)
-    res = split(res, ".")
-    gurobi_ver = string("$(res[1][end]).$(res[2])")
-    gurobi_ver = parse(Float64, gurobi_ver)
-    return gurobi_ver
+    try
+        res = read(`gurobi_cl --version`, String)
+        res = split(res, ".")
+        gurobi_ver = string("$(res[1][end]).$(res[2])")
+        gurobi_ver = parse(Float64, gurobi_ver)
+        return gurobi_ver
+    catch e
+        return 9.5
 end
