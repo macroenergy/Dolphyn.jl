@@ -45,7 +45,7 @@ function write_curtailment(path::AbstractString, sep::AbstractString, inputs::Di
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfCurtailment[!,Symbol("t$t")][1:G])
-		elseif v"1.4" <= VERSION < v"1.8"
+		elseif v"1.4" <= VERSION < v"1.9"
 			total[:,t+3] .= sum(dfCurtailment[:,Symbol("t$t")][1:G])
 		end
 	end
