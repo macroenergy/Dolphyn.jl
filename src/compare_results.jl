@@ -61,24 +61,21 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
 
     # Write the summary file
     if length(only1) > 0
-        push!(lines_to_write, join([inset, "Files in $dirname1 but not in $dirname2:"]))
-        for file in only1
-            push!(lines_to_write, file)
-        end
+        push!(lines_to_write, "$(inset)Files in $dirname1 but not in $dirname2:\n$inset")
+        push!(lines_to_write, join([inset, join(only1, "\n$inset")]))
     end
     if length(only2) > 0
-        push!(lines_to_write, join([inset, "Files in $dirname2 but not in $dirname1:"]))
-        for file in only2
-            push!(lines_to_write, file)
-        end
+        push!(lines_to_write, "$(inset)Files in $dirname2 but not in $dirname1:\n$(inset)")
+        push!(lines_to_write, join([inset, join(only2, "\n$inset")]))
     end
+    push!(lines_to_write, "\n")
     
     common_files_matching = []
     common_files_diff = []
     subdirs = []
 
     if length(common_files) > 0
-        push!(lines_to_write, join([inset, "Files in both $dirname1 and $dirname2:\n"]))
+        push!(lines_to_write, join([inset, "\nFiles in both $dirname1 and $dirname2:\n"]))
         for file in common_files
             if isfile(joinpath(path1, file)) || isfile(joinpath(path2, file))
                 # Compare the files by byte comparison
