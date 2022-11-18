@@ -58,7 +58,10 @@ push!(LOAD_PATH, src_path)
 
 using DOLPHYN
 
-outpath = "$inpath/Results"
+outpath = joinpath(inpath, "Results")
 
 summary_path = joinpath(inpath, "summary.txt")
-compare_results(joinpath(inpath, "Results_Example"), outpath, summary_path)
+example_path = joinpath(inpath, "Results_Example")
+println("Comparing $(example_path) and $(outpath)")
+println("Writing summary to $(summary_path)")
+compare_results(example_path, outpath, summary_path)
