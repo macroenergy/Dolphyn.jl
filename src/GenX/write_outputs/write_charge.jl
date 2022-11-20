@@ -49,7 +49,7 @@ function write_charge(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+3] .= sum(dfCharge[!,Symbol("t$t")][union(inputs["STOR_ALL"],inputs["FLEX"])])
-		elseif v"1.4" <= VERSION < v"1.8"
+		elseif v"1.4" <= VERSION < v"1.9"
 			total[:,t+3] .= sum(dfCharge[:,Symbol("t$t")][union(inputs["STOR_ALL"],inputs["FLEX"])])
 		end
 	end
