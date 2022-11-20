@@ -40,7 +40,7 @@
 |$n_{k,z,t}^{\textrm{H,G2P,UP}}$|the number of startup decision variable  of generator cluster $k$ in zone $z$ at time $t$|
 |$n_{k,z,t}^{\textrm{H,G2P,DN}}$|the number of shutdown decision variable of generator cluster $k$ in zone $z$ at time $t$|
 |$\tau_{k,z}^{\textrm{H,UP}}$ and $\tau_{k,z}^{\textrm{H,DN}}$|is the minimum up or down time for units in generating cluster $k$ in zone $z$|
-|$\epsilon_{z,p,load}^{maxCO_2}$| denotes the emission limit in terms on tCO$_2$/MWh|
+|$\epsilon_{z,p,load}^{maxCO_2}$| denotes the emission limit in terms on tonne-CO$_2$/MWh|
 |$U_{s,z,t}^{\textrm{H,STO}}$| this term represents initial hydrogen stored in the storage device $s$ in zone $z$ at all starting time period $t$ of modeled periods|
 |$\Delta U_{s,z,m}^{\textrm{H,STO}}$| this term represents the change of storage hydrogen inventory level of the storage device $s$ in zone $z$ during each representative period $m$|
 |$U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}}$|the hydrogen pipeline storage level decision variable representing hydrogen stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$|
@@ -67,7 +67,7 @@
 |$\eta_{s,z}^{\textrm{H,loss}}$| the self discharge rate for the storage resource|
 |$\rho^{max}_{y,z,t}$| the availability factor for Bounds on available demand flexibility |
 |$\Omega_{k,z}^{\textrm{H,G2P,size}}$|is the unit size|
-|$\epsilon_{y,z}^{CO_2}$|the parameter  reflects the specific $CO_2$ emission intensity in tCO$_2$/MWh associated with its operation|
+|$\epsilon_{y,z}^{CO_2}$|the parameter  reflects the specific CO$_2$ emission intensity in tonne-CO$_2$/MWh associated with its operation|
 |$\rho_{y,z,t}^{max}$| maximum deferrable demand as a fraction of available capacity in a particular time step $t$| 
 |$\tau_{y,z}^{advance/delay}$|the maximum time this demand can be advanced and delayed, defined by parameters, $\tau_{y,z}^{advance}$ and $\tau_{y,z}^{delay}$,respectively|
 |$\eta_{y,z}^{dflex}$|the energy losses associated with shifting demand|
