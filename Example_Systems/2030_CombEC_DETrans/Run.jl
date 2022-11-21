@@ -14,24 +14,13 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# Walk into current directory
 cd(dirname(@__FILE__))
 
-settings_path = joinpath(pwd(), "Settings")
-
-environment_path = "../../package_activate.jl"
-include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
-
-### Set relevant directory paths
-src_path = "../../src/"
-
-inpath = pwd()
-
-### Load GenX
-print_and_log("Loading packages")
-push!(LOAD_PATH, src_path)
-
-using DOLPHYN
+# Loading settings
 using YAML
+
+settings_path = joinpath(pwd(), "Settings")
 
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
@@ -40,7 +29,34 @@ mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 suppl
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
 mysetup = Dict()
-mysetup = merge( mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+
+# Start logging
+using LoggingExtras
+
+global Log = mysetup["Log"]
+
+if Log
+    logger = FileLogger(mysetup["LogFile"])
+    global_logger(logger)
+end
+
+# Activate environment
+environment_path = "../../package_activate.jl"
+if !occursin("DOLPHYNJulEnv", Base.active_project())
+    include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+end
+
+### Set relevant directory paths
+src_path = "../../src/"
+
+inpath = pwd()
+
+### Load DOLPHYN
+println("Loading packages")
+push!(LOAD_PATH, src_path)
+
+using DOLPHYN
 
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
@@ -99,4 +115,3 @@ if mysetup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
-
