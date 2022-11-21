@@ -17,10 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	configure_solver(solver::String, solver_settings_path::String)
 
-This method returns a solver-specific MathOptInterface OptimizerWithAttributes optimizer instance to be used in the GenX.generate\_model() method.
+This method returns a solver-specific MathOptInterface OptimizerWithAttributes optimizer instance to be used in the DOLPHYN.generate\_model() method.
 
 The "solver" argument is a string which specifies the solver to be used. It is not case sensitive.
-Currently supported solvers include: "Gurobi", "CPLEX", "Clp", "Cbc", or "HiGHS"
+Currently supported solvers include: "Clp", "Cbc", "HiGHS", "Gurobi" or "CPLEX".
 
 The "solver\_settings\_path" argument is a string which specifies the path to the directory that contains the settings YAML file for the specified solver.
 
