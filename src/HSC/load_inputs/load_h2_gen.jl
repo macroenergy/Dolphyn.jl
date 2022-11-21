@@ -72,9 +72,11 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	inputs_gen["H2_GEN_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1,:R_ID]
 	# Set of h2 resources eligible for unit committment
 	inputs_gen["H2_GEN_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2,:R_ID]
+	# Set of h2 resources with piecewise p2g efficiency, without unit commitment
+	inputs_gen["H2_GEN_NO_COMMIT_PW"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==4,:R_ID]
 
     #Set of all H2 production Units - can be either commit or new commit
-    inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
+    inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT_PW"])
 
     # Set of all resources eligible for new capacity - includes both storage and generation
 	# DEV NOTE: Should we allow investment in flexible demand capacity later on?
@@ -92,7 +94,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# Direct CO2 emissions per tonne of H2 produced for various technologies
 	inputs_gen["dfH2Gen"][!,:CO2_per_tonne] = zeros(Float64, inputs_gen["H2_RES_ALL"])
 
-	
+	# Load the polarization curves of the electrolyzers for the PW representation
+	inputs_gen["var_etaP2G"] = DataFrame(CSV.File(string(path,sep,"HSC_electro_polarization.csv"), header=true), copycols=true)
+
 	#### TO DO LATER ON - CO2 constraints
 
 	# for k in 1:inputs_gen["H2_RES_ALL"]

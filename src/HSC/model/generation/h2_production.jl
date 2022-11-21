@@ -32,6 +32,7 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
 	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+	H2_GEN_NO_COMMIT_PW = inputs["H2_GEN_NO_COMMIT_PW"]
 	dfH2Gen = inputs["dfH2Gen"]  # Input H2 generation and storage data
 	Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
 	T = inputs["T"]	 # Model operating time steps
@@ -42,6 +43,10 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
 	if !isempty(H2_GEN_NO_COMMIT)
 		EP = h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
+	end
+
+	if !isempty(H2_GEN_NO_COMMIT_PW)
+		EP = h2_production_no_commit_pw(EP::Model, inputs::Dict,setup::Dict)
 	end
 
 	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step

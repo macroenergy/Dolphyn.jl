@@ -152,6 +152,7 @@ include("HSC/model/core/emissions_hsc.jl")
 # H2 production
 include("HSC/model/generation/h2_production_commit.jl")
 include("HSC/model/generation/h2_production_no_commit.jl")
+include("HSC/model/generation/h2_production_no_commit_pw.jl")
 include("HSC/model/generation/h2_production_all.jl")
 include("HSC/model/generation/h2_production.jl")
 
