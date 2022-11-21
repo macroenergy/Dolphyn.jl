@@ -16,6 +16,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 import Pkg
 using Pkg
+
+function get_gurobi_version()
+    try
+        res = read(`gurobi_cl --version`, String)
+        res = split(res, ".")
+        gurobi_ver = string("$(res[1][end]).$(res[2])")
+        gurobi_ver = parse(Float64, gurobi_ver)
+        return gurobi_ver
+    catch e
+        return 9.5
+    end
+end
+
 Pkg.activate("DOLPHYNJulEnv")
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="0.8.0"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="0.8.4"))
@@ -34,11 +47,17 @@ Pkg.add(Pkg.PackageSpec(name="Distances", version="0.10.3"))
 Pkg.add(Pkg.PackageSpec(name="DataFrames", version="1.0.0")) #0.20.2
 Pkg.add(Pkg.PackageSpec(name="Documenter", version="0.27.3"))
 Pkg.add(Pkg.PackageSpec(name="DocumenterTools", version="0.1.13"))
-Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.11.3"))
-
+gurobi_ver = get_gurobi_version()
+if gurobi_ver >= 10.0
+    Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.11.4"))
+else
+    Pkg.add(Pkg.PackageSpec(name="Gurobi", version="0.11.3"))
+    Pkg.pin(Pkg.PackageSpec(name="Gurobi", version="0.11.3"))
+end
 # Julia environment variable GUROBI_HOME set to your running machine location
 # ENV["GUROBI_HOME"] = "/usr/local/gurobi/gurobi912/linux64/"
 Pkg.build("Gurobi")
+
 ##Add if elseif with Method of Morris for these
 Pkg.add(Pkg.PackageSpec(name="DiffEqSensitivity", version="6.52.1"))
 Pkg.add(Pkg.PackageSpec(name="Statistics"))
@@ -55,3 +74,4 @@ Pkg.add(Pkg.PackageSpec(name="Revise"))
 # Logging
 Pkg.add(Pkg.PackageSpec(name="Logging"))
 Pkg.add(Pkg.PackageSpec(name="LoggingExtras"))
+
