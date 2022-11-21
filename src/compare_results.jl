@@ -66,10 +66,12 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
     if length(only1) > 0
         push!(lines_to_write, "$(inset)Files in $dirname1 but not in $dirname2:\n")
         push!(lines_to_write, join([inset, join(only1, "\n$inset")]))
+        push!(lines_to_write, "\n")
     end
     if length(only2) > 0
         push!(lines_to_write, "$(inset)Files in $dirname2 but not in $dirname1:\n")
         push!(lines_to_write, join([inset, join(only2, "\n$inset")]))
+        push!(lines_to_write, "\n")
     end
     if length(only1) == 0 && length(only2) ==0
         push!(lines_to_write, "$(inset)Both directories contain the same files and subdirectories\n")
