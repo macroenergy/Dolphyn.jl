@@ -44,7 +44,7 @@ using Dates
 using Clustering
 using Distances
 using Combinatorics
-using Documenter
+#using Documenter
 using Revise
 # Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
 using Gurobi

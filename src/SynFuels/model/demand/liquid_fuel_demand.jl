@@ -62,6 +62,20 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
     @constraints(EP, begin [ t=1:T, k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd], EP[:vSFByProd][k,b,t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
 	end)
 
+    ####Constraining amount of syn fuel
+    percent_sf = setup["percent_sf"]
+
+    #Sum up conventional fuel production
+    @expression(EP, eConvLFDemandT[t=1:T], sum(vConvLFDemand[t, z] for z in 1:Z))
+	@expression(EP, eConvLFDemandTZ, sum(eConvLFDemandT[t] for t in 1:T))
+
+    #Sum up conventional fuel production
+
+    @expression(EP, eSynFuelProdNoCommitT[t=1:T], sum(EP[:eSynFuelProdNoCommit][t, z] for z in 1:Z))
+	@expression(EP, eSynFuelProdNoCommitTZ, sum(eSynFuelProdNoCommitT[t] for t in 1:T))
+
+    @constraint(EP, cSynFuelShare, (percent_sf - 1) * eSynFuelProdNoCommitTZ + percent_sf *  eConvLFDemandTZ == 0)
+
 	return EP
 
 end
