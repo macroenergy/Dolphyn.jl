@@ -115,7 +115,7 @@ include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
 
 #Core GenX Features
-include("GenX/src/model/core/discharge/discharge.jl")
+# include("GenX/src/model/core/discharge/discharge.jl")
 # include("GenX/src/model/core/discharge/investment_discharge.jl")
 # include("GenX/src/model/core/non_served_energy.jl")
 # include("GenX/src/model/core/ucommit.jl")

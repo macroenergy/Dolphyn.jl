@@ -34,7 +34,6 @@ end
 Pkg.activate("DOLPHYNJulEnv")
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="1.0.1"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="1.0.1"))
-Pkg.add(Pkg.PackageSpec(name="SCIP", version="0.11.3"))
 Pkg.add(Pkg.PackageSpec(name="HiGHS", version="1.1.4"))
 Pkg.add(Pkg.PackageSpec(name="DataStructures", version="0.18.13"))
 Pkg.add(Pkg.PackageSpec(name="Dates"))
@@ -72,8 +71,7 @@ Pkg.add(Pkg.PackageSpec(name="StatsBase", version="0.33.21"))
 Pkg.add(Pkg.PackageSpec(name="YAML", version="0.4.7"))
 Pkg.add(Pkg.PackageSpec(name="LinearAlgebra"))
 Pkg.add(Pkg.PackageSpec(name="Revise"))
-Pkg.add(Pkg.PackageSpec(name="RecursiveArrayTools", version="2.31.2")
-
+Pkg.add(Pkg.PackageSpec(name="RecursiveArrayTools", version="2.31.2"))
 
 # Logging
 Pkg.add(Pkg.PackageSpec(name="Logging"))
