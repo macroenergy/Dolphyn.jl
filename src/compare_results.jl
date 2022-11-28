@@ -57,21 +57,26 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
     # Create a summary file
     
     lines_to_write = []
-    push!(lines_to_write, "$inset--- $dirname2 ---\n")
+    push!(lines_to_write, "$(inset)Comparing the following directories:\n")
+    push!(lines_to_write, "$(inset)--- $dirname1 ---\n")
+    push!(lines_to_write, "$(inset)--- $dirname2 ---\n")
+    push!(lines_to_write, "\n")
 
     # Write the summary file
     if length(only1) > 0
-        push!(lines_to_write, join([inset, "Files in $dirname1 but not in $dirname2:"]))
-        for file in only1
-            push!(lines_to_write, file)
-        end
+        push!(lines_to_write, "$(inset)Files in $dirname1 but not in $dirname2:\n")
+        push!(lines_to_write, join([inset, join(only1, "\n$inset")]))
+        push!(lines_to_write, "\n")
     end
     if length(only2) > 0
-        push!(lines_to_write, join([inset, "Files in $dirname2 but not in $dirname1:"]))
-        for file in only2
-            push!(lines_to_write, file)
-        end
+        push!(lines_to_write, "$(inset)Files in $dirname2 but not in $dirname1:\n")
+        push!(lines_to_write, join([inset, join(only2, "\n$inset")]))
+        push!(lines_to_write, "\n")
     end
+    if length(only1) == 0 && length(only2) ==0
+        push!(lines_to_write, "$(inset)Both directories contain the same files and subdirectories\n")
+    end
+    push!(lines_to_write, "\n")
     
     common_files_matching = []
     common_files_diff = []
@@ -111,7 +116,7 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
         if length(subdirs) > 0
             push!(lines_to_write, "\n")
             push!(lines_to_write, join([inset, "Sub-directories"]))
-            push!(lines_to_write, "\n ")
+            push!(lines_to_write, "\n")
             for subdir in subdirs
                 lines_to_write = [lines_to_write; compare_dir(joinpath(path1, subdir), joinpath(path2, subdir), join([inset, "  "]))]
             end
