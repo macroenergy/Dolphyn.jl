@@ -46,12 +46,6 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 		MaxCapacity_tonne_p_hr = dfSynFuels[!,:MaxCapacity_tonne_p_hr] # t/h/h
 	end
 
-	##ADD TO SETUP
-
-	#"Syn_Fuel_CAPEX_Piecewise"
-	#"Syn_Fuel_CAPEX_Piecewise_Segments"
-
-
 	if setup["Syn_Fuel_CAPEX_Piecewise"] ==1 
 
         if setup["ParameterScale"] == 1
