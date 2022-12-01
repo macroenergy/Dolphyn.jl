@@ -850,6 +850,8 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     FuelCols = [Symbol(fuel_col_names[i]) for i in 1:length(fuel_col_names) ]
     ConstCol_Syms = [Symbol(ConstCols[i]) for i in 1:length(ConstCols) ]
 
+    LoadColsNoConst = setdiff(LoadCols, ConstCol_Syms)
+
     if mysetup["ModelH2"] == 1
         H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_col_names) ]
         H2VarCols = [Symbol(h2_var_col_names[i]) for i in 1:length(h2_var_col_names) ]
@@ -862,7 +864,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     # Get zone-wise load multipliers for later scaling in order for weighted-representative-total-zonal load to equal original total-zonal load
     #  (Only if we don't have load-related extreme periods because we don't want to change peak load periods)
     if !LoadExtremePeriod
-        load_mults = get_load_multipliers(ClusterOutputData, InputData, M, W, LoadCols, TimestepsPerRepPeriod, NewColNames, NClusters, Ncols)
+        load_mults = get_load_multipliers(ClusterOutputData, InputData, M, W, LoadColsNoConst, TimestepsPerRepPeriod, NewColNames, NClusters, Ncols)
     end
 
     # Reorganize Data by Load, Solar, Wind, Fuel, and GrpWeight by Hour, Add Constant Data Back In
@@ -887,6 +889,12 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         if mysetup["ModelH2"] == 1
             hrvDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2VarCols)) )
             hlpDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2LoadCols)) )
+
+            AllH2LoadVarConst =  length(intersect(H2LoadCols, ConstCol_Syms)) == length(H2LoadCols)
+
+            if AllH2LoadVarConst
+                hlpDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
+            end
 
             if AllHRVarConst
                 hrvDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
