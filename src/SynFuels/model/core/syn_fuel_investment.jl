@@ -126,6 +126,8 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 			#Fixed OM cost
 			@expression(EP, eFixed_OM_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i] * RefFixed_OM_per_t_per_h_y[i]/RefCapacity_t_per_h[i])
 	
+		end
+		
 
 	elseif setup["Syn_Fuel_CAPEX_Piecewise"] == 0
 

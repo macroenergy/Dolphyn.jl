@@ -41,10 +41,10 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
     #Cost of Conventional Fuel
     if setup["ParameterScale"] ==1
 		@expression(EP, eCLFVar_out[z = 1:Z,t = 1:T], 
-		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * Liquid_Fuels_D[t,z])) / ModelScalingFactor
+		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * vConvLFDemand[t,z])) / ModelScalingFactor
     else
 		@expression(EP, eCLFVar_out[z = 1:Z,t = 1:T], 
-		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * Liquid_Fuels_D[t,z]))
+		(inputs["omega"][t] * Conventional_fuel_price_per_mmbtu * vConvLFDemand[t,z]))
 	end
 
     #Sum up conventional Fuel Costs
@@ -62,19 +62,23 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
     @constraints(EP, begin [ t=1:T, k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd], EP[:vSFByProd][k,b,t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
 	end)
 
-    ####Constraining amount of syn fuel
-    percent_sf = setup["percent_sf"]
+    if setup["SpecifySynFuelPercentFlag"] == 1
 
-    #Sum up conventional fuel production
-    @expression(EP, eConvLFDemandT[t=1:T], sum(vConvLFDemand[t, z] for z in 1:Z))
-	@expression(EP, eConvLFDemandTZ, sum(eConvLFDemandT[t] for t in 1:T))
+        ####Constraining amount of syn fuel
+        percent_sf = setup["percent_sf"]
 
-    #Sum up conventional fuel production
+        #Sum up conventional fuel production
+        @expression(EP, eConvLFDemandT[t=1:T], sum(vConvLFDemand[t, z] for z in 1:Z))
+        @expression(EP, eConvLFDemandTZ, sum(eConvLFDemandT[t] for t in 1:T))
 
-    @expression(EP, eSynFuelProdNoCommitT[t=1:T], sum(EP[:eSynFuelProdNoCommit][t, z] for z in 1:Z))
-	@expression(EP, eSynFuelProdNoCommitTZ, sum(eSynFuelProdNoCommitT[t] for t in 1:T))
+        #Sum up syn fuel production
 
-    @constraint(EP, cSynFuelShare, (percent_sf - 1) * eSynFuelProdNoCommitTZ + percent_sf *  eConvLFDemandTZ == 0)
+        @expression(EP, eSynFuelProdNoCommitT[t=1:T], sum(EP[:eSynFuelProdNoCommit][t, z] for z in 1:Z))
+        @expression(EP, eSynFuelProdNoCommitTZ, sum(eSynFuelProdNoCommitT[t] for t in 1:T))
+
+        @constraint(EP, cSynFuelShare, (percent_sf - 1) * eSynFuelProdNoCommitTZ + percent_sf *  eConvLFDemandTZ == 0)
+
+    end 
 
 	return EP
 
