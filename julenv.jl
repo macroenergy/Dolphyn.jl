@@ -21,7 +21,9 @@ function get_gurobi_version()
     try
         res = read(`gurobi_cl --version`, String)
         res = split(res, ".")
-        gurobi_ver = string("$(res[1][end]).$(res[2])")
+        major = split(res[1], " ")[end]
+        minor = res[2]
+        gurobi_ver = string("$(major).$(minor)")
         gurobi_ver = parse(Float64, gurobi_ver)
         return gurobi_ver
     catch e
