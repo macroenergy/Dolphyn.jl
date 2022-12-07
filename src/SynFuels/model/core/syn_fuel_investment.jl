@@ -65,7 +65,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 			#####################################################################################################################################
 			##Piecewise Function for Investment Cost
 			#Define steps for piecewise function
-			Segments = setup["DAC_CAPEX_Piecewise_Segments"]
+			Segments = setup["Syn_Fuel_CAPEX_Piecewise_Segments"]
 			Intervals = Segments + 1
 			CAPEX_Intervals = zeros(SYN_FUELS_RES_ALL,Intervals) #Parameter alpha
 			Capacity_Intervals = zeros(SYN_FUELS_RES_ALL,Intervals) #Parameter X
@@ -99,7 +99,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 			Syn_Fuel_CAPEX_Max_Limit = zeros(SYN_FUELS_RES_ALL)
 	
 			for i in 1:SYN_FUELS_RES_ALL
-				Syn_Fuel_CAPEX_Max_Limit[i] = CAPEX_Intervals[i,Intervals-1] + Syn_Fuel_CAPEX_Extrapolate_Gradient[i] * (DAC_Capacity_Max_Limit[i] - Capacity_Intervals[i,Intervals-1])
+				Syn_Fuel_CAPEX_Max_Limit[i] = CAPEX_Intervals[i,Intervals-1] + Syn_Fuel_CAPEX_Extrapolate_Gradient[i] * (MaxCapacity_tonne_p_hr[i] - Capacity_Intervals[i,Intervals-1])
 				Capacity_Intervals[i,Intervals] = MaxCapacity_tonne_p_hr[i]
 				CAPEX_Intervals[i,Intervals] = Syn_Fuel_CAPEX_Max_Limit[i]
 			end
@@ -117,17 +117,17 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 			#Piecewise constriants
 			@constraint(EP,cSum_z_piecewise_Syn_Fuel[i in 1:SYN_FUELS_RES_ALL], sum(EP[:z_piecewise_Syn_Fuel][i,k] for k in 1:Intervals) == EP[:y_piecewise_Syn_Fuel][i])
 			@constraint(EP,cLeq_w_z_piecewise_Syn_Fuel[i in 1:SYN_FUELS_RES_ALL,k in 1:Intervals], EP[:w_piecewise_Syn_Fuel][i,k] <= EP[:z_piecewise_Syn_Fuel][i,k])
-			@constraint(EP,eCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i] == sum(EP[:z_piecewise_Syn_Fuel][i,k]*CAPEX_Intervals[i,k] + EP[:w_piecewise_Syn_Fuel][i,k]*(CAPEX_Intervals[i,k-1]-CAPEX_Intervals[i,k]) for k = 2:Intervals))
+			@constraint(EP,cCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i] == sum(EP[:z_piecewise_Syn_Fuel][i,k]*CAPEX_Intervals[i,k] + EP[:w_piecewise_Syn_Fuel][i,k]*(CAPEX_Intervals[i,k-1]-CAPEX_Intervals[i,k]) for k = 2:Intervals))
 			@constraint(EP,cCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i] == sum(EP[:z_piecewise_Syn_Fuel][i,k]*Capacity_Intervals[i,k] + EP[:w_piecewise_Syn_Fuel][i,k]*(Capacity_Intervals[i,k-1]-Capacity_Intervals[i,k]) for k = 2:Intervals))
 	
 			#Investment cost = CAPEX
 			@expression(EP, eCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i])
 	
 			#Fixed OM cost
-			@expression(EP, eFixed_OM_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i] * RefFixed_OM_per_t_per_h_y[i]/RefCapacity_t_per_h[i])
+			@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCAPEX_Syn_Fuel_per_type][i] * RefFixed_OM_per_t_per_h_y[i]/RefCapacity_t_per_h[i])
 	
 		end
-		
+
 
 	elseif setup["Syn_Fuel_CAPEX_Piecewise"] == 0
 
@@ -142,7 +142,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 		#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
 		#Investment cost = CAPEX
 		#Consider using constraint for vCAPEX_Syn_Fuel_per_type? Or expression is better
-		@expression(EP, eCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
+		@expression(EP, eCAPEX_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
 		#Fixed OM cost #Check again to match capacity
 		@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i])
 
