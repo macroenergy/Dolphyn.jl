@@ -102,6 +102,7 @@ include("time_domain_reduction/time_domain_reduction.jl")
 #Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
+include("HSC/load_inputs/load_h2_demand_liquid.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_truck.jl")
@@ -253,5 +254,6 @@ include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
+include("HSC/write_outputs/write_h2_elec_costs.jl")
 
 end

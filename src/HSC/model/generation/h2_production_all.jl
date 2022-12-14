@@ -47,9 +47,9 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 	dfH2Gen = inputs["dfH2Gen"]
 
 	#Define sets
-	H2_GEN_NO_COMMIT= inputs["H2_GEN_NO_COMMIT"]
-	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
-	H2_GEN = inputs["H2_GEN"]
+	H2_GEN_NO_COMMIT= union(inputs["H2_GEN_NO_COMMIT"], inputs["H2_LIQ_NO_COMMIT"], inputs["H2_EVAP_NO_COMMIT"])
+	H2_GEN_COMMIT = union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
+	H2_GEN = union(inputs["H2_GEN"], inputs["H2_LIQ"], inputs["H2_EVAP"])
 	H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
 	H =inputs["H2_RES_ALL"]
 

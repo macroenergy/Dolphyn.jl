@@ -147,7 +147,10 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	Z = inputs["Z"]     # Number of zones
 	H = inputs["H"]		#NUmber of hydrogen generation units 
 	
-	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+	H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
+	H2_GAS_COMMIT = inputs["H2_GEN_COMMIT"] #This is needed only for H2 balance
+	H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
+	H2_GEN_COMMIT = union(H2_LIQ_COMMIT, H2_GAS_COMMIT, H2_EVAP_COMMIT) #liquefiers are treated at generators, all the same expressions & contraints apply, except for H2 balance
 	H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"] 
 	H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"] 
 	
@@ -185,9 +188,29 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	#H2 Balance expressions
 	@expression(EP, eH2GenCommit[t=1:T, z=1:Z],
-	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GAS_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] += eH2GenCommit
+
+	if setup["ModelH2Liquid"]==1
+		#H2 LIQUID Balance expressions
+		@expression(EP, eH2LiqCommit[t=1:T, z=1:Z],
+		sum(EP[:vH2Gen][k,t] for k in intersect(H2_LIQ_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+		
+		# Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
+		EP[:eH2Balance] -= eH2LiqCommit
+		EP[:eH2LiqBalance] += eH2LiqCommit
+
+		#H2 EVAPORATION Balance expressions
+		if !isempty(H2_EVAP_COMMIT)
+			@expression(EP, eH2EvapCommit[t=1:T, z=1:Z],
+			sum(EP[:vH2Gen][k,t] for k in intersect(H2_EVAP_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+		
+			# Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
+			EP[:eH2Balance] += eH2EvapCommit
+			EP[:eH2LiqBalance] -= eH2EvapCommit
+		end
+	end
 
 	#Power Consumption for H2 Generation
 	if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 

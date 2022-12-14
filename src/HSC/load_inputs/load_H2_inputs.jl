@@ -63,6 +63,11 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	end
 	
 
+	# Read input data about hydrogen transport truck types
+	if setup["ModelH2Liquid"] ==1
+		inputs = load_h2_demand_liquid(setup, path, sep, inputs)
+	end
+	
 
 	# Read input data about G2P Resources
 	if isfile(string(path,sep,"HSC_g2p.csv"))

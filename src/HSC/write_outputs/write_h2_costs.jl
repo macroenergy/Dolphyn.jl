@@ -26,6 +26,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
+	H = inputs["H2_RES_ALL"]
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
 
 	if setup["ModelH2G2P"] == 1
@@ -50,16 +51,29 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		cG2PVar = 0
 	end
 
-
-	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix_Gen", "cH2Fix_G2P", "cH2Fix_Stor", "cH2Var", "cH2NSE", "cH2Start", "cNetworkExp"])
-	if setup["ParameterScale"]==1 # Convert costs in millions to $
-		cH2Var = (value(EP[:eTotalCH2GenVarOut]) + (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar) * ModelScalingFactor^2
-		cH2Fix_Gen = value(EP[:eTotalH2GenCFix]) * ModelScalingFactor^2
-		cH2Fix_G2P = cG2PFix * ModelScalingFactor^2
-		cH2Fix_Stor = ((!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0)) * ModelScalingFactor^2
+	if setup["ModelH2Trucks"] == 1
+		cH2Fix_Truck = (value(EP[:eTotalCFixH2TruckCharge]) + value(EP[:eTotalCFixH2TruckEnergy]))
+		cH2Var_Truck = (value(EP[:OPEX_Truck]) + value(EP[:OPEX_Truck_Compression]))
 	else
-		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0) + cG2PVar)
+		cH2Fix_Truck = 0
+		cH2Var_Truck = 0
+	end
+
+
+	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix_Gen", "cH2Fix_Liq", "cH2Fix_G2P", "cH2Fix_Stor", "cH2Var", "cH2Var_G2P", "cH2NSE", "cH2Start", "cNetworkExp", "cH2Fix_Truck", "cH2Var_Truck"])
+	if setup["ParameterScale"]==1 # Convert costs in millions to $
+		cH2Var = (value(EP[:eTotalCH2GenVarOut]) + (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0)) * ModelScalingFactor^2
+		cH2Fix_Gen = value(EP[:eTotalH2GenCFix]) * ModelScalingFactor^2
+		cH2Fix_Liq = value(EP[:eTotalH2LiqCFix]) * ModelScalingFactor^2
+		cH2Fix_G2P = cG2PFix * ModelScalingFactor^2
+		cG2PVar = cG2PVar * ModelScalingFactor^2
+		cH2Fix_Stor = ((!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0)) * ModelScalingFactor^2
+		cH2Fix_Truck = cH2Fix_Truck * ModelScalingFactor^2
+		cH2Var_Truck = cH2Var_Truck * ModelScalingFactor^2
+	else
+		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))
 		cH2Fix_Gen = value(EP[:eTotalH2GenCFix])
+		cH2Fix_Liq = value(EP[:eTotalH2LiqCFix])
 		cH2Fix_G2P = cG2PFix
 		cH2Fix_Stor = ((!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) + value(EP[:eTotalCFixH2Charge]) : 0))
 	end
@@ -78,31 +92,34 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		end
 	end
 
-	if Z >1
 		
-		if setup["ModelH2Pipelines"] == 1
-			if setup["ParameterScale"]==1 # Convert costs in millions to $
-				cH2NetworkExpCost = value(EP[:eCH2Pipe])*ModelScalingFactor^2
-			else
-				cH2NetworkExpCost = value(EP[:eCH2Pipe])
-			end
+	if setup["ModelH2Pipelines"] == 1
+		if setup["ParameterScale"]==1 # Convert costs in millions to $
+			cH2NetworkExpCost = value(EP[:eCH2Pipe])*ModelScalingFactor^2
+		else
+			cH2NetworkExpCost = value(EP[:eCH2Pipe])
 		end
-
+	else
 		cH2NetworkExpCost=0
 	end
 
 	 
-    cH2Total = cH2Var + cH2Fix_Gen + cH2Fix_G2P + cH2Fix_Stor + cH2Start + value(EP[:eTotalH2CNSE]) +cH2NetworkExpCost
+    cH2Total = cH2Fix_Gen + cH2Fix_Liq + cH2Fix_G2P + cH2Fix_Stor + cH2Start + cH2Var + cG2PVar + value(EP[:eTotalH2CNSE]) + cH2Start + cH2NetworkExpCost + cH2Fix_Truck + cH2Var_Truck
 
-    dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix_Gen, cH2Fix_G2P, cH2Fix_Stor, cH2Var, value(EP[:eTotalH2CNSE]), cH2Start,cH2NetworkExpCost]
+    dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix_Gen, cH2Fix_Liq, cH2Fix_G2P, cH2Fix_Stor, cH2Var, cG2PVar, value(EP[:eTotalH2CNSE]), cH2Start, cH2NetworkExpCost, cH2Fix_Truck, cH2Var_Truck]
 
 
+	
+
+	# Calculate Costs for each Zone
 	for z in 1:Z
 		tempCTotal = 0
 		tempCFix_Gen = 0
+		tempCFix_Liq = 0
 		tempCFix_G2P = 0
 		tempCFix_Stor = 0
 		tempCVar = 0
+		tempCVar_G2P = 0
 		tempCStart = 0
 
 		for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
@@ -112,12 +129,19 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		end
 
 		for y in dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
-			tempCFix_Gen = tempCFix_Gen +
-				value.(EP[:eH2GenCFix])[y]
+			if y in inputs["H2_GEN"]
+				tempCFix_Gen = tempCFix_Gen +
+					value.(EP[:eH2GenCFix])[y]
+			elseif y in union(inputs["H2_LIQ"], inputs["H2_EVAP"])
+				tempCFix_Liq = tempCFix_Liq +
+					value.(EP[:eH2GenCFix])[y]
+			end				
+
 			tempCVar = tempCVar +
 				(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
 				(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 				sum(value.(EP[:eCH2GenVar_out])[y,:])
+
 			if !isempty(H2_GEN_COMMIT)
 				tempCTotal = tempCTotal +
 					value.(EP[:eH2GenCFix])[y] +
@@ -144,7 +168,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			for  y in dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]
 
 				tempCFix_G2P += value.(EP[:eH2G2PCFix])[y]
-				tempCVar += sum(value.(EP[:eCH2G2PVar_out])[y,:])
+				tempCVar_G2P += sum(value.(EP[:eCH2G2PVar_out])[y,:]) 
 				tempCTotal += value.(EP[:eH2G2PCFix])[y] + sum(value.(EP[:eCH2G2PVar_out])[y,:])
 
 				if !isempty(inputs["H2_G2P_COMMIT"])
@@ -159,9 +183,11 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCFix_Gen = tempCFix_Gen * (ModelScalingFactor^2)
+			tempCFix_Liq = tempCFix_Liq * (ModelScalingFactor^2)
 			tempCFix_G2P = tempCFix_G2P * (ModelScalingFactor^2)
 			tempCFix_Stor = tempCFix_Stor * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)
+			tempCVar_G2P = tempCVar_G2P * (ModelScalingFactor^2)
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 			tempCStart = tempCStart * (ModelScalingFactor^2)
 		end
@@ -179,7 +205,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])
 		end
 
-		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_G2P, tempCFix_Stor, tempCVar, tempCNSE, tempCStart,"-"]
+		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_Liq, tempCFix_G2P, tempCFix_Stor, tempCVar, tempCVar_G2P, tempCNSE, tempCStart,"-","-","-"]
 	end
 	CSV.write(string(path,sep,"HSC_costs.csv"), dfH2Cost)
 end

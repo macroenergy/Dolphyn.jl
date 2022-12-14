@@ -35,14 +35,14 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	dfH2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 13)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", 
 	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
 			   "Storage Discharging", "Storage Charging",
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
 			   "H2_Truck_Import/Export","G2P Demand",
-	           "Demand"]
+	           "Demand", "Liquid_Generation", "Liquid_Demand", "Evaporation"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
@@ -88,6 +88,17 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 	     	dfTemp1[t+rowoffset,10] = -inputs["H2_D"][t,z]
 
+			if setup["ModelH2Liquid"] == 1
+				dfTemp1[t+rowoffset,11] = sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_LIQ].>0) .&  (dfH2Gen[!,:H2_LIQ].<3) .& (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1[t+rowoffset,13] = sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_LIQ].>2) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1[t+rowoffset,12] = -inputs["H2_D_L"][t,z]
+			else
+				dfTemp1[t+rowoffset,11] = 0
+				dfTemp1[t+rowoffset,12] = 0
+				dfTemp1[t+rowoffset,13] = 0
+			end 
+
+			
 	   	end
 
 		if z==1

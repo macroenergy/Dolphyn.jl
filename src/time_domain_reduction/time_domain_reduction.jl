@@ -131,7 +131,9 @@ function parse_data(myinputs, mysetup)
     h2_g2p_var_profiles = []
     h2_col_to_zone_map = []
     h2_load_col_names = []
+    h2_load_liq_col_names = []
     h2_load_profiles = []
+    h2_load_liq_profiles = []
 
     # What does this mean? Is this default value
     AllHRVarConst = true
@@ -181,6 +183,15 @@ function parse_data(myinputs, mysetup)
         h2_load_zones = [l for l in 1:size(h2_load_profiles)[1]]
         h2_col_to_zone_map = Dict("Load_H2_tonne_per_hr_z"*string(l) => l for l in 1:size(h2_load_profiles)[1])
 
+
+        if mysetup["ModelH2Liquid"] ==1
+        # Parsing HSC_load_data_liquid.csv
+            h2_load_liq_profiles = [ myinputs["H2_D_L"][:,l] for l in 1:size(myinputs["H2_D_L"],2) ]
+            h2_load_liq_col_names = ["Load_liqH2_tonne_per_hr_z"*string(l) for l in 1:size(h2_load_liq_profiles)[1]]
+            h2_load_liq_zones = [l for l in 1:size(h2_load_liq_profiles)[1]]
+            #h2_col_to_zone_liq_map = Dict("Load_H2_tonne_per_hr_z"*string(l) => l for l in 1:size(h2_load_liq_profiles)[1])
+        end
+
         # CAPACITY FACTORS - HSC_Generators_variability.csv
         for r in 1:length(H2_RESOURCES)
             push!(h2_var_col_names, H2_RESOURCES[r])
@@ -208,11 +219,11 @@ function parse_data(myinputs, mysetup)
         end
     end
 
-    all_col_names = [load_col_names; h2_load_col_names; var_col_names; h2_var_col_names; h2_g2p_var_col_names; fuel_col_names]
-    all_profiles = [load_profiles..., h2_load_profiles..., var_profiles..., h2_var_profiles..., h2_g2p_var_profiles..., fuel_profiles...]
+    all_col_names = [load_col_names; h2_load_col_names; h2_load_liq_col_names; var_col_names; h2_var_col_names; h2_g2p_var_col_names; fuel_col_names]
+    all_profiles = [load_profiles..., h2_load_profiles..., h2_load_liq_profiles..., var_profiles..., h2_var_profiles..., h2_g2p_var_profiles..., fuel_profiles...]
 
 
-    return load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
+    return load_col_names, h2_load_col_names, h2_load_liq_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names,
     fuel_col_names, all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
     fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst
 
@@ -583,6 +594,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     Fuel_Outfile = joinpath(TimeDomainReductionFolder, "Fuels_data.csv")
     PMap_Outfile = joinpath(TimeDomainReductionFolder, "Period_map.csv")
     H2Load_Outfile = joinpath(TimeDomainReductionFolder, "HSC_load_data.csv")
+    H2Load_Liq_Outfile = joinpath(TimeDomainReductionFolder, "HSC_load_data_liquid.csv")
     H2RVar_Outfile = joinpath(TimeDomainReductionFolder, "HSC_generators_variability.csv")
     H2G2PVar_Outfile = joinpath(TimeDomainReductionFolder, "HSC_g2p_variability.csv")
     YAML_Outfile = joinpath(TimeDomainReductionFolder, "time_domain_reduction_settings.yml")
@@ -612,7 +624,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     # Parse input data into useful structures divided by type (load, wind, solar, fuel, groupings thereof, etc.)
     # TO DO LATER: Replace these with collections of col_names, profiles, zones
-    load_col_names, h2_load_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names, fuel_col_names, 
+    load_col_names, h2_load_col_names, h2_load_liq_col_names, var_col_names, solar_col_names, wind_col_names, h2_var_col_names, h2_g2p_var_col_names, fuel_col_names, 
     all_col_names, load_profiles, var_profiles, solar_profiles, wind_profiles, h2_var_profiles, h2_g2p_var_profiles, 
     fuel_profiles, all_profiles, col_to_zone_map, h2_col_to_zone_map, AllFuelsConst, AllHRVarConst, AllHG2PVarConst = parse_data(myinputs, mysetup)
 
@@ -852,6 +864,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     if mysetup["ModelH2"] == 1
         H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_col_names) ]
+        H2LoadLiqCols = [Symbol("Load_liqH2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_liq_col_names) ]
         H2VarCols = [Symbol(h2_var_col_names[i]) for i in 1:length(h2_var_col_names) ]
         H2G2PVarCols = [Symbol(h2_g2p_var_col_names[i]) for i in 1:length(h2_g2p_var_col_names) ]
     end
@@ -874,6 +887,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
         hrvDFs = [] # Hydrogen resource variability DataFrames
         hlpDFs = [] # Hydrogen load profiles
+        hllpDFs = [] # liquid Hydrogen load profiles
         hrvg2pDFs = []
     end
     
@@ -892,6 +906,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
                 hrvDF = DataFrame(Placeholder = 1:TimestepsPerRepPeriod)
             end
             
+            if mysetup["ModelH2Liquid"] == 1
+                hllpDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2LoadLiqCols)) )
+            end
+
             if mysetup["ModelH2G2P"] == 1
 
                 hrvg2pDF = DataFrame( Dict( NewColNames[i] => ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] for i in 1:Ncols if (Symbol(NewColNames[i]) in H2G2PVarCols)))
@@ -908,6 +926,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         else
             hrvDF = []
             hlpDF = []
+            hllpDF = []
             hrvg2pDF = []
         end
                 
@@ -927,12 +946,16 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
                     hlpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
                 end
 
+                if mysetup["ModelH2Liquid"] == 1
+                    if Symbol(ConstCols[c]) in H2LoadLiqCols
+                        hllpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
+                    end
+                end
+                
                 if mysetup["ModelH2G2P"] == 1
-
                     if Symbol(ConstCols[c]) in H2G2PVarCols
                         hrvg2pDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
                     end
-
                 end
 
             end
@@ -963,6 +986,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
             push!(hrvDFs, hrvDF)
             push!(hlpDFs, hlpDF)
 
+            if mysetup["ModelH2Liquid"] == 1
+                push!(hllpDFs, hllpDF)
+            end
+
             if mysetup["ModelH2G2P"] == 1
                 if AllHG2PVarConst select!(hrvg2pDF, Not(:Placeholder))end
                 push!(hrvg2pDFs, hrvg2pDF)
@@ -978,6 +1005,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
         HLPOutputData = vcat(hlpDFs...) #Hydrogen Load Profiles
         HRVOutputData = vcat(hrvDFs...) #Hydrogen Resource Variability Profiles
+        
+        if mysetup["ModelH2Liquid"] == 1
+            HLLPOutputData = vcat(hllpDFs...) #Hydrogen Load Profiles
+        end
         
         if mysetup["ModelH2G2P"] == 1
             HG2POutputData = vcat(hrvg2pDFs...)
@@ -1076,6 +1107,33 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
         if v println("Writing load file...") end
         CSV.write(string(inpath,sep,H2Load_Outfile), h2_load_in)
+
+
+        #Write h2_load_data_liquid.csv
+        if mysetup["ModelH2Liquid"] ==1
+            h2_load_in = DataFrame(CSV.File(string(inpath,sep,"HSC_load_data_liquid.csv"), header=true), copycols=true)
+            h2_load_in[!,:Sub_Weights] = h2_load_in[!,:Sub_Weights] * 1.
+            h2_load_in[1:length(W),:Sub_Weights] .= W
+            h2_load_in[!,:Rep_Periods][1] = length(W)
+            h2_load_in[!,:Timesteps_per_Rep_Period][1] = TimestepsPerRepPeriod
+            select!(h2_load_in, Not(H2LoadLiqCols))
+            select!(h2_load_in, Not(:Time_Index))
+            Time_Index_M = Union{Int64, Missings.Missing}[missing for i in 1:size(h2_load_in,1)]
+            Time_Index_M[1:size(HLLPOutputData,1)] = 1:size(HLLPOutputData,1)
+            h2_load_in[!,:Time_Index] .= Time_Index_M
+
+            for c in H2LoadLiqCols
+                new_col = Union{Float64, Missings.Missing}[missing for i in 1:size(h2_load_in,1)]
+                new_col[1:size(HLLPOutputData,1)] = HLLPOutputData[!,c]
+                h2_load_in[!,c] .= new_col
+            end
+            
+            h2_load_in = h2_load_in[1:size(HLLPOutputData,1),:]
+
+            if v println("Writing liquid load file...") end
+            CSV.write(string(inpath,sep,H2Load_Liq_Outfile), h2_load_in)
+        end
+
 
         #Write HSC Resource Variability 
         # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg

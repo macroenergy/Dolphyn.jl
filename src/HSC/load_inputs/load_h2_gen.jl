@@ -48,7 +48,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# DEV NOTE: if we want to model other types of H2 storage (liquified or LOHC)  where discharging capacity is constrained  
 	# then we need to create another storage type to account for discharging capacity limits and costs
 	# H2_STOR = 1 : Charging and energy capacity sized and modeled but discharging capacity not sized or modeled. Mimicks gas storage
-	inputs_gen["H2_STOR_ABOVEGROUND_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	inputs_gen["H2_STOR_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	inputs_gen["H2_STOR_LIQ"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
 	#inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
 	# DEV NOTE: Duplicated currently since we have only one storage option can define it as a union when we have more storage options
 	inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
@@ -73,8 +74,23 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# Set of h2 resources eligible for unit committment
 	inputs_gen["H2_GEN_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2,:R_ID]
 
+	# Set of h2 resources for liquefaction - unit commitment
+	inputs_gen["H2_LIQ_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==1,:R_ID]
+	# Set of h2 resources for liquefaction - no UC
+	inputs_gen["H2_LIQ_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==2,:R_ID]
+	# Set of h2 resources for evaporation - unit commitment
+	inputs_gen["H2_EVAP_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==3,:R_ID]
+	# Set of h2 resources for evaporation - no UC
+	inputs_gen["H2_EVAP_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==4,:R_ID]
+
     #Set of all H2 production Units - can be either commit or new commit
     inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
+
+	#Set of all H2 liquefaction Units - can be either commit or new commit
+    inputs_gen["H2_LIQ"] = union(inputs_gen["H2_LIQ_COMMIT"],inputs_gen["H2_LIQ_NO_COMMIT"])
+
+	#Set of all H2 evaportation Units (from liquid to gas) - can be either commit or new commit
+    inputs_gen["H2_EVAP"] = union(inputs_gen["H2_EVAP_COMMIT"],inputs_gen["H2_EVAP_NO_COMMIT"])
 
     # Set of all resources eligible for new capacity - includes both storage and generation
 	# DEV NOTE: Should we allow investment in flexible demand capacity later on?

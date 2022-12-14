@@ -74,8 +74,11 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	Z = inputs["Z"]     # Number of zones
 	H = inputs["H2_GEN"]		#NUmber of hydrogen generation units 
 	
-	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
-	
+	H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+	H2_LIQ_NO_COMMIT = inputs["H2_LIQ_NO_COMMIT"]
+	H2_EVAP_NO_COMMIT = inputs["H2_EVAP_NO_COMMIT"]
+	H2_GEN_NO_COMMIT = union(H2_GAS_NO_COMMIT, H2_LIQ_NO_COMMIT, H2_EVAP_NO_COMMIT)
+
 	#Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
@@ -85,9 +88,29 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 	#H2 Balance expressions
 	@expression(EP, eH2GenNoCommit[t=1:T, z=1:Z],
-	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+	sum(EP[:vH2Gen][k,t] for k in intersect(H2_GAS_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] += eH2GenNoCommit
+
+	if setup["ModelH2Liquid"]==1
+		#H2 LIQUID Balance expressions
+		@expression(EP, eH2LiqNoCommit[t=1:T, z=1:Z],
+		sum(EP[:vH2Gen][k,t] for k in intersect(H2_LIQ_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+
+		# Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
+		EP[:eH2Balance] -= eH2LiqNoCommit
+		EP[:eH2LiqBalance] += eH2LiqNoCommit
+
+		#H2 Evaporation Balance expressions
+		if !isempty(H2_EVAP_NO_COMMIT)
+			@expression(EP, eH2EvapNoCommit[t=1:T, z=1:Z],
+			sum(EP[:vH2Gen][k,t] for k in intersect(H2_EVAP_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+
+			# Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
+			EP[:eH2Balance] += eH2EvapNoCommit
+			EP[:eH2LiqBalance] -= eH2EvapNoCommit
+		end
+	end
 
 	#Power Consumption for H2 Generation
 	#Power Consumption for H2 Generation
