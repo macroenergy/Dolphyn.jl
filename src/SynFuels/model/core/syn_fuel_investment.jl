@@ -131,6 +131,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	elseif setup["Syn_Fuel_CAPEX_Piecewise"] == 0
 
+
 		if setup["ParameterScale"] ==1 
 			Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuels[!,:Inv_Cost_p_tonne_co2_p_hr_yr]/ModelScalingFactor^2 # $/t/h/y
 			Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr]/ModelScalingFactor^2 # $/t/h/y
@@ -142,7 +143,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 		#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
 		#Investment cost = CAPEX
 		#Consider using constraint for vCAPEX_Syn_Fuel_per_type? Or expression is better
-		@expression(EP, eCAPEX_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
+		@expression(EP, eCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
 		#Fixed OM cost #Check again to match capacity
 		@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i])
 
