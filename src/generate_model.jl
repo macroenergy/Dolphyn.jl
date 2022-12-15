@@ -117,62 +117,67 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)	
 
 	##### Power System related modules ############
-	EP = discharge(EP, inputs)
+	# Infrastructure
+	discharge!(EP, inputs, setup)
 
-	EP = non_served_energy(EP, inputs)
+	non_served_energy!(EP, inputs, setup)
 
-	EP = investment_discharge(EP, inputs)
+	investment_discharge!(EP, inputs, setup)
 
 	if setup["UCommit"] > 0
-		EP = ucommit(EP, inputs, setup["UCommit"])
+		ucommit!(EP, inputs, setup)
 	end
 
 	# Emissions of various power sector resources
-	EP = emissions_power(EP, inputs,setup)
+	emissions!(EP, inputs)
 
 	if setup["Reserves"] > 0
-		EP = reserves(EP, inputs, setup["UCommit"])
+		reserves!(EP, inputs, setup)
 	end
 
 	if Z > 1
-		EP = transmission(EP, inputs, setup["UCommit"], setup["NetworkExpansion"])
+		transmission!(EP, inputs, setup)
 	end
 
 	# Technologies
 	# Model constraints, variables, expression related to dispatchable renewable resources
 
 	if !isempty(inputs["VRE"])
-		EP = curtailable_variable_renewable(EP, inputs, setup["Reserves"])
+		curtailable_variable_renewable!(EP, inputs, setup)
 	end
 
 	# Model constraints, variables, expression related to non-dispatchable renewable resources
 	if !isempty(inputs["MUST_RUN"])
-		EP = must_run(EP, inputs)
+		must_run!(EP, inputs, setup)
 	end
-
 
 	# Model constraints, variables, expression related to energy storage modeling
 	if !isempty(inputs["STOR_ALL"])
-		EP = storage(EP, inputs, setup["Reserves"], setup["OperationWrapping"])
+		storage!(EP, inputs, setup)
 	end
 
 	# Model constraints, variables, expression related to reservoir hydropower resources
 	if !isempty(inputs["HYDRO_RES"])
-		EP = hydro_res(EP, inputs, setup["Reserves"])
+		hydro_res!(EP, inputs, setup)
 	end
 
 	# Model constraints, variables, expression related to reservoir hydropower resources with long duration storage
 	if setup["OperationWrapping"] == 1 && !isempty(inputs["STOR_HYDRO_LONG_DURATION"])
-		EP = hydro_inter_period_linkage(EP, inputs)
+		hydro_inter_period_linkage!(EP, inputs)
 	end
 
 	# Model constraints, variables, expression related to demand flexibility resources
 	if !isempty(inputs["FLEX"])
-		EP = flexible_demand(EP, inputs)
+		flexible_demand!(EP, inputs, setup)
 	end
 	# Model constraints, variables, expression related to thermal resource technologies
 	if !isempty(inputs["THERM_ALL"])
-		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
+		thermal!(EP, inputs, setup)
+	end
+
+	# Model constraints, variables, expression related to retrofit technologies
+	if !isempty(inputs["RETRO"])
+		EP = retrofit(EP, inputs)
 	end
 
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
@@ -230,24 +235,28 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	################  Policies #####################3
 	# CO2 emissions limits for the power sector only
 	if setup["ModelH2"] ==0
-		EP = co2_cap_power(EP, inputs, setup)
+		co2_cap!(EP, inputs, setup)
 	elseif setup["ModelH2"]==1
 		EP = co2_cap_power_hsc(EP, inputs, setup)
 	end
 
+	# Endogenous Retirements
+	if setup["MultiStage"] > 0
+		endogenous_retirement!(EP, inputs, setup)
+	end
 
 	# Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
-		EP = energy_share_requirement(EP, inputs, setup)
+		energy_share_requirement!(EP, inputs, setup)
 	end
 
 	#Capacity Reserve Margin
 	if setup["CapacityReserveMargin"] > 0
-		EP = cap_reserve_margin(EP, inputs, setup)
+		cap_reserve_margin!(EP, inputs, setup)
 	end
 
 	if (setup["MinCapReq"] == 1)
-		EP = minimum_capacity_requirement(EP, inputs)
+		minimum_capacity_requirement!(EP, inputs, setup)
 	end
 
 	## Define the objective function
