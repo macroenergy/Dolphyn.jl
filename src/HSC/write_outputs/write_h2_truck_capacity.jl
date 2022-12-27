@@ -21,8 +21,8 @@ Functions for reporting capacities of hydrogen trucks (starting capacities or, e
 """
 function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
-    NEW_CAP_H2_TRUCK_CHARGE = inputs["NEW_CAP_H2_TRUCK_CHARGE"]
-    RET_CAP_H2_TRUCK_CHARGE = inputs["RET_CAP_H2_TRUCK_CHARGE"]
+    NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"]
+    RET_CAP_TRUCK = inputs["RET_CAP_TRUCK"]
     NEW_CAP_H2_TRUCK_ENERGY = inputs["NEW_CAP_H2_TRUCK_ENERGY"]
     RET_CAP_H2_TRUCK_ENERGY = inputs["RET_CAP_H2_TRUCK_ENERGY"]
 
@@ -34,10 +34,10 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     retNumber = zeros(size(H2_TRUCK_TYPES))
     endNumber = zeros(size(H2_TRUCK_TYPES))
     for j in H2_TRUCK_TYPES
-        if j in NEW_CAP_H2_TRUCK_CHARGE
+        if j in NEW_CAP_TRUCK
             capNumber[j] = value(EP[:vH2TruckNumber][j])
         end
-        if j in RET_CAP_H2_TRUCK_CHARGE
+        if j in RET_CAP_TRUCK
             retNumber[j] = value(EP[:vH2RetTruckNumber][j])
         end
         endNumber[j] = value(EP[:eTotalH2TruckNumber][j])
