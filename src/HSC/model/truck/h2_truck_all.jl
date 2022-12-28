@@ -582,7 +582,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         EP,
         [z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
         vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_tonne_per_unit][j] <=
-        EP[:eTotalH2TruckEnergy][z, j]
+        EP[:eTotalH2TruckComp][z, j]
     )
 
     # H2 truck flow balance
