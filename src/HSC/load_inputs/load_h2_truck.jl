@@ -22,14 +22,44 @@ Function for reading input parameters related to hydrogen trucks.
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 
     Z = inputs_truck["Z"]
-    Z_set = 1:Z
 
-    zone_distance = DataFrame(CSV.File(string(path, sep, "HSC_zone_truck_distances_miles.csv"), header=true), copycols=true)
-
-	RouteLength = zone_distance[Z_set,Z_set.+1]
-	inputs_truck["RouteLength"] = RouteLength
+    ## Hydrogen truck route inputs
+    dfH2Route =
+        DataFrame(CSV.File(joinpath(path, "Routes.csv"), header = true), copycols = true)
     
-    print_and_log("HSC_zone_truck_distances_miles.csv Successfully Read!")
+    ## Add truck route IDs after reading to prevent user errors
+    dfH2Route[!, :R_ID] = 1:size(collect(skipmissing(dfH2Route[!, 1])), 1)
+
+    ## Number of routes in the truck network
+    inputs_truck["R"] = size(collect(skipmissing(dfH2Route[!, :R_ID])), 1)
+    R = inputs_truck["R"]
+
+    inputs_truck["dfH2Route"] = dfH2Route
+
+    ## Topology of the truck network source-sink matrix
+    Truck_map = zeros(Int64, R, Z)
+
+    for r = 1:R
+        z_start = parse(Int64, dfH2Route[!, :StartZone][l][2:end])
+        z_end = parse(Int64, dfH2Route[!, :EndZone][l][2:end])
+        Truck_map[r, z_start] = 1
+        Truck_map[r, z_end] = -1
+    end
+
+    # Create route number column
+    Truck_map[!, :route_no] = 1:size(Truck_map, 1)
+    # Pivot table
+    Truck_map = stack(Truck_map, 1:Z)
+    # Create zone column
+    Truck_map[!, :Zone] = parse.(Float64, SubString.(Truck_map[!, :variable], 2))
+    # Remove redundant rows
+    Truck_map = Truck_map[Truck_map[!, :value].!=0, :]
+
+    # Rename column
+    colnames_pipe_map = ["route_no", "zone_str", "d", "Zone"]
+    rename!(Truck_map, Symbol.(colnames_pipe_map))
+
+    print_and_log("Routes.csv Successfully Read!")
 
     # H2 truck type inputs
     h2_truck_in = DataFrame(CSV.File(string(path, sep, "HSC_trucks.csv"), header=true), copycols=true)
@@ -46,23 +76,19 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
 	inputs_truck["H2_TRUCK_SHORT_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 0, :T_TYPE]
 
     # Set of H2 truck types eligible for new capacity
-    inputs_truck["NEW_CAP_H2_TRUCK_CHARGE"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
+    inputs_truck["NEW_CAP_TRUCK"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
     # Set of H2 truck types eligible for capacity retirement
-    inputs_truck["RET_CAP_H2_TRUCK_CHARGE"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
-
-    # Set of H2 truck types eligible for new energy capacity
-    inputs_truck["NEW_CAP_H2_TRUCK_ENERGY"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]
-    # Set of H2 truck types eligible for energy capacity retirement
-    inputs_truck["RET_CAP_H2_TRUCK_ENERGY"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
+    inputs_truck["RET_CAP_TRUCK"] = intersect(h2_truck_in[h2_truck_in.New_Build .!= -1, :T_TYPE], h2_truck_in[h2_truck_in.Existing_Number .> 0, :T_TYPE])
         
     # Store DataFrame of truck input data for use in model
     inputs_truck["dfH2Truck"] = h2_truck_in
 
-
     # Average truck travel time between zones
     inputs_truck["TD"] = Dict()
     for j in inputs_truck["H2_TRUCK_TYPES"]
-        inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
+        for r in 1:R
+            inputs_truck["TD"][j][r] = round.(Int, dfH2Route[!, :Distance][r] / h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
+        end
     end
     print_and_log("HSC_trucks.csv Successfully Read!")
     return inputs_truck
