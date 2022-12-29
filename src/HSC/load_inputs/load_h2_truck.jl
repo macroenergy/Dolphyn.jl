@@ -40,18 +40,19 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     Truck_map = zeros(Int64, R, Z)
 
     for r = 1:R
-        z_start = parse(Int64, dfH2Route[!, :StartZone][l][2:end])
-        z_end = parse(Int64, dfH2Route[!, :EndZone][l][2:end])
+        z_start = parse(Int64, dfH2Route[!, :StartZone][r][2:end])
+        z_end = parse(Int64, dfH2Route[!, :EndZone][r][2:end])
         Truck_map[r, z_start] = 1
         Truck_map[r, z_end] = -1
     end
 
+    Truck_map = DataFrame(Truck_map, :auto)
     # Create route number column
     Truck_map[!, :route_no] = 1:size(Truck_map, 1)
     # Pivot table
     Truck_map = stack(Truck_map, 1:Z)
     # Create zone column
-    Truck_map[!, :Zone] = parse.(Float64, SubString.(Truck_map[!, :variable], 2))
+    Truck_map[!, :Zone] = parse.(Int64, SubString.(Truck_map[!, :variable], 2))
     # Remove redundant rows
     Truck_map = Truck_map[Truck_map[!, :value].!=0, :]
 
@@ -59,6 +60,7 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     colnames_pipe_map = ["route_no", "zone_str", "d", "Zone"]
     rename!(Truck_map, Symbol.(colnames_pipe_map))
 
+    inputs_truck["Truck_map"] = Truck_map
     print_and_log("Routes.csv Successfully Read!")
 
     # H2 truck type inputs
@@ -86,6 +88,7 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     # Average truck travel time between zones
     inputs_truck["TD"] = Dict()
     for j in inputs_truck["H2_TRUCK_TYPES"]
+        inputs_truck["TD"][j] = Dict()
         for r in 1:R
             inputs_truck["TD"][j][r] = round.(Int, dfH2Route[!, :Distance][r] / h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
         end
