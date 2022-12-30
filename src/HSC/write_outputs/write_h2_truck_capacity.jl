@@ -20,11 +20,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Functions for reporting capacities of hydrogen trucks (starting capacities or, existing capacities, retired capacities, and new-built capacities).    
 """
 function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
     NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"]
     RET_CAP_TRUCK = inputs["RET_CAP_TRUCK"]
-    NEW_CAP_H2_TRUCK_ENERGY = inputs["NEW_CAP_H2_TRUCK_ENERGY"]
-    RET_CAP_H2_TRUCK_ENERGY = inputs["RET_CAP_H2_TRUCK_ENERGY"]
 
     dfH2Truck = inputs["dfH2Truck"]
     Z = inputs["Z"]
@@ -52,34 +51,34 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     )
 
     for z in 1:Z
-        dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
+        dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
+        tempComp = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
-            if j in NEW_CAP_H2_TRUCK_ENERGY
-                tempEnergy[j] = value(EP[:vH2TruckComp][z,j])
+            if j in NEW_CAP_TRUCK
+                tempComp[j] = value(EP[:vH2TruckComp][z,j])
             end
         end
-        dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
+        dfH2TruckCap[!,Symbol("NewTruckCompZone$z")] = tempComp
 
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
+        tempComp = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
-            if j in RET_CAP_H2_TRUCK_ENERGY
-                tempEnergy[j] = value(EP[:vH2RetTruckComp][z,j])
+            if j in RET_CAP_TRUCK
+                tempComp[j] = value(EP[:vH2RetTruckComp][z,j])
             end
         end
-        dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
+        dfH2TruckCap[!,Symbol("RetTruckCompZone$z")] = tempComp
 
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
+        tempComp = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
-            tempEnergy[j] = value(EP[:eTotalH2TruckComp][z,j])
+            tempComp[j] = value(EP[:eTotalH2TruckComp][z,j])
         end
-        dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")] = tempEnergy
+        dfH2TruckCap[!,Symbol("EndTruckCompZone$z")] = tempComp
     end
 
-    dfH2TruckCap[!,:StartTruckEnergy] = sum(dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:NewTruckEnergy] = sum(dfH2TruckCap[!, Symbol("NewTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:RetTruckEnergy] = sum(dfH2TruckCap[!, Symbol("RetTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:EndTruckEnergy] = sum(dfH2TruckCap[!, Symbol("EndTruckEnergyZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:StartTruckComp] = sum(dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:NewTruckComp] = sum(dfH2TruckCap[!, Symbol("NewTruckCompZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:RetTruckComp] = sum(dfH2TruckCap[!, Symbol("RetTruckCompZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:EndTruckComp] = sum(dfH2TruckCap[!, Symbol("EndTruckCompZone$z")] for z in 1:Z)
 
     dfH2TruckTotal = DataFrame(
         TruckType = "Total",
@@ -87,17 +86,17 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         NewTruck = sum(dfH2TruckCap[!,:NewTruck]),
         RetTruck = sum(dfH2TruckCap[!,:RetTruck]),
         EndTruck = sum(dfH2TruckCap[!,:EndTruck]),
-        StartTruckEnergy = sum(dfH2TruckCap[!,:StartTruckEnergy]),
-        NewTruckEnergy = sum(dfH2TruckCap[!,:NewTruckEnergy]),
-        RetTruckEnergy = sum(dfH2TruckCap[!,:RetTruckEnergy]),
-        EndTruckEnergy = sum(dfH2TruckCap[!,:EndTruckEnergy])
+        StartTruckComp = sum(dfH2TruckCap[!,:StartTruckComp]),
+        NewTruckComp = sum(dfH2TruckCap[!,:NewTruckComp]),
+        RetTruckComp = sum(dfH2TruckCap[!,:RetTruckComp]),
+        EndTruckComp = sum(dfH2TruckCap[!,:EndTruckComp])
     )
 
     for z in 1:Z
-        dfH2TruckTotal[!,Symbol("StartTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("NewTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("RetTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("EndTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")])]
+        dfH2TruckTotal[!,Symbol("StartTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckCompZone$z")])]
+        dfH2TruckTotal[!,Symbol("NewTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckCompZone$z")])]
+        dfH2TruckTotal[!,Symbol("RetTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckCompZone$z")])]
+        dfH2TruckTotal[!,Symbol("EndTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckCompZone$z")])]
     end
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)

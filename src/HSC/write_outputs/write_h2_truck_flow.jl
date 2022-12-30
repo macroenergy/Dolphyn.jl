@@ -24,6 +24,7 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	H2_TRUCK_TYPE_NAMES = inputs["H2_TRUCK_TYPE_NAMES"]
     Z = inputs["Z"]
 	T = inputs["T"]
+	R = inputs["R"]
 
     # H2 truck flow
 	truck_flow_path = string(path, sep, "H2TruckFlow")
@@ -89,13 +90,13 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	dfH2TruckArriveEmpty = DataFrame(Time = 1:T)
 	dfH2TruckDepartEmpty = DataFrame(Time = 1:T)
 	for j in H2_TRUCK_TYPES
-		dfH2TruckTravelFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_full])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
-		dfH2TruckArriveFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_full])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
-		dfH2TruckDepartFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_full])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
+		dfH2TruckTravelFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_full])[r,j,d,:] for r in 1:R, d in [-1, 1])
+		dfH2TruckArriveFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_full])[r,j,d,:] for r in 1:R, d in [-1, 1])
+		dfH2TruckDepartFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_full])[r,j,d,:] for r in 1:R, d in [-1, 1])
 
-		dfH2TruckTravelEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_empty])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
-		dfH2TruckArriveEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_empty])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
-		dfH2TruckDepartEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_empty])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
+		dfH2TruckTravelEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_empty])[r,j,d,:] for r in 1:R, d in [-1, 1])
+		dfH2TruckArriveEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_empty])[r,j,d,:] for r in 1:R, d in [-1, 1])
+		dfH2TruckDepartEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_empty])[r,j,d,:] for r in 1:R, d in [-1, 1])
 	end
 
 	CSV.write(string(truck_transit_path, sep, "H2TruckTravelFull.csv"), dfH2TruckTravelFull)
