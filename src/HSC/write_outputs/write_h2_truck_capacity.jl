@@ -100,5 +100,5 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     end
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)
-    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dftranspose(dfH2TruckCap, false))
+    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dfH2TruckCap)
 end
