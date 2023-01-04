@@ -23,17 +23,17 @@ Returns a MathOptInterface OptimizerWithAttributes CPLEX optimizer instance to b
 
 The CPLEX optimizer instance is configured with the following default parameters if a user-specified parameter for each respective field is not provided:
 
- - CPX\_PARAM\_EPRHS = 1e-6 (Constraint (primal) feasibility tolerances. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpRHS.html)
- - CPX\_PARAM\_EPOPT = 1e-6 (Dual feasibility tolerances. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpOpt.html)
- - CPX\_PARAM\_AGGFILL = 10 (Allowed fill during presolve aggregation. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/AggFill.html)
- - CPX\_PARAM\_PREDUAL = 0 (Decides whether presolve should pass the primal or dual linear programming problem to the LP optimization algorithm. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/PreDual.html)
- - CPX\_PARAM\_TILIM = 1e+75	(Limits total time solver. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/TiLim.html)
- - CPX\_PARAM\_EPGAP = 1e-4	(Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpGap.html)
- - CPX\_PARAM\_LPMETHOD = 0 (Algorithm used to solve continuous models (including MIP root relaxation). See https://www.ibm.com/support/knowledgecenter/de/SSSA5P_12.7.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/LPMETHOD.html)
- - CPX\_PARAM\_BAREPCOMP = 1e-8 (Barrier convergence tolerance (determines when barrier terminates). See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/BarEpComp.html)
- - CPX\_PARAM\_NUMERICALEMPHASIS = 0 (Numerical precision emphasis. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/NumericalEmphasis.html)
- - CPX\_PARAM\_BAROBJRNG = 1e+75 (Sets the maximum absolute value of the objective function. See https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/BarObjRng.html)
- - CPX\_PARAM\_SOLUTIONTYPE = 2 (Solution type for LP or QP. See https://www.ibm.com/support/knowledgecenter/hr/SSSA5P_12.8.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/SolutionType.html)
+ - CPX\_PARAM\_EPRHS = 1e-6 (Constraint (primal) feasibility tolerances. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpRHS.html).)
+ - CPX\_PARAM\_EPOPT = 1e-6 (Dual feasibility tolerances. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpOpt.html).)
+ - CPX\_PARAM\_AGGFILL = 10 (Allowed fill during presolve aggregation. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/AggFill.html).)
+ - CPX\_PARAM\_PREDUAL = 0 (Decides whether presolve should pass the primal or dual linear programming problem to the LP optimization algorithm. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/PreDual.html).)
+ - CPX\_PARAM\_TILIM = 1e+75	(Limits total time solver. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/TiLim.html).)
+ - CPX\_PARAM\_EPGAP = 1e-4	(Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpGap.html).)
+ - CPX\_PARAM\_LPMETHOD = 0 (Algorithm used to solve continuous models (including MIP root relaxation). See [here](https://www.ibm.com/support/knowledgecenter/de/SSSA5P_12.7.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/LPMETHOD.html).)
+ - CPX\_PARAM\_BAREPCOMP = 1e-8 (Barrier convergence tolerance (determines when barrier terminates). See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/BarEpComp.html).)
+ - CPX\_PARAM\_NUMERICALEMPHASIS = 0 (Numerical precision emphasis. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/NumericalEmphasis.html).)
+ - CPX\_PARAM\_BAROBJRNG = 1e+75 (Sets the maximum absolute value of the objective function. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/BarObjRng.html).)
+ - CPX\_PARAM\_SOLUTIONTYPE = 2 (Solution type for LP or QP. See [here](https://www.ibm.com/support/knowledgecenter/hr/SSSA5P_12.8.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/SolutionType.html).)
 
 """
 function configure_cplex(solver_settings_path::String)

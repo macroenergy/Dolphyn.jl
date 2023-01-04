@@ -104,12 +104,12 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	end
 
 	 
-    cH2Total = cH2Fix_Gen + cH2Fix_Liq + cH2Fix_G2P + cH2Fix_Stor + cH2Start + cH2Var + cG2PVar + value(EP[:eTotalH2CNSE]) + cH2Start + cH2NetworkExpCost + cH2Fix_Truck + cH2Var_Truck
+  cH2Total = cH2Fix_Gen + cH2Fix_Liq + cH2Fix_G2P + cH2Fix_Stor + cH2Start + cH2Var + cG2PVar + value(EP[:eTotalH2CNSE]) + cH2Start + cH2NetworkExpCost + cH2Fix_Truck + cH2Var_Truck
 
-    dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix_Gen, cH2Fix_Liq, cH2Fix_G2P, cH2Fix_Stor, cH2Var, cG2PVar, value(EP[:eTotalH2CNSE]), cH2Start, cH2NetworkExpCost, cH2Fix_Truck, cH2Var_Truck]
+  dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix_Gen, cH2Fix_Liq, cH2Fix_G2P, cH2Fix_Stor, cH2Var, cG2PVar, value(EP[:eTotalH2CNSE]), cH2Start, cH2NetworkExpCost, cH2Fix_Truck, cH2Var_Truck]
 
 
-	
+
 
 	# Calculate Costs for each Zone
 	for z in 1:Z
@@ -123,7 +123,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		tempCStart = 0
 
 		for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			tempCFix_Stor = tempCFix_Stor + 
+			tempCFix_Stor = tempCFix_Stor +
 			(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
 			(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0)
 		end
@@ -180,7 +180,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			end
 		end
 
-		
+
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCFix_Gen = tempCFix_Gen * (ModelScalingFactor^2)
 			tempCFix_Liq = tempCFix_Liq * (ModelScalingFactor^2)
@@ -198,7 +198,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 			tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		end
-		
+
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])* (ModelScalingFactor^2)
 		else
@@ -207,5 +207,5 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_Liq, tempCFix_G2P, tempCFix_Stor, tempCVar, tempCVar_G2P, tempCNSE, tempCStart,"-","-","-"]
 	end
-	CSV.write(string(path,sep,"HSC_costs.csv"), dfH2Cost)
+	CSV.write(string(path, sep, "HSC_costs.csv"), dfH2Cost)
 end
