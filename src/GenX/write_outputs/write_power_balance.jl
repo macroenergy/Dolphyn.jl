@@ -99,7 +99,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,13] = value(EP[:eTransmissionByZone][z,t])
 			end
 				
-			dfTemp1[t+rowoffset,14] = value(EP[:eAdditionalDemand][z,t])
+			dfTemp1[t+rowoffset,14] = value(EP[:eAdditionalDemandByZone][z,t])
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
