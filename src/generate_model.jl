@@ -116,7 +116,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Power supply by z and timestep - used in emissions constraints
 	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
 	@expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
-	@expression(EP, eDemandByZone[z=1:Z, t=1:T], inputs["pD"][z, t])
+	@expression(EP, eDemandByZone[z=1:Z, t=1:T], inputs["pD"][t, z])
 	# Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
 	@expression(EP, eAdditionalDemandByZone[z=1:Z, t=1:T], 0)	
 
