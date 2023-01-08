@@ -1,5 +1,5 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Nexus
 Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_power_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_power_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting power balance of resources across different zones.
 """
-function write_power_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_power_balance(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
 	
 	if setup["ModelH2"] == 1
@@ -37,12 +37,12 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	dfPowerBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 12)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 14)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", "H2-G2P", "Storage_Discharge", "Storage_Charge",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
 	           "Demand_Response", "Nonserved_Energy",
 			   "Transmission_NetExport", "Transmission_Losses","HSC_Consumption",
-	           "Demand"]
+	           "Demand", "Transmission", "AdditionalDemand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
@@ -72,26 +72,34 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	     	end
 	     	dfTemp1[t+rowoffset,6] = -sum(value.(EP[:vP][dfGen[(dfGen[!,:FLEX].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	if SEG>1
-	       		dfTemp1[t+rowoffset,7] = sum(value.(EP[:vNSE][2:SEG,t,z]))
+	       		dfTemp1[t+rowoffset,7] = sum(value.(EP[:vNSE][2:SEG,z,t]))
 	     	else
 	       		dfTemp1[t+rowoffset,7]=0
 	     	end
-	     	dfTemp1[t+rowoffset,8] = value(EP[:vNSE][1,t,z])
+	     	dfTemp1[t+rowoffset,8] = value(EP[:vNSE][1,z,t])
 	     	dfTemp1[t+rowoffset,9] = 0
 	     	dfTemp1[t+rowoffset,10] = 0
 
 			if Z>=2
-				dfTemp1[t+rowoffset,9] = value(EP[:ePowerBalanceNetExportFlows][t,z])
+				dfTemp1[t+rowoffset,9] = value(EP[:ePowerBalanceNetExportFlows][z,t])
 				dfTemp1[t+rowoffset,10] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 			end
 
 			if setup["ModelH2"] == 1
-				dfTemp1[t+rowoffset,11] = -value(EP[:eH2NetpowerConsumptionByAll][t,z])
+				dfTemp1[t+rowoffset,11] = -value(EP[:eH2NetpowerConsumptionByAll][z,t])
 			else
 				dfTemp1[t+rowoffset,11] = 0
 			end
 
-	     	dfTemp1[t+rowoffset,12] = -inputs["pD"][t,z]
+	     	dfTemp1[t+rowoffset,12] = -value(EP[:eDemandByZone][z,t])
+
+			dfTemp1[t+rowoffset,13] = 0
+
+			if Z>=2
+				dfTemp1[t+rowoffset,13] = value(EP[:ePTransmission][z,t])
+			end
+
+			dfTemp1[t+rowoffset,14] = value(EP[:ePDemandAddition][z,t])
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
@@ -119,5 +127,5 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	   	dfPowerBalance[rowoffset,c]=sum(inputs["omega"].*dfPowerBalance[(rowoffset+1):size(dfPowerBalance,1),c])
 	end
 	dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-	CSV.write(string(path,sep,"power_balance.csv"), dfPowerBalance, writeheader=false)
+	CSV.write(joinpath(path, "power_balance.csv"), dfPowerBalance, writeheader=false)
 end
