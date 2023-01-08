@@ -21,11 +21,18 @@ Function for reading input parameters related to planning reserve margin constra
 """
 function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)
 
+	Zones = inputs_crm["Zones"]
+	
 	# Definition of capacity reserve margin (crm) by locational deliverability area (LDA)
 	print_and_log("About to read Capacity_reserve_margin.csv")
 
 	#inputs_crm["dfCapRes"] = CSV.read(string(path,sep,"Capacity_reserve_margin.csv"), header=true)
-	inputs_crm["dfCapRes"] = DataFrame(CSV.File(string(path, sep,"Capacity_reserve_margin.csv"), header=true), copycols=true)
+	dfCapRes = DataFrame(CSV.File(string(path, sep,"Capacity_reserve_margin.csv"), header=true), copycols=true)
+
+	# Filter dfCapRes with zones in the network
+	dfCapRes = filter(row -> row.Network_zones in Zones, dfCapRes)
+
+	inputs_crm["dfCapRes"] = dfCapRes
 
 	# Ensure float format values:
 
