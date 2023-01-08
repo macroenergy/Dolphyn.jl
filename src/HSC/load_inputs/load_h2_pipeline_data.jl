@@ -59,7 +59,7 @@ function load_h2_pipeline_data(
 
     ## Pivot table
     pipe_map = stack(pipe_map, Zones)
-
+    
     ## Remove redundant rows
     pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
 
@@ -67,6 +67,13 @@ function load_h2_pipeline_data(
     colnames_pipe_map = ["pipe_no", "Zone", "d"]
     rename!(pipe_map, Symbol.(colnames_pipe_map))
 
+    pipe_map[!, :zone_str] = pipe_map[!, :Zone]
+
+    #TODO: Avoid type error of pipe_map
+    ## Check input zone type - Zone column should be Int64 in ```h2_pipeline```, input zone list should be Int64
+    if typeof(Zones[1]) == Int64
+        pipe_map[!, :Zone] = [parse(Int64, x) for x in pipe_map[!, :Zone]]
+    end
     inputs_nw["H2_Pipe_Map"] = pipe_map
 
 
