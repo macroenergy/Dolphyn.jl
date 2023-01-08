@@ -51,7 +51,6 @@ function load_inputs(setup::Dict,path::AbstractString)
     if isfile(string(path,sep,"Network.csv"))
 		inputs, network_var = load_network_data(setup, path, sep, inputs)
 	else
-		inputs["Z"] = 1
 		inputs["L"] = 0
 	end
 
