@@ -42,6 +42,11 @@ function load_inputs(setup::Dict,path::AbstractString)
 	print_and_log("Reading Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
 	inputs = Dict()
+
+	# Store zonal information in inputs from setup
+	inputs["Zones"] = setup["Zones"]
+	inputs["Z"] = length(inputs["Zones"])
+
 	# Read input data about power network topology, operating and expansion attributes
     if isfile(string(path,sep,"Network.csv"))
 		inputs, network_var = load_network_data(setup, path, sep, inputs)
