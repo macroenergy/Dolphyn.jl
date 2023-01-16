@@ -100,7 +100,7 @@ include("configure_solver/configure_solver.jl")
 # include("GenX/src/$(genx_path)/load_inputs/load_inputs.jl")
 
 # Load time domain reduction related scripts
-include("time_domain_reduction/time_domain_reduction.jl")
+# include("time_domain_reduction/time_domain_reduction.jl")
 
 #Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
@@ -288,12 +288,21 @@ include("$(genx_path)/load_inputs/load_minimum_capacity_requirement.jl")
 include("$(genx_path)/load_inputs/load_load_data.jl")
 include("$(genx_path)/load_inputs/load_fuels_data.jl")
 
+println("A = $(genx_path)")
+
 include("$(genx_path)/load_inputs/load_inputs.jl")
 
 include("$(genx_path)/time_domain_reduction/time_domain_reduction.jl")
 
+println("B = $(genx_path)")
+
 #Core GenX Features
-include("$(genx_path)/model/core/discharge/discharge.jl")
+# include(joinpath(genx_path, "model/core/discharge/discharge.jl"))
+# include("$(genx_path)/model/core/discharge/discharge.jl")
+q = "$(genx_path)/model/core/discharge/discharge.jl"
+println(q)
+include(q)
+# include("GenX/src/model/core/discharge/discharge.jl")
 include("$(genx_path)/model/core/discharge/investment_discharge.jl")
 
 include("$(genx_path)/model/core/non_served_energy.jl")
