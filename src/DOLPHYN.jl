@@ -98,14 +98,9 @@ include("$(genxsubmod_path)/load_inputs/load_period_map.jl")
 include("$(genxsubmod_path)/load_inputs/load_minimum_capacity_requirement.jl")
 include("$(genxsubmod_path)/load_inputs/load_load_data.jl")
 include("$(genxsubmod_path)/load_inputs/load_fuels_data.jl")
-
-println("A = $(genxsubmod_path)")
-
 include("$(genxsubmod_path)/load_inputs/load_inputs.jl")
 
 include("$(genxsubmod_path)/time_domain_reduction/time_domain_reduction.jl")
-
-println("B = $(genxsubmod_path)")
 
 # Core GenX Features
 include("$(genxsubmod_path)/model/core/discharge/discharge.jl")
@@ -216,6 +211,10 @@ include("$(genxsubmod_path)/additional_tools/method_of_morris.jl")
 
 # Load time domain reduction related scripts
 # include("time_domain_reduction/time_domain_reduction.jl")
+
+# Extensions to GenX
+# These should be pushed to the GenX fork
+include("write_nw_expansion.jl")
 
 #Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
