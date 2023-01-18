@@ -35,7 +35,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
 	if setup["SystemCO2Constraint"] ==1 # Independent constraints for Power and HSC
 		# CO2 constraint for power system imposed separately
-		EP = co2_cap_power(EP, inputs, setup)
+		co2_cap!(EP, inputs, setup)
 		# HSC constraint for power system imposed separately
 		EP = co2_cap_hsc(EP,inputs,setup)
 
