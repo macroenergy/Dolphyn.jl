@@ -111,7 +111,7 @@ outpath = "$inpath/Results"
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs
+outpath_H2 = "$outpath/Results_HSC"
 if mysetup["ModelH2"] == 1
-    outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
