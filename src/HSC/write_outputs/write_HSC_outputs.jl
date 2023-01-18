@@ -38,7 +38,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     end
     # Create directory if it does not exist
     if !(isdir(path))
-        mkdir(path)
+        mkpath(path)
     end
 
     write_h2_capacity(path, sep, inputs, setup, EP)
