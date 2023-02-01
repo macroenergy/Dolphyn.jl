@@ -32,6 +32,8 @@ function must_run(EP::Model, inputs::Dict)
 
 	print_and_log("Must-Run Resources Module")
 
+	Zones = inputs["Zones"]
+
 	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -45,7 +47,7 @@ function must_run(EP::Model, inputs::Dict)
 	## Power Balance Expressions ##
 
 	@expression(EP, ePowerBalanceNdisp[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t] for y in intersect(MUST_RUN, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vP][y,t] for y in intersect(MUST_RUN, dfGen[dfGen[!,:Zone].==Zones[z],:][!,:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceNdisp
 
@@ -54,7 +56,7 @@ function must_run(EP::Model, inputs::Dict)
 	@constraint(EP, [y in MUST_RUN, t=1:T], EP[:vP][y,t] == inputs["pP_Max"][y,t]*EP[:eTotalCap][y])
 	##CO2 Polcy Module Must Run Generation by zone
 	@expression(EP, eGenerationByMustRun[z=1:Z, t=1:T], # the unit is GW
-		sum(EP[:vP][y,t] for y in intersect(inputs["MUST_RUN"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
+		sum(EP[:vP][y,t] for y in intersect(inputs["MUST_RUN"], dfGen[dfGen[!,:Zone].==Zones[z],:R_ID]))
 	)
 	EP[:eGenerationByZone] += eGenerationByMustRun
 	return EP

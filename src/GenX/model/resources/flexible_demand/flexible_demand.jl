@@ -75,6 +75,8 @@ function flexible_demand(EP::Model, inputs::Dict)
 
     print_and_log("Flexible Demand Resources Module")
 
+    Zones = inputs["Zones"]
+
     dfGen = inputs["dfGen"]
 
     T = inputs["T"]     # Number of time steps (hours)
@@ -100,7 +102,7 @@ function flexible_demand(EP::Model, inputs::Dict)
 
     ## Power Balance Expressions ##
     @expression(EP, ePowerBalanceDemandFlex[t=1:T, z=1:Z],
-        sum(-EP[:vP][y,t]+EP[:vCHARGE_FLEX][y,t] for y in intersect(FLEX, dfGen[(dfGen[!,:Zone].==z),:][!,:R_ID])))
+        sum(-EP[:vP][y,t]+EP[:vCHARGE_FLEX][y,t] for y in intersect(FLEX, dfGen[(dfGen[!,:Zone].==Zones[z]),:][!,:R_ID])))
 
     EP[:ePowerBalance] += ePowerBalanceDemandFlex
 
