@@ -74,6 +74,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
+    Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
 
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
@@ -155,8 +156,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
                 vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==Zones[z]).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==Zones[z], :][!, :pipe_no]
             ) / ModelScalingFactor
         )
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
@@ -165,8 +166,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
                 vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==Zones[z]).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==Zones[z], :][!, :pipe_no]
             )
         )
     end
@@ -194,8 +195,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         EP,
         ePipeZoneDemand[t = 1:T, z = 1:Z],
         sum(
-            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
-            for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==Zones[z]).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
+            for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==Zones[z], :][!, :pipe_no]
         )
     )
 
