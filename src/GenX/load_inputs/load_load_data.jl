@@ -81,12 +81,12 @@ function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, 
 		# Max value of non-served energy
 		inputs_load["Voll"] = collect(skipmissing(load_in[!,:Voll])) /ModelScalingFactor # convert from $/MWh $ million/GWh (assuming objective is divided by 1000)
 		# Demand in MW
-		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],["Load_MW_z$z" for z in Zones]])/ModelScalingFactor  # convert to GW
+		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],["Load_MW_$z" for z in Zones]])/ModelScalingFactor  # convert to GW
 	else # No scaling
 		# Max value of non-served energy
 		inputs_load["Voll"] = collect(skipmissing(load_in[!,:Voll]))
 		# Demand in MW
-		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],["Load_MW_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load MW values and rows as the hours
+		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],["Load_MW_$z" for z in Zones]]) #form a matrix with columns as the different zonal load MW values and rows as the hours
 	end
 
 	#if setup["TimeDomainReduction"] ==1 # Used in time_domain_reduction
