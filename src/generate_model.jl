@@ -181,7 +181,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
-
+		@expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
+		@expression(EP, eHTransmissionByZone[z=1:Z, t=1:T], 0)
+		@expression(EP, eHDemandByZone[z=1:Z, t=1:T], inputs["H2_D"][t, z])
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
