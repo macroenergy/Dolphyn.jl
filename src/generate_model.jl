@@ -118,7 +118,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
 	@expression(EP, eDemandByZone[z=1:Z, t=1:T], inputs["pD"][t, z])
 	# Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-	@expression(EP, eAdditionalDemandByZone[z=1:Z, t=1:T], 0)	
+	@expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)	
 
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
@@ -227,7 +227,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_g2p(EP, inputs, setup)
 		end
 
-
+		EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
 	end
 
 
