@@ -253,7 +253,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 ) *
                 dfH2Truck[!, :Power_MW_per_mile][j] *
                 dfH2Route[!, :Distance][r] for
-                r in Truck_map[Truck_map.Zone.==z, :route_no], j in H2_TRUCK_TYPES
+                r in Truck_map[Truck_map.Zone.==z, :route_no], j in H2_TRUCK_TYPES;init=0.0
             ) / ModelScalingFactor
         else
             sum(
@@ -272,7 +272,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 ) *
                 dfH2Truck[!, :Power_MW_per_mile][j] *
                 dfH2Route[!, :Distance][r] for
-                r in Truck_map[Truck_map.Zone.==z, :route_no], j in H2_TRUCK_TYPES
+                r in Truck_map[Truck_map.Zone.==z, :route_no], j in H2_TRUCK_TYPES;init=0.0
             )
         end
     )
