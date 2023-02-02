@@ -97,7 +97,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     # Retired energy capacity of truck type "j" on zone "z" from existing capacity
     @variable(EP, vH2RetTruckComp[z = 1:Z, j in RET_CAP_TRUCK] >= 0)
 
-    # Total available charging capacity in tonnes/hour
+    # Total available truck loading capacity in truck number, for hydrogen in tonnes (unit capacity of each truck is needed)
     @expression(
         EP,
         eTotalH2TruckNumber[j in H2_TRUCK_TYPES],
@@ -113,8 +113,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-
-    # Total available energy capacity in tonnes
+    # Total available compression capacity in tonnes/hour
     @expression(
         EP,
         eTotalH2TruckComp[z = 1:Z, j in H2_TRUCK_TYPES],
@@ -186,7 +185,8 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	end
 
     # Sum individual zone and individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixH2TruckComp, sum(EP[:eCFixH2TruckComp][z, j] for z = 1:Z, j in H2_TRUCK_TYPES))
+    @expression(EP, eTotalCFixH2TruckCompPerType[z in 1:Z], sum(EP[:eCFixH2TruckComp][z, j] for j in H2_TRUCK_TYPES))
+    @expression(EP, eTotalCFixH2TruckComp, sum(EP[:eTotalCFixH2TruckCompPerType][z] for z in 1:Z))
 
     # Add term to objective function expression
     EP[:eObj] += eTotalCFixH2TruckComp

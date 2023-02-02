@@ -210,7 +210,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     ## End Objective Function Expressions ##
 
     ## Balance Expressions ##
-    # H2 Power Compression Consumption balance
+    # Power balance from hydrogen compression consumption
     @expression(
         EP,
         ePowerbalanceH2TruckCompression[t = 1:T, z = 1:Z],
@@ -232,7 +232,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     EP[:ePowerBalance] += -ePowerbalanceH2TruckCompression
     EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckCompression
 
-    # H2 Power Truck Travelling Consumption balance
+    # Power balance from electric truck travelling onsumption balance
     @expression(
         EP,
         ePowerbalanceH2TruckTravel[t = 1:T, z = 1:Z],
@@ -280,7 +280,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     EP[:ePowerBalance] += -ePowerbalanceH2TruckTravel
     EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckTravel
 
-    # H2 balance
+    # Hydrogen balance via truck transmission
     @expression(
         EP,
         eH2TruckFlow[t = 1:T, z = 1:Z],
@@ -288,7 +288,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
     EP[:eH2Balance] += eH2TruckFlow
 
-    # H2 Truck Traveling Consumption balance
+    # Hydrogen balance via truck traveling consumption 
     @expression(
         EP,
         eH2TruckTravelConsumption[t = 1:T, z = 1:Z],
@@ -313,6 +313,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
 
     EP[:eH2Balance] += -eH2TruckTravelConsumption
+
     # H2 truck emission penalty
     @expression(
         EP,
@@ -344,14 +345,14 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     ### Constraints ###
 
-    ## Total number
+    ## Total number = empty + full number
     @constraint(
         EP,
         cH2TruckTotalNumber[j in H2_TRUCK_TYPES, t in 1:T],
         vH2N_full[j, t] + vH2N_empty[j, t] == EP[:eTotalH2TruckNumber][j]
     )
 
-    # The number of total full and empty trucks
+    # The number of total full (empty) trucks = travelling + available
     @constraints(
         EP,
         begin
@@ -370,7 +371,11 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     t_arrive = 1
     t_depart = 1
 
-    # Change of the number of full available trucks
+    # Change of the number of full available trucks on each zone
+    # For each typr of truck, on each zone, the number change equals charged (meant to leave) +
+    # discharged (meant arrived) + arrived (not discharged) - departed (charged)
+    # The difference between charged and departed (same with discharged and arrived) is that
+    # there is a time lag between the two events which is set to be one hour
     @constraints(
         EP,
         begin
@@ -420,7 +425,11 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    # Change of the number of empty available trucks
+    # Change of the number of empty available trucks on each zone
+    # For each typr of truck, on each zone, the number change equals discharged (meant to arrive) -
+    # charged (meant to leave) + arrived (not discharged) - departed (charged)
+    # The difference between charged and departed (same with discharged and arrived) is that
+    # there is a time lag between the two events which is set to be one hour
     @constraints(
         EP,
         begin
@@ -474,7 +483,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    # Change of the number of full traveling trucks
+    # For each typr of truck, on each zone, the number change of full traveling trucks equals
+    # departed - arrived
     @constraints(
         EP,
         begin
@@ -499,7 +509,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    # Change of the number of empty traveling trucks
+    # For each typr of truck, on each zone, the number change of empty traveling trucks equals
+    # departed - arrived
     @constraints(
         EP,
         begin
@@ -577,7 +588,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    # Capacity constraints
+    # Capacity constraints charged hydrogen is less than the maximum compression capacity
     @constraint(
         EP,
         [z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],

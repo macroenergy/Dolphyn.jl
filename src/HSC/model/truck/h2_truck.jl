@@ -26,7 +26,7 @@ function h2_truck(EP::Model, inputs::Dict, setup::Dict)
     # investment variables expressions and related constraints for H2 trucks
     EP = h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
-     # Operating variables, expressions and constraints related to H2 trucks
+    # Operating variables, expressions and constraints related to H2 trucks
     EP = h2_truck_all(EP, inputs, setup)
 
     # Include LongDurationTruck only when modeling representative periods and long-duration truck
