@@ -51,7 +51,7 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     )
 
     for z in 1:Z
-        dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
+        dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] = dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")]
         tempComp = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
             if j in NEW_CAP_TRUCK

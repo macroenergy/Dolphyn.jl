@@ -119,14 +119,14 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eTotalH2TruckComp[z = 1:Z, j in H2_TRUCK_TYPES],
         if (j in intersect(NEW_CAP_TRUCK, RET_CAP_TRUCK))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] + EP[:vH2TruckComp][z, j] -
+            dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")][j] + EP[:vH2TruckComp][z, j] -
             EP[:vH2RetTruckComp][z, j]
         elseif (j in setdiff(NEW_CAP_TRUCK, RET_CAP_TRUCK))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] + EP[:vH2TruckComp][z, j]
+            dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")][j] + EP[:vH2TruckComp][z, j]
         elseif (j in setdiff(RET_CAP_TRUCK, NEW_CAP_TRUCK))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j] - EP[:vH2RetTruckComp][z, j]
+            dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")][j] - EP[:vH2RetTruckComp][z, j]
         else
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j]
+            dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")][j]
         end
     )
 
@@ -170,17 +170,17 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	if setup["ParameterScale"]==1
 		@expression(EP, eCFixH2TruckComp[z = 1:Z, j in H2_TRUCK_TYPES],
 		if j in NEW_CAP_TRUCK # Resources eligible for new capacity
-			1/ModelScalingFactor^2*(dfH2Truck[!,:Inv_Cost_Energy_p_tonne_yr][j]*vH2TruckComp[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2TruckComp[z, j])
+			1/ModelScalingFactor^2*(dfH2Truck[!,:Inv_Cost_Comp_p_tonne_p_hr_yr][j]*vH2TruckComp[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Comp_p_tonne_p_hr_yr][j]*eTotalH2TruckComp[z, j])
 		else
-			1/ModelScalingFactor^2*(dfH2truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2TruckComp[z, j])
+			1/ModelScalingFactor^2*(dfH2truck[!,:Fixed_OM_Cost_Comp_p_tonne_p_hr_yr][j]*eTotalH2TruckComp[z, j])
 		end
 		)
 	else
 		@expression(EP, eCFixH2TruckComp[z = 1:Z, j in H2_TRUCK_TYPES],
 		if j in NEW_CAP_TRUCK # Resources eligible for new capacity
-			dfH2Truck[!,:Inv_Cost_Energy_p_tonne_yr][j]*vH2TruckComp[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][j]*eTotalH2TruckComp[z, j]
+			dfH2Truck[!,:Inv_Cost_Comp_p_tonne_p_hr_yr][j]*vH2TruckComp[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Comp_p_tonne_p_hr_yr][j]*eTotalH2TruckComp[z, j]
 		else
-			dfH2Truck[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2TruckComp[z, j]
+			dfH2Truck[!,:Fixed_OM_Cost_Comp_p_tonne_p_hr_yr][y]*eTotalH2TruckComp[z, j]
 		end
 		)
 	end
@@ -201,7 +201,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
   	## Constraints on truck compression
 	# Cannot retire more capacity than existing compression capacity
-	@constraint(EP, cMaxRetH2TruckComp[z = 1:Z, j in RET_CAP_TRUCK], vH2RetTruckComp[z,j] <= dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")][j])
+	@constraint(EP, cMaxRetH2TruckComp[z = 1:Z, j in RET_CAP_TRUCK], vH2RetTruckComp[z,j] <= dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr$z")][j])
 
 	## Constraints on new built truck compression capacity
 	# Constraint on maximum compression capacity (if applicable) [set input to -1 if no constraint on maximum compression capacity]
