@@ -116,7 +116,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Power supply by z and timestep - used in emissions constraints
 	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
 	@expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
-	@expression(EP, eDemandByZone[z=1:Z, t=1:T], inputs["pD"][t, z])
+	@expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
 	# Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
 	@expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)	
 
@@ -182,8 +182,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
 		@expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
-		@expression(EP, eHTransmissionByZone[z=1:Z, t=1:T], 0)
-		@expression(EP, eHDemandByZone[z=1:Z, t=1:T], inputs["H2_D"][t, z])
+		@expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
+		@expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
