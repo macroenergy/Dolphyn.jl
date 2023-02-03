@@ -201,16 +201,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     EP[:eH2Balance] += ePipeZoneDemand
 
-    @expression(
-        EP,
-        eHTransimissionByPipeline[z = 1:Z, t = 1:T],
-        sum(
-            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
-            for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
-        )
-    )
-
-    EP[:eHTransmissionByZone] += eHTransmissionByPipeline
+    EP[:eHTransmissionByZone] += ePipeZoneDemand
 
     ## End Balance Expressions ##
     ### End Expressions ###
