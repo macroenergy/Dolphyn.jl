@@ -30,6 +30,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+	Zones = inputs["Zones"] # List of zones
 	SEG = inputs["SEG"] # Number of load curtailment segments
 	STOR_ALL = inputs["STOR_ALL"]
 	FLEX = inputs["FLEX"]
@@ -45,15 +46,15 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	           "Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
-		 		sum(value.(EP[:vP][dfGen[(dfGen[!,:VRE].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
-				sum(value.(EP[:vP][dfGen[(dfGen[!,:MUST_RUN].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
-				sum(value.(EP[:vP][dfGen[(dfGen[!,:HYDRO].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t])) +
+		 		sum(value.(EP[:vP][dfGen[(dfGen[!,:VRE].==1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t])) +
+				sum(value.(EP[:vP][dfGen[(dfGen[!,:MUST_RUN].==1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t])) +
+				sum(value.(EP[:vP][dfGen[(dfGen[!,:HYDRO].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
 	     	
 			if setup["ModelH2"] == 1
 				if setup["ModelH2G2P"] == 1
 					dfH2G2P = inputs["dfH2G2P"]
-					dfTemp1[t+rowoffset,2] = sum(value.(EP[:vPG2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
+					dfTemp1[t+rowoffset,2] = sum(value.(EP[:vPG2P][dfH2G2P[(dfH2G2P[!,:Zone].==Zones[z]),:][!,:R_ID],t])) 
 				else
 					dfTemp1[t+rowoffset,2] = 0
 				end
@@ -61,7 +62,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,2] = 0
 			end
 
-			dfTemp1[t+rowoffset,3] = sum(value.(EP[:vP][dfGen[(dfGen[!,:STOR].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,3] = sum(value.(EP[:vP][dfGen[(dfGen[!,:STOR].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
 	     	dfTemp1[t+rowoffset,4] = 0
 	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
 	     	    dfTemp1[t+rowoffset,4] = -sum(value.(EP[:vCHARGE][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
@@ -70,7 +71,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
 	     	    dfTemp1[t+rowoffset,5] = sum(value.(EP[:vCHARGE_FLEX][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
 	     	end
-	     	dfTemp1[t+rowoffset,6] = -sum(value.(EP[:vP][dfGen[(dfGen[!,:FLEX].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
+	     	dfTemp1[t+rowoffset,6] = -sum(value.(EP[:vP][dfGen[(dfGen[!,:FLEX].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
 	     	if SEG>1
 	       		dfTemp1[t+rowoffset,7] = sum(value.(EP[:vNSE][2:SEG,t,z]))
 	     	else
