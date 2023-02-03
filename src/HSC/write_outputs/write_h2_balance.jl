@@ -51,13 +51,13 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
             dfTemp1[t+rowoffset,3] = 0
 			dfTemp1[t+rowoffset,4] = 0
             dfTemp1[t+rowoffset,5] = 0
-	     	if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
-	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
+	     	if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_FLEX))
+	     	    dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_FLEX))
                 dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_FLEX].>=1) .&  (dfH2Gen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
 	     	end
-			 if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
-				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
-			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+			 if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL))
+				dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL))
+			   dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL))
 			end
 
 	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])

@@ -151,7 +151,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		# Update non-served energy cost for each zone
 		tempCTotal = tempCTotal +tempCNSE
 
-		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
+		dfCost[!,Symbol(Zones[z])] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
 	end
 	CSV.write(string(path,sep,"costs.csv"), dfCost)
 end

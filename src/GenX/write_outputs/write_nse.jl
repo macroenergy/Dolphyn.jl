@@ -20,17 +20,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting non-served energy for every model zone, time step and cost-segment.
 """
 function write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-    	SEG = inputs["SEG"] # Number of load curtailment segments
+    Zones = inputs["Zones"] # List of zones
+	SEG = inputs["SEG"] # Number of load curtailment segments
 	# Non-served energy/demand curtailment by segment in each time step
 	dfNse = DataFrame()
 	dfTemp = Dict()
 	for z in 1:Z
 		dfTemp = DataFrame(Segment=zeros(SEG), Zone=zeros(SEG), AnnualSum = Array{Union{Missing,Float32}}(undef, SEG))
 		dfTemp[!,:Segment] = (1:SEG)
-		dfTemp[!,:Zone] = fill(z,(SEG))
+		dfTemp[!,:Zone] = fill(Zones[z],(SEG))
 		if setup["ParameterScale"]==1
 			for i in 1:SEG
 				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vNSE])[i,:,z]))* ModelScalingFactor

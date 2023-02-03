@@ -64,12 +64,12 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 
 			dfTemp1[t+rowoffset,3] = sum(value.(EP[:vP][dfGen[(dfGen[!,:STOR].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
 	     	dfTemp1[t+rowoffset,4] = 0
-	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
-	     	    dfTemp1[t+rowoffset,4] = -sum(value.(EP[:vCHARGE][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
+	     	if !isempty(intersect(dfGen[dfGen.Zone.==Zones[z],:R_ID],STOR_ALL))
+	     	    dfTemp1[t+rowoffset,4] = -sum(value.(EP[:vCHARGE][y,t]) for y in intersect(dfGen[dfGen.Zone.==Zones[z],:R_ID],STOR_ALL))
 	     	end
 	     	dfTemp1[t+rowoffset,5] = 0
-	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
-	     	    dfTemp1[t+rowoffset,5] = sum(value.(EP[:vCHARGE_FLEX][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
+	     	if !isempty(intersect(dfGen[dfGen.Zone.==Zones[z],:R_ID],FLEX))
+	     	    dfTemp1[t+rowoffset,5] = sum(value.(EP[:vCHARGE_FLEX][y,t]) for y in intersect(dfGen[dfGen.Zone.==Zones[z],:R_ID],FLEX))
 	     	end
 	     	dfTemp1[t+rowoffset,6] = -sum(value.(EP[:vP][dfGen[(dfGen[!,:FLEX].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
 	     	if SEG>1
