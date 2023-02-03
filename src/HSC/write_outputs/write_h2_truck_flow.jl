@@ -26,11 +26,11 @@ function write_h2_truck_flow(
     setup::Dict,
     EP::Model,
 )
-    H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
-    H2_TRUCK_TYPE_NAMES = inputs["H2_TRUCK_TYPE_NAMES"]
-    Z = inputs["Z"]
-    T = inputs["T"]
-    R = inputs["R"]
+    H2_TRUCK_TYPES::Vector{Int64} = inputs["H2_TRUCK_TYPES"]
+    H2_TRUCK_TYPE_NAMES::Vector{String7} = inputs["H2_TRUCK_TYPE_NAMES"]
+    Z::Int64 = inputs["Z"]
+    T::Int64  = inputs["T"]
+    R::Int64  = inputs["R"]
 
     # H2 truck flow on each zone for every type of truck 
     truck_flow_path = string(path, sep, "H2TruckFlow")
@@ -39,12 +39,8 @@ function write_h2_truck_flow(
     end
 
     dfH2TruckFlow = DataFrame(Time = 1:T)
-    for j in H2_TRUCK_TYPES
-        for z = 1:Z
-            dfH2TruckFlow[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                value.(EP[:vH2TruckFlow])[z, j, :]
-        end
-    end
+    jump2df!(dfH2TruckFlow, EP, :vH2TruckFlow, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, Z)
+
     CSV.write(string(truck_flow_path, sep, string("H2TruckFlow.csv")), dfH2TruckFlow)
 
     # H2 truck Number tracking among zones with truck accessibility
@@ -56,15 +52,9 @@ function write_h2_truck_flow(
     dfH2TruckNumberFull = DataFrame(Time = 1:T)
     dfH2TruckNumberEmpty = DataFrame(Time = 1:T)
 
-    vH2N_full = value.(EP[:vH2N_full])
-    vH2N_empty = value.(EP[:vH2N_empty])
+    jump2df!(dfH2TruckNumberFull, EP, :vH2N_full, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES)
+    jump2df!(dfH2TruckNumberEmpty, EP, :vH2N_empty, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES)
 
-    for j in H2_TRUCK_TYPES
-        dfH2TruckNumberFull[!, Symbol(H2_TRUCK_TYPE_NAMES[j])] =
-            vH2N_full[j,:] # value.(EP[:vH2N_full])[j, :]
-        dfH2TruckNumberEmpty[!, Symbol(H2_TRUCK_TYPE_NAMES[j])] =
-            vH2N_empty[j,:] # value.(EP[:vH2N_empty])[j, :]
-    end
     CSV.write(string(truck_number_path, sep, "H2TruckNumberFull.csv"), dfH2TruckNumberFull)
     CSV.write(
         string(truck_number_path, sep, "H2TruckNumberEmpty.csv"),
@@ -81,23 +71,11 @@ function write_h2_truck_flow(
     dfH2TruckCharged = DataFrame(Time = 1:T)
     dfH2TruckDischarged = DataFrame(Time = 1:T)
 
-    vH2Navail_full = value.(EP[:vH2Navail_full])
-    vH2Navail_empty = value.(EP[:vH2Navail_empty])
-    vH2Ncharged = value.(EP[:vH2Ncharged])
-    vH2Ndischarged = value.(EP[:vH2Ndischarged])
-    
-    for j in H2_TRUCK_TYPES
-        for z = 1:Z
-            dfH2TruckAvailFull[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                vH2Navail_full[z,j,:] # value.(EP[:vH2Navail_full])[z, j, :]
-            dfH2TruckAvailEmpty[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                vH2Navail_empty[z,j,:] # vH2Navail_full[z,j,:] # value.(EP[:])[z, j, :]
-            dfH2TruckCharged[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                vH2Ncharged[z,j,:] # value.(EP[:vH2Ncharged])[z, j, :]
-            dfH2TruckDischarged[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                vH2Ndischarged[z,j,:] # value.(EP[:vH2Ndischarged])[z, j, :]
-        end
-    end
+    jump2df!(dfH2TruckAvailFull, EP, :vH2Navail_full, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, Z)
+    jump2df!(dfH2TruckAvailEmpty, EP, :vH2Navail_empty, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, Z)
+    jump2df!(dfH2TruckCharged, EP, :vH2Ncharged, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, Z)
+    jump2df!(dfH2TruckDischarged, EP, :vH2Ndischarged, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, Z)
+
     CSV.write(
         string(truck_state_path, sep, string("H2TruckAvailFull.csv")),
         dfH2TruckAvailFull,
@@ -126,80 +104,12 @@ function write_h2_truck_flow(
     dfH2TruckArriveEmpty = DataFrame(Time = 1:T)
     dfH2TruckDepartEmpty = DataFrame(Time = 1:T)
 
-    vH2Ntravel_full = value.(EP[:vH2Ntravel_full])
-    vH2Narrive_full = value.(EP[:vH2Narrive_full])
-    vH2Ndepart_full = value.(EP[:vH2Ndepart_full])
-    vH2Ntravel_empty = value.(EP[:vH2Ntravel_empty])
-    vH2Narrive_empty = value.(EP[:vH2Narrive_empty])
-    vH2Ndepart_empty = value.(EP[:vH2Ndepart_empty])
-
-    for j in H2_TRUCK_TYPES
-        for r = 1:R
-            for d in [-1, 1]
-                dfH2TruckTravelFull[
-                    !,
-                    Symbol(
-                        string(
-                            H2_TRUCK_TYPE_NAMES[j],
-                            "onRoute$r",
-                            "Direction$(directions[d])",
-                        ),
-                    ),
-                ] = vH2Ntravel_full[r,j,d,:] # value.(EP[:vH2Ntravel_full])[r, j, d, :]
-                dfH2TruckArriveFull[
-                    !,
-                    Symbol(
-                        string(
-                            H2_TRUCK_TYPE_NAMES[j],
-                            "onRoute$r",
-                            "Direction$(directions[d])",
-                        ),
-                    ),
-                ] = vH2Narrive_full[r,j,d,:] # value.(EP[:vH2Narrive_full])[r, j, d, :]
-                dfH2TruckDepartFull[
-                    !,
-                    Symbol(
-                        string(
-                            H2_TRUCK_TYPE_NAMES[j],
-                            "onRoute$r",
-                            "Direction$(directions[d])",
-                        ),
-                    ),
-                ] = vH2Ndepart_full[r,j,d,:] # value.(EP[:vH2Ndepart_full])[r, j, d, :]
-
-                dfH2TruckTravelEmpty[
-                    !,
-                    Symbol(
-                        string(
-                            H2_TRUCK_TYPE_NAMES[j],
-                            "onRoute$r",
-                            "Direction$(directions[d])",
-                        ),
-                    ),
-                ] = vH2Ntravel_empty[r,j,d,:] # value.(EP[:vH2Ntravel_empty])[r, j, d, :]
-                dfH2TruckArriveEmpty[
-                    !,
-                    Symbol(
-                        string(
-                            H2_TRUCK_TYPE_NAMES[j],
-                            "onRoute$r",
-                            "Direction$(directions[d])",
-                        ),
-                    ),
-                ] = vH2Narrive_empty[r,j,d,:] # value.(EP[:vH2Narrive_empty])[r, j, d, :]
-                dfH2TruckDepartEmpty[
-                    !,
-                    Symbol(
-                        string(
-                            H2_TRUCK_TYPE_NAMES[j],
-                            "onRoute$r",
-                            "Direction$(directions[d])",
-                        ),
-                    ),
-                ] = vH2Ndepart_empty[r,j,d,:] # value.(EP[:vH2Ndepart_empty])[r, j, d, :]
-            end
-        end
-    end
+    jump2df!(dfH2TruckTravelFull, EP, :vH2Ntravel_full, directions, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, R)
+    jump2df!(dfH2TruckArriveFull, EP, :vH2Narrive_full, directions, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, R)
+    jump2df!(dfH2TruckDepartFull, EP, :vH2Ndepart_full, directions, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, R)
+    jump2df!(dfH2TruckTravelEmpty, EP, :vH2Ntravel_empty, directions, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, R)
+    jump2df!(dfH2TruckArriveEmpty, EP, :vH2Narrive_empty, directions, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, R)
+    jump2df!(dfH2TruckDepartEmpty, EP, :vH2Ndepart_empty, directions, H2_TRUCK_TYPE_NAMES, H2_TRUCK_TYPES, R)
 
     CSV.write(string(truck_transit_path, sep, "H2TruckTravelFull.csv"), dfH2TruckTravelFull)
     CSV.write(string(truck_transit_path, sep, "H2TruckArriveFull.csv"), dfH2TruckArriveFull)
@@ -217,4 +127,34 @@ function write_h2_truck_flow(
         string(truck_transit_path, sep, "H2TruckDepartEmpty.csv"),
         dfH2TruckDepartEmpty,
     )
+end
+
+function jump2df!(df::DataFrame, EP::Model, jumpvar::Symbol, H2_TRUCK_TYPE_NAMES::Vector{String7}, H2_TRUCK_TYPES::Vector{Int64})
+    temp::JuMP.Containers.DenseAxisArray{Float64} = value.(EP[jumpvar])
+    for j in H2_TRUCK_TYPES
+        df[!, Symbol(H2_TRUCK_TYPE_NAMES[j])] = temp[j,:] 
+    end
+end
+
+function jump2df!(df::DataFrame, EP::Model, jumpvar::Symbol, H2_TRUCK_TYPE_NAMES::Vector{String7}, H2_TRUCK_TYPES::Vector{Int64}, Z::Int64)
+    temp::JuMP.Containers.DenseAxisArray{Float64} = value.(EP[jumpvar])
+    for j in H2_TRUCK_TYPES
+        for z = 1:Z
+            df[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] = temp[z,j,:] 
+        end
+    end
+end
+
+function jump2df!(df::DataFrame, EP::Model, jumpvar::Symbol, directions::Dict{Int64,String}, H2_TRUCK_TYPE_NAMES::Vector{String7}, H2_TRUCK_TYPES::Vector{Int64}, R::Int64)
+    # temp::JuMP.Containers.DenseAxisArray{Float64, 4} = value.(EP[jumpvar])
+    temp::JuMP.Containers.DenseAxisArray{Float64, 4, Ax, L} where {Ax, L<:NTuple{4, JuMP.Containers._AxisLookup}} = value.(EP[jumpvar])
+    for d in [-1, 1]
+        direction = directions[d]
+        for j in H2_TRUCK_TYPES
+            truck_name = H2_TRUCK_TYPE_NAMES[j]
+            for r = 1:R
+                @inbounds df[!, Symbol(string(truck_name,"onRoute$r","Direction$direction)"))] = temp[r,j,d,:]
+            end
+        end
+    end
 end
