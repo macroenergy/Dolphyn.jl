@@ -21,17 +21,18 @@ Functions for reporting capacities of hydrogen trucks (starting capacities or, e
 """
 function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 
-    H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
-    NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"]
-    RET_CAP_TRUCK = inputs["RET_CAP_TRUCK"]
+    # GC.enable(false)
+    H2_TRUCK_TYPES::Vector{Int64} = inputs["H2_TRUCK_TYPES"]
+    NEW_CAP_TRUCK::Vector{Int64} = inputs["NEW_CAP_TRUCK"]
+    RET_CAP_TRUCK::Vector{Int64} = inputs["RET_CAP_TRUCK"]
 
-    dfH2Truck = inputs["dfH2Truck"]
-    Z = inputs["Z"]
+    dfH2Truck::DataFrame = inputs["dfH2Truck"]
+    Z::Int64 = inputs["Z"]
 
     # H2 truck capacity
-    capNumber = zeros(size(H2_TRUCK_TYPES))
-    retNumber = zeros(size(H2_TRUCK_TYPES))
-    endNumber = zeros(size(H2_TRUCK_TYPES))
+    capNumber::Vector{Float64} = zeros(size(H2_TRUCK_TYPES))
+    retNumber::Vector{Float64} = zeros(size(H2_TRUCK_TYPES))
+    endNumber::Vector{Float64} = zeros(size(H2_TRUCK_TYPES))
     for j in H2_TRUCK_TYPES
         if j in NEW_CAP_TRUCK
             capNumber[j] = value(EP[:vH2TruckNumber][j])
@@ -50,29 +51,19 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         EndTruck = endNumber
     )
 
+    prealloc_dfH2Truck_cols!(dfH2TruckCap, Z, H2_TRUCK_TYPES)
+
     for z in 1:Z
         dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] = dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")]
-        tempComp = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in NEW_CAP_TRUCK
-                tempComp[j] = value(EP[:vH2TruckComp][z,j])
-            end
-        end
-        dfH2TruckCap[!,Symbol("NewTruckCompZone$z")] = tempComp
 
-        tempComp = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in RET_CAP_TRUCK
-                tempComp[j] = value(EP[:vH2RetTruckComp][z,j])
-            end
-        end
-        dfH2TruckCap[!,Symbol("RetTruckCompZone$z")] = tempComp
+        temp_idx::Vector{Int64} = intersect(H2_TRUCK_TYPES, NEW_CAP_TRUCK)
+        dfH2TruckCap[!,Symbol("NewTruckCompZone$z")][temp_idx] .= convert(Vector{Float64}, value.(EP[:vH2TruckComp][z,temp_idx]))
 
-        tempComp = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            tempComp[j] = value(EP[:eTotalH2TruckComp][z,j])
-        end
-        dfH2TruckCap[!,Symbol("EndTruckCompZone$z")] = tempComp
+        temp_idx = intersect(H2_TRUCK_TYPES, RET_CAP_TRUCK)
+        dfH2TruckCap[!,Symbol("RetTruckCompZone$z")][temp_idx] .= convert(Vector{Float64}, value.(EP[:vH2RetTruckComp][z,temp_idx]))
+
+        temp_idx = H2_TRUCK_TYPES
+        dfH2TruckCap[!,Symbol("EndTruckCompZone$z")][temp_idx] .= convert(Vector{Float64}, value.(EP[:eTotalH2TruckComp][z,temp_idx]))
     end
 
     dfH2TruckCap[!,:StartTruckComp] = sum(dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] for z in 1:Z)
@@ -91,7 +82,6 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         RetTruckComp = sum(dfH2TruckCap[!,:RetTruckComp]),
         EndTruckComp = sum(dfH2TruckCap[!,:EndTruckComp])
     )
-
     for z in 1:Z
         dfH2TruckTotal[!,Symbol("StartTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckCompZone$z")])]
         dfH2TruckTotal[!,Symbol("NewTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckCompZone$z")])]
@@ -101,4 +91,32 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)
     CSV.write(string(path, sep, "h2_truck_capacity.csv"), dfH2TruckCap)
+    # GC.enable(true)
+
+end
+
+function prealloc_dfH2Truck_cols!(dfH2TruckCap::DataFrame, Z::Int64, H2_TRUCK_TYPES::Vector{Int64})
+    num_trucks::Tuple{Int64} = size(H2_TRUCK_TYPES)
+
+    root_names::Vector{String} = [
+        "StartTruckCompZone",
+        "NewTruckCompZone",
+        "RetTruckCompZone",
+        "EndTruckCompZone"
+    ]
+    for z in 1:Z
+        for root in root_names
+            dfH2TruckCap[!, Symbol("$root$z")] = zeros(Float64, num_trucks)
+        end
+    end
+
+    tail_names::Vector{String} = [
+        "StartTruckComp",
+        "NewTruckComp",
+        "RetTruckComp",
+        "EndTruckComp"
+    ]
+    for name in tail_names
+        dfH2TruckCap[!, Symbol(name)] = zeros(Float64, num_trucks)
+    end
 end

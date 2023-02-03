@@ -55,11 +55,15 @@ function write_h2_truck_flow(
 
     dfH2TruckNumberFull = DataFrame(Time = 1:T)
     dfH2TruckNumberEmpty = DataFrame(Time = 1:T)
+
+    vH2N_full = value.(EP[:vH2N_full])
+    vH2N_empty = value.(EP[:vH2N_empty])
+
     for j in H2_TRUCK_TYPES
         dfH2TruckNumberFull[!, Symbol(H2_TRUCK_TYPE_NAMES[j])] =
-            value.(EP[:vH2N_full])[j, :]
+            vH2N_full[j,:] # value.(EP[:vH2N_full])[j, :]
         dfH2TruckNumberEmpty[!, Symbol(H2_TRUCK_TYPE_NAMES[j])] =
-            value.(EP[:vH2N_empty])[j, :]
+            vH2N_empty[j,:] # value.(EP[:vH2N_empty])[j, :]
     end
     CSV.write(string(truck_number_path, sep, "H2TruckNumberFull.csv"), dfH2TruckNumberFull)
     CSV.write(
@@ -76,16 +80,22 @@ function write_h2_truck_flow(
     dfH2TruckAvailEmpty = DataFrame(Time = 1:T)
     dfH2TruckCharged = DataFrame(Time = 1:T)
     dfH2TruckDischarged = DataFrame(Time = 1:T)
+
+    vH2Navail_full = value.(EP[:vH2Navail_full])
+    vH2Navail_empty = value.(EP[:vH2Navail_empty])
+    vH2Ncharged = value.(EP[:vH2Ncharged])
+    vH2Ndischarged = value.(EP[:vH2Ndischarged])
+    
     for j in H2_TRUCK_TYPES
         for z = 1:Z
             dfH2TruckAvailFull[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                value.(EP[:vH2Navail_full])[z, j, :]
+                vH2Navail_full[z,j,:] # value.(EP[:vH2Navail_full])[z, j, :]
             dfH2TruckAvailEmpty[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                value.(EP[:vH2Navail_empty])[z, j, :]
+                vH2Navail_empty[z,j,:] # vH2Navail_full[z,j,:] # value.(EP[:])[z, j, :]
             dfH2TruckCharged[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                value.(EP[:vH2Ncharged])[z, j, :]
+                vH2Ncharged[z,j,:] # value.(EP[:vH2Ncharged])[z, j, :]
             dfH2TruckDischarged[!, Symbol(string("Zone$z-", H2_TRUCK_TYPE_NAMES[j]))] =
-                value.(EP[:vH2Ndischarged])[z, j, :]
+                vH2Ndischarged[z,j,:] # value.(EP[:vH2Ndischarged])[z, j, :]
         end
     end
     CSV.write(
@@ -115,6 +125,14 @@ function write_h2_truck_flow(
     dfH2TruckTravelEmpty = DataFrame(Time = 1:T)
     dfH2TruckArriveEmpty = DataFrame(Time = 1:T)
     dfH2TruckDepartEmpty = DataFrame(Time = 1:T)
+
+    vH2Ntravel_full = value.(EP[:vH2Ntravel_full])
+    vH2Narrive_full = value.(EP[:vH2Narrive_full])
+    vH2Ndepart_full = value.(EP[:vH2Ndepart_full])
+    vH2Ntravel_empty = value.(EP[:vH2Ntravel_empty])
+    vH2Narrive_empty = value.(EP[:vH2Narrive_empty])
+    vH2Ndepart_empty = value.(EP[:vH2Ndepart_empty])
+
     for j in H2_TRUCK_TYPES
         for r = 1:R
             for d in [-1, 1]
@@ -127,7 +145,7 @@ function write_h2_truck_flow(
                             "Direction$(directions[d])",
                         ),
                     ),
-                ] = value.(EP[:vH2Ntravel_full])[r, j, d, :]
+                ] = vH2Ntravel_full[r,j,d,:] # value.(EP[:vH2Ntravel_full])[r, j, d, :]
                 dfH2TruckArriveFull[
                     !,
                     Symbol(
@@ -137,7 +155,7 @@ function write_h2_truck_flow(
                             "Direction$(directions[d])",
                         ),
                     ),
-                ] = value.(EP[:vH2Narrive_full])[r, j, d, :]
+                ] = vH2Narrive_full[r,j,d,:] # value.(EP[:vH2Narrive_full])[r, j, d, :]
                 dfH2TruckDepartFull[
                     !,
                     Symbol(
@@ -147,7 +165,7 @@ function write_h2_truck_flow(
                             "Direction$(directions[d])",
                         ),
                     ),
-                ] = value.(EP[:vH2Ndepart_full])[r, j, d, :]
+                ] = vH2Ndepart_full[r,j,d,:] # value.(EP[:vH2Ndepart_full])[r, j, d, :]
 
                 dfH2TruckTravelEmpty[
                     !,
@@ -158,7 +176,7 @@ function write_h2_truck_flow(
                             "Direction$(directions[d])",
                         ),
                     ),
-                ] = value.(EP[:vH2Ntravel_empty])[r, j, d, :]
+                ] = vH2Ntravel_empty[r,j,d,:] # value.(EP[:vH2Ntravel_empty])[r, j, d, :]
                 dfH2TruckArriveEmpty[
                     !,
                     Symbol(
@@ -168,7 +186,7 @@ function write_h2_truck_flow(
                             "Direction$(directions[d])",
                         ),
                     ),
-                ] = value.(EP[:vH2Narrive_empty])[r, j, d, :]
+                ] = vH2Narrive_empty[r,j,d,:] # value.(EP[:vH2Narrive_empty])[r, j, d, :]
                 dfH2TruckDepartEmpty[
                     !,
                     Symbol(
@@ -178,7 +196,7 @@ function write_h2_truck_flow(
                             "Direction$(directions[d])",
                         ),
                     ),
-                ] = value.(EP[:vH2Ndepart_empty])[r, j, d, :]
+                ] = vH2Ndepart_empty[r,j,d,:] # value.(EP[:vH2Ndepart_empty])[r, j, d, :]
             end
         end
     end
