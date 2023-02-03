@@ -121,7 +121,7 @@ function flexible_demand(EP::Model, inputs::Dict)
     ## Flexible demand is available only during specified hours with time delay or time advance (virtual storage-shiftable demand)
     for z in 1:Z
         # NOTE: Flexible demand operates by zone since capacity is now related to zone demand
-        FLEX_Z = intersect(FLEX, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])
+        FLEX_Z = intersect(FLEX, dfGen[dfGen[!,:Zone].==Zones[z],:][!,:R_ID])
 
         @constraints(EP, begin
             # State of "charge" constraint (equals previous state + charge - discharge)

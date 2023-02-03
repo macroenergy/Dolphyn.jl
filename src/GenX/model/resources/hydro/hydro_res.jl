@@ -170,7 +170,7 @@ function hydro_res(EP::Model, inputs::Dict, Reserves::Int)
 	end
 	##CO2 Polcy Module Hydro Res Generation by zone
 	@expression(EP, eGenerationByHydroRes[z=1:Z, t=1:T], # the unit is GW
-		sum(EP[:vP][y,t] for y in intersect(inputs["HYDRO_RES"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
+		sum(EP[:vP][y,t] for y in intersect(inputs["HYDRO_RES"], dfGen[dfGen[!,:Zone].==Zones[z],:R_ID]))
 	)
 	EP[:eGenerationByZone] += eGenerationByHydroRes
 	return EP
