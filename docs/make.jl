@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -62,7 +62,7 @@ pages = OrderedDict(
         "HSC Inputs Functions" => "load_h2_inputs.md",
         "HSC Outputs Functions" => "write_h2_outputs.md",
         "Hydrogen Notation" => "hsc_notation.md",
-        "HSC supply-demand Balance" => "h2_balance.md",
+        "HSC Supply-Demand Balance" => "h2_balance.md",
         "HSC Function Reference" => [
             "Hydrogen Core" => "h2_core.md",
             "Hydrogen Flexible Demand" => "h2_flexible_demand.md",
@@ -102,7 +102,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/macroenergy/DOLPHYN-dev.git",
+    repo = "github.com/macroenergy/DOLPHYN.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",

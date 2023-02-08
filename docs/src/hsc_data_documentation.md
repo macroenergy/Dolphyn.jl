@@ -92,7 +92,7 @@ This file includes parameters to characterize model temporal resolution to appro
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Columns**|
-|Voll |Value of lost hydrogen load in $/tonne-H2.|
+|Voll |Value of lost hydrogen load in \$/tonne-H$_2$.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
 |Cost\_of\_Demand\_Curtailment\_per\_Tonne |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
@@ -140,7 +140,7 @@ This file contains cost and performance parameters for various generators and ot
 |H2\_FLEX | {0, 1}, Flag to indicate membership in set of flexible demand-side resources (e.g. scheduleable or time shiftable loads such as smart thermostat systems, irrigating pumping loads etc).|
 ||H2\_FLEX = 0: Not part of set (default) |
 ||H2\_FLEX = 1: Flexible demand resource.|
-|LDS | {0, 1}, Defining whether H2 storage is modeled as long-duration or short-duration storage |
+|LDS | {0, 1}, Defining whether H$_2$ storage is modeled as long-duration or short-duration storage |
 ||LDS = 0: short-duration storage (inter-period energy transfer disallowed) |
 ||LDS = 1: long-duration storage (inter-period energy transfer allowed) |
 |**Existing technology capacity**|
@@ -194,7 +194,7 @@ This file contains cost and performance parameters for various generators and ot
 
 #### 2.2.1 HSC\_CO2\_cap.csv
 
-This file contains inputs specifying CO2 emission limits policies (e.g. emissions cap and permit trading programs). This file is needed if `H2CO2Cap` flag is activated in the YAML file `hsc_settings.yml`. `h2CO2Cap` flag set to 1 represents mass-based (tCO2 ) emission target. `CO2Cap` flag set to 2 is specified when emission target is given in terms of rate (tCO2/tonne-H2) and is based on total demand met. `H2CO2Cap` flag set to 3 is specified when emission target is given in terms of rate (tCO2 /tonne-H2) and is based on total generation. Note that there is also a global setting available to set one CO2 constraint for both power and hydrogen, in which case the limits in this file can be set to zero. 
+This file contains inputs specifying CO2 emission limits policies (e.g. emissions cap and permit trading programs). This file is needed if `H2CO2Cap` flag is activated in the YAML file `hsc_settings.yml`. `h2CO2Cap` flag set to 1 represents mass-based (tCO2 ) emission target. `CO2Cap` flag set to 2 is specified when emission target is given in terms of rate (tCO2/tonne-H$_2$) and is based on total demand met. `H2CO2Cap` flag set to 3 is specified when emission target is given in terms of rate (tCO2 /tonne-H$_2$) and is based on total generation. Note that there is also a global setting available to set one CO2 constraint for both power and hydrogen, in which case the limits in this file can be set to zero. 
 
 ###### Table 6: Structure of the HSC\_CO2\_cap.csv file
 ---
@@ -270,7 +270,7 @@ This file contains cost and performance parameters for various hydrogen to power
 | :------------ | :-----------|
 |H2TruckType | This column contains **unique** names of hydrogen truck resources available to the model.|
 |**Technology type flags**|
-|LDS | {0, 1}, Defining whether H2 storage is modeled as long-duration or short-duration storage |
+|LDS | {0, 1}, Defining whether H$_2$ storage is modeled as long-duration or short-duration storage |
 ||LDS = 0: short-duration storage (inter-period energy transfer disallowed) |
 ||LDS = 1: long-duration storage (inter-period energy transfer allowed) |
 |New\_Build | {-1, 0, 1}, Flag for resource (storage, generation) eligibility for capacity expansion.|
@@ -302,7 +302,7 @@ This file contains cost and performance parameters for various hydrogen to power
 |Fuel | Fuel type of truck. |
 |Fuel\_MMBTU\_per\_mile | Fuel consumption for truck in operation per mile if it burns fuels. |
 |Power\_MW\_per\_mile | Power consumption for truck in operation per mile if it feeds on power. |
-|H2\_tonne\_per\_mile | H2 consumption for truck in operation per mile if it feeds on hydrogen. |
+|H2\_tonne\_per\_mile | H$_2$ consumption for truck in operation per mile if it feeds on hydrogen. |
 
 #### 2.2.5 HSC\_load\_data\_liquid.csv
 
@@ -336,35 +336,35 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
-| StartCap |Initial H2 production or discharge capacity (for storage units) of each resource type in each zone; this is an input |H2 Tonnes / Hr |
-| RetCap |Retired H2 production or discharge capacity (for storage units) of each resource type in each zone |Tonnes / Hr |
-| NewCap |Installed H2 production or discharge capacity (for storage units) of each resource type in each zone |Tonnes / Hr|
-| EndCap| Total H2 production or discharge capacity of each resource type in each zone |Tonnes / Hr |
-| StartEnergyCap |Initial H2 energy capacity of each resource type in each zone; this is an input and applies only to H2 storage tech.| Tonnes |
-| RetEnergyCap |Retired H2 energy capacity of each resource type in each zone; applies only to H2 storage tech. |Tonnes |
-| NewEnergyCap| Installed energy capacity of each resource type in each zone; applies only to H2 storage tech. |Tonnes |
-| EndEnergyCap |Total installed energy capacity of each resource type in each zone; applies only to H2 storage tech. |Tonnes |
-| StartChargeCap| Initial H2 charging capacity of `H2_STOR = 1` resource type in each zone; this is an input |Tonnes / Hr |
-| RetChargeCap |Retired H2 charging capacity of `H2_STOR = 1` resource type in each zone |Tonnes / Hr |
-| NewChargeCap |Installed H2 charging capacity of each resource type in each zone |Tonnes / Hr |
-| EndChargeCap |Total H2 charging capacity of each resource type in each zone |Tonnes / Hr|
+| StartCap |Initial H$_2$ production or discharge capacity (for storage units) of each resource type in each zone; this is an input |H$_2$ Tonnes / Hr |
+| RetCap |Retired H$_2$ production or discharge capacity (for storage units) of each resource type in each zone |Tonnes / Hr |
+| NewCap |Installed H$_2$ production or discharge capacity (for storage units) of each resource type in each zone |Tonnes / Hr|
+| EndCap| Total H$_2$ production or discharge capacity of each resource type in each zone |Tonnes / Hr |
+| StartEnergyCap |Initial H$_2$ energy capacity of each resource type in each zone; this is an input and applies only to H$_2$ storage tech.| Tonnes |
+| RetEnergyCap |Retired H$_2$ energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. |Tonnes |
+| NewEnergyCap| Installed energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. |Tonnes |
+| EndEnergyCap |Total installed energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. |Tonnes |
+| StartChargeCap| Initial H$_2$ charging capacity of `H2_STOR = 1` resource type in each zone; this is an input |Tonnes / Hr |
+| RetChargeCap |Retired H$_2$ charging capacity of `H2_STOR = 1` resource type in each zone |Tonnes / Hr |
+| NewChargeCap |Installed H$_2$ charging capacity of each resource type in each zone |Tonnes / Hr |
+| EndChargeCap |Total H$_2$ charging capacity of each resource type in each zone |Tonnes / Hr|
 
 
 #### 3.1.2 HSC_emissions.csv
 
-Reports CO2 emissions for each zone and each hour by H2 Resources; an annual sum row will be provided (in tonnes). 
+Reports CO2 emissions for each zone and each hour by H$_2$ Resources; an annual sum row will be provided (in tonnes). 
 
 #### 3.1.4 HSC_nse.csv
 
-Reports H2 non-served energy for every model zone, time step and cost-segment.
+Reports H$_2$ non-served energy for every model zone, time step and cost-segment.
 
 #### 3.1.5 HSC_generation_discharge.csv
 
-Reports H2 discharged by each H2 production resource (generation, storage) in each model time step, as well as the annual sum (in tonnes). 
+Reports H$_2$ discharged by each H$_2$ production resource (generation, storage) in each model time step, as well as the annual sum (in tonnes). 
 
 #### 3.1.6 HSC_h2_balance.csv
 
-Reports the use (tonnes/hour or tonnes) of each H2 resource type (Generation, Flexible Demand, Storage Charge & Discharge, Nonserved Energy, H2 Pipeline Import/Export, H2 Truck Import/Export, G2P Demand, and Demand) for each zone and each time step, as well as the annual sum. 
+Reports the use (tonnes/hour or tonnes) of each H$_2$ resource type (Generation, Flexible Demand, Storage Charge & Discharge, Nonserved Energy, H$_2$ Pipeline Import/Export, H$_2$ Truck Import/Export, G2P Demand, and Demand) for each zone and each time step, as well as the annual sum. 
 
 #### 3.1.7 HSC_costs.csv
 
@@ -387,23 +387,23 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 
 #### 3.2.2 HSC_G2P_H2_consumption.csv
 
-Reports H2 required (in tonnes) by G2P for each zone and each model time step, as well as the annual sum. 
+Reports H$_2$ required (in tonnes) by G2P for each zone and each model time step, as well as the annual sum. 
 
 #### 3.2.3 HSC_charge.csv
 
-Reports H2 charging (i.e flow in tonnes for each hour) for storage resources for each zone and time step, as well as the annual sum. 
+Reports H$_2$ charging (i.e flow in tonnes for each hour) for storage resources for each zone and time step, as well as the annual sum. 
 
 #### 3.2.4 HSC_storage.csv
 
-Reports storage level (i.e amount of H2 in tonnes) for storage resources for each zone and time step. 
+Reports storage level (i.e amount of H$_2$ in tonnes) for storage resources for each zone and time step. 
 
 #### 3.2.5 HSC_h2_pipeline_flow.csv
 
-Reports H2 level (in tonnes/hour) in each pipeline for each time step, as well as the amount of hydrogen (in tonnes) sent from the source or arrived at the sink. 
+Reports H$_2$ level (in tonnes/hour) in each pipeline for each time step, as well as the amount of hydrogen (in tonnes) sent from the source or arrived at the sink. 
 
 #### 3.2.6 HSC_h2_pipeline_level.csv
 
-Reports H2 level (in tonnes/hour) in each pipeline for each time step. 
+Reports H$_2$ level (in tonnes/hour) in each pipeline for each time step. 
 
 #### 3.2.7 TRUCKS
 
@@ -421,18 +421,18 @@ This file reports truck capacity and related compression capacity. The columns a
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
-| StartTruck | Initial truck capacity of each truck type; this is an input |tonne-H2 |
-| NewTruck | Newly invested truck capacity of each truck type; this is a decision variable |tonne-H2|
-| RetTruck | Retired truck capacity of each truck type; this is a decision variable |tonne-H2 |
-| EndTruck | Total truck capacity of each truck type |tonne-H2 |
-|StartTruckEnergyZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |tonne-H2/hour|
-|NewTruckEnergyZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H2/hour|
-|RetTruckEnergyZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H2/hour|
-|EndTruckEnergyZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index}|tonne-H2/hour|
-|StartTruckEnergy| Total initial truck compression capacity of each truck type; this is an input|tonne-H2/hour|
-|NewTruckEnergy| Total newly invested truck compression capacity of each truck type; this is a decision variable |tonne-H2/hour|
-|RetTruckEnergy| Total retired truck compression capacity of each truck type; this is a decision variable|tonne-H2/hour|
-|EndTruckEnergy| Total truck compreession capacity of each truck type|tonne-H2/hour|
+| StartTruck | Initial truck capacity of each truck type; this is an input |tonne-H$_2$ |
+| NewTruck | Newly invested truck capacity of each truck type; this is a decision variable |tonne-H$_2$|
+| RetTruck | Retired truck capacity of each truck type; this is a decision variable |tonne-H$_2$ |
+| EndTruck | Total truck capacity of each truck type |tonne-H$_2$ |
+|StartTruckEnergyZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |tonne-H$_2$/hour|
+|NewTruckEnergyZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H$_2$/hour|
+|RetTruckEnergyZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H$_2$/hour|
+|EndTruckEnergyZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index}|tonne-H$_2$/hour|
+|StartTruckEnergy| Total initial truck compression capacity of each truck type; this is an input|tonne-H$_2$/hour|
+|NewTruckEnergy| Total newly invested truck compression capacity of each truck type; this is a decision variable |tonne-H$_2$/hour|
+|RetTruckEnergy| Total retired truck compression capacity of each truck type; this is a decision variable|tonne-H$_2$/hour|
+|EndTruckEnergy| Total truck compreession capacity of each truck type|tonne-H$_2$/hour|
 
 ##### 3.2.7.2 H2TruckTransit Folder
 This folder contains output files reporting variables of different transition statuses (arrive, depart and travel) in combination with loading statuses (full and empty). Each file is named after the pattern like H2Truck{transition}{loading}.csv like H2TruckArriveFull.csv reports total number of arriving trucks. The columns are separated by truck types and indexed with time steps. Other files have the same logic of reporting outputs.

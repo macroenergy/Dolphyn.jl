@@ -57,21 +57,26 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
     # Create a summary file
     
     lines_to_write = []
-    push!(lines_to_write, "$inset--- $dirname2 ---\n")
+    push!(lines_to_write, "$(inset)Comparing the following directories:\n")
+    push!(lines_to_write, "$(inset)--- $dirname1 ---\n")
+    push!(lines_to_write, "$(inset)--- $dirname2 ---\n")
+    push!(lines_to_write, "\n")
 
     # Write the summary file
     if length(only1) > 0
-        push!(lines_to_write, join([inset, "Files in $dirname1 but not in $dirname2:"]))
-        for file in only1
-            push!(lines_to_write, file)
-        end
+        push!(lines_to_write, "$(inset)Files in $dirname1 but not in $dirname2:\n")
+        push!(lines_to_write, join([inset, join(only1, "\n$inset")]))
+        push!(lines_to_write, "\n")
     end
     if length(only2) > 0
-        push!(lines_to_write, join([inset, "Files in $dirname2 but not in $dirname1:"]))
-        for file in only2
-            push!(lines_to_write, file)
-        end
+        push!(lines_to_write, "$(inset)Files in $dirname2 but not in $dirname1:\n")
+        push!(lines_to_write, join([inset, join(only2, "\n$inset")]))
+        push!(lines_to_write, "\n")
     end
+    if length(only1) == 0 && length(only2) ==0
+        push!(lines_to_write, "$(inset)Both directories contain the same files and subdirectories\n")
+    end
+    push!(lines_to_write, "\n")
     
     common_files_matching = []
     common_files_diff = []
@@ -111,7 +116,7 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
         if length(subdirs) > 0
             push!(lines_to_write, "\n")
             push!(lines_to_write, join([inset, "Sub-directories"]))
-            push!(lines_to_write, "\n ")
+            push!(lines_to_write, "\n")
             for subdir in subdirs
                 lines_to_write = [lines_to_write; compare_dir(joinpath(path1, subdir), joinpath(path2, subdir), join([inset, "  "]))]
             end
@@ -121,11 +126,11 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
 end
     
 @doc raw"""
-    filecmp(path1::AbstractString, path2::AbstractString)
+    filecmp_byte(path1::AbstractString, path2::AbstractString)
 
 Compare two files on a byte-wise basis and return a boolean indicating whether they are identical
 """
-function filecmp(path1::AbstractString, path2::AbstractString)
+function filecmp_byte(path1::AbstractString, path2::AbstractString)
     stat1, stat2 = stat(path1), stat(path2)
     if !(isfile(stat1) && isfile(stat2)) || filesize(stat1) != filesize(stat2)
         return false # or should it throw if a file doesn't exist?
@@ -142,6 +147,35 @@ function filecmp(path1::AbstractString, path2::AbstractString)
                 0 != Base._memcmp(buf1, buf2, n1) && return false
             end
             return eof(file1) == eof(file2)
+        end
+    end
+end
+
+function filecmp_str(path1::AbstractString, path2::AbstractString)
+    open(path1, "r") do file1
+        open(path2, "r") do file2
+            while !eof(file1) && !eof(file2)
+                line1 = readline(file1)
+                line2 = readline(file2)
+                if line1 != line2
+                    return false
+                end
+            end
+            return eof(file1) == eof(file2)
+        end
+    end
+end
+
+function filecmp(path1::AbstractString, path2::AbstractString)
+    # First do quick (but slightly temperamental) byte comparison
+    if filecmp_byte(path1, path2)
+        return true
+    else
+        # If that fails, do a line-by-line comparison
+        if filecmp_str(path1, path2)
+            return true
+        else
+            return false
         end
     end
 end

@@ -27,14 +27,14 @@ Model settings parameters are specified in a `GenX_Settings.yml` file which shou
 ||0 = no operating reserves |
 ||1 regulation (primary) and spinning (secondary) reserves |
 |StorageLosses | Flag to account for storage related losses.|
-||0 = VRE and CO2 constraint DO NOT account for energy lost. |
+||0 = VRE and CO$_2$ constraint DO NOT account for energy lost. |
 ||1 = constraint DO account for energy lost. |
 |**Policy related**|
 |EnergyShareRequirement | Flag for specifying regional renewable portfolio standard (RPS) and clean energy standard policy (CES) related constraints.|
 || Default = 0 (No RPS or CES constraints).|
 || 1 = activate energy share requirement related constraints. |
-|CO2Cap | Flag for specifying the type of CO2 emission limit constraint.|
-|| 0 = no CO2 emission limit|
+|CO2Cap | Flag for specifying the type of CO$_2$ emission limit constraint.|
+|| 0 = no CO$_2$ emission limit|
 || 1 = mass-based emission limit constraint|
 || 2 = load + rate-based emission limit constraint|
 || 3 = generation + rate-based emission limit constraint|
@@ -55,7 +55,7 @@ All input files are in CSV format. Running the GenX submodule requires a minimum
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Files**||
-|Fuels\_data.csv |Specify fuel type, CO2 emissions intensity, and time-series of fuel prices. |
+|Fuels\_data.csv |Specify fuel type, CO$_2$ emissions intensity, and time-series of fuel prices. |
 |Network.csv |Specify network topology, transmission fixed costs, capacity and loss parameters.|
 |Load\_data.csv |Specify time-series of load profiles for each model zone, weights for each time step, load shedding costs, and optional time domain reduction parameters.|
 |Generators\_variability.csv |Specify time-series of capacity factor/availability for each resource.|
@@ -63,7 +63,7 @@ All input files are in CSV format. Running the GenX submodule requires a minimum
 |**Settings-specific Files**||
 |Reserves.csv |Specify operational reserve requirements as a function of load and renewables generation and penalty for not meeting these requirements.|
 |Energy\_share\_requirement.csv |Specify regional renewable portfolio standard and clean energy standard style policies requiring minimum energy generation from qualifying resources.|
-|CO2\_cap.csv |Specify regional CO2 emission limits.|
+|CO2\_cap.csv |Specify regional CO$_2$ emission limits.|
 |Capacity\_reserve\_margin.csv |Specify regional capacity reserve margin requirements.|
 |Minimum\_capacity\_requirement.csv |Specify regional minimum technology capacity deployment requirements.|
 
@@ -74,7 +74,7 @@ All input files are in CSV format. Running the GenX submodule requires a minimum
 
 • **First row:** names of all fuels used in the model instance which should match the labels used in `Fuel` column in the `Generators_data.csv` file. For renewable resources or other resources that do not consume a fuel, the name of the fuel is `None`.
 
-• **Second row:** The second row specifies the CO2 emissions intensity of each fuel in tons/MMBtu (million British thermal units). Note that by convention, tons correspond to metric tonnes and not short tons (although as long as the user is internally consistent in their application of units, either can be used).
+• **Second row:** The second row specifies the CO$_2$ emissions intensity of each fuel in tons/MMBtu (million British thermal units). Note that by convention, tons correspond to metric tonnes and not short tons (although as long as the user is internally consistent in their application of units, either can be used).
 
 • **Remaining rows:** Rest of the rows in this input file specify the time-series for prices for each fuel in $/MMBtu. A constant price can be specified by entering the same value for all hours.
 
@@ -314,7 +314,7 @@ Note: this file should use the same region name as specified in the `Generators_
 
 #### 2.2.4 CO2\_cap.csv
 
-This file contains inputs specifying CO2 emission limits policies (e.g. emissions cap and permit trading programs). This file is needed if `CO2Cap` flag is activated in the YAML file `GenX_settings.yml`. `CO2Cap` flag set to 1 represents mass-based (tCO2 ) emission target. `CO2Cap` flag set to 2 is specified when emission target is given in terms of rate (tCO2/MWh) and is based on total demand met. `CO2Cap` flag set to 3 is specified when emission target is given in terms of rate (tCO2 /MWh) and is based on total generation.
+This file contains inputs specifying CO$_2$ emission limits policies (e.g. emissions cap and permit trading programs). This file is needed if `CO2Cap` flag is activated in the YAML file `GenX_settings.yml`. `CO2Cap` flag set to 1 represents mass-based (tCO2 ) emission target. `CO2Cap` flag set to 2 is specified when emission target is given in terms of rate (tCO2/MWh) and is based on total demand met. `CO2Cap` flag set to 3 is specified when emission target is given in terms of rate (tCO2 /MWh) and is based on total generation.
 
 ###### Table 10: Structure of the CO2\_cap.csv file
 ---
@@ -425,13 +425,13 @@ Reports optimal objective function value and contribution of each term by zone.
 
 #### 3.1.3 emissions.csv
 
-Reports CO2 emissions by zone at each hour; an annual sum row will be provided. If any emission cap is present, emission prices each zone faced by each cap will be copied on top of this table with the following strucutre.
+Reports CO$_2$ emissions by zone at each hour; an annual sum row will be provided. If any emission cap is present, emission prices each zone faced by each cap will be copied on top of this table with the following strucutre.
 
 ###### Table 16: Structure of emission prices in the emissions.csv file
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
-|CO_2\_price |Marginal CO2 abatement cost associated with constraint on maximum annual CO2 emissions; will be same across zones if CO2 emissions constraint is applied for the entire region and not zone-wise |\$/ tonne CO2. |
+|CO_2\_price |Marginal CO$_2$ abatement cost associated with constraint on maximum annual CO$_2$ emissions; will be same across zones if CO$_2$ emissions constraint is applied for the entire region and not zone-wise | \$/tonne-CO$_2$. |
 
 
 

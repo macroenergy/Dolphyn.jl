@@ -58,8 +58,10 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_storage(path, sep, inputs, setup, EP)
 
     if has_duals(EP) == 1
-		write_h2_elec_costs(path, sep, inputs, setup, EP)
-	end
+		  write_h2_elec_costs(path, sep, inputs, setup, EP)
+	  end
+
+    write_h2_transmission_flow(path, sep, inputs, setup, EP)
 
     if setup["ModelH2G2P"] == 1
         write_h2_g2p(path, sep, inputs, setup, EP)
