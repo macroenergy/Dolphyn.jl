@@ -51,11 +51,18 @@ Contributions to the power balance expression from compression due to storage ch
 
 **Hydrogen balance expressions**
 
-Contributions to the power balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
+Contributions to the hydrogen balance expression from storage charging and discharging action from storage devices $s \in \mathcal{S}$ are also defined as:
 
 ```math
 \begin{equation*}
-	HydrogenBal_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS}} - x_{s,z,t}^{\textrm{H,CHA}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBalGas_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS,Gas}} - x_{s,z,t}^{\textrm{H,CHA,Gas}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+Liquid hydrogen balance contributions are defined in a similar manner, for liquid storage resources. 
+
+```math
+\begin{equation*}
+	HydrogenBalLiq_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS,Liq}} - x_{s,z,t}^{\textrm{H,CHA,Liq}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 

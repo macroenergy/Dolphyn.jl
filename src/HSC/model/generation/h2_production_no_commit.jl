@@ -17,15 +17,21 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
-This function defines the operating constraints for thermal hydrogen generation plants NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions $k \in \mathcal{THE} \setminus \mathcal{UC}$.
+This function defines the operating constraints for hydrogen generation plants (thermal and electrolysis) NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions $g \in \mathcal{THE} \setminus \mathcal{UC}$.
 
 **Hydrogen balance expressions**
 
-Contributions to the hydrogen balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
+Contributions to the hydrogen balance expression from each thermal resources without unit commitment $g \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined below. If liquid hydrogen is modeled, a liquid hydrogen balance expression is needed and contributions to the gas balance are accounted for. 
 	
 ```math
 \begin{equation*}
-	HydrogenBal_{GEN} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{H,GEN}} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBalGas_{GEN} = \sum_{g \in \mathcal{G}} x_{g,z,t}^{\textrm{H,GEN}} - \sum_{g \in \mathcal{G}} x_{g,z,t}^{\textrm{H,LIQ}} + \sum_{g \in \mathcal{G}} x_{g,z,t}^{\textrm{H,EVAP}} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```	
+
+```math
+\begin{equation*}
+	HydrogenBalLiq_{GEN} = \sum_{g \in \mathcal{G}} x_{g,z,t}^{\textrm{H,LIQ}} - \sum_{g \in \mathcal{G}} x_{g,z,t}^{\textrm{H,EVAP}} \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```	
 
@@ -35,13 +41,13 @@ Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus 
 
 ```math
 \begin{equation*}
-	x_{k,z,t-1}^{\textrm{H,GEN}} - x_{k,z,t}^{\textrm{H,GEN}} \leq \kappa_{k,z}^{\textrm{H,DN}} y_{k,z}^{\textrm{H,GEN}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{g,z,t-1}^{\textrm{H,GEN}} - x_{g,z,t}^{\textrm{H,GEN}} \leq \kappa_{g,z}^{\textrm{H,DN}} y_{g,z}^{\textrm{H,GEN}} \quad \forall g \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{H,GEN}} - x_{k,z,t-1}^{\textrm{H,GEN}} \leq \kappa_{k,z}^{\textrm{H,UP}} y_{k,z}^{\textrm{H,GEN}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{g,z,t}^{\textrm{H,GEN}} - x_{g,z,t-1}^{\textrm{H,GEN}} \leq \kappa_{g,z}^{\textrm{H,UP}} y_{g,z}^{\textrm{H,GEN}} \quad \forall g \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 1-2 in the code)
@@ -52,13 +58,13 @@ This set of time-coupling constraints wrap around to ensure the hydrogen output 
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{H,GEN}} \geq \underline{R_{k,z}^{\textrm{H,GEN}}} \times y_{k,z}^{\textrm{H,GEN}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{g,z,t}^{\textrm{H,GEN}} \geq \underline{R_{g,z}^{\textrm{H,GEN}}} \times y_{g,z}^{\textrm{H,GEN}} \quad \forall g \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
 ```math
 \begin{equation*}
-	x_{k,z,t}^{\textrm{H,GEN}} \leq \overline{R_{k,z}^{\textrm{H,GEN}}} \times y_{k,z}^{\textrm{H,GEN}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{g,z,t}^{\textrm{H,GEN}} \leq \overline{R_{g,z}^{\textrm{H,GEN}}} \times y_{g,z}^{\textrm{H,GEN}} \quad \forall g \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 (See Constraints 3-4 in the code)

@@ -18,6 +18,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
 Function for reading input parameters related to hydrogen generators.
+Liquifiers and evaporators are also considered here, and are identified via the H2_LIQ type column. 
+Liquid versus gas storage is identified via the H2_STOR type column. 
 """
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 

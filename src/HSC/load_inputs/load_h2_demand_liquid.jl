@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
-Function for reading input parameters related to hydrogen load (demand) of each zone.
+Function for reading input parameters related to liquid hydrogen load (demand) of each zone. The columns should be labeled as "Load_liqH2_tonne_per_hr_zX" where X is the zone number.
 """
 function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     

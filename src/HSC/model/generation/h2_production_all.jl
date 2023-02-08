@@ -17,7 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
-The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure
+The h2 generation module creates decision variables, expressions, and constraints related to hydrogen generation infrastructure. 
+Hydrogen generation expressions are also applied to liquefiers and evaporators. 
 
 This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,H-GEN}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by electrolyzers in zone $z$ at time period $t$.
 
