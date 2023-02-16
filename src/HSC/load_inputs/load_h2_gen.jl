@@ -53,6 +53,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# DEV NOTE: Duplicated currently since we have only one storage option can define it as a union when we have more storage options
 	inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
 
+	#H2_ELECTROLYZER : Eligible for Capacity Reserve Margin
+	inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[h2_gen_in.H2_Electrolyzer.==1,:R_ID]
+
 	# Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
 	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
 	inputs_gen["H2_STOR_SHORT_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==0) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
@@ -69,9 +72,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
 	# Set of H2 generation resources
 	# Set of h2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["H2GenCommit"]
-	inputs_gen["H2_GEN_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1,:R_ID]
+	inputs_gen["H2_GEN_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==1 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
 	# Set of h2 resources eligible for unit committment
-	inputs_gen["H2_GEN_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2,:R_ID]
+	inputs_gen["H2_GEN_NO_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
 
     #Set of all H2 production Units - can be either commit or new commit
     inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
@@ -103,7 +106,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
 	# end
 
-	print_and_log("HSC_generation.csv Successfully Read!")
+	println("HSC_generation.csv Successfully Read!")
 
     return inputs_gen
 
