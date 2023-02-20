@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -42,11 +42,11 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 	capcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	retcapcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in inputs["H2_STOR_ASYMMETRIC"]
-		if i in inputs["NEW_CAP_H2_CHARGE"]
+	for i in inputs["H2_STOR_ALL"]
+		if i in inputs["NEW_CAP_H2_STOR_CHARGE"]
 			capcharge[i] = value(EP[:vH2CAPCHARGE][i])
 		end
-		if i in inputs["RET_CAP_H2_CHARGE"]
+		if i in inputs["RET_CAP_H2_STOR_CHARGE"]
 			retcapcharge[i] = value(EP[:vH2RETCAPCHARGE][i])
 		end
 	end

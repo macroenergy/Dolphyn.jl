@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +18,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
 This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies as well as carbon emission policy constraints.
+
+This module uses the following 'helper' functions in separate files: ```h2_g2p_commit()``` for thermal resources subject to unit commitment decisions and constraints (if any) and ```h2_g2p_no_commit()``` for thermal resources not subject to unit commitment (if any).
 """
 function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 

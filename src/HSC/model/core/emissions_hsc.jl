@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -18,10 +18,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
 This function creates expression to add the CO2 emissions for hydrogen supply chain in each zone, which is subsequently added to the total emissions.
+
+**Cost expressions**
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{H,EMI}} = \omega_t \times \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \textrm{c}_{z}^{\textrm{H,EMI}} x_{z,t}^{\textrm{H,EMI}}
+\end{equation*}
+```
 """
 function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 Emissions Module for CO2 Policy modularization")
+    print_and_log("H2 Emissions Module for CO2 Policy modularization")
 
     dfH2Gen = inputs["dfH2Gen"]
 

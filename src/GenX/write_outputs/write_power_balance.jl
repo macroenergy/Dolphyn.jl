@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -37,15 +37,15 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	dfPowerBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 11)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 14)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", "H2-G2P", "Storage_Discharge", "Storage_Charge",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
 	           "Demand_Response", "Nonserved_Energy",
-			   "Transmission_NetExport", "Transmission_Losses",
-	           "Demand"]
+			   "Transmission_NetExport", "Transmission_Losses","HSC_Consumption",
+	           "Demand", "Transmission", "Additional Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
+	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
 		 		sum(value.(EP[:vP][dfGen[(dfGen[!,:VRE].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
 				sum(value.(EP[:vP][dfGen[(dfGen[!,:MUST_RUN].==1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
 				sum(value.(EP[:vP][dfGen[(dfGen[!,:HYDRO].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
@@ -64,7 +64,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 			dfTemp1[t+rowoffset,3] = sum(value.(EP[:vP][dfGen[(dfGen[!,:STOR].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t]))
 	     	dfTemp1[t+rowoffset,4] = 0
 	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
-	     	    dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vCHARGE][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
+	     	    dfTemp1[t+rowoffset,4] = -sum(value.(EP[:vCHARGE][y,t]) for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
 	     	end
 	     	dfTemp1[t+rowoffset,5] = 0
 	     	if !isempty(intersect(dfGen[dfGen.Zone.==z,:R_ID],FLEX))
@@ -79,21 +79,31 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	     	dfTemp1[t+rowoffset,8] = value(EP[:vNSE][1,t,z])
 	     	dfTemp1[t+rowoffset,9] = 0
 	     	dfTemp1[t+rowoffset,10] = 0
-		#=
-	     	if setup["NetworkExpansion"] == 1
-	     	    dfTemp1[t+rowoffset,8] = value(EP[:ePowerBalanceNetExportFlows][t,z])
-	     	    dfTemp1[t+rowoffset,9] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
-	     	end
-		=#
+
 			if Z>=2
 				dfTemp1[t+rowoffset,9] = value(EP[:ePowerBalanceNetExportFlows][t,z])
 				dfTemp1[t+rowoffset,10] = -1/2 * value(EP[:eLosses_By_Zone][z,t])
 			end
-	     	dfTemp1[t+rowoffset,11] = -inputs["pD"][t,z]
+
+			if setup["ModelH2"] == 1
+				dfTemp1[t+rowoffset,11] = -value(EP[:eH2NetpowerConsumptionByAll][t,z])
+			else
+				dfTemp1[t+rowoffset,11] = 0
+			end
+
+	     	dfTemp1[t+rowoffset,12] = -inputs["pD"][t,z]
+
+			dfTemp1[t+rowoffset,13] = 0
+
+			if Z>=2
+				dfTemp1[t+rowoffset,13] = value(EP[:eTransmissionByZone][z,t])
+			end
+				
+			dfTemp1[t+rowoffset,14] = value(EP[:eAdditionalDemandByZone][t,z])
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
-				dfTemp1[t+rowoffset,2] = dfTemp1[t+rowoffset,2] * ModelScalingFactor
+				dfTemp1[t+rowoffset,2] = dfTemp1[t+rowoffset,2] #already scaled
 				dfTemp1[t+rowoffset,3] = dfTemp1[t+rowoffset,3] * ModelScalingFactor
 				dfTemp1[t+rowoffset,4] = dfTemp1[t+rowoffset,4] * ModelScalingFactor
 				dfTemp1[t+rowoffset,5] = dfTemp1[t+rowoffset,5] * ModelScalingFactor
@@ -103,6 +113,9 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,9] * ModelScalingFactor
 				dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,10] * ModelScalingFactor
 				dfTemp1[t+rowoffset,11] = dfTemp1[t+rowoffset,11] * ModelScalingFactor
+				dfTemp1[t+rowoffset,12] = dfTemp1[t+rowoffset,12] * ModelScalingFactor
+				dfTemp1[t+rowoffset,13] = dfTemp1[t+rowoffset,13] * ModelScalingFactor
+				dfTemp1[t+rowoffset,14] = dfTemp1[t+rowoffset,14] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

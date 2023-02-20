@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -79,6 +79,6 @@ function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString
             # when not scaled, the constraint unit is ton
         end
     end
-    println("HSC_CO2_cap.csv Successfully Read!")
+    print_and_log("HSC_CO2_cap.csv Successfully Read!")
     return inputs_co2_hsc
 end

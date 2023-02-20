@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -60,7 +60,7 @@ Finally, the next constraint enforces that the initial storage level for each in
 """
 function hydro_inter_period_linkage(EP::Model, inputs::Dict)
 
-	println("Long Duration Storage Module for Hydro Reservoir")
+	print_and_log("Long Duration Storage Module for Hydro Reservoir")
 
 	dfGen = inputs["dfGen"]
 

@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,16 +17,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_storage_asymmetric(EP::Model, inputs::Dict)
 
-This module separates the hydrogen storage type into asymmetric and symmetric charge and models the action when charging and discharging is asymmetric.
+Sets up variables and constraints specific to hydrogen storage resources with asymmetric charge and discharge capacities.
 
-**Hydrogen storage with asymmetric charge and discharge capacity**
-
-For hydrogen storage technologies with asymmetric charge and discharge capacities (all $o \in \mathcal{O}^{asym}$), charge rate, $\Pi_{o,z,t}$, is constrained by the total installed charge capacity, $\Delta^{total, charge}_{o,z}$, as follows:
+For storage technologies with asymmetric charge and discharge capacities (all $s \in \mathcal{S}^{asym}$), charge rate $x_{s,z,t}^{\textrm{H,CHA}}$, is constrained by the total installed charge capacity $y_{s,z}^{\textrm{H,STO,CHA}}$, as follows:
 
 ```math
-\begin{aligned}
-	&  \Pi_{o,z,t} \leq \Delta^{total, charge}_{o,z} & \quad \forall o \in \mathcal{O}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	0 \leq x_{s,z,t}^{\textrm{H,CHA}} \leq y_{s,z}^{\textrm{H,STO,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 """
 function h2_storage_asymmetric(EP::Model, inputs::Dict)

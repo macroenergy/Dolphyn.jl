@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -36,7 +36,7 @@ function load_h2_generators_variability(setup::Dict, path::AbstractString, sep::
 	# Maximum power output and variability of each energy resource
 	inputs_genvar["pH2_Max"] = transpose(Matrix{Float64}(gen_var[1:inputs_genvar["T"],2:(inputs_genvar["H2_RES_ALL"]+1)]))
 
-	println("HSC_generators_variability.csv Successfully Read!")
+	print_and_log("HSC_generators_variability.csv Successfully Read!")
 
 	return inputs_genvar
 end

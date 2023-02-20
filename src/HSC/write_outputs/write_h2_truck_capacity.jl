@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -101,5 +101,5 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     end
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)
-    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dfH2TruckCap)
+    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dftranspose(dfH2TruckCap, false))
 end

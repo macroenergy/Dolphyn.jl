@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -22,7 +22,7 @@ Function for reading input parameters related to planning reserve margin constra
 function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict)
 
 	# Definition of capacity reserve margin (crm) by locational deliverability area (LDA)
-	println("About to read Capacity_reserve_margin.csv")
+	print_and_log("About to read Capacity_reserve_margin.csv")
 
 	#inputs_crm["dfCapRes"] = CSV.read(string(path,sep,"Capacity_reserve_margin.csv"), header=true)
 	inputs_crm["dfCapRes"] = DataFrame(CSV.File(string(path, sep,"Capacity_reserve_margin.csv"), header=true), copycols=true)
@@ -36,14 +36,14 @@ function load_cap_reserve_margin(setup::Dict, path::AbstractString, sep::Abstrac
 	inputs_crm["dfCapRes"] = Matrix{Float64}(inputs_crm["dfCapRes"][:,first_col:last_col])
 	inputs_crm["NCapacityReserveMargin"] = res
 
-	println("Capacity_reserve_margin.csv Successfully Read!")
+	print_and_log("Capacity_reserve_margin.csv Successfully Read!")
 
 	return inputs_crm
 end
 
 function load_cap_reserve_margin_trans(setup::Dict, path::AbstractString, sep::AbstractString, inputs_crm::Dict, network_var::DataFrame)
 
-	println("About to Read Transmission's Participation in Capacity Reserve Margin")
+	print_and_log("About to Read Transmission's Participation in Capacity Reserve Margin")
 
 	res = inputs_crm["NCapacityReserveMargin"]
 
@@ -61,7 +61,7 @@ function load_cap_reserve_margin_trans(setup::Dict, path::AbstractString, sep::A
 	last_col_trans_excl = findall(s -> s == "CapRes_Excl_$res", names(network_var))[1]
 	dfTransCapRes_excl = network_var[:,first_col_trans_excl:last_col_trans_excl]
 	inputs_crm["dfTransCapRes_excl"] = Matrix{Float64}(dfTransCapRes_excl[completecases(dfTransCapRes_excl),:])
-	println("Transmission's Participation in Capacity Reserve Margin is Successfully Read!")
+	print_and_log("Transmission's Participation in Capacity Reserve Margin is Successfully Read!")
 
 	return inputs_crm
 end

@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -39,7 +39,7 @@ function load_inputs(setup::Dict,path::AbstractString)
 	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading Input CSV Files")
+	print_and_log("Reading Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
 	inputs = Dict()
 	# Read input data about power network topology, operating and expansion attributes
@@ -88,7 +88,7 @@ function load_inputs(setup::Dict,path::AbstractString)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
 
-	println("CSV Files Successfully Read In From $path$sep")
+	print_and_log("CSV Files Successfully Read In From $path$sep")
 
 	return inputs
 end
