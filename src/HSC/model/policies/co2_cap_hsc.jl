@@ -73,7 +73,6 @@ function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
 		)
 
 	## Load + Rate-based: Emissions constraint in terms of rate (tons/tonnes)
-    ## DEV NOTE: Add demand from H2 consumption by power sector after adding gas to power module
 	elseif setup["H2CO2Cap"] == 2 
 		@constraint(EP, cH2CO2Emissions_systemwide[cap=1:inputs["H2NCO2Cap"]],
 			sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) <=
