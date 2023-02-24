@@ -221,8 +221,8 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 		end
 	end #END unit commitment configuration
 
-		###Constraints###
-		@constraints(EP, begin
+	###Constraints###
+	@constraints(EP, begin
 		#Power Balance
 		[k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
 	end)

@@ -73,10 +73,10 @@ function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString
         # note the default inputs is in million tons
         if setup["ParameterScale"] == 1
             inputs_co2_hsc["dfH2CO2Price"] = Matrix{Float64}(inputs_co2_hsc["dfH2CO2Cap"][:, first_col:last_col]) * ModelScalingFactor / 1e+6
-            # when scaled, the constraint unit is million$/ktonne
+            # when scaled, the price unit is million$/ktonne
         else
             inputs_co2_hsc["dfH2CO2Price"] = Matrix{Float64}(inputs_co2_hsc["dfH2CO2Cap"][:, first_col:last_col])
-            # when not scaled, the constraint unit is ton
+            # when not scaled, the price unit is million$/ton
         end
     end
     print_and_log("HSC_CO2_cap.csv Successfully Read!")

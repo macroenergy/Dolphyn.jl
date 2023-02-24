@@ -29,7 +29,7 @@ export write_outputs
 export write_HSC_outputs
 export cluster_inputs
 export mga
-
+export h2_inherit_clusters
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
@@ -227,6 +227,9 @@ include("HSC/load_inputs/load_co2_cap_hsc.jl")
 include("HSC/load_inputs/load_h2_g2p.jl")
 include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
+# Inherit clusters from GenX
+include("h2_inherit_clusters.jl")
+
 # Auxiliary logging function
 include("print_and_log.jl")
 
@@ -308,5 +311,7 @@ include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
+include("HSC/write_outputs/choose_h2_output_dir.jl")
+
 
 end

@@ -41,11 +41,11 @@ if Log
     global_logger(logger)
 end
 
-# Activate environment
-environment_path = "../../../package_activate.jl"
-if !occursin("DOLPHYNJulEnv", Base.active_project())
-    include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
-end
+# # Activate environment
+# environment_path = "../../../package_activate.jl"
+# if !occursin("DOLPHYNJulEnv", Base.active_project())
+#     include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
+# end
 
 ### Set relevant directory paths
 src_path = "../../../src/"
@@ -62,16 +62,17 @@ using DOLPHYN
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
     if mysetup["ModelH2"] == 1
-        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
+        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(joinpath(TDRpath*"/HSC_load_data.csv"))) || (!isfile(joinpath(TDRpath*"/HSC_generators_variability.csv"))) || (!isfile(joinpath(TDRpath*"/HSC_g2p_variability.csv")))  
             print_and_log("Clustering Time Series Data...")
-            cluster_inputs(inpath, settings_path, mysetup)
+            cluster_inputs(inpath, settings_path, mysetup);
+            h2_inherit_clusters(inpath,mysetup);
         else
             print_and_log("Time Series Data Already Clustered.")
         end
     else
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
             print_and_log("Clustering Time Series Data...")
-            cluster_inputs(inpath, settings_path, mysetup)
+            cluster_inputs(inpath, settings_path, mysetup);
         else
             print_and_log("Time Series Data Already Clustered.")
         end
@@ -83,20 +84,20 @@ end
 print_and_log("Configuring Solver")
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
-# #### Running a case
+#### Running a case
 
-# ### Load power system inputs
-# print_and_log("Loading Inputs")
- myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
- myinputs = load_inputs(mysetup, inpath)
+### Load power system inputs
+print_and_log("Loading Inputs")
+myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
+myinputs = load_inputs(mysetup, inpath)
 
 # ### Load inputs for modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inpath)
 end
 
-# ### Generate model
-# print_and_log("Generating the Optimization Model")
+### Generate model
+print_and_log("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
@@ -108,10 +109,9 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 print_and_log("Writing Output")
 outpath = "$inpath/Results"
-outpath=write_outputs(EP, outpath, mysetup, myinputs)
+write_outputs(EP, outpath, mysetup, myinputs);
 
 # Write hydrogen supply chain outputs
-if mysetup["ModelH2"] == 1
-    outpath_H2 = "$outpath/Results_HSC"
-    write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
+if mysetup["ModelH2"] == 1   
+    write_HSC_outputs(EP, outpath, mysetup, myinputs)
 end
