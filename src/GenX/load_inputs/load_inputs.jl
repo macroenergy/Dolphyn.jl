@@ -44,7 +44,11 @@ function load_inputs(setup::Dict,path::AbstractString)
 	inputs = Dict()
 
 	# Store zonal information in inputs from setup
-	inputs["Zones"] = setup["Zones"]
+	if !haskey(setup, "Zones") || isempty(setup["Zones"])
+		inputs["Zones"] = enumerate_zones(setup,path)
+	else
+		inputs["Zones"] = setup["Zones"]
+	end
 	inputs["Z"] = length(inputs["Zones"])
 
 	# Read input data about power network topology, operating and expansion attributes
