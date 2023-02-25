@@ -13,5 +13,5 @@ TimeDomainReduction: 1 # Time domain reduce (i.e. cluster) inputs based on Load_
 Log: true # Flag whether log directed to file, turing this on will record basic output into log file and keep console io stream
 LogFile: output.log  # Filename for log file
 
-# Zone selection
+# Zone selection - empty list or no entry will include all zones
 Zones: ["z1", "z2"] # List of zones to be included in the model

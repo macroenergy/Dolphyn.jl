@@ -27,6 +27,8 @@ returns: Dict (dictionary) object containing updated zonal information
 """
 function enumerate_zones(setup::Dict,path::AbstractString)
 
+    print_and_log("Enumerating Zones")
+
     if isfile(joinpath(path,"Network.csv"))
         network_var = DataFrame(CSV.File(joinpath(path,"Network.csv")))
         Zones = unique(union(network_var.Start_Zone, network_var.End_Zone))
@@ -42,5 +44,6 @@ function enumerate_zones(setup::Dict,path::AbstractString)
         ##TODO: add truck zone filter
     end
 
+    print_and_log("Using Zones $(Zones)")
     return Zones
 end
