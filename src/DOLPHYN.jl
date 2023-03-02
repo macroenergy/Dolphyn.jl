@@ -347,6 +347,6 @@ include("SynFuels/write_outputs/write_synfuel_gen.jl")
 include("SynFuels/write_outputs/write_synfuel_emissions.jl")
 
 # Modeling to generate alternatives
-include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
+#include("modeling_to_generate_alternatives/modeling_to_generate_alternatives.jl")
 
 end
