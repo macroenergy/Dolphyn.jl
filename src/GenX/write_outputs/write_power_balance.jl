@@ -41,7 +41,6 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	dfPowerBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", "H2-G2P", "Bioelectricity Generation",  "Storage_Discharge", "Storage_Charge",
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 17)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", "H2-G2P", "Storage_Discharge", "Storage_Charge",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
