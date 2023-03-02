@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -50,7 +50,7 @@ function load_fuels_data(setup::Dict, path::AbstractString, sep::AbstractString,
 	inputs_fuel["fuel_costs"] = fuel_costs
 	inputs_fuel["fuel_CO2"] = fuel_CO2
 
-	println("Fuels_data.csv Successfully Read!")
+	print_and_log("Fuels_data.csv Successfully Read!")
 
 	return inputs_fuel, fuel_costs, fuel_CO2
 end

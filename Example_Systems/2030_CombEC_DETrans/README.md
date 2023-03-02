@@ -10,4 +10,8 @@ Once the settings are confirmed, run the model with the `Run.jl` script in the e
 
 `include("Run.jl")`
 
-Once the model has completed, results will write to the `Results` directory.
+Once the model has completed, results will write to the `Results` directory. You can compare these results to example results (using the default settings provided here) in `Results_Example`, by running:
+
+`include("Check_results.jl")`
+
+If the example has run successfully, all of the files except `status.csv` should be identical

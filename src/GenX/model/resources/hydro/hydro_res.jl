@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -92,7 +92,7 @@ In case the reservoir capacity is known ($y \in W^{cap}$), then an additional co
 """
 function hydro_res(EP::Model, inputs::Dict, Reserves::Int)
 
-	println("Hydro Reservoir Core Resources Module")
+	print_and_log("Hydro Reservoir Core Resources Module")
 
 	dfGen = inputs["dfGen"]
 
@@ -213,7 +213,7 @@ r_{y,z, t} \leq \upsilon^{rsv}_{y,z}\times \Delta^{total}_{y,z}
 """
 function hydro_res_reserves(EP::Model, inputs::Dict)
 
-	println("Hydro Reservoir Reserves Module")
+	print_and_log("Hydro Reservoir Reserves Module")
 
 	dfGen = inputs["dfGen"]
 

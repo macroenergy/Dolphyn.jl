@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -32,7 +32,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 	inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
     # Demand in tonnes per hour for each zone
-	#println(names(load_in))
+	#print_and_log(names(load_in))
 	start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
 	
 	# Max value of non-served energy in $/(tonne)
@@ -52,7 +52,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 		inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
 	end
     
-	println("HSC_load_data.csv Successfully Read!")
+	print_and_log("HSC_load_data.csv Successfully Read!")
 
     return inputs_load
 

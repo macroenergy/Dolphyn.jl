@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,22 +17,22 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
-This function defines a series of operating variables, expressions and constraints in truck scheduling and routing model.
+This function defines a series of operating variables,expressions and constraints in truck scheduling and routing model.
 
 **Variables**
 
 The sum of full and empty trucks should equal the total number of invested trucks.
 ```math
-\begin{aligned}
-    v_{j, t}^{\mathrm{F}}+v_{j, t}^{\mathrm{E}}=V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
-\end{aligned}    
+\begin{equation*}
+    v_{j, t}^{\textrm{F}}+v_{j, t}^{\textrm{E}}=V_{j} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+\end{equation*}    
 ```
     
 The full (empty) trucks include full (empty) trucks in transit and staying at each zones.
 ```math
 \begin{aligned}
-    v_{j, t}^{\mathrm{F}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z, \prime^{\prime}, t}^{\mathrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\mathrm{F}} \\
-    v_{j, t}^{\mathrm{E}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z,,^{\prime}, t}^{\mathrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\mathrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+    v_{j, t}^{\textrm{F}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z^{\prime}, t}^{\textrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{F}} \\
+    v_{j, t}^{\textrm{E}}=\sum_{z \rightarrow z^{\prime} \in \mathbb{B}} u_{z \rightarrow z^{\prime}, t}^{\textrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}    
 ```
     
@@ -40,45 +40,45 @@ The full (empty) trucks include full (empty) trucks in transit and staying at ea
     
 The change of the total number of full (empty) available trucks at zone z should equal the number of charged (discharged) trucks minus the number of discharged (charged) trucks at zone z plus the number of full (empty) trucks that just arrived minus the number of full (empty) trucks that just departed:
 ```math
-{\begin{aligned}
-    q_{z, j, t}^{\mathrm{F}}-q_{z, j, t-1}^{\mathrm{F}}=& q_{z, j, t}^{\mathrm{CHA}}-q_{z, j, t}^{\mathrm{DIS}} \\
-    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}}+y_{z \rightarrow z, j, t-1}^{\mathrm{F}}\right) \\
-    q_{z, j, t}^{\mathrm{E}}-q_{z, j, t-1}^{\mathrm{E}}=&-q_{z, j, t}^{\mathrm{CHA}}+q_{z, j, t}^{\mathrm{DIS}} \\
-    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z,,^{\prime} j, t-1}^{\mathrm{E}}+y_{z \rightarrow z,,^{\prime} j, t-1}^{\mathrm{E}}\right) \\
-    \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
+\begin{aligned}
+    q_{z, j, t}^{\textrm{F}}-q_{z, j, t-1}^{\textrm{F}}=& q_{z, j, t}^{\textrm{CHA}}-q_{z, j, t}^{\textrm{DIS}} \\
+    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{F}}+y_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{F}}\right) \\
+    q_{z, j, t}^{\textrm{E}}-q_{z, j, t-1}^{\textrm{E}}=&-q_{z, j, t}^{\textrm{CHA}}+q_{z, j, t}^{\textrm{DIS}} \\
+    &+\sum_{z^{\prime} \in \mathbb{Z}}\left(-x_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{E}}+y_{z \rightarrow z^{\prime} j, t-1}^{\textrm{E}}\right) \\
+    \quad \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
     
 The change of the total number of full (empty) trucks in transit from zone z to zone zz should equal the number of full (empty) trucks that just departed from zone z minus the number of full (empty) trucks that just arrived at zone zz:
 ```math
 \begin{aligned}
-    u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}}-u_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}} & =x_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}}-y_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{F}} \\
-    u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{E}}-u_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{E}} & =x_{z \rightarrow z,^{\prime} j, t-1}^{\mathrm{E}}-y_{z \rightarrow z,{ }^{\prime} j, t-1}^{\mathrm{E}} \\
-    & \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
+    u_{z \rightarrow z^{\prime}, j, t}^{\textrm{F}}-u_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{F}} & =x_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{F}}-y_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{F}} \\
+    u_{z \rightarrow z^{\prime}, j, t}^{\textrm{E}}-u_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{E}} & =x_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{E}}-y_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{E}} \\
+    & \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}    
 ```
     
 The amount of H2 delivered to zone z should equal the truck capacity times the number of discharged trucks minus the number of charged trucks, adjusted by theH2 boil-off loss during truck transportation and compression.
 ```math
 \begin{aligned}
-    h_{z, j, t}^{\mathrm{TRU}}=\left[\left(1-\sigma_{j}\right) q_{z, j, t}^{\mathrm{DIS}}-q_{z, j, t}^{\mathrm{CHA}}\right] \overline{\mathrm{E}}_{j}^{\mathrm{TRU}} \\
-    \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
+    h_{z, j, t}^{\textrm{H,TRU}}=\left[\left(1-\sigma_{j}\right) q_{z, j, t}^{\textrm{DIS}}-q_{z, j, t}^{\textrm{CHA}}\right] \overline{\textrm{E}}_{j}^{\textrm{H,TRU}} \\
+    \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}    
 ```
     
 The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
-    u_{z \rightarrow z,{ }^{\prime} j, t}^{\mathrm{F}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z,^{\prime} j, e}^{\mathrm{F}} \\
-    u_{z \rightarrow z,^{\prime} j, t}^{\mathrm{E}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z, j, e}^{\mathrm{E}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
+    u_{z \rightarrow z^{\prime}, j, t}^{\textrm{F}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z^{\prime}, j, e}^{\textrm{F}} \\
+    u_{z \rightarrow z^{\prime}, j, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_{z \rightarrow z^{\prime}+1}}^{e=t} x_{z \rightarrow z, j, e}^{\textrm{E}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
     
 ```math
 \begin{aligned}
-    u_{z \rightarrow z,^{\prime}j, t}^{\mathrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z,^{\prime} j, e}^{\mathrm{F}} \\
-    u_{z \rightarrow z, j, t}^{\mathrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z,^{\prime} j, e}^{\mathrm{E}} \\
-    \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
+    u_{z \rightarrow z^{\prime}, j, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z^{\prime} j, e}^{\textrm{F}} \\
+    u_{z \rightarrow z, j, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{z \rightarrow z^{\prime}}} y_{z \rightarrow z^{\prime} j, e}^{\textrm{E}} \\
+    \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}   
 ```
     
@@ -86,15 +86,15 @@ The minimum travelling time delay is modelled as follows.
     
 The charging capability of truck stations is limited by their compression or liquefaction capacity.
 ```math
-\begin{aligned}
-    q_{z, j, t}^{\mathrm{CHA}} \overline{\mathrm{E}}_{j}^{\mathrm{TRU}} \leq H_{z, j}^{\mathrm{TRU}} \quad \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
-\end{aligned}    
+\begin{equation*}
+    q_{z, j, t}^{\textrm{CHA}} \overline{\textrm{E}}_{j}^{\textrm{H,TRU}} \leq H_{z, j}^{\textrm{H,TRU}} \quad \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
+\end{equation*}    
 ```   
 """
 function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     # Setup variables, constraints, and expressions common to all hydrogen truck resources
-    println("H2 Truck Core Resources Module")
+    print_and_log("H2 Truck Core Resources Module")
 
     dfH2Truck = inputs["dfH2Truck"]
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"] # Set of h2 truck types
@@ -220,6 +220,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
 
     EP[:ePowerBalance] += -ePowerbalanceH2TruckCompression
+    EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckCompression
     
     # H2 Power Truck Travelling Consumption balance
     @expression(
@@ -243,6 +244,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
 
     EP[:ePowerBalance] += -ePowerbalanceH2TruckTravel
+    EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckTravel
 
     # H2 balance
     @expression(
@@ -251,6 +253,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_TYPES)
     )
     EP[:eH2Balance] += eH2TruckFlow
+
+    EP[:eHTransmissionByZone] += eH2TruckFlow
 
     # H2 Truck Traveling Consumption balance
     @expression(

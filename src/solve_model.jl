@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -79,16 +79,16 @@ function solve_model(EP::Model, setup::Dict)
 	optimize!(EP)
 
 	if has_duals(EP) # fully linear model
-		println("LP solved for primal")
+		print_and_log("LP solved for primal")
 	else
-		println("MILP solved for primal")
+		print_and_log("MILP solved for primal")
 	end
 
 	if !has_duals(EP) && setup["WriteShadowPrices"] == 1
 		# function to fix integers and linearize problem
 		fix_integers(EP)
 		# re-solve statement for LP solution
-		println("Solving LP solution for duals")
+		print_and_log("Solving LP solution for duals")
 		optimize!(EP)
 	end
 

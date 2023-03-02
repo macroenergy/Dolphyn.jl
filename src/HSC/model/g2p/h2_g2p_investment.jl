@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,23 +17,28 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
-This function defines the expressions and constraints keeping track of total available gas to power capacity.
+This function defines the expressions and constraints keeping track of total available hydrogen to power generation capacity $y_{k}^{\textrm{H,G2P}}$ as well as constraints on capacity retirements.
 
-The total capacity of g2p is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
+The total capacity of hydrogen to power generation is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity.
 
 ```math
-\begin{aligned}
-& \Delta^{total}_{h,z} =(\overline{\Delta_{h,z}}+\Omega_{h,z}-\Delta_{h,z}) \forall h \in \mathcal{H}, z \in \mathcal{Z}
-\end{aligned}
+\begin{equation*}
+	\begin{split}
+	y_{g, z}^{\textrm{H,G2P}} &= y_{g, z}^{\textrm{H,G2P},total} \\ 
+	& = y_{g, z}^{\textrm{H,G2P,existing}}+y_{g, z}^{\textrm{H,G2P,new}}-y_{g, z}^{\textrm{H,G2P,retired}}
+	\end{split}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+\end{equation*}
 ```
 
-In addition, this function adds investment and fixed O\&M related costs related to discharge/generation capacity to the objective function:
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus investment costs) from all generation resources $g \in \mathcal{G}$ (thermal, renewable, storage, DR, flexible demand resources and hydro):
+
 ```math
-\begin{aligned}
-& 	\sum_{h \in \mathcal{H} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST}_{h,z} \times \overline{\Omega}^{size}_{h,z} \times \Omega_{h,z})
-	+ (\pi^{FOM}_{h,z} \times \overline{\Omega}^{size}_{h,z} \times \Delta^{total}_{h,z})\right)
-\end{aligned}
+\begin{equation*}
+	C^{\textrm{H,G2P},c} = \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,G2P,new}}\times \textrm{c}_{g}^{\textrm{E,INV}} + \sum_{g \in \mathcal{G}} y_{g, z}^{\textrm{H,G2P,total}}\times \textrm{c}_{g}^{E,FOM}
+\end{equation*}
 ```
 """
 function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)

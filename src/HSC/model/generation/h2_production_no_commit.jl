@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,22 +17,32 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
-The h2_generation module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.) without unit commitment constraints
+This function defines the operating constraints for thermal hydrogen generation plants NOT subject to unit commitment constraints on power plant start-ups and shut-down decisions $k \in \mathcal{THE} \setminus \mathcal{UC}$.
+
+**Hydrogen balance expressions**
+
+Contributions to the hydrogen balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
+	
+```math
+\begin{equation*}
+	HydrogenBal_{GEN} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{H,GEN}} \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```	
 
 **Ramping limits**
 
-Hydrogen resources not subject to unit commitment ($y \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
+Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in hydrogen output:
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t-1} - \Theta_{y,z,t} \leq \kappa_{y,z}^{down} \Delta^{\text{total}}_{y,z} \hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t-1}^{\textrm{H,GEN}} - x_{k,z,t}^{\textrm{H,GEN}} \leq \kappa_{k,z}^{\textrm{H,DN}} y_{k,z}^{\textrm{H,GEN}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} - \Theta_{y,z,t-1} \leq \kappa_{y,z}^{up} \Delta^{\text{total}}_{y,z} \hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{H,GEN}} - x_{k,z,t-1}^{\textrm{H,GEN}} \leq \kappa_{k,z}^{\textrm{H,UP}} y_{k,z}^{\textrm{H,GEN}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 (See Constraints 1-2 in the code)
 
@@ -40,25 +50,22 @@ This set of time-coupling constraints wrap around to ensure the hydrogen output 
 
 **Minimum and maximum hydrogen output**
 
-When not modeling regulation and reserves, hydrogen units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
-
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \geq \rho^{min}_{y,z} \times \Delta^{total}_{y,z}
-	\hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{H,GEN}} \geq \underline{R_{k,z}^{\textrm{H,GEN}}} \times y_{k,z}^{\textrm{H,GEN}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{y,z,t} \leq \rho^{max}_{y,z,t} \times \Delta^{total}_{y,z}
-	\hspace{1cm} \forall y \in \mathcal{H \setminus UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{H,GEN}} \leq \overline{R_{k,z}^{\textrm{H,GEN}}} \times y_{k,z}^{\textrm{H,GEN}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
+(See Constraints 3-4 in the code)
 """
 function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
-	println("H2 Production (No Unit Commitment) Module")
+	print_and_log("H2 Production (No Unit Commitment) Module")
 	
 	#Rename H2Gen dataframe
 	dfH2Gen = inputs["dfH2Gen"]

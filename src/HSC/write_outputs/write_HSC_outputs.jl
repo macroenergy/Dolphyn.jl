@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -44,7 +44,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_capacity(path, sep, inputs, setup, EP)
     write_h2_gen(path, sep, inputs, setup, EP)
     write_h2_nse(path, sep, inputs, setup, EP)
-    # write_h2_costs(path, sep, inputs, setup, EP)
+    write_h2_costs(path, sep, inputs, setup, EP)
     write_h2_balance(path, sep, inputs, setup, EP)
     if setup["ModelH2Pipelines"] == 1
         write_h2_pipeline_flow(path, sep, inputs, setup, EP)
@@ -52,9 +52,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
         write_h2_pipeline_level(path, sep, inputs, setup, EP)
     end
 
-    if setup["H2CO2Cap"] == 1
-        write_h2_emissions(path, sep, inputs, setup, EP)
-    end
+    write_h2_emissions(path, sep, inputs, setup, EP)
 
     write_h2_charge(path, sep, inputs, setup, EP)
     write_h2_storage(path, sep, inputs, setup, EP)
@@ -64,7 +62,8 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
         write_h2_truck_flow(path, sep, inputs, setup, EP)
     end
 
-
+    write_h2_transmission_flow(path, sep, inputs, setup, EP)
+    
     if setup["ModelH2G2P"] == 1
         write_h2_g2p(path, sep, inputs, setup, EP)
         write_p_g2p(path, sep, inputs, setup, EP)
@@ -72,6 +71,6 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     end
 
     ## Print confirmation
-    println("Wrote outputs HSC outputs to $path$sep")
+    print_and_log("Wrote outputs HSC outputs to $path$sep")
 
 end # END output()

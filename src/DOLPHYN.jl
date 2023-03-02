@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,6 +17,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 module DOLPHYN
 
 #export package_activate
+export compare_results
+export print_and_log
 export configure_settings
 export configure_solver
 export load_inputs
@@ -46,7 +48,7 @@ using Documenter
 using Revise
 # Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
 using Gurobi
-#using CPLEX
+using HiGHS
 
 using Clp
 using Cbc
@@ -62,11 +64,21 @@ ModelScalingFactor = 1e+3
 # LHV is used when defining a system-wide CO2 constraint for the joint hydrogen and electricity infrastructures (SystemCO2Constraint =2)
 H2_LHV = 33.33 # MWh per tonne
 
+# Logging flag
+Log = true
+
+# Auxiliary logging function
+include("print_and_log.jl")
+
+# Results comparison tools
+include("compare_results.jl")
+
 # Configure settings
 include("configure_settings/configure_settings.jl")
 
 # Configure optimizer instance
 include("configure_solver/configure_gurobi.jl")
+include("configure_solver/configure_highs.jl")
 include("configure_solver/configure_cplex.jl")
 include("configure_solver/configure_clp.jl")
 include("configure_solver/configure_cbc.jl")
@@ -165,8 +177,6 @@ include("HSC/model/truck/h2_long_duration_truck.jl")
 include("HSC/model/storage/h2_storage_investment_energy.jl")
 include("HSC/model/storage/h2_storage_investment_charge.jl")
 include("HSC/model/storage/h2_storage.jl")
-include("HSC/model/storage/h2_storage_asymmetric.jl")
-include("HSC/model/storage/h2_storage_symmetric.jl")
 include("HSC/model/storage/h2_storage_all.jl")
 include("HSC/model/storage/h2_long_duration_storage.jl")
 
@@ -269,6 +279,7 @@ include("HSC/write_outputs/write_h2_charge.jl")
 include("HSC/write_outputs/write_h2_storage.jl")
 include("HSC/write_outputs/write_h2_truck_capacity.jl")
 include("HSC/write_outputs/write_h2_truck_flow.jl")
+include("HSC/write_outputs/write_h2_transmission_flow.jl")
 include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")

@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -19,28 +19,35 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This function creates decision variables and cost expressions associated with thermal plant unit commitment or start-up and shut-down decisions (cycling on/off)
 
-**Unit commitment decision variables:**
+**Unit commitment decision variables**
 
-This function defines the following decision variables:
+Commitment state variable $n_{k,z,t}^{\textrm{E,THE}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-$\nu_{y,t,z}$ designates the commitment state of generator cluster $y$ in zone $z$ at time $t$;
-$\chi_{y,t,z}$ represents number of startup decisions in cluster $y$ in zone $z$ at time $t$;
-$\zeta_{y,t,z}$ represents number of shutdown decisions in cluster $y$ in zone $z$ at time $t$.
+Startup decision variable $n_{k,z,t}^{\textrm{E,UP}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-**Cost expressions:**
+Shutdown decision variable $n_{k,z,t}^{\textrm{E,DN}}$ of generator cluster $k$ in zone $z$ at time $t$ $\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$.
 
-The total cost of start-ups across all generators subject to unit commitment ($y \in UC$) and all time periods, t is expressed as:
+The variable defined in this file named after ```vCOMMIT``` covers $n_{k,z,t}^{\textrm{E,THE}}$.
+
+The variable defined in this file named after ```vSTART``` covers $n_{k,z,t}^{\textrm{E,UP}}$.
+
+The variable defined in this file named after ```vSHUT``` covers $n_{k,z,t}^{\textrm{E,DN}}$.
+
+**Cost expressions**
+
+The total cost of start-ups across all generators subject to unit commitment ($k \in \mathcal{UC}, \mathcal{UC} \subseteq \mathcal{G}$) and all time periods $t$ is expressed as:
+
 ```math
-\begin{aligned}
-	C^{start} = \sum_{y \in UC, t \in T} \omega_t \times start\_cost_{y} \times \chi_{y,t}
-\end{aligned}
+\begin{equation*}
+	\textrm{C}^{\textrm{E,start}} = \sum_{k \in \mathcal{UC}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{k}^{\textrm{E,start}} \times n_{k,z,t}^{\textrm{E,UP}}
+\end{equation*}
 ```
 
-The sum of start-up costs is added to the objective function.
+If set ```UCommit``` to 1, the unit commitment variables are set to integer types. IF ```UCommit``` =2, these variables are treated as continuous.
 """
 function ucommit(EP::Model, inputs::Dict, UCommit::Int)
 
-	println("Unit Commitment Module")
+	print_and_log("Unit Commitment Module")
 
 	dfGen = inputs["dfGen"]
 
