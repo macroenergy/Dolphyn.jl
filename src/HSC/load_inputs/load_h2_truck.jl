@@ -18,6 +18,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
 
 Function for reading input parameters related to hydrogen trucks.
+A variable is created to distinguish between Gas and Liquid trucks, which is relevant for the hydrogen balance expressions. 
+Other truck types like LOHC are currently not considered, but may need to be identified as Gas for the balance. 
+
 """
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 

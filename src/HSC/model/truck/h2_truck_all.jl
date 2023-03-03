@@ -61,11 +61,27 @@ The change of the total number of full (empty) trucks in transit from zone z to 
 The amount of H2 delivered to zone z should equal the truck capacity times the number of discharged trucks minus the number of charged trucks, adjusted by theH2 boil-off loss during truck transportation and compression.
 ```math
 \begin{aligned}
-    h_{z, j, t}^{\textrm{H,TRU}}=\left[\left(1-\sigma_{j}\right) q_{z, j, t}^{\textrm{DIS}}-q_{z, j, t}^{\textrm{CHA}}\right] \overline{\textrm{E}}_{j}^{\textrm{H,TRU}} \\
+    x_{z, j, t}^{\textrm{H,TRU}}=\left[\left(1-\sigma_{j}\right) q_{z, j, t}^{\textrm{DIS}}-q_{z, j, t}^{\textrm{CHA}}\right] \overline{\textrm{E}}_{j}^{\textrm{H,TRU}} \\
     \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}    
 ```
-    
+
+Contributions to the hydrogen balance expression from gas trucking flows are defined as:
+HydrogenBalGas_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{\textrm{H,GEN}}
+
+```math
+\begin{equation*}
+	HydrogenBalGas_{TRU} = \sum_{j \in \mathcal{J}} x_{j,z,t}^{\textrm{H,TRU,Gas}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+Liquid hydrogen balance contributions are defined in a similar manner, for liquid trucks: 
+
+```math
+\begin{equation*}
+	HydrogenBalLiq_{TRU} = \sum_{j \in \mathcal{J}} x_{j,z,t}^{\textrm{H,TRU,Liq}}  \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
 The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
@@ -81,7 +97,7 @@ The minimum travelling time delay is modelled as follows.
     \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}   
 ```
-    
+
 **Constraints**
     
 The charging capability of truck stations is limited by their compression or liquefaction capacity.

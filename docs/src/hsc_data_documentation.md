@@ -125,12 +125,18 @@ This file contains cost and performance parameters for various generators and ot
 |H2_GEN_TYPE | {0, 1, 2}, Flag to indicate membership in set of resources for unit commitment (e.g. thermal resources like steam methane reforming)|
 ||H2\_GEN\_TYPE = 0: Not part of set (default) |
 ||H2\_GEN\_TYPE = 1: If the power plant relies on thermal energy input and subject to unit commitment constraints/decisions if `UCommit >= 1` (e.g. cycling decisions/costs/constraints). |
-||H2\_GEN\_TYPE = 2: If the power plant relies on thermal energy input and is subject to simplified economic dispatch constraints (ramping limits and minimum output level but no cycling decisions/costs/constraints). |
+||H2\_GEN\_TYPE = 2: If the power plant relies on thermal energy input and is subject to simplified economic dispatch constraints (ramping limits but no cycling decisions/costs/constraints). |
+|H2_LIQ | {0, 1, 2, 3, 4}, Flag to indicate membership in set of liquid resources for unit commitment (e.g. liquifiers and evaporators)|
+||H2\_LIQ = 0: Not part of set (default) |
+||H2\_LIQ = 1: For liquifiers subject to unit commitment constraints/decisions if `UCommit >= 1` (e.g. cycling decisions/costs/constraints). |
+||H2\_LIQ = 2: For liquifiers subject to simplified economic dispatch constraints. |
+||H2\_LIQ = 3: For evaporators subject to unit commitment constraints/decisions if `UCommit >= 1` (e.g. cycling decisions/costs/constraints). |
+||H2\_LIQ = 4: For evaporators subject to simplified economic dispatch constraints. |
 |Cap\_Size\_tonne\_p\_hr | Size (tonne/hr) of a single generating unit. This is used only for resources with integer unit commitment (`H2_GEN_TYPE = 1`) - not relevant for other resources.|
 |H2\_STOR | {0, 1, 2}, Flag to indicate membership in set of storage resources and designate which type of storage resource formulation to employ.|
 ||H2\_STOR = 0: Not part of set (default) |
-||H2\_STOR = 1: Charging power capacity and energy capacity are the investment decision variables; discharge is not considered (e.g. compressed gas storage).|
-||H2\_STOR = 2: Not applicable currently.|
+||H2\_STOR = 1: Charging power capacity and energy capacity are the investment decision variables; discharge is not considered - applies for compressed gas storage.|
+||H2\_STOR = 2: For liquid storage resources. |
 |H2\_FLEX | {0, 1}, Flag to indicate membership in set of flexible demand-side resources (e.g. scheduleable or time shiftable loads such as smart thermostat systems, irrigating pumping loads etc).|
 ||H2\_FLEX = 0: Not part of set (default) |
 ||H2\_FLEX = 1: Flexible demand resource.|
@@ -298,6 +304,22 @@ This file contains cost and performance parameters for various hydrogen to power
 |Power\_MW\_per\_mile | Power consumption for truck in operation per mile if it feeds on power. |
 |H2\_tonne\_per\_mile | H$_2$ consumption for truck in operation per mile if it feeds on hydrogen. |
 
+#### 2.2.5 HSC\_load\_data\_liquid.csv
+
+This optional file includes parameters to characterize model temporal resolution to approximate annual operations for hydrogen liquid demand for each time step for each zone, and cost of load shedding. It is to be used when modeling liquid hydrogen. 
+
+###### Table 8: Structure of the HSC\_load\_data\_liquid.csv file
+---
+|**Column Name** | **Description**|
+| :------------ | :-----------|
+|**Mandatory Columns**|
+|Voll |Value of lost hydrogen load in $/tonne-H2.|
+|Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
+|Cost\_of\_Demand\_Curtailment\_per\_Tonne |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
+|Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
+|Time\_Index |Index defining time step in the model.|
+|Load\_liqH2\_tonne\_per\_hr\_z* |Load profile of a zone z* in tonne/hr; if multiple zones, this parameter will be a matrix with columns equal to number of zones (each column named appropriate zone number appended to parameter) and rows equal to number of time periods of grid operations being modeled.|
+
 
 ## 3 Outputs
 
@@ -310,7 +332,7 @@ The table below summarizes the output variables reported as part of the various 
 
 Reports optimal values of investment variables (except StartCap, which is an input)
 
-###### Table 8: Structure of the HSC_generation_storage_capacity.csv file
+###### Table 9: Structure of the HSC_generation_storage_capacity.csv file
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
@@ -354,7 +376,7 @@ Reports HSC costs for each zone, including sum of fixed costs, variable costs, N
 
 Reports optimal values of investment variables (except StartCap, which is an input) for each G2P resource. 
 
-###### Table 9: Structure of the HSC_g2p_capacity.csv file
+###### Table 10: Structure of the HSC_g2p_capacity.csv file
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
@@ -395,7 +417,7 @@ Reports hydrogen transmission trucks related variables in ```h2_truck_capacity.c
 
 This file reports truck capacity and related compression capacity. The columns are separated by different truck types and ended with a total column recording total capacity over different types of trucks.
 
-###### Table 10: Structure of the h2_truck_capacity.csv file
+###### Table 11: Structure of the h2_truck_capacity.csv file
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
