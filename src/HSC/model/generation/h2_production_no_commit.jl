@@ -75,9 +75,14 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	H = inputs["H2_GEN"]		#NUmber of hydrogen generation units 
 	
 	H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
-	H2_LIQ_NO_COMMIT = inputs["H2_LIQ_NO_COMMIT"]
-	H2_EVAP_NO_COMMIT = inputs["H2_EVAP_NO_COMMIT"]
-	H2_GEN_NO_COMMIT = union(H2_GAS_NO_COMMIT, H2_LIQ_NO_COMMIT, H2_EVAP_NO_COMMIT)
+
+	if setup["ModelH2Liquid"] ==1
+		H2_LIQ_NO_COMMIT = inputs["H2_LIQ_NO_COMMIT"]
+		H2_EVAP_NO_COMMIT = inputs["H2_EVAP_NO_COMMIT"]
+		H2_GEN_NO_COMMIT = union(H2_GAS_NO_COMMIT, H2_LIQ_NO_COMMIT, H2_EVAP_NO_COMMIT)
+	else
+		H2_GEN_NO_COMMIT = H2_GAS_NO_COMMIT
+	end
 
 	#Define start subperiods and interior subperiods
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]

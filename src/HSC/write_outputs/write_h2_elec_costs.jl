@@ -37,7 +37,12 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
 	for z in 1:Z
 		tempP2G = zeros(T)
 		for y in dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
-			tempP2G = tempP2G .+ (y in union(inputs["H2_GEN"],inputs["H2_LIQ"],inputs["H2_EVAP"])  ? (value.(EP[:vP2G])[y,:]) : zeros(T))
+			if setup["ModelH2Liquid"] ==1 
+				tempP2G = tempP2G .+ (y in union(inputs["H2_GEN"],inputs["H2_LIQ"],inputs["H2_EVAP"])  ? (value.(EP[:vP2G])[y,:]) : zeros(T))
+			else
+				tempP2G = tempP2G .+ (y in inputs["H2_GEN"]  ? (value.(EP[:vP2G])[y,:]) : zeros(T))
+			end
+
 		end
 		tempP2G = DataFrame(transpose(tempP2G), :auto)
 		append!(dfP2G, tempP2G)

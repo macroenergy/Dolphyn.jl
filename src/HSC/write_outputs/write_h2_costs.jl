@@ -59,12 +59,20 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		cH2Var_Truck = 0
 	end
 
+	# Liquefaction Fix costs
+	if setup["ModelH2Liquid"] ==1
+		cH2Fix_Liq = value(EP[:eTotalH2LiqCFix])
+	else
+		cH2Fix_Liq = 0
+	end
+
+
 
 	dfH2Cost = DataFrame(Costs = ["cH2Total", "cH2Fix_Gen", "cH2Fix_Liq", "cH2Fix_G2P", "cH2Fix_Stor", "cH2Var", "cH2Var_G2P", "cH2NSE", "cH2Start", "cNetworkExp", "cH2Fix_Truck", "cH2Var_Truck"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cH2Var = (value(EP[:eTotalCH2GenVarOut]) + (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0) + (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0)) * ModelScalingFactor^2
 		cH2Fix_Gen = value(EP[:eTotalH2GenCFix]) * ModelScalingFactor^2
-		cH2Fix_Liq = value(EP[:eTotalH2LiqCFix]) * ModelScalingFactor^2
+		cH2Fix_Liq = cH2Fix_Liq* ModelScalingFactor^2
 		cH2Fix_G2P = cG2PFix * ModelScalingFactor^2
 		cG2PVar = cG2PVar * ModelScalingFactor^2
 		cH2Fix_Stor = ((!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) +value(EP[:eTotalCFixH2Charge]) : 0)) * ModelScalingFactor^2
@@ -73,7 +81,6 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	else
 		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))
 		cH2Fix_Gen = value(EP[:eTotalH2GenCFix])
-		cH2Fix_Liq = value(EP[:eTotalH2LiqCFix])
 		cH2Fix_G2P = cG2PFix
 		cH2Fix_Stor = ((!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) + value(EP[:eTotalCFixH2Charge]) : 0))
 	end
@@ -132,7 +139,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			if y in inputs["H2_GEN"]
 				tempCFix_Gen = tempCFix_Gen +
 					value.(EP[:eH2GenCFix])[y]
-			elseif y in union(inputs["H2_LIQ"], inputs["H2_EVAP"])
+			elseif  (setup["ModelH2Liquid"] ==1) && (y in union(inputs["H2_LIQ"], inputs["H2_EVAP"]))
 				tempCFix_Liq = tempCFix_Liq +
 					value.(EP[:eH2GenCFix])[y]
 			end				

@@ -80,12 +80,16 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
-    H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
-    H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
-    H2_COMMIT = union(H2_GEN_COMMIT, H2_LIQ_COMMIT, H2_EVAP_COMMIT)
+    if setup["ModelH2Liquid"] ==1
+        H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
+        H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
+        H2_COMMIT = union(H2_GEN_COMMIT, H2_LIQ_COMMIT, H2_EVAP_COMMIT)
+        H2_LIQ = inputs["H2_LIQ"]
+        H2_EVAP = inputs["H2_EVAP"]
+    else
+        H2_COMMIT = H2_GEN_COMMIT
+    end
     H2_GEN = inputs["H2_GEN"]
-    H2_LIQ = inputs["H2_LIQ"]
-    H2_EVAP = inputs["H2_EVAP"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"]
     H = inputs["H2_RES_ALL"]
 
@@ -185,11 +189,16 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
     # Calculate total costs for each zone, for each gen type
     @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in H2_GEN))
-    @expression(EP, eTotalH2LiqCFix, sum(EP[:eH2GenCFix][k] for k in union(H2_LIQ, H2_EVAP)))
+
+    # Adding conditional for when liquefaction is considered
+    if setup["ModelH2Liquid"] ==1
+        @expression(EP, eTotalH2LiqCFix, sum(EP[:eH2GenCFix][k] for k in union(H2_LIQ, H2_EVAP)))
+        EP[:eObj] += eTotalH2LiqCFix
+    end
 
     # Add term to objective function expression
     EP[:eObj] += eTotalH2GenCFix
-    EP[:eObj] += eTotalH2LiqCFix
+    
 
     return EP
 

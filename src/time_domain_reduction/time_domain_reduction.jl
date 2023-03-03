@@ -1151,14 +1151,14 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         insertcols!(HRVOutputData, 1, :Time_Index => 1:size(HRVOutputData,1))
         NewHRVColNames = [HRVColMap[string(c)] for c in names(HRVOutputData)]
         if v println("Writing resource file...") end
-        println(NewHRVColNames)
+        # println(NewHRVColNames)
         CSV.write(string(inpath,sep,H2RVar_Outfile), HRVOutputData, header=NewHRVColNames)
 
         if mysetup["ModelH2G2P"] == 1
             #Write HSC Resource Variability 
             # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
             # Dharik - string conversion needed to change from inlinestring to string type
-            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => string(myinputs["H2_G2P_NAME"][i]) for i in 1:length(myinputs["H2_G2P_NAME"]))
+            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => String(myinputs["H2_G2P_NAME"][i]) for i in 1:length(myinputs["H2_G2P_NAME"]))
             println(HG2PVColMap)
             HG2PVColMap["Time_Index"] = "Time_Index"
             HG2POutputData = HG2POutputData[!, Symbol.(myinputs["H2_G2P_RESOURCE_ZONES"])]

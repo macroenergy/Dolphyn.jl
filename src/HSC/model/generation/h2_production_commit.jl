@@ -146,11 +146,16 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H = inputs["H"]		#NUmber of hydrogen generation units 
-	
-	H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
+
 	H2_GAS_COMMIT = inputs["H2_GEN_COMMIT"] #This is needed only for H2 balance
-	H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
-	H2_GEN_COMMIT = union(H2_LIQ_COMMIT, H2_GAS_COMMIT, H2_EVAP_COMMIT) #liquefiers are treated at generators, all the same expressions & contraints apply, except for H2 balance
+
+	if setup["ModelH2Liquid"]==1
+		H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
+		H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
+		H2_GEN_COMMIT = union(H2_LIQ_COMMIT, H2_GAS_COMMIT, H2_EVAP_COMMIT) #liquefiers are treated at generators, all the same expressions & contraints apply, except for H2 balance
+	else
+		H2_GEN_COMMIT = H2_GAS_COMMIT
+	end
 	H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"] 
 	H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"] 
 	
