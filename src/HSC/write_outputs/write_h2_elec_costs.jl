@@ -28,7 +28,12 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
 	T = inputs["T"]     # Number of time steps (hours)
 
 	# Recreate ELEC PRICE Dataframe (like in GenX, write_price function)
-	dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
+	# Dividing dual variable for each hour with corresponding hourly weight to retrieve marginal cost of generation
+	if setup["ParameterScale"] == 1
+		dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]*ModelScalingFactor), :auto)
+	else
+		dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
+	end
 
 	dfP2G = DataFrame()
 	dfElecCost = DataFrame()
