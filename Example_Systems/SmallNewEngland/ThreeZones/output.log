@@ -1,4 +1,72 @@
-┌ Debug: Rejecting cache file /Users/junlaw/.julia/compiled/v1.6/DOLPHYN.ji because module YAML [ddb6d928-2868-570f-bddf-ab3f9cf99eb6] is already loaded and incompatible.
-└ @ Base loading.jl:1751
 ┌ Info: Precompiling DOLPHYN [top-level]
 └ @ Base loading.jl:1342
+┌ Info: Time Series Data Already Clustered.
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Configuring Solver
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Reading Input CSV Files
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Warning: thread = 1 warning: only found 14 / 15 columns around data row: 4. Filling remaining columns with `missing`
+└ @ CSV /Users/junlaw/.julia/packages/CSV/Zl2ww/src/file.jl:612
+┌ Info: Network.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Load_data.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Fuels_data.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Generators_data.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Generators_variability.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: CO2_cap.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: CSV Files Successfully Read In From /Users/junlaw/Documents/GitHub/DOLPHYN-dev/Example_Systems/SmallNewEngland/ThreeZones/
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Reading H2 Input CSV Files
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: HSC_load_data.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: HSC_generators_variability.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: HSC_pipelines.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: HSC_g2p_variability.csv Successfully Read!
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: HSC Input CSV Files Successfully Read In From /Users/junlaw/Documents/GitHub/DOLPHYN-dev/Example_Systems/SmallNewEngland/ThreeZones/
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Discharge Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Non-served Energy Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Investment Discharge Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Emissions Module for CO2 Policy modularization
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Transmission Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Dispatchable Resources Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Storage Resources Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Storage Investment Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Storage Core Resources Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Storage Resources with Symmetric Charge/Discharge Capacity Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Thermal (No Unit Commitment) Resources Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Hydrogen Generation and Storage Discharge Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Hydrogen Investment Discharge Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: Hydrogen Production Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: H2 Production Core Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: H2 Production (Unit Commitment) Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: H2 Production (No Unit Commitment) Module
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29
+┌ Info: H2 Emissions Module for CO2 Policy modularization
+└ @ DOLPHYN /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/print_and_log.jl:29

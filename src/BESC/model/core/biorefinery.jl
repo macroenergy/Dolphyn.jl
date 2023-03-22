@@ -36,6 +36,9 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 	
 	BIO_H2 = inputs["BIO_H2"]
 	BIO_E = inputs["BIO_E"]
+	BIO_DIESEL = inputs["BIO_DIESEL"]
+	BIO_GASOLINE = inputs["BIO_GASOLINE"]
+	BIO_ETHANOL = inputs["BIO_ETHANOL"]
 
 	#####################################################################################################################################
 	################################################ Power/H2 and Plant Operational Constraints #########################################
@@ -141,10 +144,129 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 		EP[:eH2Balance] += EP[:eScaled_BioH2_produced_tonne_per_time_per_zone]
 	end
 
+	#####################################################################################################################################
+
+	if setup["BIO_Gasoline_On"] == 1
+		#Bioelectricity demand
+		@expression(EP,eBiogasoline_produced_MMBtu_per_plant_per_time[i in BIO_GASOLINE, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioGasoline_yield_MMBtu_per_tonne][i])
+		@expression(EP,eBiogasoline_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiogasoline_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_GASOLINE, dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID])))
+	
+		EP[:eLFGasolineBalance] += EP[:eBiogasoline_produced_MMBtu_per_time_per_zone]
+	
+		####Constraining amount of syn fuel
+		if setup["SpecifySynBioGasolinePercentFlag"] == 1
+	
+			percent_sbf_gasoline = setup["percent_sbf_gasoline"]
+	
+			#Sum up conventional gasoline production
+			@expression(EP, eConvLFGasolineDemandT[t=1:T], sum(EP[:vConvLFGasolineDemand][t, z] for z in 1:Z))
+			@expression(EP, eConvLFGasolineDemandTZ, sum(eConvLFGasolineDemandT[t] for t in 1:T))
+	
+			#Sum up syngasoline production
+			@expression(EP, eSynFuelProdNoCommit_GasolineT[t=1:T], sum(EP[:eSynFuelProdNoCommit_Gasoline][t, z] for z in 1:Z))
+			@expression(EP, eSynFuelProdNoCommit_GasolineTZ, sum(eSynFuelProdNoCommit_GasolineT[t] for t in 1:T))
+	
+			#Sum up biogasoline production
+			@expression(EP, eBioFuelProd_GasolineT[t=1:T], sum(EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t, z] for z in 1:Z))
+			@expression(EP, eBioFuelProd_GasolineTZ, sum(eBioFuelProd_GasolineT[t] for t in 1:T))
+		
+			@constraint(EP, cBioFuelGasolineShare, (percent_sbf_gasoline - 1) * (eBioFuelProd_GasolineTZ + eSynFuelProdNoCommit_GasolineTZ) + percent_sbf_gasoline *  eConvLFGasolineDemandTZ == 0)
+	
+		end 
+	
+		#Emissions from biogasoline utilization
+		Syn_gasoline_co2_per_mmbtu = inputs["Syn_gasoline_co2_per_mmbtu"]
+	
+		if setup["ParameterScale"] ==1
+			#CO2 emitted as a result of conventional gasoline consumption
+			@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+			Syn_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
+		else
+			#CO2 emitted as a result of conventional gasoline consumption
+			@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+			Syn_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
+		end
+	
+	end
+
+	#####################################################################################################################################
+
+	if setup["BIO_Diesel_On"] == 1
+		#Bioelectricity demand
+		@expression(EP,eBiodiesel_produced_MMBtu_per_plant_per_time[i in BIO_DIESEL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioDiesel_yield_MMBtu_per_tonne][i])
+		@expression(EP,eBiodiesel_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiodiesel_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_DIESEL, dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID])))
+	
+		EP[:eLFDieselBalance] += EP[:eBiodiesel_produced_MMBtu_per_time_per_zone]
+	
+		####Constraining amount of syn fuel
+		if setup["SpecifySynBioDieselPercentFlag"] == 1
+	
+			percent_sbf_diesel = setup["percent_sbf_diesel"]
+	
+			#Sum up conventional diesel production
+			@expression(EP, eConvLFDieselDemandT[t=1:T], sum(EP[:vConvLFDieselDemand][t, z] for z in 1:Z))
+			@expression(EP, eConvLFDieselDemandTZ, sum(eConvLFDieselDemandT[t] for t in 1:T))
+
+			#Sum up syndiesel production
+			@expression(EP, eSynFuelProdNoCommit_DieselT[t=1:T], sum(EP[:eSynFuelProdNoCommit_Diesel][t, z] for z in 1:Z))
+			@expression(EP, eSynFuelProdNoCommit_DieselTZ, sum(eSynFuelProdNoCommit_DieselT[t] for t in 1:T))
+
+			#Sum up biodiesel production
+			@expression(EP, eBioFuelProd_DieselT[t=1:T], sum(EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t, z] for z in 1:Z))
+			@expression(EP, eBioFuelProd_DieselTZ, sum(eBioFuelProd_DieselT[t] for t in 1:T))
+		
+			@constraint(EP, cBioFuelDieselShare, (percent_sbf_diesel - 1) * (eBioFuelProd_DieselTZ + eSynFuelProdNoCommit_DieselTZ) + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
+	
+		end 
+	
+		#Emissions from biodiesel utilization
+		Syn_diesel_co2_per_mmbtu = inputs["Syn_diesel_co2_per_mmbtu"]
+	
+		if setup["ParameterScale"] ==1
+			#CO2 emitted as a result of conventional diesel consumption
+			@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+			Syn_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
+		else
+			#CO2 emitted as a result of conventional diesel consumption
+			@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+			Syn_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
+		end
+	
+	end
+	
+	#####################################################################################################################################
+	
+	if setup["BIO_Ethanol_On"] == 1
+		#Bioelectricity demand
+		@expression(EP,eBioethanol_produced_MMBtu_per_plant_per_time[i in BIO_ETHANOL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioEthanol_yield_MMBtu_per_tonne][i])
+		@expression(EP,eBioethanol_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBioethanol_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_ETHANOL, dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID])))
+	
+		EP[:eEthanolBalance] += EP[:eBioethanol_produced_MMBtu_per_time_per_zone]
+	
+		#Emissions from bioethanol utilization
+		Bio_ethanol_co2_per_mmbtu = inputs["Bio_ethanol_co2_per_mmbtu"]
+	
+		if setup["ParameterScale"] ==1
+			#CO2 emitted as a result of conventional ethanol consumption
+			@expression(EP,eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
+		else
+			#CO2 emitted as a result of conventional ethanol consumption
+			@expression(EP,eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z])
+		end
+	
+	end
+	
+	#####################################################################################################################################
+	
 	#For output only, generate the bioelectricity/biohydrogen production of all plants
 	@expression(EP,eBioelectricity_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioElectricity_yield_MWh_per_tonne][i])
 	@expression(EP,eBiohydrogen_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i])
-
+	@expression(EP,eBiodiesel_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioDiesel_yield_MMBtu_per_tonne][i])
+	@expression(EP,eBiogasoline_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioGasoline_yield_MMBtu_per_tonne][i])
+	@expression(EP,eBioethanol_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:BioEthanol_yield_MMBtu_per_tonne][i])
+	
     return EP
 
 end

@@ -9,3 +9,6 @@ BIO_Supply_Piecewise_Segments: 1
 
 BIO_H2_On: 1
 BIO_Electricity_On: 1
+BIO_Diesel_On: 1
+BIO_Gasoline_On: 1
+BIO_Ethanol_On: 1

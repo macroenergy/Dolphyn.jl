@@ -95,6 +95,8 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 			dfTemp1[t+rowoffset,11] = value.(EP[:eHTransmissionByZone][t,z])
 
+			dfTemp1[t+rowoffset,12] = 0
+
 			if setup["ModelBIO"] == 1
 				if setup["ParameterScale"]==1
 					dfTemp1[t+rowoffset,12] = sum(value.(EP[:eBiohydrogen_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t])*ModelScalingFactor) 

@@ -32,7 +32,8 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	dfCO2Capture = inputs["dfCO2Capture"]  # Input CO2 capture data
-	
+
+	D = inputs["CO2_RES_ALL"]
 	G = inputs["G"]  # Number of resources (generators, storage, DR, and DERs)
 	Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2, H2 and electricity
 	T = inputs["T"]	 # Model operating time steps
@@ -52,6 +53,27 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	
 	#ADD TO CO2 BALANCE
 	EP[:eCaptured_CO2_Balance] += EP[:ePower_CO2_captured_per_time_per_zone]
+
+	#################################################################################################################################################################
+	#CO2 captued by DAC CCS plants
+
+    #CCS CO2 captured by fuel usage per type of resource "k"
+    if setup["ParameterScale"] ==1
+        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
+            inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfCO2Capture[!, :Fuel_CCS_Rate][k]) * ModelScalingFactor) #As fuel CO2 is already scaled to kton/MMBtu we need to scale vDAC_CO2_Captured
+    else
+        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
+        inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfCO2Capture[!, :Fuel_CCS_Rate][k]))
+    end
+
+	@expression(EP, eDAC_Fuel_CO2_captured_per_plant_per_time[y=1:D,t=1:T], EP[:eCO2CaptureByDACFuelPlant][y,t])
+	@expression(EP, eDAC_Fuel_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+	@expression(EP, eDAC_Fuel_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+	
+	#ADD TO CO2 BALANCE
+	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
+
+	#################################################################################################################################################################
 
 	if setup["ModelH2"] == 1
 		@expression(EP, eHydrogen_CO2_captured_per_plant_per_time[y=1:H,t=1:T], EP[:eCO2CaptureByH2Plant][y,t])

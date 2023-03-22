@@ -37,22 +37,21 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
     #CO2 emitted by fuel usage per type of resource "k"
     if setup["ParameterScale"] ==1
-        @expression(EP,eDAC_Fuel_CO2_Production_per_type[k=1:CO2_RES_ALL,t=1:T], 
-            inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] * ModelScalingFactor) #As fuel CO2 is already scaled to kton/MMBtu
+        @expression(EP,eDAC_Fuel_CO2_Production_per_plant_per_time[k=1:CO2_RES_ALL,t=1:T], 
+            inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (1-dfCO2Capture[!, :Fuel_CCS_Rate][k]) * ModelScalingFactor) #As fuel CO2 is already scaled to kton/MMBtu we need to scale vDAC_CO2_Captured
     else
-        @expression(EP,eDAC_Fuel_CO2_Production_per_type[k=1:CO2_RES_ALL,t=1:T], 
-        inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t])
+        @expression(EP,eDAC_Fuel_CO2_Production_per_plant_per_time[k=1:CO2_RES_ALL,t=1:T], 
+        inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (1-dfCO2Capture[!, :Fuel_CCS_Rate][k]))
     end
 
-    #Total carbon captured per zone
+    #Total DAC carbon captured per zone by
     @expression(EP, eDAC_CO2_Captured_per_zone_per_time[z=1:Z, t=1:T], sum(EP[:vDAC_CO2_Captured][k,t] for k in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
 
 
     #Total emission per zone, need to minus CO2 loss in pipelines
-    @expression(EP, eDAC_Emissions_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_Production_per_type[k,t] for k in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+    @expression(EP, eDAC_Emissions_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_Production_per_plant_per_time[k,t] for k in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
 
 
-    
     #Carbon compressed = Carbon captured per zone
     if setup["ModelCO2Pipelines"] ==1 
         if setup["CO2Pipeline_Loss"] ==1 

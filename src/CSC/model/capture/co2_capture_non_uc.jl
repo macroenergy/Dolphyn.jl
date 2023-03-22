@@ -51,6 +51,7 @@ function co2_capture_non_uc(EP::Model, inputs::Dict,setup::Dict)
 	# If ParameterScale = 1, power system operation/capacity modeled in GW, no need to scale as MW/ton = GW/kton 
 	# If ParameterScale = 0, power system operation/capacity modeled in MW
 	
+	#Power consumption by DAC
 	@expression(EP, ePower_Balance_DAC_Non_UC[t=1:T, z=1:Z],
 	sum(EP[:vPower_DAC][k,t] for k in intersect(CO2_CAPTURE_NON_UC, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
 
@@ -60,10 +61,20 @@ function co2_capture_non_uc(EP::Model, inputs::Dict,setup::Dict)
 	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_DAC_Non_UC
 
+	#Power produced by DAC
+	@expression(EP, ePower_Produced_Balance_DAC_Non_UC[t=1:T, z=1:Z],
+	sum(EP[:vPower_Produced_DAC][k,t] for k in intersect(CO2_CAPTURE_NON_UC, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
+
+	#Add to power balance to add power produced by DAC
+	EP[:ePowerBalance] += ePower_Produced_Balance_DAC_Non_UC
+
 	###############################################################################################################################
 	##Constraints
-	#Power constraint
+	#Power consumption constraint
 	@constraint(EP,cPower_Consumption_DAC_Non_UC[k in CO2_CAPTURE_NON_UC, t = 1:T], EP[:vPower_DAC][k,t] == EP[:vDAC_CO2_Captured][k,t] * dfCO2Capture[!,:etaPCO2_MWh_per_tonne][k])
+
+	#Power production constraint
+	@constraint(EP,cPower_Production_DAC_Non_UC[k in CO2_CAPTURE_NON_UC, t = 1:T], EP[:vPower_Produced_DAC][k,t] == EP[:vDAC_CO2_Captured][k,t] * dfCO2Capture[!,:Power_Production_MWh_per_tonne][k])
 
 	#Include constraint of min capture operation
 	@constraint(EP,cMin_CO2_Captured_DAC_Non_UC_per_type_per_time[k in CO2_CAPTURE_NON_UC, t=1:T], EP[:vDAC_CO2_Captured][k,t] >= EP[:vCapacity_DAC_per_type][k] * dfCO2Capture[!,:CO2_Capture_Min_Output][k])

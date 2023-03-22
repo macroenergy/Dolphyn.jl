@@ -29,8 +29,8 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	dfCO2StorBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "Biorefinery Capture", "CO2 Pipeline Import",
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 7)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture", "CO2 Pipeline Import",
 	           "CO2 Storage"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -43,19 +43,21 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,2] = 0
 			end
 
-			dfTemp1[t+rowoffset,3]= value(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t])
+			dfTemp1[t+rowoffset,3] = value(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t])
+
+			dfTemp1[t+rowoffset,4] = value(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time][z,t])
 
 			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,4] = value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
+				dfTemp1[t+rowoffset,5] = value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
 			else
-				dfTemp1[t+rowoffset,4] = 0
+				dfTemp1[t+rowoffset,5] = 0
 			end
 
 			if Z>=2
-				dfTemp1[t+rowoffset,5] = value(EP[:ePipeZoneCO2Demand][t,z])
+				dfTemp1[t+rowoffset,6] = value(EP[:ePipeZoneCO2Demand][t,z])
 			end
 
-			dfTemp1[t+rowoffset,6] = - value(EP[:eCO2_Injected_per_zone][z,t])
+			dfTemp1[t+rowoffset,7] = - value(EP[:eCO2_Injected_per_zone][z,t])
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
@@ -64,6 +66,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,4] = dfTemp1[t+rowoffset,4] * ModelScalingFactor
 				dfTemp1[t+rowoffset,5] = dfTemp1[t+rowoffset,5] * ModelScalingFactor
 				dfTemp1[t+rowoffset,6] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
+				dfTemp1[t+rowoffset,7] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

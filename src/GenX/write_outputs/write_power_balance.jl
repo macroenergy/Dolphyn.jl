@@ -41,12 +41,12 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	dfPowerBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 17)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 18)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", "H2-G2P", "Storage_Discharge", "Storage_Charge",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
 	           "Demand_Response", "Nonserved_Energy",
-			   "Transmission_NetExport", "Transmission_Losses","HSC_Consumption",
-	           "Demand", "Transmission", "Additional Demand", "CSC Consumption","Bioelectricity Generation","BESC Power Demand"]
+			   "Transmission_NetExport", "Transmission_Losses","HSC Power Consumption",
+	           "Demand", "Transmission", "Additional Demand", "CSC Power Consumption","CSC Power Generation","Bio Power Generation","BESC Power Consumption"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].>=1) .&  (dfGen[!,:Zone].==z),:][!,:R_ID],t])) +
@@ -107,16 +107,18 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 
 			if setup["ModelCO2"] == 1
 				dfTemp1[t+rowoffset,15] = -value(EP[:eCSCNetpowerConsumptionByAll][t,z])
+				dfTemp1[t+rowoffset,16] = value(EP[:ePower_Produced_Balance_DAC_Non_UC][t,z])
 			else
 				dfTemp1[t+rowoffset,15] = 0
+				dfTemp1[t+rowoffset,16] = 0
 			end
 
 			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,16] = sum(value.(EP[:eBioelectricity_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t])) 
-				dfTemp1[t+rowoffset,17] = - value(EP[:eBIONetpowerConsumptionByAll][t,z])
+				dfTemp1[t+rowoffset,17] = sum(value.(EP[:eBioelectricity_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t])) 
+				dfTemp1[t+rowoffset,18] = - value(EP[:eBIONetpowerConsumptionByAll][t,z])
 			else
-				dfTemp1[t+rowoffset,16] = 0
 				dfTemp1[t+rowoffset,17] = 0
+				dfTemp1[t+rowoffset,18] = 0
 			end
 
 			if setup["ParameterScale"] == 1
@@ -137,6 +139,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,15] = dfTemp1[t+rowoffset,15] * ModelScalingFactor
 				dfTemp1[t+rowoffset,16] = dfTemp1[t+rowoffset,16] * ModelScalingFactor
 				dfTemp1[t+rowoffset,17] = dfTemp1[t+rowoffset,17] * ModelScalingFactor
+				dfTemp1[t+rowoffset,18] = dfTemp1[t+rowoffset,18] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

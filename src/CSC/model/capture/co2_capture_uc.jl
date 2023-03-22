@@ -88,6 +88,13 @@ function co2_capture_uc(EP::Model, inputs::Dict, setup::Dict)
 	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_DAC_UC
 
+	#Power produced by DAC
+	@expression(EP, ePower_Produced_Balance_DAC_Non_UC[t=1:T, z=1:Z],
+	sum(EP[:vPower_Produced_DAC][k,t] for k in intersect(CO2_CAPTURE_NON_UC, dfCO2Capture[dfCO2Capture[!,:Zone].==z,:][!,:R_ID])))
+
+	#Add to power balance to add power produced by DAC
+	EP[:ePowerBalance] += ePower_Produced_Balance_DAC_Non_UC
+
 	#Startup costs for resource "k" during hour "t"
 	@expression(EP, eStartup_Cost_DAC_per_type_per_time[k in CO2_CAPTURE_UC, t=1:T], (inputs["omega"][t] * DAC_Start_Cost[k] * EP[:vDAC_UC_Start][k,t]))
 	@expression(EP,eTotal_Startup_Cost_DAC_per_type[k in CO2_CAPTURE_UC], sum(EP[:eStartup_Cost_DAC_per_type_per_time][k,t] for t in 1:T))
@@ -102,6 +109,9 @@ function co2_capture_uc(EP::Model, inputs::Dict, setup::Dict)
 
 	#Power constraint
 	@constraint(EP,cPower_Consumption_DAC_UC[k in CO2_CAPTURE_UC, t = 1:T], EP[:vPower_DAC][k,t] == EP[:vDAC_CO2_Captured][k,t] * dfCO2Capture[!,:etaPCO2_MWh_per_tonne][k])
+
+	#Power production constraint
+	@constraint(EP,cPower_Production_DAC_Non_UC[k in CO2_CAPTURE_NON_UC, t = 1:T], EP[:vPower_Produced_DAC][k,t] == EP[:vDAC_CO2_Captured][k,t] * dfCO2Capture[!,:Power_Production_MWh_per_tonne][k])
 
 	#Commitment state constraint linking startup and shudown decisions for start and interior time points
 	@constraint(EP,cDAC_Commitment_Start[k in CO2_CAPTURE_UC, t in START_SUBPERIODS], EP[:vDAC_UC_Online][k,t] == EP[:vDAC_UC_Online][k,(t+hours_per_subperiod-1)] + EP[:vDAC_UC_Start][k,t] - EP[:vDAC_UC_Shut][k,t])

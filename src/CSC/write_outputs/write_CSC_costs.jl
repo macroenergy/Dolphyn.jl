@@ -39,7 +39,7 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		cDACFix = value(EP[:eFixed_Cost_DAC_total])
 		cCO2Comp = value(EP[:eFixed_Cost_CO2_Capture_Comp_total])
 		cCO2Stor = value(EP[:eFixed_Cost_CO2_Injection_total])
-		cNetworkExpansion = value(EP[:eCCO2Pipe]) * ModelScalingFactor^2
+		cNetworkExpansion = value(EP[:eCCO2Pipe])
 	end
 
 	# Start cost

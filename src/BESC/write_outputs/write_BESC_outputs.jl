@@ -53,6 +53,18 @@ function write_BESC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs
     if setup["BIO_H2_On"] == 1
       write_bio_zone_biohydrogen_produced(path, sep, inputs, setup, EP)
     end
+
+    if setup["BIO_Diesel_On"] == 1
+      write_bio_zone_biodiesel_produced(path, sep, inputs, setup, EP)
+    end
+    
+    if setup["BIO_Gasoline_On"] == 1
+      write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
+    end
+
+    if setup["BIO_Ethanol_On"] == 1
+      write_bio_zone_bioethanol_produced(path, sep, inputs, setup, EP)
+    end
     
   ## Print confirmation
   println("Wrote BESC outputs to $path$sep")

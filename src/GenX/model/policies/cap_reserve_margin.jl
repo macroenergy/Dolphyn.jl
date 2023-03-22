@@ -141,7 +141,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
 						- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
 						+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
-						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
 						>= sum(inputs["pD"][t,z]  * (1 + inputs["dfCapRes"][:,res][z])
 						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
 					else # No vFlow in single-zone models
@@ -152,7 +152,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
 						+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
-						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
 						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
 						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
 					end
@@ -165,7 +165,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
 						- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
-						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
 						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
 						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
 					else # No vFlow in single-zone models
@@ -175,7 +175,7 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
 						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
-						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
 						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
 						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
 					end
