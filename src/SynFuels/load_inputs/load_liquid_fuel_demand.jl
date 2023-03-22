@@ -34,6 +34,26 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
     inputs["Conventional_fuel_price_per_mmbtu"] = Liquid_Fuels_demand_in[!, "Conventional_fuel_price_per_mmbtu"][1]
     inputs["Syn_fuel_co2_per_mmbtu"] = Liquid_Fuels_demand_in[!, "Syn_fuel_co2_per_mmbtu"][1]
 
+	#read in gasoline_demand and emissions
+	println(joinpath(path,sep, "Gasoline_demand.csv"))
+	print(isfile(joinpath(path,sep, "Gasoline_demand.csv")))
+	if isfile(joinpath(path,sep, "Gasoline_demand.csv"))
+		gasoline_in = DataFrame(CSV.File(string(path,sep,"Gasoline_demand.csv"), header=true), copycols=true)
+		println("Gasoline Demand")
+		inputs["gasoline_emissions_mtonnes"] = gasoline_in[!,"gasoline_emissions_mtonnes"][1]
+		
+	else
+		inputs["gasoline_emissions_mtonnes"] = 0
+
+	end
+
+	gasoline_in = DataFrame(CSV.File(string(path,sep,"Gasoline_demand.csv"), header=true), copycols=true)
+	println("Gasoline Demand")
+	inputs["gasoline_emissions_mtonnes"] = gasoline_in[!,"gasoline_emissions_mtonnes"][1]
+	
+	println("Gasoline Demand")
+	println(inputs["gasoline_emissions_mtonnes"])
+	
 	println("Syn_Fuels_demand.csv Successfully Read!")
 
     return inputs

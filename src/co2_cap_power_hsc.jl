@@ -123,7 +123,8 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 			+ sum(inputs["omega"][t] * EP[:eLiquid_Fuels_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 			+ sum(inputs["omega"][t] * EP[:eSynFuelProdEmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) 
 			+ sum(inputs["omega"][t] * EP[:eByProdConsCO2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-			+ sum(inputs["omega"][t] * EP[:eSyn_Fuels_CO2_Emissions_Fuel_By_Res][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+			+ sum(inputs["omega"][t] * EP[:eSyn_Fuels_CO2_Emissions_Fuel_By_Res][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+			+ inputs["gasoline_emissions_mtonnes"] * (1e6))
 
 			## Mass-based: Emissions constraint in absolute emissions limit (tons)
 			if setup["CO2Cap"] == 1
