@@ -38,12 +38,12 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 	dfPowerBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 12)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 14)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", "H2-G2P", "Storage_Discharge", "Storage_Charge",
 	           "Flexible_Demand_Defer", "Flexible_Demand_Stasify",
 	           "Demand_Response", "Nonserved_Energy",
 			   "Transmission_NetExport", "Transmission_Losses","HSC_Consumption",
-	           "Demand"]
+	           "Demand", "Transmission", "Additional Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vP][dfGen[(dfGen[!,:THERM].>=1) .&  (dfGen[!,:Zone].==Zones[z]),:][!,:R_ID],t])) +
@@ -94,6 +94,14 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 
 	     	dfTemp1[t+rowoffset,12] = -inputs["pD"][t,z]
 
+			dfTemp1[t+rowoffset,13] = 0
+
+			if Z>=2
+				dfTemp1[t+rowoffset,13] = value(EP[:eTransmissionByZone][z,t])
+			end
+				
+			dfTemp1[t+rowoffset,14] = value(EP[:eAdditionalDemandByZone][t,z])
+
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
 				dfTemp1[t+rowoffset,2] = dfTemp1[t+rowoffset,2] #already scaled
@@ -107,6 +115,8 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,10] * ModelScalingFactor
 				dfTemp1[t+rowoffset,11] = dfTemp1[t+rowoffset,11] * ModelScalingFactor
 				dfTemp1[t+rowoffset,12] = dfTemp1[t+rowoffset,12] * ModelScalingFactor
+				dfTemp1[t+rowoffset,13] = dfTemp1[t+rowoffset,13] * ModelScalingFactor
+				dfTemp1[t+rowoffset,14] = dfTemp1[t+rowoffset,14] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

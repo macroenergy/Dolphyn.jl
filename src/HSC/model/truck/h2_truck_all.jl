@@ -254,6 +254,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
     EP[:eH2Balance] += eH2TruckFlow
 
+    EP[:eHTransmissionByZone] += eH2TruckFlow
+
     # H2 Truck Traveling Consumption balance
     @expression(
         EP,
