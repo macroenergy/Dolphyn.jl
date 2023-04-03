@@ -61,5 +61,7 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 
+	EP[:eHGenerationByZone] += eH2GenerationByZone
+
 	return EP
 end
