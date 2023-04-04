@@ -153,6 +153,8 @@ function thermal_commit(EP::Model, inputs::Dict, Reserves::Int)
 
 	print_and_log("Thermal (Unit Commitment) Resources Module")
 
+	Zones = inputs["Zones"]
+
 	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -169,7 +171,7 @@ function thermal_commit(EP::Model, inputs::Dict, Reserves::Int)
 
 	## Power Balance Expressions ##
 	@expression(EP, ePowerBalanceThermCommit[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t] for y in intersect(THERM_COMMIT, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vP][y,t] for y in intersect(THERM_COMMIT, dfGen[dfGen[!,:Zone].==Zones[z],:][!,:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceThermCommit
 

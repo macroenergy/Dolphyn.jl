@@ -25,6 +25,8 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
 	print_and_log("Hydrogen Production Module")
 	
+	Zones = inputs["Zones"]
+
 	if !isempty(inputs["H2_GEN"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies
 		EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)
@@ -46,7 +48,7 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
 	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
 	@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
-		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
+		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID]))
 	)
 
 	EP[:eHGenerationByZone] += eH2GenerationByZone
