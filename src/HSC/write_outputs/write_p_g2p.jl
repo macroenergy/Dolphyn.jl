@@ -45,9 +45,9 @@ function write_p_g2p(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	end
 
 	rename!(total,auxNew_Names)
-	dfPower = vcat(dfPG2POut, total)
+	dfPower_H2G2P = vcat(dfPG2POut, total)
 
- 	CSV.write(string(path,sep,"HSC_G2P_power_generation.csv"), dftranspose(dfPG2POut, false), writeheader=false)
+ 	CSV.write(string(path,sep,"HSC_G2P_power_generation.csv"), dftranspose(dfPower_H2G2P, false), writeheader=false)
 	
 	return dfPG2POut
 end

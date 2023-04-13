@@ -67,6 +67,7 @@ function co2_capture_non_uc(EP::Model, inputs::Dict,setup::Dict)
 
 	#Add to power balance to add power produced by DAC
 	EP[:ePowerBalance] += ePower_Produced_Balance_DAC_Non_UC
+	EP[:eCSCNetpowerConsumptionByAll] -= ePower_Produced_Balance_DAC_Non_UC
 
 	###############################################################################################################################
 	##Constraints

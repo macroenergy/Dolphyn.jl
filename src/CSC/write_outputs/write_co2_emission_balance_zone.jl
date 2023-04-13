@@ -29,8 +29,8 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 	dfCO2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 8)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biorefinery Capture", "CO2 Pipeline Loss"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 19)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biorefinery Capture", "CO2 Pipeline Loss","Synfuel Production Emissions","Synfuel Byproducts Emissions","Conventional Diesel Utilization","Conventional Jetfuel Utilization","Conventional Gasoline Utilization","Syn Diesel Utilization","Syn Jetfuel Utilization","Syn Gasoline Utilization","Bio Diesel Utilization","Bio Gasoline Utilization","Bio Ethanol Utilization"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			dfTemp1[t+rowoffset,1] = value(EP[:eEmissionsByZone][z,t])
@@ -63,6 +63,40 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 				dfTemp1[t+rowoffset,8] = value(EP[:eCO2Loss_Pipes_zt][z,t])
 			end
 
+			if setup["ModelSynFuels"] == 1
+				dfTemp1[t+rowoffset,9] = value(EP[:eSynFuelProdEmissionsByZone][z,t])
+				dfTemp1[t+rowoffset,10] = value(EP[:eByProdConsCO2EmissionsByZone][z,t])
+				dfTemp1[t+rowoffset,11] = value(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,12] = value(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,13] = value(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,14] = value(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,15] = value(EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,16] = value(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t])
+
+				if setup["ModelBIO"] == 1
+					dfTemp1[t+rowoffset,17] = value(EP[:eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,18] = value(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,19] = value(EP[:eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone][z,t])
+				else
+					dfTemp1[t+rowoffset,17] = 0
+					dfTemp1[t+rowoffset,18] = 0
+					dfTemp1[t+rowoffset,19] = 0
+				end
+
+			else
+				dfTemp1[t+rowoffset,9] = 0
+				dfTemp1[t+rowoffset,10] = 0
+				dfTemp1[t+rowoffset,11] = 0
+				dfTemp1[t+rowoffset,12] = 0
+				dfTemp1[t+rowoffset,13] = 0
+				dfTemp1[t+rowoffset,14] = 0
+				dfTemp1[t+rowoffset,15] = 0
+				dfTemp1[t+rowoffset,16] = 0
+				dfTemp1[t+rowoffset,17] = 0
+				dfTemp1[t+rowoffset,18] = 0
+				dfTemp1[t+rowoffset,19] = 0
+			end
+
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
 				dfTemp1[t+rowoffset,2] = dfTemp1[t+rowoffset,2] * ModelScalingFactor
@@ -72,6 +106,17 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 				dfTemp1[t+rowoffset,6] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
 				dfTemp1[t+rowoffset,7] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
 				dfTemp1[t+rowoffset,8] = dfTemp1[t+rowoffset,8] * ModelScalingFactor
+				dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,9] * ModelScalingFactor
+				dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,10] * ModelScalingFactor
+				dfTemp1[t+rowoffset,11] = dfTemp1[t+rowoffset,11] * ModelScalingFactor
+				dfTemp1[t+rowoffset,12] = dfTemp1[t+rowoffset,12] * ModelScalingFactor
+				dfTemp1[t+rowoffset,13] = dfTemp1[t+rowoffset,13] * ModelScalingFactor
+				dfTemp1[t+rowoffset,14] = dfTemp1[t+rowoffset,14] * ModelScalingFactor
+				dfTemp1[t+rowoffset,15] = dfTemp1[t+rowoffset,15] * ModelScalingFactor
+				dfTemp1[t+rowoffset,16] = dfTemp1[t+rowoffset,16] * ModelScalingFactor
+				dfTemp1[t+rowoffset,17] = dfTemp1[t+rowoffset,17] * ModelScalingFactor
+				dfTemp1[t+rowoffset,18] = dfTemp1[t+rowoffset,18] * ModelScalingFactor
+				dfTemp1[t+rowoffset,19] = dfTemp1[t+rowoffset,19] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

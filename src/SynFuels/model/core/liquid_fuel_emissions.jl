@@ -65,6 +65,21 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP,eSyn_Fuels_CO2_Emissions_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
     dfSynFuels[!,:co2_out_p_co2_in][k] * EP[:vSFCO2in][k,t])
 
+    #CO2 captured per type of resource "k" #No need to scale ratio
+    @expression(EP,eSyn_Fuels_CO2_Captured_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
+    dfSynFuels[!,:co2_captured_p_co2_in][k] * EP[:vSFCO2in][k,t])
+
+    #Total CO2 capture per zone per time
+    @expression(EP, eSynFuelCaptureByZone[z=1:Z, t=1:T], 
+        sum(eSyn_Fuels_CO2_Captured_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
+
+    @expression(EP, eSynFuelCapture_Per_Time_Per_Zone[t=1:T, z=1:Z], 
+        sum(eSyn_Fuels_CO2_Captured_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
+
+
+    #ADD TO CO2 BALANCE
+    EP[:eCaptured_CO2_Balance] += EP[:eSynFuelCapture_Per_Time_Per_Zone]
+
     #CO2 emitted by fuel usage per zone
     @expression(EP, eSynFuelProdEmissionsByZone[z=1:Z, t=1:T], 
         sum(eSyn_Fuels_CO2_Emissions_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]) +

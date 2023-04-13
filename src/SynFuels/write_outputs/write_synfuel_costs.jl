@@ -63,9 +63,9 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 
 	for z in 1:Z
 		tempCTotal = 0
-		tempCFix = 0
-		tempCVar = 0
-		tempCByProd = 0
+		tempC_SF_Fix = 0
+		tempC_SF_Var = 0
+		tempC_SF_ByProd = 0
 		tempCDieselConvFuel = 0
 		tempCJetfuelConvFuel = 0
 		tempCGasolineConvFuel = 0
@@ -75,13 +75,13 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		tempCGasolineConvFuel = sum(value.(EP[:eCLFGasolineVar_out])[z,:])
 
 		for y in dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]
-			tempCFix = tempCFix +
+			tempC_SF_Fix = tempC_SF_Fix +
 				value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y]
 
-			tempCVar = tempCVar +
+			tempC_SF_Var = tempC_SF_Var +
 				sum(value.(EP[:eCSFProdVar_out])[y,:])
 
-			tempCByProd = tempCByProd + -sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y])
+			tempC_SF_ByProd = tempC_SF_ByProd + -sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y])
 
 
 			tempCTotal = tempCTotal +
@@ -96,9 +96,9 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		tempCTotal = tempCTotal +  tempCDieselConvFuel + tempCJetfuelConvFuel + tempCGasolineConvFuel
 
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
-			tempCFix = tempCFix * (ModelScalingFactor^2)
-			tempCVar = tempCVar * (ModelScalingFactor^2)
-			tempCByProd = tempCByProd * (ModelScalingFactor^2)
+			tempC_SF_Fix = tempC_SF_Fix * (ModelScalingFactor^2)
+			tempC_SF_Var = tempC_SF_Var * (ModelScalingFactor^2)
+			tempC_SF_ByProd = tempC_SF_ByProd * (ModelScalingFactor^2)
 			tempCDieselConvFuel = tempCDieselConvFuel * (ModelScalingFactor^2)
 			tempCJetfuelConvFuel = tempCJetfuelConvFuel * (ModelScalingFactor^2)
 			tempCGasolineConvFuel = tempCGasolineConvFuel * (ModelScalingFactor^2)
@@ -112,11 +112,11 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		# Add emisions penalty related costs if the constraints are active
 		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
 		#if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
-		#	tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
+		#	tempC_SF_Var  = tempC_SF_Var + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		#	tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		#end
 
-		dfSynFuelsCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCByProd, tempCDieselConvFuel, tempCJetfuelConvFuel, tempCGasolineConvFuel]
+		dfSynFuelsCost[!,Symbol("Zone$z")] = [tempCTotal, tempC_SF_Fix, tempC_SF_Var, tempC_SF_ByProd, tempCDieselConvFuel, tempCJetfuelConvFuel, tempCGasolineConvFuel]
 	end
 	CSV.write(string(path,sep,"SynFuel_costs.csv"), dfSynFuelsCost)
 end

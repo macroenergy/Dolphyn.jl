@@ -44,6 +44,7 @@ function write_synfuel_outputs(EP::Model, path::AbstractString, setup::Dict, inp
     write_synfuel_capacity(path, sep, inputs, setup, EP)
     write_synfuel_gen(path, sep, inputs, setup, EP)
     write_liquid_fuel_demand_balance(path, sep, inputs, setup, EP)
+    write_liquid_fuel_balance_dual(path, sep, inputs, setup, EP)
     write_synfuel_balance(path, sep, inputs, setup, EP)
     write_synfuel_costs(path, sep, inputs, setup, EP)
     write_synfuel_emissions(path,sep,inputs, setup, EP)

@@ -41,6 +41,8 @@ function write_power(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 	rename!(dfPower,auxNew_Names)
 
+
+
 	total = DataFrame(["Total" 0 sum(dfPower[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
@@ -50,7 +52,84 @@ function write_power(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		end
 	end
 	rename!(total,auxNew_Names)
+
+	if setup["ModelH2"] == 1 && setup["ModelH2G2P"] == 1
+		dfH2G2P = inputs["dfH2G2P"]
+		H = inputs["H2_G2P_ALL"]     # Number of resources (generators, storage, DR, and DERs)
+		T = inputs["T"]     # Number of time steps (hours)
+	
+		# Power injected by each resource in each time step
+		# dfH2G2POut_annual = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2G2P[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
+		dfPG2POut = DataFrame(Resource = inputs["H2_G2P_NAME"], Zone = dfH2G2P[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
+	
+		for i in 1:H
+			dfPG2POut[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vPG2P])[i,:]))
+		end
+		# Load hourly values
+		dfPG2POut = hcat(dfPG2POut, DataFrame((value.(EP[:vPG2P])), :auto))
+	
+		# Add labels
+		auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
+		rename!(dfPG2POut,auxNew_Names)
+	
+		total_w_H2G2P = DataFrame(["Total" 0 sum(dfPower[!,:AnnualSum])+sum(dfPG2POut[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+	
+		for t in  1:T
+			total_w_H2G2P[:,t+3] .= sum(dfPower[!,Symbol("t$t")][1:G]) + sum(dfPG2POut[:,Symbol("t$t")][1:H])
+		end
+
+		rename!(total_w_H2G2P,auxNew_Names)
+
+		dfPower_w_H2G2P = vcat(dfPower, dfPG2POut, total_w_H2G2P)	
+		CSV.write(string(path,sep,"power_w_H2G2P.csv"), dftranspose(dfPower_w_H2G2P, false), writeheader=false)
+	end
+
+	if setup["ModelBIO"] == 1 && setup["BIO_Electricity_On"] == 1
+		dfbiorefinery = inputs["dfbiorefinery"]
+		B = inputs["BIO_RES_ALL"]
+		
+		# Power injected by each resource in each time step
+		dfOut_BioE = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
+		
+		for i in 1:B
+			dfOut_BioE[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:eBioelectricity_produced_per_plant_per_time])[i,:]))
+		end
+		
+		# Load hourly values
+		dfOut_BioE = hcat(dfOut_BioE, DataFrame((value.(EP[:eBioelectricity_produced_per_plant_per_time])), :auto))
+		
+		# Add labels
+		auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
+		rename!(dfOut_BioE,auxNew_Names)
+		
+		total_w_BioE = DataFrame(["Total" 0 sum(dfOut_BioE[!,:AnnualSum])+sum(dfPower[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+		
+		for t in  1:T
+			total_w_BioE[:,t+3] .= sum(dfPower[!,Symbol("t$t")][1:G]) + sum(dfOut_BioE[:,Symbol("t$t")][1:B])
+		end
+		
+		rename!(total_w_BioE,auxNew_Names)
+		
+		dfPower_w_BioE = vcat(dfPower, dfOut_BioE, total_w_BioE)	
+		CSV.write(string(path,sep,"power_w_BioE.csv"), dftranspose(dfPower_w_BioE, false), writeheader=false)
+	end
+
+	if setup["ModelH2"] == 1 && setup["ModelH2G2P"] == 1 && setup["ModelBIO"] == 1 && setup["BIO_Electricity_On"] == 1
+		total_w_H2G2P_BioE = DataFrame(["Total" 0 sum(dfPower[!,:AnnualSum])+sum(dfPG2POut[!,:AnnualSum])+sum(dfOut_BioE[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+		
+		for t in  1:T
+			total_w_H2G2P_BioE[:,t+3] .= sum(dfPower[!,Symbol("t$t")][1:G]) + sum(dfPG2POut[:,Symbol("t$t")][1:H]) + sum(dfOut_BioE[:,Symbol("t$t")][1:B])
+		end
+		
+		rename!(total_w_H2G2P_BioE,auxNew_Names)
+		
+		dfPower_w_H2G2P_BioE = vcat(dfPower, dfPG2POut, dfOut_BioE, total_w_H2G2P_BioE)	
+		CSV.write(string(path,sep,"power_w_H2G2P_BioE.csv"), dftranspose(dfPower_w_H2G2P_BioE, false), writeheader=false)
+	end
+
+
 	dfPower = vcat(dfPower, total)
  	CSV.write(string(path,sep,"power.csv"), dftranspose(dfPower, false), writeheader=false)
+
 	return dfPower
 end

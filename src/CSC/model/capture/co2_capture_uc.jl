@@ -94,6 +94,7 @@ function co2_capture_uc(EP::Model, inputs::Dict, setup::Dict)
 
 	#Add to power balance to add power produced by DAC
 	EP[:ePowerBalance] += ePower_Produced_Balance_DAC_Non_UC
+	EP[:eCSCNetpowerConsumptionByAll] -= ePower_Produced_Balance_DAC_Non_UC
 
 	#Startup costs for resource "k" during hour "t"
 	@expression(EP, eStartup_Cost_DAC_per_type_per_time[k in CO2_CAPTURE_UC, t=1:T], (inputs["omega"][t] * DAC_Start_Cost[k] * EP[:vDAC_UC_Start][k,t]))

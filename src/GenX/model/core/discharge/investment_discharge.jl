@@ -143,16 +143,27 @@ function investment_discharge(EP::Model, inputs::Dict)
 		end
 	)
 
+	#Calculate Transmission Cost of VRE Generators
+	@expression(EP, eCFix_VRE_Trans[y in 1:G],
+	if y in NEW_CAP # Resources eligible for new capacity
+		dfGen[!,:VRE_Trans_Cost_per_MWyr][y]*eTotalCap[y]
+	else
+		0
+	end
+)
+
 	# Sum individual resource contributions to fixed costs to get total fixed costs
 	@expression(EP, eTotalCFix, sum(EP[:eCFix][y] for y in 1:G))
 	@expression(EP, eCFix_Thermal, sum(EP[:eCFix][y] for y in inputs["THERM_ALL"]))
 	@expression(EP, eCFix_VRE, sum(EP[:eCFix][y] for y in inputs["VRE"]))
+	@expression(EP, eCFix_VRE_Trans_Total, sum(EP[:eCFix_VRE_Trans][y] for y in 1:G))
 	@expression(EP, eCFix_Must_Run, sum(EP[:eCFix][y] for y in inputs["MUST_RUN"]))
 	@expression(EP, eCFix_Hydro, sum(EP[:eCFix][y] for y in inputs["HYDRO_RES"]))
 	@expression(EP, eCFix_Stor_Inv, sum(EP[:eCFix][y] for y in inputs["STOR_ALL"]))
 
 	# Add term to objective function expression
 	EP[:eObj] += eTotalCFix
+	EP[:eObj] += eCFix_VRE_Trans_Total
 
 	### Constratints ###
 

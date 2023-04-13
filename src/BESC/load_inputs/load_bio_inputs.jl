@@ -45,7 +45,10 @@ function load_bio_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	## Declare Dict (dictionary) object used to store parameters
     inputs = load_bio_refinery(setup, path, sep, inputs)
     inputs = load_bio_supply(setup, path, sep, inputs)
-	inputs = load_bio_ethanol_demand(setup, path, sep, inputs)
+
+	if setup["BIO_Ethanol_On"] == 1
+		inputs = load_bio_ethanol_demand(setup, path, sep, inputs)
+	end
 
 	println("BESC Input CSV Files Successfully Read In From $path$sep")
 

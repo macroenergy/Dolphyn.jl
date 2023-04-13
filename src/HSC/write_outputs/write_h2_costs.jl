@@ -105,23 +105,23 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 	for z in 1:Z
 		tempCTotal = 0
-		tempCFix_Gen = 0
-		tempCFix_G2P = 0
-		tempCVar_G2P = 0
-		tempCFix_Stor = 0
-		tempCVar = 0
-		tempCStart = 0
+		tempC_H2_Fix_Gen = 0
+		tempC_H2_Fix_G2P = 0
+		tempC_H2_Var_G2P = 0
+		tempC_H2_Fix_Stor = 0
+		tempC_H2_Var = 0
+		tempC_H2_Start = 0
 
 		for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			tempCFix_Stor = tempCFix_Stor +
+			tempC_H2_Fix_Stor = tempC_H2_Fix_Stor +
 			(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
 			(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0)
 		end
 
 		for y in dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
-			tempCFix_Gen = tempCFix_Gen +
+			tempC_H2_Fix_Gen = tempC_H2_Fix_Gen +
 				value.(EP[:eH2GenCFix])[y]
-			tempCVar = tempCVar +
+			tempC_H2_Var = tempC_H2_Var +
 				(y in inputs["H2_STOR_ALL"] ? sum(value.(EP[:eCVarH2Stor_in])[y,:]) : 0) +
 				(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 				sum(value.(EP[:eCH2GenVar_out])[y,:])
@@ -134,7 +134,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 					(y in inputs["H2_FLEX"] ? sum(value.(EP[:eCH2VarFlex_in])[y,:]) : 0) +
 					sum(value.(EP[:eCH2GenVar_out])[y,:]) +
 					(y in inputs["H2_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
-				tempCStart = tempCStart +
+				tempC_H2_Start = tempC_H2_Start +
 					(y in inputs["H2_GEN_COMMIT"] ? sum(value.(EP[:eH2GenCStart])[y,:]) : 0)
 			else
 				tempCTotal = tempCTotal +
@@ -150,13 +150,13 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		if setup["ModelH2G2P"] == 1
 			for  y in dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]
 
-				tempCFix_G2P += value.(EP[:eH2G2PCFix])[y]
-				tempCVar_G2P += sum(value.(EP[:eCH2G2PVar_out])[y,:])
+				tempC_H2_Fix_G2P += value.(EP[:eH2G2PCFix])[y]
+				tempC_H2_Var_G2P += sum(value.(EP[:eCH2G2PVar_out])[y,:])
 				tempCTotal += value.(EP[:eH2G2PCFix])[y] + sum(value.(EP[:eCH2G2PVar_out])[y,:])
 
 				if !isempty(inputs["H2_G2P_COMMIT"])
 					if y in inputs["H2_G2P_COMMIT"]
-						tempCStart += value.(EP[:eH2G2PCStart])[y]
+						tempC_H2_Start += value.(EP[:eH2G2PCStart])[y]
 						tempCTotal += value.(EP[:eH2G2PCStart])[y]
 					end
 				end
@@ -165,29 +165,31 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
-			tempCFix_Gen = tempCFix_Gen * (ModelScalingFactor^2)
-			tempCFix_G2P = tempCFix_G2P * (ModelScalingFactor^2)
-			tempCVar_G2P = tempCVar_G2P * (ModelScalingFactor^2)
-			tempCFix_Stor = tempCFix_Stor * (ModelScalingFactor^2)
-			tempCVar = tempCVar * (ModelScalingFactor^2)
+			tempC_H2_Fix_Gen = tempC_H2_Fix_Gen * (ModelScalingFactor^2)
+			tempC_H2_Fix_G2P = tempC_H2_Fix_G2P * (ModelScalingFactor^2)
+			tempC_H2_Var_G2P = tempC_H2_Var_G2P * (ModelScalingFactor^2)
+			tempC_H2_Fix_Stor = tempC_H2_Fix_Stor * (ModelScalingFactor^2)
+			tempC_H2_Var = tempC_H2_Var * (ModelScalingFactor^2)
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
-			tempCStart = tempCStart * (ModelScalingFactor^2)
+			tempC_H2_Start = tempC_H2_Start * (ModelScalingFactor^2)
 		end
 
 		# Add emisions penalty related costs if the constraints are active
 		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
 		if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
-			tempCVar  = tempCVar + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
+			tempC_H2_Var  = tempC_H2_Var + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 			tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		end
 
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
-			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])* (ModelScalingFactor^2)
+			tempC_H2_NSE = sum(value.(EP[:eH2CNSE])[:,:,z])* (ModelScalingFactor^2)
 		else
-			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])
+			tempC_H2_NSE = sum(value.(EP[:eH2CNSE])[:,:,z])
 		end
 
-		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_G2P, tempCFix_Stor, "-", tempCVar, tempCNSE, tempCStart, "-"]
+		tempCTotal = tempCTotal + tempC_H2_NSE
+
+		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempC_H2_Fix_Gen, tempC_H2_Fix_G2P, tempC_H2_Fix_Stor, "-", tempC_H2_Var, tempC_H2_NSE, tempC_H2_Start, "-"]
 
 end
 	CSV.write(string(path, sep, "HSC_costs.csv"), dfH2Cost)

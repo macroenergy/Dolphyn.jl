@@ -29,8 +29,8 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	dfCO2StorBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 7)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture", "CO2 Pipeline Import",
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 8)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "CO2 Pipeline Import",
 	           "CO2 Storage"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -52,12 +52,18 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 			else
 				dfTemp1[t+rowoffset,5] = 0
 			end
-
-			if Z>=2
-				dfTemp1[t+rowoffset,6] = value(EP[:ePipeZoneCO2Demand][t,z])
+			
+			if setup["ModelSynFuels"] == 1
+				dfTemp1[t+rowoffset,6] = value(EP[:eSynFuelCaptureByZone][z,t])
+			else
+				dfTemp1[t+rowoffset,6] = 0
 			end
 
-			dfTemp1[t+rowoffset,7] = - value(EP[:eCO2_Injected_per_zone][z,t])
+			if Z>=2
+				dfTemp1[t+rowoffset,7] = value(EP[:ePipeZoneCO2Demand][t,z])
+			end
+
+			dfTemp1[t+rowoffset,8] = - value(EP[:eCO2_Injected_per_zone][z,t])
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
@@ -67,6 +73,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,5] = dfTemp1[t+rowoffset,5] * ModelScalingFactor
 				dfTemp1[t+rowoffset,6] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
 				dfTemp1[t+rowoffset,7] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
+				dfTemp1[t+rowoffset,8] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

@@ -124,6 +124,7 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP,eBioelectricity_produced_MWh_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBioelectricity_produced_MWh_per_plant_per_time][i,t] for i in intersect(BIO_E, dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID])))
 
 		EP[:ePowerBalance] += EP[:eBioelectricity_produced_MWh_per_time_per_zone]
+		EP[:eBIONetpowerConsumptionByAll] -= EP[:eBioelectricity_produced_MWh_per_time_per_zone]
 	end
 
 	#####################################################################################################################################
@@ -186,7 +187,8 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 			@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
 			Syn_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
 		end
-	
+	else
+		@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
 
 	#####################################################################################################################################
@@ -231,7 +233,8 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 			@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
 			Syn_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
 		end
-	
+	else
+		@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
 	
 	#####################################################################################################################################
@@ -255,7 +258,8 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 			@expression(EP,eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
 			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z])
 		end
-	
+	else
+		@expression(EP,eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
 	
 	#####################################################################################################################################

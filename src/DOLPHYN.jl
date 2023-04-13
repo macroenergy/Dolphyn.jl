@@ -300,6 +300,8 @@ include("GenX/write_outputs/ucommit/write_commit.jl")
 include("GenX/write_outputs/ucommit/write_shutdown.jl")
 include("GenX/write_outputs/ucommit/write_start.jl")
 
+include("GenX/write_outputs/write_costs_system.jl")
+
 include("GenX/write_outputs/write_outputs.jl")
 
 # HSC Write Outputs
@@ -308,6 +310,7 @@ include("HSC/write_outputs/write_h2_capacity.jl")
 include("HSC/write_outputs/write_h2_nse.jl")
 include("HSC/write_outputs/write_h2_costs.jl")
 include("HSC/write_outputs/write_h2_balance.jl")
+include("HSC/write_outputs/write_h2_balance_dual.jl")
 include("HSC/write_outputs/write_h2_pipeline_flow.jl")
 include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
 include("HSC/write_outputs/write_h2_pipeline_level.jl")
@@ -332,10 +335,12 @@ include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
 include("CSC/write_outputs/write_co2_emission_balance_zone.jl")
 include("CSC/write_outputs/write_co2_storage_balance.jl")
 include("CSC/write_outputs/write_co2_emission_balance_system.jl")
+include("CSC/write_outputs/write_co2_balance_dual.jl")
 
 #Write SynFuel Outputs
 include("SynFuels/write_outputs/write_synfuel_outputs.jl")
 include("SynFuels/write_outputs/write_liquid_fuel_demand_balance.jl")
+include("SynFuels/write_outputs/write_liquid_fuel_balance_dual.jl")
 include("SynFuels/write_outputs/write_synfuel_balance.jl")
 include("SynFuels/write_outputs/write_synfuel_capacity.jl")
 include("SynFuels/write_outputs/write_synfuel_costs.jl")

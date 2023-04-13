@@ -42,6 +42,46 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		end
 	end
 
+	startenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		startenergycap[i] = 0
+	end
+
+	retenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		retenergycap[i] = 0
+	end
+
+	newenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		newenergycap[i] = 0
+	end
+
+	endenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		endenergycap[i] = 0
+	end
+
+	startchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		startchargecap[i] = 0
+	end
+
+	retchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		retchargecap[i] = 0
+	end
+
+	newchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		newchargecap[i] = 0
+	end
+
+	endchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		endchargecap[i] = 0
+	end
+
 	MaxGen = zeros(size(1:inputs["H2_G2P_ALL"]))
 	for i in 1:H
 		MaxGen[i] = value.(EP[:eH2G2PTotalCap])[i] * 8760
@@ -69,6 +109,14 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		RetCap = retcapdischarge[:],
 		NewCap = capdischarge[:],
 		EndCap = value.(EP[:eH2G2PTotalCap]),
+		StartEnergyCap = startenergycap[:],
+		RetEnergyCap = retenergycap[:],
+		NewEnergyCap = newenergycap[:],
+		EndEnergyCap = endenergycap[:],
+		StartChargeCap = startchargecap[:],
+		RetChargeCap = retchargecap[:],
+		NewChargeCap = newchargecap[:],
+		EndChargeCap = endchargecap[:],
 		MaxAnnualGeneration = MaxGen[:],
 		AnnualGeneration = AnnualGen[:],
 		CapacityFactor = CapFactor[:]
@@ -79,6 +127,10 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 			Resource = "Total", Zone = "n/a",
 			StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
 			NewCap = sum(dfCap[!,:NewCap]), EndCap = sum(dfCap[!,:EndCap]),
+			StartEnergyCap = sum(dfCap[!,:StartEnergyCap]), RetEnergyCap = sum(dfCap[!,:RetEnergyCap]),
+			NewEnergyCap = sum(dfCap[!,:NewEnergyCap]),EndEnergyCap = sum(dfCap[!,:EndEnergyCap]),
+			StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
+			NewChargeCap = sum(dfCap[!,:NewChargeCap]),EndChargeCap = sum(dfCap[!,:EndChargeCap]),
 			MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]),
 			CapacityFactor = "-"
 		)
