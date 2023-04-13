@@ -117,7 +117,8 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	
 	@constraints(EP, begin
 	# Minimum stable generated per technology "k" at hour "t" > = Min stable output level
-	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= EP[:eH2GenTotalCap][k] * dfH2Gen[!,:H2Gen_min_output][k])
+	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= EP[:eH2GenTotalCap][k] * dfH2Gen[!,:H2Gen_min_output][k]
+	end)
 
 	@constraints(EP, begin
 	# Maximum power generated per technology "k" at hour "t"
