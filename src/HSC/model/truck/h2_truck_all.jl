@@ -33,7 +33,7 @@ Detailed truck model description is available in the [paper](https://ieeexplore.
 **Variables**
 
 |Variable|Description|
-|===============|
+|--------|-----------|
 |$v_{j, t}^{\textrm{F}}$|Number of full trucks of type 'j' at time 't'|
 |$v_{i, t}^{\textrm{E}}$|Number of empty trucks of type 'j' at time 't'|
 |$V_{j}$|Total number of trucks including full and empty of type 'j'|
@@ -45,8 +45,6 @@ Detailed truck model description is available in the [paper](https://ieeexplore.
 |$x_{r, j, d, t-1}^{\textrm{E}}$|Number of departed empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
 |$y_{r, j, d, t-1}^{\textrm{F}}$|Number of arrived full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
 |$y_{r, j, d, t-1}^{\textrm{E}}$|Number of arrived empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-
-**Expressions**
 
 **Constraints**
 
