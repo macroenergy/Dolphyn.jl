@@ -63,10 +63,10 @@ Truck compression energy cannot retire more energy capacity than existing energy
 
 **Expressions**
 ```math
-\begin{equation*}
-    C_{\textrm{\textrm{H,TRU}}}^{\textrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \textrm{~L}_{z \rightarrow z^{\prime}} \\
-    & \times\left(\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{F}} y_{z \rightarrow z,{ }^{\prime} j, t}^{\textrm{F}}+\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{E}} y_{z \rightarrow z,,^{\prime} j, t}^{\textrm{E}}\right)
-\end{equation*}
+\begin{align*}
+    C_{\textrm{\textrm{H,TRU}}}^{\textrm{o}}=& \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{j \in \mathbb{J}} \sum_{t \in \mathbb{T}} \omega_t \textrm{L}_{z \rightarrow z^{\prime}} \\
+    & \times\left(\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{F}} y_{z \rightarrow z^{\prime}, j, t}^{\textrm{F}}+\textrm{o}_{j}^{\textrm{\textrm{H,TRU}}, \textrm{E}} y_{z \rightarrow z^{\prime}, j, t}^{\textrm{E}}\right)
+\end{align*}
 ```
 """
 function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
@@ -75,7 +75,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2Truck = inputs["dfH2Truck"]
 
-	Z = inputs["Z"] # Model zones - assumed to be same for H2 and electricity 
+	Z = inputs["Z"] # Model zones - assumed to be same for H2 and electricity
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"] # Set of all truck types
 
     NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"] # Set of hydrogen truck types eligible for new capacity
