@@ -62,14 +62,20 @@ using DOLPHYN
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
     if mysetup["ModelH2"] == 1
-        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
+        if (!isfile(TDRpath * "/Load_data.csv")) ||
+           (!isfile(TDRpath * "/Generators_variability.csv")) ||
+           (!isfile(TDRpath * "/Fuels_data.csv")) ||
+           (!isfile(TDRpath * "/HSC_generators_variability.csv")) ||
+           (!isfile(TDRpath * "/HSC_load_data.csv"))
             print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
             print_and_log("Time Series Data Already Clustered.")
         end
     else
-        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
+        if (!isfile(TDRpath * "/Load_data.csv")) ||
+           (!isfile(TDRpath * "/Generators_variability.csv")) ||
+           (!isfile(TDRpath * "/Fuels_data.csv"))
             print_and_log("Clustering Time Series Data...")
             cluster_inputs(inpath, settings_path, mysetup)
         else
@@ -87,13 +93,8 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # ### Load power system inputs
 # print_and_log("Loading Inputs")
- myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
- myinputs = load_inputs(mysetup, inpath)
-
-# ### Load inputs for modeling the hydrogen supply chain
-if mysetup["ModelH2"] == 1
-    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
-end
+myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
+myinputs = load_inputs(mysetup, inpath)
 
 # ### Generate model
 # print_and_log("Generating the Optimization Model")
@@ -108,10 +109,4 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 print_and_log("Writing Output")
 outpath = "$inpath/Results"
-outpath=write_outputs(EP, outpath, mysetup, myinputs)
-
-# Write hydrogen supply chain outputs
-if mysetup["ModelH2"] == 1
-    outpath_H2 = "$outpath/Results_HSC"
-    write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
-end
+write_outputs(EP, outpath, mysetup, myinputs)
