@@ -86,6 +86,9 @@ include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
 
 include("base/load_inputs.jl")
+include("base/generate_model.jl")
+include("base/solve_model.jl")
+include("base/write_outputs.jl")
 
 # Load input data - GenX
 include("GenX/load_inputs/load_generators_data.jl")
@@ -190,8 +193,6 @@ include("HSC/model/policies/co2_cap_hsc.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
-include("generate_model.jl")
-include("solve_model.jl")
 
 
 # Write GenX Outputs
