@@ -8,6 +8,8 @@ OperationWrapping: 1 # Sets temporal resolution of the model; 0 = single period 
 TimeDomainReductionFolder: "TDR_Results" # Directory name where results from time domain reduction will be saved. If results already exist here, these will be used without running time domain reduction script again.
 TimeDomainReduction: 1 # Time domain reduce (i.e. cluster) inputs based on Load_data.csv, Generators_variability.csv, and Fuels_data.csv; 0 = not active (use input data as provided); 1 = active (cluster input data, or use data that has already been clustered)
 
+ModelPower: 1 #Flag to turn or off Power System modelling capabilities - 0 - no power system, 1- power system modeled
+ModelH2: 1 #Flag to turn or off Hydrogen Supply Chain modelling capabilities - 0 - no HSC, 1- HSC modeled
 
 # Log file
 Log: true # Flag whether log directed to file, turing this on will record basic output into log file and keep console io stream
