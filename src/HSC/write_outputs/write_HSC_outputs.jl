@@ -63,7 +63,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     end
 
     write_h2_transmission_flow(path, sep, inputs, setup, EP)
-    
+
     if setup["ModelH2G2P"] == 1
         write_h2_g2p(path, sep, inputs, setup, EP)
         write_p_g2p(path, sep, inputs, setup, EP)
@@ -71,6 +71,6 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     end
 
     ## Print confirmation
-    print_and_log("Wrote outputs HSC outputs to $path$sep")
+    print_and_log("Wrote HSC outputs to $path$sep")
 
 end # END output()

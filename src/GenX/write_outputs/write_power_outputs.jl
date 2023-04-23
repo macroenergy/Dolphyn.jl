@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+	write_power_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
 Function (entry-point) for reporting the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+function write_power_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
 	## Use appropriate directory separator depending on Mac or Windows config
 	if Sys.isunix()
@@ -30,36 +30,10 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
         sep = "/"
 	end
 
-    if !haskey(setup, "OverwriteResults") || setup["OverwriteResults"] == 1
-        # Overwrite existing results if dir exists
-        # This is the default behaviour when there is no flag, to avoid breaking existing code
-        if !(isdir(path))
-		    mkdir(path)
-	    end
-    else
-        # Find closest unused ouput directory name and create it
-        path = choose_output_dir(path)
-        mkdir(path)
-    end
-
-	# https://jump.dev/MathOptInterface.jl/v0.9.10/apireference/#MathOptInterface.TerminationStatusCode
-	status = termination_status(EP)
-
-	## Check if solved sucessfully - time out is included
-	if status != MOI.OPTIMAL && status != MOI.LOCALLY_SOLVED
-		if status != MOI.TIME_LIMIT # Model failed to solve, so record solver status and exit
-			write_status(path, sep, inputs, setup, EP)
-			return
-			# Model reached timelimit but failed to find a feasible solution
-	#### Aaron Schwartz - Not sure if the below condition is valid anymore. We should revisit ####
-		elseif isnan(objective_value(EP))==true
-			# Model failed to solve, so record solver status and exit
-			write_status(path, sep, inputs, setup, EP)
-			return
-		end
+	if !(isdir(path))
+		mkdir(path)
 	end
 
-	write_status(path, sep, inputs, setup, EP)
 	elapsed_time_costs = @elapsed write_costs(path, sep, inputs, setup, EP)
 	print_and_log("Time elapsed for writing costs is $elapsed_time_costs")
 	dfCap = write_capacity(path, sep, inputs, setup, EP)
@@ -149,7 +123,7 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	elapsed_time_net_rev = @elapsed write_net_revenue(path, sep, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
 	print_and_log("Time elapsed for writing net revenue is $elapsed_time_net_rev")
 	## Print confirmation
-	print_and_log("Wrote outputs to $path$sep")
+	print_and_log("Wrote power outputs to $path$sep")
 
 	return path
 

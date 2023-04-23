@@ -239,7 +239,7 @@ include("GenX/write_outputs/ucommit/write_commit.jl")
 include("GenX/write_outputs/ucommit/write_shutdown.jl")
 include("GenX/write_outputs/ucommit/write_start.jl")
 
-include("GenX/write_outputs/write_outputs.jl")
+include("GenX/write_outputs/write_power_outputs.jl")
 
 # HSC Write Outputs
 include("HSC/write_outputs/write_h2_gen.jl")
