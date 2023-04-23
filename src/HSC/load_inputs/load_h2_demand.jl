@@ -34,12 +34,12 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     # Number of demand curtailment/lost load segments
 	inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
-    # Demand in tonnes per hour for each zone	
+    # Demand in tonnes per hour for each zone
 	# Max value of non-served energy in $/(tonne)
 	inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
 	# Demand in Tonnes per hour
-	inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],["Load_H2_tonne_per_hr_$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
-	
+	inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],["Load_H2_tonne_per_hr_z$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+
 
     # Cost of non-served energy/demand curtailment (for each segment)
 	H2_SEG = inputs_load["H2_SEG"]  # Number of demand segments
@@ -51,7 +51,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 		# Maximum hourly demand curtailable as % of the max demand (for each segment)
 		inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
 	end
-    
+
 	print_and_log("HSC_load_data.csv Successfully Read!")
 
     return inputs_load

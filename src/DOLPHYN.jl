@@ -85,6 +85,8 @@ include("configure_solver/configure_clp.jl")
 include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
 
+include("base/load_inputs.jl")
+
 # Load input data - GenX
 include("GenX/load_inputs/load_generators_data.jl")
 include("GenX/load_inputs/load_generators_variability.jl")
@@ -97,7 +99,7 @@ include("GenX/load_inputs/load_period_map.jl")
 include("GenX/load_inputs/load_minimum_capacity_requirement.jl")
 include("GenX/load_inputs/load_load_data.jl")
 include("GenX/load_inputs/load_fuels_data.jl")
-include("GenX/load_inputs/load_inputs.jl")
+include("GenX/load_inputs/load_power_inputs.jl")
 
 # Load time domain reduction related scripts
 include("time_domain_reduction/time_domain_reduction.jl")
