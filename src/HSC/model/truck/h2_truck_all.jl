@@ -18,14 +18,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines a series of operating variables, expressions and constraints in truck scheduling and routing model.
-We differentiate the truck scheduling with reference to change of truck's states and number. In each zone 'z', we have
-available trucks either in full or empty states which are ready for unloading and loading. In addition, we have trucks
+We establish the truck scheduling model by modeling the change of truck's states and number. In each zone 'z', we have
+available trucks either in full or empty states which are ready for unloading or loading. In addition, we have trucks
 in transit states which are either in full or empty states. Further the transit states are divided into three categories:
-departed, arrived and in-transit. The departed trucks are trucks that have already loaded cargo in the origin zone; the
-arrived trucks are trucks that have already unloaded cargo in the destination zone; and the in-transit trucks are trucks
-that are in transit on a certain route. The truck state shift from loaded to departed is fulfilled by the truck loading
-time difference, and samely, the truck state shift from unloaded to arrived is fulfilled by the truck unloading time.
-Detailed truck model description is available in the [paper](https://ieeexplore.ieee.org/abstract/document/9371425).
+departed, arrived and in-transit. The departed trucks are trucks that have already loaded energy carrier such as hydrogen
+in the origin zone; the arrived trucks are trucks that have already unloaded energy carrier in the destination zone;
+and the in-transit trucks are trucks that are in transit on a certain defined route. The truck state will shift from loaded
+to departed after the truck loading time, and samely, the truck state will shift from unloaded to arrived after the truck
+unloading time. Detailed truck model description is available in the [G. He, D. S. Mallapragada 2021](https://ieeexplore.ieee.org/abstract/document/9371425).
 
 ![Truck scheduling model](assets/truck_scheduling.jpg)
 *Figure. Truck scheduling model*
@@ -35,16 +35,16 @@ Detailed truck model description is available in the [paper](https://ieeexplore.
 |Variable|Description|
 |--------|-----------|
 |$v_{j, t}^{\textrm{F}}$|Number of full trucks of type 'j' at time 't'|
-|$v_{i, t}^{\textrm{E}}$|Number of empty trucks of type 'j' at time 't'|
+|$v_{j, t}^{\textrm{E}}$|Number of empty trucks of type 'j' at time 't'|
 |$V_{j}$|Total number of trucks including full and empty of type 'j'|
 |$q_{z, j, t}^{\textrm{F}}$|Number of available full trucks of type 'j' at zone 'z' at time 't'|
 |$q_{z, j, t}^{\textrm{E}}$|Number of available empty trucks of type 'j' at zone 'z' at time 't'|
-|$u_{r, j, d, t}^{\textrm{F}}$|Number of full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$u_{r, j, d, t}^{\textrm{E}}$|Number of empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$x_{r, j, d, t-1}^{\textrm{F}}$|Number of departed full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$x_{r, j, d, t-1}^{\textrm{E}}$|Number of departed empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$y_{r, j, d, t-1}^{\textrm{F}}$|Number of arrived full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$y_{r, j, d, t-1}^{\textrm{E}}$|Number of arrived empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$u_{r, d, j, t}^{\textrm{F}}$|Number of full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$u_{r, d, j, t}^{\textrm{E}}$|Number of empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$x_{r, d, j, t-1}^{\textrm{F}}$|Number of departed full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$x_{r, d, j, t-1}^{\textrm{E}}$|Number of departed empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$y_{r, d, j, t-1}^{\textrm{F}}$|Number of arrived full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$y_{r, d, j, t-1}^{\textrm{E}}$|Number of arrived empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
 
 **Constraints**
 
@@ -58,8 +58,8 @@ The sum of full and empty trucks should equal to the total number of invested tr
 The full (empty) trucks include full (empty) trucks in transit and staying at each zones.
 ```math
 \begin{aligned}
-    v_{j, t}^{\textrm{F}}=\sum_{r \in \mathbb{R}, d in [-1,1]} u_{r, j, d, t}^{\textrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{F}} \\
-    v_{j, t}^{\textrm{E}}=\sum_{r \in \mathbb{R}, d in [-1,1]} u_{r, j, d, t}^{\textrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+    v_{j, t}^{\textrm{F}}=\sum_{r \in \mathbb{Route}, d \in [-1,1]} u_{r, d, j, t}^{\textrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{F}} \\
+    v_{j, t}^{\textrm{E}}=\sum_{r \in \mathbb{Route}, d \in [-1,1]} u_{r, d, j, t}^{\textrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
@@ -67,19 +67,19 @@ The change of the total number of full (empty) available trucks at zone z should
 ```math
 \begin{aligned}
     q_{z, j, t}^{\textrm{F}}-q_{z, j, t-1}^{\textrm{F}}=& q_{z, j, t}^{\textrm{CHA}}-q_{z, j, t}^{\textrm{DIS}} \\
-    &+\sum_{(r,d)\in \{(r,d)\vert (r,d)=(z,z^{\prime},1) or (r,d)=(z^{\prime},z,-1) \forall z^{\prime} in \mathbb{Z}\}}\left(-x_{r, j, d, t-1}^{\textrm{F}}+y_{r, j, d, t-1}^{\textrm{F}}\right) \\
+    &+\sum_{(r,d)\in \{(r,d)\vert (r,d)=(z,z^{\prime},1) or (r,d)=(z^{\prime},z,-1) \forall z^{\prime} in \mathbb{Z}\}}\left(-x_{r, d, j, t-1}^{\textrm{F}}+y_{r, d, j, t-1}^{\textrm{F}}\right) \\
     q_{z, j, t}^{\textrm{E}}-q_{z, j, t-1}^{\textrm{E}}=&-q_{z, j, t}^{\textrm{CHA}}+q_{z, j, t}^{\textrm{DIS}} \\
-    &+\sum_{(r,d)\in \{(r,d)\vert (r,d)=(z,z^{\prime},1) or (r,d)=(z^{\prime},z,-1) \forall z^{\prime} in \mathbb{Z}\}}\left(-x_{r, j, d, t-1}^{\textrm{E}}+y_{r, j, d, t-1}^{\textrm{E}}\right) \\
+    &+\sum_{(r,d)\in \{(r,d)\vert (r,d)=(z,z^{\prime},1) or (r,d)=(z^{\prime},z,-1) \forall z^{\prime} in \mathbb{Z}\}}\left(-x_{r, d, j, t-1}^{\textrm{E}}+y_{r, d, j, t-1}^{\textrm{E}}\right) \\
     \quad \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
-The change of the total number of full (empty) trucks in transit from zone z to zone zz (on route r with direction d) should equal the number of full (empty) trucks that just departed from zone z minus the number of full (empty) trucks that just arrived at zone zz:
+The change of the total number of full (empty) trucks in transit from zone $z$ to zone $z^{\prime}$ (on route $r$ with direction $d$) should equal the number of full (empty) trucks that just departed from zone $z$ minus the number of full (empty) trucks that just arrived at zone $z^{\prime}$:
 ```math
 \begin{aligned}
-    u_{r, j, d, t}^{\textrm{F}}-u_{r, j, d, t-1}^{\textrm{F}} &= x_{r, j, d, t-1}^{\textrm{F}} - y_{r, j, d, t-1}^{\textrm{F}} \\
-    u_{r, j, d, t}^{\textrm{E}}-u_{r, j, d, t-1}^{\textrm{E}} &= x_{r, j, d, t-1}^{\textrm{E}} - y_{z \rightarrow z^{\prime}, j, t-1}^{\textrm{E}} \\
-    & \quad \forall r in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
+    u_{r, d, j, t}^{\textrm{F}}-u_{r, d, j, t-1}^{\textrm{F}} &= x_{r, d, j, t-1}^{\textrm{F}} - y_{r, d, j, t-1}^{\textrm{F}} \\
+    u_{r, d, j, t}^{\textrm{E}}-u_{r, d, j, t-1}^{\textrm{E}} &= x_{r, d, j, t-1}^{\textrm{E}} - y_{r, d, j, t-1}^{\textrm{E}} \\
+    & \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
 \end{aligned}
 ```
 
@@ -94,15 +94,15 @@ The amount of H2 delivered to zone z should equal the truck capacity times the n
 The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
-    u_{r, j, d, t}^{\textrm{F}} \geq \sum_{e=t-\Delta_{r+1}}^{e=t} x_{r, j, d, e}^{\textrm{F}} \\
-    u_{r, j, d, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_{r+1}}^{e=t} x_{r, j, d, e}^{\textrm{E}} \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
+    u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t-\Delta_{r+1}}^{e=t} x_{r, d, j, e}^{\textrm{F}} \\
+    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_{r+1}}^{e=t} x_{r, d, j, e}^{\textrm{E}} \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-    u_{r, j, d, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, j, d, e}^{\textrm{F}} \\
-    u_{r, j, d, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, j, d, e}^{\textrm{E}} \\
+    u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{t}} y_{r, d, j, e}^{\textrm{F}} \\
+    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{t}} y_{r, d, j, e}^{\textrm{E}} \\
     \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
 \end{aligned}
 ```
