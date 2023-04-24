@@ -79,7 +79,7 @@ The change of the total number of full (empty) trucks in transit from zone $z$ t
 \begin{aligned}
     u_{r, d, j, t}^{\textrm{F}}-u_{r, d, j, t-1}^{\textrm{F}} &= x_{r, d, j, t-1}^{\textrm{F}} - y_{r, d, j, t-1}^{\textrm{F}} \\
     u_{r, d, j, t}^{\textrm{E}}-u_{r, d, j, t-1}^{\textrm{E}} &= x_{r, d, j, t-1}^{\textrm{E}} - y_{r, d, j, t-1}^{\textrm{E}} \\
-    & \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
+    & \quad \forall r \in \mathbb{Route}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
@@ -103,7 +103,7 @@ The minimum travelling time delay is modelled as follows.
 \begin{aligned}
     u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, d, j, e}^{\textrm{F}} \\
     u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, d, j, e}^{\textrm{E}} \\
-    \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
+    \quad \forall r \in \mathbb{Route}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
