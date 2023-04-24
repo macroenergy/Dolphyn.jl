@@ -94,15 +94,15 @@ The amount of H2 delivered to zone z should equal the truck capacity times the n
 The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
-    u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t-\Delta_{r+1}}^{e=t} x_{r, d, j, e}^{\textrm{F}} \\
-    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_{r+1}}^{e=t} x_{r, d, j, e}^{\textrm{E}} \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
+    u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t-\Delta_r+1}^{e=t} x_{r, d, j, e}^{\textrm{F}} \\
+    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_r+1}^{e=t} x_{r, d, j, e}^{\textrm{E}} \quad \forall r \in \mathbb{Route}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
 ```math
 \begin{aligned}
-    u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{t}} y_{r, d, j, e}^{\textrm{F}} \\
-    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{t}} y_{r, d, j, e}^{\textrm{E}} \\
+    u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, d, j, e}^{\textrm{F}} \\
+    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, d, j, e}^{\textrm{E}} \\
     \quad \forall r \in \mathbb{R}, j \in \mathbb{J}, d \in [-1,1], t \in \mathbb{T}
 \end{aligned}
 ```
