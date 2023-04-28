@@ -50,18 +50,12 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
-	if setup["ModelH2Liquid"]==1
-		@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
-		sum(EP[:vH2Gen][y,t] for y in intersect(union(inputs["H2_GEN"], inputs["H2_LIQ"]), dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
-		)
-	else
-		@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
-		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
-		)
-	end
+	@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
+	sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
+	)
 
 
-	EP[:eHGenerationByZone] += eH2GenerationByZone
+	EP[:eH2GenerationByZone] += eH2GenerationByZone
 
 	return EP
 end
