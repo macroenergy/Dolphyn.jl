@@ -82,7 +82,6 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		cH2Var = (value(EP[:eTotalCH2GenVarOut])+ (!isempty(inputs["H2_FLEX"]) ? value(EP[:eTotalCH2VarFlexIn]) : 0)+ (!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCVarH2StorIn]) : 0))
 		cH2Fix_Gen = value(EP[:eTotalH2GenCFix])
 		cH2Fix_G2P = cG2PFix
-		cH2Var_G2P = cG2PVar
 		cH2Fix_Stor = ((!isempty(inputs["H2_STOR_ALL"]) ? value(EP[:eTotalCFixH2Energy]) + value(EP[:eTotalCFixH2Charge]) : 0))
 	end
 
@@ -110,10 +109,14 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	else
 		cH2NetworkExpCost=0
 	end
+
 	 
   cH2Total = cH2Fix_Gen + cH2Fix_Liq + cH2Fix_G2P + cH2Fix_Stor + cH2Start + cH2Var + cG2PVar + value(EP[:eTotalH2CNSE]) + cH2Start + cH2NetworkExpCost + cH2Fix_Truck + cH2Var_Truck
 
   dfH2Cost[!,Symbol("Total")] = [cH2Total, cH2Fix_Gen, cH2Fix_Liq, cH2Fix_G2P, cH2Fix_Stor, cH2Var, cG2PVar, value(EP[:eTotalH2CNSE]), cH2Start, cH2NetworkExpCost, cH2Fix_Truck, cH2Var_Truck]
+
+
+
 
 	# Calculate Costs for each Zone
 	for z in 1:Z
@@ -121,7 +124,6 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		tempCFix_Gen = 0
 		tempCFix_Liq = 0
 		tempCFix_G2P = 0
-		tempCVar_G2P = 0
 		tempCFix_Stor = 0
 		tempCVar = 0
 		tempCVar_G2P = 0
@@ -190,7 +192,6 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCFix_Gen = tempCFix_Gen * (ModelScalingFactor^2)
 			tempCFix_Liq = tempCFix_Liq * (ModelScalingFactor^2)
 			tempCFix_G2P = tempCFix_G2P * (ModelScalingFactor^2)
-			tempCVar_G2P = tempCVar_G2P * (ModelScalingFactor^2)
 			tempCFix_Stor = tempCFix_Stor * (ModelScalingFactor^2)
 			tempCVar = tempCVar * (ModelScalingFactor^2)
 			tempCVar_G2P = tempCVar_G2P * (ModelScalingFactor^2)
@@ -211,7 +212,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCNSE = sum(value.(EP[:eH2CNSE])[:,:,z])
 		end
 
-dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_Liq, tempCFix_G2P, tempCFix_Stor, tempCVar, tempCVar_G2P, tempCNSE, tempCStart,"-","-","-"]
+		dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_Liq, tempCFix_G2P, tempCFix_Stor, tempCVar, tempCVar_G2P, tempCNSE, tempCStart,"-","-","-"]
 	end
 	CSV.write(string(path, sep, "HSC_costs.csv"), dfH2Cost)
 end

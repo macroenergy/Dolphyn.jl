@@ -184,6 +184,7 @@ include("HSC/model/g2p/h2_g2p.jl")
 
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
+include("HSC/model/policies/time_matching_requirement.jl")
 
 
 # Load model generation and solving scripts
@@ -258,5 +259,6 @@ include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
 include("HSC/write_outputs/write_h2_elec_costs.jl")
+include("HSC/write_outputs/write_h2_tmr_prices.jl")
 
 end
