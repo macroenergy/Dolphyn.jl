@@ -245,10 +245,6 @@ function transmission(EP::Model, inputs::Dict, UCommit::Int, NetworkExpansion::I
 	# Losses from power flows into or out of zone "z" in MW
     @expression(EP, eLosses_By_Zone[z=1:Z,t=1:T], sum(abs(inputs["pNet_Map"][l,z]) * vTLOSS[l,t] for l in LOSS_LINES))
 
-	# Record power flow and losses by zone into transmission expression
-	EP[:eTransmissionByZone] += EP[:eNet_Export_Flows]
-	EP[:eTransmissionByZone] += EP[:eLosses_By_Zone]
-
 	## Objective Function Expressions ##
 
 	if NetworkExpansion == 1

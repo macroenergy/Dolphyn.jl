@@ -22,7 +22,7 @@ Function for reading input parameters related to maximum capacity requirement co
 function load_maximum_capacity_requirement(path::AbstractString,sep::AbstractString, inputs::Dict, setup::Dict)
 	#MinCapReq = CSV.read(string(path,sep,"Minimum_capacity_requirement.csv"), header=true)
 	MaxCapReq = DataFrame(CSV.File(string(path, sep,"Maximum_capacity_requirement.csv"), header=true), copycols=true)
-	NumberOfMaxCapReqs = size(collect(skipmissing(MinCapReq[!,:MaxCapReqConstraint])),1)
+	NumberOfMaxCapReqs = size(collect(skipmissing(MaxCapReq[!,:MaxCapReqConstraint])),1)
 	
 	inputs["NumberOfMaxCapReqs"] = NumberOfMaxCapReqs
 	inputs["MaxCapReq"] = MaxCapReq[!,:Max_MW]
