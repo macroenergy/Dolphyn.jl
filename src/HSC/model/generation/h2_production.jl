@@ -54,7 +54,6 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 	sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
 	)
 
-
 	EP[:eH2GenerationByZone] += eH2GenerationByZone
 
 	return EP
