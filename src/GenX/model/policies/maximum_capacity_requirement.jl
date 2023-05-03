@@ -22,6 +22,7 @@ The default unit of the constraint is in MW. For each requirement $p \in \mathca
 
 ```math
 \begin{equation*}
+	%\sum_{g \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \left(\epsilon_{g,z,p}^{MinCapReq} \times y_{g,z}^{\textrm{E,GEN}} \right) \geq REQ_{p}^{MinCapReq} \forall p \in \mathcal{P}^{MinCapReq}
 	\sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \left(\epsilon_{y,z,p}^{MaxCapReq} \times x_{y,z}^{\textrm{E,GEN}} \right) \leq REQ_{p}^{MaxCapReq} \forall p \in \mathcal{P}^{MaxCapReq}
 \end{equation*}
 ```
@@ -36,10 +37,10 @@ function maximum_capacity_requirement(EP::Model, inputs::Dict)
 
 	dfGen = inputs["dfGen"]
 	NumberOfMaxCapReqs = inputs["NumberOfMaxCapReqs"]
-	@constraint(EP, cZoneMinCapReq[maxcap = 1:NumberOfMaxCapReqs],
+	@constraint(EP, cZoneMinCapReq[mincap = 1:NumberOfMaxCapReqs],
 	sum(EP[:eTotalCap][y]
-	for y in dfGen[(dfGen[!,Symbol("MaxCapTag_$maxcap")].== 1) ,:][!,:R_ID])
-	<= inputs["MaxCapReq"][maxcap])
+	for y in dfGen[(dfGen[!,Symbol("MaxCapTag_$mincap")].== 1) ,:][!,:R_ID])
+	<= inputs["MaxCapReq"][mincap])
 
 	return EP
 end

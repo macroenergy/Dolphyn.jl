@@ -21,11 +21,11 @@ Function for reporting hydrogen balance.
 """
 function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
-
+	
 	if setup["ModelH2G2P"] == 1
 		dfH2G2P = inputs["dfH2G2P"]
 	end
-
+	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
@@ -42,7 +42,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
                "Nonserved_Energy",
 			   "H2_Pipeline_Import/Export",
 			   "H2_Truck_Import/Export","G2P Demand",
-	           "Demand", "Transmission"]
+	           "Demand", "Liquid_Generation", "Liquid_Demand", "Evaporation"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 	     	dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
@@ -81,7 +81,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		# end
 
 			if setup["ModelH2G2P"] == 1
-				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
 			else
 				dfTemp1[t+rowoffset,9] = 0
 			end
@@ -98,6 +98,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,13] = 0
 			end 
 
+			
 	   	end
 
 		if z==1

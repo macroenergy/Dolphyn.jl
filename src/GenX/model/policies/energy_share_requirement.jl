@@ -49,12 +49,19 @@ function energy_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+	#H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
+	H2_GEN = inputs["H2_GEN"]
+	dfH2Gen = inputs["dfH2Gen"]
 
 	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
 	if setup["EnergyShareRequirement"] >= 1
-		@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], t=1:T) >=
-									sum(inputs["dfESR"][:,ESR][z]*inputs["omega"][t]*inputs["pD"][t,z] for t=1:T, z=findall(x->x>0,inputs["dfESR"][:,ESR]))+
-									sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
+		#z=findall(x->x>0,inputs["dfESR"][:,ESR])
+		@constraint(EP, cESRShare[ESR=1:inputs["nESR"], t=1:T, z=1], 
+						(sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID]) 
+						- sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["STOR_ALL"])))
+						>= sum(inputs["omega"][t]*EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in H2_GEN))
+						# >= inputs["dfESR"][t,ESR]*inputs["omega"][t]*inputs["pD"][t,z])
+						# + sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
 	end
 
 	return EP

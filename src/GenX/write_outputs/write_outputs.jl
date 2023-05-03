@@ -132,8 +132,8 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	dfESR = DataFrame()
 	dfESRRev = DataFrame()
 	if setup["EnergyShareRequirement"]==1 && has_duals(EP) == 1
-		dfESR = write_esr_prices(path, sep, inputs, setup, EP)
-		dfESRRev = write_esr_revenue(path, sep, inputs, setup, dfPower, dfESR)
+	#	dfESR = write_esr_prices(path, sep, inputs, setup, EP)
+	#	dfESRRev = write_esr_revenue(path, sep, inputs, setup, dfPower, dfESR)
 	end
 	dfResMar = DataFrame()
 	dfResRevenue = DataFrame()
@@ -146,8 +146,9 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 		print_and_log("Time elapsed for writing capacity value is $elapsed_time_cap_value")
 	end
 
-	elapsed_time_net_rev = @elapsed write_net_revenue(path, sep, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
-	print_and_log("Time elapsed for writing net revenue is $elapsed_time_net_rev")
+	# Avoid writing net revenue
+	#elapsed_time_net_rev = @elapsed write_net_revenue(path, sep, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
+	#print_and_log("Time elapsed for writing net revenue is $elapsed_time_net_rev")
 	## Print confirmation
 	print_and_log("Wrote outputs to $path$sep")
 
