@@ -24,6 +24,8 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 
 	print_and_log("Emissions Module for CO2 Policy modularization")
 
+	Zones = inputs["Zones"]
+
 	dfGen = inputs["dfGen"]
 
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
@@ -38,7 +40,7 @@ function emissions_power(EP::Model, inputs::Dict, setup::Dict)
 		 	dfGen[!,:CO2_per_MWh][y]*EP[:vP][y,t]
 	 	end
  	)
- 	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==z), :R_ID]))
+ 	@expression(EP, eEmissionsByZone[z=1:Z, t=1:T], sum(eEmissionsByPlant[y,t] for y in dfGen[(dfGen[!,:Zone].==Zones[z]), :R_ID]))
 
 	## TO DO: add expression to keep track of captured emissions by zone and plant (Jun Wen)
 

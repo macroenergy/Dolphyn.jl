@@ -71,6 +71,9 @@ include("print_and_log.jl")
 # Results comparison tools
 include("compare_results.jl")
 
+# Enumerate zones
+include("enumerate_zones.jl")
+
 # Configure settings
 include("configure_settings/configure_settings.jl")
 

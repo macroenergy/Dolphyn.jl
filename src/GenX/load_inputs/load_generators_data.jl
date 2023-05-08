@@ -21,9 +21,14 @@ Function for reading input parameters related to electricity generators (plus st
 """
 function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict, fuel_costs::Dict, fuel_CO2::Dict)
 
+	Zones = inputs_gen["Zones"]
+
 	# Generator related inputs
 	gen_in = DataFrame(CSV.File(string(path,sep,"Generators_data.csv"), header=true), copycols=true)
 
+	# Filter generators by zone
+	gen_in = filter(row -> row.Zone in Zones, gen_in)
+	
 	# Add Resource IDs after reading to prevent user errors
 	gen_in[!,:R_ID] = 1:size(collect(skipmissing(gen_in[!,1])),1)
 

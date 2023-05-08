@@ -22,18 +22,31 @@ Function for reading input parameters related to the electricity transmission ne
 #DEV NOTE:  add DC power flow related parameter inputs in a subsequent commit
 function load_network_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
+    Zones = inputs_nw["Zones"]
+    Z = inputs_nw["Z"]
+
     # Network zones inputs and Network topology inputs
     network_var = DataFrame(CSV.File(string(path,sep,"Network.csv"), header=true), copycols=true)
 
-    # Number of zones in the network
-    inputs_nw["Z"] = size(findall(s -> (startswith(s, "z")) & (tryparse(Float64, s[2:end]) != nothing), names(network_var)),1)
-    Z = inputs_nw["Z"]
+    ## Filter lines which links zones not modelled - network.csv should not have missing values
+    network_var = filter(row -> ((row.Start_Zone in Zones && row.End_Zone in Zones)), network_var)
+
     # Number of lines in the network
     inputs_nw["L"]=size(collect(skipmissing(network_var[!,:Network_Lines])),1)
+    L = inputs_nw["L"]
 
-    # Topology of the network source-sink matrix
-    start = findall(s -> s == "z1", names(network_var))[1]
-    inputs_nw["pNet_Map"] = Matrix{Float64}(network_var[1:inputs_nw["L"],start:start+inputs_nw["Z"]-1])
+    ## Topology of the network source-sink matrix
+    Network_map = zeros(L, Z)
+
+    for l = 1:L
+        # Use indexin to find the index of the zone in the Zones array - useful when zones is list of strings
+        z_start = indexin([network_var[!, :Start_Zone][l]], Zones)[1]
+        z_end = indexin([network_var[!, :End_Zone][l]], Zones)[1]
+        Network_map[l, z_start] = 1
+        Network_map[l, z_end] = -1
+    end
+
+    inputs_nw["pNet_Map"] = Network_map
 
     # Transmission capacity of the network (in MW)
     if setup["ParameterScale"] ==1  # Parameter scaling turned on - adjust values of subset of parameter values to GW
