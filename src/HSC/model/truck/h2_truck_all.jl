@@ -58,8 +58,8 @@ The sum of full and empty trucks should equal to the total number of invested tr
 The full (empty) trucks include full (empty) trucks in transit and staying at each zones.
 ```math
 \begin{aligned}
-    v_{j, t}^{\textrm{F}}=\sum_{r \in \mathbb{Route}, d \in [-1,1]} u_{r, d, j, t}^{\textrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{F}} \\
-    v_{j, t}^{\textrm{E}}=\sum_{r \in \mathbb{Route}, d \in [-1,1]} u_{r, d, j, t}^{\textrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
+    v_{j, t}^{\textrm{F}}=\sum_{r \in \mathfrak{R}, d \in [-1,1]} u_{r, d, j, t}^{\textrm{F}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{F}} \\
+    v_{j, t}^{\textrm{E}}=\sum_{r \in \mathfrak{R}, d \in [-1,1]} u_{r, d, j, t}^{\textrm{E}}+\sum_{z \in \mathbb{Z}} q_{z, j, t}^{\textrm{E}} \quad \forall j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
@@ -67,9 +67,9 @@ The change of the total number of full (empty) available trucks at zone z should
 ```math
 \begin{aligned}
     q_{z, j, t}^{\textrm{F}}-q_{z, j, t-1}^{\textrm{F}}=& q_{z, j, t}^{\textrm{CHA}}-q_{z, j, t}^{\textrm{DIS}} \\
-    &+\sum_{(r,d)\in \{(r,d)\vert (r,d)=(z,z^{\prime},1) or (r,d)=(z^{\prime},z,-1) \forall z^{\prime} in \mathbb{Z}\}}\left(-x_{r, d, j, t-1}^{\textrm{F}}+y_{r, d, j, t-1}^{\textrm{F}}\right) \\
+    &+\sum_{(r,d)\in \{((z,z^{\prime}),-1), ((z^{\prime},z),1) \,\forall\, z^{\prime} \in \mathbb{Z}\}}\left(-x_{r, d, j, t-1}^{\textrm{F}}+y_{r, d, j, t-1}^{\textrm{F}}\right) \\
     q_{z, j, t}^{\textrm{E}}-q_{z, j, t-1}^{\textrm{E}}=&-q_{z, j, t}^{\textrm{CHA}}+q_{z, j, t}^{\textrm{DIS}} \\
-    &+\sum_{(r,d)\in \{(r,d)\vert (r,d)=(z,z^{\prime},1) or (r,d)=(z^{\prime},z,-1) \forall z^{\prime} in \mathbb{Z}\}}\left(-x_{r, d, j, t-1}^{\textrm{E}}+y_{r, d, j, t-1}^{\textrm{E}}\right) \\
+    &+\sum_{(r,d) \in \{((z,z^{\prime}),-1), ((z^{\prime},z),1) \,\forall\, z^{\prime} \in \mathbb{Z}\}}\left(-x_{r, d, j, t-1}^{\textrm{E}}+y_{r, d, j, t-1}^{\textrm{E}}\right) \\
     \quad \forall z \in \mathbb{Z}, j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
@@ -79,7 +79,7 @@ The change of the total number of full (empty) trucks in transit from zone $z$ t
 \begin{aligned}
     u_{r, d, j, t}^{\textrm{F}}-u_{r, d, j, t-1}^{\textrm{F}} &= x_{r, d, j, t-1}^{\textrm{F}} - y_{r, d, j, t-1}^{\textrm{F}} \\
     u_{r, d, j, t}^{\textrm{E}}-u_{r, d, j, t-1}^{\textrm{E}} &= x_{r, d, j, t-1}^{\textrm{E}} - y_{r, d, j, t-1}^{\textrm{E}} \\
-    & \quad \forall r \in \mathbb{Route}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
+    & \quad \forall r \in \mathfrak{R}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
@@ -95,7 +95,7 @@ The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
     u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t-\Delta_r+1}^{e=t} x_{r, d, j, e}^{\textrm{F}} \\
-    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_r+1}^{e=t} x_{r, d, j, e}^{\textrm{E}} \quad \forall r \in \mathbb{Route}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
+    u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t-\Delta_r+1}^{e=t} x_{r, d, j, e}^{\textrm{E}} \quad \forall r \in \mathfrak{R}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
@@ -103,7 +103,7 @@ The minimum travelling time delay is modelled as follows.
 \begin{aligned}
     u_{r, d, j, t}^{\textrm{F}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, d, j, e}^{\textrm{F}} \\
     u_{r, d, j, t}^{\textrm{E}} \geq \sum_{e=t+1}^{e=t+\Delta_{r}} y_{r, d, j, e}^{\textrm{E}} \\
-    \quad \forall r \in \mathbb{Route}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
+    \quad \forall r \in \mathfrak{R}, d \in [-1,1], j \in \mathbb{J}, t \in \mathbb{T}
 \end{aligned}
 ```
 
