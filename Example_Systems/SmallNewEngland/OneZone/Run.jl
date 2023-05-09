@@ -14,11 +14,20 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-# Walk into current directory
-cd(dirname(@__FILE__))
+### Set relevant directory paths
+src_path = "../../../src/"
+
+inpath = pwd()
+
+
+### Load DOLPHYN
+println("Loading packages")
+push!(LOAD_PATH, src_path)
 
 # Loading settings
 using YAML
+using LoggingExtras
+using DOLPHYN
 
 settings_path = joinpath(pwd(), "Settings")
 
@@ -28,11 +37,12 @@ mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-s
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
-mysetup = Dict()
-mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+combined_settings = Dict()
+combined_settings = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
-# Start logging
-using LoggingExtras
+## Update settings by adding default values for various unspecified parameters
+mysetup = Dict()
+mysetup = configure_settings(combined_settings)
 
 global Log = mysetup["Log"]
 
@@ -46,17 +56,6 @@ environment_path = "../../../package_activate.jl"
 if !occursin("DOLPHYNJulEnv", Base.active_project())
     include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 end
-
-### Set relevant directory paths
-src_path = "../../../src/"
-
-inpath = pwd()
-
-### Load DOLPHYN
-println("Loading packages")
-push!(LOAD_PATH, src_path)
-
-using DOLPHYN
 
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
@@ -115,3 +114,5 @@ if mysetup["ModelH2"] == 1
     outpath_H2 = "$outpath/Results_HSC"
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
+# Write combined_settings that was used to solve the model file to help with troubleshooting
+YAML.write_file(joinpath(settings_path,"combined_settings_output.yml"), mysetup)

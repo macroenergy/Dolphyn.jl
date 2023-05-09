@@ -18,13 +18,16 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)    
 
 Function for reading input parameters related to hydrogen trucks.
+A variable is created to distinguish between Gas and Liquid trucks, which is relevant for the hydrogen balance expressions. 
+Other truck types like LOHC are currently not considered, but may need to be identified as Gas for the balance. 
+
 """
 function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::Dict)
 
     Z = inputs_truck["Z"]
     Z_set = 1:Z
 
-    zone_distance = DataFrame(CSV.File(string(path, sep, "HSC_zone_truck_distances_miles.csv"), header=true), copycols=true)
+    zone_distance = DataFrame(CSV.File(string(path,sep,"HSC_zone_distances_miles.csv"), header=true), copycols=true)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
 	inputs_truck["RouteLength"] = RouteLength
@@ -41,6 +44,10 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     inputs_truck["H2_TRUCK_TYPES"] = h2_truck_in[!,:T_TYPE]
     # Set of H2 truck type names
     inputs_truck["H2_TRUCK_TYPE_NAMES"] = h2_truck_in[!,:H2TruckType]
+
+    # Gas trucks
+    inputs_truck["H2_TRUCK_GAS"] = h2_truck_in[h2_truck_in.H2TruckType .== "Gas", :T_TYPE]
+    inputs_truck["H2_TRUCK_LIQ"] = h2_truck_in[h2_truck_in.H2TruckType .== "Liquid", :T_TYPE]
 
     inputs_truck["H2_TRUCK_LONG_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 1, :T_TYPE]
 	inputs_truck["H2_TRUCK_SHORT_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 0, :T_TYPE]
@@ -62,8 +69,9 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     # Average truck travel time between zones
     inputs_truck["TD"] = Dict()
     for j in inputs_truck["H2_TRUCK_TYPES"]
-        inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
+        inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])        
     end
+
     print_and_log("HSC_trucks.csv Successfully Read!")
     return inputs_truck
 end

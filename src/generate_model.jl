@@ -110,6 +110,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" H2 balance constraint
 	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
 
+	# Initialize Liquid Hydrogen Balance Expression
+	if setup["ModelH2Liquid"]==1
+		# Expression for "baseline" H2 liquid balance constraint
+		@expression(EP, eH2LiqBalance[t=1:T, z=1:Z], 0)
+	end
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
@@ -256,6 +262,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = minimum_capacity_requirement(EP, inputs)
 	end
 
+	if (setup["MaxCapReq"] == 1)
+		EP = maximum_capacity_requirement(EP, inputs)
+	end
+
+
 	## Define the objective function
 	@objective(EP,Min,EP[:eObj])
 
@@ -265,8 +276,13 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
 
 	if setup["ModelH2"] == 1
-		###Hydrogen Balanace constraints
+		###Hydrogen Balance constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+	end
+
+	if setup["ModelH2Liquid"] == 1
+		###Hydrogen Liquid Balance constraints
+		@constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
 	end
 	
 	## Record pre-solver time
