@@ -243,20 +243,20 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
 		# Variable costs and carbon captured per DAC resource "k" and time "t"
-		EP = co2_capture_var_cost(EP, inputs, setup)
+		EP = DAC_var_cost(EP, inputs, setup)
 
 		# Fixed costs of DAC
-		EP = co2_capture_investment(EP, inputs, setup)
+		EP = DAC_investment(EP, inputs, setup)
 	
 		#model CO2 capture
 		EP = co2_capture(EP, inputs, setup)
 
-		# Fixed costs of storage injection
+		# Fixed costs of storage storage
 		
-		EP = co2_injection_investment(EP, inputs, setup)
+		EP = co2_storage_investment(EP, inputs, setup)
 
 		if !isempty(inputs["CO2_STORAGE"])
-			#model CO2 capture
+			#model CO2 injection
 			EP = co2_injection(EP, inputs, setup)
 		end
 
@@ -292,7 +292,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		
 		EP = syn_fuel_outputs(EP, inputs, setup)
 		EP = syn_fuel_investment(EP, inputs, setup)
-		EP = syn_fuel_resources(EP, inputs, setup)
+
+		if !isempty(inputs["SYN_FUELS_RES_ALL"])
+			EP = syn_fuel_resources(EP, inputs, setup)
+		end
+
 		EP = liquid_fuel_demand(EP, inputs, setup)
 		EP = emissions_liquid_fuels(EP, inputs, setup)
 
@@ -312,16 +316,18 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		end
 
 		#Jetfuel
-		@expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
-		@expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
+		if setup["BIO_Jetfuel_On"] == 0
+			@expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
 
-		#Demand constraint for each time t for global liquid fuel demand
-		#@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
 
-		#Demand constraint for annual global liquid fuel demand
-		@expression(EP, eAnnualGlobalLFJetfuelBalance, sum(EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
-		@expression(EP, eAnnualGlobalLFJetfuelDemand, sum(EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
-		@constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFJetfuelBalance, sum(EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFJetfuelDemand, sum(EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
+		end
 
 		#Gasoline
 		if setup["BIO_Gasoline_On"] == 0
@@ -373,9 +379,22 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			#@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
 
 			#Demand constraint for annual global liquid fuel demand
-			@expression(EP, eAnnualGlobalLFDieselBalance, sum(EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
-			@expression(EP, eAnnualGlobalLFDieselDemand, sum(EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFDieselBalance, sum(inputs["omega"][t] * EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFDieselDemand, sum(inputs["omega"][t] * EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
 			@constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
+		end
+
+		if setup["BIO_Jetfuel_On"] == 1
+			@expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
+		
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
+		
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFJetfuelBalance, sum(inputs["omega"][t] * EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFJetfuelDemand, sum(inputs["omega"][t] * EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
 		end
 
 		if setup["BIO_Gasoline_On"] == 1
@@ -386,8 +405,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			#@constraint(EP, cLFGasolineBalance[t=1:T], eGlobalLFGasolineBalance[t] >= eGlobalLFGasolineDemand[t])
 
 			#Demand constraint for annual global liquid fuel demand
-			@expression(EP, eAnnualGlobalLFGasolineBalance, sum(EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
-			@expression(EP, eAnnualGlobalLFGasolineDemand, sum(EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFGasolineBalance, sum(inputs["omega"][t] * EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFGasolineDemand, sum(inputs["omega"][t] * EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
 			@constraint(EP, cLFAnnualGasolineBalance, eAnnualGlobalLFGasolineBalance >= eAnnualGlobalLFGasolineDemand)
 		end
 
@@ -400,8 +419,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			#@constraint(EP, cEthanolBalanceGlobal[t=1:T], EP[:eGlobalEthanolBalance][t] >= eGlobalEthanolDemand[t])
 
 			#Demand constraint for annual global liquid fuel demand
-			@expression(EP, eAnnualGlobalEthanolBalance, sum(EP[:eGlobalEthanolBalance][t] for t = 1:T) )
-			@expression(EP, eAnnualGlobalEthanolDemand, sum(EP[:eGlobalEthanolDemand][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalEthanolBalance, sum(inputs["omega"][t] * EP[:eGlobalEthanolBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalEthanolDemand, sum(inputs["omega"][t] * EP[:eGlobalEthanolDemand][t] for t = 1:T) )
 			@constraint(EP, cAnnualEthanolBalance, eAnnualGlobalEthanolBalance >= eAnnualGlobalEthanolDemand)
 
 		end

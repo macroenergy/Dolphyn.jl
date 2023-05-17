@@ -154,12 +154,12 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 				tempC_H2_Var_G2P += sum(value.(EP[:eCH2G2PVar_out])[y,:])
 				tempCTotal += value.(EP[:eH2G2PCFix])[y] + sum(value.(EP[:eCH2G2PVar_out])[y,:])
 
-				if !isempty(inputs["H2_G2P_COMMIT"])
-					if y in inputs["H2_G2P_COMMIT"]
-						tempC_H2_Start += value.(EP[:eH2G2PCStart])[y]
-						tempCTotal += value.(EP[:eH2G2PCStart])[y]
-					end
-				end
+				#if !isempty(inputs["H2_G2P_COMMIT"])
+				#	if y in inputs["H2_G2P_COMMIT"]
+				#		tempC_H2_Start += value.(EP[:eTotalH2G2PCStartK])[y]
+				#		tempCTotal += value.(EP[:eTotalH2G2PCStartK])[y]
+				#	end
+				#end
 			end
 		end
 

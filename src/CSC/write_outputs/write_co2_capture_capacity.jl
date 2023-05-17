@@ -21,24 +21,24 @@ Function for writing the diferent capacities for the different capture technolog
 """
 function write_co2_capture_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
-	dfCO2Capture = inputs["dfCO2Capture"]
-	H = inputs["CO2_RES_ALL"]
-	capcapture = zeros(size(inputs["CO2_RESOURCES_NAME"]))
-	for i in 1:inputs["CO2_RES_ALL"]
+	dfDAC = inputs["dfDAC"]
+	H = inputs["DAC_RES_ALL"]
+	capcapture = zeros(size(inputs["DAC_RESOURCES_NAME"]))
+	for i in 1:inputs["DAC_RES_ALL"]
 		capcapture[i] = value.(EP[:vCapacity_DAC_per_type][i])
 	end
 	
-	MaxGen = zeros(size(1:inputs["CO2_RES_ALL"]))
+	MaxGen = zeros(size(1:inputs["DAC_RES_ALL"]))
 	for i in 1:H
 		MaxGen[i] = value.(EP[:vCapacity_DAC_per_type])[i] * 8760
 	end
 
-	AnnualGen = zeros(size(1:inputs["CO2_RES_ALL"]))
+	AnnualGen = zeros(size(1:inputs["DAC_RES_ALL"]))
 	for i in 1:H
 		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vDAC_CO2_Captured])[i,:]))
 	end
 
-	CapFactor = zeros(size(1:inputs["CO2_RES_ALL"]))
+	CapFactor = zeros(size(1:inputs["DAC_RES_ALL"]))
 	for i in 1:H
 		if MaxGen[i] == 0
 			CapFactor[i] = 0
@@ -48,7 +48,7 @@ function write_co2_capture_capacity(path::AbstractString, sep::AbstractString, i
 	end
 
 	dfCap = DataFrame(
-		Resource = inputs["CO2_RESOURCES_NAME"], Zone = dfCO2Capture[!,:Zone],
+		Resource = inputs["DAC_RESOURCES_NAME"], Zone = dfDAC[!,:Zone],
 		Capacity = capcapture[:],
 		Max_Annual_Capture = MaxGen[:],
 		Annual_Capture = AnnualGen[:],

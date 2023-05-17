@@ -110,7 +110,7 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 			end
 
 			if setup["ModelSynFuels"] == 1
-				dfTemp1[t+rowoffset,15] = -value(EP[:ePowerBalanceSynFuelResNoCommit][t,z])
+				dfTemp1[t+rowoffset,15] = -value(EP[:ePowerBalanceSynFuelRes][t,z])
 			else
 				dfTemp1[t+rowoffset,15] = 0
 			end

@@ -118,8 +118,8 @@ include("HSC/load_inputs/load_h2_g2p_variability.jl")
 
 #Load input data - CSC
 include("CSC/load_inputs/load_co2_inputs.jl")
-include("CSC/load_inputs/load_co2_capture.jl")
-include("CSC/load_inputs/load_co2_capture_variability.jl")
+include("CSC/load_inputs/load_co2_capture_DAC.jl")
+include("CSC/load_inputs/load_co2_capture_DAC_variability.jl")
 include("CSC/load_inputs/load_co2_storage.jl")
 include("CSC/load_inputs/load_co2_capture_compression.jl")
 include("CSC/load_inputs/load_co2_pipeline_data.jl")
@@ -209,17 +209,16 @@ include("HSC/model/policies/co2_cap_hsc.jl")
 
 
 #Core CSC Modelling Features
-include("CSC/model/core/co2_capture_investment.jl")
-include("CSC/model/core/co2_capture_var_cost.jl")
+include("CSC/model/core/DAC_investment.jl")
+include("CSC/model/core/DAC_var_cost.jl")
 include("CSC/model/core/emissions_csc.jl")
 
 # CO2 Capture
 include("CSC/model/capture/co2_capture.jl")
-include("CSC/model/capture/co2_capture_non_uc.jl")
-include("CSC/model/capture/co2_capture_uc.jl")
+include("CSC/model/capture/co2_capture_DAC.jl")
 
 # CO2 Storage
-include("CSC/model/storage/co2_injection_investment.jl")
+include("CSC/model/storage/co2_storage_investment.jl")
 include("CSC/model/storage/co2_injection.jl")
 
 # CO2 Compression
@@ -235,10 +234,7 @@ include("SynFuels/model/core/liquid_fuel_emissions.jl")
 include("SynFuels/model/core/syn_fuel_outputs.jl")
 
 include("SynFuels/model/demand/liquid_fuel_demand.jl")
-
-include("SynFuels/model/resources/syn_fuel_res_all.jl")
 include("SynFuels/model/resources/syn_fuel_resources.jl")
-include("SynFuels/model/resources/syn_fuels_res_no_commit.jl")
 
 #Core BESC Modelling Features
 include("BESC/model/core/biorefinery_investment.jl")
@@ -302,6 +298,8 @@ include("GenX/write_outputs/ucommit/write_start.jl")
 
 include("GenX/write_outputs/write_costs_system.jl")
 
+include("GenX/write_outputs/write_power_plant_emissions.jl")
+
 include("GenX/write_outputs/write_outputs.jl")
 
 # HSC Write Outputs
@@ -329,7 +327,8 @@ include("HSC/write_outputs/write_g2p_capacity.jl")
 include("CSC/write_outputs/write_co2_capture_capacity.jl")
 include("CSC/write_outputs/write_CSC_outputs.jl")
 include("CSC/write_outputs/write_CSC_costs.jl")
-include("CSC/write_outputs/write_co2_storage_injection_capacity.jl")
+include("CSC/write_outputs/write_co2_storage_capacity.jl")
+include("CSC/write_outputs/write_co2_total_injection.jl")
 include("CSC/write_outputs/write_co2_pipeline_flow.jl")
 include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
 include("CSC/write_outputs/write_co2_emission_balance_zone.jl")
@@ -354,6 +353,7 @@ include("BESC/write_outputs/write_bio_plant_capacity.jl")
 include("BESC/write_outputs/write_bio_zone_bioelectricity_produced.jl")
 include("BESC/write_outputs/write_bio_zone_biohydrogen_produced.jl")
 include("BESC/write_outputs/write_bio_zone_biodiesel_produced.jl")
+include("BESC/write_outputs/write_bio_zone_biojetfuel_produced.jl")
 include("BESC/write_outputs/write_bio_zone_biogasoline_produced.jl")
 include("BESC/write_outputs/write_bio_zone_bioethanol_produced.jl")
 include("BESC/write_outputs/write_bio_zone_herb_consumed.jl")

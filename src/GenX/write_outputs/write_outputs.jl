@@ -91,6 +91,10 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	end
 	elapsed_time_emissions = @elapsed write_emissions(path, sep, inputs, setup, EP)
 	print_and_log("Time elapsed for writing emissions is $elapsed_time_emissions")
+	
+	elapsed_time_power_plant_emissions = @elapsed write_power_plant_emissions(path, sep, inputs, setup, EP)
+	print_and_log("Time elapsed for writing power plant emissions is $elapsed_time_power_plant_emissions")
+
 	if has_duals(EP) == 1
 		elapsed_time_reliability = @elapsed write_reliability(path, sep, inputs, setup, EP)
 		print_and_log("Time elapsed for writing reliability is $elapsed_time_reliability")

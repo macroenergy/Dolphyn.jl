@@ -128,7 +128,7 @@ function write_liquid_fuel_balance_dual(path::AbstractString, sep::AbstractStrin
 			dfBioethanolBalanceDual=hcat(dfBioethanolBalanceDual, DataFrame(dual_values, :auto))
 			rename!(dfBioethanolBalanceDual,[Symbol("Zone");[Symbol("t$t") for t in 1:T]])
 
-			CSV.write(string(path,sep,"LF_Ethanol_Balance_Dual.csv"), dftranspose(dfGasolineBalanceDual, false), writeheader=false)
+			CSV.write(string(path,sep,"LF_Ethanol_Balance_Dual.csv"), dftranspose(dfBioethanolBalanceDual, false), writeheader=false)
 		end
 	end
 

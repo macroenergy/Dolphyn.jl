@@ -6,14 +6,14 @@ ExtremePeriods:
         Min: 0
         Max: 0
       Integral:
-        Min: 1
+        Min: 0
         Max: 0
     Zone:
       Absolute:
         Min: 0
         Max: 0
       Integral:
-        Min: 0
+        Min: 1
         Max: 0
   Load:
     System:
@@ -36,18 +36,18 @@ ExtremePeriods:
         Min: 0
         Max: 0
       Integral:
-        Min: 1
+        Min: 0
         Max: 0
     Zone:
       Absolute:
         Min: 0
         Max: 0
       Integral:
-        Min: 0
+        Min: 1
         Max: 0
-UseExtremePeriods: 1
-MinPeriods: 8
-MaxPeriods: 11
+UseExtremePeriods: 0
+MinPeriods: 1
+MaxPeriods: 1
 LoadWeight: 1
 ClusterFuelPrices: 1
 nReps: 100

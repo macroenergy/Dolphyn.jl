@@ -92,7 +92,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
     if setup["ParameterScale"] ==1
         #CO2 emitted as a result of syn diesel consumption
         @expression(EP,eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        Syn_diesel_co2_per_mmbtu * EP[:eSynFuelProdNoCommit_Diesel][t,z]/ModelScalingFactor)
+        Syn_diesel_co2_per_mmbtu * EP[:eSynFuelProd_Diesel][t,z]/ModelScalingFactor)
 
         #CO2 emitted as a result of conventional diesel consumption
         @expression(EP,eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
@@ -100,7 +100,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 
         #CO2 emitted as a result of syn jetfuel consumption
         @expression(EP,eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        Syn_jetfuel_co2_per_mmbtu * EP[:eSynFuelProdNoCommit_Jetfuel][t,z]/ModelScalingFactor)
+        Syn_jetfuel_co2_per_mmbtu * EP[:eSynFuelProd_Jetfuel][t,z]/ModelScalingFactor)
         
         #CO2 emitted as a result of conventional jetfuel consumption
         @expression(EP,eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
@@ -112,7 +112,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 
         #CO2 emitted as a result of syn gasoline consumption
         @expression(EP,eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        Syn_gasoline_co2_per_mmbtu * EP[:eSynFuelProdNoCommit_Gasoline][t,z]/ModelScalingFactor)
+        Syn_gasoline_co2_per_mmbtu * EP[:eSynFuelProd_Gasoline][t,z]/ModelScalingFactor)
 
         #CO2 emitted as a result of conventional gasoline consumption
         @expression(EP,eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
@@ -122,7 +122,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
     else
         #CO2 emitted as a result of syn diesel consumption
         @expression(EP,eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        Syn_diesel_co2_per_mmbtu * EP[:eSynFuelProdNoCommit_Diesel][t,z])
+        Syn_diesel_co2_per_mmbtu * EP[:eSynFuelProd_Diesel][t,z])
 
         #CO2 emitted as a result of conventional diesel consumption
         @expression(EP,eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
@@ -130,7 +130,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 
         #CO2 emitted as a result of syn jetfuel consumption
         @expression(EP,eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        Syn_jetfuel_co2_per_mmbtu * EP[:eSynFuelProdNoCommit_Jetfuel][t,z])
+        Syn_jetfuel_co2_per_mmbtu * EP[:eSynFuelProd_Jetfuel][t,z])
 
         #CO2 emitted as a result of conventional jetfuel consumption
         @expression(EP,eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
@@ -142,7 +142,7 @@ function emissions_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 
         #CO2 emitted as a result of syn gasoline consumption
         @expression(EP,eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        Syn_gasoline_co2_per_mmbtu * EP[:eSynFuelProdNoCommit_Gasoline][t,z])
+        Syn_gasoline_co2_per_mmbtu * EP[:eSynFuelProd_Gasoline][t,z])
 
         #CO2 emitted as a result of conventional gasoline consumption
         @expression(EP,eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 

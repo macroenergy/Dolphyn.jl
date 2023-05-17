@@ -32,11 +32,6 @@ function load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString
 	# Name of CO2 capture resources
 	inputs_co2_storage["CO2_STORAGE_NAME"] = collect(skipmissing(co2_storage[!,:CO2_Storage][1:inputs_co2_storage["CO2_STOR_ALL"]]))
 	
-	# Resource identifiers by zone (just zones in resource order + resource and zone concatenated)
-	co2_zones = collect(skipmissing(co2_storage[!,:Zone][1:inputs_co2_storage["CO2_STOR_ALL"]]))
-	inputs_co2_storage["CO2_S_ZONES"] = co2_zones
-	inputs_co2_storage["CO2_STORAGE_ZONES"] = inputs_co2_storage["CO2_STORAGE_NAME"] .* "_z" .* string.(co2_zones)
-
 	# Set of CO2 resources not eligible for unit committment
 	inputs_co2_storage["CO2_STORAGE"] = co2_storage[!,:R_ID]
 

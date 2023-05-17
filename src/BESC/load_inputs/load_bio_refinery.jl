@@ -36,6 +36,8 @@ function load_bio_refinery(setup::Dict, path::AbstractString, sep::AbstractStrin
 
 	inputs_biorefinery["BIO_GASOLINE"] = biorefinery[biorefinery.BioGasoline_Production.== 1 ,:R_ID]
 
+	inputs_biorefinery["BIO_JETFUEL"] = biorefinery[biorefinery.BioJetfuel_Production.== 1 ,:R_ID]
+
 	inputs_biorefinery["BIO_ETHANOL"] = biorefinery[biorefinery.BioEthanol_Production.== 1 ,:R_ID]
 
 	# Name of CO2 capture resources

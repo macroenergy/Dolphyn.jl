@@ -82,6 +82,11 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			CapFactor[i] = AnnualGen[i]/MaxGen[i]
 		end
 	end
+
+	AnnualCO2Emissions = zeros(size(inputs["RESOURCES"]))
+	for i in 1:G
+		AnnualCO2Emissions[i] = sum(inputs["omega"].* (value.(EP[:eEmissionsByPlant])[i,:]))
+	end
 	
 	dfCap = DataFrame(
 		Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone],
@@ -99,8 +104,10 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 		EndChargeCap = dfGen[!,:Existing_Charge_Cap_MW]+capcharge[:]-retcapcharge[:],
 		MaxAnnualGeneration = MaxGen[:],
 		AnnualGeneration = AnnualGen[:],
-		CapacityFactor = CapFactor[:]
+		CapacityFactor = CapFactor[:],
+		AnnualEmissions = AnnualCO2Emissions[:]
 	)
+
 	if setup["ParameterScale"] ==1
 		dfCap.StartCap = dfCap.StartCap * ModelScalingFactor
 		dfCap.RetCap = dfCap.RetCap * ModelScalingFactor
@@ -116,6 +123,7 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 		dfCap.EndChargeCap = dfCap.EndChargeCap * ModelScalingFactor
 		dfCap.MaxAnnualGeneration = dfCap.MaxAnnualGeneration * ModelScalingFactor
 		dfCap.AnnualGeneration = dfCap.AnnualGeneration * ModelScalingFactor
+		dfCap.AnnualEmissions = dfCap.AnnualEmissions * ModelScalingFactor
 	end
 
 	total = DataFrame(
@@ -127,6 +135,7 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 		StartChargeCap = sum(dfCap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]),
 		NewChargeCap = sum(dfCap[!,:NewChargeCap]), EndChargeCap = sum(dfCap[!,:EndChargeCap]),
 		MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]),
+		AnnualEmissions = sum(dfCap[!,:AnnualEmissions]),
 		CapacityFactor = "-"
 	)
 
@@ -188,6 +197,11 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 				CapFactor_H2G2P[i] = AnnualGen_H2G2P[i]/MaxGen_H2G2P[i]
 			end
 		end
+
+		AnnualCO2Emissions_H2G2P = zeros(size(1:inputs["H2_G2P_ALL"]))
+		for i in 1:H
+			AnnualCO2Emissions_H2G2P[i] = 0
+		end
 	
 		dfCap_H2G2P = DataFrame(
 			Resource = inputs["H2_G2P_NAME"], Zone = dfH2G2P[!,:Zone],
@@ -205,7 +219,8 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			EndChargeCap = endchargecap_H2G2P[:],
 			MaxAnnualGeneration = MaxGen_H2G2P[:],
 			AnnualGeneration = AnnualGen_H2G2P[:],
-			CapacityFactor = CapFactor_H2G2P[:]
+			CapacityFactor = CapFactor_H2G2P[:],
+			AnnualEmissions = AnnualCO2Emissions_H2G2P[:]
 		)
 	
 	
@@ -218,6 +233,7 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 				StartChargeCap = sum(dfCap[!,:StartChargeCap]) + sum(dfCap_H2G2P[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]) + sum(dfCap_H2G2P[!,:RetChargeCap]),
 				NewChargeCap = sum(dfCap[!,:NewChargeCap]) + sum(dfCap_H2G2P[!,:NewChargeCap]),EndChargeCap = sum(dfCap[!,:EndChargeCap]) + sum(dfCap_H2G2P[!,:EndChargeCap]),
 				MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]) + sum(dfCap_H2G2P[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]) + sum(dfCap_H2G2P[!,:AnnualGeneration]),
+				AnnualEmissions = sum(dfCap[!,:AnnualEmissions]) + sum(dfCap_H2G2P[!,:AnnualEmissions]),
 				CapacityFactor = "-"
 			)
 
@@ -273,6 +289,11 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 				CapFactor_BioE[i] = AnnualGen_BioE[i]/MaxGen_BioE[i]
 			end
 		end
+
+		AnnualCO2Emissions_BioE = zeros(size(1:inputs["BIO_RES_ALL"]))
+		for i in 1:B
+			AnnualCO2Emissions_BioE[i] = 0
+		end
 	
 		dfBioE_Cap = DataFrame(
 			Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone],
@@ -290,7 +311,8 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			EndChargeCap = endchargecap_BioE[:],
 			MaxAnnualGeneration = MaxGen_BioE[:],
 			AnnualGeneration = AnnualGen_BioE[:],
-			CapacityFactor = CapFactor_BioE[:]
+			CapacityFactor = CapFactor_BioE[:],
+			AnnualEmissions = AnnualCO2Emissions_BioE[:]
 		)
 	
 		if setup["ParameterScale"] ==1
@@ -298,6 +320,7 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			dfBioE_Cap.newcap_BioE = dfBioE_Cap.newcap_BioE * ModelScalingFactor
 			dfBioE_Cap.MaxGen_BioE = dfBioE_Cap.MaxGen_BioE * ModelScalingFactor
 			dfBioE_Cap.AnnualGen_BioE = dfBioE_Cap.AnnualGen_BioE * ModelScalingFactor
+			dfBioE_Cap.AnnualCO2Emissions_BioE = dfBioE_Cap.AnnualCO2Emissions_BioE * ModelScalingFactor
 		end
 	
 		total_w_BioE = DataFrame(
@@ -309,6 +332,7 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 				StartChargeCap = sum(dfCap[!,:StartChargeCap]) + sum(dfBioE_Cap[!,:StartChargeCap]), RetChargeCap = sum(dfCap[!,:RetChargeCap]) + sum(dfBioE_Cap[!,:RetChargeCap]),
 				NewChargeCap = sum(dfCap[!,:NewChargeCap]) + sum(dfBioE_Cap[!,:NewChargeCap]),EndChargeCap = sum(dfCap[!,:EndChargeCap]) + sum(dfBioE_Cap[!,:EndChargeCap]),
 				MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]) + sum(dfBioE_Cap[!,:MaxAnnualGeneration]), AnnualGeneration = sum(dfCap[!,:AnnualGeneration]) + sum(dfBioE_Cap[!,:AnnualGeneration]),
+				AnnualEmissions = sum(dfCap[!,:AnnualEmissions]) + sum(dfBioE_Cap[!,:AnnualEmissions]),
 				CapacityFactor = "-"
 			)
 	
@@ -326,8 +350,9 @@ function write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,
 			StartChargeCap = sum(dfCap[!,:StartChargeCap]) + sum(dfCap_H2G2P[!,:StartChargeCap]) + sum(dfBioE_Cap[!,:StartChargeCap]) , RetChargeCap = sum(dfCap[!,:RetChargeCap]) + sum(dfCap_H2G2P[!,:RetChargeCap]) + sum(dfBioE_Cap[!,:RetChargeCap]),
 			NewChargeCap = sum(dfCap[!,:NewChargeCap]) + sum(dfCap_H2G2P[!,:NewChargeCap]) + sum(dfBioE_Cap[!,:NewChargeCap]) ,EndChargeCap = sum(dfCap[!,:EndChargeCap]) + sum(dfCap_H2G2P[!,:EndChargeCap]) + sum(dfBioE_Cap[!,:EndChargeCap]),
 			MaxAnnualGeneration = sum(dfCap[!,:MaxAnnualGeneration]) + sum(dfCap_H2G2P[!,:MaxAnnualGeneration]) + sum(dfBioE_Cap[!,:MaxAnnualGeneration]) , AnnualGeneration = sum(dfCap[!,:AnnualGeneration]) + sum(dfCap_H2G2P[!,:AnnualGeneration]) + sum(dfBioE_Cap[!,:AnnualGeneration]),
-			CapacityFactor = "-"
-		)
+			AnnualEmissions = sum(dfCap[!,:AnnualEmissions]) + sum(dfCap_H2G2P[!,:AnnualEmissions]) + sum(dfBioE_Cap[!,:AnnualEmissions]),
+			CapacityFactor = "-")
+		
 		dfCap_Total_w_BioE = vcat(dfCap, dfCap_H2G2P, dfBioE_Cap, total_w_H2G2P_BioE)
 		CSV.write(string(path,sep,"capacity_w_H2G2P_BioE.csv"), dfCap_Total_w_BioE)
 	end
