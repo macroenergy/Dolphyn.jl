@@ -18,7 +18,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines a series of operating variables, expressions and constraints in truck scheduling and routing model.
-We establish the truck scheduling model by modeling the change of truck's states and number. In each zone 'z', we have
+We establish the truck scheduling model by modeling the change of truck's states and number. In each zone $z$, we have
 available trucks either in full or empty states which are ready for unloading or loading. In addition, we have trucks
 in transit states which are either in full or empty states. Further the transit states are divided into three categories:
 departed, arrived and in-transit. The departed trucks are trucks that have already loaded energy carrier such as hydrogen
@@ -27,26 +27,26 @@ and the in-transit trucks are trucks that are in transit on a certain defined ro
 to departed after the truck loading time, and samely, the truck state will shift from unloaded to arrived after the truck
 unloading time. Detailed truck model description is available in the [G. He, D. S. Mallapragada 2021](https://ieeexplore.ieee.org/abstract/document/9371425).
 
-![Truck scheduling model](assets/truck_scheduling.jpg)
+![Truck scheduling model](assets/truck_schematic.png)
 *Figure. Truck scheduling model*
 
-**Variables**
+## **Variables**
 
 |Variable|Description|
 |--------|-----------|
-|$v_{j, t}^{\textrm{F}}$|Number of full trucks of type 'j' at time 't'|
-|$v_{j, t}^{\textrm{E}}$|Number of empty trucks of type 'j' at time 't'|
-|$V_{j}$|Total number of trucks including full and empty of type 'j'|
-|$q_{z, j, t}^{\textrm{F}}$|Number of available full trucks of type 'j' at zone 'z' at time 't'|
-|$q_{z, j, t}^{\textrm{E}}$|Number of available empty trucks of type 'j' at zone 'z' at time 't'|
-|$u_{r, d, j, t}^{\textrm{F}}$|Number of full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$u_{r, d, j, t}^{\textrm{E}}$|Number of empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$x_{r, d, j, t-1}^{\textrm{F}}$|Number of departed full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$x_{r, d, j, t-1}^{\textrm{E}}$|Number of departed empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$y_{r, d, j, t-1}^{\textrm{F}}$|Number of arrived full trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
-|$y_{r, d, j, t-1}^{\textrm{E}}$|Number of arrived empty trucks in transit on route 'r' with direction 'd' of type 'j' at time 't'|
+|$v_{j, t}^{\textrm{F}}$|Number of full trucks of type $j$ at time $t$|
+|$v_{j, t}^{\textrm{E}}$|Number of empty trucks of type $j$ at time $t$|
+|$V_{j}$|Total number of trucks including full and empty of type $j$|
+|$q_{z, j, t}^{\textrm{F}}$|Number of available full trucks of type $j$ at zone 'z' at time $t$|
+|$q_{z, j, t}^{\textrm{E}}$|Number of available empty trucks of type $j$ at zone 'z' at time $t$|
+|$u_{r, d, j, t}^{\textrm{F}}$|Number of full trucks in transit on route 'r' with direction 'd' of type $j$ at time $t$|
+|$u_{r, d, j, t}^{\textrm{E}}$|Number of empty trucks in transit on route 'r' with direction 'd' of type $j$ at time $t$|
+|$x_{r, d, j, t-1}^{\textrm{F}}$|Number of departed full trucks in transit on route 'r' with direction 'd' of type $j$ at time $t$|
+|$x_{r, d, j, t-1}^{\textrm{E}}$|Number of departed empty trucks in transit on route 'r' with direction 'd' of type $j$ at time $t$|
+|$y_{r, d, j, t-1}^{\textrm{F}}$|Number of arrived full trucks in transit on route 'r' with direction 'd' of type $j$ at time $t$|
+|$y_{r, d, j, t-1}^{\textrm{E}}$|Number of arrived empty trucks in transit on route 'r' with direction 'd' of type $j$ at time $t$|
 
-**Constraints**
+## **Constraints**
 
 The sum of full and empty trucks should equal to the total number of invested trucks.
 ```math
@@ -63,7 +63,7 @@ The full (empty) trucks include full (empty) trucks in transit and staying at ea
 \end{aligned}
 ```
 
-The change of the total number of full (empty) available trucks at zone z should equal the number of charged (discharged) trucks minus the number of discharged (charged) trucks at zone z plus the number of full (empty) trucks that just arrived minus the number of full (empty) trucks that just departed:
+The change of the total number of full (empty) available trucks at zone $z$ should equal the number of charged (discharged) trucks minus the number of discharged (charged) trucks at zone $z$ plus the number of full (empty) trucks that just arrived minus the number of full (empty) trucks that just departed:
 ```math
 \begin{aligned}
     q_{z, j, t}^{\textrm{F}}-q_{z, j, t-1}^{\textrm{F}}=& q_{z, j, t}^{\textrm{CHA}}-q_{z, j, t}^{\textrm{DIS}} \\
@@ -83,7 +83,7 @@ The change of the total number of full (empty) trucks in transit from zone $z$ t
 \end{aligned}
 ```
 
-The amount of H2 delivered to zone z should equal the truck capacity times the number of discharged trucks minus the number of charged trucks, adjusted by theH2 boil-off loss during truck transportation and compression.
+The amount of $H_{2}$ delivered to zone $z$ should equal the truck capacity times the number of discharged trucks minus the number of charged trucks, adjusted by the $H_{2}$ boil-off loss during truck transportation and compression.
 ```math
 \begin{aligned}
     h_{z, j, t}^{\textrm{H,TRU}}=\left[\left(1-\sigma_{j}\right) q_{z, j, t}^{\textrm{DIS}}-q_{z, j, t}^{\textrm{CHA}}\right] \overline{\textrm{E}}_{j}^{\textrm{H,TRU}} \\
