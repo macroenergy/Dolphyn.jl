@@ -91,6 +91,22 @@ The amount of $H_{2}$ delivered to zone $z$ should equal the truck capacity time
 \end{aligned}
 ```
 
+Contributions to the hydrogen balance expression from gas trucking flows are defined as:
+HydrogenBalGas_{GEN} = \sum_{k \in \mathcal{UC}} x_{k,z,t}^{\textrm{H,GEN}}
+
+```math
+\begin{equation*}
+	HydrogenBalGas_{TRU} = \sum_{j \in \mathcal{J}} x_{j,z,t}^{\textrm{H,TRU,Gas}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+Liquid hydrogen balance contributions are defined in a similar manner, for liquid trucks: 
+
+```math
+\begin{equation*}
+	HydrogenBalLiq_{TRU} = \sum_{j \in \mathcal{J}} x_{j,z,t}^{\textrm{H,TRU,Liq}}  \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
 The minimum travelling time delay is modelled as follows.
 ```math
 \begin{aligned}
@@ -107,6 +123,8 @@ The minimum travelling time delay is modelled as follows.
 \end{aligned}
 ```
 
+**Constraints**
+
 The charging capability of truck stations is limited by their compression or liquefaction capacity.
 ```math
 \begin{equation*}
@@ -121,10 +139,15 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2Truck = inputs["dfH2Truck"]
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"] # Set of h2 truck types
+    H2_TRUCK_GAS = inputs["H2_TRUCK_GAS"]
+    H2_TRUCK_LIQ = inputs["H2_TRUCK_LIQ"]
 
     T = inputs["T"] # Number of time steps (hours)
     Z = inputs["Z"] # Number of zones
     R = inputs["R"] # Number of routes
+
+    max_route_time = zeros(length(H2_TRUCK_TYPES))
+
 
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"] # Index of interior subperiod for each representative period
@@ -132,6 +155,11 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     dfH2Route = inputs["dfH2Route"]
 
     Truck_map = inputs["Truck_map"]
+
+    # Set max time for a trucking routes based on speed
+    for j in H2_TRUCK_TYPES
+        max_route_time[j] = setup["H2TrucksMaxDistance"]/dfH2Truck[!, :"AvgTruckSpeed_mile_per_hour"][j]
+    end
 
     ### Variables ###
 
@@ -307,11 +335,22 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         eH2TruckFlow[t = 1:T, z = 1:Z],
-        sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_TYPES)
+        sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_GAS)
     )
     EP[:eH2Balance] += eH2TruckFlow
 
     # Hydrogen balance via truck traveling consumption
+    # H2 liquid balance
+    if setup["ModelH2Liquid"]==1
+        @expression(
+            EP,
+            eH2TruckLiqFlow[t = 1:T, z = 1:Z],
+            sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_LIQ)
+        )
+        EP[:eH2LiqBalance] += eH2TruckLiqFlow
+    end
+
+    # H2 Truck Traveling Consumption balance
     @expression(
         EP,
         eH2TruckTravelConsumption[t = 1:T, z = 1:Z],
@@ -376,6 +415,43 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     )
 
     # The number of total full (empty) trucks = travelling + available
+    # No truck in transit should have the same start and end 
+    @constraints(
+        EP,
+        begin
+            cH2TruckSameZoneTravelFull[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+            vH2Ntravel_full[zz, z, j, t] == 0
+            cH2TruckSameZoneTravelEmpty[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+            vH2Ntravel_empty[zz, z, j, t] == 0
+            cH2TruckSameZoneArriveFull[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+            vH2Narrive_full[zz, z, j, t] == 0
+            cH2TruckSameZoneArriveEmpty[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+            vH2Narrive_empty[zz, z, j, t] == 0
+            cH2TruckSameZoneDepartFull[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+            vH2Ndepart_full[zz, z, j, t] == 0
+            cH2TruckSameZoneDepartEmpty[zz in 1:Z, z = zz, j in H2_TRUCK_TYPES, t in 1:T],
+            vH2Ndepart_empty[zz, z, j, t] == 0
+        end
+    )
+
+    #No truck should travel more than 500km or 8.3 hours (at 60 kph)
+    #(to avoid issues with TDR time periods of 24 hours and to simplify the problem)
+    for zz in 1:Z, z in 1:Z, j in H2_TRUCK_TYPES
+        if inputs["TD"][j][zz, z] > max_route_time[j]
+            for t in 1:T
+                fix(vH2Ntravel_full[zz, z, j, t], 0; force = true)
+                fix(vH2Ntravel_empty[zz, z, j, t], 0; force = true)
+                fix(vH2Narrive_full[zz, z, j, t], 0; force = true)
+                fix(vH2Narrive_empty[zz, z, j, t], 0; force = true)
+                fix(vH2Ndepart_full[zz, z, j, t], 0; force = true)
+                fix(vH2Ndepart_empty[zz, z, j, t], 0; force = true)
+            end
+        end
+    end
+
+    
+    # The number of total full and empty trucks
+
     @constraints(
         EP,
         begin
@@ -570,7 +646,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                     t + inputs["TD"][j][r] <=
                     (t % inputs["hours_per_subperiod"]) *
                     (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + inputs["TD"][j][r]
+                    t + 1 <= t + inputs["TD"][j][r] &&
+                    inputs["TD"][j][zz, z] < 20
             )
             [r in 1:R, j in H2_TRUCK_TYPES, d in [-1, 1], t in 1:T],
             vH2Ntravel_empty[r, j, d, t] >= sum(
@@ -580,7 +657,9 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                     t + inputs["TD"][j][r] <=
                     (t % inputs["hours_per_subperiod"]) *
                     (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + inputs["TD"][j][r]
+                    t + 1 <= t + inputs["TD"][j][r] &&
+                    tt >=1 &&
+                    inputs["TD"][j][zz, z] < 20
             )
         end
     )
@@ -596,7 +675,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                     t + inputs["TD"][j][r] <=
                     (t % inputs["hours_per_subperiod"]) *
                     (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + inputs["TD"][j][r]
+                    t + 1 <= t + inputs["TD"][j][r] &&
+                    inputs["TD"][j][zz, z] < 20
             )
             [r in 1:R, j in H2_TRUCK_TYPES, d in [-1, 1], t in INTERIOR_SUBPERIODS],
             vH2Ntravel_empty[r, j, d, t] >= sum(
@@ -606,7 +686,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                     t + inputs["TD"][j][r] <=
                     (t % inputs["hours_per_subperiod"]) *
                     (inputs["hours_per_subperiod"] + 1) &&
-                    t + 1 <= t + inputs["TD"][j][r]
+                    t + 1 <= t + inputs["TD"][j][r] &&
+                    inputs["TD"][j][zz, z] < 20
             )
         end
     )

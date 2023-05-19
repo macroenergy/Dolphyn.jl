@@ -80,6 +80,17 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+    if setup["ModelH2Liquid"] ==1
+        H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
+        H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
+        H2_COMMIT = union(H2_GEN_COMMIT, H2_LIQ_COMMIT, H2_EVAP_COMMIT)
+        H2_LIQ = inputs["H2_LIQ"]
+        H2_EVAP = inputs["H2_EVAP"]
+    else
+        H2_COMMIT = H2_GEN_COMMIT
+    end
+    H2_GEN = inputs["H2_GEN"]
+    H2_STOR_ALL = inputs["H2_STOR_ALL"]
     H = inputs["H2_RES_ALL"]
 
     # Capacity of New H2 Gen units (tonnes/hr)
@@ -96,7 +107,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eH2GenTotalCap[k in 1:H],
         if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
-            if k in H2_GEN_COMMIT
+            if k in H2_COMMIT
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
                 (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
@@ -105,14 +116,14 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
                 EP[:vH2GenRetCap][k]
             end
         elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
-            if k in H2_GEN_COMMIT
+            if k in H2_COMMIT
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
             else
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k]
             end
         elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
-            if k in H2_GEN_COMMIT
+            if k in H2_COMMIT
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] -
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
             else
@@ -136,7 +147,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             EP,
             eH2GenCFix[k in 1:H],
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_GEN_COMMIT
+                if k in H2_COMMIT
                     1 / ModelScalingFactor^2 * (
                         dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
                         dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
@@ -161,7 +172,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             EP,
             eH2GenCFix[k in 1:H],
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_GEN_COMMIT
+                if k in H2_COMMIT
                     dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
                     dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
                     EP[:vH2GenNewCap][k] +
@@ -176,10 +187,18 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-    @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k = 1:H))
+    # Calculate total costs for each zone, for each gen type
+    @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in H2_GEN))
+
+    # Adding conditional for when liquefaction is considered
+    if setup["ModelH2Liquid"] ==1
+        @expression(EP, eTotalH2LiqCFix, sum(EP[:eH2GenCFix][k] for k in union(H2_LIQ, H2_EVAP)))
+        EP[:eObj] += eTotalH2LiqCFix
+    end
 
     # Add term to objective function expression
     EP[:eObj] += eTotalH2GenCFix
+    
 
     return EP
 

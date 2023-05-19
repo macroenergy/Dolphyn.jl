@@ -71,6 +71,9 @@ include("print_and_log.jl")
 # Results comparison tools
 include("compare_results.jl")
 
+# Enumerate zones
+include("enumerate_zones.jl")
+
 # Configure settings
 include("configure_settings/configure_settings.jl")
 
@@ -92,6 +95,7 @@ include("GenX/load_inputs/load_energy_share_requirement.jl")
 include("GenX/load_inputs/load_co2_cap.jl")
 include("GenX/load_inputs/load_period_map.jl")
 include("GenX/load_inputs/load_minimum_capacity_requirement.jl")
+include("GenX/load_inputs/load_maximum_capacity_requirement.jl")
 include("GenX/load_inputs/load_load_data.jl")
 include("GenX/load_inputs/load_fuels_data.jl")
 include("GenX/load_inputs/load_inputs.jl")
@@ -102,6 +106,7 @@ include("time_domain_reduction/time_domain_reduction.jl")
 #Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
+include("HSC/load_inputs/load_h2_demand_liquid.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_truck.jl")
@@ -140,6 +145,7 @@ include("GenX/model/policies/co2_cap_power.jl")
 include("GenX/model/policies/energy_share_requirement.jl")
 include("GenX/model/policies/cap_reserve_margin.jl")
 include("GenX/model/policies/minimum_capacity_requirement.jl")
+include("GenX/model/policies/maximum_capacity_requirement.jl")
 
 #Core HSC Modelling Features
 include("HSC/model/core/h2_investment.jl")
@@ -254,5 +260,6 @@ include("HSC/write_outputs/write_HSC_outputs.jl")
 include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
+include("HSC/write_outputs/write_h2_elec_costs.jl")
 
 end

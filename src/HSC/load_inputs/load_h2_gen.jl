@@ -18,11 +18,18 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
 Function for reading input parameters related to hydrogen generators.
+Liquifiers and evaporators are also considered here, and are identified via the H2_LIQ type column. 
+Liquid versus gas storage is identified via the H2_STOR type column. 
 """
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
+	Zones = inputs_gen["Zones"]
+
 	#Read in H2 generation related inputs
     h2_gen_in = DataFrame(CSV.File(string(path,sep,"HSC_generation.csv"), header=true), copycols=true)
+
+	# Filter H2 generation by zone
+	h2_gen_in = filter(row -> row.Zone in Zones, h2_gen_in)
 
     # Add Resource IDs after reading to prevent user errors
 	h2_gen_in[!,:R_ID] = 1:size(collect(skipmissing(h2_gen_in[!,1])),1)
@@ -48,13 +55,15 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# DEV NOTE: if we want to model other types of H2 storage (liquified or LOHC)  where discharging capacity is constrained  
 	# then we need to create another storage type to account for discharging capacity limits and costs
 	# H2_STOR = 1 : Charging and energy capacity sized and modeled but discharging capacity not sized or modeled. Mimicks gas storage
-	inputs_gen["H2_STOR_ABOVEGROUND_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	inputs_gen["H2_STOR_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
+	inputs_gen["H2_STOR_LIQ"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
 	#inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
 	# DEV NOTE: Duplicated currently since we have only one storage option can define it as a union when we have more storage options
 	inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
 
-	#H2_ELECTROLYZER : Eligible for Capacity Reserve Margin
-	inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[h2_gen_in.H2_Electrolyzer.==1,:R_ID]
+	# Identify electrolyzer resources - to include for eligibility in the Capacity Reserve Margin constraint
+	inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[(h2_gen_in.etaP2G_MWh_p_tonne.>0) .& (h2_gen_in.etaFuel_MMBtu_p_tonne.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+
 
 	# Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
 	inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
@@ -76,10 +85,28 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 	# Set of h2 resources eligible for unit committment
 	inputs_gen["H2_GEN_NO_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
 
-    #Set of all H2 production Units - can be either commit or new commit
-    inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
+	if setup["ModelH2Liquid"] ==1
+		# Set of h2 resources for liquefaction - unit commitment
+		inputs_gen["H2_LIQ_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==1,:R_ID]
+		# Set of h2 resources for liquefaction - no UC
+		inputs_gen["H2_LIQ_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==2,:R_ID]
+		# Set of h2 resources for evaporation - unit commitment
+		inputs_gen["H2_EVAP_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==3,:R_ID]
+		# Set of h2 resources for evaporation - no UC
+		inputs_gen["H2_EVAP_NO_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==4,:R_ID]
 
-    # Set of all resources eligible for new capacity - includes both storage and generation
+		#Set of all H2 liquefaction Units - can be either commit or new commit
+		inputs_gen["H2_LIQ"] = union(inputs_gen["H2_LIQ_COMMIT"],inputs_gen["H2_LIQ_NO_COMMIT"])
+
+		#Set of all H2 evaportation Units (from liquid to gas) - can be either commit or new commit
+    	inputs_gen["H2_EVAP"] = union(inputs_gen["H2_EVAP_COMMIT"],inputs_gen["H2_EVAP_NO_COMMIT"])
+
+	end
+
+	#Set of all H2 production Units - can be either commit or new commit
+	inputs_gen["H2_GEN"] = union(inputs_gen["H2_GEN_COMMIT"],inputs_gen["H2_GEN_NO_COMMIT"])
+
+	# Set of all resources eligible for new capacity - includes both storage and generation
 	# DEV NOTE: Should we allow investment in flexible demand capacity later on?
 	inputs_gen["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_tonne_p_hr.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID]) 
 	# Set of all resources eligible for capacity retirements

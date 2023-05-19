@@ -62,6 +62,8 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 	## Default value of Num_VRE_Bins ==1
 	print_and_log("Dispatchable Resources Module")
 
+	Zones = inputs["Zones"]
+
 	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -77,7 +79,7 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 
 	## Power Balance Expressions ##
 
-	@expression(EP, ePowerBalanceDisp[t=1:T, z=1:Z], sum(EP[:vP][y,t] for y in intersect(VRE, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
+	@expression(EP, ePowerBalanceDisp[t=1:T, z=1:Z], sum(EP[:vP][y,t] for y in intersect(VRE, dfGen[dfGen[!,:Zone].==Zones[z],:][!,:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceDisp
 
@@ -108,7 +110,7 @@ function curtailable_variable_renewable(EP::Model, inputs::Dict, Reserves::Int)
 	@expression(EP, 
 		# the unit is GW
 		eGenerationByVRE[z=1:Z, t=1:T], 
-		sum(EP[:vP][y,t] for y in intersect(inputs["VRE"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
+		sum(EP[:vP][y,t] for y in intersect(inputs["VRE"], dfGen[dfGen[!,:Zone].==Zones[z],:R_ID]))
 	)
 	
 	EP[:eGenerationByZone] += eGenerationByVRE

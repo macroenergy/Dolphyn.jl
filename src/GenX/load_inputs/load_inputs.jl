@@ -42,11 +42,19 @@ function load_inputs(setup::Dict,path::AbstractString)
 	print_and_log("Reading Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
 	inputs = Dict()
+
+	# Store zonal information in inputs from setup
+	if !haskey(setup, "Zones") || isempty(setup["Zones"])
+		inputs["Zones"] = enumerate_zones(setup,path)
+	else
+		inputs["Zones"] = setup["Zones"]
+	end
+	inputs["Z"] = length(inputs["Zones"])
+
 	# Read input data about power network topology, operating and expansion attributes
     if isfile(string(path,sep,"Network.csv"))
 		inputs, network_var = load_network_data(setup, path, sep, inputs)
 	else
-		inputs["Z"] = 1
 		inputs["L"] = 0
 	end
 
@@ -73,6 +81,10 @@ function load_inputs(setup::Dict,path::AbstractString)
 
 	if setup["MinCapReq"] == 1
 		inputs = load_minimum_capacity_requirement(path,sep, inputs, setup)
+	end
+
+	if setup["MaxCapReq"] == 1
+		inputs = load_maximum_capacity_requirement(path,sep, inputs, setup)
 	end
 
 	if setup["EnergyShareRequirement"]==1
