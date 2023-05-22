@@ -20,24 +20,24 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Functions for reporting capacities of hydrogen trucks (starting capacities or, existing capacities, retired capacities, and new-built capacities).    
 """
 function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
-    H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
-    NEW_CAP_H2_TRUCK_CHARGE = inputs["NEW_CAP_H2_TRUCK_CHARGE"]
-    RET_CAP_H2_TRUCK_CHARGE = inputs["RET_CAP_H2_TRUCK_CHARGE"]
-    NEW_CAP_H2_TRUCK_ENERGY = inputs["NEW_CAP_H2_TRUCK_ENERGY"]
-    RET_CAP_H2_TRUCK_ENERGY = inputs["RET_CAP_H2_TRUCK_ENERGY"]
 
-    dfH2Truck = inputs["dfH2Truck"]
-    Z = inputs["Z"]
+    # GC.enable(false)
+    H2_TRUCK_TYPES::Vector{Int64} = inputs["H2_TRUCK_TYPES"]
+    NEW_CAP_TRUCK::Vector{Int64} = inputs["NEW_CAP_TRUCK"]
+    RET_CAP_TRUCK::Vector{Int64} = inputs["RET_CAP_TRUCK"]
+
+    dfH2Truck::DataFrame = inputs["dfH2Truck"]
+    Z::Int64 = inputs["Z"]
 
     # H2 truck capacity
-    capNumber = zeros(size(H2_TRUCK_TYPES))
-    retNumber = zeros(size(H2_TRUCK_TYPES))
-    endNumber = zeros(size(H2_TRUCK_TYPES))
+    capNumber::Vector{Float64} = zeros(size(H2_TRUCK_TYPES))
+    retNumber::Vector{Float64} = zeros(size(H2_TRUCK_TYPES))
+    endNumber::Vector{Float64} = zeros(size(H2_TRUCK_TYPES))
     for j in H2_TRUCK_TYPES
-        if j in NEW_CAP_H2_TRUCK_CHARGE
+        if j in NEW_CAP_TRUCK
             capNumber[j] = value(EP[:vH2TruckNumber][j])
         end
-        if j in RET_CAP_H2_TRUCK_CHARGE
+        if j in RET_CAP_TRUCK
             retNumber[j] = value(EP[:vH2RetTruckNumber][j])
         end
         endNumber[j] = value(EP[:eTotalH2TruckNumber][j])
@@ -51,35 +51,25 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         EndTruck = endNumber
     )
 
+    prealloc_dfH2Truck_cols!(dfH2TruckCap, Z, H2_TRUCK_TYPES)
+
     for z in 1:Z
-        dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in NEW_CAP_H2_TRUCK_ENERGY
-                tempEnergy[j] = value(EP[:vH2TruckEnergy][z,j])
-            end
-        end
-        dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
+        dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] = dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_z$z")]
 
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in RET_CAP_H2_TRUCK_ENERGY
-                tempEnergy[j] = value(EP[:vH2RetTruckEnergy][z,j])
-            end
-        end
-        dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
+        temp_idx::Vector{Int64} = intersect(H2_TRUCK_TYPES, NEW_CAP_TRUCK)
+        dfH2TruckCap[!,Symbol("NewTruckCompZone$z")][temp_idx] .= convert(Vector{Float64}, value.(EP[:vH2TruckComp][z,temp_idx]))
 
-        tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            tempEnergy[j] = value(EP[:eTotalH2TruckEnergy][z,j])
-        end
-        dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")] = tempEnergy
+        temp_idx = intersect(H2_TRUCK_TYPES, RET_CAP_TRUCK)
+        dfH2TruckCap[!,Symbol("RetTruckCompZone$z")][temp_idx] .= convert(Vector{Float64}, value.(EP[:vH2RetTruckComp][z,temp_idx]))
+
+        temp_idx = H2_TRUCK_TYPES
+        dfH2TruckCap[!,Symbol("EndTruckCompZone$z")][temp_idx] .= convert(Vector{Float64}, value.(EP[:eTotalH2TruckComp][z,temp_idx]))
     end
 
-    dfH2TruckCap[!,:StartTruckEnergy] = sum(dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:NewTruckEnergy] = sum(dfH2TruckCap[!, Symbol("NewTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:RetTruckEnergy] = sum(dfH2TruckCap[!, Symbol("RetTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:EndTruckEnergy] = sum(dfH2TruckCap[!, Symbol("EndTruckEnergyZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:StartTruckComp] = sum(dfH2TruckCap[!, Symbol("StartTruckCompZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:NewTruckComp] = sum(dfH2TruckCap[!, Symbol("NewTruckCompZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:RetTruckComp] = sum(dfH2TruckCap[!, Symbol("RetTruckCompZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:EndTruckComp] = sum(dfH2TruckCap[!, Symbol("EndTruckCompZone$z")] for z in 1:Z)
 
     dfH2TruckTotal = DataFrame(
         TruckType = "Total",
@@ -87,19 +77,46 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         NewTruck = sum(dfH2TruckCap[!,:NewTruck]),
         RetTruck = sum(dfH2TruckCap[!,:RetTruck]),
         EndTruck = sum(dfH2TruckCap[!,:EndTruck]),
-        StartTruckEnergy = sum(dfH2TruckCap[!,:StartTruckEnergy]),
-        NewTruckEnergy = sum(dfH2TruckCap[!,:NewTruckEnergy]),
-        RetTruckEnergy = sum(dfH2TruckCap[!,:RetTruckEnergy]),
-        EndTruckEnergy = sum(dfH2TruckCap[!,:EndTruckEnergy])
+        StartTruckComp = sum(dfH2TruckCap[!,:StartTruckComp]),
+        NewTruckComp = sum(dfH2TruckCap[!,:NewTruckComp]),
+        RetTruckComp = sum(dfH2TruckCap[!,:RetTruckComp]),
+        EndTruckComp = sum(dfH2TruckCap[!,:EndTruckComp])
     )
-
     for z in 1:Z
-        dfH2TruckTotal[!,Symbol("StartTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("NewTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("RetTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("EndTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")])]
+        dfH2TruckTotal[!,Symbol("StartTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckCompZone$z")])]
+        dfH2TruckTotal[!,Symbol("NewTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckCompZone$z")])]
+        dfH2TruckTotal[!,Symbol("RetTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckCompZone$z")])]
+        dfH2TruckTotal[!,Symbol("EndTruckCompZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckCompZone$z")])]
     end
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)
-    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dftranspose(dfH2TruckCap, false))
+    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dfH2TruckCap)
+    # GC.enable(true)
+
+end
+
+function prealloc_dfH2Truck_cols!(dfH2TruckCap::DataFrame, Z::Int64, H2_TRUCK_TYPES::Vector{Int64})
+    num_trucks::Tuple{Int64} = size(H2_TRUCK_TYPES)
+
+    root_names::Vector{String} = [
+        "StartTruckCompZone",
+        "NewTruckCompZone",
+        "RetTruckCompZone",
+        "EndTruckCompZone"
+    ]
+    for z in 1:Z
+        for root in root_names
+            dfH2TruckCap[!, Symbol("$root$z")] = zeros(Float64, num_trucks)
+        end
+    end
+
+    tail_names::Vector{String} = [
+        "StartTruckComp",
+        "NewTruckComp",
+        "RetTruckComp",
+        "EndTruckComp"
+    ]
+    for name in tail_names
+        dfH2TruckCap[!, Symbol(name)] = zeros(Float64, num_trucks)
+    end
 end
