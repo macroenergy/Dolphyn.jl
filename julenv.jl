@@ -31,7 +31,8 @@ function get_gurobi_version()
     end
 end
 
-Pkg.activate("DOLPHYNJulEnv")
+Pkg.generate("DOLPHYN")
+
 Pkg.add(Pkg.PackageSpec(name="Cbc", version="1.0.1"))
 Pkg.add(Pkg.PackageSpec(name="Clp", version="1.0.1"))
 Pkg.add(Pkg.PackageSpec(name="HiGHS", version="1.1.4"))
@@ -65,13 +66,16 @@ Pkg.add(Pkg.PackageSpec(name="Statistics", version="1.4.0"))
 Pkg.add(Pkg.PackageSpec(name="OrdinaryDiffEq", version="5.60.1"))
 Pkg.add(Pkg.PackageSpec(name="QuasiMonteCarlo", version="0.2.3"))
 ##Add if elseif with Method of Morris for these
-Pkg.add(Pkg.PackageSpec(name="BenchmarkTools", version="1.3.1"))
 Pkg.add(Pkg.PackageSpec(name="MathProgBase", version="0.7.8"))
 Pkg.add(Pkg.PackageSpec(name="StatsBase", version="0.33.21"))
-Pkg.add(Pkg.PackageSpec(name="YAML", version="0.4.7"))
 Pkg.add(Pkg.PackageSpec(name="LinearAlgebra"))
-Pkg.add(Pkg.PackageSpec(name="Revise"))
+
 Pkg.add(Pkg.PackageSpec(name="RecursiveArrayTools", version="2.31.2"))
+
+Pkg.add(Pkg.PackageSpec(name="YAML", version="0.4.7"))
+Pkg.add(Pkg.PackageSpec(name="Glob"))
+Pkg.add(Pkg.PackageSpec(name="Revise"))
+Pkg.add(Pkg.PackageSpec(name="BenchmarkTools", version="1.3.1"))
 
 # Logging
 Pkg.add(Pkg.PackageSpec(name="Logging"))
