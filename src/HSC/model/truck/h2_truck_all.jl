@@ -420,17 +420,15 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     # The number of total full (empty) trucks = travelling + available
     #No truck should travel more than 500km or 8.3 hours (at 60 kph)
     #(to avoid issues with TDR time periods of 24 hours and to simplify the problem)
-    for j in H2_TRUCK_TYPES, r=1:R
+    for j in H2_TRUCK_TYPES, r = 1:R
         if inputs["TD"][j][r] > max_route_time[j]
-            for d in [-1,1]
-                for t = 1:T
-                    fix(vH2Ntravel_full[r, j, d, t], 0; force = true)
-                    fix(vH2Ntravel_empty[r, j, d, t], 0; force = true)
-                    fix(vH2Narrive_full[r, j, d, t], 0; force = true)
-                    fix(vH2Narrive_empty[r, j, d, t], 0; force = true)
-                    fix(vH2Ndepart_full[r, j, d, t], 0; force = true)
-                    fix(vH2Ndepart_empty[r, j, d, t], 0; force = true)
-                end
+            for t = 1:T
+                fix(vH2Ntravel_full[r, j, [-1, 1], t], 0; force = true)
+                fix(vH2Ntravel_empty[r, j, [-1, 1], t], 0; force = true)
+                fix(vH2Narrive_full[r, j, [-1, 1], t], 0; force = true)
+                fix(vH2Narrive_empty[r, j, [-1, 1], t], 0; force = true)
+                fix(vH2Ndepart_full[r, j, [-1, 1], t], 0; force = true)
+                fix(vH2Ndepart_empty[r, j, [-1, 1], t], 0; force = true)
             end
         end
     end
