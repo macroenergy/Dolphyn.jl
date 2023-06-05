@@ -47,6 +47,9 @@ using Revise
 using Glob
 using LoggingExtras
 
+using Random
+using RecursiveArrayTools
+using Statistics
 
 # Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
 using Gurobi
@@ -70,13 +73,17 @@ const H2_LHV = 33.33 # MWh per tonne
 Log = true
 
 # Load GenX
-function find_all_to_include(folder::String, file_type::String=".jl", recursive::Bool=false)::Vector{String}
+function find_all_to_include(dir::String, file_type::String=".jl", recursive::Bool=false)::Vector{String}
     if recursive
-        search_string = "*/*$(file_type)"
+        result = String[]
+        for (root, dirs, files) in walkdir(dir)
+            append!(result, filter!(f -> occursin(file_type, f), joinpath.(root, files)))
+        end
+        return result
     else
         search_string = "*$(file_type)"
+        return glob(search_string, dir)
     end
-    return glob(search_string, folder)
 end
 
 # We can't easily run GenX.jl because that creates a module
@@ -84,159 +91,28 @@ end
 # Instead, we'll include all the GenX functions and then overwrite them
 genxsubmod_path = joinpath(@__DIR__,"GenX", "src")
 files_to_exclude = [
-    "$(genxsubmod_path)/time_domain_reduction/time_domain_reduction.jl"
+    joinpath(genxsubmod_path,"GenX.jl"),
+    joinpath(genxsubmod_path,"simplt_operation.jl"),
+    joinpath(genxsubmod_path,"time_domain_reduction","time_domain_reduction.jl"),
+    joinpath(genxsubmod_path,"model","solve_model.jl"),
+    joinpath(genxsubmod_path,"model","generate_model.jl"),
 ]
+dirs_to_exclude = [
+    joinpath(genxsubmod_path,"configure_solver"),
+    joinpath(genxsubmod_path,"configure_settings")
+]
+for dir in dirs_to_exclude
+    push!(files_to_exclude, find_all_to_include(dir, ".jl", true)...)
+end
+for file in files_to_exclude
+    println("Excluding $file")
+end
 genx_module_files = find_all_to_include(genxsubmod_path, ".jl", true)
 filter!(x -> !(x in files_to_exclude), genx_module_files)
 for file in genx_module_files
+    # println("Including $file")
     include(file)
 end
-
-# # Get list of all GenX .jl files
-# genx_module_files = glob("*/*.jl", genxsubmod_path)
-# # println(genx_module_files[1])
-# println(pwd())
-# for file in genx_module_files
-#     include(file)
-# end
-
-# # Case runner
-# include("$(genxsubmod_path)/case_runners/case_runner.jl")
-
-# # Configure settings
-# include("$(genxsubmod_path)/configure_settings/configure_settings.jl")
-
-# # Configure optimizer instance
-# include("$(genxsubmod_path)/configure_solver/configure_highs.jl")
-# include("$(genxsubmod_path)/configure_solver/configure_gurobi.jl")
-# include("$(genxsubmod_path)/configure_solver/configure_scip.jl")
-# include("$(genxsubmod_path)/configure_solver/configure_cplex.jl")
-# include("$(genxsubmod_path)/configure_solver/configure_clp.jl")
-# include("$(genxsubmod_path)/configure_solver/configure_cbc.jl")
-# include("$(genxsubmod_path)/configure_solver/configure_solver.jl")
-
-# # Load input data
-# include("$(genxsubmod_path)/load_inputs/load_generators_data.jl")
-# include("$(genxsubmod_path)/load_inputs/load_generators_variability.jl")
-# include("$(genxsubmod_path)/load_inputs/load_network_data.jl")
-# include("$(genxsubmod_path)/load_inputs/load_reserves.jl")
-# include("$(genxsubmod_path)/load_inputs/load_cap_reserve_margin.jl")
-# include("$(genxsubmod_path)/load_inputs/load_energy_share_requirement.jl")
-# include("$(genxsubmod_path)/load_inputs/load_co2_cap.jl")
-# include("$(genxsubmod_path)/load_inputs/load_period_map.jl")
-# include("$(genxsubmod_path)/load_inputs/load_minimum_capacity_requirement.jl")
-# include("$(genxsubmod_path)/load_inputs/load_load_data.jl")
-# include("$(genxsubmod_path)/load_inputs/load_fuels_data.jl")
-# include("$(genxsubmod_path)/load_inputs/load_inputs.jl")
-
-# include("$(genxsubmod_path)/time_domain_reduction/time_domain_reduction.jl")
-
-# # Core GenX Features
-# include("$(genxsubmod_path)/model/core/discharge/discharge.jl")
-# include("$(genxsubmod_path)/model/core/discharge/investment_discharge.jl")
-
-# include("$(genxsubmod_path)/model/core/non_served_energy.jl")
-# include("$(genxsubmod_path)/model/core/ucommit.jl")
-# include("$(genxsubmod_path)/model/core/emissions.jl")
-
-# include("$(genxsubmod_path)/model/core/reserves.jl")
-
-# include("$(genxsubmod_path)/model/core/transmission.jl")
-
-# include("$(genxsubmod_path)/model/resources/curtailable_variable_renewable/curtailable_variable_renewable.jl")
-
-# include("$(genxsubmod_path)/model/resources/flexible_demand/flexible_demand.jl")
-
-# include("$(genxsubmod_path)/model/resources/hydro/hydro_res.jl")
-# include("$(genxsubmod_path)/model/resources/hydro/hydro_inter_period_linkage.jl")
-
-# include("$(genxsubmod_path)/model/resources/must_run/must_run.jl")
-
-# include("$(genxsubmod_path)/model/resources/storage/storage.jl")
-# include("$(genxsubmod_path)/model/resources/storage/investment_energy.jl")
-# include("$(genxsubmod_path)/model/resources/storage/storage_all.jl")
-# include("$(genxsubmod_path)/model/resources/storage/long_duration_storage.jl")
-# include("$(genxsubmod_path)/model/resources/storage/investment_charge.jl")
-# include("$(genxsubmod_path)/model/resources/storage/storage_asymmetric.jl")
-# include("$(genxsubmod_path)/model/resources/storage/storage_symmetric.jl")
-
-# include("$(genxsubmod_path)/model/resources/thermal/thermal.jl")
-# include("$(genxsubmod_path)/model/resources/thermal/thermal_commit.jl")
-# include("$(genxsubmod_path)/model/resources/thermal/thermal_no_commit.jl")
-
-# include("$(genxsubmod_path)/model/resources/retrofits/retrofits.jl")
-
-# include("$(genxsubmod_path)/model/policies/co2_cap.jl")
-# include("$(genxsubmod_path)/model/policies/energy_share_requirement.jl")
-# include("$(genxsubmod_path)/model/policies/cap_reserve_margin.jl")
-# include("$(genxsubmod_path)/model/policies/minimum_capacity_requirement.jl")
-
-# # include("$(genxsubmod_path)/model/generate_model.jl")
-# # include("$(genxsubmod_path)/model/solve_model.jl")
-
-# include("$(genxsubmod_path)/write_outputs/dftranspose.jl")
-# include("$(genxsubmod_path)/write_outputs/write_capacity.jl")
-# include("$(genxsubmod_path)/write_outputs/write_capacityfactor.jl")
-# include("$(genxsubmod_path)/write_outputs/write_charge.jl")
-# include("$(genxsubmod_path)/write_outputs/write_charging_cost.jl")
-# include("$(genxsubmod_path)/write_outputs/write_costs.jl")
-# include("$(genxsubmod_path)/write_outputs/write_curtailment.jl")
-# include("$(genxsubmod_path)/write_outputs/write_emissions.jl")
-# include("$(genxsubmod_path)/write_outputs/write_energy_revenue.jl")
-# include("$(genxsubmod_path)/write_outputs/write_net_revenue.jl")
-# include("$(genxsubmod_path)/write_outputs/write_nse.jl")
-# include("$(genxsubmod_path)/write_outputs/write_power.jl")
-# include("$(genxsubmod_path)/write_outputs/write_power_balance.jl")
-# include("$(genxsubmod_path)/write_outputs/write_price.jl")
-# include("$(genxsubmod_path)/write_outputs/write_reliability.jl")
-# include("$(genxsubmod_path)/write_outputs/write_status.jl")
-# include("$(genxsubmod_path)/write_outputs/write_storage.jl")
-# include("$(genxsubmod_path)/write_outputs/write_storagedual.jl")
-# include("$(genxsubmod_path)/write_outputs/write_subsidy_revenue.jl")
-# include("$(genxsubmod_path)/write_outputs/write_time_weights.jl")
-# include("$(genxsubmod_path)/write_outputs/choose_output_dir.jl")
-
-# include("$(genxsubmod_path)/write_outputs/capacity_reserve_margin/write_capacity_value.jl")
-# include("$(genxsubmod_path)/write_outputs/capacity_reserve_margin/write_reserve_margin_revenue.jl")
-# include("$(genxsubmod_path)/write_outputs/capacity_reserve_margin/write_reserve_margin_w.jl")
-# include("$(genxsubmod_path)/write_outputs/capacity_reserve_margin/write_reserve_margin.jl")
-
-# include("$(genxsubmod_path)/write_outputs/energy_share_requirement/write_esr_prices.jl")
-# include("$(genxsubmod_path)/write_outputs/energy_share_requirement/write_esr_revenue.jl")
-
-# include("$(genxsubmod_path)/write_outputs/long_duration_storage/write_opwrap_lds_dstor.jl")
-# include("$(genxsubmod_path)/write_outputs/long_duration_storage/write_opwrap_lds_stor_init.jl")
-
-# include("$(genxsubmod_path)/write_outputs/reserves/write_reg.jl")
-# include("$(genxsubmod_path)/write_outputs/reserves/write_rsv.jl")
-
-# include("$(genxsubmod_path)/write_outputs/transmission/write_nw_expansion.jl")
-# include("$(genxsubmod_path)/write_outputs/transmission/write_transmission_flows.jl")
-# include("$(genxsubmod_path)/write_outputs/transmission/write_transmission_losses.jl")
-
-# include("$(genxsubmod_path)/write_outputs/ucommit/write_commit.jl")
-# include("$(genxsubmod_path)/write_outputs/ucommit/write_shutdown.jl")
-# include("$(genxsubmod_path)/write_outputs/ucommit/write_start.jl")
-
-# include("$(genxsubmod_path)/write_outputs/write_outputs.jl")
-
-# #Just for unit testing; Under active development
-# include("$(genxsubmod_path)/simple_operation.jl")
-
-# # Multi Stage files
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_settings.jl")
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_capacities_discharge.jl")
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_capacities_charge.jl")
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_capacities_energy.jl")
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_network_expansion.jl")
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_costs.jl")
-# include("$(genxsubmod_path)/multi_stage/write_multi_stage_stats.jl")
-# include("$(genxsubmod_path)/multi_stage/dual_dynamic_programming.jl")
-# include("$(genxsubmod_path)/multi_stage/configure_multi_stage_inputs.jl")
-# include("$(genxsubmod_path)/multi_stage/endogenous_retirement.jl")
-
-# include("$(genxsubmod_path)/additional_tools/modeling_to_generate_alternatives.jl")
-# include("$(genxsubmod_path)/additional_tools/method_of_morris.jl")
 
 # Load time domain reduction related scripts
 include("time_domain_reduction/time_domain_reduction.jl")
@@ -275,6 +151,7 @@ include("configure_solver/configure_cplex.jl")
 include("configure_solver/configure_clp.jl")
 include("configure_solver/configure_cbc.jl")
 include("configure_solver/configure_solver.jl")
+
 #Core HSC Modelling Features
 include("HSC/model/core/h2_investment.jl")
 include("HSC/model/core/h2_outputs.jl")
