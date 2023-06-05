@@ -1,3 +1,19 @@
+"""
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A complete copy of the GNU General Public License v2 (GPLv2) is available
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 using DOLPHYN
 using YAML
 using LoggingExtras
@@ -11,7 +27,7 @@ inputs_path = case_dir
 # Loading settings
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
-mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
+mysetup_genx = configure_settings(genx_settings) # mysetup dictionary stores GenX-specific parameters
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
