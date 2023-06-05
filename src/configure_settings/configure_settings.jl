@@ -60,6 +60,10 @@ function configure_settings(settings_path::String) #! This function needs to be 
     if (!haskey(settings, "MinCapReq"))
         settings["MinCapReq"] = 0
     end
+    ## Activate maximum technology carveout constraints; 0 = not active; 1 = active
+    if (!haskey(settings, "MaxCapReq"))
+        settings["MaxCapReq"] = 0
+    end
     ## Available solvers: Gurobi, CPLEX, CLPs
     if (!haskey(settings, "Solver"))
         settings["Solver"] = "Gurobi"
@@ -99,6 +103,10 @@ function configure_settings(settings_path::String) #! This function needs to be 
     # Slack value as a fraction of least-cost objective in budget constraint used for evaluating alternative model solutions; positive float value
     if (!haskey(settings, "ModelingtoGenerateAlternativeSlack"))
         settings["ModelingtoGenerateAlternativeSlack"] = 0.1
+    end
+    # ESR losses in transmission and storage
+    if (!haskey(settings, "IncludeLossesInESR"))
+        settings["IncludeLossesInESR"] = 0
     end
 
     return settings
