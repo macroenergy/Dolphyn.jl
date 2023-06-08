@@ -1,37 +1,37 @@
 # Functions for Writing the Different Results/Outputs to Separate Files
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_outputs.jl"]
+Pages = ["GenX/src/write_outputs/write_outputs.jl"]
 ```
 
 ## Write Status
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_status.jl"]
+Pages = ["GenX/src/write_outputs/write_status.jl"]
 ```
 
 ## Write Costs
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_costs.jl"]
+Pages = ["GenX/src/write_outputs/write_costs.jl"]
 ```
 
 ## Write Emissions
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_emissions.jl"]
+Pages = ["GenX/src/write_outputs/write_emissions.jl"]
 ```
 
 ## Write Capacities
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_capacity.jl"]
+Pages = ["GenX/src/write_outputs/write_capacity.jl"]
 ```
 
 ## Write Capacity Values
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/capacity_reserve_margin/write_capacity_value.jl"]
+Pages = ["GenX/src/write_outputs/capacity_reserve_margin/write_capacity_value.jl"]
 ```
 
 ## Write Capacity Reserve
@@ -46,31 +46,31 @@ Pages = [
 ## Write Charge Values
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_charge.jl"]
+Pages = ["GenX/src/write_outputs/write_charge.jl"]
 ```
 
 ## Write Charge Costs
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_charging_cost.jl"]
+Pages = ["GenX/src/write_outputs/write_charging_cost.jl"]
 ```
 
 ## Write Non-Served Energy
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_nse.jl"]
+Pages = ["GenX/src/write_outputs/write_nse.jl"]
 ```
 
 ## Write Storage
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_storage.jl"]
+Pages = ["GenX/src/write_outputs/write_storage.jl"]
 ```
 
 ## Write Storage Dual
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_storagedual.jl"]
+Pages = ["GenX/src/write_outputs/write_storagedual.jl"]
 ```
 
 ## Write Long Duration Storage
@@ -85,13 +85,13 @@ Pages = [
 ## Write Power
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_power.jl"]
+Pages = ["GenX/src/write_outputs/write_power.jl"]
 ```
 
 ## Write Power Balance
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_power_balance.jl"]
+Pages = ["GenX/src/write_outputs/write_power_balance.jl"]
 ```
 
 ## Write Unit Commitment
@@ -107,37 +107,37 @@ Pages = [
 ## Write Curtailment
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_curtailment.jl"]
+Pages = ["GenX/src/write_outputs/write_curtailment.jl"]
 ```
 
 ## Write Network Expansion
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/transmission/write_nw_expansion.jl"]
+Pages = ["GenX/src/write_outputs/transmission/write_nw_expansion.jl"]
 ```
 
 ## Write Network Flow
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/transmission/write_transmission_flows.jl"]
+Pages = ["GenX/src/write_outputs/transmission/write_transmission_flows.jl"]
 ```
 
 ## Write Network Losses
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/transmission/write_transmission_losses.jl"]
+Pages = ["GenX/src/write_outputs/transmission/write_transmission_losses.jl"]
 ```
 
 ## Write Prices
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_price.jl"]
+Pages = ["GenX/src/write_outputs/write_price.jl"]
 ```
 
 ## Write Reliability
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_reliability.jl"]
+Pages = ["GenX/src/write_outputs/write_reliability.jl"]
 ```
 
 ## Write Reserves
@@ -152,41 +152,41 @@ Pages = [
 ## Write Energy Revenue
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_energy_revenue.jl"]
+Pages = ["GenX/src/write_outputs/write_energy_revenue.jl"]
 ```
 
 ## Write Subsidy Revenue
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_subsidy_revenue.jl"]
+Pages = ["GenX/src/write_outputs/write_subsidy_revenue.jl"]
 ```
 
 ## Write Capacity Revenue
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/capacity_reserve_margin/write_reserve_margin_revenue.jl"]
+Pages = ["GenX/src/write_outputs/capacity_reserve_margin/write_reserve_margin_revenue.jl"]
 ```
 
 ## Write Energy Share Requirement Revenue
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/energy_share_requirement/write_esr_revenue.jl"]
+Pages = ["GenX/src/write_outputs/energy_share_requirement/write_esr_revenue.jl"]
 ```
 
 ## Write Energy Share Requirement Prices
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/energy_share_requirement/write_esr_prices.jl"]
+Pages = ["GenX/src/write_outputs/energy_share_requirement/write_esr_prices.jl"]
 ```
 
 ## Write Net Revenue
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_net_revenue.jl"]
+Pages = ["GenX/src/write_outputs/write_net_revenue.jl"]
 ```
 
 ## Write Time Weights
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/write_outputs/write_time_weights.jl"]
+Pages = ["GenX/src/write_outputs/write_time_weights.jl"]
 ```
