@@ -1,4 +1,6 @@
 name = "DOLPHYN Docs"
+uuid = "f496ce4e-229a-44b6-b7bb-2aa1f40294d6"
+version = "0.1.0"
 
 [deps]
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
