@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 push!(LOAD_PATH,"../src/")
 push!(LOAD_PATH,"docs/src")
 import DataStructures: OrderedDict
-using DOLPHYN
+# using DOLPHYN
 using Documenter
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 println(pwd())
