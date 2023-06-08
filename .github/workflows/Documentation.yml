@@ -16,7 +16,7 @@ jobs:
         with:
           version: '1.7'
       - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.add("DataStructures"); Pkg.add("Documenter"); Pkg.add("DocumenterTools")'
+        run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path="docs/")); Pkg.instantiate()'
       - name: Build and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
