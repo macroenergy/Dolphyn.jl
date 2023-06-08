@@ -14,10 +14,12 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-push!(LOAD_PATH,"../src/")
-push!(LOAD_PATH,"docs/src")
+println(pwd())
+push!(LOAD_PATH,joinpath(@__DIR__,"../src/"))
+push!(LOAD_PATH,joinpath(@__DIR__,"src"))
+
 import DataStructures: OrderedDict
-# using DOLPHYN
+using DOLPHYN
 using Documenter
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 println(pwd())
