@@ -1,5 +1,5 @@
 [deps]
-DOLPHYN = "5d317b1e-30ec-4ed6-a8ce-8d2d88d7cfac"
+DOLPHYN = "2a466132-4b02-429f-9994-5df6ddd3977f"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
