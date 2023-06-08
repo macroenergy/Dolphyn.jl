@@ -141,6 +141,9 @@ include("print_and_log.jl")
 # Results comparison tools
 include("compare_results.jl")
 
+# Enumerate zones
+include("enumerate_zones.jl")
+
 # Configure settings
 include("configure_settings/configure_settings.jl")
 
@@ -219,5 +222,6 @@ include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
 include("HSC/write_outputs/choose_h2_output_dir.jl")
 
+include("HSC/write_outputs/write_h2_elec_costs.jl")
 
 end

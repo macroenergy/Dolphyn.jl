@@ -25,13 +25,20 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
 	print_and_log("Hydrogen Production Module")
 	
+	Zones = inputs["Zones"]
+
 	if !isempty(inputs["H2_GEN"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies
 		EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 	end
 
-    H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
-	H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+	if setup["ModelH2Liquid"] ==1
+    	H2_GEN_COMMIT = union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
+		H2_GEN_NO_COMMIT = union(inputs["H2_GEN_NO_COMMIT"], inputs["H2_LIQ_NO_COMMIT"], inputs["H2_EVAP_NO_COMMIT"])
+	else
+    	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+		H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+	end
 	dfH2Gen = inputs["dfH2Gen"]  # Input H2 generation and storage data
 	Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
 	T = inputs["T"]	 # Model operating time steps
@@ -46,8 +53,11 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
 	## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
 	@expression(EP, eH2GenerationByZone[z=1:Z, t=1:T], # the unit is tonne/hour
-		sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
+	sum(EP[:vH2Gen][y,t] for y in intersect(inputs["H2_GEN"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID]))
 	)
+
+
+	EP[:eH2GenerationByZone] += eH2GenerationByZone
 
 	return EP
 end

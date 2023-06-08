@@ -20,7 +20,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reading input parameters related to hydrogen load (demand) of each zone.
 """
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
-    
+
+	Zones = inputs_load["Zones"]
+	Z = inputs_load["Z"]
+
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 	
 	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory,"HSC_g2p_variability.csv")) # Use Time Domain Reduced data for GenX
@@ -32,14 +35,11 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     # Number of demand curtailment/lost load segments
 	inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
-    # Demand in tonnes per hour for each zone
-	#print_and_log(names(load_in))
-	start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
-	
+    # Demand in tonnes per hour for each zone	
 	# Max value of non-served energy in $/(tonne)
 	inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
 	# Demand in Tonnes per hour
-	inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
+	inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],["Load_H2_tonne_per_hr_$z" for z in Zones]]) #form a matrix with columns as the different zonal load H2 demand values and rows as the hours
 	
 
     # Cost of non-served energy/demand curtailment (for each segment)

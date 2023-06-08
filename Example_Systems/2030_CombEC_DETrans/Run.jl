@@ -24,6 +24,16 @@ case_dir = @__DIR__
 settings_path = joinpath(case_dir, "Settings")
 inputs_path = case_dir
 
+### Set relevant directory paths
+src_path = "../../../src/"
+
+inpath = pwd()
+
+
+### Load DOLPHYN
+println("Loading packages")
+push!(LOAD_PATH, src_path)
+
 # Loading settings
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
@@ -31,8 +41,8 @@ mysetup_genx = configure_settings(genx_settings) # mysetup dictionary stores Gen
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
-mysetup = Dict()
-mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+combined_settings = Dict()
+combined_settings = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
 # Start logging
 global Log = mysetup["Log"]
@@ -103,3 +113,6 @@ outpath_H2 = "$outpath/Results_HSC"
 if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
+
+# Write combined_settings that was used to solve the model file to help with troubleshooting
+YAML.write_file(joinpath(settings_path,"combined_settings_output.yml"), mysetup)

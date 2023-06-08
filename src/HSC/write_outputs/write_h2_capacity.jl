@@ -22,9 +22,15 @@ Function for reporting the capacities for the different hydrogen resources (star
 function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2Gen = inputs["dfH2Gen"]
+	if setup["ModelH2Liquid"] ==1
+    	H2_GEN_COMMIT = union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
+	else
+		H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+	end
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_NEW_CAP"]
-		if i in inputs["H2_GEN_COMMIT"]
+		if i in H2_GEN_COMMIT
+		# if i in union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
 			capdischarge[i] = value(EP[:vH2GenNewCap][i]) * dfH2Gen[!,:Cap_Size_tonne_p_hr][i]
 		else
 			capdischarge[i] = value(EP[:vH2GenNewCap][i])
@@ -33,7 +39,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
 	retcapdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	for i in inputs["H2_GEN_RET_CAP"]
-		if i in inputs["H2_GEN_COMMIT"]
+		if i in H2_GEN_COMMIT
 			retcapdischarge[i] = first(value.(EP[:vH2GenRetCap][i])) * dfH2Gen[!,:Cap_Size_tonne_p_hr][i]
 		else
 			retcapdischarge[i] = first(value.(EP[:vH2GenRetCap][i]))

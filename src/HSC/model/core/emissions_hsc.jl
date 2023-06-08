@@ -36,6 +36,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
+    Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
 
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
@@ -60,7 +61,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         eH2EmissionsByZone[z = 1:Z, t = 1:T],
-        sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
+        sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==Zones[z]), :R_ID])
     )
 
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices
