@@ -19,9 +19,9 @@ push!(LOAD_PATH,joinpath(@__DIR__,"../src/"))
 push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 
 import DataStructures: OrderedDict
-using DOLPHYN
+# using DOLPHYN
 using Documenter
-DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+# DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 println(pwd())
 pages = OrderedDict(
     "Welcome Page" => "index.md",
