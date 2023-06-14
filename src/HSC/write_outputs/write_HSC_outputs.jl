@@ -37,21 +37,21 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
         sep = "/"
     end
     if !haskey(setup, "OverwriteResults") || setup["OverwriteResults"] == 1
-		# Overwrite existing results if dir exists
-		# This is the default behaviour when there is no flag, to avoid breaking existing code
+        # Overwrite existing results if dir exists
+        # This is the default behaviour when there is no flag, to avoid breaking existing code
         # Create directory if it does not exist
         path = "$genx_path/Results_HSC";
         if !(isdir(path))
             mkpath(path)
         end
-	else
-		# Find closest unused ouput directory name
-		path = choose_h2_output_dir(genx_path)
+    else
+        # Find closest unused ouput directory name
+        path = choose_h2_output_dir(genx_path)
             # Create directory if it does not exist
         if !(isdir(path))
             mkpath(path)
         end
-	end
+    end
 
 
 
@@ -72,8 +72,8 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     write_h2_storage(path, sep, inputs, setup, EP)
 
     if has_duals(EP) == 1
-		  write_h2_elec_costs(path, sep, inputs, setup, EP)
-	  end
+          write_h2_elec_costs(path, sep, inputs, setup, EP)
+      end
 
     write_h2_transmission_flow(path, sep, inputs, setup, EP)
 

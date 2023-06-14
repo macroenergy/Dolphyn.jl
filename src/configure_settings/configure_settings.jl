@@ -102,7 +102,9 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     # CO2 emissions constraint representation; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
     set_default_if_absent!(settings, "SystemCO2Constraint", 0)                
     #ModelH2Liquid: 0 # Whether to model liquid demand and production - 0 - not included, 1 - included
-    set_default_if_absent!(settings, "ModelH2Liquid", 0)                
+    set_default_if_absent!(settings, "ModelH2Liquid", 0)
+    # The max number of miles or km for a truck route (depends on the units used throughout, calculated via time constraint based on truck speed)
+    set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)         
 
 return settings
 end

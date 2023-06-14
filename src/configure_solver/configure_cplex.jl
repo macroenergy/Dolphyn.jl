@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	configure_cplex(solver_settings_path::String)
+    configure_cplex(solver_settings_path::String)
 
 Reads user-specified solver settings from cplex\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -27,8 +27,8 @@ The CPLEX optimizer instance is configured with the following default parameters
  - CPX\_PARAM\_EPOPT = 1e-6 (Dual feasibility tolerances. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpOpt.html).)
  - CPX\_PARAM\_AGGFILL = 10 (Allowed fill during presolve aggregation. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/AggFill.html).)
  - CPX\_PARAM\_PREDUAL = 0 (Decides whether presolve should pass the primal or dual linear programming problem to the LP optimization algorithm. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/PreDual.html).)
- - CPX\_PARAM\_TILIM = 1e+75	(Limits total time solver. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/TiLim.html).)
- - CPX\_PARAM\_EPGAP = 1e-4	(Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpGap.html).)
+ - CPX\_PARAM\_TILIM = 1e+75    (Limits total time solver. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/TiLim.html).)
+ - CPX\_PARAM\_EPGAP = 1e-4    (Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/EpGap.html).)
  - CPX\_PARAM\_LPMETHOD = 0 (Algorithm used to solve continuous models (including MIP root relaxation). See [here](https://www.ibm.com/support/knowledgecenter/de/SSSA5P_12.7.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/LPMETHOD.html).)
  - CPX\_PARAM\_BAREPCOMP = 1e-8 (Barrier convergence tolerance (determines when barrier terminates). See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/BarEpComp.html).)
  - CPX\_PARAM\_NUMERICALEMPHASIS = 0 (Numerical precision emphasis. See [here](https://www.ibm.com/support/knowledgecenter/en/SSSA5P_12.5.1/ilog.odms.cplex.help/CPLEX/Parameters/topics/NumericalEmphasis.html).)

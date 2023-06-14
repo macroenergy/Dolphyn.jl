@@ -618,7 +618,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     #Copy Original Parameter Scale Variable
     parameter_scale_org = mysetup["ParameterScale"]
     #Copy setup from set-up local. Set-up local contains some H2 setup inputs, except for correct parameter scale
-	mysetup = copy(mysetup_local)
+    mysetup = copy(mysetup_local)
     #Overwrites paramater scale
     mysetup["ParameterScale"] = parameter_scale_org 
 
@@ -1034,12 +1034,12 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ##### Step 6: Print to File
 
     if Sys.isunix()
-		sep = "/"
+        sep = "/"
     elseif Sys.iswindows()
-		sep = "\U005c"
+        sep = "\U005c"
     else
         sep = "/"
-	end
+    end
 
     mkpath(joinpath(inpath, TimeDomainReductionFolder))
 

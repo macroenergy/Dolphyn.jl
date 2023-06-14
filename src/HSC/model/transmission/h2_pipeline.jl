@@ -177,12 +177,12 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     ## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
     # if setup["ParameterScale"]==1 # Power consumption in GW
-    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
-    # 	sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])))
+    #     @expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
+    #     sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])))
 
     # else  # Power consumption in MW
-    # 	@expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
-    # 	sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])))
+    #     @expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
+    #     sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])))
 
     # end
 

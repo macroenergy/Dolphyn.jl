@@ -23,7 +23,7 @@ The total capacity of each resource is defined as the sum of the existing capaci
 
 ```math
 \begin{equation*}
-	\Delta^{total,energy}_{y,z} =(\overline{\Delta^{energy}_{y,z}}+\Omega^{energy}_{y,z}-\Delta^{energy}_{y,z}) \quad \forall y \in \mathcal{O}, z \in \mathcal{Z}
+    \Delta^{total,energy}_{y,z} =(\overline{\Delta^{energy}_{y,z}}+\Omega^{energy}_{y,z}-\Delta^{energy}_{y,z}) \quad \forall y \in \mathcal{O}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -31,7 +31,7 @@ One cannot retire more capacity than existing capacity.
 
 ```math
 \begin{equation*}
-	\Delta^{energy}_{y,z} \leq \overline{\Delta^{energy}_{y,z}} \quad \forall y \in \mathcal{O}, z \in \mathcal{Z}
+    \Delta^{energy}_{y,z} \leq \overline{\Delta^{energy}_{y,z}} \quad \forall y \in \mathcal{O}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -40,9 +40,9 @@ For resources where $\overline{\Omega_{y,z}^{energy}}$ and $\underline{\Omega_{y
 ```math
 \begin{aligned}
 & \Delta^{total,energy}_{y,z} \leq \overline{\Omega}^{energy}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
+    \hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z} \\
 & \Delta^{total,energy}_{y,z}  \geq \underline{\Omega}^{energy}_{y,z}
-	\hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
+    \hspace{4 cm}  \forall y \in \mathcal{O}, z \in \mathcal{Z}
 \end{aligned}
 ```
 
@@ -50,61 +50,61 @@ In addition, this function adds investment and fixed OM related costs related to
 
 ```math
 \begin{aligned}
-& 	\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST,energy}_{y,z} \times    \Omega^{energy}_{y,z})
-	+ (\pi^{FOM,energy}_{y,z} \times  \Delta^{total,energy}_{y,z})\right)
+&     \sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
+    \left( (\pi^{INVEST,energy}_{y,z} \times    \Omega^{energy}_{y,z})
+    + (\pi^{FOM,energy}_{y,z} \times  \Delta^{total,energy}_{y,z})\right)
 \end{aligned}
 ```
 """
 function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
-	println("H2 storage Investment Module")
+    println("H2 storage Investment Module")
 
-	dfH2Gen = inputs["dfH2Gen"]
+    dfH2Gen = inputs["dfH2Gen"]
 
-	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources - all have asymmetric (separate) charge/discharge capacity components
+    H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources - all have asymmetric (separate) charge/discharge capacity components
 
-	NEW_CAP_H2_CHARGE = inputs["NEW_CAP_H2_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity
-	RET_CAP_H2_CHARGE = inputs["RET_CAP_H2_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
+    NEW_CAP_H2_CHARGE = inputs["NEW_CAP_H2_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for new charge capacity
+    RET_CAP_H2_CHARGE = inputs["RET_CAP_H2_CHARGE"] # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
 
     NEW_CAP_H2_ENERGY=inputs["NEW_CAP_H2_ENERGY"] # set of storage resource eligible for new energy capacity investment
     RET_CAP_H2_ENERGY=inputs["RET_CAP_H2_ENERGY"] # set of storage resource eligible for energy capacity retirements
     
 
-	### Variables ###
+    ### Variables ###
 
-	## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
+    ## Storage capacity built and retired for storage resources with independent charge and discharge power capacities (STOR=2)
 
-	# New installed charge capacity of resource "y"
-	@variable(EP, vH2CAPCHARGE[y in NEW_CAP_H2_CHARGE] >= 0)
+    # New installed charge capacity of resource "y"
+    @variable(EP, vH2CAPCHARGE[y in NEW_CAP_H2_CHARGE] >= 0)
 
-	# Retired charge capacity of resource "y" from existing capacity
-	@variable(EP, vH2RETCAPCHARGE[y in RET_CAP_H2_CHARGE] >= 0)
+    # Retired charge capacity of resource "y" from existing capacity
+    @variable(EP, vH2RETCAPCHARGE[y in RET_CAP_H2_CHARGE] >= 0)
 
     
-	# New installed energy capacity of resource "y"
-	@variable(EP, vH2CAPENERGY[y in NEW_CAP_H2_ENERGY] >= 0)
+    # New installed energy capacity of resource "y"
+    @variable(EP, vH2CAPENERGY[y in NEW_CAP_H2_ENERGY] >= 0)
 
-	# Retired energy capacity of resource "y" from existing capacity
-	@variable(EP, vH2RETCAPENERGY[y in RET_CAP_H2_ENERGY] >= 0)
+    # Retired energy capacity of resource "y" from existing capacity
+    @variable(EP, vH2RETCAPENERGY[y in RET_CAP_H2_ENERGY] >= 0)
 
-	### Expressions ###
-	# Total available charging capacity in tonnes/hour
-	@expression(EP, eTotalH2CapCharge[y in H2_STOR_ALL],
-		if (y in intersect(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
-			dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y] - EP[:vH2RETCAPCHARGE][y]
-		elseif (y in setdiff(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
-			dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y]
-		elseif (y in setdiff(RET_CAP_H2_CHARGE, NEW_CAP_H2_CHARGE))
-			dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] - EP[:vH2RETCAPCHARGE][y]
-		else
-			dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y]
-		end
-	)
+    ### Expressions ###
+    # Total available charging capacity in tonnes/hour
+    @expression(EP, eTotalH2CapCharge[y in H2_STOR_ALL],
+        if (y in intersect(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
+            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y] - EP[:vH2RETCAPCHARGE][y]
+        elseif (y in setdiff(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
+            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y]
+        elseif (y in setdiff(RET_CAP_H2_CHARGE, NEW_CAP_H2_CHARGE))
+            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] - EP[:vH2RETCAPCHARGE][y]
+        else
+            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y]
+        end
+    )
 
 
     # Total available energy capacity in tonnes
-	@expression(EP, eTotalH2CapEnergy[y in H2_STOR_ALL],
+    @expression(EP, eTotalH2CapEnergy[y in H2_STOR_ALL],
     if (y in intersect(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
         dfH2Gen[!,:Existing_Energy_Cap_tonne][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]
     elseif (y in setdiff(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
@@ -116,14 +116,14 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     end
 )
 
-	## Objective Function Expressions ##
+    ## Objective Function Expressions ##
 
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
-	# If resource is not eligible for new charge capacity, fixed costs are only O&M costs
-	# Sum individual resource contributions to fixed costs to get total fixed costs
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
-	#  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"] ==1
+    # Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+    # If resource is not eligible for new charge capacity, fixed costs are only O&M costs
+    # Sum individual resource contributions to fixed costs to get total fixed costs
+    #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+    #  ParameterScale = 0 --> objective function is in $
+    if setup["ParameterScale"] ==1
 
         @expression(EP, eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_CHARGE # Resources eligible for new charge capacity
@@ -143,34 +143,34 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-	# Sum individual resource contributions to fixed costs to get total fixed costs
-	@expression(EP, eTotalCFixH2Charge, sum(EP[:eCFixH2Charge][y] for y in H2_STOR_ALL))
+    # Sum individual resource contributions to fixed costs to get total fixed costs
+    @expression(EP, eTotalCFixH2Charge, sum(EP[:eCFixH2Charge][y] for y in H2_STOR_ALL))
 
-	# Add term to objective function expression
-	EP[:eObj] += eTotalCFixH2Charge
+    # Add term to objective function expression
+    EP[:eObj] += eTotalCFixH2Charge
 
     # Energy capacity costs
-	# Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
-	# If resource is not eligible for new energy capacity, fixed costs are only O&M costs
-	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
-	#  ParameterScale = 0 --> objective function is in $
-	if setup["ParameterScale"]==1
-		@expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
-		if y in NEW_CAP_H2_ENERGY # Resources eligible for new capacity
-			1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_Energy_p_tonne_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y])
-		else
-			1/ModelScalingFactor^2*(dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y])
-		end
-		)
-	else
-		@expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
-		if y in NEW_CAP_H2_ENERGY # Resources eligible for new capacity
-			dfH2Gen[!,:Inv_Cost_Energy_p_tonne_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y]
-		else
-			dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y]
-		end
-		)
-	end
+    # Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+    # If resource is not eligible for new energy capacity, fixed costs are only O&M costs
+    #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+    #  ParameterScale = 0 --> objective function is in $
+    if setup["ParameterScale"]==1
+        @expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
+        if y in NEW_CAP_H2_ENERGY # Resources eligible for new capacity
+            1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_Energy_p_tonne_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y])
+        else
+            1/ModelScalingFactor^2*(dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y])
+        end
+        )
+    else
+        @expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
+        if y in NEW_CAP_H2_ENERGY # Resources eligible for new capacity
+            dfH2Gen[!,:Inv_Cost_Energy_p_tonne_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y]
+        else
+            dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y]
+        end
+        )
+    end
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
     @expression(EP, eTotalCFixH2Energy, sum(EP[:eCFixH2Energy][y] for y in H2_STOR_ALL))
@@ -179,35 +179,35 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     EP[:eObj] += eTotalCFixH2Energy
 
 
-	### Constratints ###
+    ### Constratints ###
 
-	## Constraints on retirements and capacity additions
-	#Cannot retire more charge capacity than existing charge capacity
- 	@constraint(EP, cMaxRetH2Charge[y in RET_CAP_H2_CHARGE], vH2RETCAPCHARGE[y] <= dfH2Gen[!,:Existing_Cap_Charge_tonne_p_hr][y])
+    ## Constraints on retirements and capacity additions
+    #Cannot retire more charge capacity than existing charge capacity
+     @constraint(EP, cMaxRetH2Charge[y in RET_CAP_H2_CHARGE], vH2RETCAPCHARGE[y] <= dfH2Gen[!,:Existing_Cap_Charge_tonne_p_hr][y])
 
-  	#Constraints on new built capacity
+      #Constraints on new built capacity
 
-	# Constraint on maximum charge capacity (if applicable) [set input to -1 if no constraint on maximum charge capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasabilty
-	@constraint(EP, cMaxCapH2Charge[y in intersect(dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] <= dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr][y])
+    # Constraint on maximum charge capacity (if applicable) [set input to -1 if no constraint on maximum charge capacity]
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasabilty
+    @constraint(EP, cMaxCapH2Charge[y in intersect(dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] <= dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr][y])
 
-	# Constraint on minimum charge capacity (if applicable) [set input to -1 if no constraint on minimum charge capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasabilty
-	@constraint(EP, cMinCapH2Charge[y in intersect(dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] >= dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr][y])
+    # Constraint on minimum charge capacity (if applicable) [set input to -1 if no constraint on minimum charge capacity]
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasabilty
+    @constraint(EP, cMinCapH2Charge[y in intersect(dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] >= dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr][y])
 
 
-		
-	# Cannot retire more energy capacity than existing energy capacity
-	@constraint(EP, cMaxRetH2Energy[y in RET_CAP_H2_ENERGY], vH2RETCAPENERGY[y] <= dfH2Gen[!,:Existing_Energy_Cap_tonne][y])
+        
+    # Cannot retire more energy capacity than existing energy capacity
+    @constraint(EP, cMaxRetH2Energy[y in RET_CAP_H2_ENERGY], vH2RETCAPENERGY[y] <= dfH2Gen[!,:Existing_Energy_Cap_tonne][y])
 
-	## Constraints on new built energy capacity
-	# Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
-	@constraint(EP, cMaxCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Max_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] <= dfH2Gen[!,:Max_Energy_Cap_tonne][y])
+    ## Constraints on new built energy capacity
+    # Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
+    @constraint(EP, cMaxCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Max_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] <= dfH2Gen[!,:Max_Energy_Cap_tonne][y])
 
-	# Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
-	# DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
-	@constraint(EP, cMinCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Min_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] >= dfH2Gen[!,:Min_Energy_Cap_tonne][y])
+    # Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
+    @constraint(EP, cMinCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Min_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] >= dfH2Gen[!,:Min_Energy_Cap_tonne][y])
 
-	return EP
+    return EP
 end

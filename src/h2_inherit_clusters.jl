@@ -3,12 +3,12 @@ function h2_inherit_clusters(path, setup)
     data_directory = joinpath(path, setup["TimeDomainReductionFolder"]);
 
     if Sys.isunix()
-		sep = "/"
+        sep = "/"
     elseif Sys.iswindows()
-		sep = "\U005c"
+        sep = "\U005c"
     else
         sep = "/"
-	end
+    end
 
     df_load = CSV.read(data_directory*sep*"load_data.csv",DataFrame);
     Period_map =  CSV.read(data_directory*sep*"Period_map.csv",DataFrame);

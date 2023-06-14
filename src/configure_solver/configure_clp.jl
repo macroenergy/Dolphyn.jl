@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	configure_clp(solver_settings_path::String)
+    configure_clp(solver_settings_path::String)
 
 Reads user-specified solver settings from clp\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -27,7 +27,7 @@ The Clp optimizer instance is configured with the following default parameters i
  - DualTolerance = 1e-7 (Dual feasibility tolerance)
  - DualObjectiveLimit = 1e308 (When using dual simplex (where the objective is monotonically changing), terminate when the objective exceeds this limit)
  - MaximumIterations = 2147483647 (Terminate after performing this number of simplex iterations)
- - MaximumSeconds = -1.0	(Terminate after this many seconds have passed. A negative value means no time limit)
+ - MaximumSeconds = -1.0    (Terminate after this many seconds have passed. A negative value means no time limit)
  - LogLevel = 1 (Set to 1, 2, 3, or 4 for increasing output. Set to 0 to disable output)
  - PresolveType = 0 (Set to 1 to disable presolve)
  - SolveType = 5 (Solution method: dual simplex (0), primal simplex (1), sprint (2), barrier with crossover (3), barrier without crossover (4), automatic (5))

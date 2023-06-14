@@ -21,7 +21,7 @@ function write_h2_transmission_flow(path::AbstractString, sep::AbstractString, i
     
     Z = inputs["Z"]     # Number of zones
     T = inputs["T"]     # Number of time steps (hours)
-	
+    
     dfH2TransmissionFlow = DataFrame(Time_Index=1:T)
     for z in 1:Z
         if setup["ModelH2Pipelines"] == 1
@@ -39,5 +39,5 @@ function write_h2_transmission_flow(path::AbstractString, sep::AbstractString, i
         dfH2TransmissionFlow[!, Symbol("H2FlowToZone$z")] = dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] + dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")]
     end
 
-	CSV.write(string(path,sep, "HSC_h2_transmission_flow.csv"), dfH2TransmissionFlow, writeheader=true)
+    CSV.write(string(path,sep, "HSC_h2_transmission_flow.csv"), dfH2TransmissionFlow, writeheader=true)
 end

@@ -15,9 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)	
+    write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)    
 
-Fucntion for reporting hydrogen flow via trucsk.	
+Fucntion for reporting hydrogen flow via trucsk.    
 """
 function write_h2_truck_flow(
     path::AbstractString,

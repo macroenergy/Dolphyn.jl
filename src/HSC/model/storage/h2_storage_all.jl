@@ -35,7 +35,7 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{H,STO,o}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s,z,t}^{\textrm{H,STO,o}} \times x_{s,z,t}^{\textrm{H,CHA}}
+    \textrm{C}^{\textrm{H,STO,o}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s,z,t}^{\textrm{H,STO,o}} \times x_{s,z,t}^{\textrm{H,CHA}}
 \end{equation*}
 ```
 
@@ -45,7 +45,7 @@ Contributions to the power balance expression from compression due to storage ch
 
 ```math
 \begin{equation*}
-	PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{\textrm{H,CHA}}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+    PowerBal_{STO} = \sum_{s \in \mathcal{S}} \Phi_s^{\textrm{E,H}} x_{s,z,t}^{\textrm{\textrm{H,CHA}}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -55,14 +55,14 @@ Contributions to the hydrogen balance expression from storage charging and disch
 
 ```math
 \begin{equation*}
-	HydrogenBalGas_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS,Gas}} - x_{s,z,t}^{\textrm{H,CHA,Gas}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+    HydrogenBalGas_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS,Gas}} - x_{s,z,t}^{\textrm{H,CHA,Gas}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 Liquid hydrogen balance contributions are defined in a similar manner, for liquid storage resources. 
 
 ```math
 \begin{equation*}
-	HydrogenBalLiq_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS,Liq}} - x_{s,z,t}^{\textrm{H,CHA,Liq}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+    HydrogenBalLiq_{STO} = \sum_{s \in \mathcal{S}} \left(x_{s,z,t}^{\textrm{H,DIS,Liq}} - x_{s,z,t}^{\textrm{H,CHA,Liq}}\right) \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -75,8 +75,8 @@ The first of these two constraints enforces storage inventory balance for interi
 
 ```math
 \begin{aligned}
-	U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,STO}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,CHA}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+    U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,STO}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+    U_{s,z,t}^{\textrm{H,STO}} &= U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}} - \frac{1}{\eta_{s,z}^{\textrm{H,STO}}}x_{s,z,t}^{\textrm{H,DIS}} + \eta_{s,z}^{\textrm{H,STO}}x_{s,z,t}^{\textrm{H,CHA}} - \eta_{s,z}^{\textrm{H,loss}}U_{s,z,t+\tau^{period}-1} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 
@@ -86,8 +86,8 @@ The storage power capacity sets lower and upper bounds on the storage energy cap
 
 ```math
 \begin{aligned}
-	y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MinDuration} &\leq y_{s,z}^{\textrm{H,STO,ENE}} \\
-	y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MaxDuration} &\geq y_{s,z}^{\textrm{H,STO,ENE}}
+    y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MinDuration} &\leq y_{s,z}^{\textrm{H,STO,ENE}} \\
+    y_{s,z}^{\textrm{H,STO,POW}} \times \tau_{s,z}^{MaxDuration} &\geq y_{s,z}^{\textrm{H,STO,ENE}}
 \end{aligned}
 ```
 
@@ -95,7 +95,7 @@ It limits the volume of energy $U_{s,z,t}^{\textrm{H,STO}}$ at any time $t$ to b
 
 ```math
 \begin{equation*}
-	0 \leq U_{s,z,t}^{\textrm{H,STO}} \leq y_{s,z}^{\textrm{H,STO,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+    0 \leq U_{s,z,t}^{\textrm{H,STO}} \leq y_{s,z}^{\textrm{H,STO,ENE}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -104,9 +104,9 @@ Finally, the maximum discharge rate for storage resources, $x_{s,z,t}^{\textrm{H
 
 ```math
 \begin{aligned}
-	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq y_{s,z}^{\textrm{H,STO,POW}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
-	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
-	0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
+    0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq y_{s,z}^{\textrm{H,STO,POW}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T} \\
+    0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{interior} \\
+    0 &\leq x_{s,z,t}^{\textrm{H,DIS}} \leq U_{s,z,t+\tau^{period}-1}^{\textrm{H,STO}}*\eta_{s,z}^{\textrm{H,DIS}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}^{start}
 \end{aligned}
 ```
 """
@@ -123,7 +123,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
     Z = inputs["Z"]     # Number of zones
     T = inputs["T"] # Number of time steps (hours) 
-	  
+      
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"] # Index of interior subperiod for each representative period
     H2_STOR_SHORT_DURATION = inputs["H2_STOR_SHORT_DURATION"] # Set of H2 storage modeled as short-duration (no energy carryover from one rep. week to the next)
@@ -132,14 +132,14 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
     ### Variables ###
-	# Storage level of resource "y" at hour "t" [tonne] on zone "z" 
-	@variable(EP, vH2S[y in H2_STOR_ALL, t=1:T] >= 0)
+    # Storage level of resource "y" at hour "t" [tonne] on zone "z" 
+    @variable(EP, vH2S[y in H2_STOR_ALL, t=1:T] >= 0)
 
-	# Rate of energy withdrawn from HSC by resource "y" at hour "t" [tonne/hour] on zone "z"
-	@variable(EP, vH2_CHARGE_STOR[y in H2_STOR_ALL, t=1:T] >= 0)
+    # Rate of energy withdrawn from HSC by resource "y" at hour "t" [tonne/hour] on zone "z"
+    @variable(EP, vH2_CHARGE_STOR[y in H2_STOR_ALL, t=1:T] >= 0)
 
     # Energy losses related to storage technologies (increase in effective demand)
-	#@expression(EP, eEH2LOSS[y in H2_STOR_ALL], sum(inputs["omega"][t]*EP[:vH2_CHARGE_STOR][y,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vH2Gen][y,t] for t in 1:T))
+    #@expression(EP, eEH2LOSS[y in H2_STOR_ALL], sum(inputs["omega"][t]*EP[:vH2_CHARGE_STOR][y,t] for t in 1:T) - sum(inputs["omega"][t]*EP[:vH2Gen][y,t] for t in 1:T))
 
     #Variable costs of "charging" for technologies "y" during hour "t" in zone "z"
     #  ParameterScale = 1 --> objective function is in million $
@@ -169,7 +169,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
 
     # Term to represent electricity consumption associated with H2 storage charging and discharging
-	@expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
+    @expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
     if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL); init=0.0)
     else
@@ -182,51 +182,51 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Adding power consumption by storage
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2Stor
  
-   	# H2 Balance expressions
-	@expression(EP, eH2BalanceStor[t=1:T, z=1:Z],
-	sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+       # H2 Balance expressions
+    @expression(EP, eH2BalanceStor[t=1:T, z=1:Z],
+    sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
-	EP[:eH2Balance] += eH2BalanceStor   
+    EP[:eH2Balance] += eH2BalanceStor   
 
     # LIQUID H2 Balance expressions
     if setup["ModelH2Liquid"]==1
-	    @expression(EP, eH2LiqBalanceStor[t=1:T, z=1:Z],
-	    sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_LIQ, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+        @expression(EP, eH2LiqBalanceStor[t=1:T, z=1:Z],
+        sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_LIQ, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
-	    EP[:eH2LiqBalance] += eH2LiqBalanceStor
+        EP[:eH2LiqBalance] += eH2LiqBalanceStor
     end
 
     ### End Expressions ###
 
     ### Constraints ###
-	## Storage energy capacity and state of charge related constraints:
+    ## Storage energy capacity and state of charge related constraints:
 
-	# Links state of charge in first time step with decisions in last time step of each subperiod
-	# We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
-	
-	if setup["OperationWrapping"] == 1 && !isempty(H2_STOR_LONG_DURATION)  && !isempty(H2_STOR_SHORT_DURATION) # Apply constraints to those storage technologies with short duration only (if non-empty)
-		@constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_SHORT_DURATION], EP[:vH2S][y,t] ==
-			EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
-			+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))
-	else # Apply constraints to all storage technologies
-		@constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_ALL], EP[:vH2S][y,t] ==
-			EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
-			+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))
+    # Links state of charge in first time step with decisions in last time step of each subperiod
+    # We use a modified formulation of this constraint (cSoCBalLongDurationStorageStart) when operations wrapping and long duration storage are being modeled
+    
+    if setup["OperationWrapping"] == 1 && !isempty(H2_STOR_LONG_DURATION)  && !isempty(H2_STOR_SHORT_DURATION) # Apply constraints to those storage technologies with short duration only (if non-empty)
+        @constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_SHORT_DURATION], EP[:vH2S][y,t] ==
+            EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
+            +(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))
+    else # Apply constraints to all storage technologies
+        @constraint(EP, cH2SoCBalStart[t in START_SUBPERIODS, y in H2_STOR_ALL], EP[:vH2S][y,t] ==
+            EP[:vH2S][y,t+hours_per_subperiod-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])
+            +(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t+hours_per_subperiod-1]))
     end
-	
-	@constraints(EP, begin
+    
+    @constraints(EP, begin
 
-		[y in H2_STOR_ALL, t in 1:T], EP[:eH2TotalCapEnergy][y]*dfH2Gen[!,:H2Stor_max_level][y] >= EP[:vH2S][y,t]
-		[y in H2_STOR_ALL, t in 1:T], EP[:eH2TotalCapEnergy][y]*dfH2Gen[!,:H2Stor_min_level][y] <= EP[:vH2S][y,t]
+        [y in H2_STOR_ALL, t in 1:T], EP[:eH2TotalCapEnergy][y]*dfH2Gen[!,:H2Stor_max_level][y] >= EP[:vH2S][y,t]
+        [y in H2_STOR_ALL, t in 1:T], EP[:eH2TotalCapEnergy][y]*dfH2Gen[!,:H2Stor_min_level][y] <= EP[:vH2S][y,t]
 
         # Constraint on maximum discharging rate imposed if storage discharging capital cost >0
         # [y in intersect(H2_STOR_ALL,dfH2Gen[!,:Inv_Cost_p_tonne_p_hr_yr].>0), t in 1:T], EP[:vH2Gen][y,t] <= EP[:eH2TotalCapEnergy][y]
         # [y in H2_STOR_ALL, t in 1:T], EP[:vH2Gen][y,t] <= EP[:eH2GenTotalCap][y] * inputs["pH2_Max"][y,t]
         
-		# energy stored for the next hour
-		cH2SoCBalInterior[t in INTERIOR_SUBPERIODS, y in H2_STOR_ALL], EP[:vH2S][y,t] ==
-			EP[:vH2S][y,t-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t-1])
-	end)
+        # energy stored for the next hour
+        cH2SoCBalInterior[t in INTERIOR_SUBPERIODS, y in H2_STOR_ALL], EP[:vH2S][y,t] ==
+            EP[:vH2S][y,t-1]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,t])+(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,t])-(dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y]*EP[:vH2S][y,t-1])
+    end)
 
 
     # Hydrogen storage discharge and charge power (and reserve contribution) related constraints for symmetric storage resources:
