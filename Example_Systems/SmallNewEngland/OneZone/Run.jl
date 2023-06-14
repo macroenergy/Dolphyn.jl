@@ -31,8 +31,10 @@ mysetup_genx = configure_settings(genx_settings) # mysetup dictionary stores Gen
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
+
 mysetup = Dict()
 mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+mysetup = configure_settings(mysetup)
 
 # Start logging
 global Log = mysetup["Log"]
@@ -95,11 +97,11 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 ### Write power system output
 
 print_and_log("Writing Output")
-outpath = "$inputs_path/Results"
+outpath = joinpath(inputs_path,"Results")
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs
-outpath_H2 = "$outpath/Results_HSC"
+outpath_H2 = joinpath(outpath,"Results_HSC")
 if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
