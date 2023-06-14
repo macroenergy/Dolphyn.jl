@@ -90,5 +90,5 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
         dfEmissions = vcat(dfEmissions, total)
     end
 
-    CSV.write(string(path,sep,"HSC_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+    CSV.write(joinpath(path, "HSC_emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
 end

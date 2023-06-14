@@ -48,6 +48,6 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
     end
     rename!(total,auxNew_Names)
     dfCharge = vcat(dfCharge, total)
-    CSV.write(string(path,sep,"HSC_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
+    CSV.write(joinpath(path, "HSC_charge.csv"), dftranspose(dfCharge, false), writeheader=false)
     return dfCharge
 end

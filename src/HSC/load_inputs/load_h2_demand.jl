@@ -29,7 +29,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory,"HSC_g2p_variability.csv")) # Use Time Domain Reduced data for GenX
         H2_load_in = DataFrame(CSV.File(string(joinpath(data_directory,"HSC_load_data.csv")), header=true), copycols=true)
     else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
-        H2_load_in = DataFrame(CSV.File(string(path,sep,"HSC_load_data.csv"), header=true), copycols=true)
+        H2_load_in = DataFrame(CSV.File(joinpath(path, "HSC_load_data.csv"), header=true), copycols=true)
     end
 
     # Number of demand curtailment/lost load segments

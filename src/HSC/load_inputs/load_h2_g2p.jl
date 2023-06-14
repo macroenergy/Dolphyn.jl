@@ -24,7 +24,7 @@ function load_h2_g2p(setup::Dict, path::AbstractString, sep::AbstractString, inp
     Zones = inputs_gen["Zones"]
 
     #Read in H2 generation related inputs
-    h2_g2p_in = DataFrame(CSV.File(string(path,sep,"HSC_g2p.csv"), header=true), copycols=true)
+    h2_g2p_in = DataFrame(CSV.File(joinpath(path, "HSC_g2p.csv"), header=true), copycols=true)
 
     # Filter gas to power by zone
     h2_g2p_in = filter(row -> row.Zone in Zones, h2_g2p_in)

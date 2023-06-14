@@ -14,4 +14,4 @@ Log: true # Flag whether log directed to file, turing this on will record basic 
 LogFile: output.log  # Filename for log file
 
 # Zone selection
-Zones: [1, 2, 3] # List of zones to be included in the model
+Zones: ["z1","z2","z3"] # List of zones to be included in the model

@@ -225,5 +225,5 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 dfH2Cost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Gen, tempCFix_Liq, tempCFix_G2P, tempCFix_Stor, tempCVar, tempCVar_G2P, tempCNSE, tempCStart,"-","-","-"]
     end
-    CSV.write(string(path, sep, "HSC_costs.csv"), dfH2Cost)
+    CSV.write(joinpath(path, "HSC_costs.csv"), dfH2Cost)
 end

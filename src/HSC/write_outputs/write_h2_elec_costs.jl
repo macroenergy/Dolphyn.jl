@@ -76,6 +76,6 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
         dfH2ElecCost[!,Symbol("Zone$z")] = [tempCVarElec]
     end
 
-    CSV.write(string(path,sep,"HSC_elec_costs.csv"), dfH2ElecCost)
+    CSV.write(joinpath(path, "HSC_elec_costs.csv"), dfH2ElecCost)
     
 end

@@ -27,7 +27,7 @@ function load_h2_g2p_variability(setup::Dict, path::AbstractString, sep::Abstrac
     if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory,"HSC_g2p_variability.csv")) # Use Time Domain Reduced data for GenX
         gen_var = DataFrame(CSV.File(string(joinpath(data_directory,"HSC_g2p_variability.csv")), header=true), copycols=true)
     else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
-        gen_var = DataFrame(CSV.File(string(path,sep,"HSC_g2p_variability.csv"), header=true), copycols=true)
+        gen_var = DataFrame(CSV.File(joinpath(path, "HSC_g2p_variability.csv"), header=true), copycols=true)
     end
 
     # Reorder DataFrame to R_ID order (order provided in Generators_data.csv)

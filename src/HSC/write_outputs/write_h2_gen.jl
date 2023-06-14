@@ -47,7 +47,7 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
     rename!(total,auxNew_Names)
     dfPower = vcat(dfH2GenOut, total)
 
-     CSV.write(string(path,sep,"HSC_h2_generation_discharge.csv"), dftranspose(dfH2GenOut, false), writeheader=false)
+     CSV.write(joinpath(path, "HSC_h2_generation_discharge.csv"), dftranspose(dfH2GenOut, false), writeheader=false)
     
     return dfH2GenOut
 end

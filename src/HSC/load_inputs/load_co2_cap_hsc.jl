@@ -25,7 +25,7 @@ function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString
 
     # Definition of Cap requirements by zone (as Max Mtons)
     dfH2CO2Cap = DataFrame(
-        CSV.File(string(path, sep, "HSC_CO2_cap.csv"), header = true),
+        CSV.File(joinpath(path, "HSC_CO2_cap.csv"), header = true),
         copycols = true,
     )
 

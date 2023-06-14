@@ -29,17 +29,17 @@ function enumerate_zones(setup::Dict,path::AbstractString)
 
     print_and_log("Enumerating Zones")
 
-    if isfile(joinpath(path,"Network.csv"))
-        network_var = DataFrame(CSV.File(joinpath(path,"Network.csv")))
-        Zones = unique(union(network_var.Start_Zone, network_var.End_Zone))
-    end
+    # if isfile(joinpath(path,"Network.csv"))
+    #     network_var = DataFrame(CSV.File(joinpath(path,"Network.csv")))
+    #     Zones = unique(union(network_var.Start_Zone, network_var.End_Zone))
+    # end
 
     if setup["ModelH2"] == 1
         if setup["ModelH2Pipelines"] == 1
             if isfile(joinpath(path,"HSC_pipelines.csv"))
                 network_var = DataFrame(CSV.File(joinpath(path,"HSC_pipelines.csv")))
-                Zones = unique(union(network_var.Start_Zone, network_var.End_Zone, Zones))
-                # Zones = unique(union(network_var.Start_Zone, network_var.End_Zone))
+                # Zones = unique(union(network_var.Start_Zone, network_var.End_Zone, Zones))
+                Zones = unique(union(network_var.Start_Zone, network_var.End_Zone))
             end
         end
         ##TODO: add truck zone filter

@@ -33,7 +33,7 @@ function write_h2_truck_flow(
     R::Int64  = inputs["R"]
 
     # H2 truck flow on each zone for every type of truck 
-    truck_flow_path = string(path, sep, "H2TruckFlow")
+    truck_flow_path = joinpath(path, "H2TruckFlow")
     if (isdir(truck_flow_path) == false)
         mkdir(truck_flow_path)
     end
@@ -44,7 +44,7 @@ function write_h2_truck_flow(
     CSV.write(string(truck_flow_path, sep, string("H2TruckFlow.csv")), dfH2TruckFlow)
 
     # H2 truck Number tracking among zones with truck accessibility
-    truck_number_path = string(path, sep, "H2TruckNumber")
+    truck_number_path = joinpath(path, "H2TruckNumber")
     if (isdir(truck_number_path) == false)
         mkdir(truck_number_path)
     end
@@ -62,7 +62,7 @@ function write_h2_truck_flow(
     )
 
     # H2 truck state - Available full, available empty, charged and discharged truck numbersk
-    truck_state_path = string(path, sep, "H2TruckState")
+    truck_state_path = joinpath(path, "H2TruckState")
     if (isdir(truck_state_path) == false)
         mkdir(truck_state_path)
     end
@@ -91,7 +91,7 @@ function write_h2_truck_flow(
     )
 
     # H2 truck transit on each route
-    truck_transit_path = string(path, sep, "H2Transit")
+    truck_transit_path = joinpath(path, "H2Transit")
     if (isdir(truck_transit_path) == false)
         mkdir(truck_transit_path)
     end

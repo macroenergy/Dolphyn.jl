@@ -39,3 +39,4 @@ src/test.jl
 /docs/build/
 Example_Systems/SmallNewEngland/ThreeZones/Settings/combined_settings_output.yml
 docs/Manifest.toml
+*.csv#

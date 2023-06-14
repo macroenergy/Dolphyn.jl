@@ -38,5 +38,5 @@ function write_nw_expansion(path::AbstractString, sep::AbstractString, inputs::D
         dfTransCap.New_Trans_Capacity *= ModelScalingFactor  # GW to MW
         dfTransCap.Cost_Trans_Capacity *= ModelScalingFactor^2  # MUSD to USD
     end
-    CSV.write(string(path,sep,"network_expansion.csv"), dfTransCap)
+    CSV.write(joinpath(path, "network_expansion.csv"), dfTransCap)
 end

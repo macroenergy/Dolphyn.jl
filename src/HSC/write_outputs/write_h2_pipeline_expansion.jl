@@ -43,5 +43,5 @@ function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, 
     Fixed_Cost_Pipes = convert(Array{Union{Missing,Float32}}, Fixed_Cost),
     )
     
-    CSV.write(string(path, sep, "HSC_pipeline_expansion.csv"), dfTransCap)
+    CSV.write(joinpath(path, "HSC_pipeline_expansion.csv"), dfTransCap)
 end

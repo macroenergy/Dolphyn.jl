@@ -53,7 +53,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     # Read input data about power network topology, operating and expansion attributes
 
     if setup["ModelH2Pipelines"] == 1
-        if isfile(string(path,sep,"HSC_pipelines.csv"))         
+        if isfile(joinpath(path, "HSC_pipelines.csv"))         
             inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
         else
             inputs["H2_P"] = 0
@@ -74,7 +74,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     
 
     # Read input data about G2P Resources
-    if isfile(string(path,sep,"HSC_g2p.csv"))
+    if isfile(joinpath(path, "HSC_g2p.csv"))
         # Create flag for other parts of the code
         setup["ModelH2G2P"] = 1
         inputs = load_h2_g2p(setup,path, sep, inputs)

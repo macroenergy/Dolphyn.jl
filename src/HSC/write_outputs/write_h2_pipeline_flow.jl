@@ -53,5 +53,5 @@ function write_h2_pipeline_flow(path::AbstractString, sep::AbstractString, input
     end
 
     dfPowerBalance = DataFrame(dfPowerBalance, :auto)
-    CSV.write(string(path,sep,"HSC_h2_pipeline_flow.csv"), dfPowerBalance, writeheader=false)
+    CSV.write(joinpath(path, "HSC_h2_pipeline_flow.csv"), dfPowerBalance, writeheader=false)
 end

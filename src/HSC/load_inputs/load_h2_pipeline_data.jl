@@ -31,7 +31,7 @@ function load_h2_pipeline_data(
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
-        CSV.File(string(path, sep, "HSC_pipelines.csv"), header = true),
+        CSV.File(joinpath(path, "HSC_pipelines.csv"), header = true),
         copycols = true,
     )
 
