@@ -67,10 +67,10 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     print_and_log("Routes.csv Successfully Read!")
 
     # H2 truck type inputs
-    h2_truck_in = DataFrame(CSV.File(string(path, sep, "HSC_trucks.csv"), header=true), copycols=true)
+    h2_truck_in = DataFrame(CSV.File(joinpath(path, "HSC_trucks.csv"), header=true), copycols=true)
 
     # Add Truck Type IDs after reading to prevent user errors
-	h2_truck_in[!,:T_TYPE] = 1:size(collect(skipmissing(h2_truck_in[!,1])),1)
+    h2_truck_in[!,:T_TYPE] = 1:size(collect(skipmissing(h2_truck_in[!,1])),1)
 
     # Set of H2 truck types
     inputs_truck["H2_TRUCK_TYPES"] = h2_truck_in[!,:T_TYPE]
@@ -82,7 +82,7 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     inputs_truck["H2_TRUCK_LIQ"] = h2_truck_in[h2_truck_in.H2TruckType .== "Liquid", :T_TYPE]
 
     inputs_truck["H2_TRUCK_LONG_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 1, :T_TYPE]
-	inputs_truck["H2_TRUCK_SHORT_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 0, :T_TYPE]
+    inputs_truck["H2_TRUCK_SHORT_DURATION"] = h2_truck_in[h2_truck_in.LDS .== 0, :T_TYPE]
 
     # Set of H2 truck types eligible for new capacity
     inputs_truck["NEW_CAP_TRUCK"] = h2_truck_in[h2_truck_in.New_Build .== 1, :T_TYPE]

@@ -99,7 +99,7 @@ files_to_exclude = [
 ]
 dirs_to_exclude = [
     joinpath(genxsubmod_path,"configure_solver"),
-    joinpath(genxsubmod_path,"configure_settings")
+    # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
 for dir in dirs_to_exclude
     push!(files_to_exclude, find_all_to_include(dir, ".jl", true)...)
@@ -143,6 +143,9 @@ include("compare_results.jl")
 
 # Enumerate zones
 include("enumerate_zones.jl")
+
+# Select zones
+include("select_zones.jl")
 
 # Configure settings
 include("configure_settings/configure_settings.jl")

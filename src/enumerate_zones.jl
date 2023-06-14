@@ -39,6 +39,7 @@ function enumerate_zones(setup::Dict,path::AbstractString)
             if isfile(joinpath(path,"HSC_pipelines.csv"))
                 network_var = DataFrame(CSV.File(joinpath(path,"HSC_pipelines.csv")))
                 Zones = unique(union(network_var.Start_Zone, network_var.End_Zone, Zones))
+                # Zones = unique(union(network_var.Start_Zone, network_var.End_Zone))
             end
         end
         ##TODO: add truck zone filter
