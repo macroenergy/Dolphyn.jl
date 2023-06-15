@@ -124,6 +124,7 @@ include("write_nw_expansion.jl")
 #Load input data - HSC
 include("HSC/load_inputs/load_h2_gen.jl")
 include("HSC/load_inputs/load_h2_demand.jl")
+include("HSC/load_inputs/load_h2_demand_liquid.jl")
 include("HSC/load_inputs/load_h2_generators_variability.jl")
 include("HSC/load_inputs/load_h2_pipeline_data.jl")
 include("HSC/load_inputs/load_h2_truck.jl")

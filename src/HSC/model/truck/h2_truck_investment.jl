@@ -201,7 +201,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
       ## Constraints on truck compression
     # Cannot retire more capacity than existing compression capacity
-    @constraint(EP, cMaxRetH2TruckComp[z = 1:Z, j in RET_CAP_TRUCK], vH2RetTruckComp[z,j] <= dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr$z")][j])
+    @constraint(EP, cMaxRetH2TruckComp[z = 1:Z, j in RET_CAP_TRUCK], vH2RetTruckComp[z,j] <= dfH2Truck[!, Symbol("Existing_Comp_Cap_tonne_p_hr_$z")][j])
 
     ## Constraints on new built truck compression capacity
     # Constraint on maximum compression capacity (if applicable) [set input to -1 if no constraint on maximum compression capacity]

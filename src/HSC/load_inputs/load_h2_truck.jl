@@ -42,6 +42,8 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     ## Topology of the truck network source-sink matrix
     Truck_map = zeros(Int64, R, Z)
 
+    # This assumes that routes are formatted z1, z2, ...
+    # FIX ME
     for r = 1:R
         z_start = parse(Int64, dfH2Route[!, :StartZone][r][2:end])
         z_end = parse(Int64, dfH2Route[!, :EndZone][r][2:end])
