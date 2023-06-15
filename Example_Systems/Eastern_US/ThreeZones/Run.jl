@@ -108,6 +108,7 @@ end
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
+
 println("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
@@ -141,6 +142,7 @@ if mysetup["ModelSynFuels"] == 1
     outpath_SF = "$outpath/Results_SF"
     write_synfuel_outputs(EP, outpath_SF, mysetup, myinputs)
 end
+
 
 # Run MGA if the MGA flag is set to 1 else only save the least cost solution
 # Only valid for power system analysis at this point

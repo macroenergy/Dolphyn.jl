@@ -216,7 +216,8 @@ function biorefinery_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Expression for total Fixed Cost for all resoruce types (For output and to add to objective function)
 	@expression(EP,eFixed_Cost_BIO_total, sum(EP[:eFixed_Cost_BIO_per_type][i] for i in 1:BIO_RES_ALL))
 
-	EP[:eObj] += EP[:eFixed_Cost_BIO_total]
+	add_to_expression!(EP[:eObj],EP[:eFixed_Cost_BIO_total])
+	#EP[:eObj] += EP[:eFixed_Cost_BIO_total]
 
     return EP
 

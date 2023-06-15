@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -14,38 +14,23 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@doc raw"""
-	write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-
-Function for reporting the shutdown action of resources at each time step.
-"""
-function write_shutdown(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_shutdown(path::AbstractString,inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	# Operational decision variable states
-
+	COMMIT = inputs["COMMIT"]
 	# Shutdown state for each resource in each time step
-	dfShutdown = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], Sum = Array{Union{Missing,Float32}}(undef, G))
+	dfShutdown = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!, :Zone])
 	shut = zeros(G,T)
-	for i in 1:G
-		if i in inputs["COMMIT"]
-			shut[i,:] = value.(EP[:vSHUT])[i,:]
-		end
-		dfShutdown[!,:Sum][i] = sum(shut[i,:])
-	end
+	shut[COMMIT, :] = value.(EP[:vSHUT][COMMIT, :])
+	dfShutdown.AnnualSum = shut * inputs["omega"]
 	dfShutdown = hcat(dfShutdown, DataFrame(shut, :auto))
-	auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("Sum");[Symbol("t$t") for t in 1:T]]
+	auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 	rename!(dfShutdown,auxNew_Names)
-	total = DataFrame(["Total" 0 sum(dfShutdown[!,:Sum]) fill(0.0, (1,T))], :auto)
-	for t in 1:T
-		if v"1.3" <= VERSION < v"1.4"
-			total[!,t+3] .= sum(dfShutdown[!,Symbol("t$t")][1:G])
-		elseif v"1.4" <= VERSION < v"1.9"
-			total[:,t+3] .= sum(dfShutdown[:,Symbol("t$t")][1:G])
-		end
-	end
+	total=DataFrame(["Total" 0 sum(dfShutdown.AnnualSum) fill(0.0, (1,T))], :auto)
+	total[:, 4:T+3] .= sum(shut, dims = 1)
 	rename!(total,auxNew_Names)
 	dfShutdown = vcat(dfShutdown, total)
-	CSV.write(string(path,sep,"shutdown.csv"), dftranspose(dfShutdown, false), writeheader=false)
+	CSV.write(joinpath(path,"shutdown.csv"), dftranspose(dfShutdown, false), writeheader=false)
 end

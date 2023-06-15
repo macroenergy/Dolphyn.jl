@@ -9,11 +9,13 @@ function load_syn_fuels_resources(setup::Dict, path::AbstractString, sep::Abstra
     # Store DataFrame of generators/resources input data for use in model
 	inputs["dfSynFuels"] = syn_fuels_in
 
-    # Index of Synfuel resources
+    # Index of Syn Fuel resources - can be either commit, no_commit 
 	inputs["SYN_FUELS_RES_ALL"] = size(collect(skipmissing(syn_fuels_in[!,:R_ID])),1)
 
-	# Set of all Synfuel resources modelled
-	inputs["SYN_FUEL_PLANT"] = syn_fuels_in[!,:R_ID]
+    # Set of all resources modelled w unit commitment
+	inputs["SYN_FUEL_RES_COMMIT"] = syn_fuels_in[syn_fuels_in.Commit.!=0,:R_ID] 
+	# Set of all resources modelled wo unit commitment
+	inputs["SYN_FUEL_RES_NO_COMMIT"] = syn_fuels_in[syn_fuels_in.Commit.==0,:R_ID] 
 
     ###Number of by-products
 	Nby_prod_excess = count(s -> startswith(String(s), "mmbtu_p_tonne_co2"), names(inputs["dfSynFuels"]))

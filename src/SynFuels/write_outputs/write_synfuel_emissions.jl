@@ -26,14 +26,14 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 	dfSFBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 12 + NSFByProd)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 11 + NSFByProd)
 		byprodHead = "ByProd_Cons_Emissions_" .* string.(collect(1:NSFByProd))
-	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","SF_Prod_Emissions", "SF_Prod_Captured", "SF_Diesel_Cons_Emissions", "Bio_Diesel_Cons_Emissions", "Conv_Diesel_Cons_Emissions","SF_Jetfuel_Cons_Emissions", "Bio_Jetfuel_Cons_Emissions", "Conv_Jetfuel_Cons_Emissions", "SF_Gasoline_Cons_Emissions", "Bio_Gasoline_Cons_Emissions", "Conv_Gasoline_Cons_Emissions"], byprodHead)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","SF_Prod_Emissions", "SF_Prod_Captured", "SF_Diesel_Cons_Emissions", "Bio_Diesel_Cons_Emissions", "Conv_Diesel_Cons_Emissions","SF_Jetfuel_Cons_Emissions", "Conv_Jetfuel_Cons_Emissions", "SF_Gasoline_Cons_Emissions", "Bio_Gasoline_Cons_Emissions", "Conv_Gasoline_Cons_Emissions"], byprodHead)
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 	   	for t in 1:T
 			if setup["ParameterScale"] ==1
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons][t,z])*ModelScalingFactor
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2ConsNoCommit][t,z])*ModelScalingFactor
 				dfTemp1[t+rowoffset,2]=value.(EP[:eSynFuelProdEmissionsByZone][z,t])*ModelScalingFactor
 				dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelCaptureByZone][z,t])*ModelScalingFactor
 				dfTemp1[t+rowoffset,4]=value.(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
@@ -42,36 +42,26 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 				if setup["BIO_Diesel_On"] == 1
 					dfTemp1[t+rowoffset,5]=value.(EP[:eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
 				end
+
 				dfTemp1[t+rowoffset,6]=value.(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
-
-
 				dfTemp1[t+rowoffset,7]=value.(EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
-
-				dfTemp1[t+rowoffset,8] = 0
-
-				if setup["BIO_Jetfuel_On"] == 1
-					dfTemp1[t+rowoffset,8]=value.(EP[:eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
-				end
-
-				dfTemp1[t+rowoffset,9]=value.(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
-
-				dfTemp1[t+rowoffset,10]=value.(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
-
-				dfTemp1[t+rowoffset,11] = 0
+				dfTemp1[t+rowoffset,8]=value.(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
+				dfTemp1[t+rowoffset,9]=value.(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
+				dfTemp1[t+rowoffset,10] = 0
 				
 				if setup["BIO_Gasoline_On"] == 1
-					dfTemp1[t+rowoffset,11]=value.(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
+					dfTemp1[t+rowoffset,10]=value.(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
 				end
 
-				dfTemp1[t+rowoffset,12]=value.(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
+				dfTemp1[t+rowoffset,11]=value.(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
 
 
 				for b in 1:NSFByProd
-					dfTemp1[t+rowoffset, 12 + b] = sum(value.(EP[:eByProdConsCO2EmissionsByZoneB][b,z,t]))*ModelScalingFactor
+					dfTemp1[t+rowoffset, 10 + b] = sum(value.(EP[:eByProdConsCO2EmissionsByZoneB][b,z,t]))*ModelScalingFactor
 				end
 
 			else
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons][t,z])
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2ConsNoCommit][t,z])
 				dfTemp1[t+rowoffset,2]=value.(EP[:eSynFuelProdEmissionsByZone][z,t])
 				dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelCaptureByZone][z,t])
 				dfTemp1[t+rowoffset,4]=value.(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t])
@@ -83,24 +73,18 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 
 				dfTemp1[t+rowoffset,6]=value.(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,7]=value.(EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t])
-
-				dfTemp1[t+rowoffset,8] = 0
-				if setup["BIO_Jetfuel_On"] == 1
-					dfTemp1[t+rowoffset,8]=value.(EP[:eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
-				end
-
-				dfTemp1[t+rowoffset,9]=value.(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])
-				dfTemp1[t+rowoffset,10]=value.(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t])
-				dfTemp1[t+rowoffset,11] = 0
+				dfTemp1[t+rowoffset,8]=value.(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,9]=value.(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,10] = 0
 				
 				if setup["BIO_Gasoline_On"] == 1
-					dfTemp1[t+rowoffset,11]=value.(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,10]=value.(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
 				end
 
-				dfTemp1[t+rowoffset,12]=value.(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,11]=value.(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
 
 				for b in 1:NSFByProd
-					dfTemp1[t+rowoffset, 12 + b] = sum(value.(EP[:eByProdConsCO2EmissionsByZoneB][b,z,t]))
+					dfTemp1[t+rowoffset, 11 + b] = sum(value.(EP[:eByProdConsCO2EmissionsByZoneB][b,z,t]))
 				end
 
 			end

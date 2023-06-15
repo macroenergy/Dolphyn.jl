@@ -58,10 +58,6 @@ function write_BESC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs
       write_bio_zone_biodiesel_produced(path, sep, inputs, setup, EP)
     end
     
-    if setup["BIO_Jetfuel_On"] == 1
-      write_bio_zone_biojetfuel_produced(path, sep, inputs, setup, EP)
-    end
-
     if setup["BIO_Gasoline_On"] == 1
       write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
     end

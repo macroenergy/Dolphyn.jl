@@ -31,11 +31,11 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
 	#####################################################################################################################################
 	##Variables
-	#CO2 injected into geological sequestration from carbon storage resource k (tonnes of CO2/hr) in time t
+	#CO2 injected into geological sequestration from carbon injection resource k (tonnes of CO2/hr) in time t
 	@variable(EP, vCO2_Injected[k=1:CO2_STOR_ALL, t = 1:T] >= 0 )
 
-	#Power required by carbon storage resource k (MW)
-	@variable(EP, vPower_CO2_Storage[k=1:CO2_STOR_ALL, t = 1:T] >= 0 )
+	#Power required by carbon injection resource k (MW)
+	@variable(EP, vPower_CO2_Injection[k=1:CO2_STOR_ALL, t = 1:T] >= 0 )
 	
 	###############################################################################################################################
 
@@ -43,14 +43,14 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	# If ParameterScale = 1, power system operation/capacity modeled in GW, no need to scale as MW/ton = GW/kton 
 	# If ParameterScale = 0, power system operation/capacity modeled in MW
 
-	@expression(EP, ePower_Balance_CO2_Storage[t=1:T, z=1:Z],
-	sum(EP[:vPower_CO2_Storage][k,t] for k in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]))
+	@expression(EP, ePower_Balance_CO2_Injection[t=1:T, z=1:Z],
+	sum(EP[:vPower_CO2_Injection][k,t] for k in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]))
 
 	#Add to power balance to take power away from generated
-	EP[:ePowerBalance] += -ePower_Balance_CO2_Storage
+	EP[:ePowerBalance] += -ePower_Balance_CO2_Injection
 
 	##For CO2 Policy constraint right hand side development - power consumption by zone and each time step
-	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_CO2_Storage
+	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_CO2_Injection
 
 	#CO2 Balance expressions
 	@expression(EP, eStored_Captured_CO2[t=1:T, z=1:Z],
@@ -69,34 +69,15 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	###############################################################################################################################
 	##Constraints
 	#Power constraint
-	@constraint(EP,cPower_Consumption_CO2_Storage[k=1:CO2_STOR_ALL, t = 1:T], EP[:vPower_CO2_Storage][k,t] == EP[:vCO2_Injected][k,t] * dfCO2Storage[!,:etaPCO2_MWh_per_tonne][k])
+	@constraint(EP,cPower_Consumption_CO2_Injection[k=1:CO2_STOR_ALL, t = 1:T], EP[:vPower_CO2_Injection][k,t] == EP[:vCO2_Injected][k,t] * dfCO2Storage[!,:etaPCO2_MWh_per_tonne][k])
 
-	#Include constraint of min storage operation
+	#Include constraint of min injection operation
+	@constraint(EP,cMin_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL], EP[:eCO2_Injected_per_year][k] >= EP[:vCapacity_CO2_Injection_per_type][k] * dfCO2Storage[!,:CO2_Injection_Min_Output][k])
 
-	#Max carbon injected into geological sequestration per resoruce type k
-	@constraint(EP,cMax_CO2_Injected_per_type_per_year[k=1:CO2_STOR_ALL], EP[:eCO2_Injected_per_year][k] <= EP[:vCapacity_CO2_Storage_per_type][k])
-
-	#Injection rate limit
-	@constraint(EP,cMin_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL, t=1:T], EP[:vCO2_Injected][k,t] >=  dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Min_Output][k])
-	@constraint(EP,cMax_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL, t=1:T], EP[:vCO2_Injected][k,t] <=  dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
+	#Max carbon injected into geological sequestration per resoruce type k at hour T
+	@constraint(EP,cMax_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL], EP[:eCO2_Injected_per_year][k] <= EP[:vCapacity_CO2_Injection_per_type][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
 
 	###############################################################################################################################
-
-	#Variable Cost of CO2 Storage (Injection)
-	if setup["ParameterScale"] ==1
-		@expression(EP, eVar_OM_CO2_Injection_per_type_per_time[k = 1:CO2_STOR_ALL,t = 1:T], 
-		(inputs["omega"][t] * (dfCO2Storage[!,:Var_OM_Cost_per_tonne][k]/ModelScalingFactor) * vCO2_Injected[k,t]))
-    else
-		@expression(EP, eVar_OM_CO2_Injection_per_type_per_time[k = 1:CO2_STOR_ALL,t = 1:T], 
-		(inputs["omega"][t] * dfCO2Storage[!,:Var_OM_Cost_per_tonne][k] * vCO2_Injected[k,t]))
-	end
-
-	@expression(EP, eVar_OM_CO2_Injection_per_time[t=1:T], sum(eVar_OM_CO2_Injection_per_type_per_time[k,t] for k in 1:CO2_STOR_ALL))
-	@expression(EP, eVar_OM_CO2_Injection_per_type[k = 1:CO2_STOR_ALL], sum(eVar_OM_CO2_Injection_per_type_per_time[k,t] for t in 1:T))
-	@expression(EP, eVar_OM_CO2_Injection_total, sum(eVar_OM_CO2_Injection_per_time[t] for t in 1:T))
-	
-	# Add total variable cost to the objective function
-	EP[:eObj] += eVar_OM_CO2_Injection_total
 
 	return EP
 

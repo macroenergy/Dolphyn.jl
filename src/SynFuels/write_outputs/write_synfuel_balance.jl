@@ -22,6 +22,10 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 
 	NSFByProd = inputs["NSFByProd"]
 
+	if !isempty(inputs["SYN_FUEL_RES_COMMIT"])
+		ErrorException("Writing outputs for commit units not implemented")
+	end
+
 	## SynFuel balance for each zone
 	dfSFBalance = Array{Any}
 	rowoffset=3
@@ -33,14 +37,14 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 
 	   	for t in 1:T
 			if setup["ParameterScale"] ==1
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons][t,z])*ModelScalingFactor #Convert kton CO2 to tonne CO2
-				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelRes][t,z])*ModelScalingFactor #Convert GW to MW
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2ConsNoCommit][t,z])*ModelScalingFactor #Convert kton CO2 to tonne CO2
+				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelResNoCommit][t,z])*ModelScalingFactor #Convert GW to MW
 			else
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons][t,z])
-				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelRes][t,z])
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2ConsNoCommit][t,z])
+				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelResNoCommit][t,z])
 			end
 
-			dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelH2Cons][t,z])
+			dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelH2ConsNoCommit][t,z])
 			dfTemp1[t+rowoffset,4]= sum(value.(EP[:vSFProd_Diesel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
 			dfTemp1[t+rowoffset,5]= sum(value.(EP[:vSFProd_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
 			dfTemp1[t+rowoffset,6]= sum(value.(EP[:vSFProd_Gasoline][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))

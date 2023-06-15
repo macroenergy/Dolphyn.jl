@@ -19,9 +19,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting the time weights after clustering process.
 """
-function write_time_weights(path::AbstractString, sep::AbstractString, inputs::Dict)
+function write_time_weights(path::AbstractString, inputs::Dict)
 	T = inputs["T"]     # Number of time steps (hours)
 	# Save array of weights for each time period (when using time sampling)
 	dfTimeWeights = DataFrame(Time=1:T, Weight=inputs["omega"])
-	CSV.write(string(path,sep,"time_weights.csv"), dfTimeWeights)
+	CSV.write(joinpath(path,"time_weights.csv"), dfTimeWeights)
 end

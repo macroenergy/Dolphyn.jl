@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_reliability(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_reliability(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting dual variable of maximum non-served energy constraint (shadow price of reliability constraint) for each model zone and time step.
 """
-function write_reliability(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_reliability(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
@@ -36,6 +36,6 @@ function write_reliability(path::AbstractString, sep::AbstractString, inputs::Di
 	auxNew_Names=[Symbol("Zone");[Symbol("t$t") for t in 1:T]]
 	rename!(dfReliability,auxNew_Names)
 
-	CSV.write(string(path,sep,"reliabilty.csv"), dftranspose(dfReliability, false), writeheader=false)
+	CSV.write(joinpath(path, "reliability.csv"), dftranspose(dfReliability, false), writeheader=false)
 
 end

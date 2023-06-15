@@ -55,7 +55,8 @@ function biorefinery_var_cost(EP::Model, inputs::Dict, setup::Dict)
 	#Total variable cost
 	@expression(EP, eVar_Cost_BIO, sum(EP[:eVar_Cost_BIO_per_plant][i] for i in 1:BIO_RES_ALL))
 
-	EP[:eObj] += EP[:eVar_Cost_BIO]
+	add_to_expression!(EP[:eObj],EP[:eVar_Cost_BIO])
+	#EP[:eObj] += EP[:eVar_Cost_BIO]
 
 	return EP
 

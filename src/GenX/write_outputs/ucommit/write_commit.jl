@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -14,24 +14,17 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@doc raw"""
-	write_commit(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-
-Function for reporting committment states for each resource at each time step.
-"""
-function write_commit(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_commit(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
-
+	COMMIT = inputs["COMMIT"]
 	# Commitment state for each resource in each time step
 	commit = zeros(G,T)
-	for i in inputs["COMMIT"]
-		commit[i,:] = value.(EP[:vCOMMIT])[i,:]
-	end
+	commit[COMMIT, :] = value.(EP[:vCOMMIT][COMMIT, :])
 	dfCommit = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone])
 	dfCommit = hcat(dfCommit, DataFrame(commit, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
 	rename!(dfCommit,auxNew_Names)
-	CSV.write(string(path,sep,"commit.csv"), dftranspose(dfCommit, false), writeheader=false)
+	CSV.write(joinpath(path, "commit.csv"), dftranspose(dfCommit, false), writeheader=false)
 end

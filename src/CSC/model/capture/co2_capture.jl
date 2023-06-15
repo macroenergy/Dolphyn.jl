@@ -15,13 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module uses the following 'helper' functions in separate files: ```co2_capture_uc()``` for DAC resources subject to unit commitment decisions and constraints (if any) and ```co2_capture_DAC()``` for DAC resources not subject to unit commitment (if any).
+This module uses the following 'helper' functions in separate files: ```co2_capture_uc()``` for DAC resources subject to unit commitment decisions and constraints (if any) and ```co2_capture_non_uc()``` for DAC resources not subject to unit commitment (if any).
 """
 function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 
-	CO2_CAPTURE_DAC = inputs["CO2_CAPTURE_DAC"]
+    CO2_CAPTURE_UC = inputs["CO2_CAPTURE_UC"]
+	CO2_CAPTURE_NON_UC = inputs["CO2_CAPTURE_NON_UC"]
 
 	dfGen = inputs["dfGen"] #To account for the CO2 captured by power sector
 
@@ -30,15 +31,19 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 		H = inputs["H2_RES_ALL"]
 	end
 
-	dfDAC = inputs["dfDAC"]  # Input CO2 capture data
+	dfCO2Capture = inputs["dfCO2Capture"]  # Input CO2 capture data
 
-	D = inputs["DAC_RES_ALL"]
+	D = inputs["CO2_RES_ALL"]
 	G = inputs["G"]  # Number of resources (generators, storage, DR, and DERs)
 	Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2, H2 and electricity
 	T = inputs["T"]	 # Model operating time steps
 
-	if !isempty(CO2_CAPTURE_DAC)
-		EP = co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
+	if !isempty(CO2_CAPTURE_UC)
+		EP = co2_capture_uc(EP::Model, inputs::Dict, setup::Dict)
+	end
+	
+	if !isempty(CO2_CAPTURE_NON_UC)
+		EP = co2_capture_non_uc(EP::Model, inputs::Dict,setup::Dict)
 	end
 
 	#CO2 captued by power sector CCS plants
@@ -50,6 +55,25 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	EP[:eCaptured_CO2_Balance] += EP[:ePower_CO2_captured_per_time_per_zone]
 
 	#################################################################################################################################################################
+	#CO2 captued by DAC CCS plants
+
+    #CCS CO2 captured by fuel usage per type of resource "k"
+    if setup["ParameterScale"] ==1
+        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
+            inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfCO2Capture[!, :Fuel_CCS_Rate][k]) * ModelScalingFactor) #As fuel CO2 is already scaled to kton/MMBtu we need to scale vDAC_CO2_Captured
+    else
+        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
+        inputs["fuel_CO2"][dfCO2Capture[!,:Fuel][k]] * dfCO2Capture[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfCO2Capture[!, :Fuel_CCS_Rate][k]))
+    end
+
+	@expression(EP, eDAC_Fuel_CO2_captured_per_plant_per_time[y=1:D,t=1:T], EP[:eCO2CaptureByDACFuelPlant][y,t])
+	@expression(EP, eDAC_Fuel_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+	@expression(EP, eDAC_Fuel_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfCO2Capture[(dfCO2Capture[!,:Zone].==z),:R_ID]))
+	
+	#ADD TO CO2 BALANCE
+	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
+
+	#################################################################################################################################################################
 
 	if setup["ModelH2"] == 1
 		@expression(EP, eHydrogen_CO2_captured_per_plant_per_time[y=1:H,t=1:T], EP[:eCO2CaptureByH2Plant][y,t])
@@ -59,25 +83,6 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 		#ADD TO CO2 BALANCE
 		EP[:eCaptured_CO2_Balance] += EP[:eHydrogen_CO2_captured_per_time_per_zone]
 	end
-	#################################################################################################################################################################
-	#CO2 captued by DAC CCS plants
-
-    #CCS CO2 captured by fuel usage per type of resource "k"
-    if setup["ParameterScale"] ==1
-        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
-            inputs["fuel_CO2"][dfDAC[!,:Fuel][k]] * dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfDAC[!, :Fuel_CCS_Rate][k]) * ModelScalingFactor) #As fuel CO2 is already scaled to kton/MMBtu we need to scale vDAC_CO2_Captured
-    else
-        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
-        inputs["fuel_CO2"][dfDAC[!,:Fuel][k]] * dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfDAC[!, :Fuel_CCS_Rate][k]))
-    end
-
-	@expression(EP, eDAC_Fuel_CO2_captured_per_plant_per_time[y=1:D,t=1:T], EP[:eCO2CaptureByDACFuelPlant][y,t])
-	@expression(EP, eDAC_Fuel_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
-	@expression(EP, eDAC_Fuel_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
-	
-	#ADD TO CO2 BALANCE
-	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
-
 
 	return EP
 end

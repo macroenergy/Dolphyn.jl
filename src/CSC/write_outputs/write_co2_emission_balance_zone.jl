@@ -29,8 +29,8 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 	dfCO2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 20)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biorefinery Capture", "CO2 Pipeline Loss","Synfuel Production Emissions","Synfuel Byproducts Emissions","Conventional Diesel Utilization","Conventional Jetfuel Utilization","Conventional Gasoline Utilization","Syn Diesel Utilization","Syn Jetfuel Utilization","Syn Gasoline Utilization","Bio Diesel Utilization","Bio Jetfuel Utilization", "Bio Gasoline Utilization","Bio Ethanol Utilization"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 19)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biorefinery Capture", "CO2 Pipeline Loss","Synfuel Production Emissions","Synfuel Byproducts Emissions","Conventional Diesel Utilization","Conventional Jetfuel Utilization","Conventional Gasoline Utilization","Syn Diesel Utilization","Syn Jetfuel Utilization","Syn Gasoline Utilization","Bio Diesel Utilization","Bio Gasoline Utilization","Bio Ethanol Utilization"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			dfTemp1[t+rowoffset,1] = value(EP[:eEmissionsByZone][z,t])
@@ -75,13 +75,12 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 
 				if setup["ModelBIO"] == 1
 					dfTemp1[t+rowoffset,17] = value(EP[:eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,18] = value(EP[:eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,19] = value(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,20] = value(EP[:eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,18] = value(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,19] = value(EP[:eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone][z,t])
 				else
 					dfTemp1[t+rowoffset,17] = 0
+					dfTemp1[t+rowoffset,18] = 0
 					dfTemp1[t+rowoffset,19] = 0
-					dfTemp1[t+rowoffset,20] = 0
 				end
 
 			else
@@ -96,7 +95,6 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 				dfTemp1[t+rowoffset,17] = 0
 				dfTemp1[t+rowoffset,18] = 0
 				dfTemp1[t+rowoffset,19] = 0
-				dfTemp1[t+rowoffset,20] = 0
 			end
 
 			if setup["ParameterScale"] == 1
@@ -119,7 +117,6 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 				dfTemp1[t+rowoffset,17] = dfTemp1[t+rowoffset,17] * ModelScalingFactor
 				dfTemp1[t+rowoffset,18] = dfTemp1[t+rowoffset,18] * ModelScalingFactor
 				dfTemp1[t+rowoffset,19] = dfTemp1[t+rowoffset,19] * ModelScalingFactor
-				dfTemp1[t+rowoffset,20] = dfTemp1[t+rowoffset,20] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end

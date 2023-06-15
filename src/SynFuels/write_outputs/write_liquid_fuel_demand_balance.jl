@@ -59,32 +59,20 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	## SynFuel jetfuel balance for each zone
 	dfSFJetfuelBalance = Array{Any}
 	rowoffset=3
-
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
-	
 	for z in 1:Z
-	   	dfTemp1_Jetfuel = Array{Any}(nothing, T+rowoffset, 4)
-	   	dfTemp1_Jetfuel[1,1:size(dfTemp1_Jetfuel,2)] = ["Syn_Fuel_Jetfuel_Generation", "Bio_Fuel_Jetfuel_Generation", "Conventional_Fuel_Jetfuel_Demand", "Jetfuel_Demand"]
-	   	dfTemp1_Jetfuel[2,1:size(dfTemp1_Jetfuel,2)] = repeat([z],size(dfTemp1_Jetfuel,2))
-	   	for t in 1:T
-	     	dfTemp1_Jetfuel[t+rowoffset,1]= sum(value.(EP[:vSFProd_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
-
-			 dfTemp1_Jetfuel[t+rowoffset,2]= 0
-
-			if setup["ModelBIO"] == 1 && setup["BIO_Jetfuel_On"] == 1
-				dfTemp1_Jetfuel[t+rowoffset,2]= sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
-			end
-
-			dfTemp1_Jetfuel[t+rowoffset,3] = value.(EP[:vConvLFJetfuelDemand][t,z])
-			dfTemp1_Jetfuel[t+rowoffset,4] = -inputs["Liquid_Fuels_Jetfuel_D"][t,z]
-	   	end
+		dfTemp1_Jetfuel = Array{Any}(nothing, T+rowoffset, 3)
+		dfTemp1_Jetfuel[1,1:size(dfTemp1_Jetfuel,2)] = ["Syn_Fuel_Jetfuel_Generation", "Conventional_Fuel_Jetfuel_Demand", "Jetfuel_Demand"]
+		dfTemp1_Jetfuel[2,1:size(dfTemp1_Jetfuel,2)] = repeat([z],size(dfTemp1_Jetfuel,2))
+		for t in 1:T
+			dfTemp1_Jetfuel[t+rowoffset,1]= sum(value.(EP[:vSFProd_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1_Jetfuel[t+rowoffset,2] = value.(EP[:vConvLFJetfuelDemand][t,z])
+			dfTemp1_Jetfuel[t+rowoffset,3] = -inputs["Liquid_Fuels_Jetfuel_D"][t,z]
+		end
 
 		if z==1
 			dfSFJetfuelBalance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1_Jetfuel)
 		else
-		    dfSFJetfuelBalance = hcat(dfSFJetfuelBalance, dfTemp1_Jetfuel)
+			dfSFJetfuelBalance = hcat(dfSFJetfuelBalance, dfTemp1_Jetfuel)
 		end
 	end
 	for c in 2:size(dfSFJetfuelBalance,2)
@@ -92,7 +80,6 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	end
 	dfSFJetfuelBalance = DataFrame(dfSFJetfuelBalance, :auto)
 	CSV.write(string(path,sep,"LF_Jetfuel_balance.csv"), dfSFJetfuelBalance, writeheader=false)
-
 
 	## SynFuel gasoline balance for each zone
 	dfSFGasolineBalance = Array{Any}

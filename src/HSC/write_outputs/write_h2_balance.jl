@@ -89,17 +89,17 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 	     	dfTemp1[t+rowoffset,11] = -inputs["H2_D"][t,z]
 
-
-			dfTemp1[t+rowoffset,12] = 0
-			
-			if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+	
+			if setup["ModelBIO"] == 1
 				dfTemp1[t+rowoffset,12] = value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone][t,z]) - value.(EP[:eScaled_BioH2_consumption_per_time_per_zone][t,z])
+			else
+				dfTemp1[t+rowoffset,12] = 0
 			end
 
 			
 
 			if setup["ModelSynFuels"] == 1
-				dfTemp1[t+rowoffset,13] = - value.(EP[:eSynFuelH2Cons][t,z])
+				dfTemp1[t+rowoffset,13] = - value.(EP[:eSynFuelH2ConsNoCommit][t,z])
 			else
 				dfTemp1[t+rowoffset,13] = 0
 			end

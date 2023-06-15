@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,187 +15,99 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-
-Function for reporting the costs pertaining to the objective function (fixed, variable O&M etc.).
+	write_costs(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+Function for writing the costs pertaining to the objective function (fixed, variable O&M etc.).
 """
-function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_costs(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
 	dfGen = inputs["dfGen"]
 	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 
-	dfCost = DataFrame(Costs = ["cTotal", "cFix_Thermal", "cFix_VRE", "cFix_Trans_VRE", "cFix_Must_Run", "cFix_Hydro", "cFix_Stor", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp"])
+	dfCost = DataFrame(Costs = ["cTotal", "cFix", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp"])
+	cVar = value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0.0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0.0)
+	cFix = value(EP[:eTotalCFix]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0.0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0.0)
+	dfCost[!,Symbol("Total")] = [objective_value(EP), cFix, cVar, value(EP[:eTotalCNSE]), 0.0, 0.0, 0.0]
+
 	if setup["ParameterScale"] == 1
-		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)) * (ModelScalingFactor^2)
-		cFix_Thermal = value(EP[:eCFix_Thermal]) * (ModelScalingFactor^2)
-		cFix_VRE = value(EP[:eCFix_VRE]) * (ModelScalingFactor^2)
-		cFix_VRE_Trans = value(EP[:eCFix_VRE_Trans_Total]) * (ModelScalingFactor^2)
-		cFix_Must_Run = value(EP[:eCFix_Must_Run]) * (ModelScalingFactor^2)
-		cFix_Hydro = value(EP[:eCFix_Hydro]) * (ModelScalingFactor^2)
-		cFix_Stor = (value(EP[:eCFix_Stor_Inv]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0)) * (ModelScalingFactor^2)
-		cNSE =  value(EP[:eTotalCNSE]) * (ModelScalingFactor^2)
-		#cTotal = cVar + cFix + cNSE
-		#dfCost[!,Symbol("Total")] = [cTotal, cFix, cVar, cNSE, 0, 0, 0]
-	else
-		cVar = (value(EP[:eTotalCVarOut])+ (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0))
-		#cVar = value(EP[:eTotalCVarOut])+(!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCVarIn]) : 0) + (!isempty(inputs["FLEX"]) ? value(EP[:eTotalCVarFlexIn]) : 0)
-		cFix_Thermal = value(EP[:eCFix_Thermal])
-		cFix_VRE = value(EP[:eCFix_VRE])
-		cFix_VRE_Trans = value(EP[:eCFix_VRE_Trans_Total])
-		cFix_Must_Run = value(EP[:eCFix_Must_Run])
-		cFix_Hydro = value(EP[:eCFix_Hydro])
-		cFix_Stor = (value(EP[:eCFix_Stor_Inv]) + (!isempty(inputs["STOR_ALL"]) ? value(EP[:eTotalCFixEnergy]) : 0) + (!isempty(inputs["STOR_ASYMMETRIC"]) ? value(EP[:eTotalCFixCharge]) : 0))
-		cNSE = value(EP[:eTotalCNSE])
-		#cTotal = cVar + cFix + cNSE
+		dfCost.Total *= ModelScalingFactor^2
 	end
 
-	# Adding emissions penalty to variable cost depending on type of emissions policy constraint
-	# Emissions penalty is already scaled by adjusting the value of carbon price used in emissions_HSC.jl
-	if setup["CO2Cap"]==4
-		cVar  = cVar + value(EP[:eCGenTotalEmissionsPenalty])
-	end
-
-	# Start cost
 	if setup["UCommit"]>=1
-		if setup["ParameterScale"] == 1
-			cStartCost = value(EP[:eTotalCStart]) * (ModelScalingFactor^2)
-		else
-			cStartCost = value(EP[:eTotalCStart])
-		end
-	else
-		cStartCost =0
-		#cTotal += dfCost[!,2][5]
+		dfCost[5,2] = value(EP[:eTotalCStart])
 	end
 
-	# Reserve cost
 	if setup["Reserves"]==1
-		if setup["ParameterScale"] == 1
-			cRsvCost = value(EP[:eTotalCRsvPen]) * (ModelScalingFactor^2)
-		else
-			cRsvCost = value(EP[:eTotalCRsvPen])
-		end
-	else
-		cRsvCost = 0
-		#cTotal += dfCost[!,2][6]
+		dfCost[6,2] = value(EP[:eTotalCRsvPen])
 	end
 
-	# Network expansion cost
 	if setup["NetworkExpansion"] == 1 && Z > 1
-		if setup["ParameterScale"] == 1
-			cNetworkExpansionCost = value(EP[:eTotalCNetworkExp]) * (ModelScalingFactor^2)
-		else
-			cNetworkExpansionCost = value(EP[:eTotalCNetworkExp])
-		end
-
-	else
-		cNetworkExpansionCost =0
-		#cTotal += dfCost[!,2][7]
+		dfCost[7,2] = value(EP[:eTotalCNetworkExp])
 	end
 
-	# Define total costs
-	cTotal = cFix_Thermal + cFix_VRE + cFix_VRE_Trans + cFix_Must_Run + cFix_Hydro + cFix_Stor + cVar + cNSE + cStartCost + cRsvCost + cNetworkExpansionCost
+	if setup["ParameterScale"] == 1
+		dfCost[5,2] *= ModelScalingFactor^2
+		dfCost[6,2] *= ModelScalingFactor^2
+		dfCost[7,2] *= ModelScalingFactor^2
+	end
 
-	# Define total column, i.e. column 2
-	dfCost[!,Symbol("Total")] = [cTotal, cFix_Thermal, cFix_VRE, cFix_VRE_Trans, cFix_Must_Run, cFix_Hydro, cFix_Stor, cVar, cNSE, cStartCost, cRsvCost, cNetworkExpansionCost]
-
-	# Computing zonal cost breakdown by cost category
 	for z in 1:Z
-		tempCTotal = 0
-		tempCFix_Thermal = 0
-		tempCFix_VRE = 0
-		tempCFix_Trans_VRE = 0
-		tempCFix_Must_Run = 0
-		tempCFix_Hydro = 0
-		tempCFix_Stor = 0
-		tempCVar = 0
-		tempCStart = 0
+		tempCTotal = 0.0
+		tempCFix = 0.0
+		tempCVar = 0.0
+		tempCStart = 0.0
+		tempCNSE = 0.0
 
-		for y in intersect(inputs["THERM_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Thermal = tempCFix_Thermal + value.(EP[:eCFix])[y]
+		Y_ZONE = dfGen[dfGen[!,:Zone].==z,:R_ID]
+		STOR_ALL_ZONE = intersect(inputs["STOR_ALL"], Y_ZONE)
+		STOR_ASYMMETRIC_ZONE = intersect(inputs["STOR_ASYMMETRIC"], Y_ZONE)
+		FLEX_ZONE = intersect(inputs["FLEX"], Y_ZONE)
+		COMMIT_ZONE = intersect(inputs["COMMIT"], Y_ZONE)
+
+		eCFix = sum(value.(EP[:eCFix][Y_ZONE]))
+		tempCFix += eCFix
+		tempCTotal += eCFix
+
+		tempCVar = sum(value.(EP[:eCVar_out][Y_ZONE,:]))
+		tempCTotal += tempCVar
+
+		if !isempty(STOR_ALL_ZONE)
+			eCVar_in = sum(value.(EP[:eCVar_in][STOR_ALL_ZONE,:]))
+			tempCVar += eCVar_in
+			eCFixEnergy = sum(value.(EP[:eCFixEnergy][STOR_ALL_ZONE]))
+			tempCFix += eCFixEnergy
+
+			tempCTotal += eCVar_in + eCFixEnergy
+		end
+		if !isempty(STOR_ASYMMETRIC_ZONE)
+			eCFixCharge = sum(value.(EP[:eCFixCharge][STOR_ASYMMETRIC_ZONE]))
+			tempCFix += eCFixCharge
+			tempCTotal += eCFixCharge
+		end
+		if !isempty(FLEX_ZONE)
+			eCVarFlex_in = sum(value.(EP[:eCVarFlex_in][FLEX_ZONE,:]))
+			tempCVar += eCVarFlex_in
+			tempCTotal += eCVarFlex_in
 		end
 
-		for y in intersect(inputs["VRE"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_VRE = tempCFix_VRE + value.(EP[:eCFix])[y]
-			tempCFix_Trans_VRE = tempCFix_Trans_VRE + value.(EP[:eCFix_VRE_Trans])[y]
+		if setup["UCommit"] >= 1
+			eCStart = sum(value.(EP[:eCStart][COMMIT_ZONE,:]))
+			tempCStart += eCStart
+			tempCTotal += eCStart
 		end
 
-		for y in intersect(inputs["MUST_RUN"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Must_Run = tempCFix_Must_Run + value.(EP[:eCFix])[y]
-		end
-
-		for y in intersect(inputs["HYDRO_RES"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Hydro = tempCFix_Hydro + value.(EP[:eCFix])[y]
-		end
-
-		for y in intersect(inputs["STOR_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID])
-			tempCFix_Stor = tempCFix_Stor + value.(EP[:eCFix])[y]
-		end
-
-		for y in dfGen[dfGen[!,:Zone].==z,:][!,:R_ID]
-				
-			tempCVar = tempCVar +
-				(y in inputs["STOR_ALL"] ? sum(value.(EP[:eCVar_in])[y,:]) : 0) +
-				(y in inputs["FLEX"] ? sum(value.(EP[:eCVarFlex_in])[y,:]) : 0) +
-				sum(value.(EP[:eCVar_out])[y,:])
-
-			tempCFix_Stor = tempCFix_Stor + (y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) + (y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0)
-				
-			if setup["UCommit"]>=1
-				tempCTotal = tempCTotal +
-					value.(EP[:eCFix])[y] +
-					value.(EP[:eCFix_VRE_Trans])[y] +
-					(y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) +
-					(y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0) +
-					(y in inputs["STOR_ALL"] ? sum(value.(EP[:eCVar_in])[y,:]) : 0) +
-					(y in inputs["FLEX"] ? sum(value.(EP[:eCVarFlex_in])[y,:]) : 0) +
-					sum(value.(EP[:eCVar_out])[y,:]) +
-					(y in inputs["COMMIT"] ? sum(value.(EP[:eCStart])[y,:]) : 0)
-					#
-				tempCStart = tempCStart +
-					(y in inputs["COMMIT"] ? sum(value.(EP[:eCStart])[y,:]) : 0)
-			else
-				tempCTotal = tempCTotal +
-					value.(EP[:eCFix])[y] +
-					value.(EP[:eCFix_VRE_Trans])[y] +
-					(y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) +
-					(y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0) +
-					(y in inputs["STOR_ALL"] ? sum(value.(EP[:eCVar_in])[y,:]) : 0) +
-					(y in inputs["FLEX"] ? sum(value.(EP[:eCVarFlex_in])[y,:]) : 0) +
-					sum(value.(EP[:eCVar_out])[y,:])
-			end
-		end
-
+		tempCNSE = sum(value.(EP[:eCNSE][:,:,z]))
+		tempCTotal += tempCNSE
 
 		if setup["ParameterScale"] == 1
-			tempCFix_Thermal = tempCFix_Thermal * (ModelScalingFactor^2)
-			tempCFix_VRE = tempCFix_VRE * (ModelScalingFactor^2)
-			tempCFix_Trans_VRE = tempCFix_Trans_VRE * (ModelScalingFactor^2)
-			tempCFix_Must_Run = tempCFix_Must_Run * (ModelScalingFactor^2)
-			tempCFix_Hydro = tempCFix_Hydro * (ModelScalingFactor^2)
-			tempCFix_Stor = tempCFix_Stor * (ModelScalingFactor^2)
-			tempCVar = tempCVar * (ModelScalingFactor^2)
-			tempCTotal = tempCTotal * (ModelScalingFactor^2)
-			tempCStart = tempCStart * (ModelScalingFactor^2)
+			tempCTotal *= ModelScalingFactor^2
+			tempCFix *= ModelScalingFactor^2
+			tempCVar *= ModelScalingFactor^2
+			tempCNSE *= ModelScalingFactor^2
+			tempCStart *= ModelScalingFactor^2
 		end
-
-		# Add emisions penalty related costs if the constraints are active to variable and total costs
-		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
-		if setup["CO2Cap"]==4
-			tempCVar  = tempCVar + value.(EP[:eCEmissionsPenaltybyZone])[z]
-			tempCTotal=tempCTotal + value.(EP[:eCEmissionsPenaltybyZone])[z]
-		end
-
-		if setup["ParameterScale"] == 1
-			tempCNSE = sum(value.(EP[:eCNSE])[:,:,z]) * (ModelScalingFactor^2)
-		else
-			tempCNSE = sum(value.(EP[:eCNSE])[:,:,z])
-		end
-		# Update non-served energy cost for each zone
-		tempCTotal = tempCTotal +tempCNSE
-
-		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Thermal, tempCFix_VRE, tempCFix_Trans_VRE, tempCFix_Must_Run, tempCFix_Hydro, tempCFix_Stor, tempCVar, tempCNSE, tempCStart, "-", "-"]
+		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
 	end
-	CSV.write(string(path,sep,"costs.csv"), dfCost)
+	CSV.write(joinpath(path, "costs.csv"), dfCost)
 end

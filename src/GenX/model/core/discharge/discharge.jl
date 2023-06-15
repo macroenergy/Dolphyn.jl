@@ -74,6 +74,7 @@ function discharge(EP::Model, inputs::Dict)
 	@expression(EP, eTotalCVarOut, sum(eTotalCVarOutT[t] for t in 1:T))
 
 	# Add total variable discharging cost contribution to the objective function
+	#add_to_expression!(EP[:eObj],eTotalCVarOut)
 	EP[:eObj] += eTotalCVarOut
 
 	return EP

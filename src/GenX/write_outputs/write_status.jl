@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_status(path::AbstractString, sep::AbstractString, inputs::Dict, EP::Model)
+	write_status(path::AbstractString, inputs::Dict, EP::Model)
 
-Function for reporting the final solve status of the optimization problem solved.
+Function for writing the final solve status of the optimization problem solved.
 """
-function write_status(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_status(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	# https://jump.dev/MathOptInterface.jl/v0.9.10/apireference/#MathOptInterface.TerminationStatusCode
 	status = termination_status(EP)
@@ -30,11 +30,7 @@ function write_status(path::AbstractString, sep::AbstractString, inputs::Dict, s
 			Objval = objective_value(EP))
 	else
 		dfStatus = DataFrame(Status = status, Solve = inputs["solve_time"],
-			Objval = objective_value(EP), 
-			#Objbound= objective_bound(EP),
-			#FinalMIPGap =(objective_value(EP) -objective_bound(EP))/objective_value(EP) 
-			)
+			Objval = objective_value(EP), Objbound= objective_bound(EP),FinalMIPGap =(objective_value(EP) -objective_bound(EP))/objective_value(EP) )
 	end
-	
-	CSV.write(string(path,sep,"status.csv"),dfStatus)
+	CSV.write(joinpath(path, "status.csv"),dfStatus)
 end

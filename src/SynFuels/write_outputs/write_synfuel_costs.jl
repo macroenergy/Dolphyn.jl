@@ -26,6 +26,10 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 
+	if !isempty(inputs["SYN_FUEL_RES_COMMIT"])
+		ErrorException("Writing outputs for commit units not implemented")
+	end
+
 	dfSynFuelsCost = DataFrame(Costs = ["cSFTotal", "cSFFix", "cSFVar", "cSFByProdRev", "CSFConvDieselFuelCost","CSFConvJetfuelFuelCost","CSFConvGasolineFuelCost"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
 		cSFVar = value(EP[:eTotalCSFProdVarOut])*ModelScalingFactor^2

@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,11 +15,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting time-dependent CO$_2$ emissions by zone.
+
 """
-function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
@@ -32,7 +33,7 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 	if (setup["WriteShadowPrices"]==1 || setup["UCommit"]==0 || (setup["UCommit"]==2 && (setup["Reserves"]==0 || (setup["Reserves"]>0 && inputs["pDynamic_Contingency"]==0)))) # fully linear model
 		# CO2 emissions by zone
 
-		if (setup["CO2Cap"]==1||setup["CO2Cap"]==2||setup["CO2Cap"]==3)
+		if setup["CO2Cap"]>=1
 			# Dual variable of CO2 constraint = shadow price of CO2
 			tempCO2Price = zeros(Z,inputs["NCO2Cap"])
 			if has_duals(EP) == 1
@@ -46,38 +47,34 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 					end
 				end
 			end
-			dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(tempCO2Price, :auto), DataFrame(AnnualSum = Array{Union{Missing,Float64}}(undef, Z)))
+			dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(tempCO2Price, :auto), DataFrame(AnnualSum = Array{Float64}(undef, Z)))
 			auxNew_Names=[Symbol("Zone"); [Symbol("CO2_Price_$cap") for cap in 1:inputs["NCO2Cap"]]; Symbol("AnnualSum")]
 			rename!(dfEmissions,auxNew_Names)
 		else
-			dfEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
+			dfEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Float64}(undef, Z))
 		end
 
 		for i in 1:Z
 			if setup["ParameterScale"]==1
-				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])*ModelScalingFactor
+				dfEmissions[i,:AnnualSum] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone][i,:]))*ModelScalingFactor
 			else
-				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])
+				dfEmissions[i,:AnnualSum] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone][i,:]))/ModelScalingFactor
 			end
 		end
 
 		if setup["ParameterScale"]==1
 			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])*ModelScalingFactor, :auto))
 		else
-			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone]), :auto))
+			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])/ModelScalingFactor, :auto))
 		end
 
 
-		if (setup["CO2Cap"]==1||setup["CO2Cap"]==2||setup["CO2Cap"]==3)
+		if setup["CO2Cap"]>=1
 			auxNew_Names=[Symbol("Zone");[Symbol("CO2_Price_$cap") for cap in 1:inputs["NCO2Cap"]];Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 			rename!(dfEmissions,auxNew_Names)
 			total = DataFrame(["Total" zeros(1,inputs["NCO2Cap"]) sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 			for t in 1:T
-				if v"1.3" <= VERSION < v"1.4"
-					total[!,t+inputs["NCO2Cap"]+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-				elseif v"1.4" <= VERSION < v"1.9"
-					total[:,t+inputs["NCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
-				end
+				total[:,t+inputs["NCO2Cap"]+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 			end
 			rename!(total,auxNew_Names)
 			dfEmissions = vcat(dfEmissions, total)
@@ -86,11 +83,7 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 			rename!(dfEmissions,auxNew_Names)
 			total = DataFrame(["Total" sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 			for t in 1:T
-				if v"1.3" <= VERSION < v"1.4"
-					total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-				elseif v"1.4" <= VERSION < v"1.9"
-					total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
-				end
+				total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 			end
 			rename!(total,auxNew_Names)
 			dfEmissions = vcat(dfEmissions, total)
@@ -100,31 +93,27 @@ function write_emissions(path::AbstractString, sep::AbstractString, inputs::Dict
 ## Aaron - Combined elseif setup["Dual_MIP"]==1 block with the first block since they were identical. Why do we have this third case? What is different about it?
 	else
 		# CO2 emissions by zone
-		dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(AnnualSum = Array{Union{Missing,Float64}}(undef, Z)))
+		dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(AnnualSum = Array{Float64}(undef, Z)))
 		for i in 1:Z
 			if setup["ParameterScale"]==1
-				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:]) *ModelScalingFactor
+				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone][i,:])) *ModelScalingFactor
 			else
-				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone])[i,:])
+				dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eEmissionsByZone][i,:]))/ModelScalingFactor
 			end
 		end
 		if setup["ParameterScale"]==1
 			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])*ModelScalingFactor, :auto))
 		else
-			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone]), :auto))
+			dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eEmissionsByZone])/ModelScalingFactor, :auto))
 		end
 		auxNew_Names=[Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 		rename!(dfEmissions,auxNew_Names)
 		total = DataFrame(["Total" sum(dfEmissions[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 		for t in 1:T
-			if v"1.3" <= VERSION < v"1.4"
-				total[!,t+2] .= sum(dfEmissions[!,Symbol("t$t")][1:Z])
-			elseif v"1.4" <= VERSION < v"1.9"
-				total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
-			end
+			total[:,t+2] .= sum(dfEmissions[:,Symbol("t$t")][1:Z])
 		end
 		rename!(total,auxNew_Names)
 		dfEmissions = vcat(dfEmissions, total)
 	end
-	CSV.write(string(path,sep,"emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
+	CSV.write(joinpath(path, "emissions.csv"), dftranspose(dfEmissions, false), writeheader=false)
 end
