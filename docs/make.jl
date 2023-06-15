@@ -21,7 +21,8 @@ using Documenter
 import DataStructures: OrderedDict
 using DOLPHYN
 
-# DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+# DocMeta.setdocmeta!(DOLPHYN, :CurrentModule, :(DOLPHYN); recursive = true)
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
@@ -101,6 +102,7 @@ makedocs(;
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
     pages = [p for p in pages],
+    doctest=false
 )
 
 deploydocs(;
