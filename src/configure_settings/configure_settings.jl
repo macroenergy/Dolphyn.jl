@@ -104,7 +104,9 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     #ModelH2Liquid: 0 # Whether to model liquid demand and production - 0 - not included, 1 - included
     set_default_if_absent!(settings, "ModelH2Liquid", 0)
     # The max number of miles or km for a truck route (depends on the units used throughout, calculated via time constraint based on truck speed)
-    set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)         
+    set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)
+    # Down-select Zones to model
+    set_default_if_absent!(settings, "Zones", [])
 
 return settings
 end
