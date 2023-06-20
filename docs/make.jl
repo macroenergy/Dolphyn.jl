@@ -17,15 +17,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 push!(LOAD_PATH,joinpath(@__DIR__,"../src/"))
 push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 
-ENV["GUROBI_JL_SKIP_LIB_CHECK"] = "FALSE"
+# ENV["GUROBI_JL_SKIP_LIB_CHECK"] = "FALSE"
 
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+# using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
 
 using Documenter
 import DataStructures: OrderedDict
 using DOLPHYN
 
-# DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
