@@ -19,7 +19,7 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 
 # ENV["GUROBI_JL_SKIP_LIB_CHECK"] = "FALSE"
 
-# using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
 
 using Documenter
 import DataStructures: OrderedDict
