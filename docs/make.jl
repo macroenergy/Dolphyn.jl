@@ -17,10 +17,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 push!(LOAD_PATH,joinpath(@__DIR__,"../src/"))
 push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 
-ENV["GUROBI_JL_SKIP_LIB_CHECK"] = "FALSE"
-
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
-
 using Documenter
 import DataStructures: OrderedDict
 using DOLPHYN
@@ -34,7 +30,7 @@ pages = OrderedDict(
     # Cover Model inputs and outputs documentation
     "Model Inputs/Outputs Documentation" =>  [
         "global_data_documentation.md",
-        "genx_data_documentation.md",  
+        "genx_data_documentation.md",
         "hsc_data_documentation.md"
     ],
     "Objective Function" => "objective_function.md", # Should cover both models
