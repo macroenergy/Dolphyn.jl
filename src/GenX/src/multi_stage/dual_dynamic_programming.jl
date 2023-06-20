@@ -414,7 +414,7 @@ function add_cut(EP_cur::Model, EP_next::Model, start_cap_d::Dict, cap_track_d::
 end
 
 @doc raw"""
-    function generate_cut_component_inv(EP_cur::Model, EP_next::Model, expr_name::Symbol, constr_name::Symbol)
+	function generate_cut_component_inv(EP_cur::Model, EP_next::Model, expr_name::Symbol, constr_name::Symbol)
 
 This function generates Bender's cut expressions for total new or retired capacity tracking linking variables in the form:
 ```math
@@ -454,7 +454,7 @@ function generate_cut_component_track(EP_cur::Model, EP_next::Model, var_name::S
 end
 
 @doc raw"""
-    function generate_cut_component_inv(EP_cur::Model, EP_next::Model, expr_name::Symbol, constr_name::Symbol)
+	function generate_cut_component_inv(EP_cur::Model, EP_next::Model, expr_name::Symbol, constr_name::Symbol)
 
 This function generates Bender's cut expressions for linking capacity investment variable expression in the form:
 ```math
