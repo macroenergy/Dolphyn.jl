@@ -49,7 +49,11 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	           "Demand", "Biohydrogen","Synfuel Consumption"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
-	     	dfTemp1[t+rowoffset,1]= value.(EP[:eH2GenCommit][t,z]) + value.(EP[:eH2GenNoCommit][t,z])
+			if !isempty(inputs["H2_GEN_COMMIT"])
+				dfTemp1[t+rowoffset,1]= value.(EP[:eH2GenCommit][t,z]) + value.(EP[:eH2GenNoCommit][t,z])
+			else
+				dfTemp1[t+rowoffset,1]= value.(EP[:eH2GenNoCommit][t,z])
+			end
 	     	dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
 			dfTemp1[t+rowoffset,4] = 0
