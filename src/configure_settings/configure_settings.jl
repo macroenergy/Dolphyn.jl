@@ -99,7 +99,7 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     #### HSC model and integrated energy system model options ###### 
      # CO2 emissions cap for HSC only; 0 = not active (no CO2 emission limit); 1 = mass-based emission limit constraint; 2 = load + rate-based emission limit constraint; 3 = generation + rate-based emission limit constraint; 4 = emissions penalized via a carbon price
     set_default_if_absent!(settings, "H2CO2Cap", 0)        
-    # CO2 emissions constraint representation; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
+    # CO2 emissions constraint representation; 0 = no CO2 constraint; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
     set_default_if_absent!(settings, "SystemCO2Constraint", 0)                
     #ModelH2Liquid: 0 # Whether to model liquid demand and production - 0 - not included, 1 - included
     set_default_if_absent!(settings, "ModelH2Liquid", 0)
