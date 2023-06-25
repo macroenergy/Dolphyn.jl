@@ -94,8 +94,6 @@ function hydro_res(EP::Model, inputs::Dict, Reserves::Int)
 
 	print_and_log("Hydro Reservoir Core Resources Module")
 
-	Zones = inputs["Zones"]
-
 	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -120,7 +118,7 @@ function hydro_res(EP::Model, inputs::Dict, Reserves::Int)
 
 	## Power Balance Expressions ##
 	@expression(EP, ePowerBalanceHydroRes[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t] for y in intersect(HYDRO_RES, dfGen[(dfGen[!,:Zone].==Zones[z]),:R_ID])))
+		sum(EP[:vP][y,t] for y in intersect(HYDRO_RES, dfGen[(dfGen[!,:Zone].==z),:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceHydroRes
 
@@ -170,7 +168,7 @@ function hydro_res(EP::Model, inputs::Dict, Reserves::Int)
 	end
 	##CO2 Polcy Module Hydro Res Generation by zone
 	@expression(EP, eGenerationByHydroRes[z=1:Z, t=1:T], # the unit is GW
-		sum(EP[:vP][y,t] for y in intersect(inputs["HYDRO_RES"], dfGen[dfGen[!,:Zone].==Zones[z],:R_ID]))
+		sum(EP[:vP][y,t] for y in intersect(inputs["HYDRO_RES"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
 	)
 	EP[:eGenerationByZone] += eGenerationByHydroRes
 	return EP

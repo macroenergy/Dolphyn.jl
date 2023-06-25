@@ -72,7 +72,7 @@ include("print_and_log.jl")
 include("compare_results.jl")
 
 # Enumerate zones
-include("enumerate_zones.jl")
+#include("enumerate_zones.jl")
 
 # Configure settings
 include("configure_settings/configure_settings.jl")

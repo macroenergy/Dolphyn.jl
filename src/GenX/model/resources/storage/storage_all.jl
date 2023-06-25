@@ -102,8 +102,6 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 	# Setup variables, constraints, and expressions common to all storage resources
 	print_and_log("Storage Core Resources Module")
 
-	Zones = inputs["Zones"]
-
 	dfGen = inputs["dfGen"]
 
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
@@ -146,7 +144,7 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 
 	# Term to represent net dispatch from storage in any period
 	@expression(EP, ePowerBalanceStor[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t]-EP[:vCHARGE][y,t] for y in intersect(dfGen[dfGen.Zone.==Zones[z],:R_ID],STOR_ALL))
+		sum(EP[:vP][y,t]-EP[:vCHARGE][y,t] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL))
 	)
 
 	EP[:ePowerBalance] += ePowerBalanceStor
@@ -204,7 +202,7 @@ function storage_all(EP::Model, inputs::Dict, Reserves::Int, OperationWrapping::
 	end
 	# From co2 Policy module
 	@expression(EP, eELOSSByZone[z=1:Z],
-		sum(EP[:eELOSS][y] for y in intersect(inputs["STOR_ALL"], dfGen[dfGen[!,:Zone].==Zones[z],:R_ID]))
+		sum(EP[:eELOSS][y] for y in intersect(inputs["STOR_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
 	)
 	return EP
 end

@@ -20,9 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting energy revenue from the different generation technologies.
 """
 function write_energy_revenue(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model, dfPower::DataFrame, dfPrice::DataFrame, dfCharge::DataFrame)
-	
-	Zones = inputs["Zones"]
-
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
@@ -32,21 +29,21 @@ function write_energy_revenue(path::AbstractString, sep::AbstractString, inputs:
 	# initiation
 	i = 1
 	dfEnergyRevenue_ = (DataFrame([[names(dfPower)]; collect.(eachrow(dfPower))], [:column; Symbol.(axes(dfPower, 1))])[4:T+3,2] .*
-	DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[1,:][:Zone]], Zones)[1]+1].*
+	DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[1,:][:Zone]+1].*
 	inputs["omega"])
 	if i in inputs["FLEX"]
 		dfEnergyRevenue_ = (DataFrame([[names(dfCharge)]; collect.(eachrow(dfCharge))], [:column; Symbol.(axes(dfCharge, 1))])[4:T+3,2] .*
-		DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[1,:][:Zone]], Zones)[1]+1].*
+		DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[1,:][:Zone]+1].*
 		inputs["omega"])
 	end
 	for i in 2:G
 		if i in inputs["FLEX"]
 			dfEnergyRevenue_1 = (DataFrame([[names(dfCharge)]; collect.(eachrow(dfCharge))], [:column; Symbol.(axes(dfCharge, 1))])[4:T+3,i+1] .*
-			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[i,:][:Zone]], Zones)[1]+1].*
+			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[i,:][:Zone]+1].*
 			inputs["omega"])
 		else
 			dfEnergyRevenue_1 = (DataFrame([[names(dfPower)]; collect.(eachrow(dfPower))], [:column; Symbol.(axes(dfPower, 1))])[4:T+3,i+1] .*
-			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[i,:][:Zone]], Zones)[1]+1].*
+			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[i,:][:Zone]+1].*
 			inputs["omega"])
 		end
 		dfEnergyRevenue_ = hcat(dfEnergyRevenue_, dfEnergyRevenue_1)
@@ -67,22 +64,22 @@ end
 	# the price is already US$/MWh, and dfPower and dfCharge is already in MW, so no scaling is needed
 
 	# dfEnergyRevenue_ = (DataFrame([[names(dfPower)]; collect.(eachrow(dfPower))], [:column; Symbol.(axes(dfPower, 1))])[4:T+3,2] .*
-	# DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[1,:][:Zone]], Zones)[1]+1] .*
+	# DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[1,:][:Zone]+1] .*
 	# inputs["omega"])
 	# for i in 2:G
 	# 	dfEnergyRevenue_1 = (DataFrame([[names(dfPower)]; collect.(eachrow(dfPower))], [:column; Symbol.(axes(dfPower, 1))])[4:T+3,i+1] .*
-	# 	DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[i,:][:Zone]], Zones)[1]+1] .*
+	# 	DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[i,:][:Zone]+1] .*
 	# 	inputs["omega"])
 	# 	dfEnergyRevenue_ = hcat(dfEnergyRevenue_, dfEnergyRevenue_1)
 	# end
 	for i in 1:G
 		if i in inputs["FLEX"]
 			dfEnergyRevenue_1 = (DataFrame([[names(dfCharge)]; collect.(eachrow(dfCharge))], [:column; Symbol.(axes(dfCharge, 1))])[4:T+3,i+1] .*
-			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[i,:][:Zone]], Zones)[1]+1] .*
+			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[i,:][:Zone]+1] .*
 			inputs["omega"])
 		else
 			dfEnergyRevenue_1 = (DataFrame([[names(dfPower)]; collect.(eachrow(dfPower))], [:column; Symbol.(axes(dfPower, 1))])[4:T+3,i+1] .*
-			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,indexin([dfPower[i,:][:Zone]], Zones)[1]+1] .*
+			DataFrame([[names(dfPrice)]; collect.(eachrow(dfPrice))], [:column; Symbol.(axes(dfPrice, 1))])[2:T+1,dfPower[i,:][:Zone]+1] .*
 			inputs["omega"])
 		end
 		dfEnergyRevenue = hcat(dfEnergyRevenue, convert(DataFrame, dfEnergyRevenue_1'))

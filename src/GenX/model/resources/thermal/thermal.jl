@@ -23,8 +23,6 @@ This module uses the following 'helper' functions in separate files: ```thermal_
 """
 function thermal(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-	Zones = inputs["Zones"]
-	
 	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -43,7 +41,7 @@ function thermal(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
 	## CO2 Policy Module Thermal Generation by zone
 	@expression(EP, eGenerationByThermAll[z=1:Z, t=1:T], # the unit is GW
-		sum(EP[:vP][y,t] for y in intersect(inputs["THERM_ALL"], dfGen[dfGen[!,:Zone].==Zones[z],:R_ID]))
+		sum(EP[:vP][y,t] for y in intersect(inputs["THERM_ALL"], dfGen[dfGen[!,:Zone].==z,:R_ID]))
 	)
 
 	EP[:eGenerationByZone] += eGenerationByThermAll

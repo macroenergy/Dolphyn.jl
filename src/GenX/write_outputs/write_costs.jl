@@ -24,7 +24,6 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 	dfGen = inputs["dfGen"]
 	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
-	Zones = inputs["Zones"] # List of zones
 	T = inputs["T"]     # Number of time steps (hours)
 
 	dfCost = DataFrame(Costs = ["cTotal", "cFix", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp"])
@@ -97,7 +96,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		tempCFix = 0
 		tempCVar = 0
 		tempCStart = 0
-		for y in dfGen[dfGen[!,:Zone].==Zones[z],:][!,:R_ID]
+		for y in dfGen[dfGen[!,:Zone].==z,:][!,:R_ID]
 			tempCFix = tempCFix +
 				(y in inputs["STOR_ALL"] ? value.(EP[:eCFixEnergy])[y] : 0) +
 				(y in inputs["STOR_ASYMMETRIC"] ? value.(EP[:eCFixCharge])[y] : 0) +
@@ -151,7 +150,7 @@ function write_costs(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		# Update non-served energy cost for each zone
 		tempCTotal = tempCTotal +tempCNSE
 
-		dfCost[!,Symbol(Zones[z])] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
+		dfCost[!,Symbol(z)] = [tempCTotal, tempCFix, tempCVar, tempCNSE, tempCStart, "-", "-"]
 	end
 	CSV.write(string(path,sep,"costs.csv"), dfCost)
 end

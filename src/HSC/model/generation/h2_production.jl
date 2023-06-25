@@ -25,8 +25,6 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
 
 	print_and_log("Hydrogen Production Module")
 	
-	Zones = inputs["Zones"]
-
 	if !isempty(inputs["H2_GEN"])
 	# expressions, variables and constraints common to all types of hydrogen generation technologies
 		EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)

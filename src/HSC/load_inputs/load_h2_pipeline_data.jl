@@ -26,7 +26,6 @@ function load_h2_pipeline_data(
     inputs_nw::Dict,
 )
 
-    Zones = inputs_nw["Zones"]
     Z = inputs_nw["Z"]
 
     # Network zones inputs and Network topology inputs
@@ -35,45 +34,28 @@ function load_h2_pipeline_data(
         copycols = true,
     )
 
-    # Filter pipeline by zone
-    pipeline_var = filter(row -> (row.Start_Zone in Zones && row.End_Zone in Zones), pipeline_var)
-
     # Number of H2 Pipelines = L
     inputs_nw["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
-    L = inputs_nw["H2_P"]
+ 
+    # Find first column of pipe map table
+    start = findall(s -> s == "z1", names(pipeline_var))[1]
 
-    ## Topology of the pipeline network source-sink matrix
-    pipe_map = zeros(Int64, L, Z)
+    # Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
+    pipe_map = pipeline_var[1:inputs_nw["H2_P"], start:start+inputs_nw["Z"]-1]
 
-    for l = 1:L
-        z_start = indexin([pipeline_var[!, :Start_Zone][l]], Zones)[1]
-        z_end = indexin([pipeline_var[!, :End_Zone][l]], Zones)[1]
-        pipe_map[l, z_start] = 1
-        pipe_map[l, z_end] = -1
-    end
-
-    pipe_map = DataFrame(pipe_map, Symbol.(Zones))
-
-    ## Create pipe number column
+    # Create pipe number column
     pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
-
-    ## Pivot table
-    pipe_map = stack(pipe_map, Zones)
-    
-    ## Remove redundant rows
+    # Pivot table
+    pipe_map = stack(pipe_map, 1:inputs_nw["Z"])
+    # Create zone column
+    pipe_map[!, :Zone] = parse.(Float64, SubString.(pipe_map[!, :variable], 2))
+    #Remove redundant rows
     pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
 
-    ## Rename column
-    colnames_pipe_map = ["pipe_no", "Zone", "d"]
+    #Rename column
+    colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(pipe_map, Symbol.(colnames_pipe_map))
 
-    pipe_map[!, :zone_str] = pipe_map[!, :Zone]
-
-    #TODO: Avoid type error of pipe_map
-    ## Check input zone type - Zone column should be Int64 in ```h2_pipeline```, input zone list should be Int64
-    if typeof(Zones[1]) == Int64
-        pipe_map[!, :Zone] = [parse(Int64, x) for x in pipe_map[!, :Zone]]
-    end
     inputs_nw["H2_Pipe_Map"] = pipe_map
 
 
@@ -156,3 +138,4 @@ function load_h2_pipeline_data(
 
     return inputs_nw
 end
+

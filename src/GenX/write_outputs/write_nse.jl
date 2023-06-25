@@ -24,7 +24,6 @@ function write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setu
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-    Zones = inputs["Zones"] # List of zones
 	SEG = inputs["SEG"] # Number of load curtailment segments
 	# Non-served energy/demand curtailment by segment in each time step
 	dfNse = DataFrame()
@@ -32,7 +31,7 @@ function write_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setu
 	for z in 1:Z
 		dfTemp = DataFrame(Segment=zeros(SEG), Zone=zeros(SEG), AnnualSum = Array{Union{Missing,Float32}}(undef, SEG))
 		dfTemp[!,:Segment] = (1:SEG)
-		dfTemp[!,:Zone] = fill(Zones[z],(SEG))
+		dfTemp[!,:Zone] = fill(z,(SEG))
 		if setup["ParameterScale"]==1
 			for i in 1:SEG
 				dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vNSE])[i,:,z]))* ModelScalingFactor

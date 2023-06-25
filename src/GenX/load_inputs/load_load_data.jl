@@ -20,8 +20,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reading input parameters related to electricity load (demand).
 """
 function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
-
-	Zones = inputs_load["Zones"]
 	
 	# Load related inputs
 	#data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
@@ -77,33 +75,18 @@ function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, 
 	inputs_load["INTERIOR_SUBPERIODS"] = setdiff(1:T,inputs_load["START_SUBPERIODS"]) # set of indexes for all time periods that do not start a subperiod
 
 	# Demand in MW for each zone
+	start = findall(s -> s == "Load_MW_z1", names(load_in))[1] #gets the starting column number of all the columns, with header "Load_MW_z1"
 	if setup["ParameterScale"] ==1  # Parameter scaling turned on
 		# Max value of non-served energy
 		inputs_load["Voll"] = collect(skipmissing(load_in[!,:Voll])) /ModelScalingFactor # convert from $/MWh $ million/GWh (assuming objective is divided by 1000)
 		# Demand in MW
-		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],["Load_MW_$z" for z in Zones]])/ModelScalingFactor  # convert to GW
+		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]])/ModelScalingFactor  # convert to GW
 	else # No scaling
 		# Max value of non-served energy
 		inputs_load["Voll"] = collect(skipmissing(load_in[!,:Voll]))
 		# Demand in MW
-		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],["Load_MW_$z" for z in Zones]]) #form a matrix with columns as the different zonal load MW values and rows as the hours
+		inputs_load["pD"] =Matrix(load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]]) #form a matrix with columns as the different zonal load MW values and rows as the hours
 	end
-
-	#if setup["TimeDomainReduction"] ==1 # Used in time_domain_reduction
-	#	inputs_load["TimestepsPerPeriod"] = collect(skipmissing(load_in[!,:Timesteps_per_Rep_Period]))[1]
-	#	inputs_load["UseExtremePeriods"] = collect(skipmissing(load_in[!,:UseExtremePeriods]))[1]
-	#	inputs_load["MinPeriods"] = collect(skipmissing(load_in[!,:MinPeriods]))[1]
-	#	inputs_load["MaxPeriods"] = collect(skipmissing(load_in[!,:MaxPeriods]))[1]
-	#	inputs_load["IterativelyAddPeriods"] = collect(skipmissing(load_in[!,:IterativelyAddPeriods]))[1]
-	#	inputs_load["IterateMethod"] = collect(skipmissing(load_in[!,:IterateMethod]))[1]
-	#	inputs_load["ClusterMethod"] = collect(skipmissing(load_in[!,:ClusterMethod]))[1]
-	#	inputs_load["Threshold"] = collect(skipmissing(load_in[!,:Threshold]))[1]
-	#	inputs_load["nReps"] = collect(skipmissing(load_in[!,:nReps]))[1]
-	#	inputs_load["ScalingMethod"] = collect(skipmissing(load_in[!,:ScalingMethod]))[1]
-	#	inputs_load["LoadWeight"] = collect(skipmissing(load_in[!,:LoadWeight]))[1]
-	#	inputs_load["ClusterFuelPrices"] = collect(skipmissing(load_in[!,:ClusterFuelPrices]))[1]
-	#	inputs_load["WeightTotal"] = collect(skipmissing(load_in[!,:WeightTotal]))[1]
-	#end
 
 	# Cost of non-served energy/demand curtailment (for each segment)
 	SEG = inputs_load["SEG"]  # Number of demand segments

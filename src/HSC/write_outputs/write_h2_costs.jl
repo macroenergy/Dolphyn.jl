@@ -25,7 +25,6 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
-	Zones = inputs["Zones"] # List of zones
 	T = inputs["T"]     # Number of time steps (hours)
 	H = inputs["H2_RES_ALL"]
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
@@ -128,7 +127,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		tempCVar_G2P = 0
 		tempCStart = 0
 
-		for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])
+		for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempCFix_Stor = tempCFix_Stor +
 			(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Energy])[y] : 0) +
 			(y in inputs["H2_STOR_ALL"] ? value.(EP[:eCFixH2Charge])[y] : 0)
@@ -171,7 +170,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 		end
 
 		if setup["ModelH2G2P"] == 1
-			for  y in dfH2G2P[dfH2G2P[!,:Zone].==Zones[z],:][!,:R_ID]
+			for  y in dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]
 
 				tempCFix_G2P += value.(EP[:eH2G2PCFix])[y]
 				tempCVar_G2P += sum(value.(EP[:eCH2G2PVar_out])[y,:]) 

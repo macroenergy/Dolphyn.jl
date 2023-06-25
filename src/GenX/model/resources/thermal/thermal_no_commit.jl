@@ -69,8 +69,6 @@ function thermal_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 
 	print_and_log("Thermal (No Unit Commitment) Resources Module")
 
-	Zones = inputs["Zones"]
-
 	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -87,7 +85,7 @@ function thermal_no_commit(EP::Model, inputs::Dict, Reserves::Int)
 
 	## Power Balance Expressions ##
 	@expression(EP, ePowerBalanceThermNoCommit[t=1:T, z=1:Z],
-		sum(EP[:vP][y,t] for y in intersect(THERM_NO_COMMIT, dfGen[dfGen[!,:Zone].==Zones[z],:][!,:R_ID])))
+		sum(EP[:vP][y,t] for y in intersect(THERM_NO_COMMIT, dfGen[dfGen[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:ePowerBalance] += ePowerBalanceThermNoCommit
 
