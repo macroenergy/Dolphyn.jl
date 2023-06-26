@@ -27,6 +27,7 @@ Gen_CAPEX_Economies_of_Scale: 1
 UCommit: 2
 H2GenCommit: 0
 ModelingToGenerateAlternatives: 0
+MaxCapReq: 0
 MinCapReq: 0
 CO2Cap: 0
 ModelH2: 1
