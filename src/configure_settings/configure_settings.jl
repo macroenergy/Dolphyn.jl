@@ -76,7 +76,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
 
     ## Activate minimum technology carveout constraints; 0 = not active; 1 = active
     set_default_if_absent!(settings, "MinCapReq", 0)
-    
+
+    ## Activate maximum technology carveout constraints; 0 = not active; 1 = active
+    set_default_if_absent!(settings, "MaxCapReq", 0)
+     
     ## Unit committment of thermal power plants; 0 = not active; 1 = active using integer clestering; 2 = active using linearized clustering
     set_default_if_absent!(settings, "UCommit", 0)    
 
