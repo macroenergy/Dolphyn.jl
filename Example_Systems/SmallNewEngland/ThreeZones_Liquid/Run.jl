@@ -27,7 +27,7 @@ inputs_path = case_dir
 # Loading settings
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
-mysetup_genx = configure_settings(genx_settings) # mysetup dictionary stores GenX-specific parameters
+mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
