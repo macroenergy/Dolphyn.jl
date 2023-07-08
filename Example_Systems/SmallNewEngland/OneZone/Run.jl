@@ -14,6 +14,9 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+# Walk into current directory
+cd(dirname(@__FILE__))
+
 ### Set relevant directory paths
 src_path = "../../../src/"
 
