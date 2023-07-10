@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2023,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -13,9 +13,15 @@ A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
+@doc raw"""
+	load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
 
+Function for reading input parameters related to liquid fuel demand. This includes diesel, jet fuel, and gasoline.  
+"""
 function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
     
+	#Read data for diesel
+
 	data_directory_diesel = joinpath(path, setup["TimeDomainReductionFolder"])
 	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory_diesel,"Load_data.csv")) && isfile(joinpath(data_directory_diesel,"Generators_variability.csv")) && isfile(joinpath(data_directory_diesel,"Fuels_data.csv")) && isfile(joinpath(data_directory_diesel,"HSC_load_data.csv")) && isfile(joinpath(data_directory_diesel,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory_diesel,"Liquid_Fuels_Diesel_Demand.csv")) # Use Time Domain Reduced data for GenX
 		Liquid_Fuels_Diesel_demand_in = DataFrame(CSV.File(string(joinpath(data_directory_diesel,"Liquid_Fuels_Diesel_Demand.csv")), header=true), copycols=true)
@@ -24,7 +30,6 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
 	end
 
     # Demand in tonnes per hour for each zone
-	#println(names(load_in))
 	start_diesel = findall(s -> s == "Load_mmbtu_z1", names(Liquid_Fuels_Diesel_demand_in))[1] #gets the start_dieseling column number of all the columns, with header "Load_H2_z1"
 	
 	# Demand in Tonnes per hour
@@ -37,6 +42,8 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
 	println("Liquid_Fuels_Diesel_demand.csv Successfully Read!")
 
 	###########################################################################################################################################
+
+	#Read in jetfuel data
 
 	data_directory_jetfuel = joinpath(path, setup["TimeDomainReductionFolder"])
 	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory_jetfuel,"Load_data.csv")) && isfile(joinpath(data_directory_jetfuel,"Generators_variability.csv")) && isfile(joinpath(data_directory_jetfuel,"Fuels_data.csv")) && isfile(joinpath(data_directory_jetfuel,"HSC_load_data.csv")) && isfile(joinpath(data_directory_jetfuel,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory_jetfuel,"Liquid_Fuels_Jetfuel_Demand.csv")) # Use Time Domain Reduced data for GenX
@@ -59,6 +66,8 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
 	println("Liquid_Fuels_Jetfuel_demand.csv Successfully Read!")
 
 	###########################################################################################################################################
+
+	#Read in gasoline data
 
 	data_directory_gasoline = joinpath(path, setup["TimeDomainReductionFolder"])
 	if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory_gasoline,"Load_data.csv")) && isfile(joinpath(data_directory_gasoline,"Generators_variability.csv")) && isfile(joinpath(data_directory_gasoline,"Fuels_data.csv")) && isfile(joinpath(data_directory_gasoline,"HSC_load_data.csv")) && isfile(joinpath(data_directory_gasoline,"HSC_generators_variability.csv")) && isfile(joinpath(data_directory_gasoline,"Liquid_Fuels_Gasoline_Demand.csv")) # Use Time Domain Reduced data for GenX

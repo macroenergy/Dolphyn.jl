@@ -88,6 +88,12 @@ pages = OrderedDict(
             ],
         ],
     ],
+    "Liquid Fuels" => [
+        "Liquid Fuels Input Functions" => "load_synfuel_inputs.md"#,
+        #"Liquid Fuels Output Functions" => "write_synfuel_outputs.md"
+        #"Liquid Fuels Notation" => "",
+        #"Liquid Fuels Supply Demand Balance" => "",
+    ], 
     "Additional Tools" => "additional_tools.md",
     "Solving the Model" => "solve_model.md",
     "Methods" => "methods.md",
