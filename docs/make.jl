@@ -17,9 +17,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 push!(LOAD_PATH,"../src/")
 push!(LOAD_PATH,"docs/src")
 import DataStructures: OrderedDict
-using DOLPHYN
+#using DOLPHYN
 using Documenter
-DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+#DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 println(pwd())
 pages = OrderedDict(
     "Welcome Page" => "index.md",
@@ -89,9 +89,9 @@ pages = OrderedDict(
         ],
     ],
     "Liquid Fuels" => [
-        "Liquid Fuels Input Functions" => "load_synfuel_inputs.md"#,
+        "Liquid Fuels Input Functions" => "load_synfuel_inputs.md",
         #"Liquid Fuels Output Functions" => "write_synfuel_outputs.md"
-        #"Liquid Fuels Notation" => "",
+        "Liquid Fuels Notation" => "synfuel_notation.md"
         #"Liquid Fuels Supply Demand Balance" => "",
     ], 
     "Additional Tools" => "additional_tools.md",
@@ -100,7 +100,7 @@ pages = OrderedDict(
 )
 
 makedocs(;
-    modules = [DOLPHYN],
+    #modules = [DOLPHYN],
     authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),

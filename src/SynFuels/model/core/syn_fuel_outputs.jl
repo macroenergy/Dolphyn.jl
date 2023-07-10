@@ -15,6 +15,23 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
+
+syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
+
+Sets up variables common to all synfuel production resources.
+
+This module defines the synthetic fuel production decision variable $x_{k,z,t}^{\textrm{L,PROD}} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing synthetic fuel injected into the grid by synthetic fuel producing resource $k$ in zone $z$ at time period $t$.
+
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of production (variable OM plus fuel cost) from all resources over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{L,Prod,o}} = \sum_{k \in \mathcal{K}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{k}^{\textrm{L,VOM}} + \textrm{c}_{k}^{\textrm{L,FUEL}}\right) \times x_{k,z,t}^{\textrm{L,Prod}}
+\end{equation*}
+```
     
 """
 
