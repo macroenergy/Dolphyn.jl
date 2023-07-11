@@ -1,7 +1,7 @@
-ModelSynFuels: 0 #Flag to turn or off Syn Fuel modelling capabilities - 0 - no SF, 1- SF modeled
+ModelSynFuels: 1 #Flag to turn or off Syn Fuel modelling capabilities - 0 - no SF, 1- SF modeled
 
 AllowConventionalDiesel: 1
-SpecifySynBioDieselPercentFlag: 0
+SpecifySynBioDieselPercentFlag: 1
 percent_sbf_diesel: 0.1
 
 AllowConventionalJetfuel: 1
