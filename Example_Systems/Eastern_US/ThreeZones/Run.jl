@@ -38,19 +38,20 @@ using YAML
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
 hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
 csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC model
-besc_settings = joinpath(settings_path, "besc_settings.yml") #Settings YAML file path for BESC model
+#besc_settings = joinpath(settings_path, "besc_settings.yml") #Settings YAML file path for BESC model
 sf_settings = joinpath(settings_path, "syn_fuel_settings.yml") #Settings YAML file path for SF model
 
 mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
 mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
 mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CO2 supply chain-specific parameters
-mysetup_besc = YAML.load(open(besc_settings)) # mysetup dictionary stores CO2 supply chain-specific parameters
+#mysetup_besc = YAML.load(open(besc_settings)) # mysetup dictionary stores CO2 supply chain-specific parameters
 mysetup_sf = YAML.load(open(sf_settings)) # mysetup dictionary stores CO2 supply chain-specific parameters
 
 global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
 mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
 mysetup = Dict()
-mysetup = merge( mysetup_sf, mysetup_besc, mysetup_csc, mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+#mysetup = merge( mysetup_sf, mysetup_besc, mysetup_csc, mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+mysetup = merge( mysetup_sf, mysetup_csc, mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 
 ## Cluster time series inputs if necessary and if specified by the user
 TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
@@ -94,9 +95,9 @@ if mysetup["ModelCO2"] == 1
 end
 
 # ### Load BESC inputs if modeling the bioenergy supply chain
-if mysetup["ModelBIO"] == 1
-    myinputs = load_bio_inputs(myinputs, mysetup, inpath)
-end
+#if mysetup["ModelBIO"] == 1
+#    myinputs = load_bio_inputs(myinputs, mysetup, inpath)
+#end
 
 # ### Load SF inputs if modeling the synthetic fuels supply chain
 if mysetup["ModelSynFuels"] == 1
@@ -131,10 +132,10 @@ if mysetup["ModelCO2"] == 1
 end
 
 # Write bioenergy supply chain outputs
-if mysetup["ModelBIO"] == 1
-    outpath_bio = "$outpath/Results_BESC"
-    write_BESC_outputs(EP, outpath_bio, mysetup, myinputs)
-end
+#if mysetup["ModelBIO"] == 1
+#    outpath_bio = "$outpath/Results_BESC"
+#    write_BESC_outputs(EP, outpath_bio, mysetup, myinputs)
+#end
 
 # Write synthetic fuels supply chain outputs
 if mysetup["ModelSynFuels"] == 1

@@ -23,9 +23,9 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	dfSFDieselBalance = Array{Any}
 	rowoffset=3
 
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
+	#if setup["ModelBIO"] == 1
+	#	dfbiorefinery = inputs["dfbiorefinery"]
+	#end
 	
 	for z in 1:Z
 	   	dfTemp1_Diesel = Array{Any}(nothing, T+rowoffset, 4)
@@ -36,9 +36,11 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 
 			 dfTemp1_Diesel[t+rowoffset,2]= 0
 
-			if setup["ModelBIO"] == 1 && setup["BIO_Diesel_On"] == 1
-				dfTemp1_Diesel[t+rowoffset,2]= sum(value.(EP[:eBiodiesel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
-			end
+			#if setup["ModelBIO"] == 1 && setup["BIO_Diesel_On"] == 1
+			#	dfTemp1_Diesel[t+rowoffset,2] = sum(value.(EP[:eBiodiesel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+			#end
+
+			dfTemp1_Diesel[t+rowoffset,2] = 0
 
 			dfTemp1_Diesel[t+rowoffset,3] = value.(EP[:vConvLFDieselDemand][t,z])
 			dfTemp1_Diesel[t+rowoffset,4] = -inputs["Liquid_Fuels_Diesel_D"][t,z]
@@ -59,10 +61,6 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	## SynFuel jetfuel balance for each zone
 	dfSFJetfuelBalance = Array{Any}
 	rowoffset=3
-
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
 	
 	for z in 1:Z
 	   	dfTemp1_Jetfuel = Array{Any}(nothing, T+rowoffset, 4)
@@ -73,9 +71,10 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 
 			 dfTemp1_Jetfuel[t+rowoffset,2]= 0
 
-			if setup["ModelBIO"] == 1 && setup["BIO_Jetfuel_On"] == 1
-				dfTemp1_Jetfuel[t+rowoffset,2]= sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
-			end
+			#if setup["ModelBIO"] == 1 && setup["BIO_Jetfuel_On"] == 1
+			#	dfTemp1_Jetfuel[t+rowoffset,2] = sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+			#end
+			dfTemp1_Jetfuel[t+rowoffset,2] = 0
 
 			dfTemp1_Jetfuel[t+rowoffset,3] = value.(EP[:vConvLFJetfuelDemand][t,z])
 			dfTemp1_Jetfuel[t+rowoffset,4] = -inputs["Liquid_Fuels_Jetfuel_D"][t,z]
@@ -98,10 +97,6 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	dfSFGasolineBalance = Array{Any}
 	rowoffset=3
 
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
-
 	for z in 1:Z
 	   	dfTemp1_Gasoline = Array{Any}(nothing, T+rowoffset, 4)
 	   	dfTemp1_Gasoline[1,1:size(dfTemp1_Gasoline,2)] = ["Syn_Fuel_Gasoline_Generation", "Bio_Fuel_Gasoline_Generation", "Conventional_Fuel_Gasoline_Demand", "Gasoline_Demand"]
@@ -111,10 +106,11 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 
 			 dfTemp1_Gasoline[t+rowoffset,2]= 0
 
-			if setup["ModelBIO"] == 1 && setup["BIO_Gasoline_On"] == 1
-				dfTemp1_Gasoline[t+rowoffset,2]= sum(value.(EP[:eBiogasoline_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
-			end
-
+			#if setup["ModelBIO"] == 1 && setup["BIO_Gasoline_On"] == 1
+			#	dfTemp1_Gasoline[t+rowoffset,2] = sum(value.(EP[:eBiogasoline_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+			#end
+			dfTemp1_Gasoline[t+rowoffset,2] = 0
+			
 			dfTemp1_Gasoline[t+rowoffset,3] = value.(EP[:vConvLFGasolineDemand][t,z])
 			dfTemp1_Gasoline[t+rowoffset,4] = -inputs["Liquid_Fuels_Gasoline_D"][t,z]
 	   	end

@@ -43,24 +43,26 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 
 			dfTemp1[t+rowoffset,3] = value(EP[:eDAC_Emissions_per_zone_per_time][z,t])
 
-			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,4] = value(EP[:eBiorefinery_CO2_emissions_per_zone_per_time][z,t])
-				dfTemp1[t+rowoffset,5] = value(EP[:eHerb_biomass_emission_per_zone_per_time][z,t]) + value(EP[:eWood_biomass_emission_per_zone_per_time][z,t])
-			else
-				dfTemp1[t+rowoffset,4] = 0
-				dfTemp1[t+rowoffset,5] = 0
-			end
+			#if setup["ModelBIO"] == 1
+				#dfTemp1[t+rowoffset,4] = value(EP[:eBiorefinery_CO2_emissions_per_zone_per_time][z,t])
+				#dfTemp1[t+rowoffset,5] = value(EP[:eHerb_biomass_emission_per_zone_per_time][z,t]) + value(EP[:eWood_biomass_emission_per_zone_per_time][z,t])
+			#else
+			dfTemp1[t+rowoffset,4] = 0
+			dfTemp1[t+rowoffset,5] = 0
+			#end
 
 			dfTemp1[t+rowoffset,6]= - value(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t])
 
-			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,7] = - value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
-			else
-				dfTemp1[t+rowoffset,7] = 0
-			end
+			#if setup["ModelBIO"] == 1
+				#dfTemp1[t+rowoffset,7] = - value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
+			#else
+			dfTemp1[t+rowoffset,7] = 0
+			#end
 
-			if Z>=2
+			if setup["ModelCO2Pipelines"] == 1
 				dfTemp1[t+rowoffset,8] = value(EP[:eCO2Loss_Pipes_zt][z,t])
+			else
+				dfTemp1[t+rowoffset,8] = 0
 			end
 
 			if setup["ModelSynFuels"] == 1
@@ -73,16 +75,17 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 				dfTemp1[t+rowoffset,15] = value(EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,16] = value(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t])
 
-				if setup["ModelBIO"] == 1
-					dfTemp1[t+rowoffset,17] = value(EP[:eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,18] = value(EP[:eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,19] = value(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,20] = value(EP[:eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone][z,t])
-				else
-					dfTemp1[t+rowoffset,17] = 0
-					dfTemp1[t+rowoffset,19] = 0
-					dfTemp1[t+rowoffset,20] = 0
-				end
+				#if setup["ModelBIO"] == 1
+					#dfTemp1[t+rowoffset,17] = value(EP[:eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
+					#dfTemp1[t+rowoffset,18] = value(EP[:eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])
+					#dfTemp1[t+rowoffset,19] = value(EP[:eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t])
+					#dfTemp1[t+rowoffset,20] = value(EP[:eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone][z,t])
+				#else
+				dfTemp1[t+rowoffset,17] = 0
+				dfTemp1[t+rowoffset,18] = 0
+				dfTemp1[t+rowoffset,19] = 0
+				dfTemp1[t+rowoffset,20] = 0
+				#end
 
 			else
 				dfTemp1[t+rowoffset,9] = 0

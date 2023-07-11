@@ -25,14 +25,12 @@ export load_inputs
 export load_h2_inputs
 export load_co2_inputs
 export load_syn_fuels_inputs
-export load_bio_inputs
 export generate_model
 export solve_model
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
 export write_synfuel_outputs
-export write_BESC_outputs
 export cluster_inputs
 export mga
 
@@ -128,13 +126,6 @@ include("CSC/load_inputs/load_co2_pipeline_data.jl")
 include("SynFuels/load_inputs/load_syn_fuels_inputs.jl")
 include("SynFuels/load_inputs/load_syn_fuels_resources.jl")
 include("SynFuels/load_inputs/load_liquid_fuel_demand.jl")
-
-#Load input data - BESC
-include("BESC/load_inputs/load_bio_inputs.jl")
-include("BESC/load_inputs/load_bio_refinery.jl")
-include("BESC/load_inputs/load_bio_supply.jl")
-include("BESC/load_inputs/load_bio_ethanol_demand.jl")
-
 
 #Core GenX Features
 include("GenX/model/core/discharge/discharge.jl")
@@ -232,19 +223,8 @@ include("CSC/model/transmission/co2_pipeline.jl")
 include("SynFuels/model/core/syn_fuel_investment.jl")
 include("SynFuels/model/core/liquid_fuel_emissions.jl")
 include("SynFuels/model/core/syn_fuel_outputs.jl")
-
 include("SynFuels/model/demand/liquid_fuel_demand.jl")
 include("SynFuels/model/resources/syn_fuel_resources.jl")
-
-#Core BESC Modelling Features
-include("BESC/model/core/biorefinery_investment.jl")
-include("BESC/model/core/biorefinery.jl")
-include("BESC/model/core/biorefinery_var_cost.jl")
-include("BESC/model/core/emissions_besc.jl")
-
-#Biomass Supplies
-include("BESC/model/supply/bio_herb_supply.jl")
-include("BESC/model/supply/bio_wood_supply.jl")
 
 # Load model generation and solving scripts
 include("co2_cap_power_hsc.jl")
@@ -296,8 +276,6 @@ include("GenX/write_outputs/ucommit/write_commit.jl")
 include("GenX/write_outputs/ucommit/write_shutdown.jl")
 include("GenX/write_outputs/ucommit/write_start.jl")
 
-include("GenX/write_outputs/write_costs_system.jl")
-
 include("GenX/write_outputs/write_power_plant_emissions.jl")
 
 include("GenX/write_outputs/write_outputs.jl")
@@ -345,18 +323,5 @@ include("SynFuels/write_outputs/write_synfuel_capacity.jl")
 include("SynFuels/write_outputs/write_synfuel_costs.jl")
 include("SynFuels/write_outputs/write_synfuel_gen.jl")
 include("SynFuels/write_outputs/write_synfuel_emissions.jl")
-
-# BESC Write Outputs
-include("BESC/write_outputs/write_BESC_outputs.jl")
-include("BESC/write_outputs/write_BESC_costs.jl")
-include("BESC/write_outputs/write_bio_plant_capacity.jl")
-include("BESC/write_outputs/write_bio_zone_bioelectricity_produced.jl")
-include("BESC/write_outputs/write_bio_zone_biohydrogen_produced.jl")
-include("BESC/write_outputs/write_bio_zone_biodiesel_produced.jl")
-include("BESC/write_outputs/write_bio_zone_biojetfuel_produced.jl")
-include("BESC/write_outputs/write_bio_zone_biogasoline_produced.jl")
-include("BESC/write_outputs/write_bio_zone_bioethanol_produced.jl")
-include("BESC/write_outputs/write_bio_zone_herb_consumed.jl")
-include("BESC/write_outputs/write_bio_zone_wood_consumed.jl")
 
 end

@@ -84,49 +84,6 @@ function write_power(path::AbstractString, sep::AbstractString, inputs::Dict, se
 		CSV.write(string(path,sep,"power_w_H2G2P.csv"), dftranspose(dfPower_w_H2G2P, false), writeheader=false)
 	end
 
-	if setup["ModelBIO"] == 1 && setup["BIO_Electricity_On"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-		B = inputs["BIO_RES_ALL"]
-		
-		# Power injected by each resource in each time step
-		dfOut_BioE = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
-		
-		for i in 1:B
-			dfOut_BioE[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:eBioelectricity_produced_per_plant_per_time])[i,:]))
-		end
-		
-		# Load hourly values
-		dfOut_BioE = hcat(dfOut_BioE, DataFrame((value.(EP[:eBioelectricity_produced_per_plant_per_time])), :auto))
-		
-		# Add labels
-		auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
-		rename!(dfOut_BioE,auxNew_Names)
-		
-		total_w_BioE = DataFrame(["Total" 0 sum(dfOut_BioE[!,:AnnualSum])+sum(dfPower[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
-		
-		for t in  1:T
-			total_w_BioE[:,t+3] .= sum(dfPower[!,Symbol("t$t")][1:G]) + sum(dfOut_BioE[:,Symbol("t$t")][1:B])
-		end
-		
-		rename!(total_w_BioE,auxNew_Names)
-		
-		dfPower_w_BioE = vcat(dfPower, dfOut_BioE, total_w_BioE)	
-		CSV.write(string(path,sep,"power_w_BioE.csv"), dftranspose(dfPower_w_BioE, false), writeheader=false)
-	end
-
-	if setup["ModelH2"] == 1 && setup["ModelH2G2P"] == 1 && setup["ModelBIO"] == 1 && setup["BIO_Electricity_On"] == 1
-		total_w_H2G2P_BioE = DataFrame(["Total" 0 sum(dfPower[!,:AnnualSum])+sum(dfPG2POut[!,:AnnualSum])+sum(dfOut_BioE[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
-		
-		for t in  1:T
-			total_w_H2G2P_BioE[:,t+3] .= sum(dfPower[!,Symbol("t$t")][1:G]) + sum(dfPG2POut[:,Symbol("t$t")][1:H]) + sum(dfOut_BioE[:,Symbol("t$t")][1:B])
-		end
-		
-		rename!(total_w_H2G2P_BioE,auxNew_Names)
-		
-		dfPower_w_H2G2P_BioE = vcat(dfPower, dfPG2POut, dfOut_BioE, total_w_H2G2P_BioE)	
-		CSV.write(string(path,sep,"power_w_H2G2P_BioE.csv"), dftranspose(dfPower_w_H2G2P_BioE, false), writeheader=false)
-	end
-
 
 	dfPower = vcat(dfPower, total)
  	CSV.write(string(path,sep,"power.csv"), dftranspose(dfPower, false), writeheader=false)

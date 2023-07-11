@@ -26,9 +26,9 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		dfH2G2P = inputs["dfH2G2P"]
 	end
 
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
+	#if setup["ModelBIO"] == 1
+		#dfbiorefinery = inputs["dfbiorefinery"]
+	#end
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -92,9 +92,9 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 			dfTemp1[t+rowoffset,12] = 0
 			
-			if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
-				dfTemp1[t+rowoffset,12] = value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone][t,z]) - value.(EP[:eScaled_BioH2_consumption_per_time_per_zone][t,z])
-			end
+			#if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+				#dfTemp1[t+rowoffset,12] = value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone][t,z]) - value.(EP[:eScaled_BioH2_consumption_per_time_per_zone][t,z])
+			#end
 
 			
 

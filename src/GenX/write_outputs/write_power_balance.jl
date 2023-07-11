@@ -28,10 +28,6 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 		end
 	end
 
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
-
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	SEG = inputs["SEG"] # Number of load curtailment segments
@@ -103,11 +99,11 @@ function write_power_balance(path::AbstractString, sep::AbstractString, inputs::
 				dfTemp1[t+rowoffset,13] = 0
 			end
 
-			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,14] = -value(EP[:eBIONetpowerConsumptionByAll][t,z])
-			else
-				dfTemp1[t+rowoffset,14] = 0
-			end
+			#if setup["ModelBIO"] == 1
+			#	dfTemp1[t+rowoffset,14] = -value(EP[:eBIONetpowerConsumptionByAll][t,z])
+			#else
+			dfTemp1[t+rowoffset,14] = 0
+			#end
 
 			if setup["ModelSynFuels"] == 1
 				dfTemp1[t+rowoffset,15] = -value(EP[:ePowerBalanceSynFuelRes][t,z])
