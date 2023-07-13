@@ -26,11 +26,8 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
     #Conventional liquid Fuel Demand
     @variable(EP, vConvLFDieselDemand[t = 1:T, z = 1:Z] >= 0 )
-
     @variable(EP, vConvLFJetfuelDemand[t = 1:T, z = 1:Z] >= 0 )
-
     @variable(EP, vConvLFGasolineDemand[t = 1:T, z = 1:Z] >= 0 )
-
 
     if setup["AllowConventionalDiesel"] == 1
 
@@ -40,7 +37,6 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             Conventional_diesel_price_per_mmbtu = inputs["Conventional_diesel_price_per_mmbtu"] 
         end
 
-        
         ### Expressions ###
         #Objective Function Expressions
 
@@ -86,7 +82,6 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             Conventional_jetfuel_price_per_mmbtu = inputs["Conventional_jetfuel_price_per_mmbtu"] 
         end
 
-        
         ### Expressions ###
         #Objective Function Expressions
     

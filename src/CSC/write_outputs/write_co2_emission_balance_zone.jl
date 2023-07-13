@@ -80,6 +80,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 					dfTemp1[t+rowoffset,20] = value(EP[:eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone][z,t])
 				else
 					dfTemp1[t+rowoffset,17] = 0
+					dfTemp1[t+rowoffset,18] = 0
 					dfTemp1[t+rowoffset,19] = 0
 					dfTemp1[t+rowoffset,20] = 0
 				end
@@ -129,6 +130,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 		    dfCO2Balance = hcat(dfCO2Balance, dfTemp1)
 		end
 	end
+
 	for c in 2:size(dfCO2Balance,2)
 	   	dfCO2Balance[rowoffset,c]=sum(inputs["omega"].*dfCO2Balance[(rowoffset+1):size(dfCO2Balance,1),c])
 	end
