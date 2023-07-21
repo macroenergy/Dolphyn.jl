@@ -33,10 +33,10 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 
 	   	for t in 1:T
 			if setup["ParameterScale"] ==1
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons][t,z])*ModelScalingFactor #Convert kton CO2 to tonne CO2
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_per_time_per_zone][t,z])*ModelScalingFactor #Convert kton CO2 to tonne CO2
 				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelRes][t,z])*ModelScalingFactor #Convert GW to MW
 			else
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons][t,z])
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_per_time_per_zone][t,z])
 				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelRes][t,z])
 			end
 
