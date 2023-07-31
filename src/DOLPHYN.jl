@@ -92,7 +92,7 @@ end
 genxsubmod_path = joinpath(@__DIR__,"GenX", "src")
 files_to_exclude = [
     joinpath(genxsubmod_path,"GenX.jl"),
-    joinpath(genxsubmod_path,"simplt_operation.jl"),
+    joinpath(genxsubmod_path,"simple_operation.jl"),
     joinpath(genxsubmod_path,"time_domain_reduction","time_domain_reduction.jl"),
     joinpath(genxsubmod_path,"model","solve_model.jl"),
     joinpath(genxsubmod_path,"model","generate_model.jl"),
@@ -104,128 +104,66 @@ dirs_to_exclude = [
 for dir in dirs_to_exclude
     push!(files_to_exclude, find_all_to_include(dir, ".jl", true)...)
 end
-for file in files_to_exclude
-    println("Excluding $file")
+# Print a list of files that are not being included from GenX
+if length(files_to_exclude) > 0
+    println(" --- The following files are not being included from GenX: --- ")
+    for file in files_to_exclude
+        println("Excluding $file")
+    end
+    println(" --- End of excluded files --- ")
 end
+# Get all .jl files in the GenX submodule directory
 genx_module_files = find_all_to_include(genxsubmod_path, ".jl", true)
+# Filter out all the files we want to exclude
 filter!(x -> !(x in files_to_exclude), genx_module_files)
 for file in genx_module_files
-    # println("Including $file")
     include(file)
 end
 
 # Load time domain reduction related scripts
-include("time_domain_reduction/time_domain_reduction.jl")
+tdr_files = find_all_to_include(joinpath(@__DIR__,"time_domain_reduction"), ".jl", true)
+for file in tdr_files
+    include(file)
+end
 
 # Extensions to GenX
-# These should be pushed to the GenX fork
-include("write_nw_expansion.jl")
+genx_ext_files = find_all_to_include(joinpath(@__DIR__,"GenX_extensions"), ".jl", true)
+for file in genx_ext_files
+    include(file)
+end
 
-#Load input data - HSC
-include("HSC/load_inputs/load_h2_gen.jl")
-include("HSC/load_inputs/load_h2_demand.jl")
-include("HSC/load_inputs/load_h2_demand_liquid.jl")
-include("HSC/load_inputs/load_h2_generators_variability.jl")
-include("HSC/load_inputs/load_h2_pipeline_data.jl")
-include("HSC/load_inputs/load_h2_truck.jl")
-include("HSC/load_inputs/load_H2_inputs.jl")
-include("HSC/load_inputs/load_co2_cap_hsc.jl")
-include("HSC/load_inputs/load_h2_g2p.jl")
-include("HSC/load_inputs/load_h2_g2p_variability.jl")
+# Load all .jl files from the HSC directory
+HSC_files = find_all_to_include(joinpath(@__DIR__,"HSC"), ".jl", true)
+for file in HSC_files
+    include(file)
+end
 
-# Inherit clusters from GenX
-include("h2_inherit_clusters.jl")
-
-# Auxiliary logging function
-include("print_and_log.jl")
-
-# Results comparison tools
-include("compare_results.jl")
-
-# Enumerate zones
-include("enumerate_zones.jl")
-
-# Select zones
-include("select_zones.jl")
+# Load all .jl files from the core directory
+core_files = find_all_to_include(joinpath(@__DIR__,"core"), ".jl", true)
+for file in core_files
+    include(file)
+end
 
 # Configure settings
-include("configure_settings/configure_settings.jl")
+settings_files = find_all_to_include(joinpath(@__DIR__,"configure_settings"), ".jl", true)
+for file in settings_files
+    include(file)
+end
 
 # Configure optimizer instance
-include("configure_solver/configure_gurobi.jl")
-include("configure_solver/configure_highs.jl")
-include("configure_solver/configure_cplex.jl")
-include("configure_solver/configure_clp.jl")
-include("configure_solver/configure_cbc.jl")
-include("configure_solver/configure_solver.jl")
+solver_files = find_all_to_include(joinpath(@__DIR__,"configure_solver"), ".jl", true)
+for file in solver_files
+    include(file)
+end
 
-#Core HSC Modelling Features
-include("HSC/model/core/h2_investment.jl")
-include("HSC/model/core/h2_outputs.jl")
-include("HSC/model/core/h2_non_served.jl")
-
-include("HSC/model/flexible_demand/h2_flexible_demand.jl")
-include("HSC/model/core/emissions_hsc.jl")
-
-# H2 production
-include("HSC/model/generation/h2_production_commit.jl")
-include("HSC/model/generation/h2_production_no_commit.jl")
-include("HSC/model/generation/h2_production_all.jl")
-include("HSC/model/generation/h2_production.jl")
-
-# H2 pipelines
-include("HSC/model/transmission/h2_pipeline.jl")
-
-# H2 trucks
-include("HSC/model/truck/h2_truck_investment.jl")
-include("HSC/model/truck/h2_truck.jl")
-include("HSC/model/truck/h2_truck_all.jl")
-include("HSC/model/truck/h2_long_duration_truck.jl")
-
-# H2 storage
-include("HSC/model/storage/h2_storage_investment_energy.jl")
-include("HSC/model/storage/h2_storage_investment_charge.jl")
-include("HSC/model/storage/h2_storage.jl")
-include("HSC/model/storage/h2_storage_all.jl")
-include("HSC/model/storage/h2_long_duration_storage.jl")
-
-# H2 G2P
-include("HSC/model/g2p/h2_g2p_investment.jl")
-include("HSC/model/g2p/h2_g2p_discharge.jl")
-include("HSC/model/g2p/h2_g2p_all.jl")
-include("HSC/model/g2p/h2_g2p_commit.jl")
-include("HSC/model/g2p/h2_g2p_no_commit.jl")
-include("HSC/model/g2p/h2_g2p.jl")
-
-# Policies
-include("HSC/model/policies/co2_cap_hsc.jl")
+# Files which involve multiple sectors
+multisector_files = find_all_to_include(joinpath(@__DIR__,"multisector"), ".jl", true)
+for file in multisector_files
+    include(file)
+end
 
 # Load model generation and solving scripts
-include("co2_cap_power_hsc.jl")
 include("generate_model.jl")
 include("solve_model.jl")
-
-# HSC Write Outputs
-include("HSC/write_outputs/write_h2_gen.jl")
-include("HSC/write_outputs/write_h2_capacity.jl")
-include("HSC/write_outputs/write_h2_nse.jl")
-include("HSC/write_outputs/write_h2_costs.jl")
-include("HSC/write_outputs/write_h2_balance.jl")
-include("HSC/write_outputs/write_h2_pipeline_flow.jl")
-include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
-include("HSC/write_outputs/write_h2_pipeline_level.jl")
-include("HSC/write_outputs/write_h2_emissions.jl")
-include("HSC/write_outputs/write_h2_charge.jl")
-include("HSC/write_outputs/write_h2_storage.jl")
-include("HSC/write_outputs/write_h2_truck_capacity.jl")
-include("HSC/write_outputs/write_h2_truck_flow.jl")
-include("HSC/write_outputs/write_h2_transmission_flow.jl")
-include("HSC/write_outputs/write_HSC_outputs.jl")
-include("HSC/write_outputs/write_p_g2p.jl")
-include("HSC/write_outputs/write_h2_g2p.jl")
-include("HSC/write_outputs/write_g2p_capacity.jl")
-include("HSC/write_outputs/choose_h2_output_dir.jl")
-
-include("HSC/write_outputs/write_h2_elec_costs.jl")
 
 end
