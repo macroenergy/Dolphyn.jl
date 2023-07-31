@@ -31,7 +31,7 @@ The HiGHS optimizer instance is configured with the following default parameters
     TimeLimit: Inf             # Time limit # [type: double, advanced: false, range: [0, inf], default: inf]
     Pre_Solve: choose          # Presolve option: "off", "choose" or "on" # [type: string, advanced: false, default: "choose"]
     Method: ipm #choose        #HiGHS-specific solver settings # Solver option: "simplex", "choose" or "ipm" # [type: string, advanced: false, default: "choose"] In order to run a case when the UCommit is set to 1, i.e. MILP instance, set the Method to choose
-    
+
     # HiGHS-specific solver settings
     # Presolve option: "off", "choose" or "on"
     # [type: string, advanced: false, default: "choose"]
@@ -708,10 +708,10 @@ function configure_highs(solver_settings_path::String)
     if (haskey(solver_settings, "allowed_cost_scale_factor"))
         Myallowed_cost_scale_factor = solver_settings["allowed_cost_scale_factor"]
     end
-    Mysimplex_dualise_strategy = -1
-    if (haskey(solver_settings, "simplex_dualise_strategy"))
-        Mysimplex_dualise_strategy = solver_settings["simplex_dualise_strategy"]
-    end
+    # Mysimplex_dualise_strategy = -1
+    # if (haskey(solver_settings, "simplex_dualise_strategy"))
+    #     Mysimplex_dualise_strategy = solver_settings["simplex_dualise_strategy"]
+    # end
     Mysimplex_permute_strategy = -1
     if (haskey(solver_settings, "simplex_permute_strategy"))
         Mysimplex_permute_strategy = solver_settings["simplex_permute_strategy"]
@@ -897,7 +897,7 @@ function configure_highs(solver_settings_path::String)
         "cost_scale_factor" => Mycost_scale_factor,
         "allowed_matrix_scale_factor" => Myallowed_matrix_scale_factor,
         "allowed_cost_scale_factor" => Myallowed_cost_scale_factor,
-        "simplex_dualise_strategy" => Mysimplex_dualise_strategy,
+        # "simplex_dualise_strategy" => Mysimplex_dualise_strategy,
         "simplex_permute_strategy" => Mysimplex_permute_strategy,
         "max_dual_simplex_cleanup_level" => Mymax_dual_simplex_cleanup_level,
         "max_dual_simplex_phase1_cleanup_level" =>
