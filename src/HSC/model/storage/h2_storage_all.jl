@@ -114,7 +114,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources
     print_and_log("H2 Storage Core Resources Module")
 
-    Zones = inputs["Zones"]
+    #Zones = inputs["Zones"]
 
     dfH2Gen = inputs["dfH2Gen"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of all h2 storage resources
@@ -171,9 +171,9 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Term to represent electricity consumption associated with H2 storage charging and discharging
     @expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
     if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
-        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL); init=0.0)
+        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
     else
-        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL); init=0.0)
+        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
     end
     )
 

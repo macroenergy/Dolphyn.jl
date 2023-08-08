@@ -28,7 +28,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
-    Zones = inputs["Zones"] # List of zones
+    #Zones = inputs["Zones"] # List of zones
     H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
     H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
@@ -55,18 +55,18 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
             ]
            dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
            for t in 1:T
-             dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
+             dfTemp1[t+rowoffset,1]= sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_GEN_TYPE].>0) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
              dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
             dfTemp1[t+rowoffset,4] = 0
             dfTemp1[t+rowoffset,5] = 0
-             if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_FLEX))
-                 dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_FLEX))
-                dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_FLEX].>=1) .&  (dfH2Gen[!,:Zone].==Zones[z]),:][!,:R_ID],t]))
+             if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
+                 dfTemp1[t+rowoffset,2] = sum(value.(EP[:vH2_CHARGE_FLEX][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_FLEX))
+                dfTemp1[t+rowoffset,3] = -sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_FLEX].>=1) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
              end
-             if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL))
-                dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL))
-               dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==Zones[z],:R_ID],H2_STOR_ALL))
+             if !isempty(intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+                dfTemp1[t+rowoffset,4] = sum(value.(EP[:vH2Gen][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
+               dfTemp1[t+rowoffset,5] = -sum(value.(EP[:vH2_CHARGE_STOR][y,t]) for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL))
             end
 
              dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
@@ -91,7 +91,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
         # end
 
             if setup["ModelH2G2P"] == 1
-                dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==Zones[z]),:][!,:R_ID],t])) 
+                dfTemp1[t+rowoffset,9] = sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t])) 
             else
                 dfTemp1[t+rowoffset,9] = 0
             end

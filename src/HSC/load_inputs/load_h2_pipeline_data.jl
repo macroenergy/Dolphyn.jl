@@ -26,29 +26,38 @@ function load_h2_pipeline_data(
     inputs_nw::Dict,
 )
 
-    Zones = inputs_nw["Zones"]
     Z = inputs_nw["Z"]
 
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
-        CSV.File(joinpath(path, "HSC_pipelines.csv"), header = true),
+        CSV.File(string(path, sep, "HSC_pipelines.csv"), header = true),
         copycols = true,
     )
 
-    # Filter pipeline by zone
-    if "Start_Zone" in names(pipeline_var)        
-        pipeline_var = filter(row -> (row.Start_Zone in Zones && row.End_Zone in Zones), pipeline_var)
-    else
-        @warn "Filtering zones not implemented when using matrix-style pipeline input"
-    end
-
     # Number of H2 Pipelines = L
     inputs_nw["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
-    L = inputs_nw["H2_P"]
+ 
+    # Find first column of pipe map table
+    start = findall(s -> s == "z1", names(pipeline_var))[1]
 
-    pipe_map = load_h2_network_map(pipeline_var, Z, L, Zones)
+    # Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
+    pipe_map = pipeline_var[1:inputs_nw["H2_P"], start:start+inputs_nw["Z"]-1]
+
+    # Create pipe number column
+    pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
+    # Pivot table
+    pipe_map = stack(pipe_map, 1:inputs_nw["Z"])
+    # Create zone column
+    pipe_map[!, :Zone] = parse.(Float64, SubString.(pipe_map[!, :variable], 2))
+    #Remove redundant rows
+    pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
+
+    #Rename column
+    colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
+    rename!(pipe_map, Symbol.(colnames_pipe_map))
 
     inputs_nw["H2_Pipe_Map"] = pipe_map
+
 
     # Number of pipelines routes in the network
     inputs_nw["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
@@ -128,104 +137,4 @@ function load_h2_pipeline_data(
     print_and_log("HSC_pipelines.csv Successfully Read!")
 
     return inputs_nw
-end
-
-@doc raw"""
-    load_h2_network_map_from_list(network_var::DataFrame, Z, L, list_columns)
-
-Loads the H2 network map from a list-style interface
-```
-..., H2_Pipelines, Start_Zone, End_Zone, ...
-                 1,           1,                2,
-                 2,           1,                3,
-```
-"""
-function load_h2_network_map_from_list(pipeline_var::DataFrame, Z, L, list_columns, Zones)
-    start_col, end_col = list_columns
-    pipe_map = zeros(Int64, L, Z)
-    start_zones = collect(skipmissing(pipeline_var[!, start_col]))
-    end_zones = collect(skipmissing(pipeline_var[!, end_col]))
-    for l in 1:L
-        z_start = indexin([pipeline_var[!, :Start_Zone][l]], Zones)[1]
-        z_end = indexin([pipeline_var[!, :End_Zone][l]], Zones)[1]
-        pipe_map[l, z_start] = 1
-        pipe_map[l, z_end] = -1
-    end
-    pipe_map = DataFrame(pipe_map, Symbol.(Zones))
-    
-    ## Create pipe number column
-    pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
-    ## Pivot table
-    pipe_map = stack(pipe_map, Zones)
-    ## Remove redundant rows
-    pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
-    ## Rename column
-    colnames_pipe_map = ["pipe_no", "Zone", "d"]
-    rename!(pipe_map, Symbol.(colnames_pipe_map))
-    pipe_map[!, :zone_str] = pipe_map[!, :Zone]
-    #TODO: Avoid type error of pipe_map
-    ## Check input zone type - Zone column should be Int64 in ```h2_pipeline```, input zone list should be Int64
-    if typeof(Zones[1]) == Int64
-        pipe_map[!, :Zone] = [parse(Int64, x) for x in pipe_map[!, :Zone]]
-    end
-    return pipe_map
-end
-
-@doc raw"""
-    load_h2_network_map_from_matrix(network_var::DataFrame, Z, L)
-
-Loads the H2 network map from a matrix-style interface
-```
-..., H2_Pipelines, z1, z2, z3, ...
-                 1,  1, -1,  0,
-                 2,  1,  0, -1,
-```
-This is equivalent to the list-style interface where the zone zN with entry +1 is the
-starting node of the line and the zone with entry -1 is the ending node of the line.
-"""
-function load_h2_network_map_from_matrix(pipeline_var::DataFrame, Z, L)
-    # Find first column of pipe map table
-    start = findall(s -> s == "z1", names(pipeline_var))[1]
-    # Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
-    pipe_map = pipeline_var[1:L, start:start+Z-1]
-    # Create pipe number column
-    pipe_map[!, :pipe_no] = 1:size(pipe_map, 1)
-    # Pivot table
-    pipe_map = stack(pipe_map, 1:Z)
-    # Create zone column
-    pipe_map[!, :Zone] = parse.(Float64, SubString.(pipe_map[!, :variable], 2))
-    #Remove redundant rows
-    pipe_map = pipe_map[pipe_map[!, :value].!=0, :]
-    #Rename column
-    colnames_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
-    rename!(pipe_map, Symbol.(colnames_pipe_map))
-    return pipe_map
-end
-
-function load_h2_network_map(pipeline_var::DataFrame, Z, L, Zones)
-    columns = names(pipeline_var)
-
-    list_columns = ["Start_Zone", "End_Zone"]
-    has_pipeline_list = all([c in columns for c in list_columns])
-
-    zones_as_strings = ["z" * string(i) for i in 1:Z]
-    has_pipeline_matrix =  all([c in columns for c in zones_as_strings])
-
-    instructions = """The H2 pipeline network should be specified in the form of a matrix
-           (with columns z1, z2, ... zN) or in the form of lists (with Start_Zone, End_Zone),
-           but not both. See the documentation for examples."""
-
-    println(has_pipeline_list)
-    println(has_pipeline_matrix)
-
-    if has_pipeline_list && has_pipeline_matrix
-        error("two types of transmission network map were provided.\n" * instructions)
-    elseif !(has_pipeline_list || has_pipeline_matrix)
-        error("no transmission network map was detected.\n" * instructions)
-    elseif has_pipeline_list
-        pipe_map = load_h2_network_map_from_list(pipeline_var, Z, L, list_columns, Zones)
-    elseif has_pipeline_matrix
-        pipe_map = load_h2_network_map_from_matrix(pipeline_var, Z, L)
-    end
-    return pipe_map
 end

@@ -21,8 +21,8 @@ Function for reading input parameters related to hydrogen load (demand) of each 
 """
 function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
-    Zones = inputs_load["Zones"]
-    Z = inputs_load["Z"]
+    #Zones = inputs_load["Zones"]
+    #Z = inputs_load["Z"]
 
     data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
     
@@ -35,19 +35,12 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     # Number of demand curtailment/lost load segments
     inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
-    # Demand in tonnes per hour for each zone    
+    # Demand in tonnes per hour for each zone
+    start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1]    
     # Max value of non-served energy in $/(tonne)
     inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
-    # Demand in Tonnes per hour
-    # Form a matrix with columns as the different zonal load H2 demand values and rows as the hours
-    # Zone names can either be of the form z1, z2, z3, ... or 1, 2, 3
-    # The column names of interest are always labelled Load_H2_tonne_per_hr_z1, Load_H2_tonne_per_hr_z2, Load_H2_tonne_per_hr_z3, ...
-    # So we have to adjust the search string accordingly
-    search_str = h2_demand_search_str(Zones)
-    
-    # Cost of non-served energy/demand curtailment (for each segment)
-    inputs_load["H2_D"] = Matrix(H2_load_in[1:inputs_load["T"],[string(search_str, z) for z in Zones]]) 
-    
+    # Demand in Tonnes per hour      
+    inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]])    
 
     # Cost of non-served energy/demand curtailment (for each segment)
     H2_SEG = inputs_load["H2_SEG"]  # Number of demand segments

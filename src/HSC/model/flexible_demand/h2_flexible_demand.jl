@@ -70,8 +70,6 @@ function h2_flexible_demand(EP::Model, inputs::Dict, setup::Dict)
 
 print_and_log("H2 Flexible Demand Resources Module")
 
-Zones = inputs["Zones"]
-
 dfH2Gen = inputs["dfH2Gen"]
 
 T = inputs["T"]     # Number of time steps (hours)
@@ -99,7 +97,7 @@ END_HOURS = START_SUBPERIODS .+ hours_per_subperiod .- 1 # Last subperiod of eac
 # vH2Gen refers to deferred demand that is met and hence has a negative sign
 # vH2_CHARGE_FLEX refers to deferred demand in period in t
 @expression(EP, eH2BalanceDemandFlex[t=1:T, z=1:Z],
-    sum(-EP[:vH2Gen][k,t]+EP[:vH2_CHARGE_FLEX][k,t] for k in intersect(H2_FLEX, dfH2Gen[(dfH2Gen[!,:Zone].==Zones[z]),:][!,:R_ID])))
+    sum(-EP[:vH2Gen][k,t]+EP[:vH2_CHARGE_FLEX][k,t] for k in intersect(H2_FLEX, dfH2Gen[(dfH2Gen[!,:Zone].==z),:][!,:R_ID])))
 
 EP[:eH2Balance] += eH2BalanceDemandFlex
 

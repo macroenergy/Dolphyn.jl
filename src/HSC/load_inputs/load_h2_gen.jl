@@ -23,13 +23,8 @@ Liquid versus gas storage is identified via the H2_STOR type column.
 """
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
-    Zones = inputs_gen["Zones"]
-
     #Read in H2 generation related inputs
     h2_gen_in = DataFrame(CSV.File(joinpath(path, "HSC_generation.csv"), header=true), copycols=true)
-
-    # Filter H2 generation by zone
-    h2_gen_in = filter(row -> row.Zone in Zones, h2_gen_in)
 
     # Add Resource IDs after reading to prevent user errors
     h2_gen_in[!,:R_ID] = 1:size(collect(skipmissing(h2_gen_in[!,1])),1)

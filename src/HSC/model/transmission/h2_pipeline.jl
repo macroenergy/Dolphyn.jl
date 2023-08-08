@@ -74,7 +74,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
-    Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
+    #Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
 
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
@@ -156,8 +156,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
                 vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==Zones[z]).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==Zones[z], :][!, :pipe_no]
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
             ) / ModelScalingFactor
         )
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
@@ -166,8 +166,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
                 vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==Zones[z]).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==Zones[z], :][!, :pipe_no]
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
             )
         )
     end
@@ -178,11 +178,11 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
     # if setup["ParameterScale"]==1 # Power consumption in GW
     #     @expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
-    #     sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])))
+    #     sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y]/ModelScalingFactor for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
 
     # else  # Power consumption in MW
     #     @expression(EP, eH2PowerConsumptionByPipe[z=1:Z, t=1:T], 
-    #     sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:R_ID])))
+    #     sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_tonne][y] for y in intersect(inputs["H2_STOR_ALL"], dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])))
 
     # end
 
@@ -195,8 +195,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         EP,
         ePipeZoneDemand[t = 1:T, z = 1:Z],
         sum(
-            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==Zones[z]).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
-            for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==Zones[z], :][!, :pipe_no]
+            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
+            for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
         )
     )
 

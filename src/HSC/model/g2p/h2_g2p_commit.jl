@@ -158,7 +158,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
-    Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
+    #Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
     H = inputs["H"]        #NUmber of hydrogen generation units 
     
     H2_G2P_COMMIT = inputs["H2_G2P_COMMIT"]
@@ -199,18 +199,18 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
     # H2 Balance expressions
     @expression(EP, eH2G2PCommit[t=1:T, z=1:Z],
-    sum(EP[:vH2G2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==Zones[z],:][!,:R_ID])))
+    sum(EP[:vH2G2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
 
     EP[:eH2Balance] -= eH2G2PCommit
 
     # Power generation from g2p units
     if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-        sum(EP[:vPG2P][k,t]/ModelScalingFactor for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==Zones[z],:][!,:R_ID]))) 
+        sum(EP[:vPG2P][k,t]/ModelScalingFactor for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
 
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
         @expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-        sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==Zones[z],:][!,:R_ID]))) 
+        sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
     end
 
     EP[:ePowerBalance] += ePowerBalanceH2G2PCommit

@@ -34,7 +34,7 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
     H2_G2P_NO_COMMIT = inputs["H2_G2P_NO_COMMIT"]
     dfH2G2P = inputs["dfH2G2P"]  # Input H2 generation and storage data
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
-    Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
+    #Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
     T = inputs["T"]     # Model operating time steps
 
     if !isempty(H2_G2P_COMMIT)
@@ -47,11 +47,11 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
 
     ## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
         @expression(EP, eGenerationByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
-        sum(EP[:vPG2P][y,t] for y in intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==Zones[z],:R_ID]))
+        sum(EP[:vPG2P][y,t] for y in intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==z,:R_ID]))
     )
 
     @expression(EP, eH2DemandByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
-        sum(EP[:vH2G2P][y,t] for y in intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==Zones[z],:R_ID]))
+        sum(EP[:vH2G2P][y,t] for y in intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==z,:R_ID]))
     )
 
     EP[:eGenerationByZone] += eGenerationByZoneG2P

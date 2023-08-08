@@ -73,7 +73,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
     print_and_log("H2 Production (No Unit Commitment) Module")
     
-    Zones = inputs["Zones"]
+    #Zones = inputs["Zones"]
     
     #Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]
@@ -128,11 +128,11 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     #Power Consumption for H2 Generation
     if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-        sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:][!,:R_ID]))) 
+        sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
 
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
         @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-        sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==Zones[z],:][!,:R_ID]))) 
+        sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
     end
 
     EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
