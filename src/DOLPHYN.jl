@@ -72,7 +72,6 @@ const H2_LHV = 33.33 # MWh per tonne
 # Logging flag
 Log = true
 
-# Load GenX
 function find_all_to_include(dir::String, file_type::String=".jl", recursive::Bool=false)::Vector{String}
     if recursive
         result = String[]
@@ -86,81 +85,69 @@ function find_all_to_include(dir::String, file_type::String=".jl", recursive::Bo
     end
 end
 
+function include_from_dir(dir::String, file_type::String=".jl", exclusions::Vector{String}=String[])::Nothing
+    files = find_all_to_include(dir, file_type, true)
+    files_to_exclude = String[]
+    for exclusion in exclusions
+        if isdir(exclusion)
+            # If it's a directory, remove all files in that directory
+            push!(files_to_exclude, find_all_to_include(exclusion, ".jl", true)...)
+        else
+            # Otherwise, just remove the file
+            push!(files_to_exclude, exclusion)
+        end
+    end
+    if length(files_to_exclude) > 0
+        println(" --- The following files are not being included from $dir: --- ")
+        for file in files_to_exclude
+            println("Excluding $file")
+        end
+        println(" --- End of excluded files --- ")
+    end
+    # Filter out all the files we want to exclude
+    filter!(x -> !(x in files_to_exclude), files)
+    # Include the remaining files
+    for file in files
+        include(file)
+    end
+end
+
 # We can't easily run GenX.jl because that creates a module
 # which doesn't export all the functions we need.
 # Instead, we'll include all the GenX functions and then overwrite them
-genxsubmod_path = joinpath(@__DIR__,"GenX", "src")
-files_to_exclude = [
+genxsubmod_path = joinpath(@__DIR__,"GenX","src")
+genx_to_exclude = [
     joinpath(genxsubmod_path,"GenX.jl"),
     joinpath(genxsubmod_path,"simple_operation.jl"),
     joinpath(genxsubmod_path,"time_domain_reduction","time_domain_reduction.jl"),
     joinpath(genxsubmod_path,"model","solve_model.jl"),
     joinpath(genxsubmod_path,"model","generate_model.jl"),
-]
-dirs_to_exclude = [
     joinpath(genxsubmod_path,"configure_solver"),
     # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
-for dir in dirs_to_exclude
-    push!(files_to_exclude, find_all_to_include(dir, ".jl", true)...)
-end
-# Print a list of files that are not being included from GenX
-if length(files_to_exclude) > 0
-    println(" --- The following files are not being included from GenX: --- ")
-    for file in files_to_exclude
-        println("Excluding $file")
-    end
-    println(" --- End of excluded files --- ")
-end
-# Get all .jl files in the GenX submodule directory
-genx_module_files = find_all_to_include(genxsubmod_path, ".jl", true)
-# Filter out all the files we want to exclude
-filter!(x -> !(x in files_to_exclude), genx_module_files)
-for file in genx_module_files
-    include(file)
-end
+include_from_dir(genxsubmod_path, ".jl", genx_to_exclude)
 
 # Load time domain reduction related scripts
-tdr_files = find_all_to_include(joinpath(@__DIR__,"time_domain_reduction"), ".jl", true)
-for file in tdr_files
-    include(file)
-end
+tdr_path = joinpath(@__DIR__,"time_domain_reduction")
+include_from_dir(tdr_path, ".jl", [joinpath(tdr_path,"PreCluster.jl")])
 
 # Extensions to GenX
-genx_ext_files = find_all_to_include(joinpath(@__DIR__,"GenX_extensions"), ".jl", true)
-for file in genx_ext_files
-    include(file)
-end
+include_from_dir(joinpath(@__DIR__,"GenX_extensions"), ".jl")
 
 # Load all .jl files from the HSC directory
-HSC_files = find_all_to_include(joinpath(@__DIR__,"HSC"), ".jl", true)
-for file in HSC_files
-    include(file)
-end
+include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
 
 # Load all .jl files from the core directory
-core_files = find_all_to_include(joinpath(@__DIR__,"core"), ".jl", true)
-for file in core_files
-    include(file)
-end
+include_from_dir(joinpath(@__DIR__,"core"), ".jl")
 
 # Configure settings
-settings_files = find_all_to_include(joinpath(@__DIR__,"configure_settings"), ".jl", true)
-for file in settings_files
-    include(file)
-end
+include_from_dir(joinpath(@__DIR__,"configure_settings"), ".jl")
 
 # Configure optimizer instance
-solver_files = find_all_to_include(joinpath(@__DIR__,"configure_solver"), ".jl", true)
-for file in solver_files
-    include(file)
-end
+include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
 
 # Files which involve multiple sectors
-multisector_files = find_all_to_include(joinpath(@__DIR__,"multisector"), ".jl", true)
-for file in multisector_files
-    include(file)
-end
+include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
 
 # Load model generation and solving scripts
 include("generate_model.jl")
