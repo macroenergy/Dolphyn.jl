@@ -98,10 +98,10 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 print_and_log("Writing Output")
 outpath = joinpath(inputs_path,"Results")
-write_outputs(EP, outpath, mysetup, myinputs)
+outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs
-outpath_H2 = joinpath(outpath,"Results_HSC")
+outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
 if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
 end
