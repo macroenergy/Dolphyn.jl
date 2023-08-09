@@ -1,7 +1,7 @@
 name = "DOLPHYN"
 uuid = "2a466132-4b02-429f-9994-5df6ddd3977f"
-authors = ["Ruaridh Macdonald <rmacd@mit.edu>"]
-version = "0.1.0"
+authors = ["Guannan He <>", "Dharik Mallapragada <dharik@mit.edu>", "Yuheng Zhang <>", "Jun Wen Law <>", "Youssef Shaker <>", "Anna Cybulsky <>", "Nicole Shi <>", "Ruaridh Macdonald <rmacd@mit.edu>"]
+version = "0.2.0"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
