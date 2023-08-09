@@ -1,5 +1,5 @@
 # Storage Asymmetric
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [DOLPHYN, GenX]
 Pages = ["GenX/src/model/resources/storage/storage_asymmetric.jl"]
 ```

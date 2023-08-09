@@ -2,3 +2,5 @@
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
+HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+RecursiveArrayTools = "731186ca-8d62-57ce-b412-fbd966d074cd"
