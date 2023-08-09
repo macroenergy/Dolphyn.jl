@@ -15,14 +15,14 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 push!(LOAD_PATH,joinpath(@__DIR__,"src"))
-push!(LOAD_PATH,joinpath(@__DIR__,"..","src"))
-push!(LOAD_PATH,joinpath(@__DIR__,"..","src","GenX","src"))
+push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
+push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+# using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
 
 using Documenter
 import DataStructures: OrderedDict
-include(joinpath(@__DIR__,"..","src","GenX","src","GenX.jl"))
+include(joinpath(dirname(@__DIR__),"src","GenX","src","GenX.jl"))
 using DOLPHYN
 
 
