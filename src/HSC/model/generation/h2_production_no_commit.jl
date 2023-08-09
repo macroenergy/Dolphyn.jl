@@ -73,8 +73,6 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
     print_and_log("H2 Production (No Unit Commitment) Module")
     
-    #Zones = inputs["Zones"]
-    
     #Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]
 

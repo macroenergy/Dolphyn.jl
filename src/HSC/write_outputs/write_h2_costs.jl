@@ -25,7 +25,6 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
     SEG = inputs["SEG"]  # Number of lines
     Z = inputs["Z"]     # Number of zones
-    #Zones = inputs["Zones"] # List of zones
     T = inputs["T"]     # Number of time steps (hours)
     H = inputs["H2_RES_ALL"]
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
@@ -53,7 +52,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
     end
 
     if setup["ModelH2Trucks"] == 1
-        cH2Fix_Truck = value.(EP[:eTotalCFixH2TruckComp]) + value.(EP[:eTotalCFixH2TruckCharge])
+        cH2Fix_Truck = value.(EP[:eTotalCFixH2TruckEnergy]) + value.(EP[:eTotalCFixH2TruckCharge])
         cH2Var_Truck = value.(EP[:OPEX_Truck]) + value.(EP[:OPEX_Truck_Compression])
     else
         cH2Fix_Truck = 0

@@ -21,17 +21,12 @@ Function for reading input parameters related to CO$_2$ emissions cap constraint
 """
 function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_hsc::Dict)
 
-    Zones = inputs_co2_hsc["Zones"]
-
     # Definition of Cap requirements by zone (as Max Mtons)
     dfH2CO2Cap = DataFrame(
         CSV.File(joinpath(path, "HSC_CO2_cap.csv"), header = true),
         copycols = true,
     )
 
-    # Filter CO2 cap requirements by zone
-    dfH2CO2Cap = filter(row -> row.Network_zones in Zones, dfH2CO2Cap)
-    
     inputs_co2_hsc["dfH2CO2Cap"] = dfH2CO2Cap
 
     cap = count(

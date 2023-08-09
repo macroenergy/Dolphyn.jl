@@ -34,7 +34,6 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
     H2_G2P_NO_COMMIT = inputs["H2_G2P_NO_COMMIT"]
     dfH2G2P = inputs["dfH2G2P"]  # Input H2 generation and storage data
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
-    #Zones = inputs["Zones"] # Model demand zones - assumed to be same for H2 and electricity
     T = inputs["T"]     # Model operating time steps
 
     if !isempty(H2_G2P_COMMIT)

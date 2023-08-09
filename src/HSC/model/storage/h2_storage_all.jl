@@ -114,8 +114,6 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Setup variables, constraints, and expressions common to all hydrogen storage resources
     print_and_log("H2 Storage Core Resources Module")
 
-    #Zones = inputs["Zones"]
-
     dfH2Gen = inputs["dfH2Gen"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of all h2 storage resources
     H2_STOR_LIQ = inputs["H2_STOR_LIQ"] # Set of all liquid storage resources

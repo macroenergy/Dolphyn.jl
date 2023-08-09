@@ -40,8 +40,8 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
     # Select zones which will be included. This currently only works for the non-GenX sectors
-    select_zones!(inputs, setup, path)
-    println("HSC Sector using zones: ", inputs["Zones"])
+    # select_zones!(inputs, setup, path)
+    # println("HSC Sector using zones: ", inputs["Zones"])
 
     ## Read input files
     print_and_log("Reading H2 Input CSV Files")

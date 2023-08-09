@@ -40,7 +40,7 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
         # Overwrite existing results if dir exists
         # This is the default behaviour when there is no flag, to avoid breaking existing code
         # Create directory if it does not exist
-        path = "$genx_path/Results_HSC";
+        path = joinpath(genx_path, "Results_HSC");
         if !(isdir(path))
             mkpath(path)
         end

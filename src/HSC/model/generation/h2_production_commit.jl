@@ -146,8 +146,6 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
     print_and_log("H2 Production (Unit Commitment) Module")
     
-    #Zones = inputs["Zones"]
-
     # Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]
     H2GenCommit = setup["H2GenCommit"]

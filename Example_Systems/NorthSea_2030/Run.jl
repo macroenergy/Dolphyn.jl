@@ -101,7 +101,7 @@ outpath = joinpath(inputs_path,"Results")
 outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs
-outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
+# outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
 if mysetup["ModelH2"] == 1
-    write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
+    write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
