@@ -43,8 +43,8 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     ## Write shadow prices of LP or relaxed MILP; 0 = not active; 1 = active
     set_default_if_absent!(settings, "WriteShadowPrices", 0)
     
-    ## Sets temporal resolution of the model; 0 = single period to represent the full year, with first-last time step linked; 1 = multiple representative periods
-    set_default_if_absent!(settings, "OperationWrapping", 0)
+    # ## Sets temporal resolution of the model; 0 = single period to represent the full year, with first-last time step linked; 1 = multiple representative periods
+    # set_default_if_absent!(settings, "OperationWrapping", 0)
 
     ## Directory name where results from time domain reduction will be saved. If results already exist here, these will be used without running time domain reduction script again.
     set_default_if_absent!(settings, "TimeDomainReductionFolder", "TDR_Results")
@@ -76,6 +76,9 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
 
     ## Activate minimum technology carveout constraints; 0 = not active; 1 = active
     set_default_if_absent!(settings, "MinCapReq", 0)
+
+    ## Activate maximum technology carveout constraints; 0 = not active; 1 = active
+    set_default_if_absent!(settings, "MaxCapReq", 0)
     
     ## Unit committment of thermal power plants; 0 = not active; 1 = active using integer clestering; 2 = active using linearized clustering
     set_default_if_absent!(settings, "UCommit", 0)    
@@ -89,14 +92,21 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     # Slack value as a fraction of least-cost objective in budget constraint used for evaluating alternative model solutions; positive float value
     set_default_if_absent!(settings, "ModelingtoGenerateAlternativeSlack", 0)        
 
+    # ESR losses in transmission and storage; 0 = not active; 1 = active
+    set_default_if_absent!(settings, "IncludeLossesInESR", 0)        
+
     ##############################################################
     #### HSC model and integrated energy system model options ###### 
      # CO2 emissions cap for HSC only; 0 = not active (no CO2 emission limit); 1 = mass-based emission limit constraint; 2 = load + rate-based emission limit constraint; 3 = generation + rate-based emission limit constraint; 4 = emissions penalized via a carbon price
     set_default_if_absent!(settings, "H2CO2Cap", 0)        
-    # CO2 emissions constraint representation; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
+    # CO2 emissions constraint representation; 0 = no CO2 constraint; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
     set_default_if_absent!(settings, "SystemCO2Constraint", 0)                
     #ModelH2Liquid: 0 # Whether to model liquid demand and production - 0 - not included, 1 - included
-    set_default_if_absent!(settings, "ModelH2Liquid", 0)                
+    set_default_if_absent!(settings, "ModelH2Liquid", 0)
+    # The max number of miles or km for a truck route (depends on the units used throughout, calculated via time constraint based on truck speed)
+    set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)
+    # Down-select Zones to model
+    set_default_if_absent!(settings, "Zones", [])
 
 return settings
 end

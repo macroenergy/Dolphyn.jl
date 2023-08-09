@@ -618,7 +618,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     #Copy Original Parameter Scale Variable
     parameter_scale_org = mysetup["ParameterScale"]
     #Copy setup from set-up local. Set-up local contains some H2 setup inputs, except for correct parameter scale
-	mysetup = copy(mysetup_local)
+    mysetup = copy(mysetup_local)
     #Overwrites paramater scale
     mysetup["ParameterScale"] = parameter_scale_org 
 
@@ -1034,12 +1034,12 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ##### Step 6: Print to File
 
     if Sys.isunix()
-		sep = "/"
+        sep = "/"
     elseif Sys.iswindows()
-		sep = "\U005c"
+        sep = "\U005c"
     else
         sep = "/"
-	end
+    end
 
     mkpath(joinpath(inpath, TimeDomainReductionFolder))
 
@@ -1159,12 +1159,12 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
             # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
             # Dharik - string conversion needed to change from inlinestring to string type
             HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => String(myinputs["H2_G2P_NAME"][i]) for i in 1:length(myinputs["H2_G2P_NAME"]))
-            println(HG2PVColMap)
+            #println(HG2PVColMap)
             HG2PVColMap["Time_Index"] = "Time_Index"
             HG2POutputData = HG2POutputData[!, Symbol.(myinputs["H2_G2P_RESOURCE_ZONES"])]
             insertcols!(HG2POutputData, 1, :Time_Index => 1:size(HG2POutputData,1))
             NewHG2PVColNames = [HG2PVColMap[string(c)] for c in names(HG2POutputData)]
-            println(NewHG2PVColNames)
+            #println(NewHG2PVColNames)
             if v println("Writing resource file...") end
             CSV.write(string(inpath,sep,H2G2PVar_Outfile), HG2POutputData, header=NewHG2PVColNames)
         end

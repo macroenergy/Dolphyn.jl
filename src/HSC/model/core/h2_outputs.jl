@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	h2_outputs(EP::Model, inputs::Dict, setup::Dict)
+    h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 Sets up variables common to all hydrogen generation resources.
 
@@ -27,12 +27,12 @@ The variable defined in this file named after ```vH2Gen``` covers all variables 
 
 ```math
 \begin{equation*}
-	x_{g,z,t}^{\textrm{H,GEN}} = 
-	\begin{cases}
-		x_{k,z,t}^{\textrm{H,THE}} if g \in \mathcal{K} \\
-		x_{s,z,t}^{\textrm{\textrm{H,DIS}}} if g \in \mathcal{S}
-	\end{cases}
-	\quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+    x_{g,z,t}^{\textrm{H,GEN}} = 
+    \begin{cases}
+        x_{k,z,t}^{\textrm{H,THE}} if g \in \mathcal{K} \\
+        x_{s,z,t}^{\textrm{\textrm{H,DIS}}} if g \in \mathcal{S}
+    \end{cases}
+    \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -42,51 +42,51 @@ This module additionally defines contributions to the objective function from va
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{H,GEN,o}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{H,VOM}} + \textrm{c}_{g}^{\textrm{H,FUEL}}\right) \times x_{g,z,t}^{\textrm{H,GEN}}
+    \textrm{C}^{\textrm{H,GEN,o}} = \sum_{g \in \mathcal{G}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{g}^{\textrm{H,VOM}} + \textrm{c}_{g}^{\textrm{H,FUEL}}\right) \times x_{g,z,t}^{\textrm{H,GEN}}
 \end{equation*}
 ```
 """
 function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
-	print_and_log("Hydrogen Generation and Storage Discharge Module")
+    print_and_log("Hydrogen Generation and Storage Discharge Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 
-	#Define sets
-	H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
-	T = inputs["T"]     # Number of time steps (hours)
+    #Define sets
+    H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
+    T = inputs["T"]     # Number of time steps (hours)
 
 
-	### Variables ###
+    ### Variables ###
 
     #H2 injected to hydrogen grid from hydrogen generation resource k (tonnes of H2/hr) in time t
-	@variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0)
+    @variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0)
 
-	### Expressions ###
+    ### Expressions ###
 
-	## Objective Function Expressions ##
+    ## Objective Function Expressions ##
 
     # Variable costs of "generation" for resource "y" during hour "t" = variable O&M plus fuel cost
 
-	#  ParameterScale = 1 --> objective function is in million $ . 
-	## In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
-	## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.
-	#  ParameterScale = 0 --> objective function is in $
+    #  ParameterScale = 1 --> objective function is in million $ . 
+    ## In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
+    ## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.
+    #  ParameterScale = 0 --> objective function is in $
 
-	if setup["ParameterScale"] ==1
-		@expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
-		(inputs["omega"][t] * (dfH2Gen[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vH2Gen[k,t]))
-	else
-		@expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
-		(inputs["omega"][t] * ((dfH2Gen[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k])) * vH2Gen[k,t]))
-	end
+    if setup["ParameterScale"] ==1
+        @expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
+        (inputs["omega"][t] * (dfH2Gen[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vH2Gen[k,t]))
+    else
+        @expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
+        (inputs["omega"][t] * ((dfH2Gen[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k])) * vH2Gen[k,t]))
+    end
 
-	@expression(EP, eTotalCH2GenVarOutT[t=1:T], sum(eCH2GenVar_out[k,t] for k in 1:H))
-	@expression(EP, eTotalCH2GenVarOut, sum(eTotalCH2GenVarOutT[t] for t in 1:T))
-	
-	# Add total variable discharging cost contribution to the objective function
-	EP[:eObj] += eTotalCH2GenVarOut
+    @expression(EP, eTotalCH2GenVarOutT[t=1:T], sum(eCH2GenVar_out[k,t] for k in 1:H))
+    @expression(EP, eTotalCH2GenVarOut, sum(eTotalCH2GenVarOutT[t] for t in 1:T))
+    
+    # Add total variable discharging cost contribution to the objective function
+    EP[:eObj] += eTotalCH2GenVarOut
 
-	return EP
+    return EP
 
 end
