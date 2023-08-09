@@ -1,3 +1,4 @@
+modelGenX: 1 # This flag determines if GenX needs to be modeled or not and impacts coupling with other sectors
 NetworkExpansion: 1 # Transmission network expansionl; 0 = not active; 1 = active systemwide
 Trans_Loss_Segments: 1 # Number of segments used in piecewise linear approximation of transmission losses; 1 = linear, >2 = piecewise quadratic
 Reserves: 0 # Regulation (primary) and operating (secondary) reserves; 0 = not active, 1 = active systemwide
