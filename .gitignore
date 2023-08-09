@@ -38,3 +38,4 @@ TDR_Results**/
 src/test.jl
 /docs/build/
 Example_Systems/SmallNewEngland/ThreeZones/Settings/combined_settings_output.yml
+Example_Systems/FRCC_2021_hourly_1GW_base/capacity_1GW_hourly_base.xlsx
