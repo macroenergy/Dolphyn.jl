@@ -22,8 +22,9 @@ using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
 
 using Documenter
 import DataStructures: OrderedDict
+include(joinpath(@__DIR__,"..","src","GenX","src","GenX.jl"))
 using DOLPHYN
-using GenX
+
 
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
