@@ -23,7 +23,7 @@ using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
 using Documenter
 import DataStructures: OrderedDict
 using DOLPHYN
-using GenX
+# using GenX
 
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
@@ -100,7 +100,8 @@ pages = OrderedDict(
 )
 
 makedocs(;
-    modules = [DOLPHYN, GenX],
+    # modules = [DOLPHYN, GenX],
+    modules = [DOLPHYN],
     authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
