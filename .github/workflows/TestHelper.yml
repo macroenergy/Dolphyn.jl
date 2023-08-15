@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 jobs:
   Test:
-    if: ${{ !contains(github.event.head_commit.message, '#skip') || !contains(github.event.head_commit.message, 'CompatHelper')
+    if: ${{ !contains(github.event.head_commit.message, '#skip') || !contains(github.event.head_commit.message, 'CompatHelper') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
