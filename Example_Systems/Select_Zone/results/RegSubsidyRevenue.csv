@@ -1,8 +1,0 @@
-region,Resource,zone,Cluster,R_ID,SubsidyRevenue
-MA,MA_natural_gas_combined_cycle,z1,1,1,0.0
-MA,MA_solar_pv,z1,1,2,0.0
-CT,CT_natural_gas_combined_cycle,z2,1,3,0.0
-CT,CT_onshore_wind,z2,1,4,0.0
-CT,CT_solar_pv,z2,1,5,0.0
-MA,MA_battery,z1,0,6,0.0
-CT,CT_battery,z2,0,7,0.0
