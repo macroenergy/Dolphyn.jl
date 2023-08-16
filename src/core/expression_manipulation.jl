@@ -57,6 +57,14 @@ function _add_similar_to_expression!(expr1::Array{C, dim1}, expr2::Array{T, dim2
     return nothing
 end
 
+function add_similar_to_expression!(expr1::GenericAffExpr{C,T}, expr2::GenericAffExpr{C,T}) where {C,T}
+    add_to_expression!(expr1, expr2)
+end
+
+function add_similar_to_expression!(expr1::GenericAffExpr{C,T}, expr2::GenericVariableRef{C}) where {C,T}
+    add_term_to_expression!(expr1, expr2)
+end
+
 function add_similar_to_expression!(expr1::Array{GenericAffExpr{C,T}, dim1}, expr2::Array{GenericAffExpr{C,T}, dim2}) where {C,T,dim1,dim2}
     _add_similar_to_expression!(expr1, expr2)
 end
