@@ -19,7 +19,7 @@ function elec_imports!(EP::Model, inputs::Dict, setup::Dict)
     end
 
     # Add to the power balance
-    add_similar_to_expression!(EP[:ePowerBalance], vElecImports_HSC)
+    add_similar_to_expression!(EP[:ePowerBalance_HSC], vElecImports_HSC)
 
     # Cost of imports
     @expression(EP, eElecImportsCost_HSC[z=1:Z,t=1:T], vElecImports_HSC[t,z] * inputs["HSC_elec_imports_prices"][t,z])
