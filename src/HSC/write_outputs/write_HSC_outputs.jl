@@ -88,6 +88,9 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
         write_h2_truck_flow(path, sep, inputs, setup, EP)
     end
 
+    write_elec_imports(path, sep, inputs, setup, EP)
+    write_elec_import_costs(path, sep, inputs, setup, EP)
+
     ## Print confirmation
     print_and_log("Wrote outputs HSC outputs to $path$sep")
 

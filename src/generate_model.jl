@@ -246,6 +246,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             )
         end
 
+        elec_imports!(EP, inputs, setup)
+
         EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
     end
 
