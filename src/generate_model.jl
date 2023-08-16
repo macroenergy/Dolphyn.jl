@@ -109,6 +109,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     # Creating new expression for "hydrogen" power balance constraint
     @expression(EP, ePowerBalance_HSC[t=1:T, z=1:Z], 0)
 
+    # The following variable is the hydrogen demand from HSC which is then represented as a coupling value to 
+    # GenX
+
+    @variable(EP, vElecExports_HSC[t=1:T, z = 1:Z], 0)
+
     # Initialize Hydrogen Balance Expression
     # Expression for "baseline" H2 balance constraint
     @expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
@@ -288,10 +293,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ## Define the objective function
     @objective(EP,Min,EP[:eObj])
 
+    # Adding Constraint for ePowerBalance equal to vElecExports_HSC, and vElecExports_HSC equal to ePowerBalance_HSC
+
+    #@constraint(EP, cGenXH2DemandEquate[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] -= EP[:vElecExports_HSC][t,z])
+
+    @constraint(EP, cElecExportsePHBH2Equate[t=1:T, z=1:Z], EP[:ePowerBalance_HSC][t,z] == EP[:vElecExports_HSC][t,z])
+
     ## Power balance constraints
     # demand = generation + storage discharge - storage charge - demand deferral + deferred demand satisfaction - demand curtailment (NSE)
     #          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
-    @constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
+    @constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z] + EP[:vElecExports_HSC][t,z])
 
     if setup["ModelH2"] == 1
         ###Hydrogen Balance constraints
