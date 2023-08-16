@@ -171,7 +171,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-    EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
+    #EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
+    EP[:ePowerBalance_HSC] -= ePowerBalanceH2PipeCompression
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2PipeCompression
 
 

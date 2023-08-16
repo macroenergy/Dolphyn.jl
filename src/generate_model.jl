@@ -106,6 +106,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     # Expression for "baseline" power balance constraint
     @expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
 
+    # Creating new expression for "hydrogen" power balance constraint
+    @expression(EP, ePowerBalance_HSC[t=1:T, z=1:Z], 0)
+
     # Initialize Hydrogen Balance Expression
     # Expression for "baseline" H2 balance constraint
     @expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
