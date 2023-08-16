@@ -15,6 +15,6 @@ function write_elec_import_costs(path::AbstractString, sep::AbstractString, inpu
     elec_costs = value.(EP[:eElecImportsCost_HSC])
     elec_costs = DataFrame(elec_costs, :auto)
     # Save to elec_import_costs.csv
-    CSV.write(joinpath(path, "elec_import_costs.csv"), elec_costs, delim = sep)
+    CSV.write(joinpath(path, "elec_import_costs.csv"), elec_costs)
     return elec_costs
 end
