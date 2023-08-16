@@ -109,10 +109,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     # Creating new expression for "hydrogen" power balance constraint
     @expression(EP, ePowerBalance_HSC[t=1:T, z=1:Z], 0)
 
-    # The following variable is the hydrogen demand from HSC which is then represented as a coupling value to 
+    # The following variable is the hydrogen demand from HSC which is then represented as a coupling value to
     # GenX
 
-    @variable(EP, vElecExports_HSC[t=1:T, z = 1:Z], 0)
+    @variable(EP, vElecExports_HSC[t=1:T, z = 1:Z] >= 0)
 
     # Initialize Hydrogen Balance Expression
     # Expression for "baseline" H2 balance constraint
@@ -132,7 +132,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
     @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)    
+    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)
 
     ##### Power System related modules ############
     # Infrastructure
@@ -204,14 +204,14 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
         @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
         # Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-        @expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
+        @expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)
 
         # Infrastructure
         EP = h2_outputs(EP, inputs, setup)
 
         # Investment cost of various hydrogen generation sources
         EP = h2_investment(EP, inputs, setup)
-    
+
         if !isempty(inputs["H2_GEN"])
             #model H2 generation
             EP = h2_production(EP, inputs, setup)
@@ -315,7 +315,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         ###Hydrogen Liquid Balance constraints
         @constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
     end
-    
+
     ## Record pre-solver time
     presolver_time = time() - presolver_start_time
         #### Question - What do we do with this time now that we've split this function into 2?
