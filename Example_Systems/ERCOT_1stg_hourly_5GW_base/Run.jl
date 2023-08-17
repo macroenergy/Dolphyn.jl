@@ -22,7 +22,7 @@ settings_path = joinpath(pwd(), "Settings")
 #include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
 
 ### Set relevant directory paths
-src_path = "../../../src/"
+src_path = "../../src/"
 
 inpath = pwd()
 
