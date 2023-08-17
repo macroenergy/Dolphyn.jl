@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAttributes,modeloutput = nothing)
+    generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAttributes,modeloutput = nothing)
 
 This function sets up and solves a constrained optimization model of electricity system capacity expansion and operation problem and extracts solution variables for later processing.
 
@@ -27,19 +27,19 @@ The objective function of GenX minimizes total annual electricity system costs o
 
 ```math
 \begin{aligned}
-	&\sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Omega_{y,z})
-	+ (\pi^{FOM}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Delta^{total}_{y,z})\right) + \notag \\
-	&\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST,energy}_{y,z} \times    \Omega^{energy}_{y,z})
-	+ (\pi^{FOM,energy}_{y,z} \times  \Delta^{total,energy}_{y,z})\right) + \notag \\
-	&\sum_{y \in \mathcal{O}^{asym} } \sum_{z \in \mathcal{Z}}
-	\left( (\pi^{INVEST,charge}_{y,z} \times    \Omega^{charge}_{y,z})
-	+ (\pi^{FOM,charge}_{y,z} \times  \Delta^{total,charge}_{y,z})\right) + \notag \\
-	& \sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_t\times(\pi^{VOM}_{y,z} + \pi^{FUEL}_{y,z})\times \Theta_{y,z,t}\right) + \sum_{y \in \mathcal{O \cup DF} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_t\times\pi^{VOM,charge}_{y,z} \times \Pi_{y,z,t}\right) +\notag \\
-	&\sum_{s \in \mathcal{S} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_t \times n_{s}^{slope} \times \Lambda_{s,z,t}\right) + \sum_{t \in \mathcal{T} } \left(\omega_t \times \pi^{unmet}_{rsv} \times r^{unmet}_{t}\right) \notag \\
-	&\sum_{y \in \mathcal{H} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_t \times \pi^{START}_{y,z} \times \chi_{s,z,t}\right) + \notag \\
-	& \sum_{l \in \mathcal{L}}\left(\pi^{TCAP}_{l} \times \bigtriangleup\varphi^{max}_{l}\right)
+    &\sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}}
+    \left( (\pi^{INVEST}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Omega_{y,z})
+    + (\pi^{FOM}_{y,z} \times \overline{\Omega}^{size}_{y,z} \times  \Delta^{total}_{y,z})\right) + \notag \\
+    &\sum_{y \in \mathcal{O} } \sum_{z \in \mathcal{Z}}
+    \left( (\pi^{INVEST,energy}_{y,z} \times    \Omega^{energy}_{y,z})
+    + (\pi^{FOM,energy}_{y,z} \times  \Delta^{total,energy}_{y,z})\right) + \notag \\
+    &\sum_{y \in \mathcal{O}^{asym} } \sum_{z \in \mathcal{Z}}
+    \left( (\pi^{INVEST,charge}_{y,z} \times    \Omega^{charge}_{y,z})
+    + (\pi^{FOM,charge}_{y,z} \times  \Delta^{total,charge}_{y,z})\right) + \notag \\
+    & \sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_t\times(\pi^{VOM}_{y,z} + \pi^{FUEL}_{y,z})\times \Theta_{y,z,t}\right) + \sum_{y \in \mathcal{O \cup DF} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_t\times\pi^{VOM,charge}_{y,z} \times \Pi_{y,z,t}\right) +\notag \\
+    &\sum_{s \in \mathcal{S} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_t \times n_{s}^{slope} \times \Lambda_{s,z,t}\right) + \sum_{t \in \mathcal{T} } \left(\omega_t \times \pi^{unmet}_{rsv} \times r^{unmet}_{t}\right) \notag \\
+    &\sum_{y \in \mathcal{H} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_t \times \pi^{START}_{y,z} \times \chi_{s,z,t}\right) + \notag \\
+    & \sum_{l \in \mathcal{L}}\left(\pi^{TCAP}_{l} \times \bigtriangleup\varphi^{max}_{l}\right)
 \end{aligned}
 ```
 
@@ -68,10 +68,10 @@ The power balance constraint of the model ensures that electricity demand is met
 
 ```math
 \begin{aligned}
-	& \sum_{y\in \mathcal{H}}{\Theta_{y,z,t}} +\sum_{y\in \mathcal{VRE}}{\Theta_{y,z,t}} +\sum_{y\in \mathcal{MR}}{\Theta_{y,z,t}} + \sum_{y\in \mathcal{O}}{(\Theta_{y,z,t}-\Pi_{y,z,t})} + \notag\\
-	& \sum_{y\in \mathcal{DF}}{(-\Theta_{y,z,t}+\Pi_{y,z,t})} +\sum_{y\in \mathcal{W}}{\Theta_{y,z,t}}+ \notag\\
-	&+ \sum_{s\in \mathcal{S}}{\Lambda_{s,z,t}}  - \sum_{l\in \mathcal{L}}{(\varphi^{map}_{l,z} \times \Phi_{l,t})} -\frac{1}{2} \sum_{l\in \mathcal{L}}{(\varphi^{map}_{l,z} \times \beta_{l,t}(\cdot))} = D_{z,t}
-	\forall z\in \mathcal{Z},  t \in \mathcal{T}
+    & \sum_{y\in \mathcal{H}}{\Theta_{y,z,t}} +\sum_{y\in \mathcal{VRE}}{\Theta_{y,z,t}} +\sum_{y\in \mathcal{MR}}{\Theta_{y,z,t}} + \sum_{y\in \mathcal{O}}{(\Theta_{y,z,t}-\Pi_{y,z,t})} + \notag\\
+    & \sum_{y\in \mathcal{DF}}{(-\Theta_{y,z,t}+\Pi_{y,z,t})} +\sum_{y\in \mathcal{W}}{\Theta_{y,z,t}}+ \notag\\
+    &+ \sum_{s\in \mathcal{S}}{\Lambda_{s,z,t}}  - \sum_{l\in \mathcal{L}}{(\varphi^{map}_{l,z} \times \Phi_{l,t})} -\frac{1}{2} \sum_{l\in \mathcal{L}}{(\varphi^{map}_{l,z} \times \beta_{l,t}(\cdot))} = D_{z,t}
+    \forall z\in \mathcal{Z},  t \in \mathcal{T}
 \end{aligned}
 ```
 
@@ -89,212 +89,233 @@ The power balance constraint of the model ensures that electricity demand is met
 ################################################################################
 function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAttributes,modeloutput = nothing)
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
+    T = inputs["T"]     # Number of time steps (hours)
+    Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
 
-	## Start pre-solve timer
-	presolver_start_time = time()
+    ## Start pre-solve timer
+    presolver_start_time = time()
 
-	# Generate Energy Portfolio (EP) Model
-	EP = Model(OPTIMIZER)
+    # Generate Energy Portfolio (EP) Model
+    EP = Model(OPTIMIZER)
 
-	# Introduce dummy variable fixed to zero to ensure that expressions like eTotalCap,
-	# eTotalCapCharge, eTotalCapEnergy and eAvail_Trans_Cap all have a JuMP variable
-	@variable(EP, vZERO == 0);
+    # Introduce dummy variable fixed to zero to ensure that expressions like eTotalCap,
+    # eTotalCapCharge, eTotalCapEnergy and eAvail_Trans_Cap all have a JuMP variable
+    @variable(EP, vZERO == 0);
 
-	# Initialize Power Balance Expression
-	# Expression for "baseline" power balance constraint
-	@expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
+    # Initialize Power Balance Expression
+    # Expression for "baseline" power balance constraint
+    @expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
 
-	# Initialize Hydrogen Balance Expression
-	# Expression for "baseline" H2 balance constraint
-	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
+    # Initialize Hydrogen Balance Expression
+    # Expression for "baseline" H2 balance constraint
+    @expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
 
-	# Initialize Liquid Hydrogen Balance Expression
-	if setup["ModelH2Liquid"]==1
-		# Expression for "baseline" H2 liquid balance constraint
-		@expression(EP, eH2LiqBalance[t=1:T, z=1:Z], 0)
+    # Initialize Liquid Hydrogen Balance Expression
+    if setup["ModelH2Liquid"]==1
+        # Expression for "baseline" H2 liquid balance constraint
+        @expression(EP, eH2LiqBalance[t=1:T, z=1:Z], 0)
+    end
+
+    # Initialize Objective Function Expression
+    @expression(EP, eObj, 0)
+
+    # Power supply by z and timestep - used in emissions constraints
+    @expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
+    @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
+    @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
+    # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
+    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)    
+
+    ##### Power System related modules ############
+    # Infrastructure
+    discharge!(EP, inputs, setup)
+
+    non_served_energy!(EP, inputs, setup)
+
+    investment_discharge!(EP, inputs, setup)
+
+    if setup["UCommit"] > 0
+        ucommit!(EP, inputs, setup)
+    end
+
+    # Emissions of various power sector resources
+    emissions!(EP, inputs)
+
+    if setup["Reserves"] > 0
+        reserves!(EP, inputs, setup)
+    end
+
+    if Z > 1
+        transmission!(EP, inputs, setup)
+    end
+
+    # Technologies
+    # Model constraints, variables, expression related to dispatchable renewable resources
+
+    if !isempty(inputs["VRE"])
+        curtailable_variable_renewable!(EP, inputs, setup)
+    end
+
+    # Model constraints, variables, expression related to non-dispatchable renewable resources
+    if !isempty(inputs["MUST_RUN"])
+        must_run!(EP, inputs, setup)
+    end
+
+    # Model constraints, variables, expression related to energy storage modeling
+    if !isempty(inputs["STOR_ALL"])
+        storage!(EP, inputs, setup)
+    end
+
+    # Model constraints, variables, expression related to reservoir hydropower resources
+    if !isempty(inputs["HYDRO_RES"])
+        hydro_res!(EP, inputs, setup)
+    end
+
+    # Model constraints, variables, expression related to reservoir hydropower resources with long duration storage
+    if setup["OperationWrapping"] == 1 && !isempty(inputs["STOR_HYDRO_LONG_DURATION"])
+        hydro_inter_period_linkage!(EP, inputs)
+    end
+
+    # Model constraints, variables, expression related to demand flexibility resources
+    if !isempty(inputs["FLEX"])
+        flexible_demand!(EP, inputs, setup)
+    end
+    # Model constraints, variables, expression related to thermal resource technologies
+    if !isempty(inputs["THERM_ALL"])
+        thermal!(EP, inputs, setup)
+    end
+
+    # Model constraints, variables, expression related to retrofit technologies
+    if !isempty(inputs["RETRO"])
+        EP = retrofit(EP, inputs)
+    end
+
+    ###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
+    if setup["ModelH2"] == 1
+        @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
+        @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
+        @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
+        # Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
+
+        # Infrastructure
+        EP = h2_outputs(EP, inputs, setup)
+
+        # Investment cost of various hydrogen generation sources
+        EP = h2_investment(EP, inputs, setup)
+    
+        if !isempty(inputs["H2_GEN"])
+            #model H2 generation
+            EP = h2_production(EP, inputs, setup)
+        end
+
+        # Direct emissions of various hydrogen sector resources
+        EP = emissions_hsc(EP, inputs,setup)
+
+        # Model H2 non-served
+        EP = h2_non_served(EP, inputs,setup)
+
+        # Model hydrogen storage technologies
+        if !isempty(inputs["H2_STOR_ALL"])
+            EP = h2_storage(EP,inputs,setup)
+        end
+
+        if !isempty(inputs["H2_FLEX"])
+            #model H2 flexible demand resources
+            EP = h2_flexible_demand(EP, inputs, setup)
+        end
+
+        if setup["ModelH2Pipelines"] == 1
+            # model hydrogen transmission via pipelines
+            EP = h2_pipeline(EP, inputs, setup)
+        end
+
+        if setup["ModelH2Trucks"] == 1
+            # model hydrogen transmission via trucks
+            EP = h2_truck(EP, inputs, setup)
+        end
+
+        if setup["ModelH2G2P"] == 1
+            #model H2 Gas to Power
+            EP = h2_g2p(EP, inputs, setup)
+        else
+            # Quick fix to ensure that the H2_G2P variable is defined even if the function is not run
+            # FIX ME: This needs to be handled better in co2_cap_hsc and co2_cap_power_hsc
+            @expression(EP, eH2DemandByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
+                0.0
+            )
+        end
+
+        EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
+    end
+
+
+    ################  Policies #####################3
+    # CO2 emissions limits for the power sector only
+    if setup["ModelH2"] ==0
+        co2_cap!(EP, inputs, setup)
+    elseif setup["ModelH2"]==1
+        EP = co2_cap_power_hsc(EP, inputs, setup)
+    end
+
+    # Endogenous Retirements
+    if setup["MultiStage"] > 0
+        endogenous_retirement!(EP, inputs, setup)
+    end
+
+    # Energy Share Requirement - hourly modeling
+	if setup["EnergyShareRequirement"] >= 1
+		energy_share_requirement(EP, inputs, setup)
+		dfGen = inputs["dfGen"]
+		@constraint(EP, cESRBatCharge[ESR=1:inputs["nESR"], t=1:T], 
+					sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["STOR_ALL"])) <= 
+					sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*inputs["pP_Max"][y,t]*EP[:eTotalCap][y] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["VRE"])))
 	end
 
-	# Initialize Objective Function Expression
-	@expression(EP, eObj, 0)
+    #Capacity Reserve Margin
+    if setup["CapacityReserveMargin"] > 0
+        cap_reserve_margin!(EP, inputs, setup)
+    end
 
-	# Power supply by z and timestep - used in emissions constraints
-	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)	
+    if (setup["MinCapReq"] == 1)
+        minimum_capacity_requirement!(EP, inputs, setup)
+    end
 
-	##### Power System related modules ############
-	EP = discharge(EP, inputs)
-
-	EP = non_served_energy(EP, inputs)
-
-	EP = investment_discharge(EP, inputs)
-
-	if setup["UCommit"] > 0
-		EP = ucommit(EP, inputs, setup["UCommit"])
-	end
-
-	# Emissions of various power sector resources
-	EP = emissions_power(EP, inputs,setup)
-
-	if setup["Reserves"] > 0
-		EP = reserves(EP, inputs, setup["UCommit"])
-	end
-
-	if Z > 1
-		EP = transmission(EP, inputs, setup["UCommit"], setup["NetworkExpansion"])
-	end
-
-	# Technologies
-	# Model constraints, variables, expression related to dispatchable renewable resources
-
-	if !isempty(inputs["VRE"])
-		EP = curtailable_variable_renewable(EP, inputs, setup["Reserves"])
-	end
-
-	# Model constraints, variables, expression related to non-dispatchable renewable resources
-	if !isempty(inputs["MUST_RUN"])
-		EP = must_run(EP, inputs)
-	end
+    if (setup["MaxCapReq"] == 1)
+        EP = maximum_capacity_requirement(EP, inputs)
+    end
 
 
-	# Model constraints, variables, expression related to energy storage modeling
-	if !isempty(inputs["STOR_ALL"])
-		EP = storage(EP, inputs, setup["Reserves"], setup["OperationWrapping"])
-	end
+    ## Define the objective function
+    @objective(EP,Min,EP[:eObj])
 
-	# Model constraints, variables, expression related to reservoir hydropower resources
-	if !isempty(inputs["HYDRO_RES"])
-		EP = hydro_res(EP, inputs, setup["Reserves"])
-	end
+    ## Power balance constraints
+    # demand = generation + storage discharge - storage charge - demand deferral + deferred demand satisfaction - demand curtailment (NSE)
+    #          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
+    @constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
 
-	# Model constraints, variables, expression related to reservoir hydropower resources with long duration storage
-	if setup["OperationWrapping"] == 1 && !isempty(inputs["STOR_HYDRO_LONG_DURATION"])
-		EP = hydro_inter_period_linkage(EP, inputs)
-	end
+    if setup["ModelH2"] == 1
+        ###Hydrogen Balance constraints
+        @constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+    end
 
-	# Model constraints, variables, expression related to demand flexibility resources
-	if !isempty(inputs["FLEX"])
-		EP = flexible_demand(EP, inputs)
-	end
-	# Model constraints, variables, expression related to thermal resource technologies
-	if !isempty(inputs["THERM_ALL"])
-		EP = thermal(EP, inputs, setup["UCommit"], setup["Reserves"])
-	end
-
-	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
-	if setup["ModelH2"] == 1
-
-		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
-
-		# Infrastructure
-		EP = h2_outputs(EP, inputs, setup)
-
-		# Investment cost of various hydrogen generation sources
-		EP = h2_investment(EP, inputs, setup)
-	
-		if !isempty(inputs["H2_GEN"])
-			#model H2 generation
-			EP = h2_production(EP, inputs, setup)
-		end
-
-		# Direct emissions of various hydrogen sector resources
-		EP = emissions_hsc(EP, inputs,setup)
-
-		# Model H2 non-served
-		EP = h2_non_served(EP, inputs,setup)
-
-		# Model hydrogen storage technologies
-		if !isempty(inputs["H2_STOR_ALL"])
-			EP = h2_storage(EP,inputs,setup)
-		end
-
-		if !isempty(inputs["H2_FLEX"])
-			#model H2 flexible demand resources
-			EP = h2_flexible_demand(EP, inputs, setup)
-		end
-
-		if setup["ModelH2Pipelines"] == 1
-			# model hydrogen transmission via pipelines
-			EP = h2_pipeline(EP, inputs, setup)
-		end
-
-		if setup["ModelH2Trucks"] == 1
-			# model hydrogen transmission via trucks
-			EP = h2_truck(EP, inputs, setup)
-		end
-
-		if setup["ModelH2G2P"] == 1
-			#model H2 Gas to Power
-			EP = h2_g2p(EP, inputs, setup)
-		end
-
-		# Modeling Time matching requirement for electricity use for hydrogen production
-		if setup["TimeMatchingRequirement"] > 0
-			EP = time_matching_requirement(EP, inputs, setup)
-		end
-
-	end
-
-
-	################  Policies #####################3
-	# CO2 emissions limits for the power sector only
-	if setup["ModelH2"] ==0
-		EP = co2_cap_power(EP, inputs, setup)
-	elseif setup["ModelH2"]==1
-		EP = co2_cap_power_hsc(EP, inputs, setup)
-	end
-
-
-	# Energy Share Requirement
-	if setup["EnergyShareRequirement"] == 1
-		EP = energy_share_requirement(EP, inputs, setup)
-	end
-		
-	#Capacity Reserve Margin
-	if setup["CapacityReserveMargin"] > 0
-		EP = cap_reserve_margin(EP, inputs, setup)
-	end
-
-	if (setup["MinCapReq"] == 1)
-		EP = minimum_capacity_requirement(EP, inputs)
-	end
-
-	if (setup["MaxCapReq"] == 1)
-		EP = maximum_capacity_requirement(EP, inputs)
-	end
-
-
-	## Define the objective function
-	@objective(EP,Min,EP[:eObj])
-
-	## Power balance constraints
-	# demand = generation + storage discharge - storage charge - demand deferral + deferred demand satisfaction - demand curtailment (NSE)
-	#          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
-	@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
-
-	if setup["ModelH2"] == 1
-		###Hydrogen Balance constraints
-		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
-	end
-
-	if setup["ModelH2Liquid"] == 1
-		###Hydrogen Liquid Balance constraints
-		@constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
-	end
-	
-	## Record pre-solver time
-	presolver_time = time() - presolver_start_time
-    	#### Question - What do we do with this time now that we've split this function into 2?
-	if setup["PrintModel"] == 1
-		if modeloutput === nothing
-			filepath = joinpath(pwd(), "YourModel.lp")
-			JuMP.write_to_file(EP, filepath)
-		else
-			filepath = joinpath(modeloutput, "YourModel.lp")
-			JuMP.write_to_file(EP, filepath)
-		end
-		print_and_log("Model Printed")
+    if setup["ModelH2Liquid"] == 1
+        ###Hydrogen Liquid Balance constraints
+        @constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
+    end
+    
+    ## Record pre-solver time
+    presolver_time = time() - presolver_start_time
+        #### Question - What do we do with this time now that we've split this function into 2?
+    if setup["PrintModel"] == 1
+        if modeloutput === nothing
+            filepath = joinpath(pwd(), "YourModel.lp")
+            JuMP.write_to_file(EP, filepath)
+        else
+            filepath = joinpath(modeloutput, "YourModel.lp")
+            JuMP.write_to_file(EP, filepath)
+        end
+        print_and_log("Model Printed")
     end
 
     return EP
