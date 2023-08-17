@@ -37,10 +37,10 @@ function maximum_capacity_requirement(EP::Model, inputs::Dict)
 
 	dfGen = inputs["dfGen"]
 	NumberOfMaxCapReqs = inputs["NumberOfMaxCapReqs"]
-	@constraint(EP, cZoneMinCapReq[mincap = 1:NumberOfMaxCapReqs],
+	@constraint(EP, cZoneMinCapReq[maxcap = 1:NumberOfMaxCapReqs],
 	sum(EP[:eTotalCap][y]
-	for y in dfGen[(dfGen[!,Symbol("MaxCapTag_$mincap")].== 1) ,:][!,:R_ID])
-	<= inputs["MaxCapReq"][mincap])
+	for y in dfGen[(dfGen[!,Symbol("MaxCapTag_$maxcap")].== 1) ,:][!,:R_ID])
+	<= inputs["MaxCapReq"][maxcap])
 
 	return EP
 end

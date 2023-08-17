@@ -229,6 +229,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_g2p(EP, inputs, setup)
 		end
 
+		# Modeling Time matching requirement for electricity use for hydrogen production
+		if setup["TimeMatchingRequirement"] > 0
+			EP = time_matching_requirement(EP, inputs, setup)
+		end
 
 	end
 
@@ -242,15 +246,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
 
-	# Energy Share Requirement - hourly modeling
-	if setup["EnergyShareRequirement"] >= 1
+	# Energy Share Requirement
+	if setup["EnergyShareRequirement"] == 1
 		EP = energy_share_requirement(EP, inputs, setup)
-		dfGen = inputs["dfGen"]
-		@constraint(EP, cESRBatCharge[ESR=1:inputs["nESR"], t=1:T], 
-					sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["STOR_ALL"])) <= 
-					sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*inputs["pP_Max"][y,t]*EP[:eTotalCap][y] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["VRE"])))
 	end
-
+		
 	#Capacity Reserve Margin
 	if setup["CapacityReserveMargin"] > 0
 		EP = cap_reserve_margin(EP, inputs, setup)

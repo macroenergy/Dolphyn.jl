@@ -74,6 +74,11 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
         write_h2_truck_flow(path, sep, inputs, setup, EP)
     end
 
+
+    if setup["TimeMatchingRequirement"] >0
+        write_h2_tmr_prices(path, sep, inputs, setup, EP)      
+    end
+
     ## Print confirmation
     print_and_log("Wrote outputs HSC outputs to $path$sep")
 

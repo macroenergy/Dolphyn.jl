@@ -153,6 +153,11 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k]* inputs["pH2_Max"][k,t]
 	end)
 
+	@constraints(EP, begin
+	# Minimum power generated per technology "k" at hour "t"
+	[k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= EP[:eH2GenTotalCap][k]*dfH2Gen[!,:H2Gen_min_output][k]
+	end)
+
 	#Ramping cosntraints 
 	@constraints(EP, begin
 

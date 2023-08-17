@@ -29,17 +29,10 @@ function load_energy_share_requirement(setup::Dict, path::AbstractString, sep::A
 	first_col = findall(s -> s == "ESR_1", names(inputs_ESR["dfESR"]))[1]
 	last_col = findall(s -> s == "ESR_$ESR", names(inputs_ESR["dfESR"]))[1]
 
-	# Number of time steps (periods)
-	inputs_ESR["T"] = size(collect(skipmissing(inputs_ESR["dfESR"][!,:Time_Index])),1)
-	## Set indices for internal use
-	T = inputs_ESR["T"]   # Total number of time steps (hours)
-
-	inputs_ESR["dfESR"] = Matrix{Float64}(inputs_ESR["dfESR"][1:inputs_ESR["T"],first_col:last_col])
-
-	#println(inputs_ESR["dfESR"])
-	
+	inputs_ESR["dfESR"] = Matrix{Float64}(inputs_ESR["dfESR"][:,first_col:last_col])
 	inputs_ESR["nESR"] = ESR
 
 	print_and_log("Energy_share_requirement.csv Successfully Read!")
 	return inputs_ESR
 end
+

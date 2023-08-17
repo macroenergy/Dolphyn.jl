@@ -41,50 +41,71 @@ This term is included in the constraint if the setup parameter ```StorageLosses=
 In practice, most existing renewable portfolio standard policies do not account for storage losses when determining energy share requirements.
 However, with 100% RPS or CES policies enacted in several jurisdictions, policy makers may wish to include storage losses in the minimum energy share, as otherwise there will be a difference between total generation and total load that will permit continued use of non-qualifying resources (e.g. emitting generators).
 """
-function energy_share_requirement(EP::Model, inputs::Dict, setup::Dict)
+function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
-	print_and_log("Energy Share Requirement Policies Module")
+	print_and_log("Electricity Time Matching Requirement for H2 Production Module")
 
-	dfGen = inputs["dfGen"]
+	dfGen = inputs["dfGen"] # Power sector inputs
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	#H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
+	H2_GEN = inputs["H2_GEN"]
+	dfH2Gen = inputs["dfH2Gen"]
+
+	# Identify number of time matching requirements
+	nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))
+
+
+	# Export expression regarding excess electricity generation from contracted VRE resources over the entire year that can be used for meeting RPS requirements
+
+	# Hourly excess electricity supply from contracted electricity resources for H2 production
+	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
+	sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
+	- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
+	-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
+	)
+
+	# Annual excess electricity supply from contracted electricity resources for H2 production
+	@expression(EP, eExcessAnnualElectricitySupplyTMR[TMR=1:nH2_TMR], sum(eExcessElectricitySupplyTMR[TMR,t]*inputs["omega"][t] for t = 1:T))
+
+
 
 	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
-	# if setup["EnergyShareRequirement"] == 1
-	# 	#z=findall(x->x>0,inputs["dfESR"][:,ESR])
-	# 	@constraint(EP, cESRShare[ESR=1:inputs["nESR"], t=1:T], 
-	# 					(sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID]) 
-	# 					- sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["STOR_ALL"])))
-	# 					>= sum(inputs["omega"][t]*EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in H2_GEN))
-	# 					# >= inputs["dfESR"][t,ESR]*inputs["omega"][t]*inputs["pD"][t,z])
-	# 					# + sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
-	# end
+	if setup["TimeMatchingRequirement"] == 1 # hourly with excess sales allowed
+	
+		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t]>=0 )
+		# @constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], 
+		# 				sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
+		# 				- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
+		# 				>= sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID])))
 
-	# Energy share requirement constraint
-	# Annual energy generated from non contracted ESR eligible resources 
-	# + Annual excess electricity generated from contracted ESR eligible resources 
-	# >= Share of exogeneous annual electricity demand that needs to be met with ESR resource 
-	# + Losses associated with use of battery storage in conjunction with ESR resources
+	# Storage resources used for time matching can only charge during periods when other contracted VRE resources are generating						
+		@constraint(EP, cESRBatCharge[TMR=1:nH2_TMR, t=1:T], 
+					sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"])) 
+					<= sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*inputs["pP_Max"][y,t]*EP[:eTotalCap][y] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["VRE"])))
+				
 
-	if setup["EnergyShareRequirement"] == 1
-		if setup["TimeMatchingRequirement"] >0
+	elseif setup["TimeMatchingRequirement"] == 2 # hourly without excess sales 
+		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t] ==0 )			
+		# @constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], 
+		# 				sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
+		# 				- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
+		# 				== sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID])))
 
-			# Identify number of time matching requirements for H2 production using electricity
-			nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))
+	# Storage resources used for time matching can only charge during periods when other contracted VRE resources are generating						
+		@constraint(EP, cESRBatCharge[TMR=1:nH2_TMR, t=1:T], 
+				sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
+				<= sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*inputs["pP_Max"][y,t]*EP[:eTotalCap][y] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["VRE"])))
 
-			@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], t=1:T)
-									+ sum(EP[:eExcessAnnualElectricitySupplyTMR][TMR] for TMR = 1:nH2_TMR)
-									>= sum(inputs["dfESR"][:,ESR][z]*inputs["omega"][t]*inputs["pD"][t,z] for t=1:T, z=findall(x->x>0,inputs["dfESR"][:,ESR]))
-									+sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
-
-		else
-			@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], t=1:T)
-			>= sum(inputs["dfESR"][:,ESR][z]*inputs["omega"][t]*inputs["pD"][t,z] for t=1:T, z=findall(x->x>0,inputs["dfESR"][:,ESR]))
-			+sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
-
-		end
+	elseif setup["TimeMatchingRequirement"] == 3 # annual matching 
+		# Annual excess electricity supply from contracted electricity resources for H2 production
+		@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR], eExcessAnnualElectricitySupplyTMR[TMR] ==0 )	
+		
+		# @constraint(EP, cH2TMR[TMR=1:nH2_TMR], 
+		# 				sum(inputs["omega"][t]*dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], t=1:T) 
+		# 				- sum(inputs["omega"][t]*dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]), t=1:T)
+		# 				== sum(inputs["omega"][t]*EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID])),t=1:T)
 
 	end
 

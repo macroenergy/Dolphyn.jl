@@ -99,6 +99,8 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "SystemCO2Constraint", 0)                
     #ModelH2Liquid: 0 # Whether to model liquid demand and production - 0 - not included, 1 - included
     set_default_if_absent!(settings, "ModelH2Liquid", 0)                
+    #TimeMatchingRequirement: 0 # Modeling time matching requiremnet for electricity based H2 production - 0 - not included, 1 - hourly with excess sales, 2- hourly without excess sales, 3 - annual 
+    set_default_if_absent!(settings, "TimeMatchingRequirement", 0)                
 
 return settings
 end
