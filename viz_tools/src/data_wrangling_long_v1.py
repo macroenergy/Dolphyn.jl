@@ -211,6 +211,143 @@ def capacity_w_H2G2p_analysis(run):
 # NEED TO DO FOR H2 NOW
 
 
+def capacity_w_H2G2p_analysis(run):
+    df = open_results_file('capacity_w_H2G2P.csv', run)
+    #drop total row
+    df = df[df['Resource'] != 'Total']
+
+    df = identify_tech_type(df)
+    
+    #breakpoint()
+    
+    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
+    df = df[variables_of_interest]
+
+    # Capacity
+    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['EndCap', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
+        'EndCap': 'electricity_capacity_MW',
+        'AnnualGeneration': 'electricity_generation_MWh'
+    })
+    
+    
+    # Annual Generation
+    
+    # Capacity
+    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['AnnualGeneration', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
+        'EndCap': 'electricity_capacity_MW',
+        'AnnualGeneration': 'electricity_generation_MWh'
+    })
+    
+    
+    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
+    
+    
+    return(melted_df)
+
+
+
+
+def electricity_analysis(run):
+    df = open_results_file('capacity_w_H2G2P.csv', run)
+    #drop total row
+    df = df[df['Resource'] != 'Total']
+
+    df = identify_tech_type(df)
+    
+    #breakpoint()
+    
+    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
+    df = df[variables_of_interest]
+
+    # Capacity
+    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['EndCap', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
+        'EndCap': 'electricity_capacity_MW',
+        'AnnualGeneration': 'electricity_generation_MWh'
+    })
+    
+    
+    # Annual Generation
+    
+    # Capacity
+    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['AnnualGeneration', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
+        'EndCap': 'electricity_capacity_MW',
+        'AnnualGeneration': 'electricity_generation_MWh'
+    })
+    
+    
+    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
+    
+    
+    return(melted_df)
+
+
+
+def h2_analysis(run):
+    df = open_results_file('HSC_generation_storage_capacity.csv', run)
+    #drop total row
+    df = df[df['Resource'] != 'Total']
+
+    df = identify_tech_type(df)
+    
+    #breakpoint()
+    
+    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
+    df = df[variables_of_interest]
+
+    # Capacity
+    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['EndCap', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
+        'EndCap': 'h2_capacity_MW',
+        'AnnualGeneration': 'h2_generation_MWh'
+    })
+    
+    
+    # Annual Generation
+    
+    # Capacity
+    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['AnnualGeneration', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
+        'EndCap': 'h2capacity_MW',
+        'AnnualGeneration': 'h2_generation_MWh'
+    })
+    
+    
+    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
+    
+    
+    return(melted_df)
+
+
+
+
 
 def main():
     runs_list = list_directories(runs_directory_path)
@@ -218,9 +355,12 @@ def main():
     dfs = []  # A list to store individual DataFrames
     
     for run in runs_list:  
-        df_elec = capacity_w_H2G2p_analysis(run)
+        df_elec = electricity_analysis(run)
         df_elec['Run'] = run
-        dfs.append(df_elec)  # Append individual DataFrame to the list
+        dfs.append(df_elec)
+        df_h2 = h2_analysis(run)
+        df_h2['Run'] = run
+        dfs.append(df_h2)  # Append individual DataFrame to the list
         
     df = pd.concat(dfs)  # Concatenate all DataFrames in the list
     
