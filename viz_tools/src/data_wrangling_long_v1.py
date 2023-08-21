@@ -12,11 +12,21 @@ import os
 import matplotlib.pyplot as plt
 
 
-print(os.getcwd())
+# Get the directory of the script, which should be 'src'
+script_directory = os.path.dirname(os.path.abspath(__file__))
 
-runs_directory_path = '../example_viz/Runs'
+# Navigate one directory up to the 'viz_tools'
+viz_tools_directory = os.path.dirname(script_directory)
 
+# Now, navigate to 'Run'
+runs_directory_path = os.path.join(viz_tools_directory, 'runs')
 
+# Check if the directory exists and change to it
+if os.path.exists(runs_directory_path ):
+    os.chdir(runs_directory_path )
+    print(f"Changed directory to: {runs_directory_path }")
+else:
+    print("Run directory not found!")
 
 def list_directories(path):
     # Get all the entries in the directory
@@ -179,11 +189,27 @@ def capacity_w_H2G2p_analysis(run):
     return(melted_df)
 
 
-
 # NEED TO DO FOR H2 NOW
 
 
-# NEED TO DO THROUGH MULTIPLE RUNS
+
+def main():
+
+    runs_list = list_directories(runs_directory_path)
+    
+    df = pd.DataFrame()
+    
+    for run in runs_list:  
+        df_elec = capacity_w_H2G2p_analysis(run)
+        df_elec['Run'] = run
+        df = pd.concat(df_elec)
+        
+    return(df)
+
+main()
+
+
+
 
 
 
