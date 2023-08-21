@@ -13,10 +13,10 @@ import matplotlib.pyplot as plt
 
 
 # Get the directory of the script, which should be 'src'
-script_directory = os.path.dirname(os.path.abspath(__file__))
+current_directory = os.getcwd()
 
 # Navigate one directory up to the 'viz_tools'
-viz_tools_directory = os.path.dirname(script_directory)
+viz_tools_directory = os.path.dirname(current_directory)
 
 # Now, navigate to 'Run'
 runs_directory_path = os.path.join(viz_tools_directory, 'runs')
@@ -176,15 +176,34 @@ def capacity_w_H2G2p_analysis(run):
     variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
     df = df[variables_of_interest]
 
-    melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+    # Capacity
+    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
                        value_vars=['EndCap', 'Resource'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
-    melted_df['Type'] = melted_df['Type'].replace({
+    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
         'EndCap': 'electricity_capacity_MW',
         'AnnualGeneration': 'electricity_generation_MWh'
     })
+    
+    
+    # Annual Generation
+    
+    # Capacity
+    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+                       value_vars=['AnnualGeneration', 'Resource'], 
+                       var_name='Type', value_name='Value')
+
+    # Replace 'Type' values based on condition
+    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
+        'EndCap': 'electricity_capacity_MW',
+        'AnnualGeneration': 'electricity_generation_MWh'
+    })
+    
+    
+    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
+    
     
     return(melted_df)
 
@@ -194,19 +213,20 @@ def capacity_w_H2G2p_analysis(run):
 
 
 def main():
-
     runs_list = list_directories(runs_directory_path)
     
-    df = pd.DataFrame()
+    dfs = []  # A list to store individual DataFrames
     
     for run in runs_list:  
         df_elec = capacity_w_H2G2p_analysis(run)
         df_elec['Run'] = run
-        df = pd.concat(df_elec)
+        dfs.append(df_elec)  # Append individual DataFrame to the list
         
+    df = pd.concat(dfs)  # Concatenate all DataFrames in the list
+    
     return(df)
 
-main()
+df = main()
 
 
 
