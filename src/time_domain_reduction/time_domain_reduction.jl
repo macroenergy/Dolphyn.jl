@@ -82,7 +82,7 @@ using DataFrames
 using StatsBase
 using Clustering
 using Distances
-using Documenter
+# using Documenter # https://github.com/macroenergy/DOLPHYN/wiki/Installing-and-running-DOLPHYN: Open src/time_domain_reduction/time_domain_reduction.jl and src/DOLPHYN.jl in your local device’s DOLPHYN folder; delete/comment the following line in both files:
 using CSV
 
 
