@@ -51,20 +51,9 @@ function energy_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 	Z = inputs["Z"]     # Number of zones
 	#H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
 
-	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
-	# if setup["EnergyShareRequirement"] == 1
-	# 	#z=findall(x->x>0,inputs["dfESR"][:,ESR])
-	# 	@constraint(EP, cESRShare[ESR=1:inputs["nESR"], t=1:T], 
-	# 					(sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID]) 
-	# 					- sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], inputs["STOR_ALL"])))
-	# 					>= sum(inputs["omega"][t]*EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in H2_GEN))
-	# 					# >= inputs["dfESR"][t,ESR]*inputs["omega"][t]*inputs["pD"][t,z])
-	# 					# + sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
-	# end
-
 	# Energy share requirement constraint
 	# Annual energy generated from non contracted ESR eligible resources 
-	# + Annual excess electricity generated from contracted ESR eligible resources 
+	# + Annual excess electricity generated from contracted ESR eligible resources (if TMRSalestoESR =1)
 	# >= Share of exogeneous annual electricity demand that needs to be met with ESR resource 
 	# + Losses associated with use of battery storage in conjunction with ESR resources
 
@@ -75,7 +64,7 @@ function energy_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 			nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))
 
 			@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], sum(inputs["omega"][t]*dfGen[!,Symbol("ESR_$ESR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], t=1:T)
-									+ sum(EP[:eExcessAnnualElectricitySupplyTMR][TMR] for TMR = 1:nH2_TMR)
+									+ setup["TMRSalestoESR"]*sum(EP[:eExcessAnnualElectricitySupplyTMR][TMR] for TMR = 1:nH2_TMR)
 									>= sum(inputs["dfESR"][:,ESR][z]*inputs["omega"][t]*inputs["pD"][t,z] for t=1:T, z=findall(x->x>0,inputs["dfESR"][:,ESR]))
 									+sum(inputs["dfESR"][:,ESR][z]*setup["StorageLosses"]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],inputs["STOR_ALL"])) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
 
