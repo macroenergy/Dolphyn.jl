@@ -153,7 +153,6 @@ def identify_tech_type(df, bin_type, resources='', aggregate=True, dont_aggregat
     return df
 
     
-    
 '''
 def zone_ID(run, file_name='HSC_h2_generation_discharge.csv'):
     df = open_results_file(run=run, file_name='HSC_h2_generation_discharge.csv')
@@ -283,34 +282,16 @@ def electricity_analysis(run):
     df = df[variables_of_interest]
 
     # Capacity
-    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+    melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
                        value_vars=['EndCap', 'AnnualGeneration'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
-    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
+    melted_df['Type'] = melted_df['Type'].replace({
         'EndCap': 'electricity_capacity_MW',
         'AnnualGeneration': 'electricity_generation_MWh'
     })
-    
-    
-    # Annual Generation
-    
-    # Capacity
-    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['AnnualGeneration', 'EndCap'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
-        'EndCap': 'electricity_capacity_MW',
-        'AnnualGeneration': 'electricity_generation_MWh'
-    })
-    
-    
-    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
-    
-    
+      
     return(melted_df)
 
 
@@ -328,33 +309,15 @@ def h2_analysis(run):
     df = df[variables_of_interest]
 
     # Capacity
-    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
+    melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
                        value_vars=['EndCap', 'AnnualGeneration'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
-    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
+    melted_df['Type'] = melted_df['Type'].replace({
         'EndCap': 'h2_capacity_tonne_hr',
         'AnnualGeneration': 'h2_generation_tonne'
     })
-    
-    
-    # Annual Generation
-    
-    # Capacity
-    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['AnnualGeneration', 'EndCap'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
-        'EndCap': 'h2capacity_MW',
-        'AnnualGeneration': 'h2_generation_MWh'
-    })
-    
-    
-    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
-    
     
     return(melted_df)
 
