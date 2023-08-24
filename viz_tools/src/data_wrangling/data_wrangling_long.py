@@ -6,7 +6,6 @@ Created on Wed Aug 16 14:16:47 2023
 @author: lesarmstrong
 """
 
-import numpy as np
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
@@ -38,7 +37,6 @@ def list_directories(path):
     return directories
 
 
-
 def save_and_show_plot(fig, filename, directory='plots_folder'):
     # Make sure the directory exists, if not, create it
     os.makedirs(directory, exist_ok=True)
@@ -65,7 +63,7 @@ def latest_result_finder(path):
     return(path)
     
 def open_results_file(file_name, run):
-    run = runs_directory_path + '/' + run
+    #run = runs_directory_path + '/' + run
     path = latest_result_finder(run)
     if file_name.startswith('HSC'):
         path = path + 'Results_HSC/'
@@ -83,21 +81,30 @@ def open_inputs_file(file_name, run):
 
 
 # Dictionary to map patterns to energy types
-energy_bins = {
-    'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'OCGT', 'CCGT'],
+elec_bins = {
+    'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'ocgt', 'ccgt'],
     'natural_gas_w_CCS': ['natural_gas_ccs'],
-    'hydroelectric': ['hydro', 'hydroelectric'],  # added 'hydroelectric' to the list for better matching
+    'hydroelectric': ['hydro', 'hydroelectric', 'ror'],  # added 'hydroelectric' to the list for better matching
     'coal': ['coal'],
     'solar': ['solar', 'pv'],
     'wind': ['wind'],
     'nuclear': ['nuclear'],
     'battery': ['battery', 'lithium', 'storage'],
+    'phs' : ['phs', "pumped"],
+    'oil' : ['oil'],
+    'biomass' : ["biomass"],
     'H2': ['H2']
 }
 
+h2_bins = {
+    'smr': ['smr'],
+    'atr': ['atr'],
+    'elecrolyzer': ['electrolyzer'],  # added 'hydroelectric' to the list for better matching
+    'h2_storage': ['storage']}
+
 
 # Function to categorize energy types based on patterns in a resource name.
-def categorize_energy_type(resource_name):
+def categorize_energy_type(resource_name, bin_type):
     # Convert the resource name to lowercase to ensure case-insensitive matching.
     resource_name = resource_name.lower()
     
@@ -105,29 +112,37 @@ def categorize_energy_type(resource_name):
     if 'h2' in resource_name:
         return 'H2'
 
+    if bin_type == "elec":
+        cat_bins = elec_bins
+    elif bin_type == "h2":
+        cat_bins = h2_bins
+    else:
+        TypeError("bin_type invalid")
+        
+
     # Iterate through each energy bin and its associated patterns.
-    for energy_bin, patterns in energy_bins.items():
+    for cat_bin, patterns in cat_bins.items():
         for pattern in patterns:
             # Check if the current pattern exists in the resource name.
             if pattern in resource_name:
                 # Special handling for natural gas with CCS:
                 # If the energy bin is "natural_gas" and "ccs" is also in the resource name,
                 # then it's categorized as "natural_gas_w_CCS".
-                if energy_bin in energy_bins.items() and "ccs" in resource_name:
-                    return "natural_gas_w_CCS"
+                if cat_bin in resource_name and "ccs" in resource_name:
+                    return cat_bin + "_ccs"
                 
                 # Return the identified energy bin.
-                return energy_bin
+                return cat_bin
         
     # If no patterns matched, return the original resource_name
     return resource_name
 
 
 
-def identify_tech_type(df, resources='', aggregate=True, dont_aggregate=''):
-    # Bin Energy Groups
+def identify_tech_type(df, bin_type, resources='', aggregate=True, dont_aggregate=''):
     
-    df['Resource'] = df['Resource'].apply(categorize_energy_type)
+    # Bin Energy Groups
+    df['Resource'] = df['Resource'].apply(categorize_energy_type, args = (bin_type,))
 
     if aggregate == True:
         # Aggregate columns based on both Zone and the identified technology types
@@ -255,14 +270,12 @@ def capacity_w_H2G2p_analysis(run):
     return(melted_df)
 
 
-
-
 def electricity_analysis(run):
-    df = open_results_file('capacity_w_H2G2P.csv', run)
+    df = open_results_file('capacity.csv', run)
     #drop total row
     df = df[df['Resource'] != 'Total']
 
-    df = identify_tech_type(df)
+    df = identify_tech_type(df, bin_type = "elec")
     
     #breakpoint()
     
@@ -271,7 +284,7 @@ def electricity_analysis(run):
 
     # Capacity
     melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'Resource'], 
+                       value_vars=['EndCap', 'AnnualGeneration'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
@@ -285,7 +298,7 @@ def electricity_analysis(run):
     
     # Capacity
     melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['AnnualGeneration', 'Resource'], 
+                       value_vars=['AnnualGeneration', 'EndCap'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
@@ -307,7 +320,7 @@ def h2_analysis(run):
     #drop total row
     df = df[df['Resource'] != 'Total']
 
-    df = identify_tech_type(df)
+    df = identify_tech_type(df, "h2")
     
     #breakpoint()
     
@@ -316,13 +329,13 @@ def h2_analysis(run):
 
     # Capacity
     melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'Resource'], 
+                       value_vars=['EndCap', 'AnnualGeneration'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
     melted_cap_df['Type'] = melted_cap_df['Type'].replace({
-        'EndCap': 'h2_capacity_MW',
-        'AnnualGeneration': 'h2_generation_MWh'
+        'EndCap': 'h2_capacity_tonne_hr',
+        'AnnualGeneration': 'h2_generation_tonne'
     })
     
     
@@ -330,7 +343,7 @@ def h2_analysis(run):
     
     # Capacity
     melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['AnnualGeneration', 'Resource'], 
+                       value_vars=['AnnualGeneration', 'EndCap'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
@@ -345,10 +358,7 @@ def h2_analysis(run):
     
     return(melted_df)
 
-
-
-
-
+'''
 def main():
     runs_list = list_directories(runs_directory_path)
     
@@ -367,7 +377,7 @@ def main():
     return(df)
 
 df = main()
-
+'''
 
 
 
