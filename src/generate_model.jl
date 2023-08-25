@@ -119,7 +119,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         EP = co2_cap_power_hsc(EP, inputs, setup)
     end
 
-    @constraint(EP, cElecExportsePHBH2Equate[t=1:T, z=1:Z], EP[:ePowerBalance_HSC][t,z] == EP[:vElecExports_HSC][t,z])
+    @constraint(EP, cElecExportsePHBH2Equate[t=1:T, z=1:Z], EP[:ePowerBalance_HSC][t,z] == -EP[:vElecExports_HSC][t,z])
 
     ## Define the objective function
     @objective(EP,Min,EP[:eObj])

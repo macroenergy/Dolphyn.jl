@@ -125,7 +125,7 @@ function generate_genx!(EP::Model, setup::Dict, inputs::Dict)
 	end
 
     # GenX -> HSC exports
-    @variable(EP, vElecExports_HSC[t=1:T, z = 1:Z] >= 0)
+    @variable(EP, vElecExports_HSC[t=1:T, z = 1:Z])
 
 	## Power balance constraints
 	# demand + exports 
