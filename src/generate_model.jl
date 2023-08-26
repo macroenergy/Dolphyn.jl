@@ -134,10 +134,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 
     # This constraint states that the external emissions for GenX is equal to the emisisons from the HSC
-    @constraint(EP, cExternalEmGenXEqEmH2[z=1:Z,t=1:T], EP[:vCO2Emissions_external_GenX[z,t]] == EP[:eH2EmissionsByZone[z,t]])
+    @constraint(EP, cExternalEmGenXEqEmH2[z=1:Z,t=1:T], EP[:vCO2Emissions_external_GenX][z,t] == EP[:eH2EmissionsByZone][z,t])
 
     # This constraint states that the external emissions for GenX is equal to the emisisons from the HSC
-    @constraint(EP, cExternalEmHSCEqEmGenX[z=1:Z,t=1:T], EP[:vCO2Emissions_external_HSC[z,t]] == EP[:eEmissionsByZone[z,t]])
+    @constraint(EP, cExternalEmHSCEqEmGenX[z=1:Z,t=1:T], EP[:vCO2Emissions_external_HSC][z,t] == EP[:eEmissionsByZone][z,t])
 
     ## Define the objective function
     @objective(EP,Min,EP[:eObj])
