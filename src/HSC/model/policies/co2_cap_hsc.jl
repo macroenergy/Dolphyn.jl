@@ -62,15 +62,21 @@ function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"]     # Number of time steps (hours)
     H2_SEG= inputs["H2_SEG"] # Number of demand response segments for H2 demand
+	Z = inputs["Z"]     # Number of zones
+
+    #### ADD new variable for dummy GenX values #####
+    @variable(EP, vCO2Emissions_external_HSC[z=1:Z,t=1:T] >=0)
 
     # NOTE: If ParameterScale = 1 , then emisisons constraint written in units of ktonnes, else emissions constraint units is tonnes
     ## Mass-based: Emissions constraint in absolute emissions limit (tons)
     # eH2emissionsbyZones scaled in emissions_hsc.jl. RHS of constraint adjusted by modifying unit of CO2 intensity constraint
     if setup["H2CO2Cap"] == 1
         @constraint(EP, cH2CO2Emissions_systemwide[cap=1:inputs["H2NCO2Cap"]],
-            sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) <=
+            + sum(inputs["omega"][t] * (vCO2Emissions_external_HSC[z,t] + EP[:eH2EmissionsByZone][z,t]) for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) 
+            <=
             sum(inputs["dfH2MaxCO2"][z,cap] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]))
         )
+
 
     ## Load + Rate-based: Emissions constraint in terms of rate (tons/tonnes)
     elseif setup["H2CO2Cap"] == 2 

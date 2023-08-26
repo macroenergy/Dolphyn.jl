@@ -53,6 +53,15 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
         end
     end
 
+    # Adding code to additionally write the values of EP[:vElecExports_HSC] to a csv file #
+    value_ElecExports_HSC = value.(EP[:vElecExports_HSC])
+    df_ElecExports_HSC = DataFrame(value_ElecExports_HSC, :auto)
+    CSV.write(joinpath(path, "ElecExports_HSC.csv"), df_ElecExports_HSC)
+
+    # Writing value for ePowerBalance_HSC
+    value_ePowerBalance_HSC = value.(EP[:ePowerBalance_HSC])
+    df_PowerBalance_HSC = DataFrame(value_ePowerBalance_HSC, :auto)
+    CSV.write(joinpath(path, "ePowerBalance_HSC.csv"), df_PowerBalance_HSC)
 
 
     write_h2_capacity(path, sep, inputs, setup, EP)

@@ -113,13 +113,31 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         generate_hsc!(EP, setup, inputs)
     end
 
-    if setup["ModelH2"] ==0
-        co2_cap!(EP, inputs, setup)
-    elseif setup["ModelH2"]==1
-        EP = co2_cap_power_hsc(EP, inputs, setup)
-    end
+    ## NOTE: The below function call is commented out because we are now computing the CO2 Balance as a Distributed Optimization term
 
+    #if setup["ModelH2"] ==0
+    #    co2_cap!(EP, inputs, setup)
+    #elseif setup["ModelH2"]==1
+    #    EP = co2_cap_power_hsc(EP, inputs, setup)
+    #end
+
+    ### ADD: CO2 Emission Constraints by Sector ####
+
+    # GenX related emissions which assumes Hydrogen emissions as Dummy values 
+    co2_cap!(EP, inputs, setup)
+
+    # HSC related emissions which assumes GenX emissions as Dummy values
+    EP = co2_cap_hsc(EP, inputs, setup)
+
+    # This is the constraint for Power Balance on the HSC side equating the Exports from the GenX side
     @constraint(EP, cElecExportsePHBH2Equate[t=1:T, z=1:Z], EP[:ePowerBalance_HSC][t,z] == -EP[:vElecExports_HSC][t,z])
+
+
+    # This constraint states that the external emissions for GenX is equal to the emisisons from the HSC
+    @constraint(EP, cExternalEmGenXEqEmH2[z=1:Z,t=1:T], EP[:vCO2Emissions_external_GenX[z,t]] == EP[:eH2EmissionsByZone[z,t]])
+
+    # This constraint states that the external emissions for GenX is equal to the emisisons from the HSC
+    @constraint(EP, cExternalEmHSCEqEmGenX[z=1:Z,t=1:T], EP[:vCO2Emissions_external_HSC[z,t]] == EP[:eEmissionsByZone[z,t]])
 
     ## Define the objective function
     @objective(EP,Min,EP[:eObj])
