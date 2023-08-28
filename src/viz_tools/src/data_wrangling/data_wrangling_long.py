@@ -103,7 +103,7 @@ elec_bins = {
 h2_bins = {
     'smr': ['smr'],
     'atr': ['atr'],
-    'elecrolyzer': ['electrolyzer'],  # added 'hydroelectric' to the list for better matching
+    'electrolyzer': ['electrolyzer'],  # added 'hydroelectric' to the list for better matching
     'h2_storage': ['storage']}
 
 
@@ -275,6 +275,7 @@ def capacity_w_H2G2p_analysis(run):
     
 '''
 
+# run is the string of the directory of the DOLPHYN case that you care about
 def electricity_analysis(run):
     df = open_results_file('capacity.csv', run)
     #drop total row
