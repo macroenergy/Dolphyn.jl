@@ -27,11 +27,11 @@ The expression defined in this file named after ```eH2GenTotalCap``` covers all 
 
 ```math
 \begin{equation*}
-	y_{g, z}^{\textrm{H,GEN}} = 
-	\begin{cases}
-		y_{k, z}^{\textrm{H,THE}} \quad if \quad g \in \mathcal{K} \\
-		y_{s, z}^{\textrm{\textrm{H,STO},DIS}} \quad if \quad g \in \mathcal{S}
-	\end{cases}
+    y_{g, z}^{\textrm{H,GEN}} = 
+    \begin{cases}
+        y_{k, z}^{\textrm{H,THE}} \quad if \quad g \in \mathcal{K} \\
+        y_{s, z}^{\textrm{\textrm{H,STO},DIS}} \quad if \quad g \in \mathcal{S}
+    \end{cases}
     \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
@@ -43,11 +43,11 @@ Note for energy storage resources in hydrogen sector, additional energy and char
 
 ```math
 \begin{equation*}
-	\begin{split}
-	y_{g, z}^{\textrm{H,GEN}} &= y_{g}^{\textrm{H,GEN,total}} \\ 
-	& = y_{g, z}^{\textrm{H,GEN,existing}} + y_{g, z}^{\textrm{H,GEN,new}} - y_{g, z}^{\textrm{H,GEN,retired}}
-	\end{split}
-	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+    \begin{split}
+    y_{g, z}^{\textrm{H,GEN}} &= y_{g}^{\textrm{H,GEN,total}} \\ 
+    & = y_{g, z}^{\textrm{H,GEN,existing}} + y_{g, z}^{\textrm{H,GEN,new}} - y_{g, z}^{\textrm{H,GEN,retired}}
+    \end{split}
+    \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -57,7 +57,7 @@ This module additionally defines contributions to the objective function from in
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{H,GEN,c}} = \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,new}}\times \textrm{c}_{g}^{\textrm{H,INV}} + \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,total}} \times \textrm{c}_{g}^{\textrm{H,FOM}}
+    \textrm{C}^{\textrm{H,GEN,c}} = \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,new}}\times \textrm{c}_{g}^{\textrm{H,INV}} + \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,total}} \times \textrm{c}_{g}^{\textrm{H,FOM}}
 \end{equation*}
 ```
 
@@ -66,13 +66,13 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-	0 \leq y_{g, z}^{\textrm{H,GEN,retired}} \leq y_{g, z}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+    0 \leq y_{g, z}^{\textrm{H,GEN,retired}} \leq y_{g, z}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
-	print_and_log("Hydrogen Investment Discharge Module")
+    print_and_log("Hydrogen Investment Discharge Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

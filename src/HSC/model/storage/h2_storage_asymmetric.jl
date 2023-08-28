@@ -23,7 +23,7 @@ For storage technologies with asymmetric charge and discharge capacities (all $s
 
 ```math
 \begin{equation*}
-	0 \leq x_{s,z,t}^{\textrm{H,CHA}} \leq y_{s,z}^{\textrm{H,STO,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
+    0 \leq x_{s,z,t}^{\textrm{H,CHA}} \leq y_{s,z}^{\textrm{H,STO,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 """
