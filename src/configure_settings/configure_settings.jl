@@ -76,6 +76,8 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
 
     ## Activate minimum technology carveout constraints; 0 = not active; 1 = active
     set_default_if_absent!(settings, "MinCapReq", 0)
+    ## Activate maximum technology carveout constraints; 0 = not active; 1 = active
+    set_default_if_absent!(settings, "MaxCapReq", 0)
     
     ## Unit committment of thermal power plants; 0 = not active; 1 = active using integer clestering; 2 = active using linearized clustering
     set_default_if_absent!(settings, "UCommit", 0)    
@@ -97,6 +99,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "SystemCO2Constraint", 0)                
     #ModelH2Liquid: 0 # Whether to model liquid demand and production - 0 - not included, 1 - included
     set_default_if_absent!(settings, "ModelH2Liquid", 0)                
+    #TimeMatchingRequirement: 0 # Modeling time matching requiremnet for electricity based H2 production - 0 - not included, 1 - hourly with excess sales, 2- hourly without excess sales, 3 - annual 
+    set_default_if_absent!(settings, "TimeMatchingRequirement", 0)                
+    #TMRSalestoESR: 0 # Modeling whether or not resources contracted for time matching requiremnet forelectricity based H2 production can sell their excess electricity to ESR market - 0 - not allowed, 1 - allowed
+    set_default_if_absent!(settings, "TMRSalestoESR", 0) 
 
 return settings
 end

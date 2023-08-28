@@ -35,6 +35,9 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
 		dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
 	end
 
+	# Recreate ELEC PRICE Dataframe (like in GenX, write_price function)
+#	dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
+
 	dfP2G = DataFrame()
 	dfElecCost = DataFrame()
 
@@ -54,7 +57,7 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
 	end
 
 	# Multiply price by power usage, for each zone and each time step
-	dfElecCost = dfP2G .* dfPrice #.* inputs["omega"]
+	dfElecCost = dfP2G .* dfPrice .* inputs["omega"]
 
 	# Create Elec Cost Vector, per Zone
 	ElecCostSum = zeros(Z)

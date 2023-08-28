@@ -35,3 +35,4 @@ function load_energy_share_requirement(setup::Dict, path::AbstractString, sep::A
 	print_and_log("Energy_share_requirement.csv Successfully Read!")
 	return inputs_ESR
 end
+

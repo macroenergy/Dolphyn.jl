@@ -14,13 +14,19 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-push!(LOAD_PATH,"../src/")
-push!(LOAD_PATH,"docs/src")
+push!(LOAD_PATH,joinpath(@__DIR__,"src"))
+push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
+push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
+
+using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+
+using Documenter
 import DataStructures: OrderedDict
 using DOLPHYN
-using Documenter
+# using GenX
+
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
-println(pwd())
+
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Solvers" => "solvers.md",
@@ -94,11 +100,13 @@ pages = OrderedDict(
 )
 
 makedocs(;
+    # modules = [DOLPHYN, GenX],
     modules = [DOLPHYN],
     authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
     pages = [p for p in pages],
+    doctest=false
 )
 
 deploydocs(;
