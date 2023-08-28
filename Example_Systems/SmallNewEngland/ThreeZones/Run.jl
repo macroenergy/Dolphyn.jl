@@ -105,3 +105,5 @@ outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
 if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
+
+dolphyn_viz(case_dir)

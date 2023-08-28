@@ -46,6 +46,10 @@ def save_and_show_plot(fig, filename, directory='plots_folder'):
 
 def find_latest_result_folder(path):
     result_folders = [folder for folder in os.listdir(path) if folder.startswith("Results")]
+
+    if "Results_Example" in result_folders:
+        return "Results_Example"
+
     if not result_folders:
         raise ValueError("No 'Results' folders found.")
         
@@ -176,7 +180,7 @@ def zone_ID(run, file_name='HSC_h2_generation_discharge.csv'):
     return(zone_dict, zone_number_dict)
 '''
 
-
+'''
 
 def capacity_w_H2G2p_analysis(run):
     df = open_results_file('capacity_w_H2G2P.csv', run)
@@ -268,6 +272,8 @@ def capacity_w_H2G2p_analysis(run):
     
     return(melted_df)
 
+    
+'''
 
 def electricity_analysis(run):
     df = open_results_file('capacity.csv', run)
@@ -278,12 +284,12 @@ def electricity_analysis(run):
     
     #breakpoint()
     
-    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
+    variables_of_interest = ['Zone', 'EndCap', 'Resource']
     df = df[variables_of_interest]
 
     # Capacity
     melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'AnnualGeneration'], 
+                       value_vars=['EndCap'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
@@ -305,12 +311,12 @@ def h2_analysis(run):
     
     #breakpoint()
     
-    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
+    variables_of_interest = ['Zone', 'EndCap',  'Resource']
     df = df[variables_of_interest]
 
     # Capacity
     melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'AnnualGeneration'], 
+                       value_vars=['EndCap'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition

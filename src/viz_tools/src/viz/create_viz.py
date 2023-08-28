@@ -29,10 +29,26 @@ def create_stacked_bar_plot(df, target_type, save_path, fig_name):
     # Plot the stacked bar plot with the dynamic figure size
     ax = pivoted_df.plot(kind='bar', stacked=True, figsize=figsize)
     
+    title_dict = {'elec_capacity': 'Power Capacity by Zone',
+                  'elec_generation': 'Power Generation by Zone',
+                  'h2_capacity' : 'H2 Generation Capacity by Zone',
+                  'h2_generation' : 'H2 Generation by Zone'}
+    
+    y_axis_dict = {'elec_capacity': 'Power Capacity (MW)',
+                  'elec_generation': 'Power Generation  (MWh)',
+                  'h2_capacity' : 'H2 Generation Capacity by Zone (Tonne/hr)',
+                  'h2_generation' : 'H2 Generation by Zone (Tonne)'}
+    
     # Add labels and title
     plt.xlabel('Zone')
-    plt.ylabel('Value')
-    plt.title(f'Stacked Bar Plot for Type: {target_type}')
+    plt.ylabel(y_axis_dict[fig_name])
+
+    title_dict = {'elec_capacity': 'Power Generation Capacity by Zone',
+                  'elec_generation': 'Power Generation by Zone',
+                  'h2_capacity' : 'H2 Generation Capacity by Zone',
+                  'h2_generation' : 'H2 Generation by Zone'}
+
+    plt.title(title_dict[fig_name])
     
     # Show the legend
     plt.legend(title='Resource')

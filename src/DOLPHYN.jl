@@ -30,6 +30,7 @@ export write_HSC_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
+export dolphyn_viz
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
@@ -57,6 +58,12 @@ using HiGHS
 
 using Clp
 using Cbc
+
+using PyCall
+using Conda
+
+Conda.add("Pandas")
+Conda.add("matplotlib")
 
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)
@@ -149,6 +156,9 @@ include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
 
 # Files which involve multiple sectors
 include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
+
+# Files which involve multiple sectors
+include_from_dir(joinpath(@__DIR__,"viz_tools/src"), ".jl")
 
 # Load model generation and solving scripts
 include("generate_model.jl")
