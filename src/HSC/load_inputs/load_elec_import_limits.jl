@@ -5,19 +5,13 @@ Read fixed electricity volumes available to the HSC sector
 """
 function load_elec_import_limits(setup::Dict, path::AbstractString, inputs::Dict, filename::AbstractString="HSC_elec_import_variability.csv")
 
-    # data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-    # if setup["TimeDomainReduction"] == 1  && time_domain_reduced_files_exist(data_directory)
-    #     my_dir = data_directory
-    # else
-    #     my_dir = path
-    # end
     my_dir = path
 
     if !isfile(joinpath(my_dir, filename))
         println("No $filename found in $my_dir\nAssuming this means there are no limits on electricity imports for HSC
         ")
-        inputs["HSC_elec_imports_limits"] = nothing
-        return nothing
+        inputs["HSC_elec_imports_limits"] = ones(inputs["T"], inputs["Z"])
+        return inputs
     end
 
     print("Reading $filename ... ")
@@ -39,3 +33,6 @@ function load_elec_import_limits(setup::Dict, path::AbstractString, inputs::Dict
 
     return inputs
 end
+
+
+

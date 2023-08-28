@@ -13,7 +13,16 @@ function load_elec_import_prices(setup::Dict, path::AbstractString, inputs::Dict
     # end
     my_dir = path
 
+    if !isfile(joinpath(my_dir, filename))
+        highprice = 1e6
+        println("No $filename found in $my_dir\nSetting electricity imports for HSC to $highprice \$/MWh
+        ")
+        inputs["HSC_elec_imports_prices"] = load_empty_elec_import_prices(inputs["T"], inputs["Z"], highprice)
+        return inputs
+    end
+
     print("Reading $filename ... ")
+    
 
     elec_prices_in = load_dataframe(joinpath(my_dir, filename))
     # For now we'll assume elec_prices_in has the same timeseries as everything else
@@ -31,4 +40,8 @@ function load_elec_import_prices(setup::Dict, path::AbstractString, inputs::Dict
     print("done!\n")
 
     return inputs
+end
+
+function load_empty_elec_import_prices(T::Int64, Z::Int64, highprice::Float64=1e6)
+    return fill(highprice, (T, Z))
 end
