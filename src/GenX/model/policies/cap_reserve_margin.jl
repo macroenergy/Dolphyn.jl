@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 
-Instead of modeling capacity reserve margin requirement (a.k.a. capacity market or resource adequacy requirement) using an annual constraint, we model each requirement with hourly constraint by simulating the activation of the capacity obligation. We define capacity reserve margin constraint for subsets of zones,$z  \in \mathcal{Z}^{CRM}_{p}$, and each subset stands for a locational deliverability area (LDA) or a reserve sharing group.  For thermal resources, the available capacity is the total capacity in the LDA derated by the outage rate, $\epsilon_{y,z,p}^{CRM}$. For storage ($y \in \mathcal{O}$), variable renewable energy ($y \in \mathcal{VRE}$), and  flexibile demand resources ($y \in \mathcal{DF}$), the available capacity is the net injection into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter, $\epsilon_{y,z,p}^{CRM}$. If the imported capacity is eligible to provide capacity to the CRM constraint, the inbound powerflow on all lines $\mathcal{L}_{p}^{in}$ in time step $t$ will be derated to form the available capacity from outside of the LDA. The reverse is true as well: the outbound derated powerflow on all lines $\mathcal{L}_{p}^{out}$ in time step $t$ is taken out from the total available capacity. The derating factor should be equal to the expected availability of the resource during periods when the capacity reserve constraint is binding (e.g. accounting for forced outages during supply constrained periods) and is similar to derating factors used in the capacity markets. On top of the flexible demand resources, load curtailment can also provide capacity (i.e., demand response or load management). We allow all segments of voluntary load curtailment, $s \geq 2 \in S$, to contribute to capacity requirements. The first segment $s = 1 \in S$ corresponds to involuntary demand curtailment or emergency load shedding at the price cap or value of lost load, and thus does not contribute to reserve requirements.  Note that the time step-weighted sum of the shadow prices of this constraint corresponds to the capacity market payments reported by ISOs with mandate capacity market mechanism.
+Instead of modeling capacity reserve margin requirement (a.k.a. capacity market or resource adequacy requirement) using an annual constraint, we model each requirement with hourly constraint by simulating the activation of the capacity obligation. We define capacity reserve margin constraint for subsets of zones,$z  \in \mathcal{Z}^{CRM}_{p}$, and each subset stands for a locational deliverability area (LDA) or a reserve sharing group.  For thermal resources, the available capacity is the total capacity in the LDA derated by the outage rate, $\epsilon_{y,z,p}^{CRM}$. For storage ($y \in \mathcal{O}$), variable renewable energy ($y \in \mathcal{VRE}$), and  flexibile demand resources ($y \in \mathcal{DF}$), the available capacity is the net storage into the transmission network in time step $t$ derated by the derating factor, also stored in the parameter, $\epsilon_{y,z,p}^{CRM}$. If the imported capacity is eligible to provide capacity to the CRM constraint, the inbound powerflow on all lines $\mathcal{L}_{p}^{in}$ in time step $t$ will be derated to form the available capacity from outside of the LDA. The reverse is true as well: the outbound derated powerflow on all lines $\mathcal{L}_{p}^{out}$ in time step $t$ is taken out from the total available capacity. The derating factor should be equal to the expected availability of the resource during periods when the capacity reserve constraint is binding (e.g. accounting for forced outages during supply constrained periods) and is similar to derating factors used in the capacity markets. On top of the flexible demand resources, load curtailment can also provide capacity (i.e., demand response or load management). We allow all segments of voluntary load curtailment, $s \geq 2 \in S$, to contribute to capacity requirements. The first segment $s = 1 \in S$ corresponds to involuntary demand curtailment or emergency load shedding at the price cap or value of lost load, and thus does not contribute to reserve requirements.  Note that the time step-weighted sum of the shadow prices of this constraint corresponds to the capacity market payments reported by ISOs with mandate capacity market mechanism.
 
 ```math
 \begin{aligned}
@@ -46,52 +46,197 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 	# VRE_HYDRO_RES = union(inputs["HYDRO_RES"],inputs["VRE"])
 	STOR_ALL = inputs["STOR_ALL"]
 	FLEX = inputs["FLEX"]
-	if setup["CapacityReserveMargin"] > 0
-		if SEG >=2
-			if Z > 1
-				@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
-				  sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
-				- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
-				+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
-				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
-				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
-			else # No vFlow in single-zone models
-				@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
-				  sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
-				+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
-				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
-				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+	
+
+
+	if setup["ModelH2"] == 1
+
+		dfH2Gen = inputs["dfH2Gen"]
+		H2_GEN = inputs["H2_GEN"]
+		H2_ELECTROLYZER = inputs["H2_ELECTROLYZER"]
+		
+		if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+			@expression(EP, eP2G[k = H2_GEN, t = 1:T], EP[:vP2G][k,t]/ModelScalingFactor) 
+		else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+			@expression(EP, eP2G[k = H2_GEN, t = 1:T], EP[:vP2G][k,t]) 
+		end
+
+		if setup["ModelH2G2P"] == 1
+			
+			dfH2G2P = inputs["dfH2G2P"]
+			H2_G2P_ALL = inputs["H2_G2P_ALL"]
+
+			if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+				@expression(EP, ePG2P[k = 1:H2_G2P_ALL, t = 1:T], EP[:vPG2P][k,t]/ModelScalingFactor) 
+			else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+				@expression(EP, ePG2P[k = 1:H2_G2P_ALL, t = 1:T], EP[:vPG2P][k,t]) 
 			end
+
+			if setup["CapacityReserveMargin"] > 0
+				if SEG >=2
+					if Z > 1
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						+ sum(dfH2G2P[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in 1:H2_G2P_ALL) # including H2G2P
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
+						+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					else # No vFlow in single-zone models
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
+						+ sum(dfH2G2P[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in 1:H2_G2P_ALL) # including H2G2P
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					end
+				else
+					if Z > 1
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						+ sum(dfH2G2P[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in 1:H2_G2P_ALL) # including H2G2P
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					else # No vFlow in single-zone models
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						+ sum(dfH2G2P[k,Symbol("CapRes_$res")] * EP[:ePG2P][k,t] for k in 1:H2_G2P_ALL) # including H2G2P
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					end
+				end
+			end
+
 		else
-			if Z > 1
-				@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
-				  sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
-				- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
-				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
-				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
-			else # No vFlow in single-zone models
-				@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
-				  sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
-				+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
-				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
-				for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+
+			if setup["CapacityReserveMargin"] > 0
+				if SEG >=2
+					if Z > 1
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
+						+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						>= sum(inputs["pD"][t,z]  * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					else # No vFlow in single-zone models
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					end
+				else
+					if Z > 1
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					else # No vFlow in single-zone models
+						@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+						sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+						+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+						- sum(dfH2Gen[k,Symbol("CapRes_$res")] * EP[:eP2G][k,t] for k in H2_ELECTROLYZER) # including P2G in H2
+						>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+						for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+					end
+				end
+			end
+
+		end
+
+
+	else
+
+		if setup["CapacityReserveMargin"] > 0
+			if SEG >=2
+				if Z > 1
+					@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+					sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+					- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
+					+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
+					>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+					for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+				else # No vFlow in single-zone models
+					@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+					sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+					+ sum(EP[:vNSE][s,t,z] for s in 2:SEG, z in findall(x->x>0,inputs["dfCapRes"][:,res]))
+					>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+					for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+				end
+			else
+				if Z > 1
+					@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+					sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+					- sum(inputs["dfTransCapRes_excl"][l,res] * inputs["dfDerateTransCapRes"][l,res]* EP[:vFLOW][l,t] for l in 1:L)
+					>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+					for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+				else # No vFlow in single-zone models
+					@constraint(EP, cCapacityResMargin[res=1:inputs["NCapacityReserveMargin"], t=1:T],
+					sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] for y in THERM_ALL) # including thermal generator
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vP][y,t] - EP[:vCHARGE][y,t])  for y in STOR_ALL) # including storage
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:eTotalCap][y] * inputs["pP_Max"][y,t]  for y in VRE ) # including VRE
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * EP[:vP][y,t]  for y in HYDRO_RES ) # including HYDRO_RES
+					+ sum(dfGen[y,Symbol("CapRes_$res")] * (EP[:vCHARGE_FLEX][y,t] - EP[:vP][y,t]) for y in FLEX) # including Flexibile load
+					>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][:,res][z])
+					for z=findall(x->x>0,inputs["dfCapRes"][:,res])))
+				end
 			end
 		end
 	end
+
+
+
 	return EP
 end

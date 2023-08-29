@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -43,7 +43,7 @@ function write_transmission_flows(path::AbstractString, sep::AbstractString, set
 	for t in 1:T
 		if v"1.3" <= VERSION < v"1.4"
 			total[!,t+2] .= sum(dfFlow[!,Symbol("t$t")][1:L])
-		elseif v"1.4" <= VERSION < v"1.8"
+		elseif v"1.4" <= VERSION < v"1.9"
 			total[:,t+2] .= sum(dfFlow[:,Symbol("t$t")][1:L])
 		end
 		

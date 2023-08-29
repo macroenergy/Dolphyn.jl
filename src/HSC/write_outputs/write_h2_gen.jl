@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -45,9 +45,39 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	end
 
 	rename!(total,auxNew_Names)
-	dfPower = vcat(dfH2GenOut, total)
 
- 	CSV.write(string(path,sep,"HSC_h2_generation_discharge.csv"), dftranspose(dfH2GenOut, false), writeheader=false)
+	if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+		dfbiorefinery = inputs["dfbiorefinery"]
+		B = inputs["BIO_RES_ALL"]
+		
+		# Power injected by each resource in each time step
+		dfOut_BioH2 = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
+		
+		for i in 1:B
+			dfOut_BioH2[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:eBiohydrogen_produced_per_plant_per_time])[i,:]))
+		end
+		
+		# Load hourly values
+		dfOut_BioH2 = hcat(dfOut_BioH2, DataFrame((value.(EP[:eBiohydrogen_produced_per_plant_per_time])), :auto))
+		
+		# Add labels
+		auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
+		rename!(dfOut_BioH2,auxNew_Names)
+		
+		total_w_BioH2 = DataFrame(["Total" 0 sum(dfOut_BioH2[!,:AnnualSum])+sum(dfH2GenOut[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
+		
+		for t in  1:T
+			total_w_BioH2[:,t+3] .= sum(dfH2GenOut[:,Symbol("t$t")][1:H]) + sum(dfOut_BioH2[:,Symbol("t$t")][1:B])
+		end
+		
+		rename!(total_w_BioH2,auxNew_Names)
+		
+		dfH2GenOut_w_BioE = vcat(dfH2GenOut, dfOut_BioH2, total_w_BioH2)	
+		CSV.write(string(path,sep,"HSC_h2_generation_discharge_w_BioH2.csv"), dftranspose(dfH2GenOut_w_BioE, false), writeheader=false)
+	end
+
+	dfH2Generation = vcat(dfH2GenOut, total)
+ 	CSV.write(string(path,sep,"HSC_h2_generation_discharge.csv"), dftranspose(dfH2Generation, false), writeheader=false)
 	
 	return dfH2GenOut
 end

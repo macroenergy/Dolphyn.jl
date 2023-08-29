@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -24,13 +24,18 @@ println(pwd())
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Solvers" => "solvers.md",
+    "Model Introduction" => "model_introduction.md", # Should cover both HSC and GenX model overview
+    # Cover Model inputs and outputs documentation
+    "Model Inputs/Outputs Documentation" =>  [
+        "global_data_documentation.md",
+        "genx_data_documentation.md",  
+        "hsc_data_documentation.md"
+    ],
+    "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
-        "GenX Introduction" => "model_introduction.md",
-        "Model Inputs/Outputs Documentation" => "data_documentation.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" => "write_outputs.md",
         "GenX Notation" => "genx_notation.md",
-        "Objective Function" => "objective_function.md",
         "Power Balance" => "power_balance.md",
         "GenX Function Reference" => [
             "Core" => "core.md",
@@ -57,6 +62,7 @@ pages = OrderedDict(
         "HSC Inputs Functions" => "load_h2_inputs.md",
         "HSC Outputs Functions" => "write_h2_outputs.md",
         "Hydrogen Notation" => "hsc_notation.md",
+        "HSC Supply-Demand Balance" => "h2_balance.md",
         "HSC Function Reference" => [
             "Hydrogen Core" => "h2_core.md",
             "Hydrogen Flexible Demand" => "h2_flexible_demand.md",
@@ -89,14 +95,14 @@ pages = OrderedDict(
 
 makedocs(;
     modules = [DOLPHYN],
-    authors = "Dharik Mallapragada, Guannan He, Yuheng Zhang",
+    authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
     pages = [p for p in pages],
 )
 
 deploydocs(;
-    repo = "github.com/MacroEnergyProject/DOLPHYN-dev.git",
+    repo = "github.com/macroenergy/DOLPHYN.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",

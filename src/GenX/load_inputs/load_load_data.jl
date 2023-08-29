@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -75,7 +75,7 @@ function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, 
 	inputs_load["INTERIOR_SUBPERIODS"] = setdiff(1:T,inputs_load["START_SUBPERIODS"]) # set of indexes for all time periods that do not start a subperiod
 
 	# Demand in MW for each zone
-	#println(names(load_in))
+	#print_and_log(names(load_in))
 	start = findall(s -> s == "Load_MW_z1", names(load_in))[1] #gets the starting column number of all the columns, with header "Load_MW_z1"
 	if setup["ParameterScale"] ==1  # Parameter scaling turned on
 		# Max value of non-served energy
@@ -117,7 +117,7 @@ function load_load_data(setup::Dict, path::AbstractString, sep::AbstractString, 
 		inputs_load["pMax_D_Curtail"][s] = collect(skipmissing(load_in[!,:Max_Demand_Curtailment]))[s]
 	end
 
-	println("Load_data.csv Successfully Read!")
+	print_and_log("Load_data.csv Successfully Read!")
 
 	return inputs_load
 end

@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -85,7 +85,7 @@ where $M_y$ is a `big M' constant equal to the largest possible capacity that ca
 """
 function reserves_contingency(EP::Model, inputs::Dict, UCommit::Int)
 
-	println("Reserves Contingency Module")
+	print_and_log("Reserves Contingency Module")
 
 	dfGen = inputs["dfGen"]
 
@@ -114,15 +114,15 @@ function reserves_contingency(EP::Model, inputs::Dict, UCommit::Int)
 	### Expressions ###
 	if UCommit == 1 && pDynamic_Contingency == 1
 		# Largest contingency defined as largest installed generator
-		println("Dynamic Contingency Type 1: Modeling the largest contingency as the largest installed generator")
+		print_and_log("Dynamic Contingency Type 1: Modeling the largest contingency as the largest installed generator")
 		@expression(EP, eContingencyReq[t=1:T], vLARGEST_CONTINGENCY)
 	elseif UCommit == 1 && pDynamic_Contingency == 2
 		# Largest contingency defined for each hour as largest committed generator
-		println("Dynamic Contingency Type 2: Modeling the largest contingency as the largest largest committed generator")
+		print_and_log("Dynamic Contingency Type 2: Modeling the largest contingency as the largest largest committed generator")
 		@expression(EP, eContingencyReq[t=1:T], vLARGEST_CONTINGENCY[t])
 	else
 		# Largest contingency defined fixed as user-specifed static contingency in MW
-		println("Static Contingency: Modeling the largest contingency as user-specifed static contingency")
+		print_and_log("Static Contingency: Modeling the largest contingency as user-specifed static contingency")
 		@expression(EP, eContingencyReq[t=1:T], inputs["pStatic_Contingency"])
 	end
 
@@ -206,7 +206,7 @@ function reserves_core(EP::Model, inputs::Dict, UCommit::Int)
 	# DEV NOTE: After simplifying reserve changes are integrated/confirmed, should we revise such that reserves can be modeled without UC constraints on?
 	# Is there a use case for economic dispatch constraints with reserves?
 
-	println("Reserves Core Module")
+	print_and_log("Reserves Core Module")
 
 	dfGen = inputs["dfGen"]
 

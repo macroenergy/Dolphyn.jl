@@ -1,6 +1,6 @@
 """
-GenX: An Configurable Capacity Expansion Model
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -36,9 +36,9 @@ The objective function of GenX minimizes total annual electricity system costs o
 	&\sum_{y \in \mathcal{O}^{asym} } \sum_{z \in \mathcal{Z}}
 	\left( (\pi^{INVEST,charge}_{y,z} \times    \Omega^{charge}_{y,z})
 	+ (\pi^{FOM,charge}_{y,z} \times  \Delta^{total,charge}_{y,z})\right) + \notag \\
-	& \sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_{t}\times(\pi^{VOM}_{y,z} + \pi^{FUEL}_{y,z})\times \Theta_{y,z,t}\right) + \sum_{y \in \mathcal{O \cup DF} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_{t}\times\pi^{VOM,charge}_{y,z} \times \Pi_{y,z,t}\right) +\notag \\
-	&\sum_{s \in \mathcal{S} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_{t} \times n_{s}^{slope} \times \Lambda_{s,z,t}\right) + \sum_{t \in \mathcal{T} } \left(\omega_{t} \times \pi^{unmet}_{rsv} \times r^{unmet}_{t}\right) \notag \\
-	&\sum_{y \in \mathcal{H} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_{t} \times \pi^{START}_{y,z} \times \chi_{s,z,t}\right) + \notag \\
+	& \sum_{y \in \mathcal{G} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_t\times(\pi^{VOM}_{y,z} + \pi^{FUEL}_{y,z})\times \Theta_{y,z,t}\right) + \sum_{y \in \mathcal{O \cup DF} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \left( \omega_t\times\pi^{VOM,charge}_{y,z} \times \Pi_{y,z,t}\right) +\notag \\
+	&\sum_{s \in \mathcal{S} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_t \times n_{s}^{slope} \times \Lambda_{s,z,t}\right) + \sum_{t \in \mathcal{T} } \left(\omega_t \times \pi^{unmet}_{rsv} \times r^{unmet}_{t}\right) \notag \\
+	&\sum_{y \in \mathcal{H} } \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}}\left(\omega_t \times \pi^{START}_{y,z} \times \chi_{s,z,t}\right) + \notag \\
 	& \sum_{l \in \mathcal{L}}\left(\pi^{TCAP}_{l} \times \bigtriangleup\varphi^{max}_{l}\right)
 \end{aligned}
 ```
@@ -58,13 +58,13 @@ The seventh summation represents the total cost of not meeting hourly operating 
 
 The eighth summation corresponds to the startup costs incurred by technologies to which unit commitment decisions apply (e.g. $y \in \mathcal{UC}$), equal to the cost of start-up, $\pi^{START}_{y,z}$, times the number of startup events, $\chi_{y,z,t}$, for the cluster of units in each zone and time step (weighted by $\omega_t$).
 
-The last term corresponds to the transmission reinforcement or construction costs, for each transmission line in the model. Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $pi^{TCAP}_{l}$, times the additional transmission capacity variable, $\bigtriangleup\varphi^{max}_{l}$. Note that fixed O\&M and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the GenX objective function.
+The last term corresponds to the transmission reinforcement or construction costs, for each transmission line in the model. Transmission reinforcement costs are equal to the sum across all lines of the product between the transmission reinforcement/construction cost, $pi^{TCAP}_{l}$, times the additional transmission capacity variable, $\bigtriangleup\varphi^{max}_{l}$. Note that fixed OM and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the GenX objective function.
 
 In summary, the objective function can be understood as the minimization of costs associated with five sets of different decisions: (1) where and how to invest on capacity, (2) how to dispatch or operate that capacity, (3) which consumer demand segments to serve or curtail, (4) how to cycle and commit thermal units subject to unit commitment decisions, (5) and where and how to invest in additional transmission network capacity to increase power transfer capacity between zones. Note however that each of these components are considered jointly and the optimization is performed over the whole problem at once as a monolithic co-optimization problem.
 
 **Power Balance**
 
-The power balance constraint of the model ensures that electricity demand is met at every time step in each zone. As shown in the constraint, electricity demand, $D_{t,z}$, at each time step and for each zone must be strictly equal to the sum of generation, $\Theta_{y,z,t}$, from thermal technologies ($\mathcal{H}$), curtailable VRE ($\mathcal{VRE}$), must-run resources ($\mathcal{MR}$), and hydro resources ($\mathcal{W}$). At the same time, energy storage devices ($\mathcal{O}$) can discharge energy, $\Theta_{y,z,t}$ to help satisfy demand, while when these devices are charging, $\Pi_{y,z,t}$, they increase demand. For the case of flexible demand resources ($\mathcal{DF}$), delaying demand (equivalent to charging virtual storage), $\Pi_{y,z,t}$, decreases demand while satisfying delayed demand (equivalent to discharging virtual demand), $\Theta_{y,z,t}$, increases demand. Price-responsive demand curtailment, $\Lambda_{s,z,t}$, also reduces demand. Finally, power flows, $\Phi_{l,t}$, on each line $l$ into or out of a zone (defined by the network map $\varphi^{map}_{l,z}$), are considered in the demand balance equation for each zone. By definition, power flows leaving their reference zone are positive, thus the minus sign in the below constraint. At the same time losses due to power flows increase demand, and one-half of losses across a line linking two zones are attributed to each connected zone. The losses function $\beta_{l,t}(\cdot)$ will depend on the configuration used to model losses (see Transmission section).
+The power balance constraint of the model ensures that electricity demand is met at every time step in each zone. As shown in the constraint, electricity demand, $D_{z,t}$, at each time step and for each zone must be strictly equal to the sum of generation, $\Theta_{y,z,t}$, from thermal technologies ($\mathcal{H}$), curtailable VRE ($\mathcal{VRE}$), must-run resources ($\mathcal{MR}$), and hydro resources ($\mathcal{W}$). At the same time, energy storage devices ($\mathcal{O}$) can discharge energy, $\Theta_{y,z,t}$ to help satisfy demand, while when these devices are charging, $\Pi_{y,z,t}$, they increase demand. For the case of flexible demand resources ($\mathcal{DF}$), delaying demand (equivalent to charging virtual storage), $\Pi_{y,z,t}$, decreases demand while satisfying delayed demand (equivalent to discharging virtual demand), $\Theta_{y,z,t}$, increases demand. Price-responsive demand curtailment, $\Lambda_{s,z,t}$, also reduces demand. Finally, power flows, $\Phi_{l,t}$, on each line $l$ into or out of a zone (defined by the network map $\varphi^{map}_{l,z}$), are considered in the demand balance equation for each zone. By definition, power flows leaving their reference zone are positive, thus the minus sign in the below constraint. At the same time losses due to power flows increase demand, and one-half of losses across a line linking two zones are attributed to each connected zone. The losses function $\beta_{l,t}(\cdot)$ will depend on the configuration used to model losses (see Transmission section).
 
 ```math
 \begin{aligned}
@@ -110,11 +110,19 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	# Expression for "baseline" H2 balance constraint
 	@expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
 
+	# Initialize CO2 Capture Balance Expression
+	@expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+
+
 	# Initialize Objective Function Expression
 	@expression(EP, eObj, 0)
 
 	# Power supply by z and timestep - used in emissions constraints
-	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)	
+	@expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
+	@expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
+	@expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
+	# Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
+	@expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)	
 
 	##### Power System related modules ############
 	EP = discharge(EP, inputs)
@@ -177,7 +185,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
 	if setup["ModelH2"] == 1
-
+		@expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
+		@expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
+		@expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
 		# Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
@@ -195,8 +205,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions of various hydrogen sector resources
 		EP = emissions_hsc(EP, inputs,setup)
 
-		#model H2 non-served energy
-		EP = h2_non_served_energy(EP, inputs,setup)
+		# Model H2 non-served
+		EP = h2_non_served(EP, inputs,setup)
 
 		# Model hydrogen storage technologies
 		if !isempty(inputs["H2_STOR_ALL"])
@@ -223,9 +233,201 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = h2_g2p(EP, inputs, setup)
 		end
 
+		EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
 
 	end
 
+	if setup["ModelCO2"] == 1
+
+		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
+		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Variable costs and carbon captured per DAC resource "k" and time "t"
+		EP = DAC_var_cost(EP, inputs, setup)
+
+		# Fixed costs of DAC
+		EP = DAC_investment(EP, inputs, setup)
+	
+		#model CO2 capture
+		EP = co2_capture(EP, inputs, setup)
+
+		# Fixed costs of storage storage
+		
+		EP = co2_storage_investment(EP, inputs, setup)
+
+		if !isempty(inputs["CO2_STORAGE"])
+			#model CO2 injection
+			EP = co2_injection(EP, inputs, setup)
+		end
+
+		# Fixed costs of carbon capture compression
+
+		EP = co2_capture_compression_investment(EP, inputs, setup)
+
+		if !isempty(inputs["CO2_CAPTURE_COMP"])
+			#model CO2 capture
+			EP = co2_capture_compression(EP, inputs, setup)
+		end
+
+		if setup["ModelCO2Pipelines"] == 1
+			# model CO2 transmission via pipelines
+			EP = co2_pipeline(EP, inputs, setup)
+		end
+
+		# Direct emissions of various carbon capture sector resources
+		EP = emissions_csc(EP, inputs,setup)
+
+		EP[:eAdditionalDemandByZone] += EP[:eCSCNetpowerConsumptionByAll]
+
+	end
+
+	if setup["ModelSynFuels"] == 1
+
+		# Initialize Liquid Fuel Balance
+		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
+
+		#@expression(EP, eLiquidFuelsConsumptionByAll[t=1:T,z=1:Z], 0)
+		
+		EP = syn_fuel_outputs(EP, inputs, setup)
+		EP = syn_fuel_investment(EP, inputs, setup)
+
+		if !isempty(inputs["SYN_FUELS_RES_ALL"])
+			EP = syn_fuel_resources(EP, inputs, setup)
+		end
+
+		EP = liquid_fuel_demand(EP, inputs, setup)
+		EP = emissions_liquid_fuels(EP, inputs, setup)
+
+		###HLiquid Fuel Demand Constraints
+		#Diesel
+		if setup["BIO_Diesel_On"] == 0
+			@expression(EP, eGlobalLFDieselBalance[t=1:T], sum(EP[:eLFDieselBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFDieselDemand[t=1:T], sum(inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) )
+
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
+
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFDieselBalance, sum(inputs["omega"][t] *EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFDieselDemand, sum(inputs["omega"][t] *EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
+		end
+
+		#Jetfuel
+		if setup["BIO_Jetfuel_On"] == 0
+			@expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
+
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
+
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFJetfuelBalance, sum(inputs["omega"][t] *EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFJetfuelDemand, sum(inputs["omega"][t] *EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
+		end
+
+		#Gasoline
+		if setup["BIO_Gasoline_On"] == 0
+			@expression(EP, eGlobalLFGasolineBalance[t=1:T], sum(EP[:eLFGasolineBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFGasolineDemand[t=1:T], sum(inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) )
+
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFGasolineBalance[t=1:T], eGlobalLFGasolineBalance[t] >= eGlobalLFGasolineDemand[t])
+
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFGasolineBalance, sum(inputs["omega"][t] *EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFGasolineDemand, sum(inputs["omega"][t] *EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualGasolineBalance, eAnnualGlobalLFGasolineBalance >= eAnnualGlobalLFGasolineDemand)
+		end
+	end
+
+	if setup["ModelBIO"] == 1
+
+		#Ethanol
+		if setup["BIO_Ethanol_On"] == 1
+			@expression(EP, eEthanolBalance[t=1:T, z=1:Z], 0)
+		end
+
+		# Net Power consumption
+		@expression(EP, eBIONetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Variable costs
+		EP = biorefinery_var_cost(EP, inputs, setup)
+
+		# Fixed costs
+		EP = biorefinery_investment(EP, inputs, setup)
+	
+		# Supply costs
+		EP = bio_herb_supply(EP, inputs, setup)
+		EP = bio_wood_supply(EP, inputs, setup)
+
+		if !isempty(inputs["BIO_RES_ALL"])
+			EP = biorefinery(EP, inputs, setup)
+		end
+
+		# Direct emissions
+		EP = emissions_besc(EP, inputs,setup)
+
+		if setup["BIO_Diesel_On"] == 1
+			@expression(EP, eGlobalLFDieselBalance[t=1:T], sum(EP[:eLFDieselBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFDieselDemand[t=1:T], sum(inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) )
+
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
+
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFDieselBalance, sum(inputs["omega"][t] * EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFDieselDemand, sum(inputs["omega"][t] * EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
+		end
+
+		if setup["BIO_Jetfuel_On"] == 1
+			@expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
+		
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
+		
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFJetfuelBalance, sum(inputs["omega"][t] * EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFJetfuelDemand, sum(inputs["omega"][t] * EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
+		end
+
+		if setup["BIO_Gasoline_On"] == 1
+			@expression(EP, eGlobalLFGasolineBalance[t=1:T], sum(EP[:eLFGasolineBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalLFGasolineDemand[t=1:T], sum(inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) )
+
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cLFGasolineBalance[t=1:T], eGlobalLFGasolineBalance[t] >= eGlobalLFGasolineDemand[t])
+
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalLFGasolineBalance, sum(inputs["omega"][t] * EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalLFGasolineDemand, sum(inputs["omega"][t] * EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
+			@constraint(EP, cLFAnnualGasolineBalance, eAnnualGlobalLFGasolineBalance >= eAnnualGlobalLFGasolineDemand)
+		end
+
+		if setup["BIO_Ethanol_On"] == 1
+			@expression(EP, eGlobalEthanolBalance[t=1:T], sum(EP[:eEthanolBalance][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalEthanolDemand[t=1:T], sum(inputs["Bio_Fuels_Ethanol_D"][t,z] for z = 1:Z) )
+
+
+			#Demand constraint for each time t for global liquid fuel demand
+			#@constraint(EP, cEthanolBalanceGlobal[t=1:T], EP[:eGlobalEthanolBalance][t] >= eGlobalEthanolDemand[t])
+
+			#Demand constraint for annual global liquid fuel demand
+			@expression(EP, eAnnualGlobalEthanolBalance, sum(inputs["omega"][t] * EP[:eGlobalEthanolBalance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalEthanolDemand, sum(inputs["omega"][t] * EP[:eGlobalEthanolDemand][t] for t = 1:T) )
+			@constraint(EP, cAnnualEthanolBalance, eAnnualGlobalEthanolBalance >= eAnnualGlobalEthanolDemand)
+
+		end
+
+		EP[:eAdditionalDemandByZone] += EP[:eBIONetpowerConsumptionByAll]
+
+	end
 
 	################  Policies #####################3
 	# CO2 emissions limits for the power sector only
@@ -262,6 +464,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		###Hydrogen Balanace constraints
 		@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
 	end
+
+	if setup["ModelCO2"] == 1
+		###Captured CO2 Balanace constraints
+		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
+	end
 	
 	## Record pre-solver time
 	presolver_time = time() - presolver_start_time
@@ -274,7 +481,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			filepath = joinpath(modeloutput, "YourModel.lp")
 			JuMP.write_to_file(EP, filepath)
 		end
-		println("Model Printed")
+		print_and_log("Model Printed")
     end
 
     return EP

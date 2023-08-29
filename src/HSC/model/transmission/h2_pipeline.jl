@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -21,32 +21,56 @@ This function includes the variables, expressions and objective funtion of hydro
 
 This function expresses hydrogen exchange through pipeline i between two zones and can be split into H2 delivering and flowing out.
 
-```math
-\begin{aligned}
-    C_{\mathrm{PIP}}^{\mathrm{c}}=\delta_{i}^{\mathrm{PIP}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \sum_{i \in \mathbb{I}} \mathrm{c}_{i}^{\mathrm{PIP}} \mathrm{L}_{z \rightarrow z^{\prime}} l_{z \rightarrow z,^{\prime}, i}
-    h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP}}=h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP+}}-h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP-}} \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, i \in \mathbb{I}, t \in \mathbb{T}
-\end{aligned}    
-```
+This module defines the hydrogen pipeline construction decision variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}$, representing newly constructed hydrogen pipeline of type $i$ through path $z \rightarrow z^{\prime}$.
 
-The flow rate of hydrogen through pipeline type i is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline i
+This module defines the hydrogen pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+
+This module defines the hydrogen pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+
+The variable defined in this file named after ```vH2NPipe``` covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{H,PIP}}$.
+
+The variable defined in this file named after ```vH2PipeFlow_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP+}}$.
+
+The variable defined in this file named after ```vH2PipeFlow_neg``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP-}}$.
+
+The variable defined in this file named after ```vH2PipeLevel``` covers variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus construction) from all pipeline resources $i \in \mathcal{I}$:
+
 ```math
-\begin{aligned}
-    \overline{\mathrm{F}}_{i} l_{z \rightarrow z^{\prime} i} \geq h_{z \rightarrow z^{\prime}, t}^{\mathrm{PIP+}}, h_{z \rightarrow z^{\prime}, i, t}^{\mathrm{PIP}} \geq 0 \quad \forall z \rightarrow z^{\prime} \in \mathbb{B}, i \in \mathbb{I}, t \in \mathbb{T}
-\end{aligned}    
+\begin{equation*}
+    \textrm{C}^{\textrm{H,PIP,c}}=\delta_{i}^{\textrm{H,PIP}} \sum_{i \in \mathbb{I}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \textrm{c}_{i}^{\textrm{H,PIP}} \textrm{L}_{z \rightarrow z^{\prime}} l_{i,z \rightarrow z^{\prime}}
+    h_{i,z \rightarrow z^{\prime}, t}^{\textrm{H,PIP}}=h_{i, z \rightarrow z^{\prime}, t}^{\textrm{H,PIP+}}-h_{i, z \rightarrow z^{\prime}, t}^{\textrm{PIP-}} \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
+\end{equation*}
+ ```
+
+The flow rate of H2 through pipeline type $i$ is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline $i$
+```math
+\begin{equation*}
+    \overline{\textrm{F}}_{i} l_{i,z \rightarrow z^{\prime}} \geq x_{i,z \rightarrow z^{\prime}, t}^{\textrm{\textrm{H,PIP+}}}, x_{i,z \rightarrow z^{\prime}, t}^{\textrm{\textrm{H,PIP-}}} \geq 0 \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
+\end{equation*}    
 ```
 
 The pipeline has storage capacity via line packing:
 ```math
-\begin{aligned}
-    \overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z^{\prime}, i} \geq &-\sum_{\tau=t_{0}}^{t}\left(h_{z^{\prime} \rightarrow z, i, \tau}^{\mathrm{PIP}}+h_{z \rightarrow z^{\prime}, i, \tau}^{\mathrm{PIP}}\right) \Delta t \geq \underline{\mathrm{R}}_{i}^{\mathrm{PIP}} \overline{\mathrm{E}}_{i}^{\mathrm{PIP}} l_{z \rightarrow z^{\prime}, i} \\
+\begin{equation*}
+    \overline{\textrm{U}}_{i}^{\textrm{\textrm{H,PIP}}} l_{i,z \rightarrow z^{\prime}} \geq -\sum_{\tau=t_{0}}^{t}\left(x_{i,z^{\prime} \rightarrow z, \tau}^{\textrm{\textrm{H,PIP}}}+x_{i,z \rightarrow z^{\prime}, \tau}^{\textrm{\textrm{H,PIP}}}\right) \Delta t \geq \underline{\textrm{R}}_{i}^{\textrm{\textrm{H,PIP}}} \overline{\textrm{E}}_{i}^{\textrm{\textrm{H,PIP}}} l_{i,z \rightarrow z^{\prime}} \\
     & \forall z^{\prime} \in \mathbb{Z}, z \in \mathbb{Z}, i \in \mathbb{I}, t \in \mathbb{T}
-\end{aligned}
+\end{equation*}   
 ```
 
+The change of hydrogen pipeline storage inventory is modeled as follows:
+```math
+\begin{equation*}
+    U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} - U_{i,z \rightarrow z^{\prime},t-1} = x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP-}} + x_{i,z^{\prime} \rightarrow z,t}^{\textrm{H,PIP-}}
+\end{equation*}
+```
 """
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-    println("Hydrogen Pipeline Module")
+    print_and_log("Hydrogen Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
@@ -148,7 +172,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     end
 
     EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
-
+    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2PipeCompression
 
     ## DEV NOTE: YS to add  power consumption by storage to right hand side of CO2 Polcy constraint using the following scripts - power consumption by pipeline compression in zone and each time step
     # if setup["ParameterScale"]==1 # Power consumption in GW
@@ -176,6 +200,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     )
 
     EP[:eH2Balance] += ePipeZoneDemand
+
+    EP[:eHTransmissionByZone] += ePipeZoneDemand
 
     ## End Balance Expressions ##
     ### End Expressions ###

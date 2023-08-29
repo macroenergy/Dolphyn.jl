@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -45,5 +45,5 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
 	dfH2Storage = hcat(dfH2Storage, DataFrame(storagevcapvalue, :auto))
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
 	rename!(dfH2Storage,auxNew_Names)
-	CSV.write(string(path,sep,"storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
+	CSV.write(string(path,sep,"HSC_storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
 end

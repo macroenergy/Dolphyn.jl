@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -24,12 +24,12 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     Z = inputs_truck["Z"]
     Z_set = 1:Z
 
-    zone_distance = DataFrame(CSV.File(string(path, sep, "zone-distances-miles.csv"), header=true), copycols=true)
+    zone_distance = DataFrame(CSV.File(string(path, sep, "HSC_zone_truck_distances_miles.csv"), header=true), copycols=true)
 
 	RouteLength = zone_distance[Z_set,Z_set.+1]
 	inputs_truck["RouteLength"] = RouteLength
     
-    println("zone-distances-miles.csv Successfully Read!")
+    print_and_log("HSC_zone_truck_distances_miles.csv Successfully Read!")
 
     # H2 truck type inputs
     h2_truck_in = DataFrame(CSV.File(string(path, sep, "HSC_trucks.csv"), header=true), copycols=true)
@@ -64,6 +64,6 @@ function load_h2_truck(path::AbstractString, sep::AbstractString, inputs_truck::
     for j in inputs_truck["H2_TRUCK_TYPES"]
         inputs_truck["TD"][j] = round.(Int, RouteLength ./ h2_truck_in[!, :AvgTruckSpeed_mile_per_hour][j])
     end
-    println("HSC_trucks.csv Successfully Read!")
+    print_and_log("HSC_trucks.csv Successfully Read!")
     return inputs_truck
 end

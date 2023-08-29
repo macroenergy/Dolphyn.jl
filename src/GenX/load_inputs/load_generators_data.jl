@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -196,13 +196,23 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 	# Maximum fuel cost in $ per MWh and CO2 emissions in tons per MWh
 	inputs_gen["C_Fuel_per_MWh"] = zeros(Float64, G, inputs_gen["T"])
 	inputs_gen["dfGen"][!,:CO2_per_MWh] = zeros(Float64, G)
+	inputs_gen["dfGen"][!,:CO2_captured_per_MWh] = zeros(Float64, G)
+
+	#CO2 capture rate of all resources (%)
+	ccs_rate = convert(Array{Float64}, collect(skipmissing(gen_in[!,:CCS_Rate])) )
+
 	for g in 1:G
 		# NOTE: When Setup[ParameterScale] =1, fuel costs are scaled in fuels_data.csv, so no if condition needed to scale C_Fuel_per_MWh
 		inputs_gen["C_Fuel_per_MWh"][g,:] = fuel_costs[fuel_type[g]].*heat_rate[g]
-		inputs_gen["dfGen"][!,:CO2_per_MWh][g] = fuel_CO2[fuel_type[g]]*heat_rate[g]
+
+		inputs_gen["dfGen"][!,:CO2_per_MWh][g] = fuel_CO2[fuel_type[g]]*heat_rate[g]*(1-ccs_rate[g])
+		inputs_gen["dfGen"][!,:CO2_captured_per_MWh][g] = fuel_CO2[fuel_type[g]]*heat_rate[g]*(ccs_rate[g])
+
 		if setup["ParameterScale"] ==1
 			inputs_gen["dfGen"][!,:CO2_per_MWh][g] = inputs_gen["dfGen"][!,:CO2_per_MWh][g] * ModelScalingFactor
+			inputs_gen["dfGen"][!,:CO2_captured_per_MWh][g] = inputs_gen["dfGen"][!,:CO2_captured_per_MWh][g] * ModelScalingFactor
 		end
+
 		# kton/MMBTU * MMBTU/MWh = kton/MWh, to get kton/GWh, we need to mutiply 1000
 		if g in inputs_gen["COMMIT"]
 			# Start-up cost is sum of fixed cost per start plus cost of fuel consumed on startup.
@@ -221,7 +231,7 @@ function load_generators_data(setup::Dict, path::AbstractString, sep::AbstractSt
 		end
 	end
 	
-	println("Generators_data.csv Successfully Read!")
+	print_and_log("Generators_data.csv Successfully Read!")
 
 	return inputs_gen
 end

@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -47,7 +47,7 @@ function write_h2_g2p(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	# rename!(total,auxNew_Names)
 	# dfPower = vcat(dfH2G2POut, total)
 
- 	CSV.write(string(path,sep,"HSC_G2P_H2_consumption.csv"), dftranspose(dfH2G2POut, false), writeheader=false)
+ 	CSV.write(string(path,sep,"HSC_G2P_H2_Consumption.csv"), dftranspose(dfH2G2POut, false), writeheader=false)
 	return dfH2G2POut
 
 

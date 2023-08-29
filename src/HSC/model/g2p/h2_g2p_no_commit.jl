@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -19,41 +19,45 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module creates decision variables, expressions, and constraints related to various hydrogen to power technologies without unit commitment constraints
 
-**Ramping limits**
+**Hydrogen balance expressions**
 
-Hydrogen to power resources not subject to unit commitment ($h \in H \setminus UC$) adhere instead to the following ramping limits on hourly changes in power output:
+Contributions to the power balance expression from each thermal resources without unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ are also defined as:
+	
+```math
+\begin{equation*}
+	HydrogenBal_{G2P} = \sum_{k \in \mathcal{K}} x_{k,z,t}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{G2P} \setminus \mathcal{UC}
+\end{equation*}
+```	
+
+Thermal resources not subject to unit commitment $k \in \mathcal{THE} \setminus \mathcal{UC}$ adhere instead to the following ramping limits on hourly changes in power output:
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t-1} - \Theta_{h,z,t} \leq \kappa_{h,z}^{down} \Delta^{\text{total}}_{h,z} \hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t-1}^{\textrm{H,G2P}} - x_{k,z,t}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{\textrm{G2P,DN}} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t} - \Theta_{h,z,t-1} \leq \kappa_{h,z}^{up} \Delta^{\text{total}}_{h,z} \hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{H,G2P}} - x_{k,z,t-1}^{\textrm{H,G2P}} \leq \kappa_{k,z}^{\textrm{G2P,UP}} y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 (See Constraints 1-2 in the code)
-
-This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$, is within the eligible ramp of the power output in the final time step of the year (or each representative period), $t+\tau^{period}-1$.
 
 **Minimum and maximum power output**
 
 When not modeling regulation and reserves, hydrogen units not subject to unit commitment decisions are bound by the following limits on maximum and minimum power output:
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t} \geq \rho^{min}_{h,z} \times \Delta^{total}_{h,z}
-	\hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{H,G2P}} \geq \underline{\textrm{R}}_{k,z}^{\textrm{H,G2P}}} \times y_{k,z}^{\textrm{H,G2P}} \quad \forall k \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 
 ```math
-\begin{aligned}
-	\Theta_{h,z,t} \leq \rho^{max}_{h,z,t} \times \Delta^{total}_{h,z}
-	\hspace{1cm} \forall h \in \mathcal{UC}, \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}
-\end{aligned}
+\begin{equation*}
+	x_{k,z,t}^{\textrm{H,G2P}} \leq \overline{\textrm{R}}_{k,z}^{\textrm{H,G2P}}} \times y_{k,z}^{\textrm{H,G2P}} \quad \forall y \in \mathcal{THE} \setminus \mathcal{UC}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
 ```
 (See Constraints 3-4 in the code)
 """
@@ -92,10 +96,6 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
 	end
 
 	EP[:ePowerBalance] += ePowerBalanceH2G2PNoCommit
-
-	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-	EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2G2PNoCommit
-
 
 	###Constraints###
 	# Power and natural gas consumption associated with H2 generation in each time step
