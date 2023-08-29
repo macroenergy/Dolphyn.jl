@@ -15,24 +15,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+    print_and_log(message::AbstractString)
 
-Function for reporting hydrogen storage level for each pipeline.
+This function takes a message which is one-piece string in julia and print it in console or
+log file depending on global ```Log``` flag.
 """
-function write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
+function print_and_log(message::AbstractString)
 
-    P = inputs["H2_P"]  # Number of H2 pipelines
-    T = inputs["T"]  # Model operating time steps
+    # Log is set as global variable
 
-    p = zeros(P, T)
-    dfH2PipelineLevel = DataFrame(Pipelines = 1:P)
-
-    for i in 1:P
-        p[i, :] = value.(EP[:vH2PipeLevel])[i, :]
+    if Log
+        println(message)
+        @info("$(Dates.format(now(), "yyyy-mm-dd HH:MM:SS")) $message")
+    else
+        println(message)
     end
 
-    dfH2PipelineLevel = hcat(dfH2PipelineLevel, DataFrame(p, :auto))
-    auxNew_Names=[Symbol("Pipelines");[Symbol("t$t") for t in 1:T]]
-    rename!(dfH2PipelineLevel, auxNew_Names)
-    CSV.write(joinpath(path, "HSC_h2_pipeline_level.csv"), dftranspose(dfH2PipelineLevel, false), writeheader=false)
 end

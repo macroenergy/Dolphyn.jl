@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	configure_cbc(solver_settings_path::String)
+    configure_cbc(solver_settings_path::String)
 
 Reads user-specified solver settings from cbc\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -34,34 +34,34 @@ The Cbc optimizer instance is configured with the following default parameters i
 """
 function configure_cbc(solver_settings_path::String)
 
-	solver_settings = YAML.load(open(solver_settings_path))
+    solver_settings = YAML.load(open(solver_settings_path))
 
-	# Optional solver parameters ############################################
-	Myseconds = 1e-6
-		if(haskey(solver_settings, "TimeLimit")) Myseconds = solver_settings["TimeLimit"] end
-	MylogLevel = 1e-6
-		if(haskey(solver_settings, "logLevel")) MylogLevel = solver_settings["logLevel"] end
-	MymaxSolutions = -1
-		if(haskey(solver_settings, "maxSolutions")) MymaxSolutions = solver_settings["maxSolutions"] end
-	MymaxNodes = -1
-		if(haskey(solver_settings, "maxNodes")) MymaxNodes = solver_settings["maxNodes"] end
-	MyallowableGap = -1
-		if(haskey(solver_settings, "allowableGap")) MyallowableGap = solver_settings["allowableGap"] end
-	MyratioGap = Inf
-		if(haskey(solver_settings, "ratioGap")) MyratioGap = solver_settings["ratioGap"] end
-	Mythreads = 1
-		if(haskey(solver_settings, "threads")) Mythreads = solver_settings["threads"] end
-	########################################################################
+    # Optional solver parameters ############################################
+    Myseconds = 1e-6
+        if(haskey(solver_settings, "TimeLimit")) Myseconds = solver_settings["TimeLimit"] end
+    MylogLevel = 1e-6
+        if(haskey(solver_settings, "logLevel")) MylogLevel = solver_settings["logLevel"] end
+    MymaxSolutions = -1
+        if(haskey(solver_settings, "maxSolutions")) MymaxSolutions = solver_settings["maxSolutions"] end
+    MymaxNodes = -1
+        if(haskey(solver_settings, "maxNodes")) MymaxNodes = solver_settings["maxNodes"] end
+    MyallowableGap = -1
+        if(haskey(solver_settings, "allowableGap")) MyallowableGap = solver_settings["allowableGap"] end
+    MyratioGap = Inf
+        if(haskey(solver_settings, "ratioGap")) MyratioGap = solver_settings["ratioGap"] end
+    Mythreads = 1
+        if(haskey(solver_settings, "threads")) Mythreads = solver_settings["threads"] end
+    ########################################################################
 
-	OPTIMIZER = optimizer_with_attributes(Cbc.Optimizer,
-		"seconds" => Myseconds,
-		"logLevel" => MylogLevel,
-		"maxSolutions" => MymaxSolutions,
-		"maxNodes" => MymaxNodes,
-		"allowableGap" => MyallowableGap,
-		"ratioGap" => MyratioGap,
-		"threads" => Mythreads
-	)
+    OPTIMIZER = optimizer_with_attributes(Cbc.Optimizer,
+        "seconds" => Myseconds,
+        "logLevel" => MylogLevel,
+        "maxSolutions" => MymaxSolutions,
+        "maxNodes" => MymaxNodes,
+        "allowableGap" => MyallowableGap,
+        "ratioGap" => MyratioGap,
+        "threads" => Mythreads
+    )
 
-	return OPTIMIZER
+    return OPTIMIZER
 end
