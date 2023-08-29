@@ -15,16 +15,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_hsc::Dict)
+    load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_hsc::Dict)
 
 Function for reading input parameters related to CO$_2$ emissions cap constraints in hydrogen supply chain only.
 """
 function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_hsc::Dict)
+
     # Definition of Cap requirements by zone (as Max Mtons)
-    inputs_co2_hsc["dfH2CO2Cap"] = DataFrame(
-        CSV.File(string(path, sep, "HSC_CO2_cap.csv"), header = true),
+    dfH2CO2Cap = DataFrame(
+        CSV.File(joinpath(path, "HSC_CO2_cap.csv"), header = true),
         copycols = true,
     )
+
+    inputs_co2_hsc["dfH2CO2Cap"] = dfH2CO2Cap
+
     cap = count(
         s -> startswith(String(s), "CO_2_Cap_Zone"),
         names(inputs_co2_hsc["dfH2CO2Cap"]),
@@ -73,10 +77,10 @@ function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString
         # note the default inputs is in million tons
         if setup["ParameterScale"] == 1
             inputs_co2_hsc["dfH2CO2Price"] = Matrix{Float64}(inputs_co2_hsc["dfH2CO2Cap"][:, first_col:last_col]) * ModelScalingFactor / 1e+6
-            # when scaled, the constraint unit is million$/ktonne
+            # when scaled, the price unit is million$/ktonne
         else
             inputs_co2_hsc["dfH2CO2Price"] = Matrix{Float64}(inputs_co2_hsc["dfH2CO2Cap"][:, first_col:last_col])
-            # when not scaled, the constraint unit is ton
+            # when not scaled, the price unit is million$/ton
         end
     end
     print_and_log("HSC_CO2_cap.csv Successfully Read!")
