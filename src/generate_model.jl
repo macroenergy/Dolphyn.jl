@@ -247,7 +247,13 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         end
 
         EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
-    end
+    
+		# Modeling Time matching requirement for electricity use for hydrogen production
+		if setup["TimeMatchingRequirement"] > 0
+			EP = time_matching_requirement(EP, inputs, setup)
+		end
+
+	end
 
 
     ################  Policies #####################3
@@ -264,10 +270,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     end
 
     # Energy Share Requirement
-    if setup["EnergyShareRequirement"] >= 1
+    if setup["EnergyShareRequirement"] == 1
         energy_share_requirement!(EP, inputs, setup)
     end
-
+		
     #Capacity Reserve Margin
     if setup["CapacityReserveMargin"] > 0
         cap_reserve_margin!(EP, inputs, setup)

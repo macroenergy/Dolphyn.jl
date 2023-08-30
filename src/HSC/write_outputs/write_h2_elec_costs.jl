@@ -35,8 +35,11 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
         dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
     end
 
-    dfP2G = DataFrame()
-    dfElecCost = DataFrame()
+	# Recreate ELEC PRICE Dataframe (like in GenX, write_price function)
+#	dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
+
+	dfP2G = DataFrame()
+	dfElecCost = DataFrame()
 
     # Sum power usage for all generators in a given zone
     for z in 1:Z
@@ -53,8 +56,8 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
         append!(dfP2G, tempP2G)
     end
 
-    # Multiply price by power usage, for each zone and each time step
-    dfElecCost = dfP2G .* dfPrice #.* inputs["omega"]
+	# Multiply price by power usage, for each zone and each time step
+	dfElecCost = dfP2G .* dfPrice .* inputs["omega"]
 
     # Create Elec Cost Vector, per Zone
     ElecCostSum = zeros(Z)

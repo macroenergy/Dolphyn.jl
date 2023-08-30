@@ -23,7 +23,7 @@ Sets up variables and constraints common to all hydrogen storage resources.
 
 This module defines the hydrogen storage energy inventory level variable $U_{s,z,t}^{\textrm{H,STO}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen stored in the storage device $s$ in zone $z$ at time period $t$.
 
-This module defines the power charge decision variable $x_{s,z,t}^{\textrm{H,CHA}} \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged hydrogen into the storage device $s$ in zone $z$ at time period $t$.
+This module defines the power charge decision variable $x_{s,z,t}^{\textrm{H,CHA}}$ \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing charged hydrogen into the storage device $s$ in zone $z$ at time period $t$.
 
 The variable defined in this file named after ```vH2S``` covers $U_{s,z,t}^{\textrm{H,STO}}$.
 
