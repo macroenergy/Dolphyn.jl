@@ -1,4 +1,4 @@
 [submodule "src/GenX"]
 	path = src/GenX
-	url = https://github.com/macroenergy/GenX
+	url = https://github.com/macroenergy/GenX.git
 	branch = reduced_main
