@@ -35,9 +35,6 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
         dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
     end
 
-	# Recreate ELEC PRICE Dataframe (like in GenX, write_price function)
-#	dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
-
 	dfP2G = DataFrame()
 	dfElecCost = DataFrame()
 

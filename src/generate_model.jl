@@ -246,13 +246,13 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             )
         end
 
-        EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
-    
-		# Modeling Time matching requirement for electricity use for hydrogen production
+        # Modeling Time matching requirement for electricity use for hydrogen production
 		if setup["TimeMatchingRequirement"] > 0
 			EP = time_matching_requirement(EP, inputs, setup)
 		end
 
+        EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
+    
 	end
 
 
