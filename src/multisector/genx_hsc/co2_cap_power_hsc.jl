@@ -34,10 +34,14 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
     Z = inputs["Z"]     # Number of zones
 
     if setup["SystemCO2Constraint"] ==1 # Independent constraints for Power and HSC
-        # CO2 constraint for power system imposed separately
-        co2_cap!(EP, inputs, setup)
-        # HSC constraint for power system imposed separately
-        EP = co2_cap_hsc(EP,inputs,setup)
+        if setup["CO2Cap"] != 0
+        
+            # CO2 constraint for power system imposed separately
+            co2_cap!(EP, inputs, setup)
+            # HSC constraint for power system imposed separately
+            EP = co2_cap_hsc(EP,inputs,setup)
+
+        end 
 
     elseif setup["SystemCO2Constraint"] ==2 # Joint emissions constraint for power and HSC sector
         # In this case, we impose a single emissions constraint across both sectors
