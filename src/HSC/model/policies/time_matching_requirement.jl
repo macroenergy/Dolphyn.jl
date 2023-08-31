@@ -55,6 +55,9 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 	# Identify number of time matching requirements
 	nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))
+	
+	# Identify number of ESRR requirements
+	nESR = count(s -> startswith(String(s), "ESR_"), names(dfGen))
 
 
 	# Export expression regarding excess electricity generation from contracted VRE resources over the entire year that can be used for meeting RPS requirements
@@ -108,6 +111,58 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 		# 				== sum(inputs["omega"][t]*EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID])),t=1:T)
 
 	end
+
+
+	
+	#NOTE: All All resources belonging to the same TMR must be part of the same ESR requirement
+	#In this section we check whether this input requirement is satisfied
+
+	# Function to check if all values in a column are the same
+	function check_column_consistency(df, column_name)
+    	column_values = df[!, column_name]
+    	return all(x -> x == column_values[1], column_values)
+	end
+
+	for curr_tmr in 1:nH2_TMR
+		
+		# Filter the DataFrame based on a column's value being equal to 1
+		dfGen_curr_tmr = filter(row -> row[Symbol("H2_TMR_$curr_tmr")] == 1, dfGen)
+
+			for curr_esr in 1:nESR
+				tmr_consistent = check_column_consistency(dfGen_curr_tmr, Symbol("ESR_$curr_esr")) !=1
+				if tmr_consistent !=1
+					ErrorException("All resources belonging to the same TMR must be part of the same ESR requirement")
+				end
+			end				
+
+	end
+	
+
+	#Creating dataframe mappin ESRs to TMRs
+	esr_tmr_df = DataFrame(ESR = Int[], TMR = Int[])
+	for curr_esr in 1:nESR
+		dfGen_curr_esr = filter(row -> row[Symbol("ESR_$curr_esr")] == 1, dfGen)
+		for curr_tmr in 1:nH2_TMR
+			if sum(dfGen_curr_esr[!, Symbol("H2_TMR_$curr_tmr")]) >= 1
+				push!(esr_tmr_df, (ESR = curr_esr, TMR = curr_tmr))	
+			end
+		end
+	end 
+
+	
+	# Hourly excess electricity supply from contracted electricity resources for H2 production
+	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
+	sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
+	- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
+	-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
+	)
+
+	# Annual excess electricity supply from contracted electricity resources for H2 production
+	@expression(EP, eExcessAnnualElectricitySupplyTMR[TMR=1:nH2_TMR], sum(eExcessElectricitySupplyTMR[TMR,t]*inputs["omega"][t] for t = 1:T))
+
+	@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum(eExcessElectricitySupplyTMR[TMR] for TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
+
+	EP[:eESR] += eExcessAnnualElectricitySupplyESR
 
 	return EP
 end
