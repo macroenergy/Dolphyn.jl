@@ -35,14 +35,16 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
     if setup["SystemCO2Constraint"] ==1 # Independent constraints for Power and HSC
         if setup["CO2Cap"] != 0
-        
             # CO2 constraint for power system imposed separately
             co2_cap!(EP, inputs, setup)
+        end
+
+        if setup["H2CO2Cap"] !=0
             # HSC constraint for power system imposed separately
             EP = co2_cap_hsc(EP,inputs,setup)
+        end
 
-        end 
-
+    
     elseif setup["SystemCO2Constraint"] ==2 # Joint emissions constraint for power and HSC sector
         # In this case, we impose a single emissions constraint across both sectors
         # Constraint type to be imposed is read from genx_settings.yml 

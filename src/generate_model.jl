@@ -264,7 +264,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
     if setup["ModelH2"] ==0
-        co2_cap!(EP, inputs, setup)
+        if setup["CO2Cap"] >0
+            co2_cap!(EP, inputs, setup)
+        end
     elseif setup["ModelH2"]==1
         EP = co2_cap_power_hsc(EP, inputs, setup)
     end
