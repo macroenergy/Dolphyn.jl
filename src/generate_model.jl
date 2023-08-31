@@ -190,6 +190,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         EP = retrofit(EP, inputs)
     end
 
+    # Energy Share Requirement
+    if setup["EnergyShareRequirement"] == 1
+        energy_share_requirement!(EP, inputs, setup)
+    end
+
     ###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
     if setup["ModelH2"] == 1
         @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
@@ -267,11 +272,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     # Endogenous Retirements
     if setup["MultiStage"] > 0
         endogenous_retirement!(EP, inputs, setup)
-    end
-
-    # Energy Share Requirement
-    if setup["EnergyShareRequirement"] == 1
-        energy_share_requirement!(EP, inputs, setup)
     end
 		
     #Capacity Reserve Margin
