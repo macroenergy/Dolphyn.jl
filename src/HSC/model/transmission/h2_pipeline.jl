@@ -80,13 +80,25 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     hours_per_subperiod = inputs["hours_per_subperiod"]
 
     H2_P = inputs["H2_P"] # Number of Hydrogen Pipelines
-    H2_Pipe_Map = inputs["H2_Pipe_Map"]
+    H2_Pipe_Map = inputs["H2_Pipe_Map"] # 
+   
+    Source_H2_Pipe_Map = H2_Pipe_Map[H2_Pipe_Map.d .== 1, :]
+    Sink_H2_Pipe_Map = H2_Pipe_Map[H2_Pipe_Map.d .== -1, :]
 
     ### Variables ###
     @variable(EP, vH2NPipe[p = 1:H2_P] >= 0) # Number of Pipes
     @variable(EP, vH2PipeLevel[p = 1:H2_P, t = 1:T] >= 0) # Storage in the pipe
-    @variable(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow
+
+    # Positive pipeline flow
+    # d +/- 1 is just creating variable. Can drop entire dimension of d. Just need one variable.
+    @variable(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = [1,-1]] >= 0) # positive pipeflow
+    # Negative pipeline flow
     @variable(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
+
+    # Unidirectional pipeline flow
+    if setup["H2PipeUnidirectional"] == 1
+        @variable(EP, vH2PipeFlow_uni[p = 1:H2_P, t = 1:T] >= 0)
+    end
 
 
     ### Expressions ###
@@ -94,11 +106,13 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eH2NPipeNew[p = 1:H2_P], vH2NPipe[p] - inputs["pH2_Pipe_No_Curr"][p])
 
     # Calculate net flow at each pipe-zone interfrace
-    @expression(
-        EP,
-        eH2PipeFlow_net[p = 1:H2_P, t = 1:T, d = [-1, 1]],
-        vH2PipeFlow_pos[p, t, d] - vH2PipeFlow_neg[p, t, d]
-    )
+    # Assume there are two nodes and you have flow
+    #### Net flow doesnt make sense in unidirectional
+    #@expression(
+    #    EP,
+    #    eH2PipeFlow_net[p = 1:H2_P, t = 1:T, d = [-1, 1]],
+    #    vH2PipeFlow_pos[p, t, d] - vH2PipeFlow_neg[p, t, d]
+    #)
 
     ## Objective Function Expressions ##
     # Capital cost of pipelines 
@@ -132,7 +146,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCH2CompPipe,
-            sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P) / ModelScalingFactor^2
+            sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P) / ModelScalingFactor^2 # Why is this squared?
         )
     else
         @expression(
@@ -149,13 +163,36 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ## Balance Expressions ##
     # H2 Power Consumption balance
 
+
+    # if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    #     @expression(
+    #         EP,
+    #         ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
+    #         sum(
+    #             vH2PipeFlow_neg[
+    #                 p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+    #             ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+    #         ) / ModelScalingFactor
+    #     )
+    # else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+    #     @expression(
+    #         EP,
+    #         ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
+    #         sum(
+    #             vH2PipeFlow_neg[
+    #                 p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+    #             ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+    #         )
+    #     )
+    # end
+
     if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(
             EP,
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
-                vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+                vH2PipeFlow_uni[
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,]
                 ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
             ) / ModelScalingFactor
         )
@@ -164,30 +201,63 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             EP,
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
-                vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+                vH2PipeFlow_uni[
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,]
                 ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
             )
         )
     end
+
+
 
     EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2PipeCompression
 
 
     # H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
-    @expression(
-        EP,
-        ePipeZoneDemand[t = 1:T, z = 1:Z],
-        sum(
-            eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
-            for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+    #### 
+    #@expression(
+    #    EP,
+    #    ePipeZoneDemand[t = 1:T, z = 1:Z],
+    #    sum(
+    #        eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
+    #        for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+    #    )
+    #)
+
+    # This is setting up an expression that computes the net flow out of the zone to help meet the demand (EP[:eH2Balance])
+    # H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p) is the directionality term
+    
+    # New. Assumes no losses in pipeline
+    @expression(EP, eH2PipeFlow[p=1:H2_P, t = 1:T], vH2PipeFlow_uni[p,t])
+    #@expression(EP, eCO2PipeOutFlow[p=1:H2_P, t = 1:T], vCO2PipeFlow_spur_uni_neg[p,t])
+
+    @expression(EP, ePipeZoneH2OutFlow[t=1:T,z=1:Z],
+        sum(eH2PipeFlow[p,t] for p in Source_H2_Pipe_Map[Source_H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no])
         )
-    )
 
-    EP[:eH2Balance] += ePipeZoneDemand
+    #@expression(EP, ePipeZoneCO2OutFlowDemand_No_Loss_Spur[t=1:T,z=1:Z],
+    #    sum(eCO2PipeOutFlow_Spur[p,t] for p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
 
-    EP[:eHTransmissionByZone] += ePipeZoneDemand
+    @expression(EP, ePipeZoneH2InFlow[t=1:T,z=1:Z],
+        sum(eH2PipeFlow[p,t] for p in Sink_H2_Pipe_Map[Sink_H2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no])
+        )
+
+    #    @expression(EP, ePipeZoneCO2InFlowDemand_No_Loss_Spur[t=1:T,z=1:Z],
+    #       sum(eCO2PipeOutFlow_Spur[p,t] for p in Sink_CO2_Spur_Pipe_Map[Sink_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+
+    # WHY IS THIS HERE?
+    #@expression(EP, ePipeZoneCO2Demand_Inflow_Spur[t=1:T,z=1:Z], ePipeZoneCO2InFlowDemand_No_Loss_Spur[t,z])    
+
+    # Might be flipped ??
+    @expression(EP, ePipesH2Balancing[t=1:T,z=1:Z],
+                ePipeZoneH2InFlow[t,z] - PipeZoneH2OutFlow[t,z]
+                )
+
+    EP[:eH2Balance] += ePipesH2Balancing
+
+    # ??
+    EP[:eHTransmissionByZone] += ePipesH2Balancing
 
     ## End Balance Expressions ##
     ### End Expressions ###
@@ -215,15 +285,16 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     end
 
     # Constraint maximum pipe flow
+    # This needs to be changed. Only need one and it is not the "net"
     @constraints(
         EP,
         begin
-            [p in 1:H2_P, t = 1:T, d in [-1, 1]],
-            EP[:eH2PipeFlow_net][p, t, d] <=
+            [p in 1:H2_P, t = 1:T],
+            EP[:eH2PipeFlow][p, t] <=
             EP[:vH2NPipe][p] * inputs["pH2_Pipe_Max_Flow"][p]
-            [p in 1:H2_P, t = 1:T, d in [-1, 1]],
-            -EP[:eH2PipeFlow_net][p, t, d] <=
-            EP[:vH2NPipe][p] * inputs["pH2_Pipe_Max_Flow"][p]
+            #[p in 1:H2_P, t = 1:T, d in [-1, 1]],
+            #-EP[:eH2PipeFlow_net][p, t, d] <=
+            #EP[:vH2NPipe][p] * inputs["pH2_Pipe_Max_Flow"][p]
         end
     )
 
@@ -250,24 +321,20 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     )
 
     # Pipeline storage level change
-    @constraints(
-        EP,
-        begin
-            [p in 1:H2_P, t in START_SUBPERIODS],
-            vH2PipeLevel[p, t] ==
-            vH2PipeLevel[p, t+hours_per_subperiod-1] - eH2PipeFlow_net[p, t, -1] -
-            eH2PipeFlow_net[p, t, 1]
-        end
-    )
+    ## Not sure how to change this. If you dont comment out get 0
+    # @constraints(
+    #     EP,
+    #     begin
+    #         [p in 1:H2_P, t in START_SUBPERIODS],
+    #         vH2PipeLevel[p, t] ==
+    #         vH2PipeLevel[p, t+hours_per_subperiod-1] - eH2PipeFlow_net[p, t, -1] -
+    #         eH2PipeFlow_net[p, t, 1]
+    #     end
+    # )
 
-    @constraints(
-        EP,
-        begin
-            [p in 1:H2_P, t in INTERIOR_SUBPERIODS],
-            vH2PipeLevel[p, t] ==
-            vH2PipeLevel[p, t-1] - eH2PipeFlow_net[p, t, -1] - eH2PipeFlow_net[p, t, 1]
-        end
-    )
+    # Pipeline storage level change
+    ## Not sure how to change this. If you dont comment out get 0 (Shan dixit)
+
 
     @constraints(EP, begin
         [p in 1:H2_P], vH2NPipe[p] <= inputs["pH2_Pipe_No_Max"][p]
