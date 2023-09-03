@@ -8,3 +8,4 @@ H2CO2Cap: 0 # CO2 emissions cap for HSC only; 0 = not active (no CO2 emission li
 H2G2PCommit: 0 #1 for unit commitment G2P representation, 0 continuous representation of H2 G2P tech
 H2TrucksMaxDistance: 500 # the max number of miles or km for a truck route (depends on the units used throughout, calculated via time constraint based on truck speed)
 ModelH2Liquid: 0 # FLag to model H2 liquid production - 0 - not included, 1 - included
+H2PipeUnidirectional: 2 # Flag to model pipeline flow direction - 1 unidirectional, 2 - bidirectional

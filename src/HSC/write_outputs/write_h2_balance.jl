@@ -61,8 +61,9 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 	     	dfTemp1[t+rowoffset,6] = value(EP[:vH2NSE][1,t,z])
 
+			
 			if setup["ModelH2Pipelines"] == 1
-			 	dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
+				dfTemp1[t+rowoffset,7] = value.(EP[:ePipeZoneDemand][t,z])
 			else
 				dfTemp1[t+rowoffset,7] = 0
 			end
