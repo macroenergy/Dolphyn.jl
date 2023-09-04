@@ -61,17 +61,21 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	if setup["ModelH2Trucks"] ==1
 		inputs = load_h2_truck(path, sep, inputs)
 	end
-	
 
 
 	# Read input data about G2P Resources
-	if isfile(string(path,sep,"HSC_g2p.csv"))
-		# Create flag for other parts of the code
-		setup["ModelH2G2P"] = 1
+	#if isfile(string(path,sep,"HSC_g2p.csv"))
+	#	# Create flag for other parts of the code
+	#	setup["ModelH2G2P"] = 1
+	#	inputs = load_h2_g2p(setup,path, sep, inputs)
+	#	inputs = load_h2_g2p_variability(setup, path, sep, inputs)
+	#else
+	#	setup["ModelH2G2P"] = 0
+	#end
+
+	if 	setup["ModelH2G2P"] == 1
 		inputs = load_h2_g2p(setup,path, sep, inputs)
 		inputs = load_h2_g2p_variability(setup, path, sep, inputs)
-	else
-		setup["ModelH2G2P"] = 0
 	end
 	
 	# If emissions flag is on, read in emissions related inputs

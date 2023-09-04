@@ -27,6 +27,7 @@ function biorefinery_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
     dfbiorefinery = inputs["dfbiorefinery"]
 	BIO_RES_ALL = inputs["BIO_RES_ALL"]
+	BIO_H2 = inputs["BIO_H2"]
 
 	#Define sets
 	T = inputs["T"]     # Number of time steps (hours)
@@ -57,6 +58,23 @@ function biorefinery_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
 	EP[:eObj] += EP[:eVar_Cost_BIO]
 
+	#####################################################################################################################################
+	#For Bio-H2 to use in LCOH calculations
+	#Variable cost per Bio H2 plant per time
+	#if setup["BIO_H2_On"] == 1
+	#	if setup["ParameterScale"] ==1
+	#		@expression(EP, eVar_Cost_BIO_H2_per_plant_per_time[i in BIO_H2, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:Var_OM_per_tonne][i]/ModelScalingFactor)
+	#	else
+	#		@expression(EP, eVar_Cost_BIO_H2_per_plant_per_time[i in BIO_H2, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:Var_OM_per_tonne][i])
+	#	end
+		
+		#Variable cost per Bio H2 plant
+	#	@expression(EP, eVar_Cost_BIO_H2_per_plant[i in BIO_H2], sum(EP[:eVar_Cost_BIO_H2_per_plant_per_time][i,t] for t in 1:T))
+
+		#Total variable cost for Bio H2
+	#	@expression(EP, eVar_Cost_BIO_H2, sum(EP[:eVar_Cost_BIO_H2_per_plant][i] for i in BIO_H2))
+	#end
+	
 	return EP
 
 end

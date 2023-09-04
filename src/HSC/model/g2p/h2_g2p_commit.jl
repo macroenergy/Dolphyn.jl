@@ -192,6 +192,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
 	# Julia is fastest when summing over one row one column at a time
 	@expression(EP, eTotalH2G2PCStartT[t=1:T], sum(eH2G2PCStart[k,t] for k in H2_G2P_COMMIT))
+	@expression(EP, eTotalH2G2PCStartK[k = H2_G2P_COMMIT], sum(eH2G2PCStart[k,t] for t in 1:T))
 	@expression(EP, eTotalH2G2PCStart, sum(eTotalH2G2PCStartT[t] for t=1:T))
 
 	EP[:eObj] += eTotalH2G2PCStart
