@@ -97,6 +97,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # Negative pipeline flow
     @variable(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
 
+    # add constraint to make vH2PipeFlow_neg == 0 
+
     # Unidirectional pipeline flow
     if setup["H2PipeUnidirectional"] == 2
         @variable(EP, vH2PipeFlow_uni[p = 1:H2_P, t = 1:T] >= 0)
@@ -200,7 +202,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             EP,
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
-                vH2PipeFlow_neg[
+                vH2PipeFlow_uni[
                     p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
                  ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
              ) / ModelScalingFactor
@@ -210,18 +212,13 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             EP,
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
-                vH2PipeFlow_neg[
+                vH2PipeFlow_uni[
                     p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
                  ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
              ) 
         )
     end
     
-
-
-
-
-
 
 
     # # Assume that power is consumed by the 
@@ -251,16 +248,16 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     #EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2PipeCompression
 
 
-    # H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
-    #### 
-    #@expression(
+    #H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
+    ### NEED TP FIGURE THIS OUT
+    # @expression(
     #    EP,
     #    ePipeZoneDemand[t = 1:T, z = 1:Z],
     #    sum(
-    #        eH2PipeFlow_net[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
+    #        eH2PipeFlow_uni[p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :][!,:d][1]] 
     #        for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
     #    )
-    #)
+    # )
 
     # This is setting up an expression that computes the net flow out of the zone to help meet the demand (EP[:eH2Balance])
     # H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p) is the directionality term
@@ -357,17 +354,20 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    # Pipeline storage level change
-    ## Not sure how to change this. If you dont comment out get 0
-    # @constraints(
-    #     EP,
-    #     begin
-    #         [p in 1:H2_P, t in START_SUBPERIODS],
-    #         vH2PipeLevel[p, t] ==
-    #         vH2PipeLevel[p, t+hours_per_subperiod-1] - eH2PipeFlow_net[p, t, -1] -
-    #         eH2PipeFlow_net[p, t, 1]
-    #     end
-    # )
+    #Pipeline storage level change
+    # Not sure how to change this. If you dont comment out get 0
+    # Start subperiods are the first hour in each representative period (dont have t-1)
+    # Interior subperiods are considering all the periods within a representative period except for period 1. Its the set of hours across the representative periods that are not the first hour. (t, t-1)
+    # Add the interior subperiod later that got deleted from the main branch
+    @constraints(
+        EP,
+        begin
+            [p in 1:H2_P, t in START_SUBPERIODS],
+            vH2PipeLevel[p, t] ==
+            vH2PipeLevel[p, t+hours_per_subperiod-1] - eH2PipeFlow_net[p, t, -1] -
+            eH2PipeFlow_net[p, t, 1]
+        end
+    )
 
     # Pipeline storage level change
     ## Not sure how to change this. If you dont comment out get 0 (Shan dixit)
