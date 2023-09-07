@@ -124,7 +124,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
     @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)    
+    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)  
+    
+    # Energy Share Requirement
+	if setup["EnergyShareRequirement"] >= 1
+		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
+	end
 
     ##### Power System related modules ############
     # Infrastructure
