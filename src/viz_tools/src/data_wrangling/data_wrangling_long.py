@@ -89,7 +89,7 @@ elec_bins = {
     'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'ocgt', 'ccgt'],
     'natural_gas_w_CCS': ['natural_gas_ccs'],
     'hydroelectric': ['hydro', 'hydroelectric', 'ror'],  # added 'hydroelectric' to the list for better matching
-    'coal': ['coal'],
+    'coal': ['coal', 'lignite'],
     'solar': ['solar', 'pv'],
     'wind': ['wind'],
     'nuclear': ['nuclear'],
@@ -103,7 +103,7 @@ elec_bins = {
 h2_bins = {
     'smr': ['smr'],
     'atr': ['atr'],
-    'electrolyzer': ['electrolyzer'],  # added 'hydroelectric' to the list for better matching
+    'electrolyzer': ['electrolyzer', 'electrolyzers'],  # added 'hydroelectric' to the list for better matching
     'h2_storage': ['storage']}
 
 
@@ -277,13 +277,25 @@ def capacity_w_H2G2p_analysis(run):
 
 # run is the string of the directory of the DOLPHYN case that you care about
 def electricity_analysis(run):
-    df = open_results_file('capacity.csv', run)
+    
+    df_capacity = open_results_file('capacity.csv', run)
+    
+    df_power = open_results_file('power.csv', run)
+    
+    df_power = df_power.set_index('Resource').T
+    df_power = df_power[['AnnualSum']]
+    # Rename the column
+    df_power.rename(columns={'AnnualSum': 'AnnualGeneration'}, inplace=True)
+    # Since 'Resource' is the index, reset it to be a column and rename "index" back to "Resource":
+    df_power = df_power.reset_index()
+    df_power.rename(columns={'index': 'Resource'}, inplace=True)
+
+    df = pd.merge(df_power, df_capacity, on='Resource', how='inner')
+    
     #drop total row
     df = df[df['Resource'] != 'Total']
 
     df = identify_tech_type(df, bin_type = "elec")
-    
-    #breakpoint()
     
     variables_of_interest = ['Zone', 'EndCap', 'Resource']
     df = df[variables_of_interest]
@@ -328,7 +340,7 @@ def h2_analysis(run):
     
     return(melted_df)
 
-'''
+
 def main():
     runs_list = list_directories(runs_directory_path)
     
@@ -347,7 +359,7 @@ def main():
     return(df)
 
 df = main()
-'''
+
 
 
 
