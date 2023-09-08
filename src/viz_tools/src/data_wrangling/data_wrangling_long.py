@@ -9,7 +9,8 @@ Created on Wed Aug 16 14:16:47 2023
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
-
+from generator_id_dict import elec_bins
+from generator_id_dict import h2_bins
 
 # Get the directory of the script, which should be 'src'
 current_directory = os.getcwd()
@@ -85,26 +86,26 @@ def open_inputs_file(file_name, run):
 
 
 # Dictionary to map patterns to energy types
-elec_bins = {
-    'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'ocgt', 'ccgt'],
-    'natural_gas_w_CCS': ['natural_gas_ccs'],
-    'hydroelectric': ['hydro', 'hydroelectric', 'ror'],  # added 'hydroelectric' to the list for better matching
-    'coal': ['coal', 'lignite'],
-    'solar': ['solar', 'pv'],
-    'wind': ['wind'],
-    'nuclear': ['nuclear'],
-    'battery': ['battery', 'lithium', 'storage'],
-    'phs' : ['phs', "pumped"],
-    'oil' : ['oil'],
-    'biomass' : ["biomass"],
-    'H2': ['H2']
-}
+# elec_bins = {
+#     'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'ocgt', 'ccgt'],
+#     'natural_gas_w_CCS': ['natural_gas_ccs'],
+#     'hydroelectric': ['hydro', 'hydroelectric', 'ror'],  # added 'hydroelectric' to the list for better matching
+#     'coal': ['coal', 'lignite'],
+#     'solar': ['solar', 'pv'],
+#     'wind': ['wind'],
+#     'nuclear': ['nuclear'],
+#     'battery': ['battery', 'lithium', 'storage'],
+#     'phs' : ['phs', "pumped"],
+#     'oil' : ['oil'],
+#     'biomass' : ["biomass"],
+#     'H2': ['H2']
+# }
 
-h2_bins = {
-    'smr': ['smr'],
-    'atr': ['atr'],
-    'electrolyzer': ['electrolyzer', 'electrolyzers'],  # added 'hydroelectric' to the list for better matching
-    'h2_storage': ['storage']}
+# h2_bins = {
+#     'smr': ['smr'],
+#     'atr': ['atr'],
+#     'electrolyzer': ['electrolyzer', 'electrolyzers'],  # added 'hydroelectric' to the list for better matching
+#     'h2_storage': ['storage']}
 
 
 
@@ -379,6 +380,9 @@ run = '/Users/lesarmstrong/Documents/GitHub/DOLPHYN-dev/Example_Systems/SmallNew
 
 
 df = main(run)
+
+
+
 
 
 
