@@ -11,3 +11,4 @@ H2CO2Cap: 0 # CO2 emissions cap for HSC only; 0 = not active (no CO2 emission li
 H2G2PCommit: 0 #1 for unit commitment G2P representation, 0 continuous representation of H2 G2P tech
 Gen_CAPEX_Economies_of_Scale: 1 #parameter to turn on economies of scale function for HSC generators (applies to Electrolyzers & SMR only)
 TimeMatchingRequirement: 1 # Modeling time matching requiremnet for electricity based H2 production - 0 - not included, 1 - hourly with excess sales, 2- hourly without excess sales, 3 - annual 
+TMRSalestoESR: 0 #Excess TMR sales can be used to meet EST requirements

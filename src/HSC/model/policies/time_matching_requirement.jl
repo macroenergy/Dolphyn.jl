@@ -148,9 +148,11 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 			end
 		end 
 
-		@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum(eExcessElectricitySupplyTMR[TMR] for TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
-
-		EP[:eESR] += eExcessAnnualElectricitySupplyESR
+		if nrow(esr_tmr_df) != 0
+			#Summing excess energy across all TMR resources in the same ESR group, creating an excess annual electricity supply variable from TMR resources for each ESR. 
+			@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum(eExcessElectricitySupplyTMR[TMR] for TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
+			EP[:eESR] += eExcessAnnualElectricitySupplyESR
+		end
 
 	end 
 

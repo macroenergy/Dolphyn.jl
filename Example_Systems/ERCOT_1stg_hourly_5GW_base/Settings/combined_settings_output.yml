@@ -10,8 +10,9 @@ ParameterScale: 0
 H2NetworkExpansion: 0
 EnergyShareRequirement: 0
 PrintModel: 0
-TimeDomainReduction: 0
+TimeDomainReduction: 1
 Trans_Loss_Segments: 1
+TMRSalestoESR: 0
 CapacityReserveMargin: 0
 ModelingtoGenerateAlternativeSlack: 0.1
 Solver: "Gurobi"
@@ -22,7 +23,9 @@ ModelH2Liquid: 0
 Reserves: 0
 StorageLosses: 0
 OperationWrapping: 0
+MultiStage: 0
 OverwriteResults: 0
+IncludeLossesInESR: 0
 Gen_CAPEX_Economies_of_Scale: 1
 TimeMatchingRequirement: 1
 UCommit: 2
@@ -34,4 +37,5 @@ CO2Cap: 0
 ModelH2: 1
 H2TrucksMaxDistance: 500
 WriteShadowPrices: 1
+Zones: []
 ModelH2Pipelines: 0
