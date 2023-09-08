@@ -107,6 +107,10 @@ h2_bins = {
     'h2_storage': ['storage']}
 
 
+
+
+
+
 # Function to categorize energy types based on patterns in a resource name.
 def categorize_energy_type(resource_name, bin_type):
     # Convert the resource name to lowercase to ensure case-insensitive matching.
@@ -341,7 +345,20 @@ def h2_analysis(run):
     return(melted_df)
 
 
-def main():
+def main(run_path):
+    
+    dfs = []
+    df_elec = electricity_analysis(run_path)
+    df_elec['Run'] = run_path
+    dfs.append(df_elec)
+    df_h2 = h2_analysis(run_path)
+    df_h2['Run'] = run_path
+    dfs.append(df_h2)
+    df = pd.concat(dfs)  # Concatenate all DataFrames in the list
+    
+    return(df)
+
+def main_multiple_runs():
     runs_list = list_directories(runs_directory_path)
     
     dfs = []  # A list to store individual DataFrames
@@ -358,10 +375,10 @@ def main():
     
     return(df)
 
-df = main()
+run = '/Users/lesarmstrong/Documents/GitHub/DOLPHYN-dev/Example_Systems/SmallNewEngland/ThreeZones'
 
 
-
+df = main(run)
 
 
 
