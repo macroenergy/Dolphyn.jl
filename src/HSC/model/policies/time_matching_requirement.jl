@@ -124,19 +124,19 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 		end
 
 		for curr_tmr in 1:nH2_TMR
-			
 			# Filter the DataFrame based on a column's value being equal to 1
 			dfGen_curr_tmr = filter(row -> row[Symbol("H2_TMR_$curr_tmr")] == 1, dfGen)
 
 				for curr_esr in 1:nESR
-					tmr_consistent = check_column_consistency(dfGen_curr_tmr, Symbol("ESR_$curr_esr")) !=1
-					if tmr_consistent !=1
-						ErrorException("All resources belonging to the same TMR must be part of the same ESR requirement")
+					tmr_consistent = check_column_consistency(dfGen_curr_tmr, Symbol("ESR_$curr_esr"))
+					if !tmr_consistent 
+						error("All resources belonging to the same TMR must be part of the same ESR requirement")
 					end
 				end				
 
 		end
-		
+
+
 		#Creating dataframe mappin ESRs to TMRs
 		esr_tmr_df = DataFrame(ESR = Int[], TMR = Int[])
 		for curr_esr in 1:nESR
