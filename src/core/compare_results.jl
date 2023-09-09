@@ -30,7 +30,7 @@ end
 Takes a string array of differences between two directories and prints them to a file
 """
 function print_comparison(lines_to_write::Array{Any,1}, output_filename::AbstractString="summary.txt")
-    summary_file = open(output_filename, "w")
+    summary_file = open(output_filename, "a")
     write(summary_file, join(lines_to_write))
     close(summary_file)
 end
@@ -55,7 +55,7 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
     only2 = setdiff(files2, common_files)
 
     # Create a summary file
-    
+
     lines_to_write = []
     push!(lines_to_write, "$(inset)Comparing the following directories:\n")
     push!(lines_to_write, "$(inset)--- $dirname1 ---\n")
@@ -77,7 +77,7 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
         push!(lines_to_write, "$(inset)Both directories contain the same files and subdirectories\n")
     end
     push!(lines_to_write, "\n")
-    
+
     common_files_matching = []
     common_files_diff = []
     subdirs = []
@@ -120,11 +120,12 @@ function compare_dir(path1::AbstractString, path2::AbstractString, inset::String
             for subdir in subdirs
                 lines_to_write = [lines_to_write; compare_dir(joinpath(path1, subdir), joinpath(path2, subdir), join([inset, "  "]))]
             end
+            push!(lines_to_write, "\n")
         end
     end
     return lines_to_write
 end
-    
+
 @doc raw"""
     filecmp_byte(path1::AbstractString, path2::AbstractString)
 
