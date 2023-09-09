@@ -2,6 +2,7 @@ on:
   pull_request:
     branches:
       - main
+      - develop
     paths:
       - '**.jl'
   workflow_dispatch:
