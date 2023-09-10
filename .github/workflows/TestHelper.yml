@@ -34,5 +34,7 @@ jobs:
         if: steps.check_files.outputs.files_exists == 'true'
         uses: mshick/add-pr-comment@v2
         with:
+          update-only: "true"
+          preformatted: "true"
           message-path: |
             test/summary.txt
