@@ -2,9 +2,7 @@
 ## Overview
 DOLPHYN is a configurable, [open source](https://github.com/gn-he/DOLPHYN-dev/blob/main/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
 
-
 In its current form, the DOLPHYN model evaluates investments and operations across the bulk supply chains for electricity and Hydrogen (H2), including production, storage, transmission, conditioning, and end-use consumption. Importantly, the model is able to capture interaction effects between the electricity and hydrogen infrastructures through different technology configurations for: a) using hydrogen for power generation and b) the ability to produce hydrogen using electricity. The model is setup  as a single-stage investment planning model and determines the least-cost mix of electricity and H2 production, storage, and transmission infrastructures to meet power and H2 demands subject to a variety of operational and policy constraints, considering carbon emissions at the same time. The DOLPHYN model is an extension of the [GenX](https://github.com/GenXProject/GenX) electricity system model and uses much of the same source code for characterizing the electricity system operations and expansion as included in the GenX model (v0.2.0). Periodically, the electricity system representation will be updated as per the latest GenX version. Users looking to study electricity systems alone are encouraged to consider working with GenX rather than DOLPHYN for best functionality and experience.
-
 
 The developed model can incorporate a wide range of power and H2 technology options, including VRE generation, carbon capture and storage (CCS) applied to power and H2 generation, and truck (gaseous, liquid) and pipelines for H2 transportation. The power systems and H2 supply chain are coupled primarily through electrolysis and power generation technologies fueled by H2, as well as electricity consumption in H2 compression/liquefaction. 
 The key operational constraints of the model include: 
@@ -13,18 +11,16 @@ The key operational constraints of the model include:
 + inventory balance constraints related to trucks at a given location (any of the zones and routes, arriving, departing or in transit) and for different states (empty and full), and
 + linearized unit commitment for conventional thermal power generation technologies and natural gas based H2 production technologies.
 
- The model is designed to be highly flexible and configurable for use in a variety of applications from academic research and technology evaluation to public policy and regulatory analysis and resource planning. 
+The model is designed to be highly flexible and configurable for use in a variety of applications from academic research and technology evaluation to public policy and regulatory analysis and resource planning. 
 
  
 ## Requirements
 
 DOLPHYN runs on Julia versions above 1.4 series, and a minimum version of JuMP v0.21.x. It is currently setup to use one of the following open-source freely available solvers: A) [Clp](https://github.com/jump-dev/Clp.jl) for linear programming (LP) problems and (B) [Cbc](https://github.com/jump-dev/Cbc.jl) for mixed integer linear programming (MILP) problems. We also provide the option to use one of these two commercial solvers: C) [Gurobi](https://www.gurobi.com), and D) [CPLEX](https://www.ibm.com/analytics/cplex-optimizer). Note that using Gurobi and CPLEX requires a valid license on the host machine. 
 
-The file `julenv.jl` in the parent directory lists all of the packages and their versions needed to run DOLPHYN. You can see all of the packages installed in your Julia environment and their version numbers by running `pkg> status` on the package manager command line in the Jula REPL.
-
 ## Running an Instance of DOLPHYN
 
-Download or clone the DOLPHYN repository on your machine in a directory named 'DOLPHYN-dev'. Create this new directory in a location where you wish to store the DOLPHYNJulEnv environment.
+Download or clone the DOLPHYN repository on your machine in a directory named 'DOLPHYN-dev'. Create this new directory in a location where you wish to store the DOLPHYN environment.
 
 The Run.jl file in each of the example sub-folders within `Example_Systems/` provides an example of how to use DOLPHYN.jl for capacity expansion modeling. Descriptions of each example system is included in the next section. The following are the main steps performed in the Run.jl script:
 
@@ -36,17 +32,43 @@ The Run.jl file in each of the example sub-folders within `Example_Systems/` pro
 6. Solve the model.
 7. Write the output files to a specified directory.
 
-To run the model, first navigate to the example directory within `DOLPHYN- dev/Example_Systems/{desired-example-directory}`:
+Ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `hsc_settings` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`) (for configuring your local machine to use Gurobi, please follow instructions [here](https://github.com/macroenergy/DOLPHYN/wiki/Installing-and-running-DOLPHYN#download-the-gurobi-and--or-highs-solvers)), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more.
 
-`cd("Example_Systems/{desired-example-directory}")`
+### Setting up the Julia environment 
 
-Next, ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `hsc_settings` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more.
+#### First time running DOLPHYN:
 
-Once the settings are confirmed, run the model with the `Run.jl` script in the example directory:
+In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder then run the following commands:
 
-`include("Run.jl")`
+- <code>julia --project=.</code>
+- <code>julia> ]</code> (type julia to get an interactive julia (aka REPL) and then enter ']' at the prompt)
+- <code>(DOLPHYN) pkg> instantiate</code> (you should see DOLPHYN project name here, if not, enter `activate .`)
+- <code>(DOLPHYN) pkg> build Gurobi</code> (if you plan to use Gurobi)
 
-Once the model has complete, results will be write in the 'Results' directory. 
+Here is a snapshot for you to see the commands (instantiate and build Gurobi) used from above:
+![Screen Shot 2023-09-07 at 11 19 22 AM](https://github.com/macroenergy/DOLPHYN/assets/2174909/8e5720fd-28f5-4bdc-840c-70fec0212cd3)
+
+You can now press backspace to exit the Julia package manager and start using DOLPHYN by [running your first example](#running-your-first-example).
+
+#### Second+ time running DOLPHYN:
+
+In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder then run the following commands:
+
+- <code>julia --project=.</code>
+- <code>julia> ]</code> 
+- <code>(DOLPHYN) pkg> st</code> (this is for checking the status of packages installed for DOLPHYN)
+
+### Running your first example: 
+
+Exit the package manager by hitting your backspace key. Then, navigate to one of the example systems, e.g.:
+
+`julia> cd("Example_Systems/SmallNewEngland/OneZone")`
+
+Use the Run.jl file to run the case:
+
+`julia> include("Run.jl")`
+
+Once the model has completed running, results will be written into the 'Results' directory. 
 
 ## Example Systems
 
