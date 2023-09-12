@@ -28,11 +28,12 @@ function write_p_g2p(path::AbstractString, sep::AbstractString, inputs::Dict, se
     # dfH2G2POut_annual = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2G2P[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
     dfPG2POut = DataFrame(Resource = inputs["H2_G2P_NAME"], Zone = dfH2G2P[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
-    for i in 1:H
-        dfPG2POut[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vPG2P])[i,:]))
-    end
+    pg2p = value.(EP[:vPG2P])
+
+    dfPG2POut.AnnualSum .= pg2p * inputs["omega"] 
+
     # Load hourly values
-    dfPG2POut = hcat(dfPG2POut, DataFrame((value.(EP[:vPG2P])), :auto))
+    dfPG2POut = hcat(dfPG2POut, DataFrame(pg2p, :auto))
 
     # Add labels
     auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
