@@ -39,6 +39,11 @@ Model settings parameters are specified in a `hsc_Settings.yml` file which shoul
 || 1 = mass-based emission limit constraint|
 || 2 = load + rate-based emission limit constraint|
 || 3 = generation + rate-based emission limit constraint|
+|TimeMatchingRequirement | Flag for specifying type of time0matching requirement. |
+|| 0 = no time matching requirement active|
+|| 1 = Hourly time-matching with excess sales|
+|| 2 = Hourly time-matching without excesst sales|
+|| 3 = Annual time-matching|
 
 ## 2 Inputs
 
@@ -189,7 +194,10 @@ This file contains cost and performance parameters for various generators and ot
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
 |Start\_Cost\_per\_tonne\_p\_hr |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
-
+|**TimeMatchingRequirement > 0**||
+|TMR\_*| Flag to indicate which resources are considered for the Time Matching Requirement constraint.|
+||1- included|
+||0- excluded|
 ### 2.2 Optional input data
 
 #### 2.2.1 HSC\_CO2\_cap.csv
