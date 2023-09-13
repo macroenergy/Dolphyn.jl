@@ -106,6 +106,6 @@ if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
-if mysetup["VisualizeData"] == 1:
+if mysetup["VisualizeData"] == 1
     dolphyn_viz(case_dir)
 end
