@@ -26,10 +26,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		dfH2G2P = inputs["dfH2G2P"]
 	end
 
-	if setup["ModelBIO"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
-	end
-
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments

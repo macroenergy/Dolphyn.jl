@@ -34,14 +34,24 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		cCO2Comp =  value(EP[:eFixed_Cost_CO2_Capture_Comp_total]) * ModelScalingFactor^2
 		cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total]) * ModelScalingFactor^2
 		cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total]) * ModelScalingFactor^2
-		cCO2NetworkExpansion = value(EP[:eCCO2Pipe]) * ModelScalingFactor^2
+
+		if setup["ModelCO2Pipelines"] == 1
+			cCO2NetworkExpansion = value(EP[:eCCO2Pipe]) * ModelScalingFactor^2
+		else
+			cCO2NetworkExpansion = 0
+		end
 	else
 		cDACVar = value(EP[:eVar_OM_DAC])
 		cDACFix = value(EP[:eFixed_Cost_DAC_total])
 		cCO2Comp = value(EP[:eFixed_Cost_CO2_Capture_Comp_total])
 		cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total])
 		cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total])
-		cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
+
+		if setup["ModelCO2Pipelines"] == 1
+			cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
+		else
+			cCO2NetworkExpansion = 0
+		end
 	end
 
 	# Define total costs

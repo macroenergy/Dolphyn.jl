@@ -64,8 +64,8 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	#elapsed_time_costs = @elapsed write_costs(path, sep, inputs, setup, EP)
 	#print_and_log("Time elapsed for writing costs is $elapsed_time_costs")
 
-	elapsed_time_costs_system = @elapsed write_costs_system(path, sep, inputs, setup, EP)
-	print_and_log("Time elapsed for writing system costs is $elapsed_time_costs_system")
+	#elapsed_time_costs_system = @elapsed write_costs_system(path, sep, inputs, setup, EP)
+	#print_and_log("Time elapsed for writing system costs is $elapsed_time_costs_system")
 
 	dfCap = write_capacity(path, sep, inputs, setup, EP)
 	dfPower = write_power(path, sep, inputs, setup, EP)

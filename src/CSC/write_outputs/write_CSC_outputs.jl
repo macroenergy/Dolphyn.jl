@@ -48,6 +48,7 @@ function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
     write_co2_emission_balance_system(path, sep, inputs, setup, EP)
     write_co2_storage_balance(path, sep, inputs, setup, EP)
+    write_co2_storage_balance_zone(path, sep, inputs, setup, EP)
     write_co2_balance_dual(path, sep, inputs, setup, EP)
 
     if setup["ModelCO2Pipelines"] ==1 

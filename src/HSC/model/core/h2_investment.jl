@@ -36,8 +36,6 @@ The expression defined in this file named after ```eH2GenTotalCap``` covers all 
 \end{equation*}
 ```
 
-This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all resources over all time periods.
-
 The total capacity of each resource (SMR, storage, electrolysis) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. 
 Note for energy storage resources in hydrogen sector, additional energy and charge capacity decisions and constraints are defined in the storage module.
 
