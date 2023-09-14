@@ -107,6 +107,8 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)
     # Down-select Zones to model
     set_default_if_absent!(settings, "Zones", [])
+    # H2 Pipeline directionality settings. 1 = Unidirectional (H2 can only flow from Source --> Sink for a given pipe); 2 = Bidirectional (H2 can flow in both direction in a pipe). Default is bidirectional
+    set_default_if_absent!(settings, "H2PipeDirection", 2)
 
 return settings
 end

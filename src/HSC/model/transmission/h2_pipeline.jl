@@ -83,9 +83,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     H2_Pipe_Map = inputs["H2_Pipe_Map"]
 
     Source_H2_Pipe_Map = H2_Pipe_Map[H2_Pipe_Map.d .== 1, :]
-    print(Source_H2_Pipe_Map)
     Sink_H2_Pipe_Map = H2_Pipe_Map[H2_Pipe_Map.d .== -1, :]
-    print(Sink_H2_Pipe_Map)
 
     ### Variables ###
     # Here the d index refers to the zones. +1 d refers to the source zone. -1 d refers to the destination zone.
@@ -98,7 +96,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     # Unidirectional pipeline flow constraints. hsc_pipeline inputs file must have 2 pipelines in between each zone for this to work properly (flipping the -1 and +1 directions)
     # Constraints force the source zone to only export H2 through pipeline p while the destination zone can only import
-    if setup["H2PipeUnidirectional"] == 1
+    if setup["H2PipeDirection"] == 1
         @constraint(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = 1] .== 0)
         @constraint(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = -1] .== 0)
     end
@@ -166,10 +164,6 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     ## Balance Expressions ##
     # H2 Power Consumption balance
-    println()
-    #println(H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==1).&(H2_Pipe_Map[!, :pipe_no].==5), :,][!,:d])
-    #println(H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==1).&(H2_Pipe_Map[!, :pipe_no].==5), :,][!,:d][1])
-    #println(H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==1, :][!, :pipe_no])
 
     if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(
