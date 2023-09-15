@@ -23,9 +23,11 @@ elec_colors = {
 }
 
 h2_colors = {
-    'smr': '#2f4f4f',  # dark grey
+    'smr': '#00ffff',  # dark grey
+    'smr_ccs': '#ff4500', #orange
     'atr': '#800000',  # bordeaux
-    'electrolyzer': '#00ffff',  # aqua blue
+    'atr_ccs': '#9400d3', #violet
+    'electrolyzer': '#2f4f4f' ,  # aqua blue
     'h2_storage': '#ffc0cb'  # pink
 }
 

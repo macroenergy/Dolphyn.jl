@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 # Dictionary to map patterns to energy types
 elec_bins = {
     'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'ocgt', 'ccgt'],
-    'natural_gas_w_CCS': ['natural_gas_ccs'],
     'hydroelectric': ['hydro', 'hydroelectric', 'ror'],  # added 'hydroelectric' to the list for better matching
     'coal': ['coal', 'lignite'],
     'solar': ['solar', 'pv'],
@@ -103,34 +102,6 @@ def open_inputs_file(file_name, run):
     path = runs_directory_path + run + '/' + file_name
     df = pd.read_csv(path)
     return(df)
-
-
-
-
-# Dictionary to map patterns to energy types
-# elec_bins = {
-#     'natural_gas': ['natural_gas', 'naturalgas', 'ng', 'combined_cycle', 'ocgt', 'ccgt'],
-#     'natural_gas_w_CCS': ['natural_gas_ccs'],
-#     'hydroelectric': ['hydro', 'hydroelectric', 'ror'],  # added 'hydroelectric' to the list for better matching
-#     'coal': ['coal', 'lignite'],
-#     'solar': ['solar', 'pv'],
-#     'wind': ['wind'],
-#     'nuclear': ['nuclear'],
-#     'battery': ['battery', 'lithium', 'storage'],
-#     'phs' : ['phs', "pumped"],
-#     'oil' : ['oil'],
-#     'biomass' : ["biomass"],
-#     'H2': ['H2']
-# }
-
-# h2_bins = {
-#     'smr': ['smr'],
-#     'atr': ['atr'],
-#     'electrolyzer': ['electrolyzer', 'electrolyzers'],  # added 'hydroelectric' to the list for better matching
-#     'h2_storage': ['storage']}
-
-
-
 
 
 
@@ -324,12 +295,12 @@ def electricity_analysis(run):
 
     df = identify_tech_type(df, bin_type = "elec")
     
-    variables_of_interest = ['Zone', 'EndCap', 'Resource']
+    variables_of_interest = ['Zone', 'EndCap', 'Resource', 'AnnualGeneration']
     df = df[variables_of_interest]
 
     # Capacity
     melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap'], 
+                       value_vars=['EndCap', 'AnnualGeneration'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition

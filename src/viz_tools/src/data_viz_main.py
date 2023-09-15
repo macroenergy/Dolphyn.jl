@@ -10,15 +10,30 @@ def run_data_viz_single_run(dir):
 
     viz_path = create_viz_dir(dir)
 
+    print(elec_viz_df)
+
+    print(h2_viz_df)
+
     create_stacked_bar_plot(df = elec_viz_df,
                             target_type = "electricity_capacity_MW",
                             save_path = viz_path,
                             fig_name = "elec_capacity")
     
+    create_stacked_bar_plot(df = elec_viz_df,
+                            target_type = "electricity_generation_MWh",
+                            save_path = viz_path,
+                            fig_name = "elec_generation")
+
     create_stacked_bar_plot(df = h2_viz_df,
                             target_type = "h2_capacity_tonne_hr",
                             save_path = viz_path,
                             fig_name = "h2_capacity")
+    
+
+    create_stacked_bar_plot(df = h2_viz_df,
+                            target_type = "h2_capacity_tonne_hr",
+                            save_path = viz_path,
+                            fig_name = "h2_generation")
 
 
 
