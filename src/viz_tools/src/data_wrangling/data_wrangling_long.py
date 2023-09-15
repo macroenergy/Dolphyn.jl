@@ -154,129 +154,14 @@ def identify_tech_type(df, bin_type, resources='', aggregate=True, dont_aggregat
 
     return df
 
-    
-'''
-def zone_ID(run, file_name='HSC_h2_generation_discharge.csv'):
-    df = open_results_file(run=run, file_name='HSC_h2_generation_discharge.csv')
-    df = df.T
-    df = df.reset_index()
-    df.columns = df.iloc[0]
-    df = df[1:]
-    df = df.rename(columns={'Zone': 'Zone_N'})
-    df = df[df['Resource'] != 'Total']
-    resources = df[df['Resource'] != 'Total']
-
-    df = identify_tech_type(df, resources, aggregate=False)
-    df = df.iloc[:-1]
-    df = df.reset_index()
-    df['Zone'] = df['Resource'].apply(lambda resource: next((zone for zone in zones_names if zone in resource), None))
-    zone_dict = pd.Series(df.Zone.values,index=df.Zone_N).to_dict()
-    zone_dict = {f'z{int(k)}': v for k, v in zone_dict.items()}
-    # Create a dictionary identifying zone numbers to zone names. Zone numbers are the keys and zone names are the values
-    zone_number_dict = df.set_index('Zone_N')['Zone'].to_dict()
-    
-    return(zone_dict, zone_number_dict)
-'''
-
-'''
-
-def capacity_w_H2G2p_analysis(run):
-    df = open_results_file('capacity_w_H2G2P.csv', run)
-    #drop total row
-    df = df[df['Resource'] != 'Total']
-
-    df = identify_tech_type(df)
-    
-    #breakpoint()
-    
-    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
-    df = df[variables_of_interest]
-
-    # Capacity
-    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'Resource'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
-        'EndCap': 'electricity_capacity_MW',
-        'AnnualGeneration': 'electricity_generation_MWh'
-    })
-    
-    
-    # Annual Generation
-    
-    # Capacity
-    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['AnnualGeneration', 'Resource'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
-        'EndCap': 'electricity_capacity_MW',
-        'AnnualGeneration': 'electricity_generation_MWh'
-    })
-    
-    
-    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
-    
-    
-    return(melted_df)
-
-
-# NEED TO DO FOR H2 NOW
-
-
-def capacity_w_H2G2p_analysis(run):
-    df = open_results_file('capacity_w_H2G2P.csv', run)
-    #drop total row
-    df = df[df['Resource'] != 'Total']
-
-    df = identify_tech_type(df)
-    
-    #breakpoint()
-    
-    variables_of_interest = ['Zone', 'EndCap', 'AnnualGeneration', 'Resource']
-    df = df[variables_of_interest]
-
-    # Capacity
-    melted_cap_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'Resource'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_cap_df['Type'] = melted_cap_df['Type'].replace({
-        'EndCap': 'electricity_capacity_MW',
-        'AnnualGeneration': 'electricity_generation_MWh'
-    })
-    
-    
-    # Annual Generation
-    
-    # Capacity
-    melted_gen_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['AnnualGeneration', 'Resource'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_gen_df['Type'] = melted_gen_df['Type'].replace({
-        'EndCap': 'electricity_capacity_MW',
-        'AnnualGeneration': 'electricity_generation_MWh'
-    })
-    
-    
-    melted_df = pd.concat([melted_cap_df, melted_gen_df], ignore_index=True)
-    
-    
-    return(melted_df)
-
-    
-'''
 
 # run is the string of the directory of the DOLPHYN case that you care about
 def electricity_analysis(run):
     
     df_capacity = open_results_file('capacity.csv', run)
+    #drop total row
+    df_capacity = df_capacity[df_capacity['Resource'] != 'Total']
+    
     
     df_power = open_results_file('power.csv', run)
     
@@ -314,20 +199,32 @@ def electricity_analysis(run):
 
 
 def h2_analysis(run):
-    df = open_results_file('HSC_generation_storage_capacity.csv', run)
+    df_capacity = open_results_file('HSC_generation_storage_capacity.csv', run)
+    
     #drop total row
-    df = df[df['Resource'] != 'Total']
+    df_capacity = df_capacity[df_capacity['Resource'] != 'Total']
+
+    df_power = open_results_file(('HSC_h2_generation_discharge.csv'), run)
+
+    df_power = df_power.set_index('Resource').T
+    df_power = df_power[['AnnualSum']]
+    # Rename the column
+    df_power.rename(columns={'AnnualSum': 'AnnualGeneration'}, inplace=True)
+    # Since 'Resource' is the index, reset it to be a column and rename "index" back to "Resource":
+    df_power = df_power.reset_index()
+    df_power.rename(columns={'index': 'Resource'}, inplace=True)
+
+    df = pd.merge(df_power, df_capacity, on='Resource', how='inner')
 
     df = identify_tech_type(df, "h2")
     
-    #breakpoint()
     
-    variables_of_interest = ['Zone', 'EndCap',  'Resource']
+    variables_of_interest = ['Zone', 'EndCap', 'Resource', 'AnnualGeneration']
     df = df[variables_of_interest]
 
-    # Capacity
+
     melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap'], 
+                       value_vars=['EndCap', 'AnnualGeneration'], 
                        var_name='Type', value_name='Value')
 
     # Replace 'Type' values based on condition
