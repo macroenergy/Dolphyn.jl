@@ -23,7 +23,11 @@
 |**Miscellaneous**|
 |PrintModel | Flag for printnig the model equations as .lp file.|
 ||1= including the model equation as an output|
-||0 for the model equation not being included as an output|
+||0= for the model equation not being included as an output|
+
+|VisualizeData | lot basic data visualizations for quick diagnostics (call_dolphyn_viz)|
+||1= create basic visualization|
+||0= do not create basic visualizations|
 
 Additionally, Solver related settings parameters are specified in the appropriate solver settings .yml file (e.g. `gurobi_settings.yml` or `cplex_settings.yml`), which should be located in the current working directory (or to specify an alternative location, edit the `solver_settings_path` variable in your Run.jl file). Note that GenX supplies default settings for most solver settings in the various solver-specific functions found in the /src/configure_solver/ directory. To overwrite default settings, you can specify the below Solver specific settings. Note that appropriate solver settings are specific to each solver.
 

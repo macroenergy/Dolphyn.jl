@@ -93,7 +93,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "ModelingtoGenerateAlternativeSlack", 0)        
 
     # ESR losses in transmission and storage; 0 = not active; 1 = active
-    set_default_if_absent!(settings, "IncludeLossesInESR", 0)        
+    set_default_if_absent!(settings, "IncludeLossesInESR", 0)     
+    
+    #Visualize data
+    set_default_if_absent!(settings, "VisualizeData", 0)
 
     ##############################################################
     #### HSC model and integrated energy system model options ###### 
