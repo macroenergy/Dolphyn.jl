@@ -62,8 +62,15 @@ using Cbc
 using PyCall
 using Conda
 
-Conda.add("Pandas")
-Conda.add("matplotlib")
+conda_package_dict = Conda._installed_packages_dict()
+
+if !haskey(conda_package_dict, "pandas")
+    Conda.add("Pandas")
+end
+
+if !haskey(conda_package_dict, "matplotlib")
+    Conda.add("matplotlib")
+end
 
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)

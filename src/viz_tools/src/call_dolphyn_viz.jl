@@ -18,5 +18,3 @@ function dolphyn_viz(run_dir)
     py"run_viz"(fun_dir, run_dir)
 
 end
-
-dolphyn_viz("/Users/youssefshaker/Documents/GitHub/DOLPHYN/Example_Systems/SmallNewEngland/ThreeZones")

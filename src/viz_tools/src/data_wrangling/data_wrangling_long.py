@@ -30,7 +30,8 @@ h2_bins = {
     'smr': ['smr'],
     'atr': ['atr'],
     'electrolyzer': ['electrolyzer', 'electrolyzers'],  # added 'hydroelectric' to the list for better matching
-    'h2_storage': ['storage']}
+    'h2_storage': ['storage'],
+    'flex_demand':['flex_demand']}
 
 
 # Get the directory of the script, which should be 'src'
@@ -41,13 +42,6 @@ viz_tools_directory = os.path.dirname(current_directory)
 
 # Now, navigate to 'Run'
 runs_directory_path = os.path.join(viz_tools_directory, 'runs')
-
-# Check if the directory exists and change to it
-if os.path.exists(runs_directory_path ):
-    os.chdir(runs_directory_path )
-    print(f"Changed directory to: {runs_directory_path }")
-else:
-    print("Run directory not found!")
 
 def list_directories(path):
     # Get all the entries in the directory
@@ -195,8 +189,6 @@ def electricity_analysis(run):
     })
       
     return(melted_df)
-
-
 
 def h2_analysis(run):
     df_capacity = open_results_file('HSC_generation_storage_capacity.csv', run)
