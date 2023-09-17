@@ -15,6 +15,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - uses: actions/cache/restore@v3
+        id: cache
+        with:
+          key: Julia-1.9-Test-Results
+          path: |
+            Example_Systems/SmallNewEngland/OneZone/Results_*
+            Example_Systems/SmallNewEngland/ThreeZones/Results_*
       - uses: julia-actions/cache@v1.2.2
         with:
           cache-registries: "true"
