@@ -149,83 +149,99 @@ def identify_tech_type(df, bin_type, resources='', aggregate=True, dont_aggregat
     return df
 
 
-# run is the string of the directory of the DOLPHYN case that you care about
-def electricity_analysis(run):
-    
-    df_capacity = open_results_file('capacity.csv', run)
-    #drop total row
-    df_capacity = df_capacity[df_capacity['Resource'] != 'Total']
-    
-    
-    df_power = open_results_file('power.csv', run)
-    
+# "run" is the string pointing to the target directory DOLPHYN case
+# Helper Function 1: Opens a specified file and removes rows with 'Total' in the 'Resource' column.
+def capacity_df_wrangler(file_name, run):
+    df_capacity = open_results_file(file_name, run)
+    # Drop columns containing 'AnnualGeneration' in their names
+    cols_to_drop = [col for col in df_capacity.columns if 'AnnualGeneration' in col]
+    df_capacity = df_capacity.drop(columns=cols_to_drop)
+    return df_capacity[df_capacity['Resource'] != 'Total']
+
+# Helper Function 2: Transforms the power dataframe by various operations.
+def power_df_wrangler(df_power):
+    # Transpose the dataframe and set 'Resource' as the index
     df_power = df_power.set_index('Resource').T
+    
+    # Filter only the 'AnnualSum' column
     df_power = df_power[['AnnualSum']]
-    # Rename the column
+    
+    # Rename the column to 'AnnualGeneration'
     df_power.rename(columns={'AnnualSum': 'AnnualGeneration'}, inplace=True)
-    # Since 'Resource' is the index, reset it to be a column and rename "index" back to "Resource":
+    
+    # Reset index and rename the columns appropriately
     df_power = df_power.reset_index()
     df_power.rename(columns={'index': 'Resource'}, inplace=True)
 
-    df = pd.merge(df_power, df_capacity, on='Resource', how='inner')
     
-    #drop total row
-    df = df[df['Resource'] != 'Total']
+    return df_power
 
-    df = identify_tech_type(df, bin_type = "elec")
-    
+# Helper Function 3: Melts the dataframe and renames certain columns based on the provided rename dictionary.
+def melt_and_rename(df, rename_dict):
+    # Select the columns of interest
     variables_of_interest = ['Zone', 'EndCap', 'Resource', 'AnnualGeneration']
     df = df[variables_of_interest]
-
-    # Capacity
+    
+    # Melt the dataframe to have a long-format structure
     melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'AnnualGeneration'], 
-                       var_name='Type', value_name='Value')
+                        value_vars=['EndCap', 'AnnualGeneration'], 
+                        var_name='Type', value_name='Value')
+    
+    # Rename the 'Type' column values based on the provided dictionary
+    melted_df['Type'] = melted_df['Type'].replace(rename_dict)
+    # Remove rows from melted_df where 'Resource' contains either 'storage' or 'battery'
+    # AND the 'Type' column contains the word 'generation'.
+    # This is done because we dont want to count generation discharge because that would essentially double count some generation
+    melted_df = melted_df[~((melted_df['Resource'].str.contains('storage|battery', case=False)) & 
+                            (melted_df['Type'].str.contains('generation', case=False)))]
+    
+    return melted_df
 
-    # Replace 'Type' values based on condition
-    melted_df['Type'] = melted_df['Type'].replace({
+# Main Function 1: Analysis for electricity data
+def electricity_analysis(run):
+    # Preprocess capacity data
+    df_capacity = capacity_df_wrangler('capacity.csv', run)
+    
+    # Transform power data
+    df_power = power_df_wrangler(open_results_file('power.csv', run))
+    
+    # Merge the capacity and power data on 'Resource'
+    df = pd.merge(df_power, df_capacity, on='Resource', how='inner')
+    
+    # Identify technology type for the dataframe
+    df = identify_tech_type(df, bin_type="elec")
+    
+    
+    # Melt and rename the dataframe for final result
+    return melt_and_rename(df, {
         'EndCap': 'electricity_capacity_MW',
         'AnnualGeneration': 'electricity_generation_MWh'
     })
-      
-    return(melted_df)
 
+# Main Function 2: Analysis for H2 data
 def h2_analysis(run):
-    df_capacity = open_results_file('HSC_generation_storage_capacity.csv', run)
+    # Preprocess H2 capacity data
+    df_capacity = capacity_df_wrangler('HSC_generation_storage_capacity.csv', run)
     
-    #drop total row
-    df_capacity = df_capacity[df_capacity['Resource'] != 'Total']
-
-    df_power = open_results_file(('HSC_h2_generation_discharge.csv'), run)
-
-    df_power = df_power.set_index('Resource').T
-    df_power = df_power[['AnnualSum']]
-    # Rename the column
-    df_power.rename(columns={'AnnualSum': 'AnnualGeneration'}, inplace=True)
-    # Since 'Resource' is the index, reset it to be a column and rename "index" back to "Resource":
-    df_power = df_power.reset_index()
-    df_power.rename(columns={'index': 'Resource'}, inplace=True)
-
+    # Transform H2 power data
+    df_power = power_df_wrangler(open_results_file('HSC_h2_generation_discharge.csv', run))
+    
+    # Merge the capacity and power data on 'Resource'
     df = pd.merge(df_power, df_capacity, on='Resource', how='inner')
-
+    
+    # Identify technology type for the dataframe
     df = identify_tech_type(df, "h2")
     
     
-    variables_of_interest = ['Zone', 'EndCap', 'Resource', 'AnnualGeneration']
-    df = df[variables_of_interest]
-
-
-    melted_df = pd.melt(df, id_vars=['Zone', 'Resource'], 
-                       value_vars=['EndCap', 'AnnualGeneration'], 
-                       var_name='Type', value_name='Value')
-
-    # Replace 'Type' values based on condition
-    melted_df['Type'] = melted_df['Type'].replace({
+    # Filter out rows containing 'storage' or 'battery'
+    
+    df = melt_and_rename(df, {
         'EndCap': 'h2_capacity_tonne_hr',
         'AnnualGeneration': 'h2_generation_tonne'
     })
-    
-    return(melted_df)
+    # Melt and rename the dataframe for final result
+    return(df)
+
 
 
 def main(run_path):
