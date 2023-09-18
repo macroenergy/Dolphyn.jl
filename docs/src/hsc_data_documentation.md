@@ -32,14 +32,13 @@ Model settings parameters are specified in a `hsc_Settings.yml` file which shoul
 ||0 = no unit commitment.|
 ||1 = unit commitment with integer clustering.|
 ||2 = unit commitment with linearized clustering.|
-
 |**Policy related**||
 |H2CO2Cap | Flag for specifying the type of CO2 emission limit constraint.|
 || 0 = no CO2 emission limit|
 || 1 = mass-based emission limit constraint|
 || 2 = load + rate-based emission limit constraint|
 || 3 = generation + rate-based emission limit constraint|
-|TimeMatchingRequirement | Flag for specifying type of time0matching requirement. |
+|TimeMatchingRequirement | Flag for specifying type of time-matching requirement. |
 || 0 = no time matching requirement active|
 || 1 = Hourly time-matching with excess sales|
 || 2 = Hourly time-matching without excesst sales|

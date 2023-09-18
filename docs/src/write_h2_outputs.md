@@ -93,3 +93,9 @@ Pages = ["HSC/write_outputs/write_h2_truck_flow.jl"]
 Modules = [DOLPHYN]
 Pages = ["HSC/write_outputs/write_p_g2p.jl"]
 ```
+
+## Write TMR Prices
+```@autodocs
+Modules = [DOLPHYN]
+Pages = ["HSC/write_outputs/write_h2_tmr_prices.jl"]
+```

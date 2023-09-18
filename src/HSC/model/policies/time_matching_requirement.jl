@@ -36,28 +36,28 @@ We define a set of TMR policy constraints $p \in \mathcal{P}^{TMR}$. For each co
 
 $\forall {p \in \mathcal{P}^{TMR}}$
 
-When the parameter '''TimeMatchingRequirement''' is set to 1, we implement the following constraint to simulate hourly time-matching with excess sales:
+When the parameter ```TimeMatchingRequirement``` is set to 1, we implement the following constraint to simulate hourly time-matching with excess sales:
 ```math
 \begin{equation*}
     {TMR Excess Energy_{p, t}} >= 0  \; \forall \; p^{TMR} \in P,  t \in T
 \end{equation*}
-````
+```
 
-When the parameter TimeMatchingRequirement is set to 2, we implement the following constraint to simulate hourly time-matching with no excess sales:
+When the parameter ```TimeMatchingRequirement``` is set to 2, we implement the following constraint to simulate hourly time-matching with no excess sales:
 ```math
 \begin{equation*}
     {TMR Excess Energy_{p, t}} = 0 \; \forall \; p^{TMR} \in P,  t \in T
 \end{equation*}
 ```
 
-When the parameter TimeMatchingRequirement is set to 3, we implement the following constraint to simulate annual time-matching with no excess sales:
+When the parameter ```TimeMatchingRequirement``` is set to 3, we implement the following constraint to simulate annual time-matching with no excess sales:
 ```math
 \begin{equation*}
     \sum_{t \in T} {TMR Excess Energy_{p, t}} = 0 \; \forall \; p^{TMR} \in P
 \end{equation*}
 ```
 
-Additionally, when EnergyShareRequirement is set to 1, and excess sales from a given TMR group is added to the corresponding ESR constraint the TMR group maps to. 
+Additionally, when ```EnergyShareRequirement``` is set to 1, and excess sales from a given TMR group is added to the corresponding ESR constraint the TMR group maps to. 
 
 """
 function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
