@@ -1,4 +1,20 @@
+function viz_pkg()
+    
+    conda_package_dict = Conda._installed_packages_dict()
+
+    if !haskey(conda_package_dict, "pandas")
+        Conda.add("Pandas")
+    end
+
+    if !haskey(conda_package_dict, "matplotlib")
+        Conda.add("matplotlib")
+    end
+   
+end
+
 function dolphyn_viz(run_dir)
+
+    viz_pkg()
     
     fun_dir = @__DIR__
     
