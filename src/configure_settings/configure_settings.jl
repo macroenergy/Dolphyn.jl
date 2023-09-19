@@ -108,5 +108,14 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     # Down-select Zones to model
     set_default_if_absent!(settings, "Zones", [])
 
+    ############################################################
+    ###CSC Model Settings Options#####
+    set_default_if_absent!(settings, "ModelCO2", 0)
+    set_default_if_absent!(settings, "DAC_Nonlinear_CAPEX", 0)
+    set_default_if_absent!(settings, "CO2PipeInteger", 0)
+    set_default_if_absent!(settings, "ModelCO2Pipelines", 0)
+    set_default_if_absent!(settings, "CO2NetworkExpansion", 0)
+    set_default_if_absent!(settings, "CO2Pipeline_Loss", 0)   
+
 return settings
 end
