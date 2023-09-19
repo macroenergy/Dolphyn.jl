@@ -25,10 +25,12 @@ export setup_TDR
 export configure_solver
 export load_inputs
 export load_h2_inputs
+export load_co2_inputs
 export generate_model
 export solve_model
 export write_outputs
 export write_HSC_outputs
+export write_CSC_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
@@ -156,6 +158,9 @@ include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
 
 # Files which involve multiple sectors
 include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
+
+# Files which involve multiple sectors
+include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
 
 # Load model generation and solving scripts
 include(joinpath(@__DIR__,"generate_model.jl"))

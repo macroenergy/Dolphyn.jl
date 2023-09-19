@@ -112,5 +112,14 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     #TMRSalestoESR: 0 # Modeling whether or not resources contracted for time matching requiremnet forelectricity based H2 production can sell their excess electricity to ESR market - 0 - not allowed, 1 - allowed
     set_default_if_absent!(settings, "TMRSalestoESR", 0) 
 
+    ############################################################
+    ###CSC Model Settings Options#####
+    set_default_if_absent!(settings, "ModelCO2", 0)
+    set_default_if_absent!(settings, "DAC_Nonlinear_CAPEX", 0)
+    set_default_if_absent!(settings, "CO2PipeInteger", 0)
+    set_default_if_absent!(settings, "ModelCO2Pipelines", 0)
+    set_default_if_absent!(settings, "CO2NetworkExpansion", 0)
+    set_default_if_absent!(settings, "CO2Pipeline_Loss", 0)   
+
 return settings
 end
