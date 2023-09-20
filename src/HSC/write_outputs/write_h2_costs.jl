@@ -189,8 +189,8 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 
                 if !isempty(inputs["H2_G2P_COMMIT"])
                     if y in inputs["H2_G2P_COMMIT"]
-                        tempCStart += value.(EP[:eH2G2PCStart])[y]
-                        tempCTotal += value.(EP[:eH2G2PCStart])[y]
+                        tempCStart += sum(value.(EP[:eH2G2PCStart])[y,:])
+                        tempCTotal += sum(value.(EP[:eH2G2PCStart])[y,:])
                     end
                 end
             end

@@ -21,7 +21,7 @@ using LoggingExtras
 # Walk into current directory
 case_dir = @__DIR__
 
-settings_path = joinpath(pwd(), "Settings")
+settings_path = joinpath(case_dir, "Settings")
 inputs_path = case_dir
 
 # Loading settings
@@ -36,7 +36,7 @@ mysetup = Dict()
 mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 mysetup = configure_settings(mysetup)
 
-if mysetup_global["ModelCO2"] == 1
+if mysetup["ModelCO2"] == 1
     csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
     mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CSC supply chain-specific parameters
     mysetup = merge(mysetup, mysetup_csc)
@@ -47,9 +47,8 @@ end
 # Start logging
 global Log = mysetup["Log"]
 
-
 ## Cluster time series inputs if necessary and if specified by the user
-TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
+TDRpath = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
 if mysetup["TimeDomainReduction"] == 1
     if mysetup["ModelH2"] == 1
         if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
@@ -67,7 +66,7 @@ if mysetup["TimeDomainReduction"] == 1
         end
     end
 
-    if mysetup["ModelCSC"] == 1
+    if mysetup["ModelCO2"] == 1
         println("CSC and SF TDR not implemented.")
     end
 end
@@ -80,21 +79,21 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # ### Load inputs
  myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
- myinputs = load_inputs(mysetup, inpath)
+ myinputs = load_inputs(mysetup, inputs_path)
 
 # ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
-    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
+    myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
 end
 
 # ### Load CO2 inputs if modeling the carbon supply chain
 if mysetup["ModelCO2"] == 1
-    myinputs = load_co2_inputs(myinputs, mysetup, inpath)
+    myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
 end
 
 # ### Load SF inputs if modeling the synthetic fuels supply chain
 #if mysetup["ModelSynFuels"] == 1
-#    myinputs = load_syn_fuels_inputs(myinputs, mysetup, inpath)
+#    myinputs = load_syn_fuels_inputs(myinputs, mysetup, inputs_path)
 #end
 
 # ### Generate model
@@ -124,8 +123,8 @@ if mysetup["ModelCO2"] == 1
 end
 
 # Write synthetic fuels supply chain outputs
-if mysetup["ModelSynFuels"] == 1
-    outpath_SF = "$outpath/Results_SF"
-    write_synfuel_outputs(EP, outpath_SF, mysetup, myinputs)
-end
+#if mysetup["ModelSynFuels"] == 1
+#    outpath_SF = "$outpath/Results_SF"
+#    write_synfuel_outputs(EP, outpath_SF, mysetup, myinputs)
+#end
 
