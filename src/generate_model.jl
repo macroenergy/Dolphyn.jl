@@ -132,6 +132,24 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
     @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)    
 
+    # Initialize Capacity Reserve Margin Expression
+    if setup["CapacityReserveMargin"] > 0
+		@expression(EP, eCapResMarBalance[res=1:inputs["NCapacityReserveMargin"], t=1:T], 0)
+	end
+
+	# Energy Share Requirement
+	if setup["EnergyShareRequirement"] >= 1
+		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
+	end
+
+	if setup["MinCapReq"] == 1
+		@expression(EP, eMinCapRes[mincap = 1:inputs["NumberOfMinCapReqs"]], 0)
+	end
+
+	if setup["MaxCapReq"] == 1
+		@expression(EP, eMaxCapRes[maxcap = 1:inputs["NumberOfMaxCapReqs"]], 0)
+	end
+
     ##### Power System related modules ############
     # Infrastructure
     discharge!(EP, inputs, setup)
