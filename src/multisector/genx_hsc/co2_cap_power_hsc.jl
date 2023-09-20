@@ -49,6 +49,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
             sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
         )
 
+        #Using an additive approach where terms are added to LHS of emissions constraint
         if setup["ModelCO2"] == 1
             @expression(EP, eEmissionsConstraintLHSCO2[cap=1:inputs["NCO2Cap"]],
                 sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
