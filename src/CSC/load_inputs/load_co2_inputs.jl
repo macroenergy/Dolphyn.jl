@@ -41,13 +41,14 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading co2 Input CSV Files")
+	println("Reading CO2 Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
     inputs = load_co2_capture_DAC(setup, path, sep, inputs)
     inputs = load_co2_capture_DAC_variability(setup, path, sep, inputs)
 	inputs = load_co2_storage(setup, path, sep, inputs)
 	inputs = load_co2_capture_compression(setup, path, sep, inputs)
 	inputs = load_co2_pipeline_data(setup, path, sep, inputs)
+	inputs = load_ccs_rate(setup, inputs)
 	
 	println("CSC Input CSV Files Successfully Read In From $path$sep")
 
