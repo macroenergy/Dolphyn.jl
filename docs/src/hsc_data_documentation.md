@@ -38,11 +38,14 @@ Model settings parameters are specified in a `hsc_Settings.yml` file which shoul
 || 1 = mass-based emission limit constraint|
 || 2 = load + rate-based emission limit constraint|
 || 3 = generation + rate-based emission limit constraint|
-|TimeMatchingRequirement | Flag for specifying type of time-matching requirement. |
+|TimeMatchingRequirement | Flag for specifying type of time-matching requirement (TMR). |
 || 0 = no time matching requirement active|
 || 1 = Hourly time-matching with excess sales|
-|| 2 = Hourly time-matching without excesst sales|
+|| 2 = Hourly time-matching without excess sales|
 || 3 = Annual time-matching|
+|TMRSalestoESR | Flag for specifying whether excess sales from resources contracted for TMR can be used to meet ESR requirements. |
+|| 0 = Excess sales from TMR eligible resources not allowed|
+|| 1 = Excess sales from TMR eligible resources allowed|
 
 ## 2 Inputs
 
@@ -185,7 +188,7 @@ This file contains cost and performance parameters for various generators and ot
 |region | Name of the model region|
 |cluster | Number of the cluster when representing multiple clusters of a given technology in a given region.  |
 
-###### Table 6: Settings-specific columns in the HSC\_generators\_data.csv file
+###### Table 6: Settings-specific columns in the HSC\_generation.csv file
 ---
 |**Column Name** | **Description**|
 | :------------ | :-----------|
@@ -194,7 +197,7 @@ This file contains cost and performance parameters for various generators and ot
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
 |Start\_Cost\_per\_tonne\_p\_hr |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 |**TimeMatchingRequirement > 0**||
-|TMR\_*| Flag to indicate which resources are considered for the Time Matching Requirement constraint.|
+|H2\_TMR\_*| Flag to indicate which resources are considered for the Time Matching Requirement constraint (constraint number denoted by value after "\_"). Similar Flag should also be added to Generators_data.csv for eligible_power_sector_resources|
 ||1- included|
 ||0- excluded|
 ### 2.2 Optional input data

@@ -18,25 +18,34 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 
-This function established constraints that require electricity consumption from certain hydrogen resource groups to be met using a specific set of electricity resources. These are know as time-matching requirements (TMR). TMR contraints can be established on either an hourly-matching basis, or an annual-matching basis. 
+This function establishes constraints that require electricity consumption from certain hydrogen resource groups to be matched by electricity generated using a specific set of electricity resources over a pre-specified time period.
+Such a time-matching requirement (TMR) mimics the contracting of clean energy resources for hydrogen production, which being contemplated to qualify for tax credits for hydrogen production. 
+TMR contraints can be established on either an hourly-matching basis, or an annual-matching basis. 
 
-To implement these constraints, the user needs to specify TMR groups in both the hydrogen and electiricty generation resource files. This is done by adding a column H2_TMR followed by the group number (e.g. H2_TMR_1) to the HSC_generation.csv file and the generation.csv file. Resources that belong to the group should be marked with a 1 in the coresponding entry in the column of the group. 
+To implement these constraints, the user needs to specify TMR groups in both the hydrogen and electiricty generation resource files. 
+This is done by adding a column H2_TMR followed by the group number (e.g. H2_TMR_1) to the HSC_generation.csv file and the generation.csv file. 
+Resources that belong to the group should be marked with a "1" in the coresponding entry in the column of the group. 
 
 
-We define a set of TMR policy constraints $p \in \mathcal{P}^{TMR}$. For each constraint we define a subset of hydrogen production $g \in \mathcal{G}^{H2, TMR}_{p}$, power generation $g \in \mathcal{G}^{E, TMR}_{p}$, and power storage resources $s \in \mathcal{S}^{E, TMR}_{p}$, these set of resources are resources allowed to participate in the fulfilment of a given TMR. 
+We define a set of TMR policy constraints $p \in \mathcal{P}^{TMR}$. 
+For each constraint we define a subset of hydrogen production resources $g \in \mathcal{G}^{H2, TMR}_{p}$, power generation resources $g \in \mathcal{G}^{E, TMR}_{p}$, and power storage resources $s \in \mathcal{S}^{E, TMR}_{p}$. 
+These set of resources are resources allowed to participate in the fulfilment for TMR requirment constraint, $p$. 
+For each constraint $p \in \mathcal{P}^{TMR}$, we define a subset of zones $z \in \mathcal{Z}^{H,ESR}_{p}$, corresponding to the eligible H2 production resources and a subset of zones  $z \in \mathcal{Z}^{E,ESR}_{p}$ corresponding to the set of eligible electricity sector resources.
 
+The expression $TMR Excess Energy_{p, t}$  calculates the differences between electricity generation from resources in $set \mathcal{G}^{E, TMR}_{p}$ + net electricity storage discharge (discharge - charge)  for resources in set $\mathcal{S}^{E, TMR}_{p}$ and the electricity consumption by hydrogen production resources in $set \mathcal{G}^{H2, TMR}_{p}$ (given by variable $x_{g,z,t}^{\textrm{E,H-Gen}$).
 ```math
 \begin{equation*}
     {TMR Excess Energy_{p, t}} =
-    \sum_{g \in \mathcal{G}^{H2, TMR}_{p}}  x_{g,t}^{\textrm{E,GEN}} - 
-    \sum_{s \in \mathcal{S}^{E, TMR}_{p}}  x_{s,t}^{\textrm{E,DIS}}- 
-    \sum_{g \in \mathcal{G}^{E, TMR}_{p}} x_{g,t}^{\textrm{E,H-Gen}} 
+    \sum_{z in \in \mathcal{Z}^{E,ESR}_{p}} \sum_{g \in \mathcal{G}^{H2, TMR}_{p}}  x_{g,z,t}^{\textrm{E,GEN}} + 
+	\sum_{z in \in \mathcal{Z}^{E,ESR}_{p}} \sum_{s \in \mathcal{S}^{E, TMR}_{p}}  x_{s,z,t}^{\textrm{E,DIS}}- 
+	\sum_{z in \in \mathcal{Z}^{E,ESR}_{p}} \sum_{s \in \mathcal{S}^{E, TMR}_{p}}  x_{s,z,t}^{\textrm{E,CHA}}- 
+	\sum_{z in \in \mathcal{Z}^{H,ESR}_{p}} \sum_{g \in \mathcal{G}^{H, TMR}_{p}} x_{g,z,t}^{\textrm{E,H-Gen}} 
 \end{equation*}
 ```
 
 $\forall {p \in \mathcal{P}^{TMR}}$
 
-When the parameter ```TimeMatchingRequirement``` is set to 1, we implement the following constraint to simulate hourly time-matching with excess sales:
+When the parameter ```TimeMatchingRequirement``` is set to 1, we implement the following constraint to simulate hourly time-matching where electricity resources are allowed to produce in excess of demand for H$_2$ production that can be sold to the grid (i.e. excess sales allowed):
 ```math
 \begin{equation*}
     {TMR Excess Energy_{p, t}} >= 0  \; \forall \; p^{TMR} \in P,  t \in T
@@ -50,14 +59,15 @@ When the parameter ```TimeMatchingRequirement``` is set to 2, we implement the f
 \end{equation*}
 ```
 
-When the parameter ```TimeMatchingRequirement``` is set to 3, we implement the following constraint to simulate annual time-matching with no excess sales:
+When the parameter ```TimeMatchingRequirement``` is set to 3, we implement the following constraint to simulate annual time-matching:
 ```math
 \begin{equation*}
-    \sum_{t \in T} {TMR Excess Energy_{p, t}} = 0 \; \forall \; p^{TMR} \in P
+    \sum_{t \in T} {TMR Excess Energy_{p, t} \times \Omega_t} = 0 \; \forall \; p^{TMR} \in P
 \end{equation*}
 ```
+Notice that in the annual time-matching case, the electricity sector resources can produce in excess of electricity demand for hydrogen production at each time step, so long as the annual sum of production and generation match. The $/Omega_t$ corresponds to time-weight of each time step which will be different from 1 when considering representative periods of system operation rahter than full year operation at an hourly resolution.
 
-Additionally, when ```EnergyShareRequirement``` is set to 1, and excess sales from a given TMR group is added to the corresponding ESR constraint the TMR group maps to. 
+In addition, when ```EnergyShareRequirement``` is set to 1, excess sales from a given TMR group is added to the corresponding ESR constraint the TMR group maps to. 
 
 """
 function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)

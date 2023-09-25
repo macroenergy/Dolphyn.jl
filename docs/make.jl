@@ -18,7 +18,7 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+#using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
 
 using Documenter
 import DataStructures: OrderedDict
