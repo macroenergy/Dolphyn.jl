@@ -56,26 +56,11 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempBlue_H2_Generation = tempBlue_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
-		end
-
-		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempBlue_H2_Fixed_Cost = tempBlue_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-		end
-
-		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempBlue_H2_Var_Cost = tempBlue_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_tonne][y].* (value.(EP[:vH2Gen])[y,:])))
-		end
-
-		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			for t in 1:T
-				tempBlue_H2_Fuel_Cost = tempBlue_H2_Fuel_Cost + inputs["omega"][t].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]][t].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,t])
-			end
-		end
-
-		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			for t in 1:T
-				tempBlue_H2_Electricity_Cost = tempBlue_H2_Electricity_Cost + value.(EP[:vP2G])[y,t].* dual.(EP[:cPowerBalance])[t,z]
-			end
+			tempBlue_H2_Fuel_Cost = tempBlue_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,:]))
+			tempBlue_H2_Electricity_Cost = tempBlue_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
+			tempBlue_H2_CO2_Emission = tempBlue_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
 		tempCO2Price = zeros(inputs["NCO2Cap"])
@@ -95,12 +80,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCO2Price_z = 0
 		end
 
-		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			tempBlue_H2_CO2_Emission = tempBlue_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
-		end
-
 		tempBlue_H2_CO2_MAC = abs(tempCO2Price_z) * tempBlue_H2_CO2_Emission
-
 
 		tempBlue_H2_CTotal = tempBlue_H2_Fixed_Cost + tempBlue_H2_Electricity_Cost + tempBlue_H2_Var_Cost + tempBlue_H2_Fuel_Cost + tempBlue_H2_CO2_MAC
 		tempBlue_H2_LCOH = tempBlue_H2_CTotal/tempBlue_H2_Generation
@@ -179,7 +159,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 	CSV.write(string(path,sep,"HSC_LCOH_blue_h2.csv"), dfCost)
 
-		################################################################################################################################
+	################################################################################################################################
 	################################################################################################################################
 	# Green H2 LCOH
 	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Fixed_Cost", "Electricity_Cost", "Storage_Cost", "Pipeline_Cost", "Total_Cost", "LCOH"])
@@ -201,16 +181,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 		for y in intersect(H2_ELECTROLYZER, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGreen_H2_Generation = tempGreen_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
-		end
-
-		for y in intersect(H2_ELECTROLYZER, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGreen_H2_Fixed_Cost = tempGreen_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-		end
-
-		for y in intersect(H2_ELECTROLYZER, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			for t in 1:T
-				tempGreen_H2_Electricity_Cost = tempGreen_H2_Electricity_Cost + value.(EP[:vP2G])[y,t].* dual.(EP[:cPowerBalance])[t,z]
-			end
+			tempGreen_H2_Electricity_Cost = tempGreen_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
 		end
 
 		for y in intersect(H2_STOR_ALL, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
@@ -284,26 +256,11 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGrey_H2_Generation = tempGrey_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
-		end
-
-		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGrey_H2_Fixed_Cost = tempGrey_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-		end
-
-		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGrey_H2_Var_Cost = tempGrey_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_tonne][y].* (value.(EP[:vH2Gen])[y,:])))
-		end
-
-		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			for t in 1:T
-				tempGrey_H2_Fuel_Cost = tempGrey_H2_Fuel_Cost + inputs["omega"][t].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]][t].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,t])
-			end
-		end
-
-		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			for t in 1:T
-				tempGrey_H2_Electricity_Cost = tempGrey_H2_Electricity_Cost + value.(EP[:vP2G])[y,t].* dual.(EP[:cPowerBalance])[t,z]
-			end
+			tempGrey_H2_Fuel_Cost = tempGrey_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,:]))
+			tempGrey_H2_Electricity_Cost = tempGrey_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
+			tempGrey_H2_CO2_Emission = tempGrey_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
 		tempCO2Price = zeros(inputs["NCO2Cap"])
@@ -321,10 +278,6 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCO2Price_z = sum(tempCO2Price)
 		else
 			tempCO2Price_z = 0
-		end
-		
-		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
-			tempGrey_H2_CO2_Emission = tempGrey_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
 		tempGrey_H2_CO2_MAC = abs(tempCO2Price_z) * tempGrey_H2_CO2_Emission

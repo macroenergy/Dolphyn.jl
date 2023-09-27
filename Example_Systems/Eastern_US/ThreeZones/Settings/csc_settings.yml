@@ -1,4 +1,4 @@
-ModelCO2: 1 #Flag to turn or off Carbon Supply Chain modelling capabilities - 0 = no CSC, 1= CSC modeled
+ModelCO2: 0 #Flag to turn or off Carbon Supply Chain modelling capabilities - 0 = no CSC, 1= CSC modeled
 
 #Linear modeling of DAC CAPEX - 0, Piecewise modeling of 6/10 rule of DAC CAPEX - 1
 DAC_Nonlinear_CAPEX: 0
