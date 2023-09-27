@@ -452,6 +452,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = minimum_capacity_requirement(EP, inputs)
 	end
 
+	# Green H2 Share Requirement
+	if setup["ModelH2"] == 1 && setup["GreenH2ShareRequirement"] == 1
+		EP = green_h2_share_requirement(EP, inputs, setup)
+	end
+
 	## Define the objective function
 	@objective(EP,Min,EP[:eObj])
 

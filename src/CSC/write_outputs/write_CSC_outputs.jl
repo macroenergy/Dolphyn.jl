@@ -41,9 +41,9 @@ function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
       mkdir(path)
     end
 
-    write_CSC_costs(path, sep, inputs, setup, EP)
+    #write_CSC_costs(path, sep, inputs, setup, EP)
     write_co2_capture_capacity(path, sep, inputs, setup, EP)
-    #write_co2_storage_capacity(path, sep, inputs, setup, EP)
+    write_co2_storage_capacity(path, sep, inputs, setup, EP)
     write_co2_total_injection(path, sep, inputs, setup, EP)
     write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
     write_co2_emission_balance_system(path, sep, inputs, setup, EP)

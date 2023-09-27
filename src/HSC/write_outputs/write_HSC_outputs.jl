@@ -45,7 +45,7 @@ function write_HSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     write_h2_capacity(path, sep, inputs, setup, EP)
     write_h2_gen(path, sep, inputs, setup, EP)
     write_h2_nse(path, sep, inputs, setup, EP)
-    write_h2_costs(path, sep, inputs, setup, EP)
+    #write_h2_costs(path, sep, inputs, setup, EP)
     write_h2_balance(path, sep, inputs, setup, EP)
     write_h2_balance_zone(path, sep, inputs, setup, EP)
     write_h2_balance_dual(path, sep, inputs, setup, EP)

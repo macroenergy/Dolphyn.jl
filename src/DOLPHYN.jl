@@ -206,6 +206,7 @@ include("HSC/model/g2p/h2_g2p.jl")
 
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
+include("HSC/model/policies/green_h2_share_requirement.jl")
 
 
 #Core CSC Modelling Features
