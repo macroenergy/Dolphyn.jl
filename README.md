@@ -20,7 +20,21 @@ DOLPHYN runs on Julia versions above 1.4 series, and a minimum version of JuMP v
 
 ## Running an Instance of DOLPHYN
 
-Download or clone the DOLPHYN repository on your machine in a directory named 'DOLPHYN-dev'. Create this new directory in a location where you wish to store the DOLPHYN environment.
+### If you are doing a fresh install
+
+In your top-level folder where you want to place DOLPHYN, run:
+
+- <code>git clone --recurse-submodules https://github.com/macroenergy/DOLPHYN</code>
+
+### If you are working from an existing project:
+
+In your top-level folder (generally DOLPHYN or DOLPHYN-DEV), run:
+
+- <code>git pull</code>
+- <code>git checkout main</code>
+- <code>cd src/GenX</code>
+- <code>git submodule init</code>
+- <code>git submodule update</code>
 
 The Run.jl file in each of the example sub-folders within `Example_Systems/` provides an example of how to use DOLPHYN.jl for capacity expansion modeling. Descriptions of each example system is included in the next section. The following are the main steps performed in the Run.jl script:
 
@@ -41,7 +55,7 @@ Ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `
 In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder then run the following commands:
 
 - <code>julia --project=.</code>
-- <code>julia> ]</code> (type julia to get an interactive julia (aka REPL) and then enter ']' at the prompt)
+- <code>julia> ]</code> (Enter ']' at the prompt)
 - <code>(DOLPHYN) pkg> instantiate</code> (you should see DOLPHYN project name here, if not, enter `activate .`)
 - <code>(DOLPHYN) pkg> build Gurobi</code> (if you plan to use Gurobi)
 
@@ -77,6 +91,7 @@ Once the model has completed running, results will be written into the 'Results'
 **SmallNewEngland: ThreeZones** is similar to the above example but contains zones representing Massachusetts, Connecticut, and Maine. Expect a run time of ~5 seconds.
 
 **2030_CombEC_DETrans** is a combined power and hydrogen model for the EU for the year 2030. It contains a power model with hourly resolution, contains zones representing Belgium, Germany, Denmark, France, Great Britain, the Netherlands, Sweden, and Norway. The model also includes a CO2 constraint representing 30% of 2015 power sector CO2 emissions applied to the hydrogen and power sector jointly. Expect a run time of ~8 minutes.
+
 
 ## DOLPHYN Team
 The model was originally [developed](https://pubs.rsc.org/en/content/articlehtml/2021/ee/d1ee00627d) by [Guannan He](https://www.guannanhe.com/) while at the MIT Energy Initiative, and is now maintained by a team contributors at [MITEI](https://energy.mit.edu/) led by [Dharik Mallapragada](http://mallapragada.mit.edu/) as well as Guannan He's research group at Peking University. Key contributors include Dharik S. Mallapragada, Guannan He, Yuheng Zhang, Youssef Shaker, Jun Wen Law, Nicole Shi and Anna Cybulsky.
