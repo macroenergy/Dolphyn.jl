@@ -59,8 +59,8 @@ body:
       The Manifest.toml file will be created after you first instantiate the DOLPHYN environment on your own computer.
     placeholder: |
       Upload your Manifest.toml file here
-    validations:
-      required: false
+  validations:
+    required: false
 - type: textarea
   attributes:
     label: Anything else?
