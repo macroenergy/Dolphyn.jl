@@ -18,8 +18,10 @@ body:
     validations:
       required: true
   - type: input
-      label: linked-issues
-      description: Please link any issues this feature would resolve. Use \# to link an issue number.  
+    id: linked-issues
+    attributes:
+      label: Please link any issues this feature would resolve
+      description: Use \# to link an issue number.  
   - type: textarea
     id: suggestion-to-implement
     attributes:
@@ -30,6 +32,7 @@ body:
     validations:
       required: false
   - type: checkboxes
+    id: add-labels
     attributes:
       label: relevant-labels
       options:
