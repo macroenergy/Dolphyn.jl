@@ -32,9 +32,8 @@ body:
     validations:
       required: false
   - type: checkboxes
-    id: add-labels
+    id: relevant-labels
     attributes:
-      label: relevant-labels
       options:
       - label: I have added any relevant labels using the drop-down menu on the right.
         required: false
