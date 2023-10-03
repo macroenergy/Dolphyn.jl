@@ -33,7 +33,8 @@ body:
       required: false
   - type: checkboxes
     id: relevant-labels
+    label: Please add any relevant labels using the drop-down menu on the right.
     attributes:
       options:
-      - label: I have added any relevant labels using the drop-down menu on the right.
+      - label: I have added all relevant labels.
         required: false
