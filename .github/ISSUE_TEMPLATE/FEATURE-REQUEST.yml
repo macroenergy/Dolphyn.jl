@@ -1,0 +1,40 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Feature]: "
+labels: ["enhancement"]
+projects: "MacroEnergy/DOLPHYN"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+  - type: textarea
+    id: what-feature
+    attributes:
+      label: What new feature do you propose?
+      description: What new feature do you propose?
+      placeholder: Tell us what you expect to see for this project!
+      value: "Tell us what you expect to see for this project!"
+    validations:
+      required: true
+  - type: input
+    id: linked-issues
+    attributes:
+      label: Please link any issues this feature would resolve
+      description: Use \# to link an issue number.  
+  - type: textarea
+    id: suggestion-to-implement
+    attributes:
+      label: What suggestion do you have for implementing this feature?
+      description: What suggestion do you have for implementing this feature?
+      placeholder: Provide us with your suggestion
+      value: "Tell us your way to implement this feature. Any suggestions?"
+    validations:
+      required: false
+  - type: checkboxes
+    id: relevant-labels
+    attributes:
+      label: Please add any relevant labels using the drop-down menu on the right.
+      options:
+      - label: I have added all relevant labels.
+        required: false
