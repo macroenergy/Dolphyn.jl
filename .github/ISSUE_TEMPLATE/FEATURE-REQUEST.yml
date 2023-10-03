@@ -5,9 +5,9 @@ labels: ["enhancement"]
 projects: "MacroEnergy/DOLPHYN"
 body:
   - type: markdown
-      attributes:
-        value: |
-          Thanks for taking the time to fill out this feature request!
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
   - type: textarea
     id: what-feature
     attributes:
