@@ -1,7 +1,8 @@
 name: 🐞 Bug
 description: File a bug/issue
 title: "[BUG] <title>"
-labels: ["Bug", "Needs Triage"]
+labels: ["bug", "Needs Triage"]
+projects: "MacroEnergy/DOLPHYN"
 body:
 - type: checkboxes
   attributes:
@@ -28,9 +29,9 @@ body:
     description: Steps to reproduce the behavior.
     placeholder: |
       1. In this environment...
-      1. With this config...
-      1. Run '...'
-      1. See error...
+      2. With this config...
+      3. Run '...'
+      4. See error...
   validations:
     required: false
 - type: textarea
@@ -39,19 +40,27 @@ body:
     description: |
       examples:
         - **OS**: Ubuntu 20.04
-        - **Node**: 13.14.0
-        - **npm**: 7.6.3
-        - **Solver**: Gurobi
         - **Julia**: 1.67
+        - **Solver**: Gurobi
+        - **Solver version**: 10.0
     value: |
         - OS:
-        - Node:
-        - npm:
-        - Solver:
         - Julia version:
+        - Solver:
+        - Solver version:
     render: markdown
   validations:
     required: false
+- type: textarea
+  attributes:
+    label: Manifest.toml file
+    description: |
+      Please upload or paste your Manifest.toml file here.
+      The Manifest.toml file will be created after you first instantiate the DOLPHYN environment on your own computer.
+    placeholder: |
+      Upload your Manifest.toml file here
+    validations:
+      required: false
 - type: textarea
   attributes:
     label: Anything else?
