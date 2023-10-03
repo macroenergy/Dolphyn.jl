@@ -20,7 +20,7 @@ DOLPHYN runs on Julia versions above 1.4 series, and a minimum version of JuMP v
 
 ## Running an Instance of DOLPHYN
 
-### If you are doing a fresh install
+### If you are doing a fresh install:
 
 In your top-level folder where you want to place DOLPHYN, run:
 
