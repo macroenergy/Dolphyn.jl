@@ -1,15 +1,13 @@
 name: Feature Request
 description: Suggest an idea for this project
 title: "[Feature]: "
-labels: ["feature", "additions"]
-projects: ["DOLPHYN/", "GenX/"]
-assignees:
-  - octocat
+labels: ["enhancement"]
+projects: "MacroEnergy/DOLPHYN"
 body:
   - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to fill out this feature request!
+      attributes:
+        value: |
+          Thanks for taking the time to fill out this feature request!
   - type: textarea
     id: what-feature
     attributes:
@@ -19,6 +17,9 @@ body:
       value: "Tell us what you expect to see for this project!"
     validations:
       required: true
+  - type: input
+      label: linked-issues
+      description: Please link any issues this feature would resolve. Use \# to link an issue number.  
   - type: textarea
     id: suggestion-to-implement
     attributes:
@@ -28,3 +29,9 @@ body:
       value: "Tell us your way to implement this feature. Any suggestions?"
     validations:
       required: false
+  - type: checkboxes
+    attributes:
+      label: relevant-labels
+      options:
+      - label: I have added any relevant labels using the drop-down menu on the right.
+        required: false
