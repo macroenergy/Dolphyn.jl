@@ -19,43 +19,61 @@ DOLPHYN also has limited support for:
 - [Cbc](https://github.com/jump-dev/Cbc.jl) - a free open-source solver
 - [CPLEX](https://www.ibm.com/analytics/cplex-optimizer) - a commercial solver requiring a paid commercial license or free academic license
 
-## Running an Instance of DOLPHYN
+## Installing DOLPHYN
 
-### If you are doing a fresh install:
+### If you are doing a fresh install
 
-In your top-level folder where you want to place DOLPHYN, run:
+#### ZIP download
+
+If you would like a one-time download of DOLPHYN which is not set up to pull updates using git, then simply download and unzip the files [using this link](https://github.com/macroenergy/DOLPHYN/archive/refs/heads/main.zip).
+
+#### Fresh Install Using GitHub Desktop
+
+Use the File -> Clone Respository -> URL dropdown menu to clone the DOLPHYN repository from:
+
+- https://github.com/macroenergy/DOLPHYN.git
+
+#### Fresh Install Using GitHub via your terminal / command line
+
+In the top-level folder where you want to place DOLPHYN, run:
 
 - <code>git clone --recurse-submodules https://github.com/macroenergy/DOLPHYN</code>
 
-### If you are working from an existing project:
+### If you are working from an existing project
+
+#### Existing Project Using GitHub Desktop
+
+Pull the latest version of DOLPHYN from the main branch. Sometimes the GenX submodule in the src/GenX folder will not update correctly and remain empty.
+
+If this happens, either use the command line arguments below to init and update the submodule, or delete the entire DOLPHYN folder from your computer and re-clone the repository.
+
+#### Existing Project Using GitHub via your terminal / command line
 
 In your top-level folder (generally DOLPHYN or DOLPHYN-DEV), run:
 
-- <code>git pull</code>
-- <code>git checkout main</code>
-- <code>cd src/GenX</code>
-- <code>git submodule init</code>
-- <code>git submodule update</code>
+-	<code>git pull</code>
+-	<code>git checkout main</code>
+-	<code>cd src/GenX</code>
+-	<code>git submodule init</code>
+-	<code>git submodule update</code>
 
-The Run.jl file in each of the example sub-folders within `Example_Systems/` provides an example of how to use DOLPHYN.jl for capacity expansion modeling. Descriptions of each example system is included in the next section. The following are the main steps performed in the Run.jl script:
+## Install the Gurobi and / or HiGHS solvers
 
-1. Establish path to environment setup files and DOLPHYN source files.
-2. Read in model settings `genx_settings.yml` for electricity sector and other setting files for H2 supply chain from the example directory.
-3. Configure solver settings.
-4. Load the model inputs from the example directory and perform time-domain clustering if required.
-5. Generate a DOLPHYN model instance.
-6. Solve the model.
-7. Write the output files to a specified directory.
+HiGHS will be automatically downloaded and installed when you instantiate the DOLPHYN Julia environment, so you do not need to download it separately. However if you would like to use a specific version of have a separate copy, it can be downloaded from: [https://highs.dev/](https://highs.dev/)
 
-Ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `hsc_settings` are correct. The default settings use the solver Gurobi (`Solver: Gurobi`) (for configuring your local machine to use Gurobi, please follow instructions [here](https://github.com/macroenergy/DOLPHYN/wiki/Installing-and-running-DOLPHYN#download-the-gurobi-and--or-highs-solvers)), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, and more.
+Gurobi is a commercial solver which requires either a free academic license or paid commercial license. You should download the latest version of the Gurobi Optimizer from:[https://www.gurobi.com/downloads/gurobi-software/](https://www.gurobi.com/downloads/gurobi-software/)
 
-### Setting up the Julia environment 
+## Setting up the Julia environment
 
-#### First time running DOLPHYN:
+In order to run DOLPHYN, several Julia packages must be downloaded and installed. To help users install the correct packages and versions, we have created a Julia environment file. This file is located in the top-level DOLPHYN folder and is called `Project.toml`.
+
+### First time running DOLPHYN
+
+The first time you run DOLPHYN, you must instantiate the Julia environment. This will download and install all the required packages.
 
 In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder then run the following commands:
 
-- <code>julia --project=.</code>
+- <code>julia --project=.</code> (this starts the Julia REPL using the environment file found in the current directory)
 - <code>julia> ]</code> (Enter ']' at the prompt)
 - <code>(DOLPHYN) pkg> instantiate</code> (you should see DOLPHYN project name here, if not, enter `activate .`)
 - <code>(DOLPHYN) pkg> build Gurobi</code> (if you plan to use Gurobi)
@@ -63,9 +81,13 @@ In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder t
 Here is a snapshot for you to see the commands (instantiate and build Gurobi) used from above:
 ![Screen Shot 2023-09-07 at 11 19 22 AM](https://github.com/macroenergy/DOLPHYN/assets/2174909/8e5720fd-28f5-4bdc-840c-70fec0212cd3)
 
+If the step to build Gurobi fails, the most likely cause is that the Gurobi installation cannot be found. [Use the following instructions](https://support.gurobi.com/hc/en-us/articles/13443862111761-How-do-I-set-system-environment-variables-for-Gurobi-) to define the "GUROBI_HOME" and "GRB_LICENSE_FILE" environment variables on your computer. For example, for Gurobi 10.0 on Ubuntu they should point to:
+- GUROBI_HOME = ...path to Gurobi install/gurobi1000/linux64
+- GRB_LICENSE_FILE = ...path to Gurobi install/gurobi1000/gurobi.lic
+
 You can now press backspace to exit the Julia package manager and start using DOLPHYN by [running your first example](#running-your-first-example).
 
-#### Second+ time running DOLPHYN:
+### Second+ time running DOLPHYN:
 
 In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder then run the following commands:
 
@@ -73,26 +95,27 @@ In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder t
 - <code>julia> ]</code> 
 - <code>(DOLPHYN) pkg> st</code> (this is for checking the status of packages installed for DOLPHYN)
 
-### Running your first example: 
+## Running your first example: 
 
-Exit the package manager by hitting your backspace key. Then, navigate to one of the example systems, e.g.:
+Navigate to one of the example systems, e.g.:
 
 `julia> cd("Example_Systems/SmallNewEngland/OneZone")`
+
+Ensure you are not in the package manager by hitting the backspace key.
 
 Use the Run.jl file to run the case:
 
 `julia> include("Run.jl")`
 
-Once the model has completed running, results will be written into the 'Results' directory. 
+Once the model has completed running, results will be written into the "Results" folder.
 
 ## Example Systems
 
 **SmallNewEngland: OneZone** is a one-year example with hourly resolution representing Massachusetts. A rate-based carbon cap of 50 gCO<sub>2</sub> per kWh is specified in the `CO2_cap.csv` input file. Expect a run time of ~5 seconds.
 
-**SmallNewEngland: ThreeZones** is similar to the above example but contains zones representing Massachusetts, Connecticut, and Maine. Expect a run time of ~5 seconds.
+**SmallNewEngland: ThreeZones** is similar to the above example but contains zones representing Massachusetts, Connecticut, and Maine. Expect a run time of ~1 minute.
 
-**2030_CombEC_DETrans** is a combined power and hydrogen model for the EU for the year 2030. It contains a power model with hourly resolution, contains zones representing Belgium, Germany, Denmark, France, Great Britain, the Netherlands, Sweden, and Norway. The model also includes a CO2 constraint representing 30% of 2015 power sector CO2 emissions applied to the hydrogen and power sector jointly. Expect a run time of ~8 minutes.
-
+**NorthSea_2030** is a combined power and hydrogen model for the EU for the year 2030. It contains a power model with hourly resolution, contains zones representing Belgium, Germany, Denmark, France, Great Britain, the Netherlands, Sweden, and Norway. The model also includes a CO2 constraint representing 30% of 2015 power sector CO2 emissions applied to the hydrogen and power sector jointly. Expect a run time of ~10 minutes.
 
 ## DOLPHYN Team
-The model was originally [developed](https://pubs.rsc.org/en/content/articlehtml/2021/ee/d1ee00627d) by [Guannan He](https://www.guannanhe.com/) while at the MIT Energy Initiative, and is now maintained by a team contributors at [MITEI](https://energy.mit.edu/) led by [Dharik Mallapragada](http://mallapragada.mit.edu/) as well as Guannan He's research group at Peking University. Key contributors include Dharik S. Mallapragada, Guannan He, Yuheng Zhang, Youssef Shaker, Jun Wen Law, Nicole Shi and Anna Cybulsky.
+The model was originally [developed](https://pubs.rsc.org/en/content/articlehtml/2021/ee/d1ee00627d) by [Guannan He](https://www.guannanhe.com/) while at the MIT Energy Initiative, and is now maintained by a team contributors at [MITEI](https://energy.mit.edu/) led by [Dharik Mallapragada](http://mallapragada.mit.edu/) as well as Guannan He's research group at Peking University. Key contributors include Dharik S. Mallapragada, Guannan He, Yuheng Zhang, Youssef Shaker, Jun Wen Law, Nicole Shi, Anna Cybulsky, Mary Bennett, and Ruaridh Macdonald.
