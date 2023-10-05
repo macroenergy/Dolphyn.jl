@@ -1,0 +1,75 @@
+  Activating project at `~/DOLPHYN-Liquid_Fuels/Example_Systems/Updated_Fuels_IES_wCO2_CapResv_oldNetwork/90pRed_CapResv_PSC_H2_CO2/DOLPHYNJulEnv`
+[ Info: Reading Input CSV Files
+[ Info: Network.csv Successfully Read!
+[ Info: Load_data.csv Successfully Read!
+[ Info: Fuels_data.csv Successfully Read!
+[ Info: Generators_data.csv Successfully Read!
+[ Info: Generators_variability.csv Successfully Read!
+[ Info: About to read Capacity_reserve_margin.csv
+[ Info: Capacity_reserve_margin.csv Successfully Read!
+[ Info: About to Read Transmission's Participation in Capacity Reserve Margin
+[ Info: Transmission's Participation in Capacity Reserve Margin is Successfully Read!
+[ Info: CO2_cap.csv Successfully Read!
+[ Info: CSV Files Successfully Read In From /home/gridsan/schakraborty/DOLPHYN-Liquid_Fuels/Example_Systems/Updated_Fuels_IES_wCO2_CapResv_oldNetwork/90pRed_CapResv_PSC_H2_CO2/
+[ Info: Reading H2 Input CSV Files
+[ Info: HSC_load_data.csv Successfully Read!
+[ Info: HSC_generators_variability.csv Successfully Read!
+[ Info: HSC_pipelines.csv Successfully Read!
+[ Info: HSC_g2p_variability.csv Successfully Read!
+[ Info: HSC_CO2_cap.csv Successfully Read!
+[ Info: Period_map.csv Successfully Read!
+[ Info: HSC Input CSV Files Successfully Read In From /home/gridsan/schakraborty/DOLPHYN-Liquid_Fuels/Example_Systems/Updated_Fuels_IES_wCO2_CapResv_oldNetwork/90pRed_CapResv_PSC_H2_CO2/
+[ Info: Discharge Module
+[ Info: Non-served Energy Module
+[ Info: Investment Discharge Module
+[ Info: Unit Commitment Module
+[ Info: Emissions Module for CO2 Policy modularization
+[ Info: Transmission Module
+[ Info: Dispatchable Resources Module
+[ Info: Must-Run Resources Module
+[ Info: Storage Resources Module
+[ Info: Storage Investment Module
+[ Info: Storage Core Resources Module
+[ Info: Storage Resources with Symmetric Charge/Discharge Capacity Module
+[ Info: Hydro Reservoir Core Resources Module
+[ Info: Thermal (Unit Commitment) Resources Module
+[ Info: Hydrogen Generation and Storage Discharge Module
+[ Info: Hydrogen Investment Discharge Module
+[ Info: Hydrogen Production Module
+[ Info: H2 Production Core Module
+[ Info: H2 Production (Unit Commitment) Module
+[ Info: H2 Production (No Unit Commitment) Module
+[ Info: H2 Emissions Module for CO2 Policy modularization
+[ Info: Hydrogen Non-served Energy Module
+[ Info: Hydrogen Storage Module
+[ Info: H2 Storage Energy Investment Module
+[ Info: H2 Storage Charging Investment Module
+[ Info: H2 Storage Core Resources Module
+[ Info: Hydrogen Long Duration Storage Module
+┌ Warning: Axis contains one element: 365. If intended, you can safely ignore this warning. To explicitly pass the axis with one element, pass `[365]` instead of `365`.
+└ @ JuMP.Containers ~/.julia/packages/JuMP/Z1pVn/src/Containers/DenseAxisArray.jl:173
+[ Info: Hydrogen Pipeline Module
+[ Info: H2 g2p demand module
+┌ Warning: The addition operator has been used on JuMP expressions a large number of times. This warning is safe to ignore but may indicate that model generation is slower than necessary. For performance reasons, you should not add expressions in a loop. Instead of x += y, use add_to_expression!(x,y) to modify x in place. If y is a single variable, you may also use add_to_expression!(x, coef, y) for x += coef*y.
+└ @ JuMP ~/.julia/packages/JuMP/Z1pVn/src/JuMP.jl:1338
+[ Info: C02 Policies Module for power and hydrogen system combined
+[ Info: LP solved for primal
+[ Info: Time elapsed for writing system costs is 494.356674993
+[ Info: Time elapsed for writing storage is 8.827864267
+[ Info: Time elapsed for writing nse is 1.736401621
+[ Info: Time elapsed for writing transmission flows is 1.615343759
+[ Info: Time elapsed for writing transmission losses is 0.082594921
+[ Info: Time elapsed for writing network expansion is 0.343418789
+[ Info: Time elapsed for writing emissions is 9.379301587
+[ Info: Time elapsed for writing power plant emissions is 424.800325159
+[ Info: Time elapsed for writing reliability is 0.48477969
+[ Info: Time elapsed for writing storage duals is 1.595559174
+[ Info: Time elapsed for writing commitment is 55.189786486
+[ Info: Time elapsed for writing startup is 52.946391587
+[ Info: Time elapsed for writing shutdown is 58.463346531
+[ Info: Time elapsed for writing time weights is 6.474948449
+[ Info: Time elapsed for writing reserve margin is 0.432691218
+[ Info: Time elapsed for writing capacity value is 111.961307722
+[ Info: Time elapsed for writing net revenue is 444.030033743
+[ Info: Wrote outputs to /home/gridsan/schakraborty/DOLPHYN-Liquid_Fuels/Example_Systems/Updated_Fuels_IES_wCO2_CapResv_oldNetwork/90pRed_CapResv_PSC_H2_CO2/Results/
+[ Info: Wrote outputs HSC outputs to /home/gridsan/schakraborty/DOLPHYN-Liquid_Fuels/Example_Systems/Updated_Fuels_IES_wCO2_CapResv_oldNetwork/90pRed_CapResv_PSC_H2_CO2/Results/Results_HSC/

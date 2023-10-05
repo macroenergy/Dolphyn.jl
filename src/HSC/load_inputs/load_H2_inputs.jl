@@ -88,6 +88,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 		(setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
 		inputs = load_period_map(setup, path, sep, inputs)
 	end
+
 	print_and_log("HSC Input CSV Files Successfully Read In From $path$sep")
 
 	return inputs

@@ -36,25 +36,29 @@ function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs:
     else
         sep = "/"
   end
-    # Create directory if it does not exist
-    if !(isdir(path))
-      mkdir(path)
-    end
+  # Create directory if it does not exist
+  if !(isdir(path))
+    mkdir(path)
+  end
 
-    #write_CSC_costs(path, sep, inputs, setup, EP)
-    write_co2_capture_capacity(path, sep, inputs, setup, EP)
-    write_co2_storage_capacity(path, sep, inputs, setup, EP)
-    write_co2_total_injection(path, sep, inputs, setup, EP)
-    write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
-    write_co2_emission_balance_system(path, sep, inputs, setup, EP)
-    write_co2_storage_balance(path, sep, inputs, setup, EP)
-    write_co2_storage_balance_zone(path, sep, inputs, setup, EP)
-    write_co2_balance_dual(path, sep, inputs, setup, EP)
+  write_CSC_costs(path, sep, inputs, setup, EP)
+  write_CSC_storage_costs(path, sep, inputs, setup, EP)
+  write_co2_capture_capacity(path, sep, inputs, setup, EP)
+  #write_co2_storage_capacity(path, sep, inputs, setup, EP)
+  write_co2_total_injection(path, sep, inputs, setup, EP)
+  write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
+  write_co2_emission_balance_system(path, sep, inputs, setup, EP)
+  write_co2_capture_outflow_balance(path, sep, inputs, setup, EP)
+  write_co2_storage_balance(path, sep, inputs, setup, EP)
+  write_co2_capture_outflow_balance_dual(path, sep, inputs, setup, EP)
+  write_co2_balance_dual(path, sep, inputs, setup, EP)
 
-    if setup["ModelCO2Pipelines"] ==1 
-      write_co2_pipeline_flow(path, sep, inputs, setup, EP)
-      write_co2_pipeline_expansion(path, sep, inputs, setup, EP)
-    end
+  if setup["ModelCO2Pipelines"] ==1 
+    write_co2_trunk_pipeline_flow(path, sep, inputs, setup, EP)
+    write_co2_spur_pipeline_flow(path, sep, inputs, setup, EP)
+    write_co2_trunk_pipeline_expansion(path, sep, inputs, setup, EP)
+    write_co2_spur_pipeline_expansion(path, sep, inputs, setup, EP)
+  end
     
   ## Print confirmation
   println("Wrote CSC outputs to $path$sep")

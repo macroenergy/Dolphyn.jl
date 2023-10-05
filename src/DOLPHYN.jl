@@ -123,6 +123,7 @@ include("CSC/load_inputs/load_co2_capture_DAC_variability.jl")
 include("CSC/load_inputs/load_co2_storage.jl")
 include("CSC/load_inputs/load_co2_capture_compression.jl")
 include("CSC/load_inputs/load_co2_pipeline_data.jl")
+include("CSC/load_inputs/load_co2_demand.jl")
 
 #Load input data - syn fuels
 include("SynFuels/load_inputs/load_syn_fuels_inputs.jl")
@@ -204,9 +205,11 @@ include("HSC/model/g2p/h2_g2p_commit.jl")
 include("HSC/model/g2p/h2_g2p_no_commit.jl")
 include("HSC/model/g2p/h2_g2p.jl")
 
+# Carbon Accounting
+include("HSC/model/capture/co2_capture_power_hsc_accounting.jl")
+
 # Policies
 include("HSC/model/policies/co2_cap_hsc.jl")
-include("HSC/model/policies/green_h2_share_requirement.jl")
 
 
 #Core CSC Modelling Features
@@ -228,6 +231,7 @@ include("CSC/model/compression/co2_capture_compression.jl")
 
 # CO2 Pipeline
 include("CSC/model/transmission/co2_pipeline.jl")
+
 
 #Syn Fuels
 include("SynFuels/model/core/syn_fuel_investment.jl")
@@ -325,6 +329,7 @@ include("HSC/write_outputs/write_p_g2p.jl")
 include("HSC/write_outputs/write_h2_g2p.jl")
 include("HSC/write_outputs/write_g2p_capacity.jl")
 include("HSC/write_outputs/write_HSC_LCOH.jl")
+include("HSC/write_outputs/write_co2_captured_across_sectors.jl")
 
 # CSC Write Outputs
 include("CSC/write_outputs/write_co2_capture_capacity.jl")
@@ -332,13 +337,20 @@ include("CSC/write_outputs/write_CSC_outputs.jl")
 include("CSC/write_outputs/write_CSC_costs.jl")
 include("CSC/write_outputs/write_co2_storage_capacity.jl")
 include("CSC/write_outputs/write_co2_total_injection.jl")
-include("CSC/write_outputs/write_co2_pipeline_flow.jl")
-include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
+#include("CSC/write_outputs/write_co2_pipeline_flow.jl")
+include("CSC/write_outputs/write_co2_trunk_pipeline_flow.jl")
+include("CSC/write_outputs/write_co2_spur_pipeline_flow.jl")
+#include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
+include("CSC/write_outputs/write_co2_trunk_pipeline_expansion.jl")
+include("CSC/write_outputs/write_co2_spur_pipeline_expansion.jl")
 include("CSC/write_outputs/write_co2_emission_balance_zone.jl")
 include("CSC/write_outputs/write_co2_storage_balance.jl")
 include("CSC/write_outputs/write_co2_storage_balance_zone.jl")
 include("CSC/write_outputs/write_co2_emission_balance_system.jl")
 include("CSC/write_outputs/write_co2_balance_dual.jl")
+include("CSC/write_outputs/write_CSC_storage_costs.jl")
+include("CSC/write_outputs/write_co2_capture_outflow_balance.jl")
+include("CSC/write_outputs/write_co2_capture_outflow_balance_dual.jl")
 
 #Write SynFuel Outputs
 include("SynFuels/write_outputs/write_synfuel_outputs.jl")

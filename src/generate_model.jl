@@ -91,6 +91,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
+	
+	if setup["ModelCO2"] == 1
+		S = inputs["S"]	    # Number of CO2 sites
+	end
+
+	
 
 	## Start pre-solve timer
 	presolver_start_time = time()
@@ -112,6 +118,13 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	# Initialize CO2 Capture Balance Expression
 	@expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+
+	# Initializing Expression that would set CO2 Stored == CO2 Inflow 
+	if setup["ModelCO2"] == 1
+		@expression(EP, eCO2Store_Flow_Balance[t=1:T, z=1:S], 0)
+	end
+
+	
 
 
 	# Initialize Objective Function Expression
@@ -235,6 +248,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
 
+
+		# Compute CO2 captured per sector
+		EP = co2_capture_power_hsc_accounting(EP, inputs, setup)
+
 	end
 
 	if setup["ModelCO2"] == 1
@@ -255,6 +272,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		
 		EP = co2_storage_investment(EP, inputs, setup)
 
+		if setup["ModelCO2Pipelines"] == 1
+			# model CO2 transmission via pipelines
+			EP = co2_pipeline(EP, inputs, setup)
+		end
+
 		if !isempty(inputs["CO2_STORAGE"])
 			#model CO2 injection
 			EP = co2_injection(EP, inputs, setup)
@@ -269,11 +291,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = co2_capture_compression(EP, inputs, setup)
 		end
 
-		if setup["ModelCO2Pipelines"] == 1
-			# model CO2 transmission via pipelines
-			EP = co2_pipeline(EP, inputs, setup)
-		end
-
+		
 		# Direct emissions of various carbon capture sector resources
 		EP = emissions_csc(EP, inputs,setup)
 
@@ -452,11 +470,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = minimum_capacity_requirement(EP, inputs)
 	end
 
-	# Green H2 Share Requirement
-	if setup["ModelH2"] == 1 && setup["GreenH2ShareRequirement"] == 1
-		EP = green_h2_share_requirement(EP, inputs, setup)
-	end
-
 	## Define the objective function
 	@objective(EP,Min,EP[:eObj])
 
@@ -473,6 +486,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	if setup["ModelCO2"] == 1
 		###Captured CO2 Balanace constraints
 		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
+		@constraint(EP, cStorage_Equates_Flow[t=1:T, z=1:S], EP[:eCO2Store_Flow_Balance][t,z] == 0)
+		@expression(EP, eTotal_CO2_captured[z = 1:Z, t = 1:T], EP[:ePower_CO2_captured_per_zone_per_time][z,t] + EP[:eHydrogen_CO2_captured_per_zone_per_time][z,t] + EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] + EP[:eDAC_Fuel_CO2_captured_per_zone_per_time][z,t])
 	end
 	
 	## Record pre-solver time

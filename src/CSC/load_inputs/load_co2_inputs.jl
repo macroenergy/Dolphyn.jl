@@ -48,6 +48,11 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	inputs = load_co2_storage(setup, path, sep, inputs)
 	inputs = load_co2_capture_compression(setup, path, sep, inputs)
 	inputs = load_co2_pipeline_data(setup, path, sep, inputs)
+	inputs = load_co2_demand(setup, path, sep, inputs)
+
+	#if haskey(setup, "CO2CaptureTarget")
+	#	inputs["CO2CaptureTarget"] = setup["CO2CaptureTarget"]
+	#end
 	
 	println("CSC Input CSV Files Successfully Read In From $path$sep")
 

@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module models the CO2 captured by flue gas CCS units present in power, H2, and DAC plants and adds them to the total captured CO2 balance 
+This module uses the following 'helper' functions in separate files: ```co2_capture_uc()``` for DAC resources subject to unit commitment decisions and constraints (if any) and ```co2_capture_DAC()``` for DAC resources not subject to unit commitment (if any).
 """
 function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 
@@ -77,6 +77,12 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	
 	#ADD TO CO2 BALANCE
 	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
+
+	### Add New Constraint that forces CO2 Captured and Stored to be Equal to a given target ####
+
+	if haskey(setup, "CO2CaptureTarget")
+		@constraint(EP, cMatchingCO2CaptureTarget, sum(sum(inputs["omega"].* ((EP[:ePower_CO2_captured_per_zone_per_time_acc])[z,:])) for z in 1:Z) + sum(sum(inputs["omega"].* ((EP[:eHydrogen_CO2_captured_per_zone_per_time_acc])[z,:])) for z in 1:Z) - setup["CO2CaptureTarget"] == 0)
+	end
 
 
 	return EP

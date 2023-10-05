@@ -49,7 +49,7 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 	end
 
 
-	dfCost = DataFrame(Costs = ["cTotal", "cFix_Thermal", "cFix_VRE", "cFix_Trans_VRE", "cFix_Must_Run", "cFix_Hydro", "cFix_Stor", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp", "cH2Fix_Gen", "cH2Fix_G2P", "cH2Fix_Stor", "cH2Fix_Truck", "cH2Var", "cH2NSE", "cH2Start", "cH2NetworkExp", "cDACFix", "cDACVar", "cCO2Comp", "cCO2Stor", "cCO2Injection", "cCO2NetworkExp", "cBiorefineryFix", "cBiorefineryVar", "cHerb", "cWood", "cSFFix", "cSFVar", "cSFByProdRev", "CSFConvDieselFuelCost","CSFConvJetfuelFuelCost","CSFConvGasolineFuelCost", "cPower_Total", "cHSC_Total","cCSC_Total","cBiorefinery_Total","cBioresource_Total","cSF_Prod","cConv_Fuels","cHydro_Must_Run"])
+	dfCost = DataFrame(Costs = ["cTotal", "cFix_Thermal", "cFix_VRE", "cFix_Trans_VRE", "cFix_Must_Run", "cFix_Hydro", "cFix_Stor", "cVar", "cNSE", "cStart", "cUnmetRsv", "cNetworkExp", "cH2Fix_Gen", "cH2Fix_G2P", "cH2Fix_Stor", "cH2Fix_Truck", "cH2Var", "cH2NSE", "cH2Start", "cH2NetworkExp", "cDACFix", "cDACVar", "cCO2Comp", "cCO2Stor", "cCO2Injection", "cCO2NetworkExp_Trunk", "cCO2NetworkExp_Spur", "cBiorefineryFix", "cBiorefineryVar", "cHerb", "cWood", "cSFFix", "cSFVar", "cSFByProdRev", "CSFConvDieselFuelCost","CSFConvJetfuelFuelCost","CSFConvGasolineFuelCost", "cPower_Total", "cHSC_Total","cCSC_Total","cBiorefinery_Total","cBioresource_Total","cSF_Prod","cConv_Fuels","cHydro_Must_Run"])
 
 
 	if setup["ParameterScale"] == 1
@@ -213,9 +213,11 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 			cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total]) * ModelScalingFactor^2
 
 			if setup["ModelCO2Pipelines"] == 1
-				cCO2NetworkExpansion = value(EP[:eCCO2Pipe]) * ModelScalingFactor^2
+				cCO2NetworkExpansion_Trunk = value(EP[:eCCO2Pipe_Trunk]) * ModelScalingFactor^2
+				cCO2NetworkExpansion_Spur = value(EP[:eCCO2Pipe_Spur]) * ModelScalingFactor^2
 			else
-				cCO2NetworkExpansion = 0
+				cCO2NetworkExpansion_Trunk = 0
+				cCO2NetworkExpansion_Spur = 0
 			end
 		else
 			cDACVar = value(EP[:eVar_OM_DAC])
@@ -225,9 +227,11 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 			cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total])
 			
 			if setup["ModelCO2Pipelines"] == 1
-				cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
+				cCO2NetworkExpansion_Trunk = value(EP[:eCCO2Pipe_Trunk])
+				cCO2NetworkExpansion_Spur = value(EP[:eCCO2Pipe_Spur])
 			else
-				cCO2NetworkExpansion = 0
+				cCO2NetworkExpansion_Trunk = 0
+				cCO2NetworkExpansion_Spur = 0
 			end
 		end
 
@@ -237,7 +241,8 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 		cCO2Comp = 0
 		cCO2Stor = 0
 		cCO2Injection = 0
-		cCO2NetworkExpansion = 0
+		cCO2NetworkExpansion_Trunk = 0
+		cCO2NetworkExpansion_Spur = 0
 	end
 
 	if setup["ModelBIO"] == 1
@@ -288,16 +293,16 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 	# Define total costs
 	cPower_Total = cFix_Thermal + cFix_VRE + cFix_VRE_Trans + cFix_Must_Run + cFix_Hydro + cFix_Stor + cVar + cNSE + cStartCost + cRsvCost + cNetworkExpansionCost
 	cHSC_Total = cH2Var + cH2Fix_Gen + cH2Fix_G2P + cH2Fix_Stor + cH2Fix_Truck + cH2Start + cH2NSE + cH2NetworkExpCost
-	cCSC_Total = cDACFix + cDACVar + cCO2Comp + cCO2Stor + cCO2Injection + cCO2NetworkExpansion
+	cCSC_Total = cDACFix + cDACVar + cCO2Comp + cCO2Stor + cCO2Injection + cCO2NetworkExpansion_Trunk + cCO2NetworkExpansion_Spur 
 	cBiorefinery = cBiorefineryFix + cBiorefineryVar
 	cBioresources = cHerb + cWood
 	cSF_Prod = cSFVar + cSFFix + cSFByProdRev
 	cConv_Fuels = cSFConvDieselFuelCost + cSFConvJetfuelFuelCost + cSFConvGasolineFuelCost
 	cHydro_Must_Run = cFix_Must_Run + cFix_Hydro
 
-	cTotal = cFix_Thermal + cFix_VRE + cFix_VRE_Trans + cFix_Must_Run + cFix_Hydro + cFix_Stor + cVar + cNSE + cStartCost + cRsvCost + cNetworkExpansionCost + cH2Var + cH2Fix_Gen + cH2Fix_G2P + cH2Fix_Stor + cH2Fix_Truck + cH2Start + cH2NSE + cH2NetworkExpCost + cDACFix + cDACVar + cCO2Comp + cCO2Stor + cCO2NetworkExpansion + cBiorefineryFix + cBiorefineryVar + cHerb + cWood + cSFVar + cSFFix + cSFByProdRev + cSFConvDieselFuelCost + cSFConvJetfuelFuelCost + cSFConvGasolineFuelCost
+	cTotal = cFix_Thermal + cFix_VRE + cFix_VRE_Trans + cFix_Must_Run + cFix_Hydro + cFix_Stor + cVar + cNSE + cStartCost + cRsvCost + cNetworkExpansionCost + cH2Var + cH2Fix_Gen + cH2Fix_G2P + cH2Fix_Stor + cH2Fix_Truck + cH2Start + cH2NSE + cH2NetworkExpCost + cDACFix + cDACVar + cCO2Comp + cCO2Stor + cCO2NetworkExpansion_Trunk + cCO2NetworkExpansion_Spur + cBiorefineryFix + cBiorefineryVar + cHerb + cWood + cSFVar + cSFFix + cSFByProdRev + cSFConvDieselFuelCost + cSFConvJetfuelFuelCost + cSFConvGasolineFuelCost
 
-	dfCost[!,Symbol("Total")] = [cTotal, cFix_Thermal, cFix_VRE, cFix_VRE_Trans, cFix_Must_Run, cFix_Hydro, cFix_Stor, cVar, cNSE, cStartCost, cRsvCost, cNetworkExpansionCost, cH2Fix_Gen, cH2Fix_G2P, cH2Fix_Stor, cH2Fix_Truck, cH2Var, cH2NSE, cH2Start, cH2NetworkExpCost, cDACFix, cDACVar, cCO2Comp, cCO2Stor, cCO2Injection, cCO2NetworkExpansion, cBiorefineryFix, cBiorefineryVar, cHerb, cWood,cSFFix, cSFVar, cSFByProdRev, cSFConvDieselFuelCost, cSFConvJetfuelFuelCost, cSFConvGasolineFuelCost, cPower_Total, cHSC_Total, cCSC_Total, cBiorefinery, cBioresources, cSF_Prod, cConv_Fuels, cHydro_Must_Run]
+	dfCost[!,Symbol("Total")] = [cTotal, cFix_Thermal, cFix_VRE, cFix_VRE_Trans, cFix_Must_Run, cFix_Hydro, cFix_Stor, cVar, cNSE, cStartCost, cRsvCost, cNetworkExpansionCost, cH2Fix_Gen, cH2Fix_G2P, cH2Fix_Stor, cH2Fix_Truck, cH2Var, cH2NSE, cH2Start, cH2NetworkExpCost, cDACFix, cDACVar, cCO2Comp, cCO2Stor, cCO2Injection, cCO2NetworkExpansion_Trunk, cCO2NetworkExpansion_Spur, cBiorefineryFix, cBiorefineryVar, cHerb, cWood,cSFFix, cSFVar, cSFByProdRev, cSFConvDieselFuelCost, cSFConvJetfuelFuelCost, cSFConvGasolineFuelCost, cPower_Total, cHSC_Total, cCSC_Total, cBiorefinery, cBioresources, cSF_Prod, cConv_Fuels, cHydro_Must_Run]
 
 	# Define total column, i.e. column 2
 
@@ -588,7 +593,7 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 			tempC_H2_NSE = 0
 		end
 
-		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Thermal, tempCFix_VRE, tempCFix_Trans_VRE, tempCFix_Must_Run, tempCFix_Hydro, tempCFix_Stor, tempCVar, tempCNSE, tempCStart, "-", "-",tempC_H2_Fix_Gen, tempC_H2_Fix_G2P, tempC_H2_Fix_Stor, "-", tempC_H2_Var, tempC_H2_NSE, tempC_H2_Start, "-", tempCDACFix, tempCDACVar, tempCCO2Comp, tempCCO2Stor, tempCCO2Injection, "-", tempCBIOFix, tempCBIOVar, tempCBIOHerb, tempCBIOWood, tempC_SF_Fix, tempC_SF_Var, tempC_SF_ByProd, tempCDieselConvFuel, tempCJetfuelConvFuel, tempCGasolineConvFuel, "-", "-", "-", "-", "-", "-", "-", "-"]
+		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCFix_Thermal, tempCFix_VRE, tempCFix_Trans_VRE, tempCFix_Must_Run, tempCFix_Hydro, tempCFix_Stor, tempCVar, tempCNSE, tempCStart, "-", "-",tempC_H2_Fix_Gen, tempC_H2_Fix_G2P, tempC_H2_Fix_Stor, "-", tempC_H2_Var, tempC_H2_NSE, tempC_H2_Start, "-", tempCDACFix, tempCDACVar, tempCCO2Comp, tempCCO2Stor, tempCCO2Injection, "-", "-", tempCBIOFix, tempCBIOVar, tempCBIOHerb, tempCBIOWood, tempC_SF_Fix, tempC_SF_Var, tempC_SF_ByProd, tempCDieselConvFuel, tempCJetfuelConvFuel, tempCGasolineConvFuel, "-", "-", "-", "-", "-", "-", "-", "-"]
 	end
 	CSV.write(string(path,sep,"costs_system.csv"), dfCost)
 end

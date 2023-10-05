@@ -17,33 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     DAC_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-Sets up constraints common to all DAC resources.
-
-This function defines the expressions and constraints keeping track of total available DAC CO2 capture capacity $y_{k}^{\textrm{C,DAC}}$ as well as constraints on capacity.
-
-The expression defined in this file named after ```vCapacity\textunderscore DAC\textunderscore per\textunderscore type``` covers all variables $y_{k}^{\textrm{C,DAC}}$.
-
-The total capacity of each DAC resource is defined as the sum of newly invested capacity based on the assumption there are no existing DAC resources. 
-
-**Cost expressions**
-
-This module additionally defines contributions to the objective function from investment costs of DAC (fixed O\&M plus investment costs) from all generation resources $k \in \mathcal{K}$:
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,DAC,c}} = \sum_{k \in \mathcal{K}} \sum_{z \in \mathcal{Z}} y_{k, z}^{\textrm{C,DAC}}\times \textrm{c}_{k}^{\textrm{DAC,INV}} + \sum_{k \in \mathcal{K}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,DAC,total}} \times \textrm{c}_{k}^{\textrm{DAC,FOM}}
-\end{equation*}
-```
-
-**Constraints on DAC capacity**
-
-For resources where upper bound $\overline{y_{k}^{\textrm{C,DAC}}}$ and lower bound $\underline{y_{k}^{\textrm{C,DAC}}}$ of capacity is defined, then we impose constraints on minimum and maximum capture capacity.
-
-```math
-\begin{equation*}
-	\underline{y_{k}^{\textrm{C,DAC}}} \leq y_{k}^{\textrm{C,DAC}} \leq \overline{y_{k}^{\textrm{C,DAC}}} \quad \forall k \in \mathcal{K}
-\end{equation*}
-```
+This module defines the built capacity and the total fixed cost (Investment + Fixed O&M) of DAC resource $k$.
 
 """
 function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
@@ -58,6 +32,8 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_DAC_per_type[i in 1:DAC_RES_ALL])
+	@variable(EP,vDummy_Capacity_DAC_per_type[i in 1:DAC_RES_ALL, t in 1:T]) #To linearize UC constraint
+	@variable(EP,vCAPEX_DAC_per_type[i in 1:DAC_RES_ALL])
 
 	if setup["ParameterScale"] == 1
 		DAC_Capacity_Min_Limit = dfDAC[!,:Min_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
@@ -67,21 +43,114 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 		DAC_Capacity_Max_Limit = dfDAC[!,:Max_capacity_tonne_per_hr] # t/h
 	end
 	
+	if setup["DAC_Nonlinear_CAPEX"] == 1
+
+		if setup["ParameterScale"] == 1
+			##Load cost and capacity parameters
+			RefCAPEX_per_t_per_h_y = dfDAC[!,:Ref_CAPEX_per_yr]/ModelScalingFactor^2 # $M
+			RefFixed_OM_per_t_per_h_y = dfDAC[!,:Ref_Fixed_OM_per_yr]/ModelScalingFactor^2 # $M
+			RefCapacity_t_per_h = dfDAC[!,:Ref_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
+		else
+			##Load cost and capacity parameters
+			RefCAPEX_per_t_per_h_y = dfDAC[!,:Ref_CAPEX_per_yr] # $
+			RefFixed_OM_per_t_per_h_y = dfDAC[!,:Ref_Fixed_OM_per_yr] # $
+			RefCapacity_t_per_h = dfDAC[!,:Ref_capacity_tonne_per_hr] # t/h
+		end
+		
 	
-	if setup["ParameterScale"] == 1
-		DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-		DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-	else
-		DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]
-		DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
+		if setup["DAC_CAPEX_Piecewise_Segments"] > 1
+			#####################################################################################################################################
+			##Piecewise Function for Investment Cost
+			#Define steps for piecewise function
+			Segments = setup["DAC_CAPEX_Piecewise_Segments"]
+			Intervals = Segments + 1
+			CAPEX_Intervals = zeros(DAC_RES_ALL,Intervals) #Parameter alpha
+			Capacity_Intervals = zeros(DAC_RES_ALL,Intervals) #Parameter X
+	
+			#Input coordinates of capacity (x-axis) into piecewise and find corresponding line of CAPEX vs Capacity
+			for i in 1:DAC_RES_ALL
+	
+				#Fill up first coordinate as zero
+				Capacity_Interval_Size_i = RefCapacity_t_per_h[i]/(Intervals-2)
+				CAPEX_Interval_Size_i = RefCAPEX_per_t_per_h_y[i]/(Intervals-2) #Irrelevant piece of code
+				
+				Capacity_Intervals[i,1] = 0
+				CAPEX_Intervals[i,1] = 0
+	
+				#Fill up other intervals
+				for k in 2:Intervals-1
+					Capacity_Intervals[i,k] = Capacity_Intervals[i,k-1] + Capacity_Interval_Size_i
+					CAPEX_Intervals[i,k] = RefCAPEX_per_t_per_h_y[i]*(Capacity_Intervals[i,k]/RefCapacity_t_per_h[i])^0.6
+				end
+			end
+	
+			#Write linear function to find plant Fixed OM from ref Capacity and ref Fixed OM
+			#Not sure how to set infinity so we use a very large number which can be changed for example 100 MT/year approx = 10000 t/h
+			#Find gradient of last segment
+			DAC_CAPEX_Extrapolate_Gradient = zeros(DAC_RES_ALL)
+	
+			for i in 1:DAC_RES_ALL
+				DAC_CAPEX_Extrapolate_Gradient[i] = (CAPEX_Intervals[i,Intervals-1] - CAPEX_Intervals[i,Intervals-2])/(Capacity_Intervals[i,Intervals-1] - Capacity_Intervals[i,Intervals-2])
+			end
+	
+			#Extrapolate CAPEX as linear line to very large capacity limit after reference capacity of 1 MT/y
+			DAC_CAPEX_Max_Limit = zeros(DAC_RES_ALL)
+	
+			for i in 1:DAC_RES_ALL
+				DAC_CAPEX_Max_Limit[i] = CAPEX_Intervals[i,Intervals-1] + DAC_CAPEX_Extrapolate_Gradient[i] * (DAC_Capacity_Max_Limit[i] - Capacity_Intervals[i,Intervals-1])
+				Capacity_Intervals[i,Intervals] = DAC_Capacity_Max_Limit[i]
+				CAPEX_Intervals[i,Intervals] = DAC_CAPEX_Max_Limit[i]
+			end
+	
+			#####################################################################################################################################
+			##Variables
+			#Model piecewise function for CAPEX
+			@variable(EP,w_piecewise_DAC[i in 1:DAC_RES_ALL, k in 1:Intervals] >= 0 )
+			@variable(EP,z_piecewise_DAC[i in 1:DAC_RES_ALL, k in 1:Intervals],Bin)
+			@variable(EP,y_piecewise_DAC[i in 1:DAC_RES_ALL],Bin)
+	
+			#####################################################################################################################################
+			##Constraints
+	
+			#Piecewise constriants
+			@constraint(EP,cSum_z_piecewise_DAC[i in 1:DAC_RES_ALL], sum(EP[:z_piecewise_DAC][i,k] for k in 1:Intervals) == EP[:y_piecewise_DAC][i])
+			@constraint(EP,cLeq_w_z_piecewise_DAC[i in 1:DAC_RES_ALL,k in 1:Intervals], EP[:w_piecewise_DAC][i,k] <= EP[:z_piecewise_DAC][i,k])
+			@constraint(EP,cCAPEX_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCAPEX_DAC_per_type][i] == sum(EP[:z_piecewise_DAC][i,k]*CAPEX_Intervals[i,k] + EP[:w_piecewise_DAC][i,k]*(CAPEX_Intervals[i,k-1]-CAPEX_Intervals[i,k]) for k = 2:Intervals))
+			@constraint(EP,cCapacity_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] == sum(EP[:z_piecewise_DAC][i,k]*Capacity_Intervals[i,k] + EP[:w_piecewise_DAC][i,k]*(Capacity_Intervals[i,k-1]-Capacity_Intervals[i,k]) for k = 2:Intervals))
+	
+			#Investment cost = CAPEX
+			@expression(EP, eCAPEX_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCAPEX_DAC_per_type][i])
+	
+			#Fixed OM cost
+			@expression(EP, eFixed_OM_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * RefFixed_OM_per_t_per_h_y[i]/RefCapacity_t_per_h[i])
+	
+		else
+			#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
+			#Investment cost = CAPEX
+			#Consider using constraint for vCAPEX_DAC_per_type? Or expression is better
+			@expression(EP, eCAPEX_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * RefCAPEX_per_t_per_h_y[i]/RefCapacity_t_per_h[i])
+	
+			#Fixed OM cost
+			@expression(EP, eFixed_OM_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * RefFixed_OM_per_t_per_h_y[i]/RefCapacity_t_per_h[i])
+		end
+	
+	elseif setup["DAC_Nonlinear_CAPEX"] == 0
+		
+		if setup["ParameterScale"] == 1
+			DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
+			DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
+		else
+			DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]
+			DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
+		end
+	
+		#Investment cost = CAPEX
+		@expression(EP, eCAPEX_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * DAC_Inv_Cost_per_tonne_per_hr_yr[i])
+	
+		#Fixed OM cost
+		@expression(EP, eFixed_OM_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * DAC_Fixed_OM_Cost_per_tonne_per_hr_yr[i])
+	
 	end
-
-	#Investment cost = CAPEX
-	@expression(EP, eCAPEX_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * DAC_Inv_Cost_per_tonne_per_hr_yr[i])
-
-	#Fixed OM cost
-	@expression(EP, eFixed_OM_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * DAC_Fixed_OM_Cost_per_tonne_per_hr_yr[i])
-
 	
 	#####################################################################################################################################
 	#Min and max capacity constraints

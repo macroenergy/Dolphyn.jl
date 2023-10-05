@@ -17,9 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	emissions_csc(EP::Model, inputs::Dict, UCommit::Int)
 
-    This function creates expression to add the CO2 emissions for carbon supply chain in each zone, which is subsequently added to the total emissions. 
-    
-    These include emissions from fuel utilization in DAC minus CO2 captured by flue gas CCS and also pipeline losses.
+This function creates expression to add the net CO2 captured by plants in each zone, which is subsequently deducted to the total emissions
 """
 function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 

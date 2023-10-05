@@ -101,5 +101,12 @@ function configure_settings(settings_path::String) #! This function needs to be 
         settings["ModelingtoGenerateAlternativeSlack"] = 0.1
     end
 
+    # H2 Pipeline directionality settings. 1 = Unidirectional (H2 can only flow from Source --> Sink for a given pipe); 2 = Bidirectional (H2 can flow in both direction in a pipe). Default is bidirectional
+    if (!haskey(settings, "H2PipeDirection"))
+        settings["H2PipeDirection"] = 2
+    end
+
+
+
     return settings
 end

@@ -135,13 +135,15 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		cCO2Injection = value(EP[:eVar_OM_CO2_Injection_total])
 
 		if setup["ModelCO2Pipelines"] == 1
-			cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
+			cCO2NetworkExpansion_trunk = value(EP[:eCCO2Pipe_Trunk])
+			cCO2NetworkExpansion_spur = value(EP[:eCCO2Pipe_Spur])
 		else
-			cCO2NetworkExpansion = 0
+			cCO2NetworkExpansion_trunk = 0
+            cCO2NetworkExpansion_spur = 0
 		end
 
 		Blue_H2_CO2_Stor_Cost = (cCO2Injection + cCO2Stor) * Fraction_H2_CCS
-		Blue_H2_CO2_Pipeline_Cost = cCO2NetworkExpansion * Fraction_H2_CCS
+		Blue_H2_CO2_Pipeline_Cost = (cCO2NetworkExpansion_trunk + cCO2NetworkExpansion_spur)  * Fraction_H2_CCS
 
 	else
 		Blue_H2_CO2_Stor_Cost = 0
@@ -318,10 +320,10 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 	################################################################################################################################
 	################################################################################################################################
 	# Combined H2 LCOH
-	dfCost = DataFrame(Costs = ["H2_Generation", "Fixed_Cost", "Var_Cost", "Fuel_Cost", "Electricity_Cost", "CO2_MAC", "H2_Storage_Cost", "H2_Pipeline_Cost", "CO2_Stor_Cost", "CO2_Pipeline_Cost", "Total_Cost", "LCOH"])
-	dfCost[!,Symbol("Green_H2")] = [Green_H2_Generation_Total, Green_H2_Fixed_Cost_Total, "-", "-", Green_H2_Electricity_Cost_Total, "-", Green_H2_Storage_Cost_Total, Green_H2_Pipeline_Cost_Total, "-", "-", cGreen_H2_Total, Green_H2_LCOH_Total]
-	dfCost[!,Symbol("Blue_H2")] = [Blue_H2_Generation_Total, Blue_H2_Fixed_Cost_Total, Blue_H2_Var_Cost_Total, Blue_H2_Fuel_Cost_Total, Blue_H2_Electricity_Cost_Total, Blue_H2_CO2_MAC_Total, "-", "-", Blue_H2_CO2_Stor_Cost, Blue_H2_CO2_Pipeline_Cost, cBlue_H2_Total, Blue_H2_LCOH_Total]
-	dfCost[!,Symbol("Grey_H2")] = [Grey_H2_Generation_Total, Grey_H2_Fixed_Cost_Total, Grey_H2_Var_Cost_Total, Grey_H2_Fuel_Cost_Total, Grey_H2_Electricity_Cost_Total, Grey_H2_CO2_MAC_Total, "-", "-", "-", "-", cGrey_H2_Total, Grey_H2_LCOH_Total]
+	dfCost = DataFrame(Costs = ["H2_Generation", "Fixed_Cost", "Var_Cost", "Fuel_Cost", "Electricity_Cost", "H2_Storage_Cost", "H2_Pipeline_Cost", "CO2_Stor_Cost", "CO2_Pipeline_Cost", "Total_Cost", "LCOH"])
+	dfCost[!,Symbol("Green_H2")] = [Green_H2_Generation_Total, Green_H2_Fixed_Cost_Total, "-", "-", Green_H2_Electricity_Cost_Total, Green_H2_Storage_Cost_Total, Green_H2_Pipeline_Cost_Total, "-", "-", cGreen_H2_Total, Green_H2_LCOH_Total]
+	dfCost[!,Symbol("Blue_H2")] = [Blue_H2_Generation_Total, Blue_H2_Fixed_Cost_Total, Blue_H2_Var_Cost_Total, Blue_H2_Fuel_Cost_Total, Blue_H2_Electricity_Cost_Total, "-", "-", Blue_H2_CO2_Stor_Cost, Blue_H2_CO2_Pipeline_Cost, cBlue_H2_Total, Blue_H2_LCOH_Total]
+	dfCost[!,Symbol("Grey_H2")] = [Grey_H2_Generation_Total, Grey_H2_Fixed_Cost_Total, Grey_H2_Var_Cost_Total, Grey_H2_Fuel_Cost_Total, Grey_H2_Electricity_Cost_Total, "-", "-", "-", "-", cGrey_H2_Total, Grey_H2_LCOH_Total]
 	CSV.write(string(path,sep,"HSC_LCOH.csv"), dfCost)
 
 end

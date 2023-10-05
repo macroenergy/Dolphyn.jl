@@ -23,6 +23,7 @@ function write_co2_emission_balance_system(path::AbstractString, sep::AbstractSt
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+    S = inputs["S"]     # Number of CO2 Sites
 
 	## CO2 balance for each type of resources
 	dfCO2Balance = Array{Any}
@@ -39,8 +40,8 @@ function write_co2_emission_balance_system(path::AbstractString, sep::AbstractSt
             dfTemp1[t+rowoffset,2] = 0
         end
 
-        if setup["ModelCO2Pipelines"] == 1 && setup["CO2Pipeline_Loss"] == 1
-            dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) + value(sum(EP[:eCO2Loss_Pipes_zt][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
+        if Z > 1
+            dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) + value(sum(EP[:eCO2Loss_Pipes_Trunk_zt][z,t] for z in 1:Z)) + value(sum(EP[:eCO2Loss_Pipes_Spur_zt][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
         else
             dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
         end

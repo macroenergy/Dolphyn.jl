@@ -33,13 +33,13 @@ function write_co2_total_injection(path::AbstractString, sep::AbstractString, in
 	end
 
 	dfCap = DataFrame(
-		Resource = inputs["CO2_STORAGE_NAME"], Zone = dfCO2Storage[!,:Zone],
+		Resource = inputs["CO2_STORAGE_NAME"], Site = dfCO2Storage[!,:Site],
 		Capacity_tonne_per_yr = capcapture[:],
 	)
 
 
 	total = DataFrame(
-			Resource = "Total", Zone = "n/a",
+			Resource = "Total", Site = "n/a",
 			Capacity_tonne_per_yr = sum(dfCap[!,:Capacity_tonne_per_yr]),
 		)
 
