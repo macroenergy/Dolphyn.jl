@@ -97,6 +97,6 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
     )
 
     dfCap = vcat(dfCap, total)
-    CSV.write(joinpath(path, "HSC_generation_storage_capacity.csv"), dfCap)
+    CSV.write(joinpath(path, "HSC_generation_storage_capacity.csv"), dftranspose(dfCap, false), writeheader=false)
     return dfCap
 end
