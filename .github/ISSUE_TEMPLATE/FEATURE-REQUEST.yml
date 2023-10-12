@@ -25,9 +25,9 @@ body:
   - type: textarea
     id: suggestion-to-implement
     attributes:
-      label: What suggestion do you have for implementing this feature?
-      description: Provide us with your suggestion
-      placeholder: Provide us with your suggestion
+      label: What suggestions do you have for implementing this feature?
+      description: Provide us with your suggestions
+      placeholder: Provide us with your suggestions
       value: "Tell us your way to implement this feature. Any suggestions?"
     validations:
       required: false
