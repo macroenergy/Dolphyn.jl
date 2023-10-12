@@ -24,6 +24,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 * OS:
 * Solver:
 * Julia version:
+* Solver version:
 
 # Checklist:
 

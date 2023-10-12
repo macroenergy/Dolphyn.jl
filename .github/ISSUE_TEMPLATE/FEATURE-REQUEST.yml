@@ -2,7 +2,7 @@ name: Feature Request
 description: Suggest an idea for this project
 title: "[Feature]: "
 labels: ["enhancement"]
-projects: "MacroEnergy/DOLPHYN"
+projects: ["macroenergy/DOLPHYN"]
 body:
   - type: markdown
     attributes:
@@ -12,7 +12,7 @@ body:
     id: what-feature
     attributes:
       label: What new feature do you propose?
-      description: What new feature do you propose?
+      description: Tell us what you expect to see for this project!
       placeholder: Tell us what you expect to see for this project!
       value: "Tell us what you expect to see for this project!"
     validations:
@@ -26,7 +26,7 @@ body:
     id: suggestion-to-implement
     attributes:
       label: What suggestion do you have for implementing this feature?
-      description: What suggestion do you have for implementing this feature?
+      description: Provide us with your suggestion
       placeholder: Provide us with your suggestion
       value: "Tell us your way to implement this feature. Any suggestions?"
     validations:

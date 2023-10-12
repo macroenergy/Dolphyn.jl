@@ -1,8 +1,8 @@
 name: 🐞 Bug
 description: File a bug/issue
 title: "[BUG] <title>"
-labels: ["bug", "Needs Triage"]
-projects: "MacroEnergy/DOLPHYN"
+labels: ["bug"]
+projects: ["macroenergy/DOLPHYN"]
 body:
 - type: checkboxes
   attributes:
@@ -26,7 +26,7 @@ body:
 - type: textarea
   attributes:
     label: Steps To Reproduce
-    description: Steps to reproduce the behavior.
+    description: Please list the steps to reproduce the behavior.
     placeholder: |
       1. In this environment...
       2. With this config...
@@ -55,10 +55,10 @@ body:
   attributes:
     label: Manifest.toml file
     description: |
-      Please upload or paste your Manifest.toml file here.
+      Please upload or paste your Manifest.toml file here. GitHub will not allow you to upload a file with the extension .toml, so you will need to change the extension to .txt before uploading.
       The Manifest.toml file will be created after you first instantiate the DOLPHYN environment on your own computer.
     placeholder: |
-      Upload your Manifest.toml file here
+      Upload your Manifest.toml file here. Change the file extension to .txt before uploading.
   validations:
     required: false
 - type: textarea
