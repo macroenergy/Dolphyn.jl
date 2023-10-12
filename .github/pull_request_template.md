@@ -2,7 +2,9 @@
 
 Please include a summary of the changes and the related issue. Please also include relevant motivation and context. List any dependencies that are required for this change.
 
-Fixes # (issue)
+## Fixes issue \#
+
+Please tag any associated issues here using the format `Fixes #<issue number>`. If there is no associated issue, please type `No associated issue`.
 
 ## Type of change
 
@@ -24,6 +26,7 @@ Please describe the tests that you ran to verify your changes. Provide instructi
 * OS:
 * Solver:
 * Julia version:
+* Solver version:
 
 # Checklist:
 
