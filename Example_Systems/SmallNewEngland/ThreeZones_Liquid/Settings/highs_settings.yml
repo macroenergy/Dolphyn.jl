@@ -9,5 +9,7 @@ Method: ipm             #HiGHS-specific solver settings # Solver option: "simple
 #HiGHS-specific solver settings
 
 # Run the crossover routine for IPX
-# [type: string, "off", "choose" or "on". Default: "on"]
-run_crossover: on
+# [type: bool, advanced: true, range: {false, true}, default: true]
+run_crossover: true
+
+
