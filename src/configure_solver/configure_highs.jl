@@ -31,7 +31,7 @@ The HiGHS optimizer instance is configured with the following default parameters
     TimeLimit: Inf             # Time limit # [type: double, advanced: false, range: [0, inf], default: inf]
     Pre_Solve: choose          # Presolve option: "off", "choose" or "on" # [type: string, advanced: false, default: "choose"]
     Method: ipm #choose        #HiGHS-specific solver settings # Solver option: "simplex", "choose" or "ipm" # [type: string, advanced: false, default: "choose"] In order to run a case when the UCommit is set to 1, i.e. MILP instance, set the Method to choose
-
+    
     # HiGHS-specific solver settings
     # Presolve option: "off", "choose" or "on"
     # [type: string, advanced: false, default: "choose"]
@@ -447,7 +447,7 @@ function configure_highs(solver_settings_path::String)
     if (haskey(solver_settings, "parallel"))
         Myparallel = solver_settings["parallel"]
     end
-    Myrun_crossover = "off"
+    Myrun_crossover = false
     if (haskey(solver_settings, "run_crossover"))
         Myrun_crossover = solver_settings["run_crossover"]
     end
