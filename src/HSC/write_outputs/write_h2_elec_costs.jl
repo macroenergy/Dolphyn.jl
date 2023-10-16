@@ -41,13 +41,15 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
     # Sum power usage for all generators in a given zone
     for z in 1:Z
         tempP2G = zeros(T)
-        for y in dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
-            if setup["ModelH2Liquid"] ==1 
-                tempP2G = tempP2G .+ (y in union(inputs["H2_GEN"],inputs["H2_LIQ"],inputs["H2_EVAP"])  ? (value.(EP[:vP2G])[y,:]) : zeros(T))
-            else
-                tempP2G = tempP2G .+ (y in inputs["H2_GEN"]  ? (value.(EP[:vP2G])[y,:]) : zeros(T))
+        idx_set = dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
+        if setup["ModelH2Liquid"] ==1
+            for y in idx_set
+                tempP2G = tempP2G .+ (y in union(inputs["H2_GEN"],inputs["H2_LIQ"],inputs["H2_EVAP"])  ? (value.(EP[:vP2G][y,:])) : zeros(T))
             end
-
+        else
+            for y in idx_set
+                tempP2G = tempP2G .+ (y in inputs["H2_GEN"]  ? (value.(EP[:vP2G][y,:])) : zeros(T))
+            end
         end
         tempP2G = DataFrame(transpose(tempP2G), :auto)
         append!(dfP2G, tempP2G)

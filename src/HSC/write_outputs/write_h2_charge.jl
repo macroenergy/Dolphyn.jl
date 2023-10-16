@@ -26,12 +26,11 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
     # Power withdrawn to charge each resource in each time step
     dfCharge = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum =  Array{Union{Missing,Float32}}(undef, H))
     charge = zeros(H,T)
-    for i in 1:H
-        if i in inputs["H2_STOR_ALL"]
-            charge[i,:] = value.(EP[:vH2_CHARGE_STOR])[i,:] 
-        elseif i in inputs["H2_FLEX"]
-            charge[i,:] = value.(EP[:vH2_CHARGE_FLEX])[i,:]
-        end
+    if !isempty(inputs["H2_STOR_ALL"])
+        charge[inputs["H2_STOR_ALL"],:] = value.(EP[:vH2_CHARGE_STOR][inputs["H2_STOR_ALL"],:]).data
+    end
+    if !isempty(inputs["H2_FLEX"])
+        charge[inputs["H2_FLEX"],:] = value.(EP[:vH2_CHARGE_FLEX][inputs["H2_FLEX"],:]).data
     end
 
     dfCharge.AnnualSum .= charge * inputs["omega"]
