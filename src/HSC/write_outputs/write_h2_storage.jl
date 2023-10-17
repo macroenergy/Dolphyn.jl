@@ -29,8 +29,12 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
     s = zeros(H,T)
     storagevcapvalue = zeros(H,T)
 
-    s[inputs["H2_STOR_ALL"],:] = value.(EP[:vH2S][inputs["H2_STOR_ALL"],:]).data
-    s[inputs["H2_FLEX"],:] = value.(EP[:vS_H2_FLEX][inputs["H2_FLEX"],:]).data
+    if !isempty(inputs["H2_STOR_ALL"])
+        s[inputs["H2_STOR_ALL"],:] = value.(EP[:vH2S][inputs["H2_STOR_ALL"],:]).data
+    end
+    if !isempty(inputs["H2_FLEX"])
+        s[inputs["H2_FLEX"],:] = value.(EP[:vS_H2_FLEX][inputs["H2_FLEX"],:]).data
+    end
 
     # Incorporating effect of Parameter scaling (ParameterScale=1) on output values
     for y in 1:H
