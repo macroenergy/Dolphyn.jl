@@ -22,7 +22,6 @@ using Pkg; Pkg.add("Documenter")
 
 using Documenter, DOLPHYN
 import DataStructures: OrderedDict
-using DOLPHYN
 
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
