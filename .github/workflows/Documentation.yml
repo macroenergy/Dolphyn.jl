@@ -11,16 +11,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout DOLPHYN
+        uses: actions/checkout@v4
+        with: 
+          submodules: 'recursive'
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1.7
         with:
-          submodules: 'true'
-      - uses: julia-actions/setup-julia@latest
+          version: '1.8.5'
+          arch: 'x64'
+      - name: Cache for speed
+        uses: julia-actions/cache@v1
         with:
-          version: '1.8'
-      - name: Install dependencies
-        run: julia --project=docs/ -e 'using Pkg; Pkg.instantiate()'
-      - name: Build and deploy
+          cache-registries: "true"
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: Build docs and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }} # For authentication with documenter
-        run: julia --project=docs/ docs/make.jl
+        run: 
+            julia --project=docs docs/make.jl

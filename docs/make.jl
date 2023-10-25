@@ -18,17 +18,14 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+using Pkg; Pkg.add("Documenter")
 
-using Documenter
+using Documenter, DOLPHYN
 import DataStructures: OrderedDict
-using DOLPHYN
 
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
 include(joinpath(@__DIR__, "module_parser.jl"))
-
-# DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
@@ -184,12 +181,12 @@ copy_assets(genx_doc_path)
 
 makedocs(;
     modules = [DOLPHYN],
-    authors = "Guannan He, Dharik Mallapragada, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
+    authors = "Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
     pages = [p for p in pages],
-    doctest = false,
-    warnonly = true
+    doctest=false,
+    warnonly=true
 )
 
 deploydocs(;
