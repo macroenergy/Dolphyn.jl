@@ -18,9 +18,10 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+#using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+using Pkg; Pkg.add("Documenter")
 
-using Documenter
+using Documenter, DOLPHYN
 import DataStructures: OrderedDict
 using DOLPHYN
 # using GenX
@@ -102,11 +103,12 @@ pages = OrderedDict(
 makedocs(;
     # modules = [DOLPHYN, GenX],
     modules = [DOLPHYN],
-    authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
+    authors = "Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
     pages = [p for p in pages],
-    doctest=false
+    doctest=false,
+    warnonly=true
 )
 
 deploydocs(;
