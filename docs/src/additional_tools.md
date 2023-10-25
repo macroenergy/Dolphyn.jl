@@ -6,12 +6,12 @@ Pages = ["configure_settings/configure_settings.jl"]
 
 # DataFrame Transpose
 ```@autodocs
-Modules = [DOLPHYN, GenX]
+Modules = [DOLPHYN]
 Pages = ["GenX/src/write_outputs/dftranspose.jl"]
 ```
 
 # Choose Output Folder
 ```@autodocs
-Modules = [DOLPHYN, GenX]
+Modules = [DOLPHYN]
 Pages = ["GenX/src/write_outputs/choose_output_dir.jl"]
 ```

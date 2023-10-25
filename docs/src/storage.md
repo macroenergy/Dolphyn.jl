@@ -1,5 +1,5 @@
 # Storage
 ```@autodocs
-Modules = [DOLPHYN, GenX]
+Modules = [DOLPHYN]
 Pages = ["GenX/src/model/resources/storage/storage.jl"]
 ```

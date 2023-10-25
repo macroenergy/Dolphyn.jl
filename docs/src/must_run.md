@@ -1,5 +1,5 @@
 # Must Run
 ```@autodocs
-Modules = [DOLPHYN, GenX]
+Modules = [DOLPHYN]
 Pages = ["GenX/src/model/resources/must_run/must_run.jl"]
 ```
