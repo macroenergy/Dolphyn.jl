@@ -172,7 +172,7 @@ All input files are in CSV format. Running the GenX model requires a minimum of 
 
 • **Second row:** The second row specifies the CO2 emissions intensity of each fuel in tons/MMBtu (million British thermal units). Note that by convention, tons correspond to metric tonnes and not short tons (although as long as the user is internally consistent in their application of units, either can be used).
 
-• **Remaining rows:** Rest of the rows in this input file specify the time-series for prices for each fuel in $/MMBtu. A constant price can be specified by entering the same value for all hours.
+• **Remaining rows:** Rest of the rows in this input file specify the time-series for prices for each fuel in \$/MMBtu. A constant price can be specified by entering the same value for all hours.
 
 * ** First column:** The first column in this file denotes, Time\_index, represents the index of time steps in a model instance.
 
@@ -242,7 +242,7 @@ This file includes parameters to characterize model temporal resolution to appro
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Columns**|
-|Voll |Value of lost load in $/MWh.|
+|Voll |Value of lost load in \$/MWh.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
 |Cost\_of\_Demand\_Curtailment\_per\_MW |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
@@ -316,14 +316,14 @@ This file contains cost and performance parameters for various generators and ot
 |Min\_Cap\_MWh| -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in MWh) of the resource with `STOR = 1` or `STOR = 2`.|
 |Min\_Charge\_Cap\_MW |-1 (default) – no limit on minimum charge capacity of the resource. If non-negative, represents minimum allowed charge capacity (in MW) of the resource with `STOR = 2`.|
 |**Cost parameters**|
-|Inv\_Cost\_per\_MWyr | Annualized capacity investment cost of a technology ($/MW/year). |
-|Inv\_Cost\_per\_MWhyr | Annualized investment cost of the energy capacity for a storage technology ($/MW/year), applicable to either `STOR = 1` or `STOR = 2`. |
-|Inv\_Cost\_Charge\_per\_MWyr | Annualized capacity investment cost for the charging portion of a storage technology with `STOR = 2` ($/MW/year). |
-|Fixed\_OM\_Cost\_per\_MWy | Fixed operations and maintenance cost of a technology ($/MW/year). |
-|Fixed\_OM\_Cost\_per\_MWhyr | Fixed operations and maintenance cost of the energy component of a storage technology ($/MWh/year). |
+|Inv\_Cost\_per\_MWyr | Annualized capacity investment cost of a technology (\$/MW/year). |
+|Inv\_Cost\_per\_MWhyr | Annualized investment cost of the energy capacity for a storage technology (\$/MW/year), applicable to either `STOR = 1` or `STOR = 2`. |
+|Inv\_Cost\_Charge\_per\_MWyr | Annualized capacity investment cost for the charging portion of a storage technology with `STOR = 2` (\$/MW/year). |
+|Fixed\_OM\_Cost\_per\_MWy | Fixed operations and maintenance cost of a technology (\$/MW/year). |
+|Fixed\_OM\_Cost\_per\_MWhyr | Fixed operations and maintenance cost of the energy component of a storage technology (\$/MWh/year). |
 |Fixed\_OM\_Cost\_charge\_per\_MWyr | Fixed operations and maintenance cost of the charging component of a storage technology of type `STOR = 2`. |
-|Var\_OM\_Cost\_per\_MWh | Variable operations and maintenance cost of a technology ($/MWh). |
-|Var\_OM\_Cost\_per\_MWhIn | Variable operations and maintenance cost of the charging aspect of a storage technology with `STOR = 2`, or variable operations and maintenance costs associated with flexible demand deferral with `FLEX = 1`. Otherwise 0 ($/MWh). |
+|Var\_OM\_Cost\_per\_MWh | Variable operations and maintenance cost of a technology (\$/MWh). |
+|Var\_OM\_Cost\_per\_MWhIn | Variable operations and maintenance cost of the charging aspect of a storage technology with `STOR = 2`, or variable operations and maintenance costs associated with flexible demand deferral with `FLEX = 1`. Otherwise 0 (\$/MWh). |
 |**Technical performance parameters**|
 |Heat\_Rate\_MMBTU\_per\_MWh  |Heat rate of a generator or MMBtu of fuel consumed per MWh of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
 |Fuel  |Fuel needed for a generator. The names should match with the ones in the `Fuels_data.csv`. |
@@ -356,11 +356,11 @@ This file contains cost and performance parameters for various generators and ot
 |**UCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints (`THERM = 1`).|
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
-|Start\_Cost\_per\_MW |Cost per MW of nameplate capacity to start a generator ($/MW per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+|Start\_Cost\_per\_MW |Cost per MW of nameplate capacity to start a generator (\$/MW per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 |Start\_Fuel\_MMBTU\_per\_MW |Startup fuel use per MW of nameplate capacity of each generator (MMBtu/MW per start).|
 |**Reserves = 1** | The following settings apply to thermal, dispatchable VRE, hydro and storage resources|
-|Reg\_Cost |Cost of providing regulation reserves ($/MW per time step/hour).|
-|Rsv\_Cost |Cost of providing upwards spinning or contingency reserves ($/MW per time step/hour).|
+|Reg\_Cost |Cost of providing regulation reserves (\$/MW per time step/hour).|
+|Rsv\_Cost |Cost of providing upwards spinning or contingency reserves (\$/MW per time step/hour).|
 |Reg\_Max |[0,1], Fraction of nameplate capacity that can committed to provided regulation reserves. .|
 |Rsv\_Max |[0,1], Fraction of nameplate capacity that can committed to provided upwards spinning or contingency reserves.|
 |**EnergyShareRequirement > 0**||
@@ -421,7 +421,7 @@ This file includes parameter inputs needed to model time-dependent procurement o
 |Reg\_Req\_Percent\_VRE |[0,1], Regulation requirement as a percent of time-dependent wind and solar generation (summed across all model zones).|
 |Rsv\_Req\_Percent\_Load [0,1], |Spinning up or contingency reserve requirement as a percent of time-dependent load (which is summed across all zones).|
 |Rsv\_Req\_Percent\_VRE |[0,1], Spinning up or contingency reserve requirement as a percent of time-dependent wind and solar generation (which is summed across all zones).|
-|Unmet\_Rsv\_Penalty\_Dollar\_per\_MW |Penalty for not meeting time-dependent spinning reserve requirement ($/MW per time step).|
+|Unmet\_Rsv\_Penalty\_Dollar\_per\_MW |Penalty for not meeting time-dependent spinning reserve requirement (\$/MW per time step).|
 |Dynamic\_Contingency |Flags to include capacity (generation or transmission) contingency to be added to the spinning reserve requirement.|
 |Dynamic\_Contingency |= 1: contingency set to be equal to largest installed thermal unit (only applied when `UCommit = 1`).|
 ||= 2: contingency set to be equal to largest committed thermal unit each time period (only applied when `UCommit = 1`).|
@@ -710,12 +710,12 @@ This file includes the capacity revenue earned by each generator listed in the i
 
 #### 3.2.6 ESR\_prices.csv
 
-This file includes the renewable/clean energy credit price of each modeled RPS/CES constraint. GenX will print this file only when RPS/CES is modeled and the shadow price can be obtained form the solver. The unit is $/MWh.
+This file includes the renewable/clean energy credit price of each modeled RPS/CES constraint. GenX will print this file only when RPS/CES is modeled and the shadow price can be obtained form the solver. The unit is \$/MWh.
 
 
 #### 3.2.7 ESR\_Revenue.csv
 
-This file includes the renewable/clean credit revenue earned by each generator listed in the input file. GenX will print this file only when RPS/CES is modeled and the shadow price can be obtained form the solver. Each row corresponds to a generator, and each column starting from the 6th to the second last is the total revenue earned from each RPS constraint. The revenue is calculated as the total annual generation (if elgible for the corresponding constraint) multiplied by the RPS/CES price. The last column is the total revenue received from all constraint. The unit is $.
+This file includes the renewable/clean credit revenue earned by each generator listed in the input file. GenX will print this file only when RPS/CES is modeled and the shadow price can be obtained form the solver. Each row corresponds to a generator, and each column starting from the 6th to the second last is the total revenue earned from each RPS constraint. The revenue is calculated as the total annual generation (if elgible for the corresponding constraint) multiplied by the RPS/CES price. The last column is the total revenue received from all constraint. The unit is \$.
 
 
 #### 3.2.8 SubsidyRevenue.csv
