@@ -25,12 +25,14 @@ import DataStructures: OrderedDict
 
 DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
 
-include(joinpath(@__DIR__, "module_parser.jl"))
+doc_tools_dir = joinpath(@__DIR__, "doc_tools")
+include(joinpath(doc_tools_dir, "module_parser.jl"))
+include(joinpath(doc_tools_dir, "update_genx_docs.jl"))
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Solvers" => "solvers.md",
-    "Model Introduction" => "model_introduction.md", # Should cover both HSC and GenX model overview
+    "Model Introduction" => "dolphyn_model_introduction.md", # Should cover both HSC and GenX model overview
     # Cover Model inputs and outputs documentation
     "Model Inputs/Outputs Documentation" => [
         "global_data_documentation.md",
@@ -42,31 +44,42 @@ pages = OrderedDict(
     ],
     "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
+        "Model Introduction" => "model_introduction.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" => "write_outputs.md",
-        "GenX Notation" => "genx_notation.md",
+        "GenX Notation" => "model_notation.md",
         "Power Balance" => "power_balance.md",
         "GenX Function Reference" => [
             "Core" => "core.md",
             "Resources" => [
                 "Curtailable Variable Renewable" => "curtailable_variable_renewable.md",
                 "Flexible Demand" => "flexible_demand.md",
-                "Hydro" => "hydro_res.md",
+                "Hydro" => [
+                    "Hydro Reservoir" => "hydro_res.md",
+                    "Long Duration Hydro" => "hydro_inter_period_linkage.md"
+                ],
                 "Must Run" => "must_run.md",
-                "Storage" => "storage.md",
-                "Investment Charge" => "investment_charge.md",
-                "Investment Energy" => "investment_energy.md",
-                "Long Duration Storage" => "long_duration_storage.md",
-                "Storage All" => "storage_all.md",
-                "Storage Asymmetric" => "storage_asymmetric.md",
-                "Storage Symmetric" => "storage_symmetric.md",
-                "Thermal" => "thermal.md",
-                "Thermal Commit" => "thermal_commit.md",
-                "Thermal No Commit" => "thermal_no_commit.md",
+                "Storage" => [
+                    "Storage" => "storage.md",
+                    "Investment Charge" => "investment_charge.md",
+                    "Investment Energy" => "investment_energy.md",
+                    "Long Duration Storage" => "long_duration_storage.md",
+                    "Storage All" => "storage_all.md",
+                    "Storage Asymmetric" => "storage_asymmetric.md",
+                    "Storage Symmetric" => "storage_symmetric.md"
+                ],
+                "Thermal" => [
+                    "Thermal" => "thermal.md",
+                    "Thermal Commit" => "thermal_commit.md",
+                    "Thermal No Commit" => "thermal_no_commit.md"
+                ],
             ],
-            "Policies" => "policies.md",
+            "Multi_stage" => [
+                    "Configure multi-stage inputs" => "configure_multi_stage_inputs.md",
+                    "Model multi stage: Dual Dynamic Programming Algorithm" => "dual_dynamic_programming.md",
+            ],
+            "Slack Variables for Policies" => "slack_variables_overview.md",
         ],
-        "Solver Configurations" => "solver_configuration.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" =>"write_outputs.md",
         "Additional Features" => "additional_features.md",
@@ -107,75 +120,15 @@ pages = OrderedDict(
     "Methods" => "methods.md",
 )
 
-function insert_new_genx_pages!(pages::OrderedDict, genx_doc_path::String)
-# Try to insert GenX pages if they exist
-    if isdir(genx_doc_path)
-        genx_pages = get_pages_dict(joinpath(genx_doc_path, "make.jl"))
-        if haskey(genx_pages, "Model Inputs/Outputs Documentation")
-            pages["Model Inputs/Outputs Documentation"][2] = "GenX Database Documentation" => genx_pages["Model Inputs/Outputs Documentation"]
-        end
-        if haskey(genx_pages, "Model Function Reference")
-            pages["GenX"][5] = "GenX Function Reference" => genx_pages["Model Function Reference"]
-        end
-        if haskey(genx_pages, "Notation")
-            pages["GenX"][3] = "Genx Notation" => genx_pages["Notation"]
-        end
-    end
-end
-
 genx_doc_path = joinpath(dirname(@__DIR__), "src", "GenX", "docs")
-insert_new_genx_pages!(pages, genx_doc_path)
 
-function change_module_to_dolphyn(filepath::String)
-    # Read a file line by line
-    # If the line contains Modules = [GenX], replace it with Modules = [DOLPHYN]
-    # Save the lines as arrays.
-    lines = []
-    open(filepath) do file
-        for line in eachline(file)
-            if contains(line, "Modules = [GenX]")
-                line = "Modules = [DOLPHYN]"
-            end
-            push!(lines, line)
-        end
-    end
-    return lines
-end
-    
-function update_genx_docs(genx_doc_path::String)
-    # List all the genx and dolphyn doc files
-    genx_docs = readdir(joinpath(genx_doc_path, "src"))
-    dolphyn_docs = readdir(joinpath(@__DIR__, "src"))
-    # For each doc in genx_docs, copy or replace it in dolphyn_docs
-    for doc in genx_docs
-        if !contains(doc, ".md")
-            continue
-        end
-        if !(doc in dolphyn_docs)
-            updated_file = change_module_to_dolphyn(joinpath(genx_doc_path, "src", doc))
-            open(joinpath(@__DIR__, "src", doc), "w") do file
-                for line in updated_file
-                    println(file, line)
-                end
-            end
-        end
-    end
-end
+# This will add new pages in the GenX docs to the DOLPHYN docs
+# It's disabled for now, as it's leading to duplicate pages,
+# which Documenter.jl handles by only building the first instance.
+# This means we have to manually update the GenX doc tree for now
+# insert_new_genx_pages!(pages, genx_doc_path)
 
 update_genx_docs(genx_doc_path)
-
-# Copy all assets from GenX to DOLPHYN
-function copy_assets(genx_doc_path::String)
-    genx_assets = readdir(joinpath(genx_doc_path, "src", "assets"))
-    for asset in genx_assets
-        if !contains(asset, ".")
-            continue
-        end
-        if !isfile(joinpath(@__DIR__, "src", "assets", asset))
-            cp(joinpath(genx_doc_path, "src", "assets", asset), joinpath(@__DIR__, "src", "assets", asset))
-        end
-    end
-end
 
 copy_assets(genx_doc_path)
 
