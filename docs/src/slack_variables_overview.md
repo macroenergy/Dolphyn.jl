@@ -53,39 +53,15 @@ GenX will also print the total cost associated with each activated slack variabl
 
 The folder `Example_Systems/SmallNewEngland/ThreeZones_Slack_Variables_Example` contains examples of the input files needed to activate slack variables for each of the policy types in GenX. 
 Running this example with a given set of policy constraints activated will generate the relevant slack variables and print their outputs.
- 
+
 ## Relevant Files
 
-### Capacity Reserve Margin
-```@autodocs
-Modules = [DOLPHYN]
-Pages = ["cap_reserve_margin.jl"]
-```
+### [Capacity Reserve Margin](@ref cap_reserve_margin_policy)
 
+### [CO$_2$ Capacity](@ref co2_cap_policy)
 
-### CO2 Cap
-```@autodocs
-Modules = [DOLPHYN]
-Pages = ["co2_cap.jl"]
-```
+### [Energy Share Requirement](@ref energy_share_requirement_policy)
 
+### [Minimum Capacity Requirement](@ref min_capacity_requirement_policy)
 
-### Energy Share Requirement
-```@autodocs
-Modules = [DOLPHYN]
-Pages = ["energy_share_requirement.jl"]
-```
-
-
-### Minimum Capacity Requirement
-```@autodocs
-Modules = [DOLPHYN]
-Pages = ["minimum_capacity_requirement.jl"]
-```
-
-
-### Maximum Capacity Requirement
-```@autodocs
-Modules = [DOLPHYN]
-Pages = ["maximum_capacity_requirement.jl"]
-```
+### [Maximum Capacity Requirement](@ref max_capacity_requirement_policy)
