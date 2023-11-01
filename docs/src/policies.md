@@ -11,7 +11,7 @@ Pages = ["GenX/src/model/policies/cap_reserve_margin.jl"]
 
 ```@autodocs
 Modules = [DOLPHYN]
-Pages = ["GenX/src/model/policies/co2_cap_power.jl"]
+Pages = ["co2_cap_power_hsc.jl"]
 ```
 
 ## [Energy Share Requirement](@id energy_share_requirement_policy)

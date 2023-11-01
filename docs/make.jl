@@ -100,7 +100,7 @@ pages = OrderedDict(
                 "Hydrogen Storage Investment" => "h2_storage_investment.md",
                 "Hydrogen Storage" => "h2_storage.md",
             ],
-            "Hydrogen Transimission" => "h2_transmission.md",
+            "Hydrogen Transmission" => "h2_transmission.md",
             "Hydrogen Truck" => [
                 "Hydrogen Long Duration Truck" => "h2_long_duration_truck.md",
                 "Hydrogen Truck All" => "h2_truck_all.md",
@@ -149,6 +149,6 @@ deploydocs(;
     devbranch = "main",
     devurl = "dev",
     push_preview=true,
-    versions = ["stable" => "v^", "v#.#"],
+    versions = ["stable" => "v^", "v#.#", "v#.#.#"],
     forcepush = false,
 )
