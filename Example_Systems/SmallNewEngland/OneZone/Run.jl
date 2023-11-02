@@ -14,7 +14,7 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-using Dolphyn
+using DOLPHYN
 using YAML
 using LoggingExtras
 

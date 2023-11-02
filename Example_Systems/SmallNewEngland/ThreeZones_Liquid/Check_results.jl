@@ -56,7 +56,7 @@ inpath = pwd()
 println("Loading packages")
 push!(LOAD_PATH, src_path)
 
-using Dolphyn
+using DOLPHYN
 
 outpath = "$inpath/Results"
 
