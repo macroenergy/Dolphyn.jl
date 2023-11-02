@@ -22,10 +22,13 @@ jobs:
           path: |
             Example_Systems/SmallNewEngland/OneZone/Results_*
             Example_Systems/SmallNewEngland/ThreeZones/Results_*
+      - uses: julia-actions/setup-julia@v1.7
+        with:
+            version: '1.9'
+            arch: 'x64'
       - uses: julia-actions/cache@v1.2.2
         with:
           cache-registries: "true"
-      - uses: julia-actions/setup-julia@latest
       - uses: julia-actions/julia-buildpkg@latest
         env:
           PYTHON: ""
