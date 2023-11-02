@@ -10,5 +10,5 @@ TimeDomainReduction: 1 # Time domain reduce (i.e. cluster) inputs based on Load_
 
 
 # Log file
-Log: true # Flag whether log directed to file, turing this on will record basic output into log file and keep console io stream
-LogFile: output.log  # Filename for log file
+Log: false # Flag whether log directed to file, turing this on will record basic output into log file and keep console io stream
+LogFile: ""  # Filename for log file
