@@ -1,4 +1,9 @@
-# DOLPHYN
+# DOLPHYN Documentation
+
+```@meta
+CurrentModule = DOLPHYN
+```
+
 ## Overview
 DOLPHYN is a configurable, [open source](https://github.com/macroenergy/DOLPHYN/blob/README_Doc_Update/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
 
@@ -37,15 +42,13 @@ Use the File -> Clone Respository -> URL dropdown menu to clone the DOLPHYN repo
 
 In the top-level folder where you want to place DOLPHYN, run:
 
-- <code>git clone --recurse-submodules https://github.com/macroenergy/DOLPHYN</code>
+- <code>git clone https://github.com/macroenergy/DOLPHYN</code>
 
 ### If you are working from an existing project
 
 #### Existing Project Using GitHub Desktop
 
-Pull the latest version of DOLPHYN from the main branch. Sometimes the GenX submodule in the src/GenX folder will not update correctly and remain empty.
-
-If this happens, either use the command line arguments below to init and update the submodule, or delete the entire DOLPHYN folder from your computer and re-clone the repository.
+Pull the latest version of DOLPHYN from the main branch. If you previously used the verison of DOLPHYN where GenX was a submodule (as opposed to ordinary folder as it is now) then some of the submodule config files may remain in your project. The easiest solution is to delete your entire DOLPHYN folder from your computer and re-clone the repository.
 
 #### Existing Project Using GitHub via your terminal / command line
 
@@ -54,8 +57,6 @@ In your top-level folder (generally DOLPHYN or DOLPHYN-DEV), run:
 -	<code>git pull</code>
 -	<code>git checkout main</code>
 -	<code>cd src/GenX</code>
--	<code>git submodule init</code>
--	<code>git submodule update</code>
 
 ## Install the Gurobi and / or HiGHS solvers
 
