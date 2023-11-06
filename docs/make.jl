@@ -23,7 +23,7 @@ using Pkg; Pkg.add("Documenter")
 using Documenter, DOLPHYN
 import DataStructures: OrderedDict
 
-DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using Dolphyn); recursive = true)
 
 doc_tools_dir = joinpath(@__DIR__, "doc_tools")
 include(joinpath(doc_tools_dir, "module_parser.jl"))
