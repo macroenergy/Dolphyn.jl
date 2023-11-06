@@ -1,8 +1,4 @@
-# DOLPHYN Documentation
-
-```@meta
-CurrentModule = DOLPHYN
-```
+# DOLPHYN
 
 ## Overview
 DOLPHYN is a configurable, [open source](https://github.com/macroenergy/DOLPHYN/blob/README_Doc_Update/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
