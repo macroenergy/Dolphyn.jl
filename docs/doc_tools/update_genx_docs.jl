@@ -16,13 +16,13 @@ end
 
 function change_module_to_dolphyn(filepath::String)
     # Read a file line by line
-    # If the line contains Modules = [GenX], replace it with Modules = [DOLPHYN]
+    # If the line contains Modules = [GenX], replace it with Modules = [Dolphyn]
     # Save the lines as arrays.
     lines = []
     open(filepath) do file
         for line in eachline(file)
             if contains(line, "Modules = [GenX]")
-                line = "Modules = [DOLPHYN]"
+                line = "Modules = [Dolphyn]"
             end
             push!(lines, line)
         end
@@ -41,7 +41,7 @@ function update_genx_docs(genx_doc_path::String)
             continue
         end
         if !(doc in dolphyn_docs)
-            print("Copying $doc from GenX to DOLPHYN --- ")
+            print("Copying $doc from GenX to Dolphyn --- ")
             updated_file = change_module_to_dolphyn(joinpath(genx_doc_path, "src", doc))
             open(joinpath(dolphyn_doc_path, "src", doc), "w") do file
                 for line in updated_file
@@ -53,7 +53,7 @@ function update_genx_docs(genx_doc_path::String)
     end
 end
 
-# Copy all assets from GenX to DOLPHYN
+# Copy all assets from GenX to Dolphyn
 function copy_assets(genx_doc_path::String)
     genx_assets = readdir(joinpath(genx_doc_path, "src", "assets"))
     dolphyn_doc_path = dirname(@__DIR__)
