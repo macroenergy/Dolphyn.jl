@@ -1,5 +1,5 @@
 # configure multi stage inputs
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["configure_multi_stage_inputs.jl"]
 ```

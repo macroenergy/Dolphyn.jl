@@ -1,5 +1,5 @@
 # Documentation
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["documentation.jl"]
 ```

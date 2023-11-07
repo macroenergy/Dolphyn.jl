@@ -1,5 +1,5 @@
 # Thermal
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["GenX/src/model/resources/thermal/thermal.jl"]
 ```
