@@ -14,9 +14,8 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-module DOLPHYN
+module Dolphyn
 
-#export package_activate
 export compare_results
 export print_and_log
 export configure_settings
@@ -151,7 +150,7 @@ include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
 include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
 
 # Load model generation and solving scripts
-include("generate_model.jl")
-include("solve_model.jl")
+include(joinpath(@__DIR__,"generate_model.jl"))
+include(joinpath(@__DIR__, "solve_model.jl"))
 
 end

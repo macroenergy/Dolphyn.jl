@@ -1,6 +1,6 @@
 # Dual Dynamic Programming Algorithm
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["dual_dynamic_programming.jl"]
 ```
 

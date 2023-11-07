@@ -20,10 +20,10 @@ push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
 using Pkg; Pkg.add("Documenter")
 
-using Documenter, DOLPHYN
+using Documenter, Dolphyn
 import DataStructures: OrderedDict
 
-DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+DocMeta.setdocmeta!(Dolphyn, :DocTestSetup, :(using Dolphyn); recursive = true)
 
 doc_tools_dir = joinpath(@__DIR__, "doc_tools")
 include(joinpath(doc_tools_dir, "module_parser.jl"))
@@ -133,7 +133,7 @@ update_genx_docs(genx_doc_path)
 copy_assets(genx_doc_path)
 
 makedocs(;
-    modules = [DOLPHYN],
+    modules = [Dolphyn],
     authors = "Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
     sitename = "DOLPHYN",
     format = Documenter.HTML(),
@@ -143,7 +143,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/macroenergy/DOLPHYN.git",
+    repo = "github.com/macroenergy/Dolphyn.jl.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",

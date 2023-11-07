@@ -1,5 +1,5 @@
 # Long Duration Storage for Hydrogen
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["HSC/model/storage/h2_long_duration_storage.jl"]
 ```
