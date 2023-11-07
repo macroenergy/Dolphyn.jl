@@ -143,7 +143,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/macroenergy/DOLPHYN.git",
+    repo = "github.com/macroenergy/Dolphyn.jl.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",
