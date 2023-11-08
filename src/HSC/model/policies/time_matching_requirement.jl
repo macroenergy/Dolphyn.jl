@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
+    time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 
 This function establishes constraints that require electricity consumption from certain hydrogen resource groups to be matched by electricity generated using a specific set of electricity resources over a pre-specified time period.
@@ -32,7 +32,7 @@ For each constraint we define a subset of hydrogen production resources $g \in \
 These set of resources are resources allowed to participate in the fulfilment for TMR requirment constraint, $p$. 
 For each constraint $p \in \mathcal{P}^{TMR}$, we define a subset of zones $z \in \mathcal{Z}^{H,ESR}_{p}$, corresponding to the eligible H2 production resources and a subset of zones  $z \in \mathcal{Z}^{E,ESR}_{p}$ corresponding to the set of eligible electricity sector resources.
 
-The expression $TMR Excess Energy_{p, t}$  calculates the differences between electricity generation from resources in $set \mathcal{G}^{E, TMR}_{p}$ + net electricity storage discharge (discharge - charge)  for resources in set $\mathcal{S}^{E, TMR}_{p}$ and the electricity consumption by hydrogen production resources in $set \mathcal{G}^{H2, TMR}_{p}$ (given by variable $x_{g,z,t}^{\textrm{E,H-Gen}$).
+The expression $TMR Excess Energy_{p, t}$  calculates the differences between electricity generation from resources in $set \mathcal{G}^{E, TMR}_{p}$ + net electricity storage discharge (discharge - charge)  for resources in set $\mathcal{S}^{E, TMR}_{p}$ and the electricity consumption by hydrogen production resources in $set \mathcal{G}^{H2, TMR}_{p}$ (given by variable $x_{g,z,t}^{\textrm{E,H-Gen}}$).
 ```math
 \begin{equation*}
     {TMR Excess Energy_{p, t}} =
@@ -65,7 +65,7 @@ When the parameter ```TimeMatchingRequirement``` is set to 3, we implement the f
     \sum_{t \in T} {TMR Excess Energy_{p, t} \times \Omega_t} = 0 \; \forall \; p^{TMR} \in P
 \end{equation*}
 ```
-Notice that in the annual time-matching case, the electricity sector resources can produce in excess of electricity demand for hydrogen production at each time step, so long as the annual sum of production and generation match. The $/Omega_t$ corresponds to time-weight of each time step which will be different from 1 when considering representative periods of system operation rahter than full year operation at an hourly resolution.
+Notice that in the annual time-matching case, the electricity sector resources can produce in excess of electricity demand for hydrogen production at each time step, so long as the annual sum of production and generation match. The $\Omega_t$ corresponds to time-weight of each time step which will be different from 1 when considering representative periods of system operation rahter than full year operation at an hourly resolution.
 
 In addition, when ```EnergyShareRequirement``` is set to 1, excess sales from a given TMR group is added to the corresponding ESR constraint the TMR group maps to. 
 
