@@ -54,7 +54,7 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
     end
 
 	# Multiply price by power usage, for each zone and each time step
-	dfElecCost = dfP2G .* dfPrice .* inputs["omega"]
+	dfElecCost = dfP2G .* dfPrice .* inputs["omega"]'
 
     # Create Elec Cost Vector, per Zone
     ElecCostSum = zeros(Z)
