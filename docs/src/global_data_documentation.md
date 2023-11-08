@@ -25,7 +25,7 @@
 ||1= including the model equation as an output|
 ||0= for the model equation not being included as an output|
 
-|VisualizeData | lot basic data visualizations for quick diagnostics (call_dolphyn_viz)|
+|VisualizeData | Plot basic data visualizations for quick diagnostics (call_dolphyn_viz)|
 ||1= create basic visualization|
 ||0= do not create basic visualizations|
 
