@@ -1,10 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-#import yaml
-#from generators_color_dict.py import elec_colors
-#from generators_color_dict.py import h2_colors
-
 
 # Dictionary of colors for the technologies
 elec_colors = {
