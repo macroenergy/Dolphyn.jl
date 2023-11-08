@@ -109,3 +109,6 @@ end
 if mysetup["VisualizeData"] == 1
     dolphyn_viz(case_dir)
 end
+
+compare_results(outpath_GenX, joinpath(case_dir, "Results"))
+
