@@ -87,7 +87,6 @@ def open_results_file(file_name, run):
     if file_name.startswith('HSC'):
         path = path + 'Results_HSC/'
     path = path + file_name
-    #print(path)
     df = pd.read_csv(path)
     return(df)
 
