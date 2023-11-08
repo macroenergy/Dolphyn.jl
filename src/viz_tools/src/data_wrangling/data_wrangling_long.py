@@ -83,7 +83,6 @@ def latest_result_finder(path):
     return(path)
     
 def open_results_file(file_name, run):
-    #run = runs_directory_path + '/' + run
     path = latest_result_finder(run)
     if file_name.startswith('HSC'):
         path = path + 'Results_HSC/'
