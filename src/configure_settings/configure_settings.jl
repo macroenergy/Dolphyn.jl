@@ -107,6 +107,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)
     # Down-select Zones to model
     set_default_if_absent!(settings, "Zones", [])
+    #TimeMatchingRequirement: 0 # Modeling time matching requiremnet for electricity based H2 production - 0 - not included, 1 - hourly with excess sales, 2- hourly without excess sales, 3 - annual 
+    set_default_if_absent!(settings, "TimeMatchingRequirement", 0)                
+    #TMRSalestoESR: 0 # Modeling whether or not resources contracted for time matching requiremnet forelectricity based H2 production can sell their excess electricity to ESR market - 0 - not allowed, 1 - allowed
+    set_default_if_absent!(settings, "TMRSalestoESR", 0) 
 
 return settings
 end
