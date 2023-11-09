@@ -60,10 +60,10 @@ end
 function add_similar_to_expression!(expr1::Array{GenericAffExpr{C,T}, dim1}, expr2::Array{GenericAffExpr{C,T}, dim2}) where {C,T,dim1,dim2}
     _add_similar_to_expression!(expr1, expr2)
 end
-
-function add_similar_to_expression!(expr1::Array{GenericAffExpr{C,T}, dim1}, expr2::Array{GenericVariableRef{C}, dim2}) where {C,T,dim1,dim2}
-    _add_similar_to_expression!(expr1, expr2)
-end
+# This function threw an error. LoadError: UndefVarError: GenericVariableRef not defined - not sure why
+#function add_similar_to_expression!(expr1::Array{GenericAffExpr{C,T}, dim1}, expr2::Array{GenericVariableRef{C}, dim2}) where {C,T,dim1,dim2}
+#    _add_similar_to_expression!(expr1, expr2)
+#end
 
 function add_similar_to_expression!(expr1::Array{GenericAffExpr{C,T}, dim1}, expr2::Array{AbstractJuMPScalar, dim2}) where {C,T,dim1,dim2}
     _add_similar_to_expression!(expr1, expr2)
@@ -83,10 +83,10 @@ end
 function add_term_to_expression!(expr1::Array{GenericAffExpr{C,T}, dims}, expr2::GenericAffExpr{C,T}) where {C,T,dims}
     _add_term_to_expression!(expr1, expr2)
 end
-
-function add_term_to_expression!(expr1::Array{GenericAffExpr{C,T}, dims}, expr2::GenericVariableRef{C}) where {C,T,dims}
-    _add_term_to_expression!(expr1, expr2)
-end
+# This function threw an error. LoadError: UndefVarError: GenericVariableRef not defined - not sure why
+# function add_term_to_expression!(expr1::Array{GenericAffExpr{C,T}, dims}, expr2::GenericVariableRef{C}) where {C,T,dims}
+#     _add_term_to_expression!(expr1, expr2)
+# end
 
 function add_term_to_expression!(expr1::Array{GenericAffExpr{C,T}, dims}, expr2::AbstractJuMPScalar) where {C,T,dims}
     _add_term_to_expression!(expr1, expr2)
@@ -114,9 +114,10 @@ function sum_expression(expr::AbstractArray{GenericAffExpr{C,T}, dims}) where {C
     return _sum_expression(expr)
 end
 
-function sum_expression(expr::AbstractArray{GenericVariableRef{C}, dims}) where {C,dims}
-    return _sum_expression(expr)
-end
+# This function threw an error. LoadError: UndefVarError: GenericVariableRef not defined - not sure why
+# function sum_expression(expr::AbstractArray{GenericVariableRef{C}, dims}) where {C,dims}
+#     return _sum_expression(expr)
+# end
 
 function sum_expression(expr::AbstractArray{AbstractJuMPScalar, dims}) where {dims}
     return _sum_expression(expr)

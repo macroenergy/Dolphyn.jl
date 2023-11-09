@@ -32,13 +32,20 @@ Model settings parameters are specified in a `hsc_Settings.yml` file which shoul
 ||0 = no unit commitment.|
 ||1 = unit commitment with integer clustering.|
 ||2 = unit commitment with linearized clustering.|
-
 |**Policy related**||
 |H2CO2Cap | Flag for specifying the type of CO2 emission limit constraint.|
 || 0 = no CO2 emission limit|
 || 1 = mass-based emission limit constraint|
 || 2 = load + rate-based emission limit constraint|
 || 3 = generation + rate-based emission limit constraint|
+|TimeMatchingRequirement | Flag for specifying type of time-matching requirement (TMR). |
+|| 0 = no time matching requirement active|
+|| 1 = Hourly time-matching with excess sales|
+|| 2 = Hourly time-matching without excess sales|
+|| 3 = Annual time-matching|
+|TMRSalestoESR | Flag for specifying whether excess sales from resources contracted for TMR can be used to meet ESR requirements. |
+|| 0 = Excess sales from TMR eligible resources not allowed|
+|| 1 = Excess sales from TMR eligible resources allowed|
 
 ## 2 Inputs
 
@@ -181,7 +188,7 @@ This file contains cost and performance parameters for various generators and ot
 |region | Name of the model region|
 |cluster | Number of the cluster when representing multiple clusters of a given technology in a given region.  |
 
-###### Table 6: Settings-specific columns in the HSC\_generators\_data.csv file
+###### Table 6: Settings-specific columns in the HSC\_generation.csv file
 ---
 |**Column Name** | **Description**|
 | :------------ | :-----------|

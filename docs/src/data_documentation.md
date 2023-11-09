@@ -379,7 +379,6 @@ This file contains cost and performance parameters for various generators and ot
 |**MaxCapReq = 1**|
 |MaxCapTag\_*| Eligibility of resources to participate in Maximum Technology Carveout constraint. \* corresponds to the ith row of the file `Maximum_capacity_requirement.csv`.|
 
-
 ### 2.2 Optional inputs files
 
 #### 2.2.1 Online Time-domain reduction

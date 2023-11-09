@@ -124,7 +124,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
     @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)    
+    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)  
+    
+    # Energy Share Requirement
+	if setup["EnergyShareRequirement"] >= 1
+		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
+	end
 
     ##### Power System related modules ############
     # Infrastructure
@@ -246,14 +251,22 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             )
         end
 
+        # Modeling Time matching requirement for electricity use for hydrogen production
+		if setup["TimeMatchingRequirement"] > 0
+			EP = time_matching_requirement(EP, inputs, setup)
+		end
+
         EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
-    end
+    
+	end
 
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
     if setup["ModelH2"] ==0
-        co2_cap!(EP, inputs, setup)
+        if setup["CO2Cap"] >0
+            co2_cap!(EP, inputs, setup)
+        end
     elseif setup["ModelH2"]==1
         EP = co2_cap_power_hsc(EP, inputs, setup)
     end
@@ -263,11 +276,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         endogenous_retirement!(EP, inputs, setup)
     end
 
-    # Energy Share Requirement
-    if setup["EnergyShareRequirement"] >= 1
+     # Energy Share Requirement
+     if setup["EnergyShareRequirement"] == 1
         energy_share_requirement!(EP, inputs, setup)
     end
-
+		
     #Capacity Reserve Margin
     if setup["CapacityReserveMargin"] > 0
         cap_reserve_margin!(EP, inputs, setup)
