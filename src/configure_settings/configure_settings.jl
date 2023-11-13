@@ -34,7 +34,7 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     ## Write the model formulation as an output; 0 = active; 1 = not active
     set_default_if_absent!(settings, "PrintModel", 0)
    
-    ## Available solvers: Gurobi, CPLEX, CLPs
+    ## Set HiGHS as the solver if none is set
     set_default_if_absent!(settings, "Solver", "HiGHS")
 
     ## Turn on parameter scaling wherein load, capacity and power variables are defined in GW rather than MW. 0 = not active; 1 = active systemwide

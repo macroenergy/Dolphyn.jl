@@ -82,7 +82,6 @@ using DataFrames
 using StatsBase
 using Clustering
 using Distances
-using Documenter
 using CSV
 
 

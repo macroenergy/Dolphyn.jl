@@ -19,6 +19,9 @@ module Dolphyn
 export compare_results
 export print_and_log
 export configure_settings
+export load_settings
+export setup_logging
+export setup_TDR
 export configure_solver
 export load_inputs
 export load_h2_inputs
@@ -32,7 +35,6 @@ export h2_inherit_clusters
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
-using MathProgBase #for fix_integers
 using CSV
 using StatsBase
 using LinearAlgebra
@@ -41,7 +43,6 @@ using Dates
 using Clustering
 using Distances
 using Combinatorics
-using Documenter
 using Revise
 using Glob
 using LoggingExtras
@@ -50,12 +51,8 @@ using Random
 using RecursiveArrayTools
 using Statistics
 
-# Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
-using Gurobi
+# HiGHS is the default solver, but there is an option to employ other optimizers
 using HiGHS
-
-using Clp
-using Cbc
 
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)
