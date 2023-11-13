@@ -7,6 +7,9 @@ function load_ccs_rate(setup::Dict, inputs_gen::Dict )
     filename = "Generators_data.csv"
     gen_in = inputs_gen["dfGen"]
 
+	fuel_costs = inputs_gen["fuel_costs"]
+	fuel_CO2 = inputs_gen["fuel_CO2"]
+
     # Set indices for internal use
 	G = inputs_gen["G"]   # Number of resources (generators, storage, DR, and DERs)
 
