@@ -93,6 +93,11 @@ function configure_gurobi(solver_settings_path::String)
             MyGurobiLogFile = solver_settings["GurobiLogFile"]
         end
     end
+
+    MyBarHomogeneous = 0 # Numerical precision emphasis. See https://www.gurobi.com/documentation/8.1/refman/numericfocus.html
+    if (haskey(solver_settings, "BarHomogeneous"))
+        MyBarHomogeneous = solver_settings["BarHomogeneous"]
+    end
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
@@ -108,7 +113,8 @@ function configure_gurobi(solver_settings_path::String)
         "BarConvTol" => MyBarConvTol,
         "NumericFocus" => MyNumericFocus,
         "Crossover" => MyCrossover,
-        "LogFile" => MyGurobiLogFile
+        "LogFile" => MyGurobiLogFile,
+        "BarHomogeneous" => MyBarHomogeneous
     )
 
     return OPTIMIZER

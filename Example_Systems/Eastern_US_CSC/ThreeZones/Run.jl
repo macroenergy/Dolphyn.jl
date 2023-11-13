@@ -36,11 +36,10 @@ mysetup = Dict()
 mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
 mysetup = configure_settings(mysetup)
 
-if mysetup["ModelCO2"] == 1
-    csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
-    mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CSC supply chain-specific parameters
-    mysetup = merge(mysetup, mysetup_csc)
-end
+
+csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
+mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CSC supply chain-specific parameters
+mysetup = merge(mysetup, mysetup_csc)
 
 ##TO ADD SYNFUEL SETTING IMPORT
 
