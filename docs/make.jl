@@ -135,7 +135,7 @@ copy_assets(genx_doc_path)
 makedocs(;
     modules = [Dolphyn],
     authors = "Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
-    sitename = "DOLPHYN",
+    sitename = "Dolphyn.jl",
     format = Documenter.HTML(),
     pages = [p for p in pages],
     doctest=false,
@@ -143,7 +143,7 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/macroenergy/Dolphyn.jl.git",
+    repo = "https://github.com/macroenergy/Dolphyn.jl.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",

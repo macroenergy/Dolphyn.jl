@@ -31,25 +31,69 @@ function configure_solver(solver::String, solver_settings_path::String)
 
     # Set solver as HiGHS
     if solver == "highs"
-        highs_settings_path = joinpath(solver_settings_path, "highs_settings.yml")
-            OPTIMIZER = configure_highs(highs_settings_path)
+        if check_if_solver_available("HiGHS")
+            highs_settings_path = joinpath(solver_settings_path, "highs_settings.yml")
+            optimizer = configure_highs(highs_settings_path)
+        else
+            error("
+                HiGHS is not an available solver on your computer.
+                Please check DOLPHYN has been installed correctly.
+            ")
+        end
+        
     # Set solver as Gurobi
     elseif solver == "gurobi"
-        gurobi_settings_path = joinpath(solver_settings_path, "gurobi_settings.yml")
-            OPTIMIZER = configure_gurobi(gurobi_settings_path)
+        if check_if_solver_available("Gurobi")
+            gurobi_settings_path = joinpath(solver_settings_path, "gurobi_settings.yml")
+            optimizer = configure_gurobi(gurobi_settings_path)
+        else
+            error_on_solver("Gurobi")
+        end
     # Set solver as CPLEX
     elseif solver == "cplex"
-        cplex_settings_path = joinpath(solver_settings_path, "cplex_settings.yml")
-            OPTIMIZER = configure_cplex(cplex_settings_path)
+        if check_if_solver_available("CPLEX")
+            cplex_settings_path = joinpath(solver_settings_path, "cplex_settings.yml")
+            optimizer = configure_cplex(cplex_settings_path)
+        else
+            error_on_solver("CPLEX")
+        end
     # Set solver as Clp
     elseif solver == "clp"
-        clp_settings_path = joinpath(solver_settings_path, "clp_settings.yml")
-            OPTIMIZER = configure_clp(clp_settings_path)
+        if check_if_solver_available("Clp")
+            clp_settings_path = joinpath(solver_settings_path, "clp_settings.yml")
+            optimizer = configure_clp(clp_settings_path)
+        else
+            error_on_solver("Clp")
+        end
     # Set solver as Cbc
     elseif solver == "cbc"
-        cbc_settings_path = joinpath(solver_settings_path, "cbc_settings.yml")
-            OPTIMIZER = configure_cbc(cbc_settings_path)
+        if check_if_solver_available("Cbc")
+            cbc_settings_path = joinpath(solver_settings_path, "cbc_settings.yml")
+            optimizer = configure_cbc(cbc_settings_path)
+        else
+            error_on_solver("Cbc")
+        end
     end
+    return optimizer
+end
 
-    return OPTIMIZER
+function find_optimizer_packagename(optimizer::DataType)
+    return lowercase(string(parentmodule(optimizer)))
+end
+
+function check_if_solver_available(optimizer_name::String)
+    try
+        eval(Meta.parse("using $optimizer_name"))
+        return true
+    catch
+        return false
+    end
+end
+
+function error_on_solver(optimizer_name::String)
+    error("
+        $optimizer_name is not an available solver on your computer.
+        Either change the solver to HiGHS, which is included with DOLPHYN
+        or install $optimizer_name and add it to your Julia environment.
+    ")
 end
