@@ -53,16 +53,12 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
 
     #Carbon compressed = Carbon captured per zone
-    if setup["ModelCO2Pipelines"] ==1 
-        if setup["CO2Pipeline_Loss"] ==1 
-            @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t] + EP[:eCO2Loss_Pipes_zt][z,t])
-        else
-            @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t])
-        end
+    if setup["ModelCO2Pipelines"] ==1 & setup["CO2Pipeline_Loss"] ==1 
+        @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t] + EP[:eCO2Loss_Pipes_zt][z,t])
     else
         @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t])
     end
-
+    
     ###################################################################################################################################################################
 
     ##Compression
