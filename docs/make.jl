@@ -18,8 +18,6 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
-using Pkg; Pkg.add("Documenter")
-
 using Documenter, Dolphyn
 import DataStructures: OrderedDict
 
@@ -135,7 +133,7 @@ copy_assets(genx_doc_path)
 makedocs(;
     modules = [Dolphyn],
     authors = "Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
-    sitename = "DOLPHYN",
+    sitename = "Dolphyn",
     format = Documenter.HTML(),
     pages = [p for p in pages],
     doctest=false,

@@ -5,7 +5,7 @@
 To run the model, first navigate to the example directory at `Example_Systems/SmallNewEngland/OneZone`:
 
 `cd("Example_Systems/SmallNewEngland/OneZone")`
-   
+
 Next, ensure that your settings in `global_model_settings.yml`, `GenX_settings.yml`, `hsc_settings` are correct. The default settings use the solver Gurobi (`Solver: HiGHS`), time domain reduced input data (`TimeDomainReduction: 1`). Other optional policies include minimum capacity requirements, a capacity reserve margin, CO2 cap and and more.
 
 Once the settings are confirmed, run the model with the `Run.jl` script in the example directory:
@@ -16,4 +16,4 @@ Once the model has completed, results will write to the `Results` directory. You
 
 `include("Check_results.jl")`
 
-If the example has run successfully, all of the files except `status.csv` should be identical
+If the example has run successfully, all of the files except `status.csv` should be identical.

@@ -1,13 +1,13 @@
 # DOLPHYN
 
 ## Overview
-DOLPHYN is a configurable, [open source](https://github.com/macroenergy/DOLPHYN/blob/README_Doc_Update/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
+DOLPHYN is a configurable, [open source](https://github.com/macroenergy/Dolphyn.jl/blob/README_Doc_Update/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
 
 The DOLPHYN model evaluates investments and operations across the electricity and Hydrogen (H2) supply chains, including production, storage, transmission, conditioning, and end-use consumption. Importantly, the model is able to capture interactions between electricity and hydrogen infrastructure through: a) using hydrogen for power generation and b) production of hydrogen using electricity. The model is set up as a single-stage investment planning model and determines the least-cost mix of electricity and H2 infrastructure to meet electricity and H2 demand subject to a variety of operational, policy and carbon emission constraints. The DOLPHYN model incorporates the [GenX](https://github.com/GenXProject/GenX) electricity system model to characterize electricity system operations and investments (v0.3.6). Periodically, the electricity system representation is regularly updated to the latest GenX version.
 
 DOLPHYN is designed to be highly flexible and configurable, for use in a variety of applications from academic research and technology evaluation to public policy and regulatory analysis and resource planning. We are currently working to add biofuel supply chains and carbon capture, transport, and storage to the model. 
 
-We welcome you to add new features and resources to DOLPHYN for use in your own work and to [share them here for others](https://github.com/macroenergy/DOLPHYN/pulls). If you have issues using DOLPHYN [please let us know by opening an issue](https://github.com/macroenergy/DOLPHYN/issues).
+We welcome you to add new features and resources to DOLPHYN for use in your own work and to [share them here for others](https://github.com/macroenergy/Dolphyn.jl/pulls). If you have issues using DOLPHYN [please let us know by opening an issue](https://github.com/macroenergy/Dolphyn.jl/issues).
  
 ## Requirements
 
@@ -98,7 +98,7 @@ However, if you would like to extend, modify or contribute to DOLPHYN then we re
 
 #### ZIP download
 
-If you would like a one-time download of DOLPHYN which is not set up to pull updates using git, then simply download and unzip the files [using this link](https://github.com/macroenergy/DOLPHYN/archive/refs/heads/main.zip).
+If you would like a one-time download of DOLPHYN which is not set up to pull updates using git, then simply download and unzip the files [using this link](https://github.com/macroenergy/Dolphyn.jl/archive/refs/heads/main.zip).
 
 #### Fresh Install Using GitHub Desktop
 
@@ -144,7 +144,7 @@ If you plan to use Gurobi or another solver other than HiGHS, you should add the
 
 Here is a snapshot for you to see the commands in action. The user instantiates the environment and then builds Gurobi. Not shown, is that they added the Gurobi package to the environment using `add Gurobi` before instantiating.
 
-![Screen Shot 2023-09-07 at 11 19 22 AM](https://github.com/macroenergy/DOLPHYN/assets/2174909/8e5720fd-28f5-4bdc-840c-70fec0212cd3)
+![Screen Shot 2023-09-07 at 11 19 22 AM](https://github.com/macroenergy/Dolphyn.jl/assets/2174909/8e5720fd-28f5-4bdc-840c-70fec0212cd3)
 
 You can now press backspace to exit the Julia package manager and start using DOLPHYN by [running your first example](#running-your-first-example).
 

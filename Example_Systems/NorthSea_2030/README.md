@@ -16,4 +16,4 @@ Once the model has completed, results will write to the `Results` directory. You
 
 `include("Check_results.jl")`
 
-If the example has run successfully, all of the files except `status.csv` should be identical
+If the example has run successfully, all of the files except `status.csv` should be identical.
