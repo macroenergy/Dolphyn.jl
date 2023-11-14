@@ -5,7 +5,7 @@ CurrentModule = Dolphyn
 ```
 
 ## Overview
-DOLPHYN is a configurable, [open source](https://github.com/macroenergy/Dolphyn.jl/blob/main/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
+DOLPHYN is a configurable, [open source](https://github.com/macroenergy/Dolphyn.jl/blob/README_Doc_Update/LICENSE) energy system optimization model developed to explore interactions between multiple energy vectors and emerging technologies across their supply chains as part of a future integrated low-carbon energy system.
 
 The DOLPHYN model evaluates investments and operations across the electricity and Hydrogen (H2) supply chains, including production, storage, transmission, conditioning, and end-use consumption. Importantly, the model is able to capture interactions between electricity and hydrogen infrastructure through: a) using hydrogen for power generation and b) production of hydrogen using electricity. The model is set up as a single-stage investment planning model and determines the least-cost mix of electricity and H2 infrastructure to meet electricity and H2 demand subject to a variety of operational, policy and carbon emission constraints. The DOLPHYN model incorporates the [GenX](https://github.com/GenXProject/GenX) electricity system model to characterize electricity system operations and investments (v0.3.6). Periodically, the electricity system representation is regularly updated to the latest GenX version.
 
@@ -15,9 +15,9 @@ We welcome you to add new features and resources to DOLPHYN for use in your own 
  
 ## Requirements
 
-DOLPHYN is written in [Julia](https://julialang.org/). We recommend using the [latest version of Julia](https://julialang.org/downloads/) but will support all versions back to the current long term stable version. 
+DOLPHYN is written in [Julia](https://julialang.org/). We recommend using the [latest version of Julia](https://julialang.org/downloads/) to run DOLPHYN but will support all versions back to the current long term stable version. 
 
-DOLPHYN requires a mathematical programme solver to run. DOLPHYN comes packaged with [HiGHS](https://highs.dev/), a free open-source solver. This will be installed automatically by the [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) package when you use DOLPHYN.
+You need a mathematical programme solver to run DOLPHYN. DOLPHYN comes packaged with [HiGHS](https://highs.dev/), a free open-source solver. This will be installed automatically by the [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) package when you use DOLPHYN.
 
 DOLPHYN also works with several other open-source and commercial solvers via the [JuMP.jl](https://jump.dev) package. DOLPHYN is most extensively tested using [Gurobi](https://www.gurobi.com), a commercial solver requiring a paid commercial license or free academic license
 
@@ -37,7 +37,7 @@ DOLPHYN is available as a Julia package. To install DOLPHYN, open the Julia REPL
 
 ### Running your first example
 
-Navigate to one of the example systems, e.g.:
+Download the example systems by downloading or cloning the Dolphyn.jl repository by [following the instruction here](#if-you-are-doing-a-fresh-install). Navigate to one of the example systems, e.g.:
 
 `julia> cd("Example_Systems/SmallNewEngland/OneZone")`
 

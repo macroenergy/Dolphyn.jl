@@ -11,9 +11,9 @@ We welcome you to add new features and resources to DOLPHYN for use in your own 
  
 ## Requirements
 
-DOLPHYN is written in [Julia](https://julialang.org/). We recommend using the [latest version of Julia](https://julialang.org/downloads/) but will support all versions back to the current long term stable version. 
+DOLPHYN is written in [Julia](https://julialang.org/). We recommend using the [latest version of Julia](https://julialang.org/downloads/) to run DOLPHYN but will support all versions back to the current long term stable version. 
 
-DOLPHYN requires a mathematical programme solver to run. DOLPHYN comes packaged with [HiGHS](https://highs.dev/), a free open-source solver. This will be installed automatically by the [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) package when you use DOLPHYN.
+You need a mathematical programme solver to run DOLPHYN. DOLPHYN comes packaged with [HiGHS](https://highs.dev/), a free open-source solver. This will be installed automatically by the [HiGHS.jl](https://github.com/jump-dev/HiGHS.jl) package when you use DOLPHYN.
 
 DOLPHYN also works with several other open-source and commercial solvers via the [JuMP.jl](https://jump.dev) package. DOLPHYN is most extensively tested using [Gurobi](https://www.gurobi.com), a commercial solver requiring a paid commercial license or free academic license
 
@@ -33,7 +33,7 @@ DOLPHYN is available as a Julia package. To install DOLPHYN, open the Julia REPL
 
 ### Running your first example
 
-Navigate to one of the example systems, e.g.:
+Download the example systems by downloading or cloning the Dolphyn.jl repository by [following the instruction here](#if-you-are-doing-a-fresh-install). Navigate to one of the example systems, e.g.:
 
 `julia> cd("Example_Systems/SmallNewEngland/OneZone")`
 

@@ -15,8 +15,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 using Dolphyn
-using YAML
-using LoggingExtras
 
 # The directory containing your settings folder and files
 settings_path = joinpath(@__DIR__, "Settings")
