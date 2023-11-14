@@ -25,6 +25,8 @@ jobs:
         with:
           cache-registries: "true"
       - uses: julia-actions/julia-buildpkg@v1
+      - name: Install dependencies
+        run: julia --project=docs -e 'using Pkg; Pkg.instantiate()'
       - name: Build docs and deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # For authentication with GitHub Actions token
