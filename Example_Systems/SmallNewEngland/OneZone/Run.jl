@@ -72,4 +72,4 @@ if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
-compare_results(outpath_GenX, joinpath(case_dir, "Results"))
+compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))

@@ -5,7 +5,7 @@ Pages = ["HSC/model/policies/co2_cap_hsc.jl"]
 ```
 
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["HSC/model/policies/time_matching_requirement.jl"]
 ```
 
