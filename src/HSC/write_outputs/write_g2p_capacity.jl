@@ -57,6 +57,6 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
         )
 
     dfCap = vcat(dfCap, total)
-    CSV.write(joinpath(path, "HSC_g2p_capacity.csv"), dfCap)
+    CSV.write(joinpath(path, "HSC_g2p_capacity.csv"), dftranspose(dfCap, false), writeheader=false)
     return dfCap
 end

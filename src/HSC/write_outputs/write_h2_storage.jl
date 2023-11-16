@@ -41,8 +41,13 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
         storagevcapvalue[y,:] = s[y,:]
     end
 
-    dfH2Storage = hcat(dfH2Storage, DataFrame(storagevcapvalue, :auto))
-    auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
+    dfH2Storage = hcat(dfH2Storage, DataFrame(AnnualMean=Array{Union{Missing,Float32}}(undef, H)), DataFrame(storagevcapvalue, :auto))
+
+    auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualMean");[Symbol("t$t") for t in 1:T]]
+
     rename!(dfH2Storage,auxNew_Names)
-    CSV.write(joinpath(path, "storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
+
+    dfH2Storage.AnnualMean .= [sum(dfH2Storage[i,r"t"])/T for i in 1:H ]
+
+    CSV.write(joinpath(path, "HSC_storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
 end
