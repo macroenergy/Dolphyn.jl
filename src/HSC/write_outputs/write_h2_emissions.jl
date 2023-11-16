@@ -40,27 +40,22 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
                 end
             end
         end
-        dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(tempCO2Price, :auto), DataFrame(AnnualSum = Array{Union{Missing,Float64}}(undef, Z)))
+        dfEmissions = hcat(DataFrame(Zone = 1:Z), DataFrame(tempCO2Price, :auto), DataFrame(AnnualSum = Array{Union{Missing,Float32}}(undef, Z)))
         auxNew_Names=[Symbol("Zone"); [Symbol("CO2_Price_$cap") for cap in 1:inputs["H2NCO2Cap"]]; Symbol("AnnualSum")]
         rename!(dfEmissions,auxNew_Names)
     else
         dfEmissions = DataFrame(Zone = 1:Z, AnnualSum = Array{Union{Missing,Float32}}(undef, Z))
     end
 
-    for i in 1:Z
-        if setup["ParameterScale"]==1
-            dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])*ModelScalingFactor
-        else
-            dfEmissions[!,:AnnualSum][i] = sum(inputs["omega"].*value.(EP[:eH2EmissionsByZone])[i,:])
-        end
-    end
-
+    emissions = value.(EP[:eH2EmissionsByZone])
+ 
     if setup["ParameterScale"]==1
-        dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone])*ModelScalingFactor, :auto))
-    else
-        dfEmissions = hcat(dfEmissions, DataFrame(value.(EP[:eH2EmissionsByZone]), :auto))
+        emissions *= ModelScalingFactor
     end
 
+    dfEmissions.AnnualSum .= emissions * inputs["omega"]
+
+    dfEmissions = hcat(dfEmissions, DataFrame(emissions, :auto))
 
     if ((setup["H2CO2Cap"]==1||setup["H2CO2Cap"]==2||setup["H2CO2Cap"]==3) && setup["SystemCO2Constraint"]==1)
         auxNew_Names=[Symbol("Zone");[Symbol("CO2_Price_$cap") for cap in 1:inputs["H2NCO2Cap"]];Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]

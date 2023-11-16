@@ -31,11 +31,12 @@ function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, s
         dfTemp = DataFrame(Segment=zeros(H2_SEG), Zone=zeros(H2_SEG), AnnualSum = Array{Union{Missing,Float32}}(undef, H2_SEG))
         dfTemp[!,:Segment] = (1:H2_SEG)
         dfTemp[!,:Zone] = fill(z,(H2_SEG))
-        
-            for i in 1:H2_SEG
-                dfTemp[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2NSE])[i,:,z]))
-            end
-            dfTemp = hcat(dfTemp, DataFrame(value.(EP[:vH2NSE])[:,:,z], :auto))
+
+        h2nse = value.(EP[:vH2NSE][:, :, z])
+    
+        dfTemp.AnnualSum .= h2nse * inputs["omega"] 
+
+        dfTemp = hcat(dfTemp, DataFrame(h2nse, :auto))
         
         if z == 1
             dfNse = dfTemp

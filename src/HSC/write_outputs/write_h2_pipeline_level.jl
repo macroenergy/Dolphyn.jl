@@ -28,7 +28,7 @@ function write_h2_pipeline_level(path::AbstractString, sep::AbstractString, inpu
     dfH2PipelineLevel = DataFrame(Pipelines = 1:P)
 
     for i in 1:P
-        p[i, :] = value.(EP[:vH2PipeLevel])[i, :]
+        p[i, :] = value.(EP[:vH2PipeLevel][i, :])
     end
 
     dfH2PipelineLevel = hcat(dfH2PipelineLevel, DataFrame(p, :auto))
