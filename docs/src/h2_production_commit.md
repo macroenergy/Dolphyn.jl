@@ -1,5 +1,5 @@
 # Hydrogen Production Commitment
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["HSC/model/generation/h2_production_commit.jl"]
 ```

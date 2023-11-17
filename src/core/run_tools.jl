@@ -1,0 +1,70 @@
+"""
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A complete copy of the GNU General Public License v2 (GPLv2) is available
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+# Methods to simplify the process of running DOLPHYN cases
+
+"""
+    load_settings(settings_path::AbstractString) :: Dict{Any, Any}
+
+Loads Global, GenX and HSC settings and returns a merged settings dict called mysetup
+"""
+function load_settings(settings_path::AbstractString)
+    genx_settings_path = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
+    mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
+
+    hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
+    mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
+
+    global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
+    mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
+
+    mysetup = Dict{Any,Any}()
+    mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+    mysetup = configure_settings(mysetup)
+
+    return mysetup
+end
+
+function setup_logging(mysetup::Dict{Any, Any})
+    # Start logging
+    global Log = mysetup["Log"]
+    if Log
+        logger = FileLogger(mysetup["LogFile"])
+        return global_logger(logger)
+    end
+    return nothing
+end
+
+function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any,Any})
+    TDRpath = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
+    if mysetup["TimeDomainReduction"] == 1
+        if mysetup["ModelH2"] == 1
+            if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
+                print_and_log("Clustering Time Series Data...")
+                cluster_inputs(inputs_path, settings_path, mysetup)
+            else
+                print_and_log("Time Series Data Already Clustered.")
+            end
+        else
+            if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
+                print_and_log("Clustering Time Series Data...")
+                cluster_inputs(inputs_path, settings_path, mysetup)
+            else
+                print_and_log("Time Series Data Already Clustered.")
+            end
+        end
+    end
+end

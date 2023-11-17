@@ -1,5 +1,5 @@
 # Long Duration Truck for Hydrogen
 ```@autodocs
-Modules = [DOLPHYN]
+Modules = [Dolphyn]
 Pages = ["HSC/model/truck/h2_long_duration_truck.jl"]
 ```

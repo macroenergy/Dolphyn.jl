@@ -18,56 +18,77 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
-using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()
+using Pkg; Pkg.add("Documenter")
 
-using Documenter
+using Documenter, Dolphyn
 import DataStructures: OrderedDict
-using DOLPHYN
-# using GenX
 
-DocMeta.setdocmeta!(DOLPHYN, :DocTestSetup, :(using DOLPHYN); recursive = true)
+DocMeta.setdocmeta!(Dolphyn, :DocTestSetup, :(using Dolphyn); recursive = true)
+
+doc_tools_dir = joinpath(@__DIR__, "doc_tools")
+include(joinpath(doc_tools_dir, "module_parser.jl"))
+include(joinpath(doc_tools_dir, "update_genx_docs.jl"))
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Solvers" => "solvers.md",
-    "Model Introduction" => "model_introduction.md", # Should cover both HSC and GenX model overview
+    "Model Introduction" => "dolphyn_model_introduction.md", # Should cover both HSC and GenX model overview
     # Cover Model inputs and outputs documentation
-    "Model Inputs/Outputs Documentation" =>  [
+    "Model Inputs/Outputs Documentation" => [
         "global_data_documentation.md",
-        "genx_data_documentation.md",  
+        "GenX Database Documentation" => [
+            "Single-stage Model" => "data_documentation.md",
+            "Multi-stage Model" => "multi_stage_model_overview.md",
+        ],  
         "hsc_data_documentation.md"
     ],
     "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
+        "Model Introduction" => "model_introduction.md",
         "GenX Inputs Functions" => "load_inputs.md",
         "GenX Outputs Functions" => "write_outputs.md",
-        "GenX Notation" => "genx_notation.md",
+        "GenX Notation" => "model_notation.md",
         "Power Balance" => "power_balance.md",
         "GenX Function Reference" => [
             "Core" => "core.md",
             "Resources" => [
                 "Curtailable Variable Renewable" => "curtailable_variable_renewable.md",
                 "Flexible Demand" => "flexible_demand.md",
-                "Hydro" => "hydro_res.md",
+                "Hydro" => [
+                    "Hydro Reservoir" => "hydro_res.md",
+                    "Long Duration Hydro" => "hydro_inter_period_linkage.md"
+                ],
                 "Must Run" => "must_run.md",
-                "Storage" => "storage.md",
-                "Investment Charge" => "investment_charge.md",
-                "Investment Energy" => "investment_energy.md",
-                "Long Duration Storage" => "long_duration_storage.md",
-                "Storage All" => "storage_all.md",
-                "Storage Asymmetric" => "storage_asymmetric.md",
-                "Storage Symmetric" => "storage_symmetric.md",
-                "Thermal" => "thermal.md",
-                "Thermal Commit" => "thermal_commit.md",
-                "Thermal No Commit" => "thermal_no_commit.md",
+                "Storage" => [
+                    "Storage" => "storage.md",
+                    "Investment Charge" => "investment_charge.md",
+                    "Investment Energy" => "investment_energy.md",
+                    "Long Duration Storage" => "long_duration_storage.md",
+                    "Storage All" => "storage_all.md",
+                    "Storage Asymmetric" => "storage_asymmetric.md",
+                    "Storage Symmetric" => "storage_symmetric.md"
+                ],
+                "Thermal" => [
+                    "Thermal" => "thermal.md",
+                    "Thermal Commit" => "thermal_commit.md",
+                    "Thermal No Commit" => "thermal_no_commit.md"
+                ],
             ],
-            "Policies" => "policies.md",
+            "Multi_stage" => [
+                    "Configure multi-stage inputs" => "configure_multi_stage_inputs.md",
+                    "Model multi stage: Dual Dynamic Programming Algorithm" => "dual_dynamic_programming.md",
+            ],
+            "Slack Variables for Policies" => "slack_variables_overview.md",
         ],
+        "GenX Inputs Functions" => "load_inputs.md",
+        "GenX Outputs Functions" =>"write_outputs.md",
+        "Additional Features" => "additional_features.md",
+        "Third Party Extensions" => "additional_third_party_extensions.md"
     ],
-    "HSC" => [
+    "Hydrogen Supply Chain (HSC)" => [
         "HSC Inputs Functions" => "load_h2_inputs.md",
         "HSC Outputs Functions" => "write_h2_outputs.md",
-        "Hydrogen Notation" => "hsc_notation.md",
+        "HSC Notation" => "hsc_notation.md",
         "HSC Supply-Demand Balance" => "h2_balance.md",
         "HSC Function Reference" => [
             "Hydrogen Core" => "h2_core.md",
@@ -79,7 +100,7 @@ pages = OrderedDict(
                 "Hydrogen Storage Investment" => "h2_storage_investment.md",
                 "Hydrogen Storage" => "h2_storage.md",
             ],
-            "Hydrogen Transimission" => "h2_transmission.md",
+            "Hydrogen Transmission" => "h2_transmission.md",
             "Hydrogen Truck" => [
                 "Hydrogen Long Duration Truck" => "h2_long_duration_truck.md",
                 "Hydrogen Truck All" => "h2_truck_all.md",
@@ -99,23 +120,35 @@ pages = OrderedDict(
     "Methods" => "methods.md",
 )
 
+genx_doc_path = joinpath(dirname(@__DIR__), "src", "GenX", "docs")
+
+# This will add new pages in the GenX docs to the DOLPHYN docs
+# It's disabled for now, as it's leading to duplicate pages,
+# which Documenter.jl handles by only building the first instance.
+# This means we have to manually update the GenX doc tree for now
+# insert_new_genx_pages!(pages, genx_doc_path)
+
+update_genx_docs(genx_doc_path)
+
+copy_assets(genx_doc_path)
+
 makedocs(;
-    # modules = [DOLPHYN, GenX],
-    modules = [DOLPHYN],
-    authors = "Guannan He, Dharik Mallapragada, Yuheng Zhang, Jun Wen Law, Youssef Shaker, Anna Cybulsky, Nicole Shi, and Ruaridh Macdonald",
-    sitename = "DOLPHYN",
+    modules = [Dolphyn],
+    authors = "Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang",
+    sitename = "Dolphyn.jl",
     format = Documenter.HTML(),
     pages = [p for p in pages],
-    doctest=false
+    doctest=false,
+    warnonly=true
 )
 
 deploydocs(;
-    repo = "github.com/macroenergy/DOLPHYN.git",
+    repo = "https://github.com/macroenergy/Dolphyn.jl.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main",
     devurl = "dev",
     push_preview=true,
-    versions = ["stable" => "v^", "v#.#"],
+    versions = ["stable" => "v^", "v#.#", "v#.#.#"],
     forcepush = false,
 )

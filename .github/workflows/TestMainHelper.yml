@@ -1,0 +1,46 @@
+name: TestMainHelper
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+jobs:
+  test:
+    name: Julia ${{ matrix.julia-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        julia-version: 
+          - '1.7' 
+          - '1.8'
+          - '1.9'
+        julia-arch: 
+          - 'x64'
+        
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cache Results
+        id: cache-results
+        if: ${{ matrix.julia-version == '1.9' }}
+        uses: actions/cache@v3.3.2
+        with:
+          key: Julia-1.9-Test-Results
+          path: |
+            Example_Systems/SmallNewEngland/OneZone/Results_*
+            Example_Systems/SmallNewEngland/ThreeZones/Results_*
+      - uses: julia-actions/cache@v1.2.2
+        with:
+          cache-registries: "true"
+      - name: Setup Julia
+        id: install-julia
+        uses: julia-actions/setup-julia@latest
+        with:
+          version: ${{ matrix.julia-version }}
+          arch: ${{ matrix.julia-arch }}
+      - uses: julia-actions/julia-buildpkg@latest
+        env:
+          PYTHON: ""
+      - uses: julia-actions/julia-runtest@latest
+        continue-on-error: ${{ matrix.julia-version == 'nightly' }}
+        env:
+          PYTHON: ""

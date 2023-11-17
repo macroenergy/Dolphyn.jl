@@ -14,12 +14,14 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-module DOLPHYN
+module Dolphyn
 
-#export package_activate
 export compare_results
 export print_and_log
 export configure_settings
+export load_settings
+export setup_logging
+export setup_TDR
 export configure_solver
 export load_inputs
 export load_h2_inputs
@@ -35,7 +37,6 @@ export h2_inherit_clusters
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
-using MathProgBase #for fix_integers
 using CSV
 using StatsBase
 using LinearAlgebra
@@ -44,7 +45,6 @@ using Dates
 using Clustering
 using Distances
 using Combinatorics
-using Documenter
 using Revise
 using Glob
 using LoggingExtras
@@ -53,12 +53,8 @@ using Random
 using RecursiveArrayTools
 using Statistics
 
-# Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
-using Gurobi
+# HiGHS is the default solver, but there is an option to employ other optimizers
 using HiGHS
-
-using Clp
-using Cbc
 
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)
@@ -125,7 +121,18 @@ genx_to_exclude = [
     joinpath(genxsubmod_path,"model","solve_model.jl"),
     joinpath(genxsubmod_path,"model","generate_model.jl"),
     joinpath(genxsubmod_path,"configure_solver"),
+    joinpath(genxsubmod_path,"write_outputs","write_capacity.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_capacityfactor.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_charging_cost.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_energy_revenue.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_net_revenue.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_nw_expansion.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_outputs.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_price.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_reliability.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_storage.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_storagedual.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_subsidy_revenue.jl"),
     joinpath(genxsubmod_path,"model","core","emissions.jl"),
     # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
@@ -157,7 +164,7 @@ include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
 include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
 
 # Load model generation and solving scripts
-include("generate_model.jl")
-include("solve_model.jl")
+include(joinpath(@__DIR__,"generate_model.jl"))
+include(joinpath(@__DIR__, "solve_model.jl"))
 
 end

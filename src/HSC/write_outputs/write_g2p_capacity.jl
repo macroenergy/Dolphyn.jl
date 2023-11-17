@@ -23,24 +23,24 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
     # Capacity decisions
     dfH2G2P = inputs["dfH2G2P"]
     capdischarge = zeros(size(inputs["H2_G2P_NAME"]))
-    for i in inputs["H2_G2P_NEW_CAP"]
-        if i in inputs["H2_G2P_COMMIT"]
-            capdischarge[i] = value(EP[:vH2G2PNewCap][i]) * dfH2G2P[!,:Cap_Size_MW][i]
-        else
-            capdischarge[i] = value(EP[:vH2G2PNewCap][i])
-        end
+    new_cap_and_commit = intersect(inputs["H2_G2P_NEW_CAP"], inputs["H2_G2P_COMMIT"])
+    new_cap_not_commit = setdiff(inputs["H2_G2P_NEW_CAP"], inputs["H2_G2P_COMMIT"])
+    if !isempty(new_cap_and_commit)
+        capdischarge[new_cap_and_commit] = value.(EP[:vH2G2PNewCap][new_cap_and_commit]).data .* dfH2G2P[new_cap_and_commit,:Cap_Size_MW]
+    end
+    if !isempty(new_cap_not_commit)
+        capdischarge[new_cap_not_commit] = value.(EP[:vH2G2PNewCap][new_cap_not_commit]).data
     end
 
     retcapdischarge = zeros(size(inputs["H2_G2P_NAME"]))
-    for i in inputs["H2_G2P_RET_CAP"]
-        if i in inputs["H2_G2P_COMMIT"]
-            retcapdischarge[i] = first(value.(EP[:vH2G2PRetCap][i])) * dfH2G2P[!,:Cap_Size_MW][i]
-        else
-            retcapdischarge[i] = first(value.(EP[:vH2G2PRetCap][i]))
-        end
+    ret_cap_and_commit = intersect(inputs["H2_G2P_RET_CAP"], inputs["H2_G2P_COMMIT"])
+    ret_cap_not_commit = setdiff(inputs["H2_G2P_RET_CAP"], inputs["H2_G2P_COMMIT"])
+    if !isempty(ret_cap_and_commit)
+        retcapdischarge[ret_cap_and_commit] = value.(EP[:vH2G2PRetCap][ret_cap_and_commit]).data .* dfH2G2P[ret_cap_and_commit,:Cap_Size_MW]
     end
-
-    
+    if !isempty(ret_cap_not_commit)
+        retcapdischarge[ret_cap_not_commit] = value.(EP[:vH2G2PRetCap][ret_cap_not_commit]).data
+    end
 
     dfCap = DataFrame(
         Resource = inputs["H2_G2P_NAME"], Zone = dfH2G2P[!,:Zone],
@@ -50,7 +50,6 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
         EndCap = value.(EP[:eH2G2PTotalCap]),
     )
 
-
     total = DataFrame(
             Resource = "Total", Zone = "n/a",
             StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
@@ -58,6 +57,6 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
         )
 
     dfCap = vcat(dfCap, total)
-    CSV.write(joinpath(path, "HSC_g2p_capacity.csv"), dfCap)
+    CSV.write(joinpath(path, "HSC_g2p_capacity.csv"), dftranspose(dfCap, false), writeheader=false)
     return dfCap
 end

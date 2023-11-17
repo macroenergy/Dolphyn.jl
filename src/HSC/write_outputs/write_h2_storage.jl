@@ -28,12 +28,12 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
     dfH2Storage = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone])
     s = zeros(H,T)
     storagevcapvalue = zeros(H,T)
-    for i in 1:H
-        if i in inputs["H2_STOR_ALL"]
-            s[i,:] = value.(EP[:vH2S])[i,:]
-        elseif i in inputs["H2_FLEX"]
-            s[i,:] = value.(EP[:vS_H2_FLEX])[i,:]
-        end
+
+    if !isempty(inputs["H2_STOR_ALL"])
+        s[inputs["H2_STOR_ALL"],:] = value.(EP[:vH2S][inputs["H2_STOR_ALL"],:]).data
+    end
+    if !isempty(inputs["H2_FLEX"])
+        s[inputs["H2_FLEX"],:] = value.(EP[:vS_H2_FLEX][inputs["H2_FLEX"],:]).data
     end
 
     # Incorporating effect of Parameter scaling (ParameterScale=1) on output values
@@ -41,9 +41,13 @@ function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dic
         storagevcapvalue[y,:] = s[y,:]
     end
 
+    dfH2Storage = hcat(dfH2Storage, DataFrame(AnnualMean=Array{Union{Missing,Float32}}(undef, H)), DataFrame(storagevcapvalue, :auto))
 
-    dfH2Storage = hcat(dfH2Storage, DataFrame(storagevcapvalue, :auto))
-    auxNew_Names=[Symbol("Resource");Symbol("Zone");[Symbol("t$t") for t in 1:T]]
+    auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualMean");[Symbol("t$t") for t in 1:T]]
+
     rename!(dfH2Storage,auxNew_Names)
-    CSV.write(joinpath(path, "storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
+
+    dfH2Storage.AnnualMean .= [sum(dfH2Storage[i,r"t"])/T for i in 1:H ]
+
+    CSV.write(joinpath(path, "HSC_storage.csv"), dftranspose(dfH2Storage, false), writeheader=false)
 end

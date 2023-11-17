@@ -1,5 +1,5 @@
 # Thermal Commit
 ```@autodocs
-Modules = [DOLPHYN, GenX]
+Modules = [Dolphyn]
 Pages = ["GenX/src/model/resources/thermal/thermal_commit.jl"]
 ```

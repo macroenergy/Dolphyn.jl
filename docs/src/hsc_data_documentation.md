@@ -32,13 +32,20 @@ Model settings parameters are specified in a `hsc_Settings.yml` file which shoul
 ||0 = no unit commitment.|
 ||1 = unit commitment with integer clustering.|
 ||2 = unit commitment with linearized clustering.|
-
 |**Policy related**||
 |H2CO2Cap | Flag for specifying the type of CO2 emission limit constraint.|
 || 0 = no CO2 emission limit|
 || 1 = mass-based emission limit constraint|
 || 2 = load + rate-based emission limit constraint|
 || 3 = generation + rate-based emission limit constraint|
+|TimeMatchingRequirement | Flag for specifying type of time-matching requirement (TMR). |
+|| 0 = no time matching requirement active|
+|| 1 = Hourly time-matching with excess sales|
+|| 2 = Hourly time-matching without excess sales|
+|| 3 = Annual time-matching|
+|TMRSalestoESR | Flag for specifying whether excess sales from resources contracted for TMR can be used to meet ESR requirements. |
+|| 0 = Excess sales from TMR eligible resources not allowed|
+|| 1 = Excess sales from TMR eligible resources allowed|
 
 ## 2 Inputs
 
@@ -155,13 +162,13 @@ This file contains cost and performance parameters for various generators and ot
 |Min\_Cap\_tonne\_p\_hr| -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in tonne) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
 |Min\_Charge\_Cap\_tonne\_p\_hr |-1 (default) – no limit on minimum charge capacity of the resource. If non-negative, represents minimum allowed charge capacity (in tonne/hr) of the resource with `H2_STOR = 2`.|
 |**Cost parameters**|
-|Inv\_Cost\_p\_tonne\_p\_hr\_yr | Annualized capacity investment cost of a technology ($/tonne/hr/year). |
-|Inv\_Cost\_Energy\_p\_tonne\_yr | Annualized investment cost of the energy capacity for a storage technology (e.g. a tank) ($/tonne/hr/year), applicable to either `H2_STOR = 1` or `H2_STOR = 2`. |
-|Inv\_Cost\_Charge\_p\_tonne\_p\_hr\_yr | Annualized capacity investment cost for the charging portion of a storage technology (e.g. compressor) with `H2_STOR = 1` ($/tonne/hr/year). |
-|Fixed\_OM\_Cost\_p\_tonne\_p\_hr\_yr | Fixed operations and maintenance cost of a technology ($/tonne/hr/year). |
-|Fixed\_OM\_Cost\_Energy\_p\_tonne\_yr | Fixed operations and maintenance cost of the energy component of a storage technology ($/tonne/year). |
+|Inv\_Cost\_p\_tonne\_p\_hr\_yr | Annualized capacity investment cost of a technology (\$/tonne/hr/year). |
+|Inv\_Cost\_Energy\_p\_tonne\_yr | Annualized investment cost of the energy capacity for a storage technology (e.g. a tank) (\$/tonne/hr/year), applicable to either `H2_STOR = 1` or `H2_STOR = 2`. |
+|Inv\_Cost\_Charge\_p\_tonne\_p\_hr\_yr | Annualized capacity investment cost for the charging portion of a storage technology (e.g. compressor) with `H2_STOR = 1` (\$/tonne/hr/year). |
+|Fixed\_OM\_Cost\_p\_tonne\_p\_hr\_yr | Fixed operations and maintenance cost of a technology (\$/tonne/hr/year). |
+|Fixed\_OM\_Cost\_Energy\_p\_tonne\_yr | Fixed operations and maintenance cost of the energy component of a storage technology (\$/tonne/year). |
 |Fixed\_OM\_Cost\_Charge\_p\_tonne\_p\_hr\_yr | Fixed operations and maintenance cost of the charging component of a storage technology of type `H2_STOR = 1`. |
-|Var\_OM\_Cost\_p\_tonne | Variable operations and maintenance cost of a technology ($/tonne). |
+|Var\_OM\_Cost\_p\_tonne | Variable operations and maintenance cost of a technology (\$/tonne). |
 |Var\_OM\_Cost\_Charge\_p\_tonne | Variable operations and maintenance cost of the charging aspect of a storage technology with `H2_STOR = 1`. |
 |**Technical performance parameters**|
 |etaFuel\_MMBtu\_p\_tonne  |Heat rate of a generator or MMBtu of fuel consumed per tonne of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
@@ -181,14 +188,14 @@ This file contains cost and performance parameters for various generators and ot
 |region | Name of the model region|
 |cluster | Number of the cluster when representing multiple clusters of a given technology in a given region.  |
 
-###### Table 6: Settings-specific columns in the HSC\_generators\_data.csv file
+###### Table 6: Settings-specific columns in the HSC\_generation.csv file
 ---
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**H2GenCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints (`H2_GEN_TYPE = 1`).|
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
-|Start\_Cost\_per\_tonne\_p\_hr |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+|Start\_Cost\_per\_tonne\_p\_hr |Cost per tonne/hr of nameplate capacity to start a generator (\$/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 
 ### 2.2 Optional input data
 
@@ -231,9 +238,9 @@ This file contains cost and performance parameters for various hydrogen to power
 |Max\_Cap\_MW |-1 (default) – no limit on maximum capacity of the resource. If non-negative, represents maximum allowed discharge capacity (in MW) of the resource.|
 |Min\_Cap\_MW | -1 (default) – no limit on minimum power capacity of the resource. If non-negative, represents minimum allowed power capacity (in MW) of the resource.|
 |**Cost parameters**|
-|Inv\_Cost\_p\_MW\_p\_yr | Annualized capacity investment cost of a technology ($/MW/year). |
-|Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a technology ($/MW/year). |
-|Var\_OM\_Cost\_p\_MWh | Variable operations and maintenance cost of a technology ($/MWh). |
+|Inv\_Cost\_p\_MW\_p\_yr | Annualized capacity investment cost of a technology (\$/MW/year). |
+|Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a technology (\$/MW/year). |
+|Var\_OM\_Cost\_p\_MWh | Variable operations and maintenance cost of a technology (\$/MWh). |
 |**Technical performance parameters**|
 |etaG2P\_MWh\_p\_tonne | Power generation per tonne of hydrogen consumption.|
 |G2P\_min\_output |[0,1], The minimum generation level for a unit as a fraction of total capacity. |
@@ -250,7 +257,7 @@ This file contains cost and performance parameters for various hydrogen to power
 |**H2G2PCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints.|
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
-|Start\_Cost\_per\_MW |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+|Start\_Cost\_per\_MW |Cost per tonne/hr of nameplate capacity to start a generator (\$/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 
 #### 2.2.3 HSC\_g2p\_generators\_variability.csv
 
@@ -286,9 +293,9 @@ This file contains cost and performance parameters for various hydrogen to power
 |Min\_Energy\_Cap\_tonne | 0 (default) – minimum compression capacity of the resource. If non-negative, represents minimum allowed compression capacity (in tonne/hr) of the resource. |
 |H2TruckCompressionEnergy | Compression energy requirements for hydrogen per tonne.|
 |**Cost parameters**|
-|Inv\_Cost\_p\_unit\_p\_yr | Annualized capacity investment cost of a type of truck ($/unit/year). |
+|Inv\_Cost\_p\_unit\_p\_yr | Annualized capacity investment cost of a type of truck (\$/unit/year). |
 |Inv\_Cost\_Energy\_p\_tonne\_yr | Annualized capacity investment cost of compression stations for trucks. | 
-|Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a truck ($/unit/year). |
+|Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a truck (\$/unit/year). |
 |Fixed\_OM\_Cost\_Energy\_p\_tonne\_yr | Fixed operations and maintenance cost of compression stations for trucks. |
 |H2TruckCompressionUnitOpex | Variable cost for compression for hydrogen per tonne.|
 |H2TruckUnitOpex\_per\_mile\_full | Variable cost for full truck operation. |
@@ -313,7 +320,7 @@ This optional file includes parameters to characterize model temporal resolution
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Columns**|
-|Voll |Value of lost hydrogen load in $/tonne-H2.|
+|Voll |Value of lost hydrogen load in \$/tonne-H$_2$.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
 |Cost\_of\_Demand\_Curtailment\_per\_Tonne |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|

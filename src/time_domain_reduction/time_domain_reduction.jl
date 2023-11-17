@@ -82,7 +82,6 @@ using DataFrames
 using StatsBase
 using Clustering
 using Distances
-using Documenter
 using CSV
 
 
@@ -103,8 +102,6 @@ function rmse_score(y_true, y_pred)
     rmse = sqrt(mse)
     return rmse
 end
-
-# include("/Users/youssefshaker/Documents/GitHub/DOLPHYN-dev/src/time_domain_reduction/time_domain_reduction.jl")
 
 @doc raw"""
     parse_data(myinputs)

@@ -34,7 +34,7 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     ## Write the model formulation as an output; 0 = active; 1 = not active
     set_default_if_absent!(settings, "PrintModel", 0)
    
-    ## Available solvers: Gurobi, CPLEX, CLPs
+    ## Set HiGHS as the solver if none is set
     set_default_if_absent!(settings, "Solver", "HiGHS")
 
     ## Turn on parameter scaling wherein load, capacity and power variables are defined in GW rather than MW. 0 = not active; 1 = active systemwide
@@ -107,6 +107,19 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)
     # Down-select Zones to model
     set_default_if_absent!(settings, "Zones", [])
+    #TimeMatchingRequirement: 0 # Modeling time matching requiremnet for electricity based H2 production - 0 - not included, 1 - hourly with excess sales, 2- hourly without excess sales, 3 - annual 
+    set_default_if_absent!(settings, "TimeMatchingRequirement", 0)                
+    #TMRSalestoESR: 0 # Modeling whether or not resources contracted for time matching requiremnet forelectricity based H2 production can sell their excess electricity to ESR market - 0 - not allowed, 1 - allowed
+    set_default_if_absent!(settings, "TMRSalestoESR", 0) 
+
+    ############################################################
+    ###CSC Model Settings Options#####
+    set_default_if_absent!(settings, "ModelCO2", 0)
+    set_default_if_absent!(settings, "DAC_Nonlinear_CAPEX", 0)
+    set_default_if_absent!(settings, "CO2PipeInteger", 0)
+    set_default_if_absent!(settings, "ModelCO2Pipelines", 0)
+    set_default_if_absent!(settings, "CO2NetworkExpansion", 0)
+    set_default_if_absent!(settings, "CO2Pipeline_Loss", 0)   
 
     ############################################################
     ###CSC Model Settings Options#####
