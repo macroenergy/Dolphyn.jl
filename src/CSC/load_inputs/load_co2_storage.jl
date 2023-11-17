@@ -13,14 +13,17 @@ A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
+@doc raw"""
+    load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_storage::Dict)
 
-
+Function for reading input parameters related to the co2 storage sites data
+"""
 function load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_storage::Dict)
 
 	#Read in CO2 capture related inputs
     co2_storage = DataFrame(CSV.File(string(path,sep,"CSC_storage.csv"), header=true), copycols=true)
 
-    # Add Resource IDs after reading to prevent user errors
+    # Add Resource IDs after reading to prevent user errors. This is used as a tracker of co2 site index
 	co2_storage[!,:R_ID] = 1:size(collect(skipmissing(co2_storage[!,1])),1)
 
     # Store DataFrame of capture units/resources input data for use in model

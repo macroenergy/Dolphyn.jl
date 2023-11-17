@@ -15,43 +15,43 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_network_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_nw::Dict)
+    load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_nw::Dict)
 
-Function for reading input parameters related to the electricity transmission network
+Function for reading input parameters related to the co2 transport pipelines
 """
 function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_nw::Dict)
 
-    # Network zones inputs and Network topology inputs
+    # Read in the topology of both the trunk and spur pipelines
     co2_trunk_pipeline_var = DataFrame(CSV.File(string(path,sep,"CSC_trunk_pipelines.csv"), header=true), copycols=true)
 
     co2_spur_pipeline_var = DataFrame(CSV.File(string(path,sep,"CSC_spur_pipelines.csv"), header=true), copycols=true)
 
     ##### FOR TRUNK PIPELINES #####
-    # These are from the GenX/HSC domains
+    # These are the zonal definitions from the GenX/HSC domains
     inputs_co2_nw["Z"] = size(findall(s -> (startswith(s, "z")) & (tryparse(Float64, s[2:end]) != nothing), names(co2_trunk_pipeline_var)),1)
 
-    #Number of CO2 Pipelines = L
+    # Specifying the number of CO2 Trunk Pipelines = Trunk_CO2_P
     inputs_co2_nw["Trunk_CO2_P"]=size(collect(skipmissing(co2_trunk_pipeline_var[!,:CO2_Pipelines])),1)
 
-    #Find first column of pipe map table
+    # Find first column of pipe map table
     start = findall(s -> s == "z1", names(co2_trunk_pipeline_var))[1]
 
-    #Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
+    # Select pipe map L x N matrix  where L is number of trunk pipelines and N is number of IPM zones
     co2_trunk_pipe_map = co2_trunk_pipeline_var[1:inputs_co2_nw["Trunk_CO2_P"], start:start+inputs_co2_nw["Z"]-1]
 
-    #Create pipe number column
+    # Create pipe number column for trunk pipelines
     co2_trunk_pipe_map[!,:pipe_no] = 1:size(co2_trunk_pipe_map,1)
 
-    #Pivot table
+    # Pivot table created for processing in later steps  
     co2_trunk_pipe_map = stack(co2_trunk_pipe_map, 1:inputs_co2_nw["Z"])
 
-    #Create zone column
+    # Create zone column
     co2_trunk_pipe_map[!,:Zone] = parse.(Float64,SubString.(co2_trunk_pipe_map[!,:variable],2))
 
-    #Remove redundant rows
+    # Remove redundant rows (row combinations that get repeated)
     co2_trunk_pipe_map = co2_trunk_pipe_map[co2_trunk_pipe_map[!,:value].!=0,:]
 
-    #Rename column
+    # Rename column: additional steps for renaming pipe numbers, IPM zones, the directionality of the pipes, and the Zone Number
     colnames_co2_trunk_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(co2_trunk_pipe_map, Symbol.(colnames_co2_trunk_pipe_map))
 
@@ -70,16 +70,16 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     #Check if there should be a "." after inputs_co2_nw["pCO2_Pipe_length_miles"] for division    
     inputs_co2_nw["Trunk_CO2_no_booster_comp_stations"] = floor.(inputs_co2_nw["Trunk_pCO2_Pipe_length_miles"]./inputs_co2_nw["Trunk_CO2_len_bw_comp_mile"]) - ones(length(inputs_co2_nw["Trunk_CO2_len_bw_comp_mile"]))
     
-    #Maximum number of pipelines
+    # Maximum number of trunk pipelines
     inputs_co2_nw["Trunk_pCO2_Pipe_No_Max"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:Max_No_Pipe])))
 
-    #Current number of pipelines
+    # Current number of  trunk pipelines
     inputs_co2_nw["Trunk_pCO2_Pipe_No_Curr"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:Existing_No_Pipe])))
 
-    #Maxiumum Pipe Flow per Pipe
+    # Maxiumum Pipe Flow per trunk Pipe
     inputs_co2_nw["Trunk_pCO2_Pipe_Max_Flow"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:Max_Flow_Tonne_p_hr_Per_Pipe])))
 
-    #Maximum Pipeline storage capacity in tonnes per pipe
+    # Maximum Pipeline storage capacity in tonnes per pipe
     inputs_co2_nw["Trunk_pCO2_Pipe_Max_Cap"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:CO2PipeCap_tonne_per_mile]))) .* inputs_co2_nw["Trunk_pCO2_Pipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
@@ -89,7 +89,7 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     inputs_co2_nw["Trunk_pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["Trunk_pCO2_Pipe_length_miles"]
     inputs_co2_nw["Trunk_pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["Trunk_pCO2_Pipe_length_miles"]
     inputs_co2_nw["Trunk_pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_Mean]))) .* inputs_co2_nw["Trunk_pCO2_Pipe_length_miles"]
-
+    # Accouting for losses in pipelines that are specified as a linear function
     inputs_co2_nw["Trunk_pLoss_tonne_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_trunk_pipeline_var[!,:CO2PipeLoss_tonne_per_mile_per_tonne]))) .* inputs_co2_nw["Trunk_pCO2_Pipe_length_miles"]
     
     #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
@@ -101,19 +101,19 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
 
     #### FOR SPUR PIPELINES ######
 
-    # These are from the GenX/HSC domains
+    # These are the regional units (or zones) from the GenX/HSC domains
     inputs_co2_nw["Z"] = size(findall(s -> (startswith(s, "z")) & (tryparse(Float64, s[2:end]) != nothing), names(co2_spur_pipeline_var)),1)
 
-    # The following are from the CO2 Domain
+    # The following are from the CO2 sites specified in the CO2 Domain
     inputs_co2_nw["S"] = size(findall(s -> (startswith(s, "s")), names(co2_spur_pipeline_var)),1)
 
-    #Number of CO2 Pipelines = L
+    # Number of CO2 Spur Pipelines = L
     inputs_co2_nw["Spur_CO2_P"]=size(collect(skipmissing(co2_spur_pipeline_var[!,:CO2_Pipelines])),1)
 
-    #Find first column of pipe map table
+    #Find first column of pipe map table. This identifies from where the definition of the pipeline map begins
     start = findall(s -> s == "z1", names(co2_spur_pipeline_var))[1]
 
-    #Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
+    # Select pipe map L x M matrix  where L is number of pipelines and M is number of regional units (or zones) + Number of Co2 Sites
     co2_spur_pipe_map = co2_spur_pipeline_var[1:inputs_co2_nw["Spur_CO2_P"], start:start+inputs_co2_nw["Z"]+inputs_co2_nw["S"]-1]
 
     #Create pipe number column
@@ -128,7 +128,7 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     #Remove redundant rows
     co2_spur_pipe_map = co2_spur_pipe_map[co2_spur_pipe_map[!,:value].!=0,:]
 
-    #Rename column
+    #Rename column in a similar value to the trunk pipeline map
     colnames_co2_spur_pipe_map = ["pipe_no", "zone_str", "d", "Zone"]
     rename!(co2_spur_pipe_map, Symbol.(colnames_co2_spur_pipe_map))
 
@@ -166,7 +166,7 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     #Minimum Pipeline storage capacity in tonnes per pipe
     inputs_co2_nw["Spur_pCO2_Pipe_Min_Cap"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:Min_pipecap_stor_frac]))) .* inputs_co2_nw["Spur_pCO2_Pipe_Max_Cap"]
 
-    #Capital Cost Per Pipe using mean cost
+    #Capital Cost Per Spur Pipe using mean cost
     inputs_co2_nw["Spur_pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["Spur_pCO2_Pipe_length_miles"]
     inputs_co2_nw["Spur_pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["Spur_pCO2_Pipe_length_miles"]
     inputs_co2_nw["Spur_pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_Mean]))) .* inputs_co2_nw["Spur_pCO2_Pipe_length_miles"]
@@ -178,12 +178,6 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
 
     #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
     inputs_co2_nw["Spur_pComp_MWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:BoosterCompEnergy_MWh_per_tonne]))).* inputs_co2_nw["Spur_CO2_no_booster_comp_stations"] 
-
-
-    ##### Loading a mapper between CO2_sites and IPM_zones #######
-    co2_ipm_mapper = DataFrame(CSV.File(string(path,sep,"CO2_to_IPM_mapping.csv"), header=true), copycols=true)
-
-    inputs_co2_nw["CSC_IPM_Mapper"] = co2_ipm_mapper
 
 
     println("CO2_trunk_pipelines.csv Successfully Read!")
