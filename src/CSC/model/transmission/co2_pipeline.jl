@@ -13,8 +13,11 @@ A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
+@doc raw"""
+    co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-
+The co2_pipeline module creates decision variables, expressions, and constraints related to flow of CO2 in both the trunk and spur pipelines
+"""
 function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
 	println("CO2 Pipeline Module")
@@ -277,6 +280,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     #EP[:eCaptured_CO2_Balance] -= ePipeZoneCO2Demand_Outflow
 
     ### NEW CONSTRAINT DEFINED AS ###
+    # The constraint is defined as CO2_Captured + CO2_Flow_Trunk - Exogeneous CO2 Demand - CO2_Spur_Ouflow == 0 #
     EP[:eCaptured_CO2_Balance] -= inputs["CO2_D"]
     EP[:eCaptured_CO2_Balance] += ePipeZoneCO2Demand_Trunk
     EP[:eCaptured_CO2_Balance] -= ePipeZoneCO2Demand_Outflow_Spur
@@ -360,6 +364,8 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ###### Adding a New Constraint on CO2 Inflow == CO2_Stored #####
     #EP[:eCO2Store_Flow_Balance] += ePipeZoneCO2Demand_Inflow
     
+    # This expression is computed to ensure that the CO2 flow into a site s is equal to the inflow from the summation 
+    # of the spur inflows
     EP[:eCO2Store_Flow_Balance] += ePipeZoneCO2Demand_Inflow_Spur
 
 	return EP
