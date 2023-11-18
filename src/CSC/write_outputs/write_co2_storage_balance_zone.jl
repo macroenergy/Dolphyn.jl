@@ -13,9 +13,9 @@ A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 @doc raw"""
     write_co2_storage_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+This file is responsible for writing the balance between the inflow on spur pipelines and the CO2 storage site into a given zone 
 """
 function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	Z = inputs["Z"]     # Number of zones

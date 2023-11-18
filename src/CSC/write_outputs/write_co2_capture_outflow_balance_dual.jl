@@ -13,7 +13,12 @@ A complete copy of the GNU General Public License v2 (GPLv2) is available
 in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
+@doc raw"""
+    write_co2_capture_outflow_balance_dual(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
+This file is responsible for writing the duals of the equality constraint related to the capture flow balance that is computed at 
+the zonal level    
+"""
 function write_co2_capture_outflow_balance_dual(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	
 	T = inputs["T"]     # Number of time steps (hours)
