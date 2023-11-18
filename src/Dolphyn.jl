@@ -134,6 +134,7 @@ genx_to_exclude = [
     joinpath(genxsubmod_path,"write_outputs","write_storagedual.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_subsidy_revenue.jl"),
     joinpath(genxsubmod_path,"model","core","emissions.jl"),
+    joinpath(genxsubmod_path,"model","policies","co2_cap.jl"),
     # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
 include_from_dir(genxsubmod_path, ".jl", genx_to_exclude)
