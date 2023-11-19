@@ -114,7 +114,7 @@ function configure_gurobi(solver_settings_path::String)
         "NumericFocus" => MyNumericFocus,
         "Crossover" => MyCrossover,
         "LogFile" => MyGurobiLogFile,
-        "BarHomogeneous" => MyBarHomogeneous
+        "BarHomogeneous" => MyBarHomogeneous,
     )
 
     return OPTIMIZER

@@ -22,38 +22,51 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## returns: n/a
 ################################################################################
 @doc raw"""
-	write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+	write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
 Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
-function write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+function write_CSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, inputs::Dict)
 
   ## Use appropriate directory separator depending on Mac or Windows config
   if Sys.isunix()
     sep = "/"
-    elseif Sys.iswindows()
+  elseif Sys.iswindows()
     sep = "\U005c"
-    else
+  else
         sep = "/"
   end
+  if !haskey(setup, "OverwriteResults") || setup["OverwriteResults"] == 1
+    # Overwrite existing results if dir exists
+    # This is the default behaviour when there is no flag, to avoid breaking existing code
+    # Create directory if it does not exist
+    path = joinpath(genx_path, "Results_CSC");
+    if !(isdir(path))
+        mkpath(path)
+    end
+  else
+    # Find closest unused ouput directory name
+    path = choose_csc_output_dir(genx_path)
     # Create directory if it does not exist
     if !(isdir(path))
-      mkdir(path)
+        mkpath(path)
     end
+  end
 
-    write_CSC_costs(path, sep, inputs, setup, EP)
-    write_co2_capture_capacity(path, sep, inputs, setup, EP)
-    #write_co2_storage_capacity(path, sep, inputs, setup, EP)
-    write_co2_total_injection(path, sep, inputs, setup, EP)
-    write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
-    write_co2_emission_balance_system(path, sep, inputs, setup, EP)
-    write_co2_storage_balance(path, sep, inputs, setup, EP)
-    write_co2_balance_dual(path, sep, inputs, setup, EP)
 
-    if setup["ModelCO2Pipelines"] ==1 
-      write_co2_pipeline_flow(path, sep, inputs, setup, EP)
-      write_co2_pipeline_expansion(path, sep, inputs, setup, EP)
-    end
+  write_CSC_costs(path, sep, inputs, setup, EP)
+  write_co2_capture_capacity(path, sep, inputs, setup, EP)
+  #write_co2_storage_capacity(path, sep, inputs, setup, EP)
+  write_co2_total_injection(path, sep, inputs, setup, EP)
+  write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
+  write_co2_emission_balance_system(path, sep, inputs, setup, EP)
+  write_co2_storage_balance(path, sep, inputs, setup, EP)
+  write_co2_balance_dual(path, sep, inputs, setup, EP)
+
+  if setup["ModelCO2Pipelines"] ==1 
+    write_co2_pipeline_flow(path, sep, inputs, setup, EP)
+    write_co2_pipeline_expansion(path, sep, inputs, setup, EP)
+  end
     
   ## Print confirmation
   println("Wrote CSC outputs to $path$sep")

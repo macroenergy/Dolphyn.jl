@@ -3,7 +3,7 @@
 
 This function creates expression to add the CO2 emissions by plants in each zone, which is subsequently added to the total emissions
 """
-function emissions!(EP::Model, inputs::Dict)
+function emissions!(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Emissions Module (for CO2 Policy modularization")
 
@@ -22,12 +22,11 @@ function emissions!(EP::Model, inputs::Dict)
 		end
 	)
 
-
 	@expression(
         EP,
-        eCO2CaptureByPlant[t = 1:G, t = 1:T],
+        eCO2CaptureByPlant[y = 1:G, t = 1:T],
         if y in inputs["COMMIT"]
-			(dfGen[y,:CO2_per_MWh]*EP[:vP][y,t]+dfGen[y,:CO2_per_Start]*EP[:vSTART][y,t])*(ffGen[!, :CCS_Rate][y])
+			(dfGen[y,:CO2_per_MWh]*EP[:vP][y,t]+dfGen[y,:CO2_per_Start]*EP[:vSTART][y,t])*(dfGen[!, :CCS_Rate][y])
 		else
 			dfGen[y,:CO2_per_MWh]*EP[:vP][y,t]*(dfGen[!, :CCS_Rate][y])
 		end
@@ -37,7 +36,7 @@ function emissions!(EP::Model, inputs::Dict)
 
 	# If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint),
  	# then need to add cost penalty due to CO2 prices
-	 if (setup["CO2Cap"] ==4) 
+	if (setup["CO2Cap"] ==4) 
 		# Use CO2 price for power system as the global CO2 price
 		# Emissions penalty by zone - needed to report zonal cost breakdown
 		@expression(EP,eCEmissionsPenaltybyZone[z = 1:Z],
@@ -57,5 +56,7 @@ function emissions!(EP::Model, inputs::Dict)
 		EP[:eObj] += eCGenTotalEmissionsPenalty
 
 	end
+
+	return EP
 
 end

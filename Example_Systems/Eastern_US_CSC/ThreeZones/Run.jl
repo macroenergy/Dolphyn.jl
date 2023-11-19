@@ -14,71 +14,38 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-using DOLPHYN
-using YAML
-using LoggingExtras
+using Dolphyn
 
-# Walk into current directory
-case_dir = @__DIR__
+# The directory containing your settings folder and files
+settings_path = joinpath(@__DIR__, "Settings")
 
-settings_path = joinpath(case_dir, "Settings")
-inputs_path = case_dir
+# The directory containing your input data
+inputs_path = @__DIR__
 
-# Loading settings
-genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
-hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
-mysetup_genx = configure_settings(genx_settings) # mysetup dictionary stores GenX-specific parameters
-mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
-global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
-mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
+# Load settings
+mysetup = load_settings(settings_path)
 
-mysetup = Dict()
-mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
-mysetup = configure_settings(mysetup)
+# Setup logging 
+global_logger = setup_logging(mysetup)
 
-
-csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
-mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CSC supply chain-specific parameters
-mysetup = merge(mysetup, mysetup_csc)
+### Load DOLPHYN
+println("Loading packages")
 
 ##TO ADD SYNFUEL SETTING IMPORT
 
-# Start logging
-global Log = mysetup["Log"]
-
-## Cluster time series inputs if necessary and if specified by the user
-TDRpath = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
-if mysetup["TimeDomainReduction"] == 1
-    if mysetup["ModelH2"] == 1
-        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-            println("Clustering Time Series Data...")
-            cluster_inputs(inpath, settings_path, mysetup)
-        else
-            println("Time Series Data Already Clustered.")
-        end
-    else
-        if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
-            println("Clustering Time Series Data...")
-            cluster_inputs(inpath, settings_path, mysetup)
-        else
-            println("Time Series Data Already Clustered.")
-        end
-    end
-
-    if mysetup["ModelCO2"] == 1
-        println("CSC and SF TDR not implemented.")
-    end
-end
+# Setup time domain reduction and cluster inputs if necessary
+setup_TDR(inputs_path, settings_path, mysetup)
 
 # ### Configure solver
-println("Configuring Solver")
+print_and_log("Configuring Solver")
+
 OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # #### Running a case
 
 # ### Load inputs
- myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
- myinputs = load_inputs(mysetup, inputs_path)
+myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
+myinputs = load_inputs(mysetup, inputs_path)
 
 # ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
@@ -99,26 +66,24 @@ end
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
-println("Solving Model")
+print_and_log("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
 ### Write power system output
 
-println("Writing Output")
+print_and_log("Writing Output")
 outpath = joinpath(inputs_path,"Results")
-outpath=write_outputs(EP, outpath, mysetup, myinputs)
+outpath_GenX=write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs
 if mysetup["ModelH2"] == 1
-    outpath_H2 = "$outpath/Results_HSC"
-    write_HSC_outputs(EP, outpath_H2, mysetup, myinputs)
+    write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
 # Write carbon supply chain outputs
 if mysetup["ModelCO2"] == 1
-    outpath_CO2 = "$outpath/Results_CSC"
-    write_CSC_outputs(EP, outpath_CO2, mysetup, myinputs)
+    write_CSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
 # Write synthetic fuels supply chain outputs
@@ -126,4 +91,7 @@ end
 #    outpath_SF = "$outpath/Results_SF"
 #    write_synfuel_outputs(EP, outpath_SF, mysetup, myinputs)
 #end
+
+compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))
+
 
