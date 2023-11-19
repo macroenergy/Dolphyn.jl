@@ -346,7 +346,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     # CO2 emissions limits for the power sector only
     if (setup["CO2Cap"] < 4) & (setup["CO2Cap"] > 0)
 
-        println("Here")
         if setup["ModelH2"] ==0
             if setup["ModelCO2"] == 1
                 co2_cap_power_csc!(EP, inputs, setup)

@@ -102,7 +102,7 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
                 - sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
         )
 
-        EP[:eEmissionsConstraintLHS] += eEmissionsConstraintLHSCSC
+        eEmissionsConstraintLHS += eEmissionsConstraintLHSCSC
 
         if setup["CO2Cap"] == 2
 
@@ -110,7 +110,7 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
                 sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (EP[:eCSCNetpowerConsumptionByAll][t,z]) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) 
             )
 
-            EP[:eEmissionsConstraintRHS] += eEmissionsConstraintRHSCSC
+            eEmissionsConstraintRHS += eEmissionsConstraintRHSCSC
         end 
 
 	end
