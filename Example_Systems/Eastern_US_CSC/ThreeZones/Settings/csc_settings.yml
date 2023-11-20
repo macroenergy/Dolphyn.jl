@@ -9,7 +9,7 @@ DAC_Nonlinear_CAPEX: 0
 DAC_CAPEX_Piecewise_Segments: 3
 
 CO2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer 0 = continuous capacity, 1 = discrete capacity
-ModelCO2Pipelines: 1 # Whether to model pipeline in CO2 supply chain - 0 = not included, 1 = included
-CO2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
+ModelCO2Pipelines: 0 # Whether to model pipeline in CO2 supply chain - 0 = not included, 1 = included
+CO2NetworkExpansion: 0 # Transmission network expansional; 0 = not active; 1 = active systemwide
 
 CO2Pipeline_Loss: 0 #Loss of CO2 from pipelines

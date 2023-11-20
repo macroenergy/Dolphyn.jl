@@ -61,9 +61,12 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,7] = 0
 			end
 
-			if Z>=2
+			if (Z>=2) & (setup["ModelCO2Pipelines"] == 1)
 				dfTemp1[t+rowoffset,8] = value(EP[:ePipeZoneCO2Demand][t,z])
+			else
+				dfTemp1[t+rowoffset,8] = 0
 			end
+
 
 			dfTemp1[t+rowoffset,9] = - value(EP[:eCO2_Injected_per_zone][z,t])
 

@@ -59,8 +59,14 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 				dfTemp1[t+rowoffset,7] = 0
 			end
 
-			if Z>=2
-				dfTemp1[t+rowoffset,8] = value(EP[:eCO2Loss_Pipes_zt][z,t])
+			if setup["ModelCO2Pipelines"] != 0
+				if Z>=2
+					dfTemp1[t+rowoffset,8] = value(EP[:eCO2Loss_Pipes_zt][z,t])
+				end
+			else
+				if Z>=2
+					dfTemp1[t+rowoffset,8] = 0
+				end
 			end
 
 			if setup["ModelSynFuels"] == 1
