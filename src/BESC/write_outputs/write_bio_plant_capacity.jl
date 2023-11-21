@@ -85,7 +85,7 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 		AnnualBioEthanol[i] = sum(inputs["omega"].* (value.(EP[:eBioethanol_produced_per_plant_per_time])[i,:]))
 		MaxBiomassConsumption[i] = value.(EP[:vCapacity_BIO_per_type])[i] * 8760
 		AnnualBiomassConsumption[i] = sum(inputs["omega"].* (value.(EP[:vBiomass_consumed_per_plant_per_time])[i,:]))
-		AnnualCO2Emission[i] = sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_emissions_per_plant_per_time])[i,:] - value.(EP[:eBIO_CO2_captured_per_plant_per_time])[i,:]))
+		AnnualCO2Emission[i] = sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_emissions_per_plant_per_time])[i,:] - value.(EP[:eBiomass_CO2_captured_per_plant_per_time])[i,:]))
 
 		if MaxBiomassConsumption[i] == 0
 			CapFactor[i] = 0

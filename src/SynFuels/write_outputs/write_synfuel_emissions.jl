@@ -33,9 +33,9 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 
 	   	for t in 1:T
 			if setup["ParameterScale"] ==1
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_per_time_per_zone][t,z])*ModelScalingFactor
-				dfTemp1[t+rowoffset,2]=value.(EP[:eSynFuelProdEmissionsByZone][z,t])*ModelScalingFactor
-				dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelCapture_per_zone_per_time][z,t])*ModelScalingFactor
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_Per_Time_Per_Zone][t,z])*ModelScalingFactor
+				dfTemp1[t+rowoffset,2]=value.(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
+				dfTemp1[t+rowoffset,3]=value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])*ModelScalingFactor
 				dfTemp1[t+rowoffset,4]=value.(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
 				dfTemp1[t+rowoffset,5] = 0
 				
@@ -71,9 +71,9 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 				end
 
 			else
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_per_time_per_zone][t,z])
-				dfTemp1[t+rowoffset,2]=value.(EP[:eSynFuelProdEmissionsByZone][z,t])
-				dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelCapture_per_zone_per_time][z,t])
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_Per_Time_Per_Zone][t,z])
+				dfTemp1[t+rowoffset,2]=value.(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,3]=value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])
 				dfTemp1[t+rowoffset,4]=value.(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,5] = 0
 				

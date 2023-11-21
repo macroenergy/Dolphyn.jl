@@ -15,26 +15,27 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
+    h2_generation(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-The synthetic fuel resource module creates decision variables, expressions, and constraints related to various synthetic fuel production facilities (FT process)
+The h2_production module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.)
 
+This module uses the following 'helper' functions in separate files: ```h2_generation_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```h2_generation_no_commit()``` for resources not subject to unit commitment (if any).
 """
 function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
-	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
-
-	#Rename SF dataframe
+	#Rename H2Gen dataframe
 	dfSynFuels = inputs["dfSynFuels"]
-	dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
+    dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
-	NSFByProd = inputs["NSFByProd"]
-	SYN_FUEL_PLANT = inputs["SYN_FUEL_PLANT"]
+    NSFByProd = inputs["NSFByProd"]
+	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
 
 	####Variables####
+	#Define variables needed across both commit and no commit sets
+    
     #Amount of Syn Fuel Produced in MMBTU
 	@variable(EP, vSFProd_Diesel[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
 	@variable(EP, vSFProd_Jetfuel[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
@@ -49,13 +50,13 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	
     #Liquid Fuel Balance Expression
     @expression(EP, eSynFuelProd_Diesel[t=1:T, z=1:Z],
-		sum(EP[:vSFProd_Diesel][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))#intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vSFProd_Diesel][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
 	@expression(EP, eSynFuelProd_Jetfuel[t=1:T, z=1:Z],
-		sum(EP[:vSFProd_Jetfuel][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))#intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vSFProd_Jetfuel][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
 	@expression(EP, eSynFuelProd_Gasoline[t=1:T, z=1:Z],
-    	sum(EP[:vSFProd_Gasoline][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))#intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+    	sum(EP[:vSFProd_Gasoline][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
     EP[:eLFDieselBalance] += eSynFuelProd_Diesel
 	EP[:eLFJetfuelBalance] += eSynFuelProd_Jetfuel
@@ -63,24 +64,22 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
 	#H2 Balance expressions
 	@expression(EP, eSynFuelH2Cons[t=1:T, z=1:Z],
-		sum(EP[:vSFH2in][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+		sum(EP[:vSFH2in][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
 	EP[:eH2Balance] -= eSynFuelH2Cons
 
     #CO2 Balance Expression
-	@expression(EP, eSynFuelCO2Cons_per_zone_per_time[z=1:Z,t=1:T],
-	sum(EP[:vSFCO2in][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
+    @expression(EP, eSynFuelCO2Cons_Per_Time_Per_Zone[t=1:T, z=1:Z],
+		sum(EP[:vSFCO2in][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
+	@expression(EP, eSynFuelCO2Cons_Per_Zone_Per_Time[z=1:Z, t=1:T],
+		sum(EP[:vSFCO2in][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
-    @expression(EP, eSynFuelCO2Cons_per_time_per_zone[t=1:T, z=1:Z],
-		sum(EP[:vSFCO2in][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
-
-	EP[:eCaptured_CO2_Balance] -= eSynFuelCO2Cons_per_time_per_zone
-
+	EP[:eCaptured_CO2_Balance] -= eSynFuelCO2Cons_Per_Time_Per_Zone
 
 	#Power Balance Expression
 	@expression(EP, ePowerBalanceSynFuelRes[t=1:T, z=1:Z],
-		sum(EP[:vSFPin][k,t] for k in intersect(SYN_FUEL_PLANT, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]))) 
+		sum(EP[:vSFPin][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]))) 
 
 	EP[:ePowerBalance] += -ePowerBalanceSynFuelRes
 
@@ -88,65 +87,64 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	if setup["ParameterScale"] ==1
 		#SynFuel Diesel Production Equal to CO2 in * Synf Fuel Diesel Production to CO2 in Ratio (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
 		@constraints(EP, begin 
-			[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFProd_Diesel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_diesel_p_tonne_co2][k] * ModelScalingFactor
+			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Diesel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_diesel_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
 		#SynFuel Jetfuel Production Equal to CO2 in * Synf Fuel Jetfuel Production to CO2 in Ratio (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
 		@constraints(EP, begin 
-			[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFProd_Jetfuel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_jetfuel_p_tonne_co2][k] * ModelScalingFactor
+			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Jetfuel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_jetfuel_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
 		#SynFuel Gasoline Production Equal to CO2 in * Synf Fuel Gasoline Production to CO2 in Ratio (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
 			@constraints(EP, begin 
-			[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFProd_Gasoline][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][k] * ModelScalingFactor
+			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Gasoline][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
 		#Hydrogen Consumption (change tonne H2/tonne CO2 to tonne H2/ktonne CO2 since H2 is not scaled in HSC)
 		@constraints(EP, begin
-		[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k] * ModelScalingFactor
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
 		# By-product produced constraint (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
 		@constraints(EP, begin
-		[k in SYN_FUEL_PLANT, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k] * ModelScalingFactor
+		[k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k] * ModelScalingFactor
 		end)
 
 	else
 		#SynFuel Diesel Production Equal to CO2 in * Synf Fuel Diesel Production to CO2 in Ratio
 		@constraints(EP, begin 
-		[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFProd_Diesel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_diesel_p_tonne_co2][k]
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Diesel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_diesel_p_tonne_co2][k]
 		end)
 
 		#SynFuel Jetfuel Production Equal to CO2 in * Synf Fuel Jetfuel Production to CO2 in Ratio (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
 		@constraints(EP, begin 
-			[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFProd_Jetfuel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_jetfuel_p_tonne_co2][k]
+			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Jetfuel][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_jetfuel_p_tonne_co2][k]
 		end)
 
 		#SynFuel Gasoline Production Equal to CO2 in * Synf Fuel Gasoline Production to CO2 in Ratio (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
 			@constraints(EP, begin 
-			[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFProd_Gasoline][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][k]
+			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Gasoline][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][k]
 		end)
 
 		#Hydrogen Consumption
 		@constraints(EP, begin
-		[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
 		end)
 
 		# By-product produced constraint
 		@constraints(EP, begin
-		[k in SYN_FUEL_PLANT, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
+		[k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd, t=1:T], EP[:vSFByProd][k, b, t] == EP[:vSFCO2in][k,t] * dfSynFuelsByProdExcess[:,b][k]
 		end)
 	end
 
 	#Power and natural gas consumption associated with Syn Fuel Production in each time step (no change to MW/tonne CO2 to GW/ktonne CO2 when parameter scaling = 1)	 
 	@constraints(EP, begin
-	[k in SYN_FUEL_PLANT, t = 1:T], EP[:vSFPin][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_p_tonne_co2][k]
+	[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFPin][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_p_tonne_co2][k]
 	end)
 
 
     # Production must be smaller than available capacity
-	@constraints(EP, begin [k in SYN_FUEL_PLANT, t=1:T], EP[:vSFCO2in][k,t] <= EP[:vCapacity_Syn_Fuel_per_type][k] end)
-
+	@constraints(EP, begin [k in 1:SYN_FUELS_RES_ALL, t=1:T], EP[:vSFCO2in][k,t] <= EP[:vCapacity_Syn_Fuel_per_type][k] end)
 
 	return EP
 end

@@ -1,6 +1,6 @@
 """
 DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2023,  Massachusetts Institute of Technology
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,9 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-syn_fuel_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    co2_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the built capacity and the total fixed cost (Investment + Fixed O&M) of Synfuel resource $k$.
+This module defines the built capacity and the total fixed cost (Investment + Fixed O&M) of DAC resource $k$.
 
 """
 function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
@@ -33,9 +33,8 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	# In powedfSynFuelr system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 
-	#General variables for non-piecewise and piecewise cost functions
+	#General variables
 	@variable(EP,vCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL]>=0) #Capacity of units in co2 input mtonnes/hr 
-	@variable(EP,vCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL])
 
 	if setup["ParameterScale"] == 1
 		MinCapacity_tonne_p_hr = dfSynFuels[!,:MinCapacity_tonne_p_hr]/ModelScalingFactor # kt/h
@@ -50,15 +49,12 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr] # $/tonne
 	end
 
-
 	#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
 	#Investment cost = CAPEX
-	#Consider using constraint for vCAPEX_Syn_Fuel_per_type? Or expression is better
 	@expression(EP, eCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
 	#Fixed OM cost #Check again to match capacity
 	@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i])
 
-	
 	#####################################################################################################################################
 	#Min and max capacity constraints
 	@constraint(EP,cMinSFCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  >= MinCapacity_tonne_p_hr[i])

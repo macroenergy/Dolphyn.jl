@@ -23,12 +23,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 	#Define sets
     Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
-
-    #Conventional liquid Fuel Demand
-    @variable(EP, vConvLFDieselDemand[t = 1:T, z = 1:Z] >= 0 )
-    @variable(EP, vConvLFJetfuelDemand[t = 1:T, z = 1:Z] >= 0 )
-    @variable(EP, vConvLFGasolineDemand[t = 1:T, z = 1:Z] >= 0 )
-
+    
     if setup["AllowConventionalDiesel"] == 1
 
         if setup["ParameterScale"] ==1
@@ -37,11 +32,22 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             Conventional_diesel_price_per_mmbtu = inputs["Conventional_diesel_price_per_mmbtu"] 
         end
 
+        #Conventional liquid Fuel Demand
+        @variable(EP, vConvLFDieselDemand[t = 1:T, z = 1:Z] >= 0 )
+        
         ### Expressions ###
         #Objective Function Expressions
 
         #Cost of Conventional Fuel
         @expression(EP, eCLFDieselVar_out[z = 1:Z,t = 1:T], (inputs["omega"][t] * Conventional_diesel_price_per_mmbtu * vConvLFDieselDemand[t,z]))
+
+        #Sum up conventional Fuel Costs
+        @expression(EP, eTotalCLFDieselVarOutT[t=1:T], sum(eCLFDieselVar_out[z,t] for z in 1:Z))
+        @expression(EP, eTotalCLFDieselVarOut, sum(eTotalCLFDieselVarOutT[t] for t in 1:T))
+
+        #Liquid Fuel Balance
+        EP[:eLFDieselBalance] += vConvLFDieselDemand
+        EP[:eObj] += eTotalCLFDieselVarOut
 
         ####Constraining amount of syn fuel
         if setup["BIO_Diesel_On"] == 0
@@ -58,19 +64,8 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
                 @expression(EP, eSynFuelProd_DieselTZ, sum(eSynFuelProd_DieselT[t] for t in 1:T))
                 @constraint(EP, cSynFuelDieselShare, (percent_sbf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
             end
-        end 
-    else
-        @constraint(EP, cNoConvDiesel[t = 1:T, z = 1:Z], vConvLFDieselDemand[t,z] == 0)
-        @expression(EP, eCLFDieselVar_out[z = 1:Z,t = 1:T],0)
+        end
     end
-
-    #Sum up conventional Fuel Costs
-    @expression(EP, eTotalCLFDieselVarOutT[t=1:T], sum(eCLFDieselVar_out[z,t] for z in 1:Z))
-    @expression(EP, eTotalCLFDieselVarOut, sum(eTotalCLFDieselVarOutT[t] for t in 1:T))
-
-    #Liquid Fuel Balance
-    EP[:eLFDieselBalance] += vConvLFDieselDemand
-    EP[:eObj] += eTotalCLFDieselVarOut
 
     #############################################################################################################################################
     
@@ -81,12 +76,23 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         else
             Conventional_jetfuel_price_per_mmbtu = inputs["Conventional_jetfuel_price_per_mmbtu"] 
         end
-
+    
+        #Conventional liquid Fuel Demand
+        @variable(EP, vConvLFJetfuelDemand[t = 1:T, z = 1:Z] >= 0 )
+        
         ### Expressions ###
         #Objective Function Expressions
     
         #Cost of Conventional Fuel
         @expression(EP, eCLFJetfuelVar_out[z = 1:Z,t = 1:T], (inputs["omega"][t] * Conventional_jetfuel_price_per_mmbtu * vConvLFJetfuelDemand[t,z]))
+    
+        #Sum up conventional Fuel Costs
+        @expression(EP, eTotalCLFJetfuelVarOutT[t=1:T], sum(eCLFJetfuelVar_out[z,t] for z in 1:Z))
+        @expression(EP, eTotalCLFJetfuelVarOut, sum(eTotalCLFJetfuelVarOutT[t] for t in 1:T))
+    
+        #Liquid Fuel Balance
+        EP[:eLFJetfuelBalance] += vConvLFJetfuelDemand
+        EP[:eObj] += eTotalCLFJetfuelVarOut
     
         ####Constraining amount of syn fuel
         if setup["BIO_Jetfuel_On"] == 0
@@ -104,18 +110,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
                 @constraint(EP, cSynFuelJetfuelShare, (percent_sbf_jetfuel - 1) * eSynFuelProd_JetfuelTZ + percent_sbf_jetfuel *  eConvLFJetfuelDemandTZ == 0)
             end
         end 
-    else
-        @constraint(EP, cNoConvJetfuel[t = 1:T, z = 1:Z], vConvLFJetfuelDemand[t,z] == 0)
-        @expression(EP, eCLFJetfuelVar_out[z = 1:Z,t = 1:T], 0)
     end
-
-    #Sum up conventional Fuel Costs
-    @expression(EP, eTotalCLFJetfuelVarOutT[t=1:T], sum(eCLFJetfuelVar_out[z,t] for z in 1:Z))
-    @expression(EP, eTotalCLFJetfuelVarOut, sum(eTotalCLFJetfuelVarOutT[t] for t in 1:T))
-
-    #Liquid Fuel Balance
-    EP[:eLFJetfuelBalance] += vConvLFJetfuelDemand
-    EP[:eObj] += eTotalCLFJetfuelVarOut
 
     #############################################################################################################################################
  
@@ -126,13 +121,23 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         else
             Conventional_gasoline_price_per_mmbtu = inputs["Conventional_gasoline_price_per_mmbtu"] 
         end
-
+    
+        #Conventional liquid Fuel Demand
+        @variable(EP, vConvLFGasolineDemand[t = 1:T, z = 1:Z] >= 0 )
         
         ### Expressions ###
         #Objective Function Expressions
     
         #Cost of Conventional Fuel
         @expression(EP, eCLFGasolineVar_out[z = 1:Z,t = 1:T], (inputs["omega"][t] * Conventional_gasoline_price_per_mmbtu * vConvLFGasolineDemand[t,z]))
+    
+        #Sum up conventional Fuel Costs
+        @expression(EP, eTotalCLFGasolineVarOutT[t=1:T], sum(eCLFGasolineVar_out[z,t] for z in 1:Z))
+        @expression(EP, eTotalCLFGasolineVarOut, sum(eTotalCLFGasolineVarOutT[t] for t in 1:T))
+    
+        #Liquid Fuel Balance
+        EP[:eLFGasolineBalance] += vConvLFGasolineDemand
+        EP[:eObj] += eTotalCLFGasolineVarOut
     
         ####Constraining amount of syn fuel
         if setup["BIO_Gasoline_On"] == 0
@@ -149,19 +154,8 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
                 @expression(EP, eSynFuelProd_GasolineTZ, sum(eSynFuelProd_GasolineT[t] for t in 1:T))
                 @constraint(EP, cSynFuelGasolineShare, (percent_sbf_gasoline - 1) * eSynFuelProd_GasolineTZ + percent_sbf_gasoline *  eConvLFGasolineDemandTZ == 0)
             end
-        end 
-    else
-        @constraint(EP, cNoConvGasoline[t = 1:T, z = 1:Z], vConvLFGasolineDemand[t,z] == 0)
-        @expression(EP, eCLFGasolineVar_out[z = 1:Z,t = 1:T], 0)
+        end
     end
-
-    #Sum up conventional Fuel Costs
-    @expression(EP, eTotalCLFGasolineVarOutT[t=1:T], sum(eCLFGasolineVar_out[z,t] for z in 1:Z))
-    @expression(EP, eTotalCLFGasolineVarOut, sum(eTotalCLFGasolineVarOutT[t] for t in 1:T))
-
-    #Liquid Fuel Balance
-    EP[:eLFGasolineBalance] += vConvLFGasolineDemand
-    EP[:eObj] += eTotalCLFGasolineVarOut
 
    
 

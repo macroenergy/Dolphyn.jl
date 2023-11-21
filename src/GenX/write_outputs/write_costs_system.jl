@@ -264,16 +264,45 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 			cSFVar = value(EP[:eTotalCSFProdVarOut])*ModelScalingFactor^2
 			cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])*ModelScalingFactor^2
 			cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])*ModelScalingFactor^2
-			cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])*ModelScalingFactor^2
-			cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])*ModelScalingFactor^2
-			cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])*ModelScalingFactor^2
+			if setup["AllowConventionalDiesel"] == 1
+				cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])*ModelScalingFactor^2
+			else
+				cSFConvDieselFuelCost = 0
+			end
+	
+			if setup["AllowConventionalJetfuel"] == 1
+				cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])*ModelScalingFactor^2
+			else
+				cSFConvJetfuelFuelCost = 0
+			end
+	
+			if setup["AllowConventionalGasoline"] == 1
+				cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])*ModelScalingFactor^2
+			else
+				cSFConvGasolineFuelCost = 0
+			end
 		else
 			cSFVar = value(EP[:eTotalCSFProdVarOut])
 			cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])
 			cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])
-			cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])
-			cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])
-			cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])
+			
+			if setup["AllowConventionalDiesel"] == 1
+				cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])
+			else
+				cSFConvDieselFuelCost = 0
+			end
+	
+			if setup["AllowConventionalJetfuel"] == 1
+				cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])
+			else
+				cSFConvJetfuelFuelCost = 0
+			end
+	
+			if setup["AllowConventionalGasoline"] == 1
+				cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])
+			else
+				cSFConvGasolineFuelCost = 0
+			end
 		end
 	else
 		cSFVar = 0
@@ -488,9 +517,23 @@ function write_costs_system(path::AbstractString, sep::AbstractString, inputs::D
 		tempCGasolineConvFuel = 0
 
 		if setup["ModelSynFuels"] == 1
-			tempCDieselConvFuel = sum(value.(EP[:eCLFDieselVar_out])[z,:])
-			tempCJetfuelConvFuel = sum(value.(EP[:eCLFJetfuelVar_out])[z,:])
-			tempCGasolineConvFuel = sum(value.(EP[:eCLFGasolineVar_out])[z,:])
+			if setup["AllowConventionalDiesel"] == 1
+				tempCDieselConvFuel = sum(value.(EP[:eCLFDieselVar_out])[z,:])
+			else
+				tempCDieselConvFuel = 0
+			end
+	
+			if setup["AllowConventionalJetfuel"] == 1
+				tempCJetfuelConvFuel = sum(value.(EP[:eCLFJetfuelVar_out])[z,:])
+			else
+				tempCJetfuelConvFuel = 0
+			end
+	
+			if setup["AllowConventionalGasoline"] == 1
+				tempCGasolineConvFuel = sum(value.(EP[:eCLFGasolineVar_out])[z,:])
+			else
+				tempCGasolineConvFuel = 0
+			end
 
 			for y in dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]
 				tempC_SF_Fix = tempC_SF_Fix +

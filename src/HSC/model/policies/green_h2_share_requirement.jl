@@ -30,24 +30,31 @@ function green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 	H2_ELECTROLYZER = inputs["H2_ELECTROLYZER"]
 	GreenH2Share = setup["GreenH2Share"]
 
-	## Green H2 Share Requirements (minimum H2 share from electrolyzer) constraint
-	@expression(EP, eGlobalGreenH2Balance[t=1:T], sum(EP[:vH2Gen][y,t] for y in H2_ELECTROLYZER) )
-	@expression(EP, eGlobalGreenH2Demand[t=1:T], sum(inputs["H2_D"][t,z] for z = 1:Z) )
+	if setup["GreenH2ShareRequirement"] == 1
+		if setup["ModelH2G2P"] == 1
+			## Green H2 Share Requirements (minimum H2 share from electrolyzer) constraint
+			@expression(EP, eGlobalGreenH2Balance[t=1:T], sum(EP[:vH2Gen][y,t] for y in H2_ELECTROLYZER) )
+			@expression(EP, eGlobalGreenH2Demand[t=1:T], sum(inputs["H2_D"][t,z] for z = 1:Z) )
+			@expression(EP, eH2DemandG2P[t=1:T], sum(EP[:eH2DemandByZoneG2P][z,t] for z = 1:Z))	
 
-	@expression(EP, eAnnualGlobalGreenH2Balance, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Balance][t] for t = 1:T) )
-	@expression(EP, eAnnualGlobalGreenH2Demand, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Demand][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalGreenH2Balance, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Balance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalGreenH2Demand, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Demand][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalGreenH2DemandG2P, sum(inputs["omega"][t] * EP[:eH2DemandG2P][t] for t = 1:T) )
 
-	#Only if modeling a net-zero system with negative emission technologies (NETs) avaialble, then we can set a equality constraint
-	#Otherwise solution can be infeasible if we force the model to uptake less than 100% of green H2 in a net-zero system without NETs
-	#NETs = DAC in CO2 supply chain, and BECCS in bioenergy supply chain
+			@constraint(EP, cGreenH2ShareRequirement, eAnnualGlobalGreenH2Balance == GreenH2Share * (eAnnualGlobalGreenH2Demand + eAnnualGlobalGreenH2DemandG2P))
+			
+		else
+			## Green H2 Share Requirements (minimum H2 share from electrolyzer) constraint
+			@expression(EP, eGlobalGreenH2Balance[t=1:T], sum(EP[:vH2Gen][y,t] for y in H2_ELECTROLYZER) )
+			@expression(EP, eGlobalGreenH2Demand[t=1:T], sum(inputs["H2_D"][t,z] for z = 1:Z) )
 
-	if setup["ModelCO2"] == 0 #If NETs are not available then green H2 have to be above share to avoid infeasibility
-		@constraint(EP, cGreenH2ShareRequirement, eAnnualGlobalGreenH2Balance >= GreenH2Share * eAnnualGlobalGreenH2Demand)
-	elseif setup["ModelCO2"] == 1 #If NETs are available, we are able to force a specific proportion of green H2 without running into infeasibility
-		@constraint(EP, cGreenH2ShareRequirement, eAnnualGlobalGreenH2Balance == GreenH2Share * eAnnualGlobalGreenH2Demand)
+			@expression(EP, eAnnualGlobalGreenH2Balance, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Balance][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalGreenH2Demand, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Demand][t] for t = 1:T) )
+
+			@constraint(EP, cGreenH2ShareRequirement, eAnnualGlobalGreenH2Balance == GreenH2Share * eAnnualGlobalGreenH2Demand)
+		end
+
 	end
-
-
 
 	return EP
 end

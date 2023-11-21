@@ -25,7 +25,7 @@ function write_synfuel_capacity(path::AbstractString, sep::AbstractString, input
 	H = inputs["SYN_FUELS_RES_ALL"]
 	
 	capsynfuelplant = zeros(size(inputs["SYN_FUELS_RESOURCES_NAME"]))
-	for i in inputs["SYN_FUEL_PLANT"]
+	for i in 1:inputs["SYN_FUELS_RES_ALL"]
 		if setup["ParameterScale"] ==1
 			capsynfuelplant[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i])*ModelScalingFactor
 		else
@@ -44,7 +44,7 @@ function write_synfuel_capacity(path::AbstractString, sep::AbstractString, input
 	CapFactor = zeros(size(1:inputs["SYN_FUELS_RES_ALL"]))
 	
 
-	for i in 1:H
+	for i in 1:inputs["SYN_FUELS_RES_ALL"]
 		capsyndiesel[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i]) * dfSynFuels[!,:mmbtu_sf_diesel_p_tonne_co2][i]
 		capsynjetfuel[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i]) * dfSynFuels[!,:mmbtu_sf_jetfuel_p_tonne_co2][i]
 		capsyngasoline[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i]) * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][i]

@@ -176,16 +176,16 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 		end 
 	
 		#Emissions from biogasoline utilization
-		Syn_gasoline_co2_per_mmbtu = inputs["Syn_gasoline_co2_per_mmbtu"]
+		Bio_gasoline_co2_per_mmbtu = inputs["Bio_gasoline_co2_per_mmbtu"]
 	
 		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of conventional gasoline consumption
+			#CO2 emitted as a result of bio gasoline consumption
 			@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Syn_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
+			Bio_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
 		else
-			#CO2 emitted as a result of conventional gasoline consumption
+			#CO2 emitted as a result of bio gasoline consumption
 			@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Syn_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
+			Bio_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
 		end
 	else
 		@expression(EP,eBio_Fuels_Con_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
@@ -222,16 +222,16 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 		end 
 	
 		#Emissions from biojetfuel utilization
-		Syn_jetfuel_co2_per_mmbtu = inputs["Syn_jetfuel_co2_per_mmbtu"]
+		Bio_jetfuel_co2_per_mmbtu = inputs["Bio_jetfuel_co2_per_mmbtu"]
 	
 		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of conventional jetfuel consumption
+			#CO2 emitted as a result of bio jetfuel consumption
 			@expression(EP,eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Syn_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
+			Bio_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
 		else
-			#CO2 emitted as a result of conventional jetfuel consumption
+			#CO2 emitted as a result of bio jetfuel consumption
 			@expression(EP,eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Syn_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z])
+			Bio_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z])
 		end
 	else
 		@expression(EP,eBio_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
@@ -268,16 +268,16 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 		end 
 	
 		#Emissions from biodiesel utilization
-		Syn_diesel_co2_per_mmbtu = inputs["Syn_diesel_co2_per_mmbtu"]
+		Bio_diesel_co2_per_mmbtu = inputs["Bio_diesel_co2_per_mmbtu"]
 	
 		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of conventional diesel consumption
+			#CO2 emitted as a result of bio diesel consumption
 			@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Syn_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
+			Bio_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
 		else
-			#CO2 emitted as a result of conventional diesel consumption
+			#CO2 emitted as a result of bio diesel consumption
 			@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Syn_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
+			Bio_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
 		end
 	else
 		@expression(EP,eBio_Fuels_Con_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
@@ -296,11 +296,11 @@ function biorefinery(EP::Model, inputs::Dict, setup::Dict)
 		Bio_ethanol_co2_per_mmbtu = inputs["Bio_ethanol_co2_per_mmbtu"]
 	
 		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of conventional ethanol consumption
+			#CO2 emitted as a result of bio ethanol consumption
 			@expression(EP,eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
 			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
 		else
-			#CO2 emitted as a result of conventional ethanol consumption
+			#CO2 emitted as a result of bio ethanol consumption
 			@expression(EP,eBio_Fuels_Con_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
 			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z])
 		end

@@ -48,14 +48,14 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 			dfTemp1[t+rowoffset,4] = value(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time][z,t])
 
 			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,5] = value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
+				dfTemp1[t+rowoffset,5] = value(EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t])
 			else
 				dfTemp1[t+rowoffset,5] = 0
 			end
 			
 			if setup["ModelSynFuels"] == 1
-				dfTemp1[t+rowoffset,6] = value(EP[:eSynFuelCapture_per_zone_per_time][z,t])
-				dfTemp1[t+rowoffset,7] = - value(EP[:eSynFuelCO2Cons_per_zone_per_time][z,t])
+				dfTemp1[t+rowoffset,6] = value(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])
+				dfTemp1[t+rowoffset,7] = - value(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time][z,t])
 			else
 				dfTemp1[t+rowoffset,6] = 0
 				dfTemp1[t+rowoffset,7] = 0

@@ -90,7 +90,7 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 					+ sum(inputs["omega"][t] * EP[:eHerb_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 					+ sum(inputs["omega"][t] * EP[:eWood_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 					- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-					- sum(inputs["omega"][t] * EP[:eBIO_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
+					- sum(inputs["omega"][t] * EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
 					sum(inputs["dfMaxCO2"][z,cap] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 				)
 
@@ -104,7 +104,7 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 						+ sum(inputs["omega"][t] * EP[:eHerb_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 						+ sum(inputs["omega"][t] * EP[:eWood_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 						- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-						- sum(inputs["omega"][t] * EP[:eBIO_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)  <=
+						- sum(inputs["omega"][t] * EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)  <=
 						sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] + EP[:eCSCNetpowerConsumptionByAll][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
 						sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 					)
@@ -116,7 +116,7 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 						+ sum(inputs["omega"][t] * EP[:eHerb_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 						+ sum(inputs["omega"][t] * EP[:eWood_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 						- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-						- sum(inputs["omega"][t] * EP[:eBIO_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
+						- sum(inputs["omega"][t] * EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
 						sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] + EP[:eH2NetpowerConsumptionByAll][t,z] + EP[:eCSCNetpowerConsumptionByAll][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
 						sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 					)
@@ -132,7 +132,7 @@ function co2_cap_power(EP::Model, inputs::Dict, setup::Dict)
 					+ sum(inputs["omega"][t] * EP[:eHerb_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 					+ sum(inputs["omega"][t] * EP[:eWood_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
 					- sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-					- sum(inputs["omega"][t] * EP[:eBIO_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
+					- sum(inputs["omega"][t] * EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) <=
 					sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
 				)
 			end 

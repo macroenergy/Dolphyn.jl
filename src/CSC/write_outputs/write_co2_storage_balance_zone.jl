@@ -34,14 +34,14 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 	DAC_Fuel_CCS = sum(sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
 	if setup["ModelBIO"] == 1
-		Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBIO_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+		Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 	else
 		Biorefinery_Capture = 0
 	end
 
 	if setup["ModelSynFuels"] == 1
-		Synfuel_Production_Capture = sum(sum(inputs["omega"].* (value.(EP[:eSynFuelCapture_per_zone_per_time])[z,:])) for z in 1:Z)
-		Synfuel_Production_Consumption = - sum(sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_per_zone_per_time])[z,:])) for z in 1:Z)
+		Synfuel_Production_Capture = sum(sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
+		Synfuel_Production_Consumption = - sum(sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
 	else
 		Synfuel_Production_Capture = 0
 		Synfuel_Production_Consumption = 0
@@ -97,12 +97,12 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 		tempDAC_Fuel_CCS = tempDAC_Fuel_CCS + sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:]))
 
 		if setup["ModelBIO"] == 1
-			tempBiorefinery_Capture = tempBiorefinery_Capture + sum(inputs["omega"].* (value.(EP[:eBIO_CO2_captured_per_zone_per_time])[z,:]))
+			tempBiorefinery_Capture = tempBiorefinery_Capture + sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:]))
 		end
 
 		if setup["ModelSynFuels"] == 1
-			tempSynfuel_Production_Capture = tempSynfuel_Production_Capture + sum(inputs["omega"].* (value.(EP[:eSynFuelCapture_per_zone_per_time])[z,:]))
-			tempSynfuel_Production_Consumption = tempSynfuel_Production_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_per_zone_per_time])[z,:]))
+			tempSynfuel_Production_Capture = tempSynfuel_Production_Capture + sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:]))
+			tempSynfuel_Production_Consumption = tempSynfuel_Production_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time])[z,:]))
 		end
 
 		if setup["ModelCO2Pipelines"] == 1

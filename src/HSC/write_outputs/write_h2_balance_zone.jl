@@ -36,10 +36,23 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total"])
 
 	#Try this form of summing otherwise just create z dimensions and sum later
-	
-	Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
-	Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2))
-	Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2))
+	if !isempty(inputs["H2_ELECTROLYZER"])
+		Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
+	else
+		Green_H2_Generation = 0
+	end
+
+	if !isempty(inputs["BLUE_H2"])
+		Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2))
+	else
+		Blue_H2_Generation = 0
+	end
+
+	if !isempty(inputs["GREY_H2"])
+		Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2))
+	else
+		Grey_H2_Generation = 0
+	end
 
 	if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
 		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z) - sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z])) for z in 1:Z)
