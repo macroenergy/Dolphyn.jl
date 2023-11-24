@@ -46,57 +46,14 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
                 retcapdischarge[ret_cap_not_commit] = value.(EP[:vH2G2PRetCap][ret_cap_not_commit]).data
         end
 
-	startenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		startenergycap[i] = 0
-	end
+	startenergycap = retenergycap = newenergycap = endenergycap = startchargecap = retchargecap = newchargecap = endchargecap = MaxGen = AnnualGen = CapFactor = zeros(Int32,size(1:inputs["H2_G2P_ALL"]))
 
-	retenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		retenergycap[i] = 0
-	end
+    	h2g2pTC = value.(EP[:eH2G2PTotalCap])
+	MaxGen = h2g2pTC * 8760
 
-	newenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		newenergycap[i] = 0
-	end
+        pg2p = value.(EP[:vPG2P])
+	AnnualGen .= pg2p * inputs["omega"]
 
-	endenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		endenergycap[i] = 0
-	end
-
-	startchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		startchargecap[i] = 0
-	end
-
-	retchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		retchargecap[i] = 0
-	end
-
-	newchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		newchargecap[i] = 0
-	end
-
-	endchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		endchargecap[i] = 0
-	end
-
-	MaxGen = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		MaxGen[i] = value.(EP[:eH2G2PTotalCap])[i] * 8760
-	end
-
-	AnnualGen = zeros(size(1:inputs["H2_G2P_ALL"]))
-	for i in 1:H
-		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vPG2P])[i,:]))
-	end
-
-	CapFactor = zeros(size(1:inputs["H2_G2P_ALL"]))
 	for i in 1:H
 		if MaxGen[i] == 0
 			CapFactor[i] = 0

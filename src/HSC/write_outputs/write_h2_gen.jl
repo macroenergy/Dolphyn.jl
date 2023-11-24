@@ -51,10 +51,8 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 		# Power injected by each resource in each time step
 		dfOut_BioH2 = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
 		
-		for i in 1:B
-			dfOut_BioH2[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:eBiohydrogen_produced_per_plant_per_time])[i,:]))
-		end
-		
+		biohydrogen_produced = value.(EP[:eBiohydrogen_produced_per_plant_per_time])
+		dfOut_BioH2.AnnualSum .= biohydrogen_produced * inputs["omega"]
 		# Load hourly values
 		dfOut_BioH2 = hcat(dfOut_BioH2, DataFrame((value.(EP[:eBiohydrogen_produced_per_plant_per_time])), :auto))
 		

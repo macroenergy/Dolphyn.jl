@@ -33,13 +33,11 @@ function write_h2_balance_dual(path::AbstractString, sep::AbstractString, inputs
 	end
 
 	# Incorporating effect of time step weights (When OperationWrapping=1) and Parameter scaling (ParameterScale=1) on dual variables
-	for z in 1:Z
-		if setup["ParameterScale"]==1
-			dual_values[z,:] = x1[z,:]./inputs["omega"] *ModelScalingFactor
-		else
-			dual_values[z,:] = x1[z,:]./inputs["omega"]
-		end
+	if setup["ParameterScale"]==1
+		x1 = x1 * ModelScalingFactor
 	end
+
+	dual_values .= x1 ./inputs["omega"]
 
 	dfH2BalanceDual=hcat(dfH2BalanceDual, DataFrame(dual_values, :auto))
 	rename!(dfH2BalanceDual,[Symbol("Zone");[Symbol("t$t") for t in 1:T]])

@@ -28,9 +28,9 @@ function write_h2_g2p(path::AbstractString, sep::AbstractString, inputs::Dict, s
     # dfH2G2POut_annual = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2G2P[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
     dfH2G2POut = DataFrame(Resource = inputs["H2_G2P_NAME"], Zone = dfH2G2P[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
-    for i in 1:H
-        dfH2G2POut[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2G2P][i,:])))
-    end
+    h2g2p = value.(EP[:vH2G2P])
+    dfH2G2POut.AnnualSum .= h2g2p * inputs["omega"]
+
     # Load hourly values
     dfH2G2POut = hcat(dfH2G2POut, DataFrame((value.(EP[:vH2G2P])), :auto), copycols = false)
 

@@ -66,17 +66,14 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
              retcapenergy[stor_ret_cap_energy] = value.(EP[:vH2RETCAPENERGY][stor_ret_cap_energy]).data
 	end
 
-	MaxGen = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in 1:H
-		MaxGen[i] = value.(EP[:eH2GenTotalCap])[i] * 8760
-	end
+	MaxGen = AnnualGen = CapFactor = zeros(size(inputs["H2_RESOURCES_NAME"]))
 
-	AnnualGen = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in 1:H
-		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vH2Gen])[i,:]))
-	end
+	h2genTC = value.(EP[:eH2GenTotalCap])
+	MaxGen = h2genTC * 8760
 
-	CapFactor = zeros(size(inputs["H2_RESOURCES_NAME"]))
+	h2gen = value.(EP[:vH2Gen])
+	AnnualGen = h2gen *inputs["omega"]
+
 	for i in 1:H
 		if MaxGen[i] == 0
 			CapFactor[i] = 0
@@ -86,10 +83,9 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	end
 	
 	AnnualCO2Emissions = zeros(size(inputs["H2_RESOURCES_NAME"]))
-	for i in 1:H
-		AnnualCO2Emissions[i] = sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[i,:]))
-	end
 
+	h2emissionsbyplant = value.(EP[:eH2EmissionsByPlant])
+	AnnualCO2Emissions = h2emissionsbyplant * inputs["omega"]
 
 	dfCap = DataFrame(
 		Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
@@ -135,38 +131,15 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 			newcap_BioH2[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i]
 		end
 
-		startcap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+		startcap_BioH2 = retcap_BioH2 = startenergycap_BioH2 = retenergycap_BioH2 = newenergycap_BioH2 = endenergycap_BioH2 = startchargecap_BioH2 = retchargecap_BioH2 = newchargecap_BioH2 = endchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 
-		retcap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		startenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		retenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		newenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		endenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		startchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		retchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		newchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		endchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-
-		AnnualGen_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
+		AnnualGen_BioH2 = MaxGen_BioH2 = CapFactor_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
 		for i in 1:B
-			AnnualGen_BioH2[i] = sum(inputs["omega"].* (value.(EP[:eBiohydrogen_produced_per_plant_per_time])[i,:]))
-		end
+		biohydrogen_produced = value.(EP[:eBiohydrogen_produced_per_plant_per_time])
+		AnnualGen_BioH2 = biohydrogen_produced * inputs["omega"]
 	
-		MaxGen_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
 		for i in 1:B
 			MaxGen_BioH2[i] = value.(EP[:vCapacity_BIO_per_type])[i] * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i] * 8760
-		end
-
-		CapFactor_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
-		for i in 1:B
 			if MaxGen_BioH2[i] == 0
 				CapFactor_BioH2[i] = 0
 			else
@@ -174,10 +147,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 			end
 		end
 
-		AnnualCO2Emissions_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
-		for i in 1:B
-			AnnualCO2Emissions_BioH2[i] = 0 #Already counted in power capacity page
-		end
+		AnnualCO2Emissions_BioH2 = zeros(Int32, size(1:inputs["BIO_RES_ALL"]))#Already counted in power capacity page
 	
 		dfBioH2_Cap = DataFrame(
 			Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone],
