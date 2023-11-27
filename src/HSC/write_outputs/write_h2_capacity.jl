@@ -110,8 +110,6 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		AnnualEmissions = AnnualCO2Emissions[:]
 		
 	)
-
-
 	total = DataFrame(
 		Resource = "Total", Zone = "n/a",
 		StartCap = sum(dfCap[!,:StartCap]), RetCap = sum(dfCap[!,:RetCap]),
