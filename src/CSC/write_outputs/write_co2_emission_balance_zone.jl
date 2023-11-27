@@ -17,10 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_co2_emission_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for reporting co2 balance of resources across different zones.
+Function for reporting CO2 balance of resources across different zones.
 """
+
 function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -30,7 +30,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 	rowoffset=3
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 20)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biorefinery Capture", "CO2 Pipeline Loss","Synfuel Production Emissions","Synfuel Byproducts Emissions","Conventional Diesel Utilization","Conventional Jetfuel Utilization","Conventional Gasoline Utilization","Syn Diesel Utilization","Syn Jetfuel Utilization","Syn Gasoline Utilization","Bio Diesel Utilization","Bio Jetfuel Utilization", "Bio Gasoline Utilization","Bio Ethanol Utilization"]
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biomass Capture", "CO2 Pipeline Loss","Synfuel Production Emissions","Synfuel Byproducts Emissions","Conventional Diesel Utilization","Conventional Jetfuel Utilization","Conventional Gasoline Utilization","Syn Diesel Utilization","Syn Jetfuel Utilization","Syn Gasoline Utilization","Bio Diesel Utilization","Bio Jetfuel Utilization", "Bio Gasoline Utilization","Bio Ethanol Utilization"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			dfTemp1[t+rowoffset,1] = value(EP[:eEmissionsByZone][z,t])
@@ -54,23 +54,21 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 			dfTemp1[t+rowoffset,6]= - value(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t])
 
 			if setup["ModelBIO"] == 1
-				dfTemp1[t+rowoffset,7] = - value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
+				dfTemp1[t+rowoffset,7] = - value(EP[:eBiomass_CO2_captured_per_zone_per_time][z,t])
 			else
 				dfTemp1[t+rowoffset,7] = 0
 			end
 
-			if setup["ModelCO2Pipelines"] != 0
-				if Z>=2
-					dfTemp1[t+rowoffset,8] = value(EP[:eCO2Loss_Pipes_zt][z,t])
-				end
+	
+			if setup["ModelCO2Pipelines"] == 1 && setup["CO2Pipeline_Loss"] == 1
+				dfTemp1[t+rowoffset,8] = value(EP[:eCO2Loss_Pipes_zt][z,t])
 			else
-				if Z>=2
-					dfTemp1[t+rowoffset,8] = 0
-				end
+				dfTemp1[t+rowoffset,8] = 0
 			end
 
+
 			if setup["ModelSynFuels"] == 1
-				dfTemp1[t+rowoffset,9] = value(EP[:eSynFuelProdEmissionsByZone][z,t])
+				dfTemp1[t+rowoffset,9] = value(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,10] = value(EP[:eByProdConsCO2EmissionsByZone][z,t])
 				dfTemp1[t+rowoffset,11] = value(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,12] = value(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t])

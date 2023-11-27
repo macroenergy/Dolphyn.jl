@@ -125,7 +125,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
         end 
 
         #Using an additive approach where terms are added to LHS of emissions constraint
-        if setup["ModelCO2"] == 1
+        if setup["ModelCSC"] == 1
             @expression(EP, eEmissionsConstraintLHSCSC[cap=1:inputs["NCO2Cap"]],
                 sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
                 - sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)

@@ -40,7 +40,8 @@ pages = OrderedDict(
             "Single-stage Model" => "data_documentation.md",
             "Multi-stage Model" => "multi_stage_model_overview.md",
         ],  
-        "hsc_data_documentation.md"
+        "hsc_data_documentation.md",
+        "csc_data_documentation.md"
     ],
     "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
@@ -115,6 +116,21 @@ pages = OrderedDict(
             ],
         ],
     ],
+
+    "CO2 Supply Chain (CSC)" => [
+        "CSC Inputs Functions" => "load_co2_inputs.md",
+        "CSC Outputs Functions" => "write_h2_outputs.md",
+        "CSC Notation" => "csc_notation.md",
+
+        "CSC Function Reference" => [
+            "CSC Core" => "co2_core.md",
+            "CO2 Capture" => "co2_capture.md",
+            "CO2 Compression" => "co2_compression.md",
+            "CO2 Storage" => "co2_storage.md",
+            "CO2 Transmission" => "co2_transmission.md",
+        ],
+    ],
+
     "Additional Tools" => "additional_tools.md",
     "Solving the Model" => "solve_model.md",
     "Methods" => "methods.md",

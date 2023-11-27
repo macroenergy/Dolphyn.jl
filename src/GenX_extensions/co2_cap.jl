@@ -95,7 +95,7 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
 		)
 	end 
 
-	if setup["ModelCO2"] == 1
+	if setup["ModelCSC"] == 1
 
 		@expression(EP, eEmissionsConstraintLHSCSC[cap=1:inputs["NCO2Cap"]],
                 sum(inputs["omega"][t] * EP[:eCSC_Emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)

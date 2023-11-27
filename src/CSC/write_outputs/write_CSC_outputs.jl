@@ -22,9 +22,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## returns: n/a
 ################################################################################
 @doc raw"""
-	write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+  write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
 
-Function for the entry-point for writing the different output files. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
+Function (entry-point) for reporting the different output files of CO2 supply chain. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
 function write_CSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, inputs::Dict)
 
@@ -53,14 +53,13 @@ function write_CSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     end
   end
 
-
   write_CSC_costs(path, sep, inputs, setup, EP)
   write_co2_capture_capacity(path, sep, inputs, setup, EP)
-  #write_co2_storage_capacity(path, sep, inputs, setup, EP)
-  write_co2_total_injection(path, sep, inputs, setup, EP)
   write_co2_emission_balance_zone(path, sep, inputs, setup, EP)
+  write_co2_storage_balance_zone(path, sep, inputs, setup, EP)
   write_co2_storage_balance(path, sep, inputs, setup, EP)
-  write_co2_balance_dual(path, sep, inputs, setup, EP)
+  write_co2_storage_capacity(path, sep, inputs, setup, EP)
+  write_co2_total_injection(path, sep, inputs, setup, EP)
 
   if setup["ModelCO2Pipelines"] ==1 
     write_co2_pipeline_flow(path, sep, inputs, setup, EP)

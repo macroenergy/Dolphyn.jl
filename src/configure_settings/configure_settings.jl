@@ -114,7 +114,7 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
 
     ############################################################
     ###CSC Model Settings Options#####
-    set_default_if_absent!(settings, "ModelCO2", 0)
+    set_default_if_absent!(settings, "ModelCSC", 0)
     set_default_if_absent!(settings, "DAC_Nonlinear_CAPEX", 0)
     set_default_if_absent!(settings, "CO2PipeInteger", 0)
     set_default_if_absent!(settings, "ModelCO2Pipelines", 0)

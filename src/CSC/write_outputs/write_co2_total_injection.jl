@@ -15,10 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_co2_storage_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_co2_total_injection(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the diferent capacities for CO2 storage
+Function for reporting CO2 storage injection.
 """
+
 function write_co2_total_injection(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	dfCO2Storage = inputs["dfCO2Storage"]
@@ -34,13 +35,13 @@ function write_co2_total_injection(path::AbstractString, sep::AbstractString, in
 
 	dfCap = DataFrame(
 		Resource = inputs["CO2_STORAGE_NAME"], Zone = dfCO2Storage[!,:Zone],
-		Capacity_tonne_per_yr = capcapture[:],
+		Injection_tonne_per_yr = capcapture[:],
 	)
 
 
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
-			Capacity_tonne_per_yr = sum(dfCap[!,:Capacity_tonne_per_yr]),
+			Injection_tonne_per_yr = sum(dfCap[!,:Injection_tonne_per_yr]),
 		)
 
 	dfCap = vcat(dfCap, total)

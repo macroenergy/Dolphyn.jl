@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the cost for the different sectors of the carbon supply chain (DAC, Compression, Storage, Network Expansion)).
+Function for writing the cost for the different sectors of the carbon supply chain (DAC, Compression, Storage, Injection, Network Expansion)).
 """
 function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results

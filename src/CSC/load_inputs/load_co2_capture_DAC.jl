@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+    load_co2_capture_DAC(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
+
+Function for reading input parameters related to DAC resources in the carbon supply chain.
+"""
 
 function load_co2_capture_DAC(setup::Dict, path::AbstractString, sep::AbstractString, inputs_capture::Dict)
 

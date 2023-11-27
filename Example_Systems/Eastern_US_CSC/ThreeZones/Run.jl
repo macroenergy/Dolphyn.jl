@@ -53,7 +53,7 @@ if mysetup["ModelH2"] == 1
 end
 
 # ### Load CO2 inputs if modeling the carbon supply chain
-if mysetup["ModelCO2"] == 1
+if mysetup["ModelCSC"] == 1
     myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
 end
 
@@ -82,7 +82,7 @@ if mysetup["ModelH2"] == 1
 end
 
 # Write carbon supply chain outputs
-if mysetup["ModelCO2"] == 1
+if mysetup["ModelCSC"] == 1
     write_CSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 

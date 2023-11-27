@@ -15,10 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_network_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_nw::Dict)
+    load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
 
-Function for reading input parameters related to the electricity transmission network
+Function for reading input parameters related to the CO2 transmission network via pipelines.
 """
+
 function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_nw::Dict)
 
     # Network zones inputs and Network topology inputs
@@ -83,9 +84,9 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     inputs_co2_nw["pCO2_Pipe_Min_Cap"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:Min_pipecap_stor_frac]))) .* inputs_co2_nw["pCO2_Pipe_Max_Cap"]
 
     #Capital Cost Per Pipe using mean cost
-    inputs_co2_nw["pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
-    inputs_co2_nw["pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
-    inputs_co2_nw["pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne_Mean]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
+    inputs_co2_nw["pCAPEX_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Inv_Cost_per_mile_yr]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
+    inputs_co2_nw["pFixed_OM_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Fixed_OM_Cost_per_mile_yr]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
+    inputs_co2_nw["pMWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2Pipe_Energy_MWh_per_mile_per_tonne]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
 
     inputs_co2_nw["pLoss_tonne_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:CO2PipeLoss_tonne_per_mile_per_tonne]))) .* inputs_co2_nw["pCO2_Pipe_length_miles"]
     

@@ -116,7 +116,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @expression(EP, eH2LiqBalance[t=1:T, z=1:Z], 0)
     end
 
-    if setup["ModelCO2"] == 1
+    if setup["ModelCSC"] == 1
         # Initialize CO2 Capture Balance Expression
 	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
     end
@@ -293,11 +293,15 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = time_matching_requirement(EP, inputs, setup)
 		end
 
+        if setup["GreenH2ShareRequirement"] == 1
+			EP = green_h2_share_requirement(EP, inputs, setup)
+		end
+
         EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
     
 	end
 
-    if setup["ModelCO2"] == 1
+    if setup["ModelCSC"] == 1
 
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
@@ -395,7 +399,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
     end
 
-    if setup["ModelCO2"] == 1
+    if setup["ModelCSC"] == 1
 		###Captured CO2 Balanace constraints
 		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
 	end

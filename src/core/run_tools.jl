@@ -71,7 +71,7 @@ function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any
         end
     end
 
-    if mysetup["ModelCO2"] == 1
+    if mysetup["ModelCSC"] == 1
         print_and_log("CSC and SF TDR not implemented.")
     end
 end
