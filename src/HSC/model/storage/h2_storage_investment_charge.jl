@@ -80,14 +80,14 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eTotalH2CapCharge[y in H2_STOR_ALL],
         if (y in intersect(NEW_CAP_H2_STOR_CHARGE, RET_CAP_H2_STOR_CHARGE))
-            dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y] -
+            dfH2Gen[!, :Existing_Charge_Cap_MWh][y] + EP[:vH2CAPCHARGE][y] -
             EP[:vH2RETCAPCHARGE][y]
         elseif (y in setdiff(NEW_CAP_H2_STOR_CHARGE, RET_CAP_H2_STOR_CHARGE))
-            dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y]
+            dfH2Gen[!, :Existing_Charge_Cap_MWh][y] + EP[:vH2CAPCHARGE][y]
         elseif (y in setdiff(RET_CAP_H2_STOR_CHARGE, NEW_CAP_H2_STOR_CHARGE))
-            dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y] - EP[:vH2RETCAPCHARGE][y]
+            dfH2Gen[!, :Existing_Charge_Cap_MWh][y] - EP[:vH2RETCAPCHARGE][y]
         else
-            dfH2Gen[!, :Existing_Charge_Cap_tonne_p_hr][y]
+            dfH2Gen[!, :Existing_Charge_Cap_MWh][y]
         end
     )
 
@@ -151,10 +151,10 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cMaxCapH2Charge[y in intersect(
-            dfH2Gen[!, :Max_Charge_Cap_tonne_p_hr] .> 0,
+            dfH2Gen[!, :Max_Charge_Cap_MWh] .> 0,
             H2_STOR_ALL,
         )],
-        eTotalH2CapCharge[y] <= dfH2Gen[!, :Max_Charge_Cap_tonne_p_hr][y]
+        eTotalH2CapCharge[y] <= dfH2Gen[!, :Max_Charge_Cap_MWh][y]
     )
 
     # Constraint on minimum charge capacity (if applicable) [set input to -1 if no constraint on minimum charge capacity]
@@ -162,10 +162,10 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cMinCapH2Charge[y in intersect(
-            dfH2Gen[!, :Min_Charge_Cap_tonne_p_hr] .> 0,
+            dfH2Gen[!, :Min_Charge_Cap_MWh] .> 0,
             H2_STOR_ALL,
         )],
-        eTotalH2CapCharge[y] >= dfH2Gen[!, :Min_Charge_Cap_tonne_p_hr][y]
+        eTotalH2CapCharge[y] >= dfH2Gen[!, :Min_Charge_Cap_MWh][y]
     )
 
     return EP

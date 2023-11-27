@@ -92,13 +92,13 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     # Total available charging capacity in tonnes/hour
     @expression(EP, eTotalH2CapCharge[y in H2_STOR_ALL],
         if (y in intersect(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
-            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y] - EP[:vH2RETCAPCHARGE][y]
+            dfH2Gen[!,:Existing_Charge_Cap_MWh][y] + EP[:vH2CAPCHARGE][y] - EP[:vH2RETCAPCHARGE][y]
         elseif (y in setdiff(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
-            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] + EP[:vH2CAPCHARGE][y]
+            dfH2Gen[!,:Existing_Charge_Cap_MWh][y] + EP[:vH2CAPCHARGE][y]
         elseif (y in setdiff(RET_CAP_H2_CHARGE, NEW_CAP_H2_CHARGE))
-            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y] - EP[:vH2RETCAPCHARGE][y]
+            dfH2Gen[!,:Existing_Charge_Cap_MWh][y] - EP[:vH2RETCAPCHARGE][y]
         else
-            dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr][y]
+            dfH2Gen[!,:Existing_Charge_Cap_MWh][y]
         end
     )
 
@@ -189,11 +189,11 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
     # Constraint on maximum charge capacity (if applicable) [set input to -1 if no constraint on maximum charge capacity]
     # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasabilty
-    @constraint(EP, cMaxCapH2Charge[y in intersect(dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] <= dfH2Gen[!,:Max_Charge_Cap_tonne_p_hr][y])
+    @constraint(EP, cMaxCapH2Charge[y in intersect(dfH2Gen[!,:Max_Charge_Cap_MWh].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] <= dfH2Gen[!,:Max_Charge_Cap_MWh][y])
 
     # Constraint on minimum charge capacity (if applicable) [set input to -1 if no constraint on minimum charge capacity]
     # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasabilty
-    @constraint(EP, cMinCapH2Charge[y in intersect(dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] >= dfH2Gen[!,:Min_Charge_Cap_tonne_p_hr][y])
+    @constraint(EP, cMinCapH2Charge[y in intersect(dfH2Gen[!,:Min_Charge_Cap_MWh].>0, H2_STOR_ALL)], eTotalH2CapCharge[y] >= dfH2Gen[!,:Min_Charge_Cap_MWh][y])
 
 
         

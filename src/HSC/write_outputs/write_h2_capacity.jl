@@ -90,27 +90,21 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	h2emissionsbyplant = value.(EP[:eH2EmissionsByPlant])
 	AnnualCO2Emissions = h2emissionsbyplant * inputs["omega"]
 
-	dfCap = DataFrame(
-		Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
-		StartCap = dfH2Gen[!,:Existing_Cap_tonne_p_hr],
-		RetCap = retcapdischarge[:],
-		NewCap = capdischarge[:],
-		EndCap = value.(EP[:eH2GenTotalCap]),
-		StartEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_tonne],
-		RetEnergyCap = retcapenergy[:],
-		NewEnergyCap = capenergy[:],
-		EndEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_tonne]+capenergy[:]-retcapenergy[:],
-		StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr],
-		RetChargeCap = retcapcharge[:],
-		NewChargeCap = capcharge[:],
-		EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_tonne_p_hr]+capcharge[:]-retcapcharge[:],
-		MaxAnnualGeneration = MaxGen[:],
-		AnnualGeneration = AnnualGen[:],
-		CapacityFactor = CapFactor[:],
-		AnnualEmissions = AnnualCO2Emissions[:]
-		
-	)
-
+    dfCap = DataFrame(
+        Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
+        StartCap = dfH2Gen[!,:Existing_Cap_MWh],
+        RetCap = retcapdischarge[:],
+        NewCap = capdischarge[:],
+        EndCap = value.(EP[:eH2GenTotalCap]),
+        StartEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_tonne],
+        RetEnergyCap = retcapenergy[:],
+        NewEnergyCap = capenergy[:],
+        EndEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_tonne]+capenergy[:]-retcapenergy[:],
+        StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh],
+        RetChargeCap = retcapcharge[:],
+        NewChargeCap = capcharge[:],
+        EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh]+capcharge[:]-retcapcharge[:]
+    )
 
 	total = DataFrame(
 		Resource = "Total", Zone = "n/a",
