@@ -108,30 +108,30 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         eH2GenTotalCap[k in 1:H],
         if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
             if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
+                dfH2Gen[!, :Existing_Cap_MWh][k] +
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
                 (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k] -
+                dfH2Gen[!, :Existing_Cap_MWh][k] + EP[:vH2GenNewCap][k] -
                 EP[:vH2GenRetCap][k]
             end
         elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
             if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
+                dfH2Gen[!, :Existing_Cap_MWh][k] +
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k]
+                dfH2Gen[!, :Existing_Cap_MWh][k] + EP[:vH2GenNewCap][k]
             end
         elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
             if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] -
+                dfH2Gen[!, :Existing_Cap_MWh][k] -
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] - EP[:vH2GenRetCap][k]
+                dfH2Gen[!, :Existing_Cap_MWh][k] - EP[:vH2GenRetCap][k]
             end
         else
             # Resources not eligible for new capacity or retirements
-            dfH2Gen[!, :Existing_Cap_tonne_p_hr][k]
+            dfH2Gen[!, :Existing_Cap_MWh][k]
         end
     )
 
