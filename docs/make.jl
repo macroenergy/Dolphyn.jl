@@ -119,7 +119,7 @@ pages = OrderedDict(
 
     "CO2 Supply Chain (CSC)" => [
         "CSC Inputs Functions" => "load_co2_inputs.md",
-        "CSC Outputs Functions" => "write_h2_outputs.md",
+        "CSC Outputs Functions" => "write_co2_outputs.md",
         "CSC Notation" => "csc_notation.md",
 
         "CSC Function Reference" => [
