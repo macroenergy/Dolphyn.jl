@@ -16,7 +16,6 @@
 ---
 |**Notation** | **Description**|
 | :------------ | :-----------|
-
 |$x_{d,z,t}^{\textrm{C,DAC}}$| this term represents CO2 captured by DAC resource $d$ in zone $z$ at time period $t$|
 |$x_{k,z,t}^{\textrm{C,COMP}}$| this term represents DAC-captured CO2 compressed by CO2 compression generation resource $k$ in zone $z$ at time period $t$|
 |$x_{s,z,t}^{\textrm{C,INJ}}$| this term represents CO2 injected into the CO2 storage resource $s$ in zone $z$ at time period $t$|

@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_capture_compression_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict)
 
 This module defines the total fixed cost (Investment + Fixed O&M) of compressing the CO2 after capture by DAC
 

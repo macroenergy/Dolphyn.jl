@@ -15,11 +15,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
+	load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_storage::Dict)
 
 Function for reading input parameters related to CO2 storage resources in the carbon supply chain.
 """
-
 function load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_storage::Dict)
 
 	#Read in CO2 capture related inputs

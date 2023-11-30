@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_co2_emission_balance_system(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+    write_co2_emission_balance_system(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting CO2 balance of resources across the entire system
 """

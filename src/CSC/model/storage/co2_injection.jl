@@ -15,52 +15,51 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_injection(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
-	This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $s$ in zone $z$ at time period $t$.
+This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $s$ in zone $z$ at time period $t$.
 
-	The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Injected$``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
-	
-	This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection in zone $z$ at time period $t$.
-	
-	The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Injection``` cover variable $x_{z,t}^{E,INJ}$.
-	
-	**Cost expressions**
-	
-	This module additionally defines contributions to the objective function from variable costs of CO2 injection (variable OM) from all resources over all time periods.
-	
-	```math
-	\begin{equation*}
-		\textrm{C}^{\textrm{C,INJ,o}} = \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s}^{\textrm{INJ,VOM}} \times x_{s,z,t}^{\textrm{C,INJ}}
-	\end{equation*}
-	```
-	
-	**Minimum and maximum injection output hourly**
-	
-	For resources where upper bound $\overline{x_{s}^{\textrm{C,INJ}}}$ of injection rate is defined, then we impose constraints on minimum and maximum injection rate
-	
-	
-	```math
-	\begin{equation*}
-		x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-	\end{equation*}
-	```
-	
-	```math
-	\begin{equation*}
-		x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-	\end{equation*}
-	```
-	
-	**Maximum injection per year according to CO2 storage capacity per year**
-	
-	```math
-	\begin{equation*}
-		\sum_{t \in \mathcal{T}} x_{s,z,t}^{\textrm{C,INJ}} \leq y_{s,z}^{\textrm{C,STO}}
-	\end{equation*}
-	```
+The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Injected$``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
+
+This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection in zone $z$ at time period $t$.
+
+The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Injection``` cover variable $x_{z,t}^{E,INJ}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of CO2 injection (variable OM) from all resources over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{C,INJ,o}} = \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s}^{\textrm{INJ,VOM}} \times x_{s,z,t}^{\textrm{C,INJ}}
+\end{equation*}
+```
+
+**Minimum and maximum injection output hourly**
+
+For resources where upper bound $\overline{x_{s}^{\textrm{C,INJ}}}$ of injection rate is defined, then we impose constraints on minimum and maximum injection rate
+
+
+```math
+\begin{equation*}
+	x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+```math
+\begin{equation*}
+	x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+**Maximum injection per year according to CO2 storage capacity per year**
+
+```math
+\begin{equation*}
+	\sum_{t \in \mathcal{T}} x_{s,z,t}^{\textrm{C,INJ}} \leq y_{s,z}^{\textrm{C,STO}}
+\end{equation*}
+```
 """
-
 function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename CO2Storage dataframe

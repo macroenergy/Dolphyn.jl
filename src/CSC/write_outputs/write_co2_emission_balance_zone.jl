@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting CO2 balance of resources across different zones.
 """
-
 function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	T = inputs["T"]     # Number of time steps (hours)

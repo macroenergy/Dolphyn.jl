@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_capture_DAC(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 
 The DAC module creates decision variables, expressions, and constraints related to DAC capture infrastructure
 
@@ -60,9 +60,7 @@ DAC resources adhere to the following ramping limits on hourly changes in CO2 ca
 (See Constraints 5-8 in the code)
 
 This set of time-coupling constraints wrap around to ensure the DAC capture output in the first time step of each year (or each representative period), $t \in \mathcal{T}^{start}$, is within the eligible ramp of the output in the final time step of the year (or each representative period), $t+\tau^{period}-1$.
-
 """
-
 function co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename CO2Capture dataframe

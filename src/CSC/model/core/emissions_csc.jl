@@ -15,21 +15,20 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	emissions_csc(EP::Model, inputs::Dict, UCommit::Int)
+    emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
-    This function creates expression to add the CO2 emissions for carbon supply chain in each zone, which is subsequently added to the total emissions. 
-    
-    These include emissions from fuel utilization in DAC minus CO2 captured by flue gas CCS and also pipeline losses.
+This function creates expression to add the CO2 emissions for carbon supply chain in each zone, which is subsequently added to the total emissions. 
 
-    In addition, there is a constraint that specify that amount of CO2 that undergoes compression in each zone has to be equal to the amount of CO2 captured by DAC
+These include emissions from fuel utilization in DAC minus CO2 captured by flue gas CCS and also pipeline losses.
 
-    ```math
-    \begin{equation*}
-        x_{z,t}^{\textrm{C,DAC}} = x_{z,t}^{\textrm{C,COMP}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-    \end{equation*}
-    ```
+In addition, there is a constraint that specify that amount of CO2 that undergoes compression in each zone has to be equal to the amount of CO2 captured by DAC
+
+```math
+\begin{equation*}
+    x_{z,t}^{\textrm{C,DAC}} = x_{z,t}^{\textrm{C,COMP}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
 """
-
 function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
 	println("CO2 Emissions Module for CO2 Policy modularization")

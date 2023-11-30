@@ -19,7 +19,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting CO2 storage injection.
 """
-
 function write_co2_total_injection(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	dfCO2Storage = inputs["dfCO2Storage"]

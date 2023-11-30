@@ -22,7 +22,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 ## returns: n/a
 ################################################################################
 @doc raw"""
-  write_CSC_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dict)
+  write_CSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, inputs::Dict)
 
 Function (entry-point) for reporting the different output files of CO2 supply chain. From here, onward several other functions are called, each for writing specific output files, like costs, capacities, etc.
 """
