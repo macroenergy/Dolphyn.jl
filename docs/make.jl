@@ -18,6 +18,15 @@ push!(LOAD_PATH,joinpath(@__DIR__,"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src"))
 push!(LOAD_PATH,joinpath(dirname(@__DIR__),"src","GenX","src"))
 
+import LiveServer
+const repo_root = dirname(@__DIR__)
+const liveserver = "liveserver" in ARGS
+
+if liveserver
+    using Revise
+    Revise.revise()
+end
+
 using Pkg; Pkg.add("Documenter")
 
 using Documenter, Dolphyn
