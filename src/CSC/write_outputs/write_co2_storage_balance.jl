@@ -29,9 +29,9 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	dfCO2StorBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "Synfuel Production Consumption", "CO2 Pipeline Import",
-	           "CO2 Storage"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "Synfuel Production Consumption", "CO2 Trunk Pipeline Import",
+	           "CO2 Spur Pipeline Outflow", "CO2 Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 
@@ -62,12 +62,18 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 			end
 
 			if setup["ModelCO2Pipelines"] == 1
-				dfTemp1[t+rowoffset,8] = value(EP[:ePipeZoneCO2Demand][t,z])
+				dfTemp1[t+rowoffset,8] = value(EP[:ePipeZoneCO2Demand_Trunk][t,z])
 			else
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
-			dfTemp1[t+rowoffset,9] = - value(EP[:eCO2_Injected_per_zone][z,t])
+			if setup["ModelCO2Pipelines"] == 1
+				dfTemp1[t+rowoffset,9] = - value(EP[:ePipeZoneCO2Demand_Outflow_Spur][t,z])
+			else
+				dfTemp1[t+rowoffset,9] = 0
+			end
+
+			dfTemp1[t+rowoffset,10] = inputs["CO2_D"][t,z]
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
@@ -79,6 +85,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,7] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
 				dfTemp1[t+rowoffset,8] = dfTemp1[t+rowoffset,8] * ModelScalingFactor
 				dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,9] * ModelScalingFactor
+				dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,10] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end
@@ -92,5 +99,5 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	   	dfCO2StorBalance[rowoffset,c]=sum(inputs["omega"].*dfCO2StorBalance[(rowoffset+1):size(dfCO2StorBalance,1),c])
 	end
 	dfCO2StorBalance = DataFrame(dfCO2StorBalance, :auto)
-	CSV.write(string(path,sep,"Zone_CO2_storage_balance.csv"), dfCO2StorBalance, writeheader=false)
+	CSV.write(string(path,sep,"Zone_CO2_capture_outflow_balance.csv"), dfCO2StorBalance, writeheader=false)
 end

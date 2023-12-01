@@ -20,77 +20,133 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting co2 capture and outflow across all zones.
 """
 function write_co2_capture_outflow_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfGen = inputs["dfGen"]
-
-	T = inputs["T"]     # Number of time steps (hours)
+	
 	Z = inputs["Z"]     # Number of zones
     S = inputs["S"]     # Number of CO2 Sites
-	## CO2 balance for each zone
-	## CO2 balance for each zone
-    dfCO2StorBalance = Array{Any}
-    rowoffset=3
-    for z in 1:Z
-        dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
-        dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "CO2 Trunk Pipeline Import",
-            "CO2 Spur Pipeline Outflow", "CO2_Demand"]
-        dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
-        for t in 1:T
+	
+    ## CO2 balance for each zone
+	dfCost = DataFrame(Costs = ["Power_CCS", "H2_CCS", "DAC_Capture", "DAC_Fuel_CCS", "Biorefinery_Capture", "Synfuel_Production_Capture", "Synfuel_Production_Consumption", "CO2_Trunk_Pipeline_Import", "CO2_Spur_Pipeline_Outflow", "CO2_Demand", "Total"])
+    
+    Power_CCS = sum(sum(inputs["omega"].* (value.(EP[:ePower_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
-            dfTemp1[t+rowoffset,1] = value(EP[:ePower_CO2_captured_per_zone_per_time][z,t])
+    if setup["ModelH2"] == 1
+		H2_CCS = sum(sum(inputs["omega"].* (value.(EP[:eHydrogen_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+	else
+		H2_CCS = 0
+	end
 
-            if setup["ModelH2"] == 1
-                dfTemp1[t+rowoffset,2] = value(EP[:eHydrogen_CO2_captured_per_zone_per_time][z,t])
-            else
-                dfTemp1[t+rowoffset,2] = 0
-            end
+    DAC_Capture =  sum(sum(inputs["omega"].* (value.(EP[:eDAC_CO2_Captured_per_zone_per_time])[z,:])) for z in 1:Z)
+	DAC_Fuel_CCS = sum(sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
-            dfTemp1[t+rowoffset,3] = value(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t])
+    if setup["ModelBIO"] == 1
+		Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+	else
+		Biorefinery_Capture = 0
+	end
 
-            dfTemp1[t+rowoffset,4] = value(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time][z,t])
+    if setup["ModelSynFuels"] == 1
+		Synfuel_Production_Capture = sum(sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
+		Synfuel_Production_Consumption = - sum(sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
+	else
+		Synfuel_Production_Capture = 0
+		Synfuel_Production_Consumption = 0
+	end
 
-            if setup["ModelBIO"] == 1
-                dfTemp1[t+rowoffset,5] = value(EP[:eBIO_CO2_captured_per_zone_per_time][z,t])
-            else
-                dfTemp1[t+rowoffset,5] = 0
-            end
+    if setup["ModelCO2Pipelines"] == 1
+		CO2_Trunk_Pipeline_Import = sum(sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand_Trunk])[:,z])) for z in 1:Z)
+        CO2_Spur_Pipeline_Outflow = - sum(sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand_Outflow_Spur])[:,z])) for z in 1:Z)
+	else
+		CO2_Trunk_Pipeline_Import = 0
+        CO2_Spur_Pipeline_Outflow = 0
+	end
 
-            if setup["ModelSynFuels"] == 1
-                dfTemp1[t+rowoffset,6] = value(EP[:eSynFuelCaptureByZone][z,t])
-            else
-                dfTemp1[t+rowoffset,6] = 0
-            end
-
-            if Z>=2
-                dfTemp1[t+rowoffset,7] = value(EP[:ePipeZoneCO2Demand_Trunk][t,z])
-            end
-
-            dfTemp1[t+rowoffset,8] = - value(EP[:ePipeZoneCO2Demand_Outflow_Spur][t,z])
-        
-            dfTemp1[t+rowoffset,9] = inputs["CO2_D"][t,z]
-
-            if setup["ParameterScale"] == 1
-                dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
-                dfTemp1[t+rowoffset,2] = dfTemp1[t+rowoffset,2] * ModelScalingFactor
-                dfTemp1[t+rowoffset,3] = dfTemp1[t+rowoffset,3] * ModelScalingFactor
-                dfTemp1[t+rowoffset,4] = dfTemp1[t+rowoffset,4] * ModelScalingFactor
-                dfTemp1[t+rowoffset,5] = dfTemp1[t+rowoffset,5] * ModelScalingFactor
-                dfTemp1[t+rowoffset,6] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
-                dfTemp1[t+rowoffset,7] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
-                dfTemp1[t+rowoffset,8] = dfTemp1[t+rowoffset,8] * ModelScalingFactor
-                dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,9] * ModelScalingFactor
-            end
-            # DEV NOTE: need to add terms for electricity consumption from H2 balance
-        end
-        if z==1
-            dfCO2StorBalance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
-        else
-            dfCO2StorBalance = hcat(dfCO2StorBalance, dfTemp1)
-        end
+    if setup["Exogeneous_CO2_Demand"] == 1
+        CO2_Demand = sum(sum(inputs["omega"].* inputs["CO2_D"][:,z]) for z in 1:Z)
+    else
+        CO2_Demand = 0
     end
 
-	for c in 2:size(dfCO2StorBalance,2)
-	   	dfCO2StorBalance[rowoffset,c]=sum(inputs["omega"].*dfCO2StorBalance[(rowoffset+1):size(dfCO2StorBalance,1),c])
+    # Define Annual Balance
+    cTotal = Power_CCS + H2_CCS + DAC_Capture + DAC_Fuel_CCS + Biorefinery_Capture + Synfuel_Production_Capture + Synfuel_Production_Consumption + CO2_Trunk_Pipeline_Import + CO2_Spur_Pipeline_Outflow + CO2_Demand
+
+    if setup["ParameterScale"] == 1
+		Power_CCS = Power_CCS * ModelScalingFactor
+		H2_CCS = H2_CCS * ModelScalingFactor
+		DAC_Capture = DAC_Capture * ModelScalingFactor
+		DAC_Fuel_CCS = DAC_Fuel_CCS * ModelScalingFactor
+		Biorefinery_Capture = Biorefinery_Capture * ModelScalingFactor
+		Synfuel_Production_Capture = Synfuel_Production_Capture * ModelScalingFactor
+		Synfuel_Production_Consumption = Synfuel_Production_Consumption * ModelScalingFactor
+		CO2_Trunk_Pipeline_Import = CO2_Trunk_Pipeline_Import * ModelScalingFactor
+		CO2_Spur_Pipeline_Outflow = CO2_Spur_Pipeline_Outflow * ModelScalingFactor
+        CO2_Demand = CO2_Demand * ModelScalingFactor
+		cTotal = cTotal * ModelScalingFactor
 	end
-	dfCO2StorBalance = DataFrame(dfCO2StorBalance, :auto)
-	CSV.write(string(path,sep,"Zone_CO2_capture_outflow_balance.csv"), dfCO2StorBalance, writeheader=false)
+
+    # Define total column, i.e. column 2
+	dfCost[!,Symbol("Total")] = [Power_CCS, H2_CCS, DAC_Capture, DAC_Fuel_CCS, Biorefinery_Capture, Synfuel_Production_Capture, Synfuel_Production_Consumption, CO2_Trunk_Pipeline_Import, CO2_Spur_Pipeline_Outflow, CO2_Demand, cTotal]
+    
+    ################################################################################################################################
+
+    for z in 1:Z
+        tempPower_CCS = 0
+		tempH2_CCS = 0
+		tempDAC_Capture = 0
+		tempDAC_Fuel_CCS = 0
+		tempBiorefinery_Capture = 0
+		tempSynfuel_Production_Capture = 0
+		tempSynfuel_Production_Consumption = 0
+		tempCO2_Trunk_Pipeline_Import = 0
+        tempCO2_Spur_Pipeline_Outflow = 0
+		tempCO2_Demand = 0
+
+        tempPower_CCS = tempPower_CCS + sum(inputs["omega"].* (value.(EP[:ePower_CO2_captured_per_zone_per_time])[z,:]))
+
+        if setup["ModelH2"] == 1
+			tempH2_CCS = tempH2_CCS + sum(inputs["omega"].* (value.(EP[:eHydrogen_CO2_captured_per_zone_per_time])[z,:]))
+		end
+
+        tempDAC_Capture = tempDAC_Capture + sum(inputs["omega"].* (value.(EP[:eDAC_CO2_Captured_per_zone_per_time])[z,:]))
+		tempDAC_Fuel_CCS = tempDAC_Fuel_CCS + sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:]))
+
+        if setup["ModelBIO"] == 1
+			tempBiorefinery_Capture = tempBiorefinery_Capture + sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:]))
+		end
+
+		if setup["ModelSynFuels"] == 1
+			tempSynfuel_Production_Capture = tempSynfuel_Production_Capture + sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:]))
+			tempSynfuel_Production_Consumption = tempSynfuel_Production_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time])[z,:]))
+		end
+
+        if setup["ModelCO2Pipelines"] == 1
+			tempCO2_Trunk_Pipeline_Import = tempCO2_Trunk_Pipeline_Import + sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand_Trunk])[:,z]))
+            tempCO2_Spur_Pipeline_Outflow = - tempCO2_Spur_Pipeline_Outflow - sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand_Outflow_Spur])[:,z]))
+		end
+
+        if setup["Exogeneous_CO2_Demand"] == 1
+            tempCO2_Demand = tempCO2_Demand + sum(inputs["omega"].* (inputs["CO2_D"][z,:]))
+        end
+
+        tempCTotal = tempPower_CCS + tempH2_CCS + tempDAC_Capture + tempDAC_Fuel_CCS + tempBiorefinery_Capture + tempSynfuel_Production_Capture + tempSynfuel_Production_Consumption + tempCO2_Trunk_Pipeline_Import + tempCO2_Spur_Pipeline_Outflow + tempCO2_Demand
+
+        if setup["ParameterScale"] == 1
+			tempPower_CCS = tempPower_CCS * ModelScalingFactor
+			tempH2_CCS = tempH2_CCS * ModelScalingFactor
+			tempDAC_Capture = tempDAC_Capture * ModelScalingFactor
+			tempDAC_Fuel_CCS = tempDAC_Fuel_CCS * ModelScalingFactor
+			tempBiorefinery_Capture = tempBiorefinery_Capture * ModelScalingFactor
+			tempSynfuel_Production_Capture = tempSynfuel_Production_Capture * ModelScalingFactor
+			tempSynfuel_Production_Consumption = tempSynfuel_Production_Consumption * ModelScalingFactor
+			tempCO2_Trunk_Pipeline_Import = tempCO2_Trunk_Pipeline_Import * ModelScalingFactor
+            tempCO2_Spur_Pipeline_Outflow = tempCO2_Spur_Pipeline_Outflow * ModelScalingFactor
+			tempCO2_Demand = tempCO2_Demand * ModelScalingFactor
+			tempCTotal = tempCTotal * ModelScalingFactor
+		end
+
+        dfCost[!,Symbol("Zone$z")] = [tempPower_CCS, tempH2_CCS, tempDAC_Capture, tempDAC_Fuel_CCS, tempBiorefinery_Capture, tempSynfuel_Production_Capture, tempSynfuel_Production_Consumption, tempCO2_Trunk_Pipeline_Import, tempCO2_Spur_Pipeline_Outflow, tempCO2_Demand, tempCTotal]
+
+    end
+
+    CSV.write(string(path,sep,"CSC_capture_outflow_balanace.csv"), dfCost)
+
 end
