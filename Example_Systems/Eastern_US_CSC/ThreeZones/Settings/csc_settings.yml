@@ -8,3 +8,5 @@ ModelCO2Pipelines: 1 # Whether to model pipeline in CO2 supply chain - 0 = not i
 CO2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = active systemwide
 
 CO2Pipeline_Loss: 1 #Loss of CO2 from pipelines
+
+Exogeneous_CO2_Demand: 1

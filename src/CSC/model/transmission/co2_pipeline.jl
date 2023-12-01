@@ -17,15 +17,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-    This function includes the variables, expressions and objective funtion of CO2 pipeline.
+    This function includes the variables, expressions and objective funtion of both CO2 trunk and spur pipelines.
 
-    This function expresses CO2 exchange through pipeline i between two zones and can be split into CO2 delivering and flowing out.
+    This function expresses trunk CO2 exchange through pipeline i between two zones and can be split into CO2 delivering and flowing out.
+    
+    This function expresses spur CO2 exchange through pipeline i between a zone and a CO2 Storage site and is the amount of CO2 flowing out of a zone into a co2 storage site.
 
-    This module defines the CO2 pipeline construction decision variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}$, representing newly constructed CO2 pipeline of type $i$ through path $z \rightarrow z^{\prime}$.
+    This module defines the CO2 trunk pipeline construction decision variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}$, representing newly constructed CO2 trunk pipeline of type $i$ through path $z \rightarrow z^{\prime}$.
 
-    This module defines the CO2 pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+    This module defines the CO2 trunk pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
 
-    This module defines the CO2 pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+    This module defines the CO2 trunk pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
 
     The variable defined in this file named after ```vCO2NPipe``` covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}}$.
 
@@ -75,23 +77,70 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2 and electricity
+
+    if setup["CO2NetworkExpansion"] == 1
+        S = inputs["S"] # Number of CO2 Storage Sites
+    end
+
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
     hours_per_subperiod = inputs["hours_per_subperiod"]
+   
+    # Number of Trunk and Spur Pipelines
+    Trunk_CO2_P = inputs["Trunk_CO2_P"]
+    Spur_CO2_P = inputs["Spur_CO2_P"]
 
-	CO2_P = inputs["CO2_P"] # Number of CO2 Pipelines
-    CO2_Pipe_Map = inputs["CO2_Pipe_Map"] 
+    # Specifying Trunk and Spur CO2 Pipe Maps
+    CO2_Trunk_Pipe_Map = inputs["CO2_Trunk_Pipe_Map"]
+    CO2_Spur_Pipe_Map = inputs["CO2_Spur_Pipe_Map"]
+
+	# From the CO2_Spur_Pipe_Map the Source_CO2_Pipe_Map and Sink_CO2_Pipe_Map is inferred. This helps with creating unidirectional pipeline flows 
+    Source_CO2_Spur_Pipe_Map = CO2_Spur_Pipe_Map[CO2_Spur_Pipe_Map.d .==1,:]
+    Sink_CO2_Spur_Pipe_Map = CO2_Spur_Pipe_Map[CO2_Spur_Pipe_Map.d .==-1, :]
 
 	### Variables ###
-    @variable(EP, vCO2NPipe[p=1:CO2_P] >= 0 ) #Number of Pipes
-    @variable(EP, vCO2PipeLevel[p=1:CO2_P, t = 1:T] >= 0 ) #Storage in the pipe
-    @variable(EP, vCO2PipeFlow_pos[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #positive pipeflow
-    @variable(EP, vCO2PipeFlow_neg[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #negative pipeflow
-    @variable(EP, vCO2Loss[t=1:T,z=1:Z] >= 0 ) #CO2 Loss in Pipe
+    
+    # Variable for Number of Trunk and Spur Pipelines
+    @variable(EP, vCO2NPipe_Trunk[p=1:Trunk_CO2_P] >= 0)
+    @variable(EP, vCO2NPipe_Spur[p=1:Spur_CO2_P] >= 0)
+
+    # Variable for PipeLevel (for CO2 Storage in Pipe) for Trunk and Spur Pipelines
+    @variable(EP, vCO2PipeLevel_Trunk[p=1:Trunk_CO2_P, t = 1:T] >= 0)
+    @variable(EP, vCO2PipeLevel_Spur[p=1:Spur_CO2_P, t = 1:T] >= 0)
+    
+    # Variable for Pipe Flow Positive Direction (Specifying Inflow into a zone)
+    @variable(EP, vCO2PipeFlow_trunk_pos[p=1:Trunk_CO2_P, t=1:T, d=[1,-1]] >= 0)
+
+    # DEV NOTE: Positive Notation for Spur Pipeline might not be required
+    # Spur Pipeline
+    @variable(EP, vCO2PipeFlow_spur_uni_pos[p=1:Spur_CO2_P, t=1:T] >= 0)
+
+    # Variable for Outflow from Zones through Pipes 
+    # Trunk Pipeline
+    @variable(EP, vCO2NPipeFlow_trunk_neg[p=1:Trunk_CO2_P, t=1:T, d=[1,-1]] >= 0) # Negative Pipeflow
+
+    # Spur Pipeline
+    @variable(EP, vCO2PipeFlow_spur_uni_neg[p=1:Spur_CO2_P, t = 1:T] >= 0) 
+
+    # Variable for CO2 Loss Across time period and zones for Trunk and Spur Pipelines
+    # Trunk Pipeline
+    @variable(EP, vCO2Loss_trunk[t=1:T, z=1:Z] >= 0)
+
+    # Spur Pipeline
+    @variable(EP, vCO2Loss_spur[t=1:T, z=1:Z] >= 0)
+
+    #@variable(EP, vCO2PipeFlow_pos[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #positive pipeflow
+    #@variable(EP, vCO2PipeFlow_neg[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #negative pipeflow
+    #@variable(EP, vCO2Loss[t=1:T,z=1:Z] >= 0 ) #CO2 Loss in Pipe
 
 	### Expressions ###
-    #Calculate the number of new pipes
-    @expression(EP, eCO2NPipeNew[p = 1:CO2_P], vCO2NPipe[p] - inputs["pCO2_Pipe_No_Curr"][p])
+    #Calculate the number of new trunk and spur pipelines
+
+    # Trunk Pipelines
+    @expression(EP, eCO2NPipeNew_trunk[p = 1:Trunk_CO2_P], vCO2NPipe_Trunk[p] - inputs["Trunk_pCO2_Pipe_No_Curr"][p])
+
+    # Spur Pipelines
+    @expression(EP, eCO2NPipeNew_spur[p = 1:Spur_CO2_P], vCO2NPipe_Spur[p] - inputs["Spur_pCO2_Pipe_No_Curr"][p])
 
 	## Objective Function Expressions ##
 	# Capital cost of pipelines 
@@ -99,25 +148,30 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 0 --> objective function is in $
 
     if setup["ParameterScale"] ==1 
-        @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pCAPEX_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:CO2_P) + sum(vCO2NPipe[p] * inputs["pFixed_OM_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:CO2_P))
+        @expression(EP, eCCO2Pipe_Trunk,  sum(eCO2NPipeNew_trunk[p] * inputs["Trunk_pCAPEX_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:Trunk_CO2_P) + sum(vCO2NPipe_Trunk[p] * inputs["Trunk_pFixed_OM_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:Trunk_CO2_P))
+        @expression(EP, eCCO2Pipe_Spur,  sum(eCO2NPipeNew_spur[p] * inputs["Spur_pCAPEX_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:Spur_CO2_P) + sum(vCO2NPipe_Spur[p] * inputs["Spur_pFixed_OM_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:Spur_CO2_P))
     else
-        @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pCAPEX_CO2_Pipe"][p] for p = 1:CO2_P) + sum(vCO2NPipe[p] * inputs["pFixed_OM_CO2_Pipe"][p] for p = 1:CO2_P))
+        @expression(EP, eCCO2Pipe_Trunk,  sum(eCO2NPipeNew_trunk[p] * inputs["Trunk_pCAPEX_CO2_Pipe"][p] for p = 1:Trunk_CO2_P) + sum(vCO2NPipe_Trunk[p] * inputs["Trunk_pFixed_OM_CO2_Pipe"][p] for p = 1:Trunk_CO2_P))
+        @expression(EP, eCCO2Pipe_Spur,  sum(eCO2NPipeNew_spur[p] * inputs["Spur_pCAPEX_CO2_Pipe"][p] for p = 1:Spur_CO2_P) + sum(vCO2NPipe_Spur[p] * inputs["Spur_pFixed_OM_CO2_Pipe"][p] for p = 1:Spur_CO2_P))
     end
 
-    EP[:eObj] += eCCO2Pipe
+    EP[:eObj] += eCCO2Pipe_Trunk
+    EP[:eObj] += eCCO2Pipe_Spur
 
     # Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
      #  ParameterScale = 1 --> objective function is in million $
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"] ==1 
-        @expression(EP, eCCO2CompPipe, sum(eCO2NPipeNew[p] * inputs["pCAPEX_Comp_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:CO2_P))
-
+        @expression(EP, eCCO2CompPipe_trunk, sum(eCO2NPipeNew_trunk[p] * inputs["Trunk_pCAPEX_Comp_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:Trunk_CO2_P))
+        @expression(EP, eCCO2CompPipe_spur, sum(eCO2NPipeNew_spur[p] * inputs["Spur_pCAPEX_Comp_CO2_Pipe"][p]/(ModelScalingFactor)^2 for p = 1:Spur_CO2_P))
 	else
-        @expression(EP, eCCO2CompPipe, sum(eCO2NPipeNew[p] * inputs["pCAPEX_Comp_CO2_Pipe"][p] for p = 1:CO2_P))
+        @expression(EP, eCCO2CompPipe_trunk, sum(eCO2NPipeNew_trunk[p] * inputs["Trunk_pCAPEX_Comp_CO2_Pipe"][p] for p = 1:Trunk_CO2_P))
+        @expression(EP, eCCO2CompPipe_spur, sum(eCO2NPipeNew_spur[p] * inputs["Spur_pCAPEX_Comp_CO2_Pipe"][p] for p = 1:Spur_CO2_P))
 	end
 	
 
-    EP[:eObj] += eCCO2CompPipe
+    EP[:eObj] += eCCO2CompPipe_trunk
+    EP[:eObj] += eCCO2CompPipe_spur
 
 	## End Objective Function Expressions ##
 
@@ -125,106 +179,207 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	# Electrical energy requirement for pipeline operation
     # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW, , no need to scale as MW/ton = GW/kton
     # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of CO2 related power consumption
-    @expression(EP, ePowerDemandCO2Pipe[t=1:T, z=1:Z],
-    sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pMWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
     
-    @expression(EP, ePowerDemandCO2Pipe_zt[z=1:Z,t=1:T],
-    sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pMWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+    @expression(EP, ePowerDemandCO2Pipe_Trunk[t=1:T, z=1:Z],
+    sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pMWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+
+    @expression(EP, ePowerDemandCO2Pipe_Spur[t=1:T, z=1:Z],
+    sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pMWh_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+    
+    @expression(EP, ePowerDemandCO2Pipe_Trunk_zt[z=1:Z, t=1:T],
+    sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pMWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+
+    @expression(EP, ePowerDemandCO2Pipe_Spur_zt[z=1:Z, t=1:T],
+    sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pMWh_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
 
 	# Electrical energy requirement for booster compression
     # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW, , no need to scale as MW/ton = GW/kton
     # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of CO2 related power consumption
-    @expression(EP, ePowerDemandCO2PipeCompression[t=1:T, z=1:Z],
-    sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+    
+    @expression(EP, ePowerDemandCO2PipeCompression_Trunk[t=1:T, z=1:Z],
+    sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
 
-    @expression(EP, ePowerDemandCO2PipeCompression_zt[z=1:Z,t=1:T],
-    sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+    @expression(EP, ePowerDemandCO2PipeCompression_Spur[t=1:T, z=1:Z],
+    sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
 
-    EP[:ePowerBalance] += -ePowerDemandCO2Pipe
-    EP[:ePowerBalance] += -ePowerDemandCO2PipeCompression
+    @expression(EP, ePowerDemandCO2PipeCompression_Trunk_zt[z=1:Z,t=1:T],
+    sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
 
-    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2Pipe
-    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2PipeCompression
+    @expression(EP, ePowerDemandCO2PipeCompression_Spur_zt[z=1:Z, t=1:T],
+    sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
+
+    EP[:ePowerBalance] -= ePowerDemandCO2Pipe_Trunk
+    EP[:ePowerBalance] -= ePowerDemandCO2PipeCompression_Trunk
+
+    EP[:ePowerBalance] -= ePowerDemandCO2Pipe_Spur
+    EP[:ePowerBalance] -= ePowerDemandCO2PipeCompression_Spur
+
+    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2Pipe_Trunk
+    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2Pipe_Spur
+    
+    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2PipeCompression_Trunk
+    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2PipeCompression_Spur
 
 
 	### Constraints ###
 
     # Constraints
 	if setup["CO2PipeInteger"] == 1
-        for p=1:CO2_P
-		    set_integer.(vCO2NPipe[p])
+        for p=1:Trunk_CO2_P
+		    set_integer.(vCO2NPipe_Trunk[p])
+        end
+        for p=1:Spur_CO2_P
+		    set_integer.(vCO2NPipe_Spur[p])
         end
 	end
 
     # Modeling expansion of the pipleline network
     if setup["CO2NetworkExpansion"]==1
         # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe 
-        @constraint(EP, cCO2NetworkExpansion[p in 1:CO2_P], EP[:eCO2NPipeNew][p] >= 0)
+        @constraint(EP, cCO2NetworkExpansion_Trunk[p in 1:Trunk_CO2_P], EP[:eCO2NPipeNew_trunk][p] >= 0)
+        @constraint(EP, cCO2NetworkExpansion_Spur[p in 1:Spur_CO2_P], EP[:eCO2NPipeNew_spur][p] >= 0)
     else
         # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe 
-        @constraint(EP, cCO2NetworkExpansion[p in 1:CO2_P], EP[:eCO2NPipeNew][p] == 0)
+        @constraint(EP, cCO2NetworkExpansion_Trunk[p in 1:Trunk_CO2_P], EP[:eCO2NPipeNew_trunk][p] == 0)
+        @constraint(EP, cCO2NetworkExpansion_Spur[p in 1:Spur_CO2_P], EP[:eCO2NPipeNew_spur][p] == 0)
     end
 
     # Modeling loss of CO2 in the piplelines
     if setup["CO2Pipeline_Loss"]==1
         # If modeling CO2 loss from pipe
-        @expression(EP, eCO2Loss_Pipes_per_pipe[t=1:T,z=1:Z], sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+        @expression(EP, eCO2Loss_Pipes_per_pipe_Trunk[t=1:T,z=1:Z], sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
         
-        @expression(EP, eCO2Loss_Pipes[t=1:T,z=1:Z], sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
-        @expression(EP, eCO2Loss_Pipes_zt[z=1:Z,t=1:T], sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+        @expression(EP, eCO2Loss_Pipes_Trunk[t=1:T,z=1:Z], sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+        @expression(EP, eCO2Loss_Pipes_Trunk_zt[z=1:Z,t=1:T], sum(vCO2PipeFlow_trunk_neg[p,t,CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["Trunk_pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+
+        # If modeling CO2 Loss from Pipe: For Spur Pipelines
+        @expression(EP, eCO2Loss_Pipes_per_pipe_Spur[t=1:T,z=1:Z], sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+        @expression(EP, eCO2Loss_Pipes_Spur[t=1:T,z=1:Z], sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+        @expression(EP, eCO2Loss_Pipes_Spur_zt[z=1:Z,t=1:T], sum(vCO2PipeFlow_spur_uni_neg[p,t] * inputs["Spur_pLoss_tonne_per_tonne_CO2_Pipe"][p] for  p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+
     else
         # If not modeling CO2 loss from pipe
-        @expression(EP, eCO2Loss_Pipes[t=1:T,z=1:Z], 0)
-        @expression(EP, eCO2Loss_Pipes_zt[z=1:Z,t=1:T], 0)
+        # Trunk Pipelines
+        @expression(EP, eCO2Loss_Pipes_Trunk[t=1:T,z=1:Z], 0)
+        @expression(EP, eCO2Loss_Pipes_Trunk_zt[z=1:Z,t=1:T], 0)
+
+        # Spur Pipelines
+        @expression(EP, eCO2Loss_Pipes_Spur[t=1:T,z=1:Z], 0)
+        @expression(EP, eCO2Loss_Pipes_Spur_zt[z=1:Z,t=1:T], 0)
+
     end
 
-    
-
     #Calculate net flow at each pipe-zone interfrace
-    @expression(EP, eCO2PipeFlow_net[p = 1:CO2_P, t = 1:T, d = [-1,1]],  vCO2PipeFlow_pos[p,t,d] - vCO2PipeFlow_neg[p,t,d]*(1-inputs["pLoss_tonne_per_tonne_CO2_Pipe"][p]))
+    @expression(EP, eCO2PipeFlow_Trunk_net[p = 1:Trunk_CO2_P, t = 1:T, d = [-1,1]],  vCO2PipeFlow_trunk_pos[p,t,d] - vCO2PipeFlow_trunk_neg[p,t,d]*(1-inputs["Trunk_pLoss_tonne_per_tonne_CO2_Pipe"][p]))
+
+    ## DEV NOTE: We might not require the net flow for Spur Pipelines ##
+    @expression(EP, eCO2PipeFlow_Spur_net[p = 1:Spur_CO2_P, t = 1:T],  vCO2PipeFlow_spur_uni_pos[p,t] - vCO2PipeFlow_spur_uni_neg[p,t]*(1-inputs["Spur_pLoss_tonne_per_tonne_CO2_Pipe"][p]))
+
+    # Specifying expression for CO2 Outflows in Spur Pipelines
+    @expression(EP, eCO2PipeOutFlow_Spur[p=1:Spur_CO2_P, t = 1:T], vCO2PipeFlow_spur_uni_neg[p,t])
 
     # CO2 balance - net flows of CO2 from between z and zz via pipeline p over time period t
-    @expression(EP, ePipeZoneCO2Demand_No_Loss[t=1:T,z=1:Z],
-        sum(eCO2PipeFlow_net[p,t, CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] for p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
-
+    @expression(EP, ePipeZoneCO2Demand_No_Loss_Trunk[t=1:T,z=1:Z], 
+    sum(eCO2PipeFlow_Trunk_net[p,t, CO2_Trunk_Pipe_Map[(CO2_Trunk_Pipe_Map[!,:Zone] .== z) .& (CO2_Trunk_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] for p in CO2_Trunk_Pipe_Map[CO2_Trunk_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+    
     # CO2 balance - net flows of CO2 from between z and zz via pipeline p over time period t
-    @expression(EP, ePipeZoneCO2Demand[t=1:T,z=1:Z],ePipeZoneCO2Demand_No_Loss[t,z] - eCO2Loss_Pipes[t,z])
+    @expression(EP, ePipeZoneCO2Demand_Trunk[t=1:T,z=1:Z],ePipeZoneCO2Demand_No_Loss_Trunk[t,z] - eCO2Loss_Pipes_Trunk[t,z])
+
+    # Specifying CO2 Balance for Spur Pipelines
+    @expression(EP, ePipeZoneCO2OutFlowDemand_No_Loss_Spur[t=1:T,z=1:Z],
+    sum(eCO2PipeOutFlow_Spur[p,t] for p in Source_CO2_Spur_Pipe_Map[Source_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+
+    @expression(EP, ePipeZoneCO2Demand_Outflow_Spur[t=1:T,z=1:Z], ePipeZoneCO2OutFlowDemand_No_Loss_Spur[t,z] - eCO2Loss_Pipes_Spur[t,z])
+
+    ##### NOTE: If we do want to account for losses they can be tracked in a new expression as follows ########
+    ### New Expression ###
+    @expression(EP, eCO2PipeInFlow_Spur[p=1:Spur_CO2_P, t = 1:T], vCO2PipeFlow_spur_uni_neg[p,t] * (1 - inputs["Spur_pLoss_tonne_per_tonne_CO2_Pipe"][p]))
+
+
+    # Specifying expression for Pipe Zone CO2 Inflow Demand while ignoring losses
+    @expression(EP, ePipeZoneCO2InFlowDemand_No_Loss_Spur[t=1:T,z=1:S],
+    sum(eCO2PipeOutFlow_Spur[p,t] for p in Sink_CO2_Spur_Pipe_Map[Sink_CO2_Spur_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))
+
+    @expression(EP, ePipeZoneCO2Demand_Inflow_Spur[t=1:T,z=1:S], ePipeZoneCO2InFlowDemand_No_Loss_Spur[t,z])
+
+    #### Adding a new expression here to be used later in co2_injection script ####
+    EP[:ePipeZoneCO2Demand_Inflow_Spur] = ePipeZoneCO2Demand_Inflow_Spur
+
+    if setup["Exogeneous_CO2_Demand"] == 1
+        EP[:eCaptured_CO2_Balance] -= inputs["CO2_D"]
+    end
+
+    EP[:eCaptured_CO2_Balance] += ePipeZoneCO2Demand_Trunk
+    EP[:eCaptured_CO2_Balance] -= ePipeZoneCO2Demand_Outflow_Spur
 
     #EP[:eCaptured_CO2_Balance] -= eCO2Loss_Pipes #No need as we have already deducted the loss from the balance
-    EP[:eCaptured_CO2_Balance] += ePipeZoneCO2Demand
+    #EP[:eCaptured_CO2_Balance] += ePipeZoneCO2Demand
 
     if setup["ParameterScale"] ==1 
         #Pipe flow constraint
-        @constraint(EP, cMinCO2Pipeflow[d in [-1,1], p in 1:CO2_P, t=1:T], EP[:eCO2PipeFlow_net][p,t,d] >= -EP[:vCO2NPipe][p] * inputs["pCO2_Pipe_Max_Flow"][p]/ModelScalingFactor)
-        @constraint(EP, cMaxCO2Pipeflow[d in [-1,1], p in 1:CO2_P, t=1:T], EP[:eCO2PipeFlow_net][p,t,d] <= EP[:vCO2NPipe][p] * inputs["pCO2_Pipe_Max_Flow"][p]/ModelScalingFactor)
+        @constraint(EP, cMinCO2Pipeflow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], EP[:eCO2PipeFlow_Trunk_net][p,t,d] >= -EP[:vCO2NPipe_Trunk][p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p]/ModelScalingFactor)
+        @constraint(EP, cMaxCO2Pipeflow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], EP[:eCO2PipeFlow_Trunk_net][p,t,d] <= EP[:vCO2NPipe_Trunk][p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p]/ModelScalingFactor)
     
         #Constrain positive and negative pipe flows
-        @constraint(EP, cMaxPositiveCO2Flow[d in [-1,1], p in 1:CO2_P, t=1:T], vCO2NPipe[p] * inputs["pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_pos[p,t,d]/ModelScalingFactor)
-        @constraint(EP, cMaxNegativeCO2Flow[d in [-1,1], p in 1:CO2_P, t=1:T], vCO2NPipe[p] * inputs["pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_neg[p,t,d]/ModelScalingFactor)
+        @constraint(EP, cMaxPositiveCO2Flow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], vCO2NPipe_Trunk[p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_trunk_pos[p,t,d]/ModelScalingFactor)
+        @constraint(EP, cMaxNegativeCO2Flow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], vCO2NPipe_Trunk[p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_trunk_neg[p,t,d]/ModelScalingFactor)
         
         #Pipe level constraint
-        @constraint(EP, cMinCO2PipeLevel[p in 1:CO2_P, t=1:T], vCO2PipeLevel[p,t] >= inputs["pCO2_Pipe_Min_Cap"][p] * vCO2NPipe[p]/ModelScalingFactor)
-        @constraint(EP, cMaxCO2PipeLevel[p in 1:CO2_P, t=1:T], vCO2PipeLevel[p,t] <= inputs["pCO2_Pipe_Max_Cap"][p] * vCO2NPipe[p]/ModelScalingFactor)
+        @constraint(EP, cMinCO2PipeLevel_Trunk[p in 1:Trunk_CO2_P, t=1:T], vCO2PipeLevel_Trunk[p,t] >= inputs["Trunk_pCO2_Pipe_Min_Cap"][p] * vCO2NPipe_Trunk[p]/ModelScalingFactor)
+        @constraint(EP, cMaxCO2PipeLevel_Trunk[p in 1:Trunk_CO2_P, t=1:T], vCO2PipeLevel_Trunk[p,t] <= inputs["Trunk_pCO2_Pipe_Max_Cap"][p] * vCO2NPipe_Trunk[p]/ModelScalingFactor)
+        
+        ## For Spur Pipelines ##
+
+        @constraint(EP, cMinCO2Pipeflow_Spur[p in 1:Spur_CO2_P, t=1:T], EP[:eCO2PipeOutFlow_Spur][p,t] >= 0)
+        @constraint(EP, cMaxCO2Pipeflow_Spur[p in 1:Spur_CO2_P, t=1:T], EP[:eCO2PipeOutFlow_Spur][p,t] <= EP[:vCO2NPipe_Spur][p] * inputs["Spur_pCO2_Pipe_Max_Flow"][p]/ModelScalingFactor)
+        @constraint(EP, cMaxCO2Outflow_Spur[p in 1:Spur_CO2_P, t = 1:T], vCO2NPipe_Spur[p] * inputs["Spur_pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_spur_uni_neg[p,t]/ModelScalingFactor)
+    
+        #Pipe level constraint
+        @constraint(EP, cMinCO2PipeLevel_Spur[p in 1:Spur_CO2_P, t=1:T], vCO2PipeLevel_Spur[p,t] >= inputs["Spur_pCO2_Pipe_Min_Cap"][p] * vCO2NPipe_Spur[p]/ModelScalingFactor)
+        @constraint(EP, cMaxCO2PipeLevel_Spur[p in 1:Spur_CO2_P, t=1:T], vCO2PipeLevel_Spur[p,t] <= inputs["Spur_pCO2_Pipe_Max_Cap"][p] * vCO2NPipe_Spur[p]/ModelScalingFactor)
+    
     else
         #Pipe flow constraint
-        @constraint(EP, cMinCO2Pipeflow[d in [-1,1], p in 1:CO2_P, t=1:T], EP[:eCO2PipeFlow_net][p,t,d] >= -EP[:vCO2NPipe][p] * inputs["pCO2_Pipe_Max_Flow"][p])
-        @constraint(EP, cMaxCO2Pipeflow[d in [-1,1], p in 1:CO2_P, t=1:T], EP[:eCO2PipeFlow_net][p,t,d] <= EP[:vCO2NPipe][p] * inputs["pCO2_Pipe_Max_Flow"][p])
+        @constraint(EP, cMinCO2Pipeflow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], EP[:eCO2PipeFlow_Trunk_net][p,t,d] >= -EP[:vCO2NPipe_Trunk][p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p])
+        @constraint(EP, cMaxCO2Pipeflow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], EP[:eCO2PipeFlow_Trunk_net][p,t,d] <= EP[:vCO2NPipe_Trunk][p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p])
         
         #Constrain positive and negative pipe flows
-        @constraint(EP, cMaxPositiveCO2Flow[d in [-1,1], p in 1:CO2_P, t=1:T], vCO2NPipe[p] * inputs["pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_pos[p,t,d])
-        @constraint(EP, cMaxNegativeCO2Flow[d in [-1,1], p in 1:CO2_P, t=1:T], vCO2NPipe[p] * inputs["pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_neg[p,t,d])
+        @constraint(EP, cMaxPositiveCO2Flow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], vCO2NPipe_Trunk[p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_trunk_pos[p,t,d])
+        @constraint(EP, cMaxNegativeCO2Flow_Trunk[d in [-1,1], p in 1:Trunk_CO2_P, t=1:T], vCO2NPipe_Trunk[p] * inputs["Trunk_pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_trunk_neg[p,t,d])
 
         #Pipe level constraint
-        @constraint(EP, cMinCO2PipeLevel[p in 1:CO2_P, t=1:T], vCO2PipeLevel[p,t] >= inputs["pCO2_Pipe_Min_Cap"][p] * vCO2NPipe[p])
-        @constraint(EP, cMaxCO2PipeLevel[p in 1:CO2_P, t=1:T], vCO2PipeLevel[p,t] <= inputs["pCO2_Pipe_Max_Cap"][p] * vCO2NPipe[p])
+        @constraint(EP, cMinCO2PipeLevel_Trunk[p in 1:Trunk_CO2_P, t=1:T], vCO2PipeLevel_Trunk[p,t] >= inputs["Trunk_pCO2_Pipe_Min_Cap"][p] * vCO2NPipe_Trunk[p])
+        @constraint(EP, cMaxCO2PipeLevel_Trunk[p in 1:Trunk_CO2_P, t=1:T], vCO2PipeLevel_Trunk[p,t] <= inputs["Trunk_pCO2_Pipe_Max_Cap"][p] * vCO2NPipe_Trunk[p])
+
+        ## For Spur Pipelines ##
+
+        @constraint(EP, cMinCO2Pipeflow_Spur[p in 1:Spur_CO2_P, t=1:T], EP[:eCO2PipeOutFlow_Spur][p,t] >= 0)
+        @constraint(EP, cMaxCO2Pipeflow_Spur[p in 1:Spur_CO2_P, t=1:T], EP[:eCO2PipeOutFlow_Spur][p,t] <= EP[:vCO2NPipe_Spur][p] * inputs["Spur_pCO2_Pipe_Max_Flow"][p])
+        @constraint(EP, cMaxCO2Outflow_Spur[p in 1:Spur_CO2_P, t = 1:T], vCO2NPipe_Spur[p] * inputs["Spur_pCO2_Pipe_Max_Flow"][p] >= vCO2PipeFlow_spur_uni_neg[p,t])
+    
+        #Pipe level constraint
+        @constraint(EP, cMinCO2PipeLevel_Spur[p in 1:Spur_CO2_P, t=1:T], vCO2PipeLevel_Spur[p,t] >= inputs["Spur_pCO2_Pipe_Min_Cap"][p] * vCO2NPipe_Spur[p])
+        @constraint(EP, cMaxCO2PipeLevel_Spur[p in 1:Spur_CO2_P, t=1:T], vCO2PipeLevel_Spur[p,t] <= inputs["Spur_pCO2_Pipe_Max_Cap"][p] * vCO2NPipe_Spur[p])        
+
     end
 
     #CO2 Balance in pipe
-    @constraint(EP, cCO2PipeBalanceStart[p in 1:CO2_P, t in START_SUBPERIODS], vCO2PipeLevel[p,t] == vCO2PipeLevel[p,t + hours_per_subperiod - 1] - eCO2PipeFlow_net[p,t, -1] - eCO2PipeFlow_net[p,t,1])
 
-    @constraint(EP, cCO2PipeBalanceInterior[p in 1:CO2_P, t in INTERIOR_SUBPERIODS], vCO2PipeLevel[p,t] == vCO2PipeLevel[p,t - 1] - eCO2PipeFlow_net[p,t, -1] - eCO2PipeFlow_net[p,t,1])
+    # Trunk Pipelines
+    @constraint(EP, cCO2PipeBalanceStart_Trunk[p in 1:Trunk_CO2_P, t in START_SUBPERIODS], vCO2PipeLevel_Trunk[p,t] == vCO2PipeLevel_Trunk[p,t + hours_per_subperiod - 1] - eCO2PipeFlow_Trunk_net[p,t, -1] - eCO2PipeFlow_Trunk_net[p,t,1])
 
-    @constraint(EP, cCO2PipesMaxNumber[p in 1:CO2_P], vCO2NPipe[p] <= inputs["pCO2_Pipe_No_Max"][p])
+    @constraint(EP, cCO2PipeBalanceInterior_Trunk[p in 1:Trunk_CO2_P, t in INTERIOR_SUBPERIODS], vCO2PipeLevel_Trunk[p,t] == vCO2PipeLevel_Trunk[p,t - 1] - eCO2PipeFlow_Trunk_net[p,t, -1] - eCO2PipeFlow_Trunk_net[p,t,1])
+
+    @constraint(EP, cCO2PipesMaxNumber_Trunk[p in 1:Trunk_CO2_P], vCO2NPipe_Trunk[p] <= inputs["Trunk_pCO2_Pipe_No_Max"][p])
+
+    ## DEV NOTE: Line Packing is ignored for Spur Pipelines as it is assumed that its a delivery network ## 
+    ## and CO2 would rather be stored in the final site ##
+
+    # Spur Pipelines
+    @constraint(EP, cCO2PipesMaxNumber_Spur[p in 1:Spur_CO2_P], vCO2NPipe_Spur[p] <= inputs["Spur_pCO2_Pipe_No_Max"][p])
+
+    ## Constraint related to CO2 Inflow (from Spur Pipelines) == CO2 Stored ## 
+    EP[:eCO2Store_Flow_Balance] += ePipeZoneCO2Demand_Inflow_Spur 
 
 	return EP
 end

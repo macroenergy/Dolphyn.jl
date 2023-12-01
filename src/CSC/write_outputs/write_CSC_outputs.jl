@@ -62,8 +62,10 @@ function write_CSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
   write_co2_total_injection(path, sep, inputs, setup, EP)
 
   if setup["ModelCO2Pipelines"] ==1 
-    write_co2_pipeline_flow(path, sep, inputs, setup, EP)
-    write_co2_pipeline_expansion(path, sep, inputs, setup, EP)
+    write_co2_trunk_pipeline_flow(path, sep, inputs, setup, EP)
+    write_co2_spur_pipeline_flow(path, sep, inputs, setup, EP)
+    write_co2_trunk_pipeline_expansion(path, sep, inputs, setup, EP)
+    write_co2_spur_pipeline_expansion(path, sep, inputs, setup, EP)
   end
     
   ## Print confirmation

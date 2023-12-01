@@ -27,7 +27,7 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 	
-	dfCost = DataFrame(Costs = ["cTotal", "cDACFix", "cDACVar", "cCO2Comp", "cCO2Stor", "cCO2Injection", "cCO2NetworkExp"])
+	dfCost = DataFrame(Costs = ["cTotal", "cDACFix", "cDACVar", "cCO2Comp", "cCO2Stor", "cCO2Injection", "cCO2NetworkExp_Trunk", "cCO2NetworkExp_Spur"])
 	if setup["ParameterScale"] == 1
 		cDACVar = value(EP[:eVar_OM_DAC]) * ModelScalingFactor^2
 		cDACFix = value(EP[:eFixed_Cost_DAC_total]) * ModelScalingFactor^2
@@ -36,9 +36,11 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total]) * ModelScalingFactor^2
 		
 		if setup["ModelCO2Pipelines"] != 0
-			cCO2NetworkExpansion = value(EP[:eCCO2Pipe]) * ModelScalingFactor^2
+			cCO2NetworkExp_Trunk = value(EP[:eCCO2Pipe_Trunk]) * ModelScalingFactor^2
+			cCO2NetworkExp_Spur = value(EP[:eCCO2Pipe_Spur]) * ModelScalingFactor^2
 		else
-			cCO2NetworkExpansion = 0
+			cCO2NetworkExp_Trunk = 0
+			cCO2NetworkExp_Spur = 0
 		end
 
 	else
@@ -48,17 +50,19 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total])
 		cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total])
 		if setup["ModelCO2Pipelines"] != 0
-			cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
+			cCO2NetworkExp_Trunk = value(EP[:eCCO2Pipe_Trunk])
+			cCO2NetworkExp_Spur = value(EP[:eCCO2Pipe_Spur])
 		else
-			cCO2NetworkExpansion = 0
+			cCO2NetworkExp_Trunk = 0
+			cCO2NetworkExp_Spur = 0
 		end
 	end
 
 	# Define total costs
-	cTotal = cDACFix + cDACVar + cCO2Comp + cCO2Stor + cCO2Injection + cCO2NetworkExpansion
+	cTotal = cDACFix + cDACVar + cCO2Comp + cCO2Stor + cCO2Injection + cCO2NetworkExp_Trunk + cCO2NetworkExp_Spur
 
 	# Define total column, i.e. column 2
-	dfCost[!,Symbol("Total")] = [cTotal, cDACFix, cDACVar, cCO2Comp, cCO2Stor, cCO2Injection, cCO2NetworkExpansion]
+	dfCost[!,Symbol("Total")] = [cTotal, cDACFix, cDACVar, cCO2Comp, cCO2Stor, cCO2Injection, cCO2NetworkExp_Trunk, cCO2NetworkExp_Spur]
 
 	# Computing zonal cost breakdown by cost category
 	for z in 1:Z
@@ -68,6 +72,7 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 		tempCCO2Comp = 0
 		tempCCO2Stor = 0
 		tempCCO2Injection = 0
+
 		
 		for y in dfDAC[dfDAC[!,:Zone].==z,:][!,:R_ID]
 
@@ -102,7 +107,7 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 			tempCCO2Injection = tempCCO2Injection * (ModelScalingFactor^2)
 		end
 
-		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCDACFix, tempCDACVar, tempCCO2Comp, tempCCO2Stor, tempCCO2Injection, "-"]
+		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCDACFix, tempCDACVar, tempCCO2Comp, tempCCO2Stor, tempCCO2Injection, "-", "-"]
 	end
 
 	CSV.write(string(path,sep,"CSC_costs.csv"), dfCost)

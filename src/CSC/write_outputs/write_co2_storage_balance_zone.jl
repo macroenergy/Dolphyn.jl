@@ -51,7 +51,7 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 	end
 
 	if setup["ModelCO2Pipelines"] == 1
-		CO2_Pipeline_Import = sum(sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand])[:,z])) for z in 1:Z)
+		CO2_Pipeline_Import = sum(sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand_Inflow_Spur])[:,z])) for z in 1:Z)
 	else
 		CO2_Pipeline_Import = 0
 	end
@@ -109,7 +109,7 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 		end
 
 		if setup["ModelCO2Pipelines"] == 1
-			tempCO2_Pipeline_Import = tempCO2_Pipeline_Import + sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand])[:,z]))
+			tempCO2_Pipeline_Import = tempCO2_Pipeline_Import + sum(inputs["omega"].* (value.(EP[:ePipeZoneCO2Demand_Inflow_Spur])[:,z]))
 		end
 
 		tempCO2_Storage = tempCO2_Storage - sum(inputs["omega"].* (value.(EP[:eCO2_Injected_per_zone])[z,:]))
