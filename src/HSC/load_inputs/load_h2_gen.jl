@@ -129,7 +129,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     #     # NOTE: When Setup[ParameterScale] =1, fuel costs and emissions are scaled in fuels_data.csv, so no if condition needed to scale C_Fuel_per_MWh
     #     # IF ParameterScale = 1, then CO2 emissions intensity Units ktonne/tonne
     #     # If ParameterScale = 0 , then CO2 emission intensity units is tonne/tonne
-    #     inputs_gen["dfH2Gen"][!,:CO2_per_tonne][g] =inputs_gen["fuel_CO2"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]))
+    #     inputs_gen["dfH2Gen"][!,:CO2_per_tonne][g] =inputs_gen["fuel_CO2"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_MWh][k]))
 
     # end
 
