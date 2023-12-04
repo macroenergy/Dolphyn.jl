@@ -70,7 +70,6 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
                 sum(inputs["dfMaxCO2"][z,cap] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
             )
 
-
         elseif setup["CO2Cap"] == 2
             if setup["ParameterScale"] ==1
                 @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],

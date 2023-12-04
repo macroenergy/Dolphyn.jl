@@ -109,7 +109,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
             if k in H2_COMMIT
                 dfH2Gen[!, :Existing_Cap_MWh][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
+                dfH2Gen[!, :Cap_Size_MWh][k] *
                 (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
             else
                 dfH2Gen[!, :Existing_Cap_MWh][k] + EP[:vH2GenNewCap][k] -
@@ -118,14 +118,14 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
             if k in H2_COMMIT
                 dfH2Gen[!, :Existing_Cap_MWh][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
+                dfH2Gen[!, :Cap_Size_MWh][k] * EP[:vH2GenNewCap][k]
             else
                 dfH2Gen[!, :Existing_Cap_MWh][k] + EP[:vH2GenNewCap][k]
             end
         elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
             if k in H2_COMMIT
                 dfH2Gen[!, :Existing_Cap_MWh][k] -
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
+                dfH2Gen[!, :Cap_Size_MWh][k] * EP[:vH2GenRetCap][k]
             else
                 dfH2Gen[!, :Existing_Cap_MWh][k] - EP[:vH2GenRetCap][k]
             end
@@ -149,19 +149,19 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
                 if k in H2_COMMIT
                     1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                        dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
+                        dfH2Gen[!, :Inv_Cost_p_MWh_yr][k] *
+                        dfH2Gen[!, :Cap_Size_MWh][k] *
                         EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                        dfH2Gen[!, :Fixed_OM_Cost_p_MWh_yr][k] * eH2GenTotalCap[k]
                     )
                 else
                     1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                        dfH2Gen[!, :Inv_Cost_p_MWh_yr][k] * EP[:vH2GenNewCap][k] +
+                        dfH2Gen[!, :Fixed_OM_Cost_p_MWh_yr][k] * eH2GenTotalCap[k]
                     )
                 end
             else
-                (dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]) /
+                (dfH2Gen[!, :Fixed_OM_Cost_p_MWh_yr][k] * eH2GenTotalCap[k]) /
                 ModelScalingFactor^2
             end
         )
@@ -173,16 +173,16 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             eH2GenCFix[k in 1:H],
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
                 if k in H2_COMMIT
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                    dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
+                    dfH2Gen[!, :Inv_Cost_p_MWh_yr][k] *
+                    dfH2Gen[!, :Cap_Size_MWh][k] *
                     EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                    dfH2Gen[!, :Fixed_OM_Cost_p_MWh_yr][k] * eH2GenTotalCap[k]
                 else
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                    dfH2Gen[!, :Inv_Cost_p_MWh_yr][k] * EP[:vH2GenNewCap][k] +
+                    dfH2Gen[!, :Fixed_OM_Cost_p_MWh_yr][k] * eH2GenTotalCap[k]
                 end
             else
-                dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                dfH2Gen[!, :Fixed_OM_Cost_p_MWh_yr][k] * eH2GenTotalCap[k]
             end
         )
     end

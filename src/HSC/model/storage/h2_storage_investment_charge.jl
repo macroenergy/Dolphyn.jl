@@ -104,13 +104,13 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
             eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_STOR_CHARGE # Resources eligible for new charge capacity
                 1 / ModelScalingFactor^2 * (
-                    dfH2Gen[!, :Inv_Cost_Charge_p_tonne_p_hr_yr][y] * vH2CAPCHARGE[y] +
-                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] *
+                    dfH2Gen[!, :Inv_Cost_Charge_p_MWh_yr][y] * vH2CAPCHARGE[y] +
+                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] *
                     eTotalH2CapCharge[y]
                 )
             else
                 1 / ModelScalingFactor^2 * (
-                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] *
+                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] *
                     eTotalH2CapCharge[y]
                 )
             end
@@ -120,10 +120,10 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
             EP,
             eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_STOR_CHARGE # Resources eligible for new charge capacity
-                dfH2Gen[!, :Inv_Cost_Charge_p_tonne_p_hr_yr][y] * vH2CAPCHARGE[y] +
-                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] * eTotalH2CapCharge[y]
+                dfH2Gen[!, :Inv_Cost_Charge_p_MWh_yr][y] * vH2CAPCHARGE[y] +
+                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] * eTotalH2CapCharge[y]
             else
-                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y] * eTotalH2CapCharge[y]
+                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] * eTotalH2CapCharge[y]
             end
         )
     end

@@ -106,13 +106,13 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     # Total available energy capacity in tonnes
     @expression(EP, eTotalH2CapEnergy[y in H2_STOR_ALL],
     if (y in intersect(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
-        dfH2Gen[!,:Existing_Energy_Cap_tonne][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]
+        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]
     elseif (y in setdiff(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
-        dfH2Gen[!,:Existing_Energy_Cap_tonne][y] + EP[:vH2CAPENERGY][y]
+        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] + EP[:vH2CAPENERGY][y]
     elseif (y in setdiff(RET_CAP_H2_ENERGY, NEW_CAP_H2_ENERGY))
-        dfH2Gen[!,:Existing_Energy_Cap_tonne][y] - EP[:vH2RETCAPENERGY][y]
+        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] - EP[:vH2RETCAPENERGY][y]
     else
-        dfH2Gen[!,:Existing_Energy_Cap_tonne][y] 
+        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] 
     end
 )
 
@@ -127,18 +127,18 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
         @expression(EP, eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_CHARGE # Resources eligible for new charge capacity
-                1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_Charge_p_tonne_p_hr_yr][y]*vH2CAPCHARGE[y] + dfH2Gen[!,:Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y]*eTotalH2CapCharge[y])
+                1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_Charge_p_MWh_yr][y]*vH2CAPCHARGE[y] + dfH2Gen[!,:Fixed_OM_Cost_Charge_p_MWh_yr][y]*eTotalH2CapCharge[y])
             else
-                1/ModelScalingFactor^2*(dfH2Gen[!,:Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y]*eTotalH2CapCharge[y])
+                1/ModelScalingFactor^2*(dfH2Gen[!,:Fixed_OM_Cost_Charge_p_MWh_yr][y]*eTotalH2CapCharge[y])
             end
         )
 
     else
         @expression(EP, eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_CHARGE # Resources eligible for new charge capacity
-                dfH2Gen[!,:Inv_Cost_Charge_p_tonne_p_hr_yr][y]*vH2CAPCHARGE[y] + dfH2Gen[!,:Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y]*eTotalH2CapCharge[y]
+                dfH2Gen[!,:Inv_Cost_Charge_p_MWh_yr][y]*vH2CAPCHARGE[y] + dfH2Gen[!,:Fixed_OM_Cost_Charge_p_MWh_yr][y]*eTotalH2CapCharge[y]
             else
-                dfH2Gen[!,:Fixed_OM_Cost_Charge_p_tonne_p_hr_yr][y]*eTotalH2CapCharge[y]
+                dfH2Gen[!,:Fixed_OM_Cost_Charge_p_MWh_yr][y]*eTotalH2CapCharge[y]
             end
         )
     end
@@ -157,17 +157,17 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     if setup["ParameterScale"]==1
         @expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
         if y in NEW_CAP_H2_ENERGY # Resources eligible for new capacity
-            1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_Energy_p_tonne_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y])
+            1/ModelScalingFactor^2*(dfH2Gen[!,:Inv_Cost_Energy_p_MWh_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_MWh_yr][y]*eTotalH2CapEnergy[y])
         else
-            1/ModelScalingFactor^2*(dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y])
+            1/ModelScalingFactor^2*(dfH2Gen[!,:Fixed_OM_Cost_Energy_p_MWh_yr][y]*eTotalH2CapEnergy[y])
         end
         )
     else
         @expression(EP, eCFixH2Energy[y in H2_STOR_ALL],
         if y in NEW_CAP_H2_ENERGY # Resources eligible for new capacity
-            dfH2Gen[!,:Inv_Cost_Energy_p_tonne_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y]
+            dfH2Gen[!,:Inv_Cost_Energy_p_MWh_yr][y]*vH2CAPENERGY[y] + dfH2Gen[!,:Fixed_OM_Cost_Energy_p_MWh_yr][y]*eTotalH2CapEnergy[y]
         else
-            dfH2Gen[!,:Fixed_OM_Cost_Energy_p_tonne_yr][y]*eTotalH2CapEnergy[y]
+            dfH2Gen[!,:Fixed_OM_Cost_Energy_p_MWh_yr][y]*eTotalH2CapEnergy[y]
         end
         )
     end
@@ -198,16 +198,16 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
         
     # Cannot retire more energy capacity than existing energy capacity
-    @constraint(EP, cMaxRetH2Energy[y in RET_CAP_H2_ENERGY], vH2RETCAPENERGY[y] <= dfH2Gen[!,:Existing_Energy_Cap_tonne][y])
+    @constraint(EP, cMaxRetH2Energy[y in RET_CAP_H2_ENERGY], vH2RETCAPENERGY[y] <= dfH2Gen[!,:Existing_Energy_Cap_MWh][y])
 
     ## Constraints on new built energy capacity
     # Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
     # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
-    @constraint(EP, cMaxCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Max_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] <= dfH2Gen[!,:Max_Energy_Cap_tonne][y])
+    @constraint(EP, cMaxCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Max_Energy_Cap_MWh.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] <= dfH2Gen[!,:Max_Energy_Cap_MWh][y])
 
     # Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
     # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
-    @constraint(EP, cMinCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Min_Energy_Cap_tonne.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] >= dfH2Gen[!,:Min_Energy_Cap_tonne][y])
+    @constraint(EP, cMinCapH2Energy[y in intersect(dfH2Gen[dfH2Gen.Min_Energy_Cap_MWh.>0,:R_ID], H2_STOR_ALL)], eTotalH2CapEnergy[y] >= dfH2Gen[!,:Min_Energy_Cap_MWh][y])
 
     return EP
 end
