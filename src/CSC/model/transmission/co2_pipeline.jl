@@ -56,9 +56,8 @@ The flow rate of CO2 through pipeline type $i$ is capped by the operational limi
 The pipeline has storage capacity via line packing:
 ```math
 \begin{equation*}
-    \overline{\textrm{U}}_{i}^{\textrm{\textrm{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \geq -\sum_{\tau=t_{0}}^{t}\left(x_{i,z^{\prime} \rightarrow z, \tau}^{\textrm{\textrm{C,PIP}}}+x_{i,z \rightarrow z^{\prime}, \tau}^{\textrm{\textrm{C,PIP}}}\right) \Delta t \geq \underline{\textrm{R}}_{i}^{\textrm{\textrm{C,PIP}}} \overline{\textrm{E}}_{i}^{\textrm{\textrm{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \\
-    & \forall z^{\prime} \in \mathbb{Z}, z \in \mathbb{Z}, i \in \mathbb{I}, t \in \mathbb{T}
-\end{equation*}   
+    \overline{\textrm{U}}_{i}^{\textrm{\text{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \geq -\sum_{\tau=t_{0}}^{t}\left(x_{i,z^{\prime}\rightarrow z, \tau}^{\textrm{\textrm{C,PIP}}}+x_{i,z \rightarrow z^{\prime} \tau}^{\textrm{\textrm{C,PIP}}}\right)\Delta t \geq\underline{\textrm{R}}_{i}^{\textrm{\textrm{C,PIP}}}\overline{\textrm{E}}_{i}^{\textrm{\textrm{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \forall z^{\prime} \in Z, z \in Z, i \in I, t \in T
+\end{equation*}  
 ```
 
 The change of CO2 pipeline storage inventory is modeled as follows:

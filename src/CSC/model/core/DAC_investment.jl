@@ -21,7 +21,7 @@ Sets up constraints common to all DAC resources.
 
 This function defines the expressions and constraints keeping track of total available DAC CO2 capture capacity $y_{d}^{\textrm{C,DAC}}$ as well as constraints on capacity.
 
-The expression defined in this file named after ```vCapacity\textunderscore DAC\textunderscore per\textunderscore type``` covers all variables $y_{d}^{\textrm{C,DAC}}$.
+The expression defined in this file named after ```vCapacity\textunderscore{DAC}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{d}^{\textrm{C,DAC}}$.
 
 The total capacity of each DAC resource is defined as the sum of newly invested capacity based on the assumption there are no existing DAC resources. 
 

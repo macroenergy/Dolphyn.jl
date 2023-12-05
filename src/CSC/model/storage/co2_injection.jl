@@ -19,11 +19,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $s$ in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Injected$``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
+The variable defined in this file named after ```vDAC\textunderscore{CO2}\textunderscore{Injected}``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
 
 This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Injection``` cover variable $x_{z,t}^{E,INJ}$.
+The variable defined in this file named after ```vPower\textunderscore{CO2}\textunderscore{Injection}``` cover variable $x_{z,t}^{E,INJ}$.
 
 **Cost expressions**
 

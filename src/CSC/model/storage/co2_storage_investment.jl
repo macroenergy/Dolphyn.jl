@@ -23,7 +23,7 @@ Sets up constraints common to all CO2 storage resources.
 
 This function defines the expressions and constraints keeping track of total available CO2 storage capacity $y_{s}^{\textrm{C,STO}}$ (per year) as well as constraints on capacity.
 
-The expression defined in this file named after ```vCapacity\textunderscore CO2\textunderscore Storage\textunderscore per\textunderscore type``` covers all variables $y_{s}^{\textrm{C,STO}}$.
+The expression defined in this file named after ```vCapacity\textunderscore{CO2}\textunderscore{Storage}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{s}^{\textrm{C,STO}}$.
 
 The total capacity (per year) of each CO2 storage resource is defined as the sum of newly invested capacity (per year) based on the assumption there are no existing CO2 storage resources. 
 

@@ -21,11 +21,11 @@ The CO2 compression module creates decision variables, expressions, and constrai
 
 This module defines the CO2 compression decision variable $x_{k,z,t}^{\textrm{C,COMP}} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 compressed by resource $k$ in zone $z$ at time period $t$ after being captured by DAC.
 
-The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Capture\textunderscore Compressed$``` covers all variables $x_{k,z,t}^{\textrm{C,COMP}}$.
+The variable defined in this file named after ```vDAC\textunderscore{CO2}\textunderscore{Capture}\textunderscore{Compressed}$``` covers all variables $x_{k,z,t}^{\textrm{C,COMP}}$.
 
 This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,COMP}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 compression in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Capture\textunderscore Compressed``` cover variable $x_{z,t}^{E,COMP}$.
+The variable defined in this file named after ```vPower\textunderscore{CO2}\textunderscore{Capture}\textunderscore{Compressed}``` cover variable $x_{z,t}^{E,COMP}$.
 
 **Minimum and maximum CO2 compression output**
 
