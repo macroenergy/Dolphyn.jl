@@ -29,14 +29,14 @@ function load_settings(settings_path::AbstractString)
     if isfile(csc_settings)
         mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
     else
-        mysetup_hsc = = Dict()
+        mysetup_hsc = Dict()
     end
 
     csc_settings_path = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
     if isfile(csc_settings_path)
         mysetup_csc = YAML.load(open(csc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
     else
-        mysetup_csc = = Dict()
+        mysetup_csc = Dict()
     end 
 
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
