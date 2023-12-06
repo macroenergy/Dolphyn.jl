@@ -25,45 +25,48 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	H = inputs["H2_RES_ALL"]
 
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-        new_cap_and_commit = intersect(inputs["H2_GEN_NEW_CAP"], H2_GEN_COMMIT)
-        new_cap_not_commit = setdiff(inputs["H2_GEN_NEW_CAP"], H2_GEN_COMMIT)
-        if !isempty(new_cap_and_commit)
-             capdischarge[new_cap_and_commit] .= value.(EP[:vH2GenNewCap][new_cap_and_commit]).data .* dfH2Gen[new_cap_and_commit,:Cap_Size_tonne_p_hr]
-        end
-        if !isempty(new_cap_not_commit)
-             capdischarge[new_cap_not_commit] .= value.(EP[:vH2GenNewCap][new_cap_not_commit]).data
-        end
+    new_cap_and_commit = intersect(inputs["H2_GEN_NEW_CAP"], H2_GEN_COMMIT)
+    new_cap_not_commit = setdiff(inputs["H2_GEN_NEW_CAP"], H2_GEN_COMMIT)
+    if !isempty(new_cap_and_commit)
+        capdischarge[new_cap_and_commit] .= value.(EP[:vH2GenNewCap][new_cap_and_commit]).data .* dfH2Gen[new_cap_and_commit,:Cap_Size_tonne_p_hr]
+    end
+    
+	if !isempty(new_cap_not_commit)
+        capdischarge[new_cap_not_commit] .= value.(EP[:vH2GenNewCap][new_cap_not_commit]).data
+    end
 
 	retcapdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-        ret_cap_and_commit = intersect(inputs["H2_GEN_RET_CAP"], H2_GEN_COMMIT)
-        ret_cap_not_commit = setdiff(inputs["H2_GEN_RET_CAP"], H2_GEN_COMMIT)
-        if !isempty(ret_cap_and_commit)
-             retcapdischarge[ret_cap_and_commit] .= value.(EP[:vH2GenRetCap][ret_cap_and_commit]).data .* dfH2Gen[ret_cap_and_commit,:Cap_Size_tonne_p_hr]
-        end
-        if !isempty(ret_cap_not_commit)
-             retcapdischarge[ret_cap_not_commit] .= value.(EP[:vH2GenRetCap][ret_cap_not_commit]).data
+    ret_cap_and_commit = intersect(inputs["H2_GEN_RET_CAP"], H2_GEN_COMMIT)
+    ret_cap_not_commit = setdiff(inputs["H2_GEN_RET_CAP"], H2_GEN_COMMIT)
+    if !isempty(ret_cap_and_commit)
+        retcapdischarge[ret_cap_and_commit] .= value.(EP[:vH2GenRetCap][ret_cap_and_commit]).data .* dfH2Gen[ret_cap_and_commit,:Cap_Size_tonne_p_hr]
+    end
+    
+	if !isempty(ret_cap_not_commit)
+        retcapdischarge[ret_cap_not_commit] .= value.(EP[:vH2GenRetCap][ret_cap_not_commit]).data
 	end
 
 	capcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	retcapcharge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-        stor_new_cap_charge = intersect(inputs["H2_STOR_ALL"], inputs["NEW_CAP_H2_STOR_CHARGE"])
-        stor_ret_cap = intersect(inputs["H2_STOR_ALL"], inputs["RET_CAP_H2_STOR_CHARGE"])
-        if !isempty(stor_new_cap_charge)
-             capcharge[stor_new_cap_charge] .= value.(EP[:vH2CAPCHARGE][stor_new_cap_charge]).data
-        end
-        if !isempty(stor_ret_cap)
-             retcapcharge[stor_ret_cap] .= value.(EP[:vH2RETCAPCHARGE][stor_ret_cap]).data
+    stor_new_cap_charge = intersect(inputs["H2_STOR_ALL"], inputs["NEW_CAP_H2_STOR_CHARGE"])
+    stor_ret_cap = intersect(inputs["H2_STOR_ALL"], inputs["RET_CAP_H2_STOR_CHARGE"])
+    if !isempty(stor_new_cap_charge)
+        capcharge[stor_new_cap_charge] .= value.(EP[:vH2CAPCHARGE][stor_new_cap_charge]).data
+    end
+    
+	if !isempty(stor_ret_cap)
+        retcapcharge[stor_ret_cap] .= value.(EP[:vH2RETCAPCHARGE][stor_ret_cap]).data
 	end
 
 	capenergy = zeros(size(inputs["H2_RESOURCES_NAME"]))
 	retcapenergy = zeros(size(inputs["H2_RESOURCES_NAME"]))
-        stor_new_cap_energy = intersect(inputs["H2_STOR_ALL"], inputs["NEW_CAP_H2_ENERGY"])
-        stor_ret_cap_energy = intersect(inputs["H2_STOR_ALL"], inputs["RET_CAP_H2_ENERGY"])
-        if !isempty(stor_new_cap_energy)
-             capenergy[stor_new_cap_energy] = value.(EP[:vH2CAPENERGY][stor_new_cap_energy]).data
-        end
-        if !isempty(stor_ret_cap_energy)
-             retcapenergy[stor_ret_cap_energy] = value.(EP[:vH2RETCAPENERGY][stor_ret_cap_energy]).data
+    stor_new_cap_energy = intersect(inputs["H2_STOR_ALL"], inputs["NEW_CAP_H2_ENERGY"])
+    stor_ret_cap_energy = intersect(inputs["H2_STOR_ALL"], inputs["RET_CAP_H2_ENERGY"])
+    if !isempty(stor_new_cap_energy)
+        capenergy[stor_new_cap_energy] = value.(EP[:vH2CAPENERGY][stor_new_cap_energy]).data
+    end
+    if !isempty(stor_ret_cap_energy)
+        retcapenergy[stor_ret_cap_energy] = value.(EP[:vH2RETCAPENERGY][stor_ret_cap_energy]).data
 	end
 
 	MaxGen = AnnualGen = CapFactor = zeros(size(inputs["H2_RESOURCES_NAME"]))
@@ -131,15 +134,38 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 			newcap_BioH2[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i]
 		end
 
-		startcap_BioH2 = retcap_BioH2 = startenergycap_BioH2 = retenergycap_BioH2 = newenergycap_BioH2 = endenergycap_BioH2 = startchargecap_BioH2 = retchargecap_BioH2 = newchargecap_BioH2 = endchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+		startcap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 
-		AnnualGen_BioH2 = MaxGen_BioH2 = CapFactor_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
+		retcap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		startenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		retenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		newenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		endenergycap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		startchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		retchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		newchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		endchargecap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+
+		AnnualGen_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
 		for i in 1:B
-		biohydrogen_produced = value.(EP[:eBiohydrogen_produced_per_plant_per_time])
-		AnnualGen_BioH2 = biohydrogen_produced * inputs["omega"]
+			AnnualGen_BioH2[i] = sum(inputs["omega"].* (value.(EP[:eBiohydrogen_produced_per_plant_per_time])[i,:]))
+		end
 	
+		MaxGen_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
 		for i in 1:B
 			MaxGen_BioH2[i] = value.(EP[:vCapacity_BIO_per_type])[i] * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i] * 8760
+		end
+
+		CapFactor_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
+		for i in 1:B
 			if MaxGen_BioH2[i] == 0
 				CapFactor_BioH2[i] = 0
 			else
@@ -147,7 +173,10 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 			end
 		end
 
-		AnnualCO2Emissions_BioH2 = zeros(Int32, size(1:inputs["BIO_RES_ALL"]))#Already counted in power capacity page
+		AnnualCO2Emissions_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
+		for i in 1:B
+			AnnualCO2Emissions_BioH2[i] = 0 #Already counted in power capacity page
+		end
 	
 		dfBioH2_Cap = DataFrame(
 			Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone],
@@ -193,7 +222,6 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		dfCap_Total_w_BioH2 = vcat(dfCap, dfBioH2_Cap, total_w_BioH2)
 		CSV.write(string(path,sep,"HSC_generation_storage_capacity_w_BioH2.csv"), dfCap_Total_w_BioH2)
 	end
-
 
 	dfCap = vcat(dfCap, total)
 	CSV.write(string(path,sep,"HSC_generation_storage_capacity.csv"), dfCap)
