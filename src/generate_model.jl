@@ -142,24 +142,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@expression(EP, eCapResMarBalance[res=1:inputs["NCapacityReserveMargin"], t=1:T], 0)
 	end
 
-	# Energy Share Requirement
-	if setup["EnergyShareRequirement"] >= 1
-		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
-	end
-
-	if setup["MinCapReq"] == 1
-		@expression(EP, eMinCapRes[mincap = 1:inputs["NumberOfMinCapReqs"]], 0)
-	end
-
-	if setup["MaxCapReq"] == 1
-		@expression(EP, eMaxCapRes[maxcap = 1:inputs["NumberOfMaxCapReqs"]], 0)
-	end
-
-	# Energy Share Requirement
-	if setup["EnergyShareRequirement"] >= 1
-		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
-	end
-
 	if setup["MinCapReq"] == 1
 		@expression(EP, eMinCapRes[mincap = 1:inputs["NumberOfMinCapReqs"]], 0)
 	end
@@ -349,7 +331,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
     if (setup["CO2Cap"] < 4) & (setup["CO2Cap"] > 0)
-
         if setup["ModelH2"] ==0
             co2_cap!(EP, inputs, setup)
         elseif setup["ModelH2"]==1

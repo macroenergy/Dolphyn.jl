@@ -51,7 +51,8 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 			   "Liquid_Demand", #13
 			   "Evaporation",# 14 
 			   "Biohydrogen",#15 
-			   "Synfuel Consumption" # 16] 
+			   "Synfuel Consumption"] # 16] 
+
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			if !isempty(inputs["H2_GEN_COMMIT"])
