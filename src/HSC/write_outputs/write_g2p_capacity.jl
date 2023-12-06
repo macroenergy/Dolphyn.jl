@@ -25,35 +25,74 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 	H = inputs["H2_G2P_ALL"]
 
 	capdischarge = zeros(size(inputs["H2_G2P_NAME"]))
-        new_cap_and_commit = intersect(inputs["H2_G2P_NEW_CAP"], inputs["H2_G2P_COMMIT"])
-        new_cap_not_commit = setdiff(inputs["H2_G2P_NEW_CAP"], inputs["H2_G2P_COMMIT"])
-        if !isempty(new_cap_and_commit)
-             capdischarge[new_cap_and_commit] = value.(EP[:vH2G2PNewCap][new_cap_and_commit]).data .* dfH2G2P[new_cap_and_commit,:Cap_Size_MW]
-        end
-        if !isempty(new_cap_not_commit)
-             capdischarge[new_cap_not_commit] = value.(EP[:vH2G2PNewCap][new_cap_not_commit]).data
-        end	
+	for i in inputs["H2_G2P_NEW_CAP"]
+		if i in inputs["H2_G2P_COMMIT"]
+			capdischarge[i] = value(EP[:vH2G2PNewCap][i]) * dfH2G2P[!,:Cap_Size_MW][i]
+		else
+			capdischarge[i] = value(EP[:vH2G2PNewCap][i])
+		end
+	end
 
 	retcapdischarge = zeros(size(inputs["H2_G2P_NAME"]))
+	for i in inputs["H2_G2P_RET_CAP"]
+		if i in inputs["H2_G2P_COMMIT"]
+			retcapdischarge[i] = first(value.(EP[:vH2G2PRetCap][i])) * dfH2G2P[!,:Cap_Size_MW][i]
+		else
+			retcapdischarge[i] = first(value.(EP[:vH2G2PRetCap][i]))
+		end
+	end
 
-        ret_cap_and_commit = intersect(inputs["H2_G2P_RET_CAP"], inputs["H2_G2P_COMMIT"])
-        ret_cap_not_commit = setdiff(inputs["H2_G2P_RET_CAP"], inputs["H2_G2P_COMMIT"])
+	startenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		startenergycap[i] = 0
+	end
 
-        if !isempty(ret_cap_and_commit)
-                retcapdischarge[ret_cap_and_commit] = value.(EP[:vH2G2PRetCap][ret_cap_and_commit]).data .* dfH2G2P[ret_cap_and_commit,:Cap_Size_MW]
-        end
-        if !isempty(ret_cap_not_commit)
-                retcapdischarge[ret_cap_not_commit] = value.(EP[:vH2G2PRetCap][ret_cap_not_commit]).data
-        end
+	retenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		retenergycap[i] = 0
+	end
 
-	startenergycap = retenergycap = newenergycap = endenergycap = startchargecap = retchargecap = newchargecap = endchargecap = MaxGen = AnnualGen = CapFactor = zeros(Int32,size(1:inputs["H2_G2P_ALL"]))
+	newenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		newenergycap[i] = 0
+	end
 
-    	h2g2pTC = value.(EP[:eH2G2PTotalCap])
-	MaxGen = h2g2pTC * 8760
+	endenergycap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		endenergycap[i] = 0
+	end
 
-        pg2p = value.(EP[:vPG2P])
-	AnnualGen .= pg2p * inputs["omega"]
+	startchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		startchargecap[i] = 0
+	end
 
+	retchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		retchargecap[i] = 0
+	end
+
+	newchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		newchargecap[i] = 0
+	end
+
+	endchargecap = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		endchargecap[i] = 0
+	end
+
+	MaxGen = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		MaxGen[i] = value.(EP[:eH2G2PTotalCap])[i] * 8760
+	end
+
+	AnnualGen = zeros(size(1:inputs["H2_G2P_ALL"]))
+	for i in 1:H
+		AnnualGen[i] = sum(inputs["omega"].* (value.(EP[:vPG2P])[i,:]))
+	end
+
+	CapFactor = zeros(size(1:inputs["H2_G2P_ALL"]))
 	for i in 1:H
 		if MaxGen[i] == 0
 			CapFactor[i] = 0
@@ -97,6 +136,6 @@ function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::D
 		)
 
 	dfCap = vcat(dfCap, total)
-        CSV.write(joinpath(path, "HSC_g2p_capacity.csv"), dftranspose(dfCap, false), writeheader=false)
+	CSV.write(string(path,sep,"HSC_g2p_capacity.csv"), dfCap)
 	return dfCap
 end

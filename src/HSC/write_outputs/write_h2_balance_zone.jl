@@ -159,6 +159,6 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		dfCost[!,Symbol("Zone$z")] = [tempGreen_H2_Generation, tempBlue_H2_Generation, tempGrey_H2_Generation, tempBio_H2, tempStorage_Discharging, tempStorage_Charging, tempNonserved_Energy, tempH2_Pipeline_Import_Export, tempH2_Truck_Import_Export, tempTruck_Consumption, tempH2G2P, tempDemand, tempSynfuel_Consumption, tempCTotal]
 	end
 
-	CSV.write(string(path,sep,"HSC_balanace_zone.csv"), dfCost)
+	CSV.write(string(path,sep,"HSC_balance_zone.csv"), dfCost)
 
 end

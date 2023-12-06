@@ -29,7 +29,7 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	dfH2GenOut = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
 	h2gen = value.(EP[:vH2Gen])
-        dfH2GenOut.AnnualSum .= h2gen * inputs["omega"]
+    dfH2GenOut.AnnualSum .= h2gen * inputs["omega"]
 
 	# Load hourly values
 	dfH2GenOut = hcat(dfH2GenOut, DataFrame((value.(EP[:vH2Gen])), :auto))
