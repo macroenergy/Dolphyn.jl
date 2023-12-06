@@ -27,10 +27,10 @@ function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict
     dfCharge = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum =  Array{Union{Missing,Float32}}(undef, H))
     charge = zeros(H,T)
     if !isempty(inputs["H2_STOR_ALL"])
-        charge[inputs["H2_STOR_ALL"],:] = value.(EP[:vH2_CHARGE_STOR][inputs["H2_STOR_ALL"],:]).data
+        charge[inputs["H2_STOR_ALL"],:] = value.(EP[:vH2_CHARGE_STOR][inputs["H2_STOR_ALL"],:])
     end
     if !isempty(inputs["H2_FLEX"])
-        charge[inputs["H2_FLEX"],:] = value.(EP[:vH2_CHARGE_FLEX][inputs["H2_FLEX"],:]).data
+        charge[inputs["H2_FLEX"],:] = value.(EP[:vH2_CHARGE_FLEX][inputs["H2_FLEX"],:])
     end
 
     dfCharge.AnnualSum .= charge * inputs["omega"]
