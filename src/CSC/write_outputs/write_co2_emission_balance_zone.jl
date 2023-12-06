@@ -29,7 +29,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 	dfCO2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 20)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 21)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "DAC Capture", "Biomass Capture", "CO2 Trunk Pipeline Loss", "CO2 Spur Pipeline Loss", "Synfuel Production Emissions","Synfuel Byproducts Emissions","Conventional Diesel Utilization","Conventional Jetfuel Utilization","Conventional Gasoline Utilization","Syn Diesel Utilization","Syn Jetfuel Utilization","Syn Gasoline Utilization","Bio Diesel Utilization","Bio Jetfuel Utilization", "Bio Gasoline Utilization","Bio Ethanol Utilization"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T

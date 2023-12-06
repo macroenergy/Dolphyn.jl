@@ -117,7 +117,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     # Variable for Outflow from Zones through Pipes 
     # Trunk Pipeline
-    @variable(EP, vCO2NPipeFlow_trunk_neg[p=1:Trunk_CO2_P, t=1:T, d=[1,-1]] >= 0) # Negative Pipeflow
+    @variable(EP, vCO2PipeFlow_trunk_neg[p=1:Trunk_CO2_P, t=1:T, d=[1,-1]] >= 0) # Negative Pipeflow
 
     # Spur Pipeline
     @variable(EP, vCO2PipeFlow_spur_uni_neg[p=1:Spur_CO2_P, t = 1:T] >= 0) 

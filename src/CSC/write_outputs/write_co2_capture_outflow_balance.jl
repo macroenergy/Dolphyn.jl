@@ -124,7 +124,8 @@ function write_co2_capture_outflow_balance(path::AbstractString, sep::AbstractSt
 		end
 
         if setup["Exogeneous_CO2_Demand"] == 1
-            tempCO2_Demand = tempCO2_Demand + sum(inputs["omega"].* (inputs["CO2_D"][z,:]))
+            #tempCO2_Demand = tempCO2_Demand + sum(inputs["omega"].* (inputs["CO2_D"][z,:]))
+			tempCO2_Demand = tempCO2_Demand + sum(inputs["omega"].* (inputs["CO2_D"][:,z]))
         end
 
         tempCTotal = tempPower_CCS + tempH2_CCS + tempDAC_Capture + tempDAC_Fuel_CCS + tempBiorefinery_Capture + tempSynfuel_Production_Capture + tempSynfuel_Production_Consumption + tempCO2_Trunk_Pipeline_Import + tempCO2_Spur_Pipeline_Outflow + tempCO2_Demand

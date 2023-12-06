@@ -81,7 +81,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	### Adding a New Constraint that forces CO2 Captured and Stored to be Equal to a Given Target ###
 	# Note: DAC capture values can also be added here
 
-	if hashkey(setup, "CO2CaptureTarget")
+	if setup["CO2CaptureTarget"] > 0
 		@constraint(EP, cMatchingCO2CaptureTarget, sum(sum(inputs["omega"].* ((EP[:ePower_CO2_captured_per_zone_per_time_acc])[z,:])) for z in 1:Z) + sum(sum(inputs["omega"].* ((EP[:eHydrogen_CO2_captured_per_zone_per_time_acc])[z,:])) for z in 1:Z) - setup["CO2CaptureTarget"] == 0)
 	end
 

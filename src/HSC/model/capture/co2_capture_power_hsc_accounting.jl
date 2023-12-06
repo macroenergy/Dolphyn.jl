@@ -33,13 +33,10 @@ function co2_capture_power_hsc_accounting(EP::Model, inputs::Dict, setup::Dict)
 	T = inputs["T"]	 # Model operating time steps
 
 	#CO2 captued by power sector CCS plants
-	@expression(EP, ePower_CO2_captured_per_plant_per_time_acc[y=1:G,t=1:T], dfGen[!,:CO2_captured_per_MWh][y]*EP[:vP][y,t]) #tonne/MWh = kton/GWh so no need scale
+	@expression(EP, ePower_CO2_captured_per_plant_per_time_acc[y=1:G,t=1:T], EP[:eCO2CaptureByPlant][y,t]) #tonne/MWh = kton/GWh so no need scale
 	@expression(EP, ePower_CO2_captured_per_zone_per_time_acc[z=1:Z, t=1:T], sum(ePower_CO2_captured_per_plant_per_time_acc[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
 	@expression(EP, ePower_CO2_captured_per_time_per_zone_acc[t=1:T, z=1:Z], sum(ePower_CO2_captured_per_plant_per_time_acc[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
 
-    #@expression(EP, ePower_CO2_captured_total_per_zone, sum(sum(ePower_CO2_captured_per_time_per_zone_acc[t,z] for t in 1:T) for z in 1:Z))
-
-    #EP[:ePower_CO2_captured_total_per_zone] = ePower_CO2_captured_total_per_zone
 	EP[:ePower_CO2_captured_per_zone_per_time_acc] = ePower_CO2_captured_per_zone_per_time_acc
 	
 	#ADD TO CO2 BALANCE
@@ -54,19 +51,11 @@ function co2_capture_power_hsc_accounting(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP, eHydrogen_CO2_captured_per_zone_per_time_acc[z=1:Z, t=1:T], sum(eHydrogen_CO2_captured_per_plant_per_time_acc[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
 		@expression(EP, eHydrogen_CO2_captured_per_time_per_zone_acc[t=1:T, z=1:Z], sum(eHydrogen_CO2_captured_per_plant_per_time_acc[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
 
-		#ADD TO CO2 BALANCE
-		#EP[:eCaptured_CO2_Balance] += EP[:eHydrogen_CO2_captured_per_time_per_zone]
-        #@expression(EP, eHydrogen_CO2_captured_total_per_zone, sum(sum(eHydrogen_CO2_captured_per_time_per_zone_acc[t,z] for t in 1:T) for z in 1:Z))
-
-        #EP[:eHydrogen_CO2_captured_total_per_zone] = eHydrogen_CO2_captured_total_per_zone
-
+		
 		EP[:eHydrogen_CO2_captured_per_zone_per_time_acc] = eHydrogen_CO2_captured_per_zone_per_time_acc
 
 
 	end
-    
-
-    #@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
 	
 
 

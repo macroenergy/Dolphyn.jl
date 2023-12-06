@@ -35,7 +35,7 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     inputs_co2_nw["Trunk_CO2_P"]=size(collect(skipmissing(co2_trunk_pipeline_var[!,:CO2_Pipelines])),1)
 
     #Find first column of pipe map table
-    start = findall(s -> s == "z1", names(co2_pipeline_var))[1]
+    start = findall(s -> s == "z1", names(co2_trunk_pipeline_var))[1]
 
     #Select pipe map L x N matrix  where L is number of pipelines and N is number of nodes
     co2_trunk_pipe_map = co2_trunk_pipeline_var[1:inputs_co2_nw["Trunk_CO2_P"], start:start+inputs_co2_nw["Z"]-1]
@@ -144,6 +144,15 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
 
     # Length between two booster compressor stations in miles
     inputs_co2_nw["Spur_CO2_len_bw_comp_mile"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:CO2_len_bw_comp_mile])))
+
+    # Number of booster compressors between source and sink
+    inputs_co2_nw["Spur_CO2_no_booster_comp_stations"] = floor.(inputs_co2_nw["Spur_pCO2_Pipe_length_miles"]./inputs_co2_nw["Spur_CO2_len_bw_comp_mile"]) - ones(length(inputs_co2_nw["Spur_CO2_len_bw_comp_mile"]))
+
+    #Maximum number of pipelines
+    inputs_co2_nw["Spur_pCO2_Pipe_No_Max"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:Max_No_Pipe])))
+
+    #Current number of pipelines
+    inputs_co2_nw["Spur_pCO2_Pipe_No_Curr"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:Existing_No_Pipe])))
 
     #Maxiumum Pipe Flow per Pipe
     inputs_co2_nw["Spur_pCO2_Pipe_Max_Flow"] = convert(Array{Float64}, collect(skipmissing(co2_spur_pipeline_var[!,:Max_Flow_Tonne_p_hr_Per_Pipe])))

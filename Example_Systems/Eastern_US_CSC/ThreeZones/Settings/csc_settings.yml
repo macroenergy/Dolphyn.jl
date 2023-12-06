@@ -10,3 +10,4 @@ CO2NetworkExpansion: 1 # Transmission network expansional; 0 = not active; 1 = a
 CO2Pipeline_Loss: 1 #Loss of CO2 from pipelines
 
 Exogeneous_CO2_Demand: 1
+CO2CaptureTarget: 0
