@@ -26,7 +26,7 @@ function load_settings(settings_path::AbstractString)
     mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
 
     hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
-    if isfile(csc_settings)
+    if isfile(hsc_settings_path)
         mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
     else
         mysetup_hsc = Dict()
