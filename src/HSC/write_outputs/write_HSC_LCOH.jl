@@ -104,7 +104,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 	Blue_H2_Electricity_Cost_Total = sum(Blue_H2_Electricity_Cost_Zone)
 	Blue_H2_CO2_MAC_Total = sum(Blue_H2_CO2_MAC)
 
-	if setup["ModelCO2"] == 1
+	if setup["ModelCSC"] == 1
 		Power_CCS = sum(sum(inputs["omega"].* (value.(EP[:ePower_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
 		if setup["ModelH2"] == 1
