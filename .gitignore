@@ -24,13 +24,15 @@ GenXJulEnv/
 # Don't store results files, except the example results
 # This requires a slightly awkward set of rules
 # as we want to keep the Results_HSC folder
-# !Results**/
+!Results**/
 Results**/
 TDR_Results**/
 !Results_Example/
 !Results_Example/Results_HSC
 !TDR_Results_Example/
 !TDR_Results_Example/Results_HSC
+Example_System/mpc_runs/
+
 
 # Don't store summary files
 **/summary.txt
