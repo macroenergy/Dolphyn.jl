@@ -117,7 +117,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 			
 			end 
 
-			if setup["ModelSynFuels"] == 1
+			if setup["ModelLiquidFuels"] == 1
 				dfTemp1[t+rowoffset,16] = - value.(EP[:eSynFuelH2Cons][t,z])
 			else
 				dfTemp1[t+rowoffset,16] = 0

@@ -327,6 +327,22 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 	end
 
+    if setup["ModelLiquidFuels"] == 1
+
+		# Initialize Liquid Fuel Balance
+		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
+
+		#@expression(EP, eLiquidFuelsConsumptionByAll[t=1:T,z=1:Z], 0)
+		
+		EP = syn_fuel_outputs(EP, inputs, setup)
+		EP = syn_fuel_investment(EP, inputs, setup)
+		EP = syn_fuel_resources(EP, inputs, setup)
+		EP = liquid_fuel_demand(EP, inputs, setup)
+		EP = emissions_liquid_fuels(EP, inputs, setup)
+	end
+
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only

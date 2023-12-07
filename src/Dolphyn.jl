@@ -26,11 +26,13 @@ export configure_solver
 export load_inputs
 export load_h2_inputs
 export load_co2_inputs
+export load_liquid_fuels_inputs
 export generate_model
 export solve_model
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
+export write_liquid_fuels_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
@@ -149,6 +151,9 @@ include_from_dir(joinpath(@__DIR__,"GenX_extensions"), ".jl")
 
 # Load all .jl files from the HSC directory
 include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
+
+# Load all .jl files from the LFSC directory
+include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
 
 # Load all .jl files from the core directory
 include_from_dir(joinpath(@__DIR__,"core"), ".jl")
