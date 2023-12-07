@@ -143,5 +143,9 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "SpecifySynBioGasolinePercentFlag",0)
     set_default_if_absent!(settings, "percent_sbf_gasoline",0)
 
+    set_default_if_absent!(settings, "BIO_Diesel_On",0)
+    set_default_if_absent!(settings, "BIO_Jetfuel_On",0)
+    set_default_if_absent!(settings, "BIO_Gasoline_On",0)
+
 return settings
 end
