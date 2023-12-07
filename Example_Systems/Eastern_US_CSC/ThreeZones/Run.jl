@@ -88,8 +88,7 @@ end
 
 # Write synthetic fuels supply chain outputs
 if mysetup["ModelLiquidFuels"] == 1
-    outpath_S\LF = "$outpath/Results_LF"
-    write_liquid_fuels_outputs(EP, outpath_LF, mysetup, myinputs)
+    write_liquid_fuels_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
 compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))

@@ -1,4 +1,4 @@
-ModelH2: 1 #Flag to turn or off Hydrogen Supply Chain modelling capabilities - 0 - no HSC, 1- HSC modeled
+ModelH2: 0 #Flag to turn or off Hydrogen Supply Chain modelling capabilities - 0 - no HSC, 1- HSC modeled
 H2PipeInteger: 0 # Whether to model pipeline capacity as discrete or integer - 0 - continuous capacity, 1- discrete capacity
 ModelH2Pipelines: 1 # Whether to model pipeline in hydrogen supply chain - 0 - not included, 1 - included
 ModelH2Trucks: 0 # Whether to model truck in hydrogen supply chain - 0 - not included, 1 - included
