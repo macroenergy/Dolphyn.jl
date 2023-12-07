@@ -127,7 +127,7 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     
     set_default_if_absent!(settings, "ModelBIO", 0)
     set_default_if_absent!(settings, "ModelSynFuels", 0)
-
+    set_default_if_absent!(settings, "BIO_H2_On", 0)
 
 return settings
 end

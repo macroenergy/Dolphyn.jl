@@ -24,10 +24,11 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	BLUE_H2 = inputs["BLUE_H2"]
 	GREY_H2 = inputs["GREY_H2"]
 	H2_STOR_ALL = inputs["H2_STOR_ALL"]
-	H2_G2P_ALL = inputs["H2_G2P_ALL"]
+	
 
 	if setup["ModelH2G2P"] == 1
 		dfH2G2P = inputs["dfH2G2P"]
+		H2_G2P_ALL = inputs["H2_G2P_ALL"]
 	end
 
 	T = inputs["T"]     # Number of time steps (hours)
