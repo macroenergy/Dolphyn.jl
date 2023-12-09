@@ -408,7 +408,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		
     #Capacity Reserve Margin
     if setup["CapacityReserveMargin"] > 0
-        cap_reserve_margin!(EP, inputs, setup)
+        EP = cap_reserve_margin(EP, inputs, setup)
     end
 
     if (setup["MinCapReq"] == 1)
