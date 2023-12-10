@@ -33,6 +33,12 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     ### MODEL SOLUTION AND OUTPUT PARAMETERS
     ## Write the model formulation as an output; 0 = active; 1 = not active
     set_default_if_absent!(settings, "PrintModel", 0)
+
+    ## Sets Solver Log file Name
+    set_default_if_absent!(settings, "Log", true)
+
+    ## Sets Solver Log file Name
+    set_default_if_absent!(settings, "LogFile", "my_log_file.txt")
    
     ## Set HiGHS as the solver if none is set
     set_default_if_absent!(settings, "Solver", "HiGHS")

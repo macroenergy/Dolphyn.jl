@@ -1,0 +1,4 @@
+Syn_Fuel_Resource,Zone,segment_start,segment_end,inv_cost_tonne_co2
+tech_1_z1,z1,0,100,1000
+tech_1_z1,z1,100,200,500
+tech_1_z1,z1,200,300,100
