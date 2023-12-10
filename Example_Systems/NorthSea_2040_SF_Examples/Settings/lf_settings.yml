@@ -1,8 +1,5 @@
 ModelLiquidFuels: 1 #Flag to turn or off Syn Fuel modelling capabilities - 0 - no SF, 1- SF modeled
 
-Syn_Fuel_CAPEX_Piecewise: 0 #Linear modeling of SF Plant CAPEX - 0, Piecewise modeling of 6/10 rule of SF Plant CAPEX - 1
-Syn_Fuel_CAPEX_Piecewise_Segments: 3
-
 AllowConventionalDiesel: 1
 SpecifySynDieselPercentFlag: 1
 percent_sf_diesel: 0.25
