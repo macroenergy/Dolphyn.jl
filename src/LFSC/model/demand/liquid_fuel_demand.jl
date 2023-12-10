@@ -53,7 +53,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         
         if setup["SpecifySynDieselPercentFlag"] == 1
 
-            percent_sbf_diesel = setup["percent_sf_diesel"]
+            percent_sf_diesel = setup["percent_sf_diesel"]
 
             #Sum up conventional fuel production
             @expression(EP, eConvLFDieselDemandT[t=1:T], sum(vConvLFDieselDemand[t, z] for z in 1:Z))
@@ -62,7 +62,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             #Sum up synfuel fuel production (Synfuel main product is diesel)
             @expression(EP, eSynFuelProd_DieselT[t=1:T], sum(EP[:eSynFuelProd_Diesel][t, z] for z in 1:Z))
             @expression(EP, eSynFuelProd_DieselTZ, sum(eSynFuelProd_DieselT[t] for t in 1:T))
-            @constraint(EP, cSynFuelDieselShare, (percent_sf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
+            @constraint(EP, cSynFuelDieselShare, (percent_sf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sf_diesel *  eConvLFDieselDemandTZ == 0)
         end
 
     end
