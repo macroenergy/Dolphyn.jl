@@ -153,5 +153,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "BIO_Jetfuel_On",0)
     set_default_if_absent!(settings, "BIO_Gasoline_On",0)
 
+    #Parameter Scaling for Liquid Fuels is untested
+    if settings["ModelLiquidFuels"] == 1
+        settings["ParameterScale"] = 0
+    end
+
 return settings
 end
