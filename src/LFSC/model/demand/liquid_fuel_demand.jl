@@ -90,11 +90,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             #Sum up synfuel fuel production (Synfuel main product is diesel)
             @expression(EP, eSynFuelProd_DieselT[t=1:T], sum(EP[:eSynFuelProd_Diesel][t, z] for z in 1:Z))
             @expression(EP, eSynFuelProd_DieselTZ, sum(eSynFuelProd_DieselT[t] for t in 1:T))
-<<<<<<< HEAD
             @constraint(EP, cSynFuelDieselShare, (percent_sf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sf_diesel *  eConvLFDieselDemandTZ == 0)
-=======
-            @constraint(EP, cSynFuelDieselShare, (percent_sf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
->>>>>>> 586e214d (push to debug liquid fuels)
         end
 
     end
