@@ -26,10 +26,18 @@ function load_settings(settings_path::AbstractString)
     mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
 
     hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
-    mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
+    if isfile(hsc_settings_path)
+        mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
+    else
+        mysetup_hsc = Dict()
+    end
 
-    csc_settings = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
-    mysetup_csc = YAML.load(open(csc_settings)) # mysetup dictionary stores CSC supply chain-specific parameters
+    csc_settings_path = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
+    if isfile(csc_settings_path)
+        mysetup_csc = YAML.load(open(csc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
+    else
+        mysetup_csc = Dict()
+    end 
 
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
     mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings

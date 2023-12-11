@@ -62,7 +62,6 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     
     #BLUE_H2
 	inputs_gen["BLUE_H2"] = h2_gen_in[h2_gen_in.Blue_H2.==1,:R_ID]
-
 	#GREY_H2
 	inputs_gen["GREY_H2"] = h2_gen_in[h2_gen_in.Grey_H2.==1,:R_ID]
 
