@@ -64,8 +64,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     else
         H2_electrolyzer_declared = Int64[]
     end
-    if issubset(["etaP2G_MWh_p_MWh","etaFuel_MMBtu_p_MWh","H2_GEN_TYPE"], h2_gen_in_names)
-        H2_Electrolyzer_infered = h2_gen_in[(h2_gen_in.etaP2G_MWh_p_MWh.>0) .& (h2_gen_in.etaFuel_MMBtu_p_MWh.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    if issubset(["etaP2G","etaFuel_MMBtu_p_MWh","H2_GEN_TYPE"], h2_gen_in_names)
+        H2_Electrolyzer_infered = h2_gen_in[(h2_gen_in.etaP2G.>0) .& (h2_gen_in.etaFuel_MMBtu_p_MWh.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
     else
         H2_Electrolyzer_infered = Int64[]
     end

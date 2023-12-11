@@ -175,7 +175,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 		if j in NEW_CAP_TRUCK # Resources eligible for new capacity
 			1/ModelScalingFactor^2*(dfH2Truck[!,:Inv_Cost_Energy_p_MWh_yr][j]*vH2TruckEnergy[z, j] + dfH2Truck[!,:Fixed_OM_Cost_Energy_p_MWh_yr][j]*eTotalH2TruckEnergy[z, j])
 		else
-			1/ModelScalingFactor^2*(dfH2truck[!,:Fixed_OM_Cost_Energy_p_MWh_yr][j]*eTotalH2TruckEnergy[z, j])
+			1/ModelScalingFactor^2*(dfH2Truck[!,:Fixed_OM_Cost_Energy_p_MWh_yr][j]*eTotalH2TruckEnergy[z, j])
 		end
 		)
 	else
