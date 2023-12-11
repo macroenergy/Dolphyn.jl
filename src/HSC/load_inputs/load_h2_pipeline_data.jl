@@ -86,14 +86,14 @@ function load_h2_pipeline_data(
     #Maxiumum Pipe Flow per Pipe
     inputs_nw["pH2_Pipe_Max_Flow"] = convert(
         Array{Float64},
-        collect(skipmissing(pipeline_var[!, :Max_Flow_Tonne_p_Hr_Per_Pipe])),
+        collect(skipmissing(pipeline_var[!, :Max_Flow_MW_p_Hr_Per_Pipe])),
     )
 
     #Maximum Pipeline storage capacity in tonnes per pipe
     inputs_nw["pH2_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2PipeCap_tonne_per_mile])),
+            collect(skipmissing(pipeline_var[!, :H2PipeCap_MW_per_mile])),
         ) .* inputs_nw["pPipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
@@ -119,7 +119,7 @@ function load_h2_pipeline_data(
             ) .+
             inputs_nw["no_booster_comp_stations"] .* convert(
                 Array{Float64},
-                collect(skipmissing(pipeline_var[!, :BoosterCompCapex_per_tonne_p_hr_yr])),
+                collect(skipmissing(pipeline_var[!, :BoosterCompCapex_p_MWh_yr])),
             )
         )
 
@@ -131,7 +131,7 @@ function load_h2_pipeline_data(
         ) .+ 
         inputs_nw["no_booster_comp_stations"] .* convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
+            collect(skipmissing(pipeline_var[!, :BoosterCompEnergy])),
         )
 
     print_and_log(" -- HSC_pipelines.csv Successfully Read!")

@@ -36,7 +36,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
     # Demand in tonnes per hour for each zone
-    start = findall(s -> s == "Load_H2_tonne_per_hr_z1", names(H2_load_in))[1]    
+    start = findall(s -> s == "Load_H2_MW_z1", names(H2_load_in))[1]    
     # Max value of non-served energy in $/(tonne)
     inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
     # Demand in Tonnes per hour      
@@ -48,7 +48,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     inputs_load["pMax_H2_D_Curtail"] = zeros(H2_SEG)
     for s in 1:H2_SEG
         # Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
-        inputs_load["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_per_Tonne]))[s]*inputs_load["H2_Voll"][1]
+        inputs_load["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_p_MWh]))[s]*inputs_load["H2_Voll"][1]
         # Maximum hourly demand curtailable as % of the max demand (for each segment)
         inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
 
@@ -63,10 +63,10 @@ end
 function h2_demand_search_str(Zones::Union{Vector{Int64}, Vector{String}})
     if typeof(Zones[1]) == Int64
         # Zones are of the form 1, 2, 3, ...
-        search_str = "Load_H2_tonne_per_hr_z"
+        search_str = "Load_H2_MW_z"
     elseif typeof(Zones[1]) == String
         # Zones are of the form z1, z2, z3, ...
-        search_str = "Load_H2_tonne_per_hr_"
+        search_str = "Load_H2_MW_"
     else
         error("Zones are neither of type Int64 nor String")
     end
