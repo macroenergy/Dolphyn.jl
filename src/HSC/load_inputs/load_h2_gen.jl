@@ -57,7 +57,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
 
     # Identify electrolyzer resources - to include for eligibility in the Capacity Reserve Margin constraint
-    inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[(h2_gen_in.etaP2G_MWh_p_MWh.>0) .& (h2_gen_in.etaFuel_MMBtu_p_MWh.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[(h2_gen_in.etaP2G.>0) .& (h2_gen_in.etaFuel_MMBtu_p_MWh.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
     
     #BLUE_H2
 	inputs_gen["BLUE_H2"] = h2_gen_in[h2_gen_in.Blue_H2.==1,:R_ID]

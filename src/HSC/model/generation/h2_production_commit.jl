@@ -259,7 +259,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     ###Constraints###
     @constraints(EP, begin
         #Power Balance
-        [k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_MWh][k]
+        [k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G][k]
     end)
 
     ### Capacitated limits on unit commitment decision variables (Constraints #1-3)
