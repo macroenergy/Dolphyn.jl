@@ -29,7 +29,7 @@ The variable defined in this file named after ```vSFH2in``` cover variable $x_{f
 
 This module defines the synthetic gasoline, jetfuel, and diesel production decision variables $x_{f,t}^{\textrm{Gasoline,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$, $x_{f,t}^{\textrm{Jetfuel,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$, $x_{f,t}^{\textrm{Diesel,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$ representing  synthetic gasoline, jetfuel, and diesel produced by resource $f$ at time period $t$.
 
-The variables defined in this file named after ```vSFProd\textunderscore{Gasoline}``` cover variable $x_{f,t}^{Gasoline,Syn}$, ```vSFProd\textunderscore{Jetfuel}``` cover variable $x_{f,t}^{Jetfuel,Syn}$, and ```vSFProd\textunderscore{Diesel}``` cover variable $x_{f,t}^{Diesel,Syn}$.
+The variables defined in this file named after ```vSFProd_Gasoline``` cover variable $x_{f,t}^{Gasoline,Syn}$, ```vSFProd_Jetfuel``` cover variable $x_{f,t}^{Jetfuel,Syn}$, and ```vSFProd_Diesel``` cover variable $x_{f,t}^{Diesel,Syn}$.
 
 **Maximum CO2 input to synthetic fuels resource**
 
