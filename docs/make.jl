@@ -27,7 +27,7 @@ if liveserver
     Revise.revise()
 end
 
-using Pkg; Pkg.add("Documenter")
+using Pkg; Pkg.develop(PackageSpec(; path=(@__DIR__) * "/../")); Pkg.add("Documenter")
 
 using Documenter, Dolphyn
 import DataStructures: OrderedDict
