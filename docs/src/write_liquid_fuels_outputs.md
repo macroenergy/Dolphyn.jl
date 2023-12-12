@@ -1,7 +1,11 @@
 ## Liquid Fuels Supply Chain Results
 ```@autodocs
 Modules = [Dolphyn]
+<<<<<<< HEAD
 Pages = ["LFSC/write_outputs/write_liquid_fuels_outputs.jl"]
+=======
+Pages = ["LFSC/write_outputs/write_synfuel_outputs.jl"]
+>>>>>>> 8c12b617 (Testing and documentations done)
 ```
 ## Write Liquid Fuels Supply Chain Costs
 ```@autodocs
@@ -37,4 +41,8 @@ Pages = ["LFSC/write_outputs/write_synfuel_emissions.jl"]
 ```@autodocs
 Modules = [Dolphyn]
 Pages = ["LFSC/write_outputs/write_liquid_fuel_demand_balance.jl"]
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 8c12b617 (Testing and documentations done)
