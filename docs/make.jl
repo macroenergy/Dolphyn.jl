@@ -50,7 +50,8 @@ pages = OrderedDict(
             "Multi-stage Model" => "multi_stage_model_overview.md",
         ],  
         "hsc_data_documentation.md",
-        "csc_data_documentation.md"
+        "csc_data_documentation.md",
+        "lfsc_data_documentation.md"
     ],
     "Objective Function" => "objective_function.md", # Should cover both models
     "GenX" => [
@@ -137,6 +138,18 @@ pages = OrderedDict(
             "CO2 Compression" => "co2_compression.md",
             "CO2 Storage" => "co2_storage.md",
             "CO2 Transmission" => "co2_transmission.md",
+        ],
+    ],
+
+    "Liquid Fuels Supply Chain (LFSC)" => [
+        "LFSC Inputs Functions" => "load_liquid_fuels_inputs.md",
+        "LFSC Outputs Functions" => "write_liquid_fuels_outputs.md",
+        "LFSC Notation" => "lfsc_notation.md",
+
+        "LFSC Function Reference" => [
+            "LFSC Core" => "liquid_fuels_core.md",
+            "LF Demand" => "liquid_fuels_demand.md",
+            "LF Resources" => "liquid_fuels_resources.md",
         ],
     ],
 

@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,10 +15,35 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the built capacity and the total fixed cost (Investment + Fixed O&M) of DAC resource $k$.
+Sets up constraints common to all synthetic fuels resources.
 
+This function defines the expressions and constraints keeping track of total available synthetic fuels capacity $y_{f}^{\textrm{C,Syn}}$ based on its input CO2 in tonne per hour as well as constraints on capacity.
+
+The expression defined in this file named after ```vCapacity\textunderscore{Syn}\textunderscore{Fuel}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{f}^{\textrm{C,Syn}}$.
+
+The total capacity of each synthetic fuels resource is defined as the sum of newly invested capacity based on the assumption there are no existing synthetic fuels resources. 
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from investment costs of synthetic fuels (fixed O\&M plus investment costs) from all generation resources $f \in \mathcal{F}$:
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{LF,Syn,c}} = \sum_{f \in \mathcal{F}} \sum_{z \in \mathcal{Z}} y_{f, z}^{\textrm{C,Syn}}\times \textrm{c}_{f}^{\textrm{Syn,INV}} + \sum_{f \in \mathcal{F}} \sum_{z \in \mathcal{Z}} y_{f, z}^{\textrm{C,Syn}} \times \textrm{c}_{f}^{\textrm{Syn,FOM}}
+\end{equation*}
+```
+
+**Constraints on synthetic fuels resource capacity**
+
+For resources where upper bound $\overline{y_{f}^{\textrm{C,Syn}}}$ and lower bound $\underline{y_{f}^{\textrm{C,Syn}}}$ of capacity is defined, then we impose constraints on minimum and maximum synthetic fuels resource input CO2 capacity.
+
+```math
+\begin{equation*}
+	\underline{y_{f}^{\textrm{C,Syn}}} \leq y_{f}^{\textrm{C,Syn}} \leq \overline{y_{f}^{\textrm{C,Syn}}} \quad \forall f \in \mathcal{F}
+\end{equation*}
+```
 """
 function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	

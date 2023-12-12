@@ -1,6 +1,6 @@
 """
-DOLPKYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -15,9 +15,34 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    
-"""
+	syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
+	
+Sets up variables common to all synthetic fuels resources.
 
+This module defines the synthetic fuels resource decision variable $x_{f,t}^{\textrm{C,Syn}} \forall f \in \mathcal{F}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 input into the synthetic fuels resource $f$ at time period $t$.
+
+$x_{f,b,t}^{\textrm{By,Syn}} \forall f \in \mathcal{F}, \forall b \in \mathcal{B}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing synthetic fuels by products $b$ (if any) by the synthetic fuels resource $f$ at time period $t$.
+
+The variables defined in this file named after ```vSFCO2in``` covers all variables $x_{f,t}^{\textrm{C,Syn}}$ and ```vSFByProd``` covers all variables $x_{f,b,t}^{\textrm{Syn,By}}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all synthetic fuels resources over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{LF,Syn,o}} = \sum_{f \in \mathcal{F}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{f}^{\textrm{Syn,VOM}} + \textrm{c}_{f}^{\textrm{Syn,FUEL}}\right) \times x_{f,t}^{\textrm{C,Syn}}
+\end{equation*}
+```
+
+This module also defines contributions to the objective function from revenues of by-products (if any) of synthetic fuels generation from all resources over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{LF,Syn,r}} = \sum_{f \in \mathcal{F}} \sum_{b \in \mathcal{B}} \sum_{t \in \mathcal{T}} \omega_t \times x_{f,b,t}^{\textrm{By,Syn}} \times \textrm{c}_{b}^{\textrm{By,Syn}}
+\end{equation*}
+```
+"""
 function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Syn Fuel module")

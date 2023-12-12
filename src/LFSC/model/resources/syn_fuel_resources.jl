@@ -15,11 +15,29 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_generation(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
-The h2_production module creates decision variables, expressions, and constraints related to various hydrogen generation technologies (electrolyzers, natural gas reforming etc.)
+This module creates decision variables, expressions, and constraints related to synthetic fuels resources.
 
-This module uses the following 'helper' functions in separate files: ```h2_generation_commit()``` for resources subject to unit commitment decisions and constraints (if any) and ```h2_generation_no_commit()``` for resources not subject to unit commitment (if any).
+This module defines the power consumption decision variable $x_{f,t}^{\textrm{E,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$, representing power consumed by synthetic fuels resource $f$ at time period $t$.
+
+The variable defined in this file named after ```vSFPin``` cover variable $x_{f,t}^{E,Syn}$.
+
+This module defines the hydrogen consumption decision variable $x_{f,t}^{\textrm{H,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$, representing hydrogen consumed by synthetic fuels resource $f$ at time period $t$.
+
+The variable defined in this file named after ```vSFH2in``` cover variable $x_{f,t}^{H,Syn}$.
+
+This module defines the synthetic gasoline, jetfuel, and diesel production decision variables $x_{f,t}^{\textrm{Gasoline,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$, $x_{f,t}^{\textrm{Jetfuel,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$, $x_{f,t}^{\textrm{Diesel,Syn}} \forall f\in \mathcal{F}, t \in \mathcal{T}$ representing  synthetic gasoline, jetfuel, and diesel produced by resource $f$ at time period $t$.
+
+The variables defined in this file named after ```vSFProd\textunderscore{Gasoline}``` cover variable $x_{f,t}^{Gasoline,Syn}$, ```vSFProd\textunderscore{Jetfuel}``` cover variable $x_{f,t}^{Jetfuel,Syn}$, and ```vSFProd\textunderscore{Diesel}``` cover variable $x_{f,t}^{Diesel,Syn}$.
+
+**Maximum CO2 input to synthetic fuels resource**
+
+```math
+\begin{equation*}
+	x_{f,t}^{\textrm{C,Syn}} \leq  y_{f}^{\textrm{C,Syn}} \quad \forall f \in \mathcal{F}, t \in \mathcal{T}
+\end{equation*}
+```
 """
 function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
