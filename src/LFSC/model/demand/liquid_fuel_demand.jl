@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -16,8 +16,36 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 @doc raw"""
 
-"""
+    liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
+This module defines the conventional gasoline, jetfuel, and diesel production decision variables $x_{z,t}^{\textrm{Gasoline,Conv}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, $x_{z,t}^{\textrm{Jetfuel,Conv}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, $x_{z,t}^{\textrm{Diesel,Conv}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$ representing  conventional gasoline, jetfuel, and diesel purchased in zone $z$ at time period $t$.
+
+The variables defined in this file named after ```vConvLFGasolineDemand``` cover variable $x_{z,t}^{Gasoline,Conv}$, ```vConvLFJetfuelDemand``` cover variable $x_{z,t}^{Jetfuel,Conv}$, and ```vConvLFDieselDemand``` cover variable $x_{z,t}^{Diesel,Conv}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of  conventional fuel purchase over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{Gasoline,Conv,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{z}^{\textrm{Gasoline,Conv,VOM}} \times x_{z,t}^{\textrm{Gasoline,Conv}}
+\end{equation*}
+```
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{Jetfuel,Conv,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{z}^{\textrm{Jetfuel,Conv,VOM}} \times x_{z,t}^{\textrm{Jetfuel,Conv}}
+\end{equation*}
+```
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{Diesel,Conv,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{z}^{\textrm{Diesel,Conv,VOM}} \times x_{z,t}^{\textrm{Diesel,Conv}}
+\end{equation*}
+```
+
+This module also constraints the amount of each type of non conventional fuels deployment based on user specifications (if any).
+"""
 function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
 	#Define sets
