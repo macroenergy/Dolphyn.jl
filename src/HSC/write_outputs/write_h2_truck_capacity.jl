@@ -52,7 +52,7 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     )
 
     for z in 1:Z
-        dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_MWh_z$z")]
+        dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_MW_z$z")]
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
         truck_new_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["NEW_CAP_TRUCK"])
         tempEnergy[truck_new_cap] = value.(EP[:vH2TruckEnergy][z,truck_new_cap]).data
