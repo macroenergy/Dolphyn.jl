@@ -106,13 +106,13 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     # Total available energy capacity in tonnes
     @expression(EP, eTotalH2CapEnergy[y in H2_STOR_ALL],
     if (y in intersect(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
-        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]
+        dfH2Gen[!,:Existing_Energy_Cap_MW][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]
     elseif (y in setdiff(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
-        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] + EP[:vH2CAPENERGY][y]
+        dfH2Gen[!,:Existing_Energy_Cap_MW][y] + EP[:vH2CAPENERGY][y]
     elseif (y in setdiff(RET_CAP_H2_ENERGY, NEW_CAP_H2_ENERGY))
-        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] - EP[:vH2RETCAPENERGY][y]
+        dfH2Gen[!,:Existing_Energy_Cap_MW][y] - EP[:vH2RETCAPENERGY][y]
     else
-        dfH2Gen[!,:Existing_Energy_Cap_MWh][y] 
+        dfH2Gen[!,:Existing_Energy_Cap_MW][y] 
     end
 )
 
@@ -198,7 +198,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
         
     # Cannot retire more energy capacity than existing energy capacity
-    @constraint(EP, cMaxRetH2Energy[y in RET_CAP_H2_ENERGY], vH2RETCAPENERGY[y] <= dfH2Gen[!,:Existing_Energy_Cap_MWh][y])
+    @constraint(EP, cMaxRetH2Energy[y in RET_CAP_H2_ENERGY], vH2RETCAPENERGY[y] <= dfH2Gen[!,:Existing_Energy_Cap_MW][y])
 
     ## Constraints on new built energy capacity
     # Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
