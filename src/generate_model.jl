@@ -334,7 +334,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
 		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
 
-		
 		EP = syn_fuel_outputs(EP, inputs, setup)
 		EP = syn_fuel_investment(EP, inputs, setup)
 		EP = syn_fuel_resources(EP, inputs, setup)

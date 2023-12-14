@@ -137,7 +137,6 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             @expression(EP, eSynFuelProd_JetfuelTZ, sum(eSynFuelProd_JetfuelT[t] for t in 1:T))
             @constraint(EP, cSynFuelJetfuelShare, (percent_sf_jetfuel - 1) * eSynFuelProd_JetfuelTZ + percent_sf_jetfuel *  eConvLFJetfuelDemandTZ == 0)
         end
-       
     end
 
     #############################################################################################################################################
@@ -182,11 +181,7 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             @expression(EP, eSynFuelProd_GasolineTZ, sum(eSynFuelProd_GasolineT[t] for t in 1:T))
             @constraint(EP, cSynFuelGasolineShare, (percent_sf_gasoline - 1) * eSynFuelProd_GasolineTZ + percent_sf_gasoline *  eConvLFGasolineDemandTZ == 0)
         end
-
     end
-
-   
-
 	return EP
 
 end
