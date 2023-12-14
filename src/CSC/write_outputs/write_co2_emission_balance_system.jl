@@ -59,7 +59,7 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
             dfTemp1[t+rowoffset,6] = 0
         end
 
-        if setup["ModelSynFuels"] == 1
+        if setup["ModelLiquidFuels"] == 1
             dfTemp1[t+rowoffset,7] = value(sum(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eByProdConsCO2EmissionsByZone][z,t] for z in 1:Z))
             dfTemp1[t+rowoffset,8] = value(sum(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
             dfTemp1[t+rowoffset,9] = value(sum(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t] for z in 1:Z))

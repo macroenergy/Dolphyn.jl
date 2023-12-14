@@ -25,25 +25,32 @@ function load_settings(settings_path::AbstractString)
     genx_settings_path = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
     mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
 
-    hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
+    hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC  model
     if isfile(hsc_settings_path)
         mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
     else
         mysetup_hsc = Dict()
     end
 
-    csc_settings_path = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC modelgrated model
+    csc_settings_path = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC model
     if isfile(csc_settings_path)
         mysetup_csc = YAML.load(open(csc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
     else
         mysetup_csc = Dict()
     end 
 
+    lf_settings_path = joinpath(settings_path, "lf_settings.yml") #Settings YAML file path for LF model
+    if isfile(lf_settings_path)
+        mysetup_lf = YAML.load(open(lf_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
+    else
+        mysetup_lf = Dict()
+    end 
+
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
     mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
 
     mysetup = Dict{Any,Any}()
-    mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+    mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
     mysetup = configure_settings(mysetup)
 
     return mysetup

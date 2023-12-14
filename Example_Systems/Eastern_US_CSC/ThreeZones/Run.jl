@@ -57,16 +57,16 @@ if mysetup["ModelCSC"] == 1
     myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
 end
 
-# ### Load SF inputs if modeling the synthetic fuels supply chain
-#if mysetup["ModelSynFuels"] == 1
-#    myinputs = load_syn_fuels_inputs(myinputs, mysetup, inputs_path)
-#end
+### Load LF inputs if modeling the synthetic fuels supply chain
+if mysetup["ModelLiquidFuels"] == 1
+    myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
+end
 
 # ### Generate model
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
 ### Solve model
-print_and_log("Solving Model")
+print_and_log("Solving Model")  
 EP, solve_time = solve_model(EP, mysetup)
 myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 
@@ -87,10 +87,9 @@ if mysetup["ModelCSC"] == 1
 end
 
 # Write synthetic fuels supply chain outputs
-#if mysetup["ModelSynFuels"] == 1
-#    outpath_SF = "$outpath/Results_SF"
-#    write_synfuel_outputs(EP, outpath_SF, mysetup, myinputs)
-#end
+if mysetup["ModelLiquidFuels"] == 1
+    write_liquid_fuels_outputs(EP, outpath_GenX, mysetup, myinputs)
+end
 
 compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))
 

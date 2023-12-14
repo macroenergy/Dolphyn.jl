@@ -80,7 +80,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 	Demand = - sum(sum(inputs["omega"].* (inputs["H2_D"][:,z]) for z in 1:Z))
 
-	if setup["ModelSynFuels"] == 1
+	if setup["ModelLiquidFuels"] == 1
 		Synfuel_Consumption = sum(sum(inputs["omega"].* value.(EP[:eSynFuelH2Cons])[:,z] for z in 1:Z))
 	else
 		Synfuel_Consumption = 0 
@@ -150,7 +150,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 		tempDemand = tempDemand - sum(inputs["omega"].* (inputs["H2_D"][:,z]))
 
-		if setup["ModelSynFuels"] == 1
+		if setup["ModelLiquidFuels"] == 1
 			tempSynfuel_Consumption = tempSynfuel_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelH2Cons])[:,z]))
 		end
 
