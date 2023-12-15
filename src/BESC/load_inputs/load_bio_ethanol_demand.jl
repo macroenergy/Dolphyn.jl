@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon for Power and Hydrogen Networks
-Copyright (C) 2021,  Massachusetts Institute of Technology
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -14,6 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	load_bio_ethanol_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
+
+Function for reading input parameters related to Bio_ethanol_co2_per_mmbtu load (demand) and emissions of each zone for bioethanol.
+"""
 function load_bio_ethanol_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
     
 	data_directory_ethanol = joinpath(path, setup["TimeDomainReductionFolder"])

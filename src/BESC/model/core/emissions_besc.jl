@@ -15,47 +15,47 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	emissions(EP::Model, inputs::Dict, UCommit::Int)
+    emissions_besc(EP::Model, inputs::Dict, setup::Dict)
 
-This function creates expression to add the CO2 capture and emissions by biorefineries in each zone
+This function creates expression to add the CO2 emissions from the biorefinery, negative emissions from the biomass utilization, and add any CO2 captured from the biorefinery to the captured CO2 inventory.
 """
 function emissions_besc(EP::Model, inputs::Dict, setup::Dict)
 
 	println("CO2 Capture and Emissions Module for Biorefineries")
 
-	dfbiorefinery = inputs["dfbiorefinery"]
+	dfbioenergy = inputs["dfbioenergy"]
     BIO_RES_ALL = inputs["BIO_RES_ALL"]
 
     T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
     #Bioenergy carbon balance:
-    #Biomass CO2 captured = Biorefinery emissions + biorefinery capture to storage + biofuel emissions
+    #Biomass CO2 captured = Biorefinery emissions + bioenergy capture to storage + biofuel emissions
     #Biorefinery capture to storage is added to CO2 storage balance
     #Net negative emission = Biorefinery capture to storage
 
     #####################################################################################################################################
     #Biomass CO2 capture per plant per time
-    @expression(EP, eBiomass_CO2_captured_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:Biomass_tonne_CO2_per_tonne][i])
+    @expression(EP, eBiomass_CO2_captured_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Biomass_tonne_CO2_per_tonne][i])
 
     #Total biomass CO2 capture per zone per time
-    @expression(EP, eBiomass_CO2_captured_per_zone_per_time[z in 1:Z, t in 1:T], sum(EP[:eBiomass_CO2_captured_per_plant_per_time][i,t] for i in dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID]))
+    @expression(EP, eBiomass_CO2_captured_per_zone_per_time[z in 1:Z, t in 1:T], sum(EP[:eBiomass_CO2_captured_per_plant_per_time][i,t] for i in dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID]))
     
     #####################################################################################################################################
    
     #Biorefinery CO2 emissions per plant per time
-    @expression(EP, eBiorefinery_CO2_emissions_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:CO2_emissions_tonne_per_tonne][i])
+    @expression(EP, eBiorefinery_CO2_emissions_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:CO2_emissions_tonne_per_tonne][i])
     #per zone per time (Add to CO2 emissions)
-    @expression(EP, eBiorefinery_CO2_emissions_per_zone_per_time[z in 1:Z, t in 1:T], sum(EP[:eBiorefinery_CO2_emissions_per_plant_per_time][i,t] for i in dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID]))
+    @expression(EP, eBiorefinery_CO2_emissions_per_zone_per_time[z in 1:Z, t in 1:T], sum(EP[:eBiorefinery_CO2_emissions_per_plant_per_time][i,t] for i in dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID]))
 
     #####################################################################################################################################
     #Biorefinery CO2 capture to storage per plant per time
-    @expression(EP, eBiorefinery_CO2_captured_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbiorefinery[!,:CO2_capture_tonne_per_tonne][i])
+    @expression(EP, eBiorefinery_CO2_captured_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:CO2_capture_tonne_per_tonne][i])
 
     #Total CO2 capture to storage per zone per time
-    @expression(EP, eBiorefinery_CO2_captured_per_zone_per_time[z in 1:Z, t in 1:T], sum(EP[:eBiorefinery_CO2_captured_per_plant_per_time][i,t] for i in dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID]))
+    @expression(EP, eBiorefinery_CO2_captured_per_zone_per_time[z in 1:Z, t in 1:T], sum(EP[:eBiorefinery_CO2_captured_per_plant_per_time][i,t] for i in dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID]))
     
-    @expression(EP, eBiorefinery_CO2_captured_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiorefinery_CO2_captured_per_plant_per_time][i,t] for i in dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID]))
+    @expression(EP, eBiorefinery_CO2_captured_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiorefinery_CO2_captured_per_plant_per_time][i,t] for i in dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID]))
 
     #ADD TO CO2 BALANCE
     EP[:eCaptured_CO2_Balance] += EP[:eBiorefinery_CO2_captured_per_time_per_zone]

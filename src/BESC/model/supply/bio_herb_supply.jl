@@ -15,11 +15,34 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    bio_herb_supply(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    bio_herb_supply(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the amount of bio herb supplies used into the network by zone $z$ by at time period $t, along with the cost and CO2 emissions associated with it.
+Sets up herb biomass variables
+
+This module defines the herb biomass resource decision variable $x_{z,t}^{\textrm{B,Herb}} \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing herb biomass utilized in zone $z$ at time period $t$. 
+
+The variables defined in this file named after ```vHerb\textunderscore{biomass}\textunderscore{utilized}\textunderscore{per}\textunderscore{zone}\textunderscore{per}\textunderscore{time}``` covers all variables $x_{z,t}^{\textrm{B,Herb}}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of generation (variable OM) from herb biomass supply over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{Herb,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{r}^{\textrm{Herb,VOM}} \times x_{z,t}^{\textrm{B,Herb}}
+\end{equation*}
+```	
+
+**Maximum herb biomass supply**
+
+```math
+\begin{equation*}
+	x_{z,t}^{\textrm{B,Herb}} \leq  y_{z}^{\textrm{B,Herb}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+This function creates expression to add the CO2 emissions for herb biomass in each zone, which is subsequently added to the total emissions.
 """
-
 function bio_herb_supply(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Bioenergy herbaceous biomass supply cost module")
@@ -30,7 +53,6 @@ function bio_herb_supply(EP::Model, inputs::Dict, setup::Dict)
 
 	#Variables
 	@variable(EP,vHerb_biomass_utilized_per_zone_per_time[z in 1:Z, t in 1:T] >= 0)
-	@variable(EP,vHerb_biomass_supply_cost_per_zone_per_time[z in 1:Z, t in 1:T] >= 0)
 
 	Herb_biomass_supply_df = inputs["Herb_biomass_supply_df"]
 

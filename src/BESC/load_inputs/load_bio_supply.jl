@@ -14,7 +14,11 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	load_bio_supply(setup::Dict, path::AbstractString, sep::AbstractString, inputs_bio_supply::Dict)
 
+Function for reading input parameters related to biomass supply in the bioenergy supply chain.
+"""
 function load_bio_supply(setup::Dict, path::AbstractString, sep::AbstractString, inputs_bio_supply::Dict)
 
 	inputs_bio_supply["Herb_biomass_supply_df"] = DataFrame(CSV.File(string(path,sep,"BESC_Herb_Supply.csv"), header=true), copycols=true)

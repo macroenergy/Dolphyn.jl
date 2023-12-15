@@ -15,15 +15,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the diferent capacities for the different capture technologies (starting capacities or, existing capacities, retired capacities, and new-built capacities).
+Function for writing the diferent capacities for biorefinery resources.
 """
 function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity_tonne_biomass_per_h decisions
-	dfbiorefinery = inputs["dfbiorefinery"]
+	dfbioenergy = inputs["dfbioenergy"]
 	H = inputs["BIO_RES_ALL"]
-	capbiorefinery = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+	capbioenergy = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 	capbioelectricity = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 	capbioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 	capbiodiesel = zeros(size(inputs["BIO_RESOURCES_NAME"]))
@@ -32,7 +32,7 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 	capbioethanol = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 
 	for i in 1:inputs["BIO_RES_ALL"]
-		capbiorefinery[i] = value(EP[:vCapacity_BIO_per_type][i])
+		capbioenergy[i] = value(EP[:vCapacity_BIO_per_type][i])
 		#capbioelectricity[i] = 0
 		#capbioH2[i] = 0
 		#capbiodiesel[i] = 0
@@ -42,27 +42,27 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 	end
 
 	for i in inputs["BIO_E"]
-		capbioelectricity[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioElectricity_yield_MWh_per_tonne][i]
+		capbioelectricity[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioElectricity_yield_MWh_per_tonne][i]
 	end
 
 	for i in inputs["BIO_H2"]
-		capbioH2[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i]
+		capbioH2[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioH2_yield_tonne_per_tonne][i]
 	end
 
 	for i in inputs["BIO_DIESEL"]
-		capbiodiesel[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioDiesel_yield_MMBtu_per_tonne][i]
+		capbiodiesel[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioDiesel_yield_MMBtu_per_tonne][i]
 	end
 
 	for i in inputs["BIO_JETFUEL"]
-		capbiojetfuel[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioJetfuel_yield_MMBtu_per_tonne][i]
+		capbiojetfuel[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioJetfuel_yield_MMBtu_per_tonne][i]
 	end
 
 	for i in inputs["BIO_GASOLINE"]
-		capbiogasoline[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioGasoline_yield_MMBtu_per_tonne][i]
+		capbiogasoline[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioGasoline_yield_MMBtu_per_tonne][i]
 	end
 
 	for i in inputs["BIO_ETHANOL"]
-		capbioethanol[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioEthanol_yield_MMBtu_per_tonne][i]
+		capbioethanol[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioEthanol_yield_MMBtu_per_tonne][i]
 	end
 
 	AnnualElectricity = zeros(size(1:inputs["BIO_RES_ALL"]))
@@ -98,8 +98,8 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 
 
 	dfCap = DataFrame(
-		Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone],
-		Capacity_tonne_biomass_per_h = capbiorefinery[:],
+		Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbioenergy[!,:Zone],
+		Capacity_tonne_biomass_per_h = capbioenergy[:],
 		Capacity_Bioelectricity_MWh_per_h = capbioelectricity[:],
 		Capacity_BioH2_tonne_per_h = capbioH2[:],
 		Capacity_Biodiesel_MMBtu_per_h = capbiodiesel[:],
@@ -159,7 +159,7 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 		)
 
 	dfCap = vcat(dfCap, total)
-	CSV.write(string(path,sep,"BESC_biorefinery_capacity.csv"), dfCap)
+	CSV.write(string(path,sep,"BESC_bioenergy_capacity.csv"), dfCap)
 
 	return dfCap
 end

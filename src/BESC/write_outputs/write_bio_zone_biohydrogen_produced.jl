@@ -14,9 +14,13 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+@doc raw"""
+	write_bio_zone_biohydrogen_produced(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
+Function for reporting the biohydrogen produced across different zones with time.
+"""
 function write_bio_zone_biohydrogen_produced(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfbiorefinery = inputs["dfbiorefinery"]
+	dfbioenergy = inputs["dfbioenergy"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -31,9 +35,9 @@ function write_bio_zone_biohydrogen_produced(path::AbstractString, sep::Abstract
 
 	   	for t in 1:T
 			if setup["ParameterScale"]==1
-	     		dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiohydrogen_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))*ModelScalingFactor
+	     		dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiohydrogen_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))*ModelScalingFactor
 			else
-				dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiohydrogen_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiohydrogen_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 	   	end
 

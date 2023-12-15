@@ -17,11 +17,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_BESC_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for writing the cost for the different sectors of the bioenergy supply chain (Biorefineries, herbaceous and woody resources).
+Function for writing the cost for the different sectors of the bioenergy supply chain (Biorefinery resources CAPEX and OPEX, herb and wood biomass supply).
 """
 function write_BESC_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
-	dfbiorefinery = inputs["dfbiorefinery"]
+	dfbioenergy = inputs["dfbioenergy"]
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 	
@@ -52,7 +52,7 @@ function write_BESC_costs(path::AbstractString, sep::AbstractString, inputs::Dic
 		tempCBIOHerb = 0
 		tempCBIOWood = 0
 
-		for y in dfbiorefinery[dfbiorefinery[!,:Zone].==z,:][!,:R_ID]
+		for y in dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID]
 
 			tempCBIOFix = tempCBIOFix + value.(EP[:eFixed_Cost_BIO_per_type])[y]
 			tempCBIOVar = tempCBIOVar + sum(value.(EP[:eVar_Cost_BIO_per_plant])[y,:])

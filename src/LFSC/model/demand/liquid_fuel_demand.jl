@@ -78,19 +78,20 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         EP[:eObj] += eTotalCLFDieselVarOut
 
         ####Constraining amount of syn fuel
-        
-        if setup["SpecifySynBioDieselPercentFlag"] == 1
+        if setup["Bio_Diesel_On"] == 0
+            if setup["SpecifySynBioDieselPercentFlag"] == 1
 
-            percent_sbf_diesel = setup["percent_sbf_diesel"]
+                percent_sbf_diesel = setup["percent_sbf_diesel"]
 
-            #Sum up conventional fuel production
-            @expression(EP, eConvLFDieselDemandT[t=1:T], sum(inputs["omega"][t]*vConvLFDieselDemand[t, z] for z in 1:Z))
-            @expression(EP, eConvLFDieselDemandTZ, sum(eConvLFDieselDemandT[t] for t in 1:T))
+                #Sum up conventional fuel production
+                @expression(EP, eConvLFDieselDemandT[t=1:T], sum(inputs["omega"][t]*vConvLFDieselDemand[t, z] for z in 1:Z))
+                @expression(EP, eConvLFDieselDemandTZ, sum(eConvLFDieselDemandT[t] for t in 1:T))
 
-            #Sum up synfuel fuel production (Synfuel main product is diesel)
-            @expression(EP, eSynFuelProd_DieselT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Diesel][t, z] for z in 1:Z))
-            @expression(EP, eSynFuelProd_DieselTZ, sum(eSynFuelProd_DieselT[t] for t in 1:T))
-            @constraint(EP, cSynFuelDieselShare, (percent_sbf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
+                #Sum up synfuel fuel production (Synfuel main product is diesel)
+                @expression(EP, eSynFuelProd_DieselT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Diesel][t, z] for z in 1:Z))
+                @expression(EP, eSynFuelProd_DieselTZ, sum(eSynFuelProd_DieselT[t] for t in 1:T))
+                @constraint(EP, cSynFuelDieselShare, (percent_sbf_diesel - 1) * eSynFuelProd_DieselTZ + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
+            end
         end
 
     end
@@ -123,19 +124,20 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         EP[:eObj] += eTotalCLFJetfuelVarOut
     
         ####Constraining amount of syn fuel
-        
-        if setup["SpecifySynBioJetfuelPercentFlag"] == 1
+        if setup["Bio_Jetfuel_On"] == 0
+            if setup["SpecifySynBioJetfuelPercentFlag"] == 1
 
-            percent_sbf_jetfuel = setup["percent_sbf_jetfuel"]
+                percent_sbf_jetfuel = setup["percent_sbf_jetfuel"]
 
-            #Sum up conventional fuel production
-            @expression(EP, eConvLFJetfuelDemandT[t=1:T], sum(inputs["omega"][t]*vConvLFJetfuelDemand[t, z] for z in 1:Z))
-            @expression(EP, eConvLFJetfuelDemandTZ, sum(eConvLFJetfuelDemandT[t] for t in 1:T))
+                #Sum up conventional fuel production
+                @expression(EP, eConvLFJetfuelDemandT[t=1:T], sum(inputs["omega"][t]*vConvLFJetfuelDemand[t, z] for z in 1:Z))
+                @expression(EP, eConvLFJetfuelDemandTZ, sum(eConvLFJetfuelDemandT[t] for t in 1:T))
 
-            #Sum up synfuel fuel production (Synfuel main product is jetfuel)
-            @expression(EP, eSynFuelProd_JetfuelT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Jetfuel][t, z] for z in 1:Z))
-            @expression(EP, eSynFuelProd_JetfuelTZ, sum(eSynFuelProd_JetfuelT[t] for t in 1:T))
-            @constraint(EP, cSynFuelJetfuelShare, (percent_sbf_jetfuel - 1) * eSynFuelProd_JetfuelTZ + percent_sbf_jetfuel *  eConvLFJetfuelDemandTZ == 0)
+                #Sum up synfuel fuel production (Synfuel main product is jetfuel)
+                @expression(EP, eSynFuelProd_JetfuelT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Jetfuel][t, z] for z in 1:Z))
+                @expression(EP, eSynFuelProd_JetfuelTZ, sum(eSynFuelProd_JetfuelT[t] for t in 1:T))
+                @constraint(EP, cSynFuelJetfuelShare, (percent_sbf_jetfuel - 1) * eSynFuelProd_JetfuelTZ + percent_sbf_jetfuel *  eConvLFJetfuelDemandTZ == 0)
+            end
         end
        
     end
@@ -168,19 +170,20 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         EP[:eObj] += eTotalCLFGasolineVarOut
     
         ####Constraining amount of syn fuel
-        
-        if setup["SpecifySynBioGasolinePercentFlag"] == 1
+        if setup["Bio_Gasoline_On"] == 0
+            if setup["SpecifySynBioGasolinePercentFlag"] == 1
 
-            percent_sbf_gasoline = setup["percent_sbf_gasoline"]
+                percent_sbf_gasoline = setup["percent_sbf_gasoline"]
 
-            #Sum up conventional fuel production
-            @expression(EP, eConvLFGasolineDemandT[t=1:T], sum(inputs["omega"][t]*vConvLFGasolineDemand[t, z] for z in 1:Z))
-            @expression(EP, eConvLFGasolineDemandTZ, sum(eConvLFGasolineDemandT[t] for t in 1:T))
+                #Sum up conventional fuel production
+                @expression(EP, eConvLFGasolineDemandT[t=1:T], sum(inputs["omega"][t]*vConvLFGasolineDemand[t, z] for z in 1:Z))
+                @expression(EP, eConvLFGasolineDemandTZ, sum(eConvLFGasolineDemandT[t] for t in 1:T))
 
-            #Sum up synfuel fuel production (Synfuel main product is gasoline)
-            @expression(EP, eSynFuelProd_GasolineT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Gasoline][t, z] for z in 1:Z))
-            @expression(EP, eSynFuelProd_GasolineTZ, sum(eSynFuelProd_GasolineT[t] for t in 1:T))
-            @constraint(EP, cSynFuelGasolineShare, (percent_sbf_gasoline - 1) * eSynFuelProd_GasolineTZ + percent_sbf_gasoline *  eConvLFGasolineDemandTZ == 0)
+                #Sum up synfuel fuel production (Synfuel main product is gasoline)
+                @expression(EP, eSynFuelProd_GasolineT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Gasoline][t, z] for z in 1:Z))
+                @expression(EP, eSynFuelProd_GasolineTZ, sum(eSynFuelProd_GasolineT[t] for t in 1:T))
+                @constraint(EP, cSynFuelGasolineShare, (percent_sbf_gasoline - 1) * eSynFuelProd_GasolineTZ + percent_sbf_gasoline *  eConvLFGasolineDemandTZ == 0)
+            end
         end
 
     end

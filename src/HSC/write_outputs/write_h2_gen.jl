@@ -45,11 +45,11 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	rename!(total,auxNew_Names)
 
 	if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
+		dfbioenergy = inputs["dfbioenergy"]
 		B = inputs["BIO_RES_ALL"]
 		
 		# Power injected by each resource in each time step
-		dfOut_BioH2 = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
+		dfOut_BioH2 = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbioenergy[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
 		
 		biohydrogen_produced = value.(EP[:eBiohydrogen_produced_per_plant_per_time])
 		dfOut_BioH2.AnnualSum .= biohydrogen_produced * inputs["omega"]

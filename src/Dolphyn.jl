@@ -34,7 +34,7 @@ export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
 export write_liquid_fuels_outputs
-export write_BESC_outputs
+export write_bio_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters

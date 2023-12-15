@@ -15,9 +15,33 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    bio_wood_supply(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the amount of bio wood supplies used into the network by zone $z$ by at time period $t, along with the cost and CO2 emissions associated with it.
+Sets up wood biomass variables
+
+This module defines the wood biomass resource decision variable $x_{z,t}^{\textrm{B,Wood}} \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing wood biomass utilized in zone $z$ at time period $t$. 
+
+The variables defined in this file named after ```vWood\textunderscore{biomass}\textunderscore{utilized}\textunderscore{per}\textunderscore{zone}\textunderscore{per}\textunderscore{time}``` covers all variables $x_{z,t}^{\textrm{B,Wood}}$.
+
+**Cost expressions**
+
+This module additionally defines contributions to the objective function from variable costs of generation (variable OM) from wood biomass supply over all time periods.
+
+```math
+\begin{equation*}
+	\textrm{C}^{\textrm{Wood,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{r}^{\textrm{Wood,VOM}} \times x_{z,t}^{\textrm{B,Wood}}
+\end{equation*}
+```	
+
+**Maximum wood biomass supply**
+
+```math
+\begin{equation*}
+	x_{z,t}^{\textrm{B,Wood}} \leq  y_{z}^{\textrm{B,Wood}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+\end{equation*}
+```
+
+This function creates expression to add the CO2 emissions for wood biomass in each zone, which is subsequently added to the total emissions.
 """
 
 function bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)

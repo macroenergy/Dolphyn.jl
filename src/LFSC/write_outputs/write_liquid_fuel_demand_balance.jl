@@ -29,7 +29,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	rowoffset=3
 
 	if setup["ModelBESC"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
+		dfbioenergy = inputs["dfbioenergy"]
 	end
 	
 	for z in 1:Z
@@ -42,7 +42,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 			 dfTemp1_Diesel[t+rowoffset,2]= 0
 
 			if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
-				dfTemp1_Diesel[t+rowoffset,2]= sum(value.(EP[:eBiodiesel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1_Diesel[t+rowoffset,2]= sum(value.(EP[:eBiodiesel_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 
 			if setup["AllowConventionalDiesel"] == 1
@@ -71,7 +71,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	rowoffset=3
 
 	if setup["ModelBESC"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
+		dfbioenergy = inputs["dfbioenergy"]
 	end
 	
 	for z in 1:Z
@@ -84,7 +84,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 			 dfTemp1_Jetfuel[t+rowoffset,2]= 0
 
 			if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
-				dfTemp1_Jetfuel[t+rowoffset,2]= sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1_Jetfuel[t+rowoffset,2]= sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 
 			if setup["AllowConventionalJetfuel"] == 1
@@ -113,7 +113,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	rowoffset=3
 
 	if setup["ModelBESC"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
+		dfbioenergy = inputs["dfbioenergy"]
 	end
 
 	for z in 1:Z
@@ -126,7 +126,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 			 dfTemp1_Gasoline[t+rowoffset,2]= 0
 
 			if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
-				dfTemp1_Gasoline[t+rowoffset,2]= sum(value.(EP[:eBiogasoline_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
+				dfTemp1_Gasoline[t+rowoffset,2]= sum(value.(EP[:eBiogasoline_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 
 			if setup["AllowConventionalJetfuel"] == 1

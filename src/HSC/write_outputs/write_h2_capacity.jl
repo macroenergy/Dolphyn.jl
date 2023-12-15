@@ -126,12 +126,12 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	)
 
 	if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
-		dfbiorefinery = inputs["dfbiorefinery"]
+		dfbioenergy = inputs["dfbioenergy"]
 		B = inputs["BIO_RES_ALL"]
 
 		newcap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 		for i in inputs["BIO_H2"]
-			newcap_BioH2[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i]
+			newcap_BioH2[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioH2_yield_tonne_per_tonne][i]
 		end
 
 		startcap_BioH2 = zeros(size(inputs["BIO_RESOURCES_NAME"]))
@@ -161,7 +161,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	
 		MaxGen_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
 		for i in 1:B
-			MaxGen_BioH2[i] = value.(EP[:vCapacity_BIO_per_type])[i] * dfbiorefinery[!,:BioH2_yield_tonne_per_tonne][i] * 8760
+			MaxGen_BioH2[i] = value.(EP[:vCapacity_BIO_per_type])[i] * dfbioenergy[!,:BioH2_yield_tonne_per_tonne][i] * 8760
 		end
 
 		CapFactor_BioH2 = zeros(size(1:inputs["BIO_RES_ALL"]))
@@ -179,7 +179,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 		end
 	
 		dfBioH2_Cap = DataFrame(
-			Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone],
+			Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbioenergy[!,:Zone],
 			StartCap = startcap_BioH2[:],
 			RetCap = retcap_BioH2[:],
 			NewCap = newcap_BioH2[:],

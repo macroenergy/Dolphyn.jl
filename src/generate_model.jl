@@ -402,17 +402,17 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@expression(EP, eBioNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
 		# Variable costs
-		EP = biorefinery_var_cost(EP, inputs, setup)
+		EP = bioenergy_var_cost(EP, inputs, setup)
 
 		# Fixed costs
-		EP = biorefinery_investment(EP, inputs, setup)
+		EP = bioenergy_investment(EP, inputs, setup)
 	
 		# Supply costs
 		EP = bio_herb_supply(EP, inputs, setup)
 		EP = bio_wood_supply(EP, inputs, setup)
 
 		if !isempty(inputs["BIO_RES_ALL"])
-			EP = biorefinery(EP, inputs, setup)
+			EP = bioenergy(EP, inputs, setup)
 		end
 
 		# Direct emissions
