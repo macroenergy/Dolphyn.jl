@@ -82,11 +82,11 @@ This input file contains input parameters related to: 1) definition of pipeline 
 |Max_Flow_Tonne_p_Hr_Per_Pipe | Maximum capacity (flow rate) per hydrogen pipeline.|
 |H2Pipe_Inv_Cost_per_mile_yr | Annulized capital investment cost per pipeline-mile.|
 |Pipe_length_miles | Hydrogen pipeline length in miles.|
-|H2PipeCap_tonne_per_mile | Maximum storage capacity per hydrogen pipeline per mile.|
+|H2PipeCap_MW_per_mile | Maximum storage capacity per hydrogen pipeline per mile.|
 |Min_pipecap_stor_frac | Minimum storage capacity per hydrogen pipeline in percentage of maximum.|
 |len_bw_comp_mile | Length between two booster compressors in miles.|
-|BoosterCompCapex_per_tonne_p_hr_yr | Annulized investment cost of booster compressors per tonne/hr.|
-|BoosterCompEnergy_MWh_per_tonne | Electricity consumption of booster compressor per tonne of hydrogen in MWh.|
+|BoosterCompCapex_p_MWhr_yr | Annulized investment cost of booster compressors per MWh.|
+|BoosterCompEnergy | Electricity consumption of booster compressor per MWh of hydrogen in MWh.|
 |H2PipeCompCapex | Annulized investment cost for main compressor (at pipeline entrance).|
 |H2PipeCompEnergy | Energy consumption for main compressor.|
 
@@ -99,12 +99,12 @@ This file includes parameters to characterize model temporal resolution to appro
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Columns**|
-|Voll |Value of lost hydrogen load in \$/tonne-H$_2$.|
+|Voll |Value of lost hydrogen load in \$/MWh-H$_2$.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
 |Cost\_of\_Demand\_Curtailment\_per\_Tonne |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
 |Time\_Index |Index defining time step in the model.|
-|Load\_H2\_tonne\_per\_hr\_z* |Load profile of a zone z* in tonne/hr; if multiple zones, this parameter will be a matrix with columns equal to number of zones (each column named appropriate zone number appended to parameter) and rows equal to number of time periods of grid operations being modeled.|
+|Load\_H2\_MWh\_z* |Load profile of a zone z* in MWh; if multiple zones, this parameter will be a matrix with columns equal to number of zones (each column named appropriate zone number appended to parameter) and rows equal to number of time periods of grid operations being modeled.|
 
 #### 2.1.4 HSC\_generator\_variability.csv
 
@@ -139,7 +139,7 @@ This file contains cost and performance parameters for various generators and ot
 ||H2\_LIQ = 2: For liquifiers subject to simplified economic dispatch constraints. |
 ||H2\_LIQ = 3: For evaporators subject to unit commitment constraints/decisions if `UCommit >= 1` (e.g. cycling decisions/costs/constraints). |
 ||H2\_LIQ = 4: For evaporators subject to simplified economic dispatch constraints. |
-|Cap\_Size\_tonne\_p\_hr | Size (tonne/hr) of a single generating unit. This is used only for resources with integer unit commitment (`H2_GEN_TYPE = 1`) - not relevant for other resources.|
+|Cap\_Size\_MWhr | Size (MWh) of a single generating unit. This is used only for resources with integer unit commitment (`H2_GEN_TYPE = 1`) - not relevant for other resources.|
 |H2\_STOR | {0, 1, 2}, Flag to indicate membership in set of storage resources and designate which type of storage resource formulation to employ.|
 ||H2\_STOR = 0: Not part of set (default) |
 ||H2\_STOR = 1: Charging power capacity and energy capacity are the investment decision variables; discharge is not considered - applies for compressed gas storage.|
@@ -151,35 +151,35 @@ This file contains cost and performance parameters for various generators and ot
 ||LDS = 0: short-duration storage (inter-period energy transfer disallowed) |
 ||LDS = 1: long-duration storage (inter-period energy transfer allowed) |
 |**Existing technology capacity**|
-|Existing\_Cap\_tonne\_p\_hr |The existing capacity of a power plant in tonne/hr.|
-|Existing\_Energy\_Cap\_tonne |The existing capacity of storage in tonne where `H2_STOR = 1` or `H2_STOR = 2`.|
+|Existing\_Cap\_MWh |The existing capacity of a power plant in MWh.|
+|Existing\_Energy\_Cap\_MWh |The existing capacity of storage in MWh where `H2_STOR = 1` or `H2_STOR = 2`.|
 |Existing\_Charge\_Cap\_p\_hr |The existing charging capacity for resources where `H2_STOR = 1`.|
 |**Capacity/Energy requirements**|
-|Max\_Cap\_tonne\_p\_hr |-1 (default) – no limit on maximum discharge capacity of the resource. If non-negative, represents maximum allowed discharge capacity (in tonne/hr) of the resource.|
-|Max\_Energy\_Cap\_tonne |-1 (default) – no limit on maximum energy capacity of the resource. If non-negative, represents maximum allowed energy capacity (in tonne) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
-|Max\_Charge\_Cap\_tonne\_p\_hr |-1 (default) – no limit on maximum charge capacity of the resource. If non-negative, represents maximum allowed charge capacity (in tonne/hr) of the resource with `H2_STOR = 2`.|
-|Min\_Energy\_Cap\_tonne |-1 (default) – no limit on minimum discharge capacity of the resource. If non-negative, represents minimum allowed discharge capacity (in tonne/hr) of the resource.|
-|Min\_Cap\_tonne\_p\_hr| -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in tonne) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
-|Min\_Charge\_Cap\_tonne\_p\_hr |-1 (default) – no limit on minimum charge capacity of the resource. If non-negative, represents minimum allowed charge capacity (in tonne/hr) of the resource with `H2_STOR = 2`.|
+|Max\_Cap\_MWh |-1 (default) – no limit on maximum discharge capacity of the resource. If non-negative, represents maximum allowed discharge capacity (in MWh) of the resource.|
+|Max\_Energy\_Cap\_MWh |-1 (default) – no limit on maximum energy capacity of the resource. If non-negative, represents maximum allowed energy capacity (in MWh) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
+|Max\_Charge\_Cap\_MWh |-1 (default) – no limit on maximum charge capacity of the resource. If non-negative, represents maximum allowed charge capacity (in MWh) of the resource with `H2_STOR = 2`.|
+|Min\_Energy\_Cap\_MWh |-1 (default) – no limit on minimum discharge capacity of the resource. If non-negative, represents minimum allowed discharge capacity (in MWh) of the resource.|
+|Min\_Cap\_MWh| -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in MWh) of the resource with `H2_STOR = 1` or `H2_STOR = 2`.|
+|Min\_Charge\_Cap\_MWh |-1 (default) – no limit on minimum charge capacity of the resource. If non-negative, represents minimum allowed charge capacity (in MWh) of the resource with `H2_STOR = 2`.|
 |**Cost parameters**|
-|Inv\_Cost\_p\_tonne\_p\_hr\_yr | Annualized capacity investment cost of a technology (\$/tonne/hr/year). |
-|Inv\_Cost\_Energy\_p\_tonne\_yr | Annualized investment cost of the energy capacity for a storage technology (e.g. a tank) (\$/tonne/hr/year), applicable to either `H2_STOR = 1` or `H2_STOR = 2`. |
-|Inv\_Cost\_Charge\_p\_tonne\_p\_hr\_yr | Annualized capacity investment cost for the charging portion of a storage technology (e.g. compressor) with `H2_STOR = 1` (\$/tonne/hr/year). |
-|Fixed\_OM\_Cost\_p\_tonne\_p\_hr\_yr | Fixed operations and maintenance cost of a technology (\$/tonne/hr/year). |
-|Fixed\_OM\_Cost\_Energy\_p\_tonne\_yr | Fixed operations and maintenance cost of the energy component of a storage technology (\$/tonne/year). |
-|Fixed\_OM\_Cost\_Charge\_p\_tonne\_p\_hr\_yr | Fixed operations and maintenance cost of the charging component of a storage technology of type `H2_STOR = 1`. |
-|Var\_OM\_Cost\_p\_tonne | Variable operations and maintenance cost of a technology (\$/tonne). |
-|Var\_OM\_Cost\_Charge\_p\_tonne | Variable operations and maintenance cost of the charging aspect of a storage technology with `H2_STOR = 1`. |
+|Inv\_Cost\_p\_MWh\_yr | Annualized capacity investment cost of a technology (\$/MWh/year). |
+|Inv\_Cost\_Energy\_p\_MWh\_yr | Annualized investment cost of the energy capacity for a storage technology (e.g. a tank) (\$/MWh/year), applicable to either `H2_STOR = 1` or `H2_STOR = 2`. |
+|Inv\_Cost\_Charge\_p\_MWh\_yr | Annualized capacity investment cost for the charging portion of a storage technology (e.g. compressor) with `H2_STOR = 1` (\$/MWh/year). |
+|Fixed\_OM\_Cost\_p\_MWh\_yr | Fixed operations and maintenance cost of a technology (\$/MWh/year). |
+|Fixed\_OM\_Cost\_Energy\_p\_MWh\_yr | Fixed operations and maintenance cost of the energy component of a storage technology (\$/MWh/year). |
+|Fixed\_OM\_Cost\_Charge\_p\_MWh\_yr | Fixed operations and maintenance cost of the charging component of a storage technology of type `H2_STOR = 1`. |
+|Var\_OM\_Cost\_p\_MWh | Variable operations and maintenance cost of a technology (\$/MWh). |
+|Var\_OM\_Cost\_Charge\_p\_MWh | Variable operations and maintenance cost of the charging aspect of a storage technology with `H2_STOR = 1`. |
 |**Technical performance parameters**|
-|etaFuel\_MMBtu\_p\_tonne  |Heat rate of a generator or MMBtu of fuel consumed per tonne of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
+|etaFuel\_MMBtu\_p\_MWh  |Heat rate of a generator or MMBtu of fuel consumed per MWh of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
 |Fuel  |Fuel needed for a generator. The names should match with the ones in the `Fuels_data.csv`. |
-|etaP2G\_MWh\_p\_tonne | Energy required per tonne of hydrogen generation.|
+|etaP2G | Energy required per MWh of hydrogen generation.|
 |H2Stor\_self\_discharge\_rate\_p\_hour |[0,1], The energy loss of storage technologies per hour (fraction loss per hour)- only applies to storage techs (e.g. boiloff fraction).|
 |H2Gen\_min\_output |[0,1], The minimum generation level for a unit as a fraction of total capacity. |
 |H2Stor\_min\_level |[0,1], The minimum storage level for a unit as a fraction of total capacity. |
 |H2Stor\_max\_level |[0,1], The maximum storage level for a unit as a fraction of total capacity. |
-|H2Stor\_Charge\_MWh\_p\_tonne | Energy consumption for charging hydrogen into storage devices for all storage types. |
-|H2Stor\_Charge\_MMBtu\_p\_tonne | Fuel consumption for charging hydrogen into storage devices for all storage types. |
+|H2Stor\_Charge\_MWh\_p\_MWh | Energy consumption for charging hydrogen into storage devices for all storage types. |
+|H2Stor\_Charge\_MMBtu\_p\_MWh | Fuel consumption for charging hydrogen into storage devices for all storage types. |
 |Ramp\_Up\_Percentage |[0,1], Maximum increase in power output from between two periods (typically hours), reported as a fraction of nameplate capacity. Applies to thermal plants.|
 |Ramp\_Dn\_Percentage |[0,1], Maximum decrease in power output from between two periods (typically hours), reported as a fraction of nameplate capacity. Applies to thermal plants.|
 |H2Stor\_eff\_charge  |[0,1], Efficiency of charging storage – applies to storage technologies (all storage types). |
@@ -245,7 +245,7 @@ This file contains cost and performance parameters for various hydrogen to power
 |Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a technology (\$/MW/year). |
 |Var\_OM\_Cost\_p\_MWh | Variable operations and maintenance cost of a technology (\$/MWh). |
 |**Technical performance parameters**|
-|etaG2P\_MWh\_p\_tonne | Power generation per tonne of hydrogen consumption.|
+|etaG2P | Power generation per MWh of hydrogen consumption.|
 |G2P\_min\_output |[0,1], The minimum generation level for a unit as a fraction of total capacity. |
 |Ramp\_Up\_Percentage |[0,1], Maximum increase in power output from between two periods (typically hours), reported as a fraction of nameplate capacity. Applies to thermal plants.|
 |Ramp\_Dn\_Percentage |[0,1], Maximum decrease in power output from between two periods (typically hours), reported as a fraction of nameplate capacity. Applies to thermal plants.|
@@ -260,7 +260,7 @@ This file contains cost and performance parameters for various hydrogen to power
 |**H2G2PCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints.|
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
-|Start\_Cost\_per\_MW |Cost per tonne/hr of nameplate capacity to start a generator (\$/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+|Start\_Cost\_per\_MW |Cost per MWh of nameplate capacity to start a generator (\$/MWh per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 
 #### 2.2.3 HSC\_g2p\_generators\_variability.csv
 
@@ -287,20 +287,20 @@ This file contains cost and performance parameters for various hydrogen to power
 ||New\_Build = 1: eligible for capacity expansion and retirement. |
 ||New\_Build = 0: not eligible for capacity expansion, eligible for retirement.|
 ||New\_Build = -1: not eligible for capacity expansion or retirement.|
-|TruckCap\_tonne\_per\_unit | Size (tonne/unit) of a single truck unit. |
+|TruckCap\_MW\_per\_unit | Size (MW/unit) of a single truck unit. |
 |**Existing technology capacity**|
 |Existing\_Number |The existing capacity of a type of hydrogen truck. |
-|Existing\_Energy\_Cap\_tonne\_z* | The existing capacity of truck loading station compression in tonne. |
+|Existing\_Energy\_Cap\_MW\_z* | The existing capacity of truck loading station compression in MW. |
 |**Capacity/Energy requirements**|
-|Max\_Energy\_Cap\_tonne | -1 (default) – no limit on maximum compression capacity of the resource. If non-negative, represents maximum allowed compression capacity (in tonne/hr) of the resource.|
-|Min\_Energy\_Cap\_tonne | 0 (default) – minimum compression capacity of the resource. If non-negative, represents minimum allowed compression capacity (in tonne/hr) of the resource. |
-|H2TruckCompressionEnergy | Compression energy requirements for hydrogen per tonne.|
+|Max\_Energy\_Cap\_MWh | -1 (default) – no limit on maximum compression capacity of the resource. If non-negative, represents maximum allowed compression capacity (in MWh) of the resource.|
+|Min\_Energy\_Cap\_MWh | 0 (default) – minimum compression capacity of the resource. If non-negative, represents minimum allowed compression capacity (in MWh) of the resource. |
+|H2TruckCompressionEnergy | Compression energy requirements for hydrogen per MWh.|
 |**Cost parameters**|
 |Inv\_Cost\_p\_unit\_p\_yr | Annualized capacity investment cost of a type of truck (\$/unit/year). |
-|Inv\_Cost\_Energy\_p\_tonne\_yr | Annualized capacity investment cost of compression stations for trucks. | 
+|Inv\_Cost\_Energy\_p\_MWh\_yr | Annualized capacity investment cost of compression stations for trucks. | 
 |Fixed\_OM\_p\_MW\_yr | Fixed operations and maintenance cost of a truck (\$/unit/year). |
-|Fixed\_OM\_Cost\_Energy\_p\_tonne\_yr | Fixed operations and maintenance cost of compression stations for trucks. |
-|H2TruckCompressionUnitOpex | Variable cost for compression for hydrogen per tonne.|
+|Fixed\_OM\_Cost\_Energy\_p\_MWh\_yr | Fixed operations and maintenance cost of compression stations for trucks. |
+|H2TruckCompressionUnitOpex | Variable cost for compression for hydrogen per MWh.|
 |H2TruckUnitOpex\_per\_mile\_full | Variable cost for full truck operation. |
 |H2TruckUnitOpex\_per\_mile\_empty | Variable cost for empty truck operation. |
 |**Technical performance parameters**|
@@ -312,7 +312,7 @@ This file contains cost and performance parameters for various hydrogen to power
 |Fuel | Fuel type of truck. |
 |Fuel\_MMBTU\_per\_mile | Fuel consumption for truck in operation per mile if it burns fuels. |
 |Power\_MW\_per\_mile | Power consumption for truck in operation per mile if it feeds on power. |
-|H2\_tonne\_per\_mile | H$_2$ consumption for truck in operation per mile if it feeds on hydrogen. |
+|H2\_MW\_per\_mile | H$_2$ consumption for truck in operation per mile if it feeds on hydrogen. |
 
 #### 2.2.5 HSC\_load\_data\_liquid.csv
 
@@ -323,12 +323,12 @@ This optional file includes parameters to characterize model temporal resolution
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Columns**|
-|Voll |Value of lost hydrogen load in \$/tonne-H$_2$.|
+|Voll |Value of lost hydrogen load in \$/MW-H$_2$.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
 |Cost\_of\_Demand\_Curtailment\_per\_Tonne |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
 |Time\_Index |Index defining time step in the model.|
-|Load\_liqH2\_tonne\_per\_hr\_z* |Load profile of a zone z* in tonne/hr; if multiple zones, this parameter will be a matrix with columns equal to number of zones (each column named appropriate zone number appended to parameter) and rows equal to number of time periods of grid operations being modeled.|
+|Load\_liqH2\_MW\_z* |Load profile of a zone z* in MWh; if multiple zones, this parameter will be a matrix with columns equal to number of zones (each column named appropriate zone number appended to parameter) and rows equal to number of time periods of grid operations being modeled.|
 
 
 ## 3 Outputs
@@ -362,7 +362,7 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 
 #### 3.1.2 HSC_emissions.csv
 
-Reports CO2 emissions for each zone and each hour by H$_2$ Resources; an annual sum row will be provided (in tonnes). 
+Reports CO2 emissions for each zone and each hour by H$_2$ Resources; an annual sum row will be provided (in MW). 
 
 #### 3.1.4 HSC_nse.csv
 
@@ -370,11 +370,11 @@ Reports H$_2$ non-served energy for every model zone, time step and cost-segment
 
 #### 3.1.5 HSC_generation_discharge.csv
 
-Reports H$_2$ discharged by each H$_2$ production resource (generation, storage) in each model time step, as well as the annual sum (in tonnes). 
+Reports H$_2$ discharged by each H$_2$ production resource (generation, storage) in each model time step, as well as the annual sum (in MW). 
 
 #### 3.1.6 HSC_h2_balance.csv
 
-Reports the use (tonnes/hour or tonnes) of each H$_2$ resource type (Generation, Flexible Demand, Storage Charge & Discharge, Nonserved Energy, H$_2$ Pipeline Import/Export, H$_2$ Truck Import/Export, G2P Demand, and Demand) for each zone and each time step, as well as the annual sum. 
+Reports the use (MWh or MW) of each H$_2$ resource type (Generation, Flexible Demand, Storage Charge & Discharge, Nonserved Energy, H$_2$ Pipeline Import/Export, H$_2$ Truck Import/Export, G2P Demand, and Demand) for each zone and each time step, as well as the annual sum. 
 
 #### 3.1.7 HSC_costs.csv
 
@@ -397,23 +397,23 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 
 #### 3.2.2 HSC_G2P_H2_consumption.csv
 
-Reports H$_2$ required (in tonnes) by G2P for each zone and each model time step, as well as the annual sum. 
+Reports H$_2$ required (in MW) by G2P for each zone and each model time step, as well as the annual sum. 
 
 #### 3.2.3 HSC_charge.csv
 
-Reports H$_2$ charging (i.e flow in tonnes for each hour) for storage resources for each zone and time step, as well as the annual sum. 
+Reports H$_2$ charging (i.e flow in MWh) for storage resources for each zone and time step, as well as the annual sum. 
 
 #### 3.2.4 HSC_storage.csv
 
-Reports storage level (i.e amount of H$_2$ in tonnes) for storage resources for each zone and time step. 
+Reports storage level (i.e amount of H$_2$ in MW) for storage resources for each zone and time step. 
 
 #### 3.2.5 HSC_h2_pipeline_flow.csv
 
-Reports H$_2$ level (in tonnes/hour) in each pipeline for each time step, as well as the amount of hydrogen (in tonnes) sent from the source or arrived at the sink. 
+Reports H$_2$ level (in MWh) in each pipeline for each time step, as well as the amount of hydrogen (in MW) sent from the source or arrived at the sink. 
 
 #### 3.2.6 HSC_h2_pipeline_level.csv
 
-Reports H$_2$ level (in tonnes/hour) in each pipeline for each time step. 
+Reports H$_2$ level (in MWh) in each pipeline for each time step. 
 
 #### 3.2.7 TRUCKS
 
@@ -431,18 +431,18 @@ This file reports truck capacity and related compression capacity. The columns a
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
-| StartTruck | Initial truck capacity of each truck type; this is an input |tonne-H$_2$ |
-| NewTruck | Newly invested truck capacity of each truck type; this is a decision variable |tonne-H$_2$|
-| RetTruck | Retired truck capacity of each truck type; this is a decision variable |tonne-H$_2$ |
-| EndTruck | Total truck capacity of each truck type |tonne-H$_2$ |
-|StartTruckEnergyZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |tonne-H$_2$/hour|
-|NewTruckEnergyZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H$_2$/hour|
-|RetTruckEnergyZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable|tonne-H$_2$/hour|
-|EndTruckEnergyZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index}|tonne-H$_2$/hour|
-|StartTruckEnergy| Total initial truck compression capacity of each truck type; this is an input|tonne-H$_2$/hour|
-|NewTruckEnergy| Total newly invested truck compression capacity of each truck type; this is a decision variable |tonne-H$_2$/hour|
-|RetTruckEnergy| Total retired truck compression capacity of each truck type; this is a decision variable|tonne-H$_2$/hour|
-|EndTruckEnergy| Total truck compreession capacity of each truck type|tonne-H$_2$/hour|
+| StartTruck | Initial truck capacity of each truck type; this is an input |MW-H$_2$ |
+| NewTruck | Newly invested truck capacity of each truck type; this is a decision variable |MW-H$_2$|
+| RetTruck | Retired truck capacity of each truck type; this is a decision variable |MW-H$_2$ |
+| EndTruck | Total truck capacity of each truck type |MW-H$_2$ |
+|StartTruckEnergyZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |MWh-H$_2$|
+|NewTruckEnergyZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|MWh-H$_2$|
+|RetTruckEnergyZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable|MWh-H$_2$|
+|EndTruckEnergyZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index}|MWh-H$_2$|
+|StartTruckEnergy| Total initial truck compression capacity of each truck type; this is an input|MWh-H$_2$|
+|NewTruckEnergy| Total newly invested truck compression capacity of each truck type; this is a decision variable |MWh-H$_2$|
+|RetTruckEnergy| Total retired truck compression capacity of each truck type; this is a decision variable|MWh-H$_2$|
+|EndTruckEnergy| Total truck compreession capacity of each truck type|MWh-H$_2$|
 
 ##### 3.2.7.2 H2TruckTransit Folder
 This folder contains output files reporting variables of different transition statuses (arrive, depart and travel) in combination with loading statuses (full and empty). Each file is named after the pattern like H2Truck{transition}{loading}.csv like H2TruckArriveFull.csv reports total number of arriving trucks. The columns are separated by truck types and indexed with time steps. Other files have the same logic of reporting outputs.
