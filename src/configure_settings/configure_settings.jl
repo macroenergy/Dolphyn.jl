@@ -140,14 +140,14 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
 
     set_default_if_absent!(settings, "ModelLiquidFuels",0)
     set_default_if_absent!(settings, "AllowConventionalDiesel",1)
-    set_default_if_absent!(settings, "SpecifySynBioDieselPercentFlag",0)
-    set_default_if_absent!(settings, "percent_sbf_diesel",0)
+    set_default_if_absent!(settings, "SpecifySynDieselPercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_diesel",0)
     set_default_if_absent!(settings, "AllowConventionalJetfuel",1)
-    set_default_if_absent!(settings, "SpecifySynBioJetfuelPercentFlag",0)
-    set_default_if_absent!(settings, "percent_sbf_jetfuel",0)
+    set_default_if_absent!(settings, "SpecifySynJetfuelPercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_jetfuel",0)
     set_default_if_absent!(settings, "AllowConventionalGasoline",1)
-    set_default_if_absent!(settings, "SpecifySynBioGasolinePercentFlag",0)
-    set_default_if_absent!(settings, "percent_sbf_gasoline",0)
+    set_default_if_absent!(settings, "SpecifySynGasolinePercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_gasoline",0)
 
     set_default_if_absent!(settings, "BIO_Diesel_On",0)
     set_default_if_absent!(settings, "BIO_Jetfuel_On",0)
@@ -156,6 +156,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     #Parameter Scaling for Liquid Fuels is untested
     if settings["ModelLiquidFuels"] == 1
         settings["ParameterScale"] = 0
+    end
+
+    if (settings["SpecifySynDieselPercentFlag"] + settings["SpecifySynJetfuelPercentFlag"] + settings["SpecifySynGasolinePercentFlag"] ) > 1
+        error("Only one of SpecifySynDieselPercentFlag, SpecifySynJetfuelPercentFlag, and SpecifySynGasolinePercentFlag can be on")
     end
 
 return settings
