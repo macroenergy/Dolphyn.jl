@@ -1,16 +1,16 @@
 ModelLiquidFuels: 1 #Flag to turn or off Syn Fuel modelling capabilities - 0 - no SF, 1- SF modeled
 
 AllowConventionalDiesel: 1
-SpecifySynDieselPercentFlag: 1
-percent_sf_diesel: 0.25
+SpecifySynBioDieselPercentFlag: 1
+percent_sbf_diesel: 0.25
 
 AllowConventionalJetfuel: 1
-SpecifySynJetfuelPercentFlag: 0
-percent_sf_jetfuel: 0.0
+SpecifySynBioJetfuelPercentFlag: 0
+percent_sbf_jetfuel: 0.0
 
 AllowConventionalGasoline: 1
-SpecifySynGasolinePercentFlag: 0
-percent_sf_gasoline: 0.0
+SpecifySynBioGasolinePercentFlag: 0
+percent_sbf_gasoline: 0.0
 
 #Syn_Fuel_Commit: 1 # Continuous or binary capacity representation of Syn Fuel production technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as binary variables;
 #Not yet modeled

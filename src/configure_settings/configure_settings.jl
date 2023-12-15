@@ -130,10 +130,6 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "ModelCO2Pipelines", 0)
     set_default_if_absent!(settings, "CO2NetworkExpansion", 0)
     set_default_if_absent!(settings, "CO2Pipeline_Loss", 0)  
-    
-    set_default_if_absent!(settings, "ModelBIO", 0)
-    set_default_if_absent!(settings, "BIO_H2_On", 0)
-
 
     ############################################################
     ###LF Model Settings Options#####
@@ -149,12 +145,23 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "SpecifySynBioGasolinePercentFlag",0)
     set_default_if_absent!(settings, "percent_sbf_gasoline",0)
 
-    set_default_if_absent!(settings, "BIO_Diesel_On",0)
-    set_default_if_absent!(settings, "BIO_Jetfuel_On",0)
-    set_default_if_absent!(settings, "BIO_Gasoline_On",0)
-
     #Parameter Scaling for Liquid Fuels is untested
     if settings["ModelLiquidFuels"] == 1
+        settings["ParameterScale"] = 0
+    end
+
+    ############################################################
+    ###BESC Model Settings Options#####
+    set_default_if_absent!(settings, "ModelBESC", 0)
+    set_default_if_absent!(settings, "Bio_H2_On", 0)
+    set_default_if_absent!(settings, "Bio_Electricity_On", 0)
+    set_default_if_absent!(settings, "Bio_Diesel_On", 0)
+    set_default_if_absent!(settings, "Bio_Jetfuel_On", 0)
+    set_default_if_absent!(settings, "Bio_Gasoline_On", 0)
+    set_default_if_absent!(settings, "Bio_Ethanol_On", 0)
+
+    #Parameter Scaling for BESC is untested
+    if settings["ModelBESC"] == 1
         settings["ParameterScale"] = 0
     end
 

@@ -42,7 +42,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2))
 	Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2))
 
-	if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+	if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
 		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z) - sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z])) for z in 1:Z)
 	else
 		Bio_H2 = 0
@@ -122,7 +122,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		end
 
 
-		if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
 			tempBio_H2 = tempBio_H2 + sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) - sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z]))
 		end
 

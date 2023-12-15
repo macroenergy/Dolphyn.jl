@@ -63,6 +63,6 @@ function write_liquid_fuels_outputs(EP::Model, genx_path::AbstractString, setup:
   write_synfuel_emissions(path,sep,inputs, setup, EP)
 
   ## Print confirmation
-  println("Wrote SF outputs to $path$sep")
+  println("Wrote LF outputs to $path$sep")
 
 end # END output()

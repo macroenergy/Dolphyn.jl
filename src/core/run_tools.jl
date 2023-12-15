@@ -46,11 +46,18 @@ function load_settings(settings_path::AbstractString)
         mysetup_lf = Dict()
     end 
 
+    besc_settings_path = joinpath(settings_path, "besc_settings.yml") #Settings YAML file path for BESC model
+    if isfile(lf_settings_path)
+        mysetup_besc = YAML.load(open(besc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
+    else
+        mysetup_besc = Dict()
+    end 
+
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
     mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
 
     mysetup = Dict{Any,Any}()
-    mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+    mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_lf, mysetup_besc, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
     mysetup = configure_settings(mysetup)
 
     return mysetup
@@ -87,6 +94,15 @@ function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any
     end
 
     if mysetup["ModelCSC"] == 1
-        print_and_log("CSC and SF TDR not implemented.")
+        print_and_log("CSC TDR not implemented.")
     end
+
+    if mysetup["ModelLiquidFuels"] == 1
+        print_and_log("Liquid Fuels TDR not implemented.")
+    end
+
+    if mysetup["ModelBESC"] == 1
+        print_and_log("BESC TDR not implemented.")
+    end
+    
 end

@@ -27,12 +27,14 @@ export load_inputs
 export load_h2_inputs
 export load_co2_inputs
 export load_liquid_fuels_inputs
+export load_bio_inputs
 export generate_model
 export solve_model
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
 export write_liquid_fuels_outputs
+export write_BESC_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
@@ -156,6 +158,9 @@ include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
 # Load all .jl files from the LFSC directory
 include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
 
+# Load all .jl files from the BESC directory
+include_from_dir(joinpath(@__DIR__,"BESC"), ".jl")
+
 # Load all .jl files from the core directory
 include_from_dir(joinpath(@__DIR__,"core"), ".jl")
 
@@ -168,7 +173,7 @@ include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
 # Files which involve multiple sectors
 include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
 
-# Files which involve multiple sectors
+# Load all .jl files from the CSC directory
 include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
 
 # Load model generation and solving scripts

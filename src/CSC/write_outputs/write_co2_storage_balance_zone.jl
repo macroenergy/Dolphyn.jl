@@ -35,7 +35,7 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 	DAC_Capture =  sum(sum(inputs["omega"].* (value.(EP[:eDAC_CO2_Captured_per_zone_per_time])[z,:])) for z in 1:Z)
 	DAC_Fuel_CCS = sum(sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
-	if setup["ModelBIO"] == 1
+	if setup["ModelBESC"] == 1
 		Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 	else
 		Biorefinery_Capture = 0
@@ -98,7 +98,7 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 		tempDAC_Capture = tempDAC_Capture + sum(inputs["omega"].* (value.(EP[:eDAC_CO2_Captured_per_zone_per_time])[z,:]))
 		tempDAC_Fuel_CCS = tempDAC_Fuel_CCS + sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:]))
 
-		if setup["ModelBIO"] == 1
+		if setup["ModelBESC"] == 1
 			tempBiorefinery_Capture = tempBiorefinery_Capture + sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:]))
 		end
 

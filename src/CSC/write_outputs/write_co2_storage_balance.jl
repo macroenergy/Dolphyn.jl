@@ -46,7 +46,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 
 			dfTemp1[t+rowoffset,4] = value(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time][z,t])
 
-			if setup["ModelBIO"] == 1
+			if setup["ModelBESC"] == 1
 				dfTemp1[t+rowoffset,5] = value(EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t])
 			else
 				dfTemp1[t+rowoffset,5] = 0
