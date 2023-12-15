@@ -62,6 +62,11 @@ if mysetup["ModelLiquidFuels"] == 1
     myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
 end
 
+### Load BESC inputs if modeling the bioenergy fuels supply chain
+if mysetup["ModelBESC"] == 1
+    myinputs = load_bio_inputs(myinputs, mysetup, inputs_path)
+end
+
 # ### Generate model
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
@@ -86,9 +91,14 @@ if mysetup["ModelCSC"] == 1
     write_CSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
-# Write synthetic fuels supply chain outputs
+# Write liquid fuels supply chain outputs
 if mysetup["ModelLiquidFuels"] == 1
     write_liquid_fuels_outputs(EP, outpath_GenX, mysetup, myinputs)
+end
+
+# Write bioenergy fuels supply chain outputs
+if mysetup["ModelBESC"] == 1
+    write_BESC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
 compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))

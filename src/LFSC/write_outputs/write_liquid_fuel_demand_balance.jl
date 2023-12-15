@@ -28,7 +28,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	dfSFDieselBalance = Array{Any}
 	rowoffset=3
 
-	if setup["ModelBIO"] == 1
+	if setup["ModelBESC"] == 1
 		dfbiorefinery = inputs["dfbiorefinery"]
 	end
 	
@@ -41,7 +41,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 
 			 dfTemp1_Diesel[t+rowoffset,2]= 0
 
-			if setup["ModelBIO"] == 1 && setup["BIO_Diesel_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
 				dfTemp1_Diesel[t+rowoffset,2]= sum(value.(EP[:eBiodiesel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 
@@ -70,7 +70,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	dfSFJetfuelBalance = Array{Any}
 	rowoffset=3
 
-	if setup["ModelBIO"] == 1
+	if setup["ModelBESC"] == 1
 		dfbiorefinery = inputs["dfbiorefinery"]
 	end
 	
@@ -83,7 +83,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 
 			 dfTemp1_Jetfuel[t+rowoffset,2]= 0
 
-			if setup["ModelBIO"] == 1 && setup["BIO_Jetfuel_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
 				dfTemp1_Jetfuel[t+rowoffset,2]= sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 
@@ -112,7 +112,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 	dfSFGasolineBalance = Array{Any}
 	rowoffset=3
 
-	if setup["ModelBIO"] == 1
+	if setup["ModelBESC"] == 1
 		dfbiorefinery = inputs["dfbiorefinery"]
 	end
 
@@ -125,7 +125,7 @@ function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractStr
 
 			 dfTemp1_Gasoline[t+rowoffset,2]= 0
 
-			if setup["ModelBIO"] == 1 && setup["BIO_Gasoline_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
 				dfTemp1_Gasoline[t+rowoffset,2]= sum(value.(EP[:eBiogasoline_produced_per_plant_per_time][dfbiorefinery[(dfbiorefinery[!,:Zone].==z),:][!,:R_ID],t]))
 			end
 

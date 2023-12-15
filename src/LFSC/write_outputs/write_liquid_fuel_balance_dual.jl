@@ -105,8 +105,8 @@ function write_liquid_fuel_balance_dual(path::AbstractString, sep::AbstractStrin
 
 	CSV.write(string(path,sep,"LF_Gasoline_Balance_Dual.csv"), dftranspose(dfGasolineBalanceDual, false), writeheader=false)
 
-	if setup["ModelBIO"] == 1
-		if setup["BIO_Ethanol_On"] == 1
+	if setup["ModelBESC"] == 1
+		if setup["Bio_Ethanol_On"] == 1
 
 			# # Dual of storage level (state of charge) balance of each resource in each time step
 			dfBioethanolBalanceDual = DataFrame(Zone = 1:Z)

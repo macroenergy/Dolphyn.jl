@@ -110,7 +110,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,14] = 0
 			end
 
-			if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
 				dfTemp1[t+rowoffset,15] = value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone][t,z]) - value.(EP[:eScaled_BioH2_consumption_per_time_per_zone][t,z])
 			else
 				dfTemp1[t+rowoffset,15] = 0
