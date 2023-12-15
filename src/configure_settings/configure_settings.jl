@@ -33,6 +33,12 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     ### MODEL SOLUTION AND OUTPUT PARAMETERS
     ## Write the model formulation as an output; 0 = active; 1 = not active
     set_default_if_absent!(settings, "PrintModel", 0)
+
+    ## Sets Solver Log file Name
+    set_default_if_absent!(settings, "Log", true)
+
+    ## Sets Solver Log file Name
+    set_default_if_absent!(settings, "LogFile", "my_log_file.txt")
    
     ## Set HiGHS as the solver if none is set
     set_default_if_absent!(settings, "Solver", "HiGHS")
@@ -126,8 +132,35 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "CO2Pipeline_Loss", 0)  
     
     set_default_if_absent!(settings, "ModelBIO", 0)
-    set_default_if_absent!(settings, "ModelSynFuels", 0)
     set_default_if_absent!(settings, "BIO_H2_On", 0)
+
+
+    ############################################################
+    ###LF Model Settings Options#####
+
+    set_default_if_absent!(settings, "ModelLiquidFuels",0)
+    set_default_if_absent!(settings, "AllowConventionalDiesel",1)
+    set_default_if_absent!(settings, "SpecifySynDieselPercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_diesel",0)
+    set_default_if_absent!(settings, "AllowConventionalJetfuel",1)
+    set_default_if_absent!(settings, "SpecifySynJetfuelPercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_jetfuel",0)
+    set_default_if_absent!(settings, "AllowConventionalGasoline",1)
+    set_default_if_absent!(settings, "SpecifySynGasolinePercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_gasoline",0)
+
+    set_default_if_absent!(settings, "BIO_Diesel_On",0)
+    set_default_if_absent!(settings, "BIO_Jetfuel_On",0)
+    set_default_if_absent!(settings, "BIO_Gasoline_On",0)
+
+    #Parameter Scaling for Liquid Fuels is untested
+    if settings["ModelLiquidFuels"] == 1
+        settings["ParameterScale"] = 0
+    end
+
+    if (settings["SpecifySynDieselPercentFlag"] + settings["SpecifySynJetfuelPercentFlag"] + settings["SpecifySynGasolinePercentFlag"] ) > 1
+        error("Only one of SpecifySynDieselPercentFlag, SpecifySynJetfuelPercentFlag, and SpecifySynGasolinePercentFlag can be on")
+    end
 
 return settings
 end
