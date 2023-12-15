@@ -66,7 +66,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 			end
 
 
-			if setup["ModelSynFuels"] == 1
+			if setup["ModelLiquidFuels"] == 1
 				dfTemp1[t+rowoffset,9] = value(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,10] = value(EP[:eByProdConsCO2EmissionsByZone][z,t])
 				dfTemp1[t+rowoffset,11] = value(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])

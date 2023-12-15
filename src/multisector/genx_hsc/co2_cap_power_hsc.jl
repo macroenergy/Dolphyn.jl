@@ -142,6 +142,22 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
                 eEmissionsConstraintRHS += eEmissionsConstraintRHSCSC
             end 
 
+        end
+        
+        #Using an additive approach where terms are added to LHS of emissions constraint
+        if setup["ModelLiquidFuels"] == 1
+            @expression(EP, eEmissionsConstraintLHSLF[cap=1:inputs["NCO2Cap"]],
+            sum(inputs["omega"][t] * EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            + sum(inputs["omega"][t] * EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            + sum(inputs["omega"][t] * EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            + sum(inputs["omega"][t] * EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            + sum(inputs["omega"][t] * EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            + sum(inputs["omega"][t] * EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            + sum(inputs["omega"][t] * EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T) 
+            + sum(inputs["omega"][t] * EP[:eByProdConsCO2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+            )
+
+            eEmissionsConstraintLHS += eEmissionsConstraintLHSLF
         end 
 
         @constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
