@@ -35,11 +35,11 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     # Number of demand curtailment/lost load segments
     inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
-    # Demand in tonnes per hour for each zone
+    # Demand in MW for each zone
     start = findall(s -> s == "Load_H2_MW_z1", names(H2_load_in))[1]    
-    # Max value of non-served energy in $/(tonne)
+    # Max value of non-served energy in $/(MW)
     inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
-    # Demand in Tonnes per hour      
+    # Demand in MWh      
     inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]])    
 
     # Cost of non-served energy/demand curtailment (for each segment)

@@ -79,7 +79,7 @@ This input file contains input parameters related to: 1) definition of pipeline 
 |H2_Pipelines | Index number of existing and candidate hydrogen pipelines.|
 |Max_No_Pipe | Maximum number of hydrogen pipelines.|
 |Existing_No_Pipe | Existing number of hydrogen pipelines.|
-|Max_Flow_Tonne_p_Hr_Per_Pipe | Maximum capacity (flow rate) per hydrogen pipeline.|
+|Max_Flow_MW_p_Hr_Per_Pipe | Maximum capacity (flow rate) per hydrogen pipeline.|
 |H2Pipe_Inv_Cost_per_mile_yr | Annulized capital investment cost per pipeline-mile.|
 |Pipe_length_miles | Hydrogen pipeline length in miles.|
 |H2PipeCap_MW_per_mile | Maximum storage capacity per hydrogen pipeline per mile.|
@@ -325,7 +325,7 @@ This optional file includes parameters to characterize model temporal resolution
 |**Mandatory Columns**|
 |Voll |Value of lost hydrogen load in \$/MW-H$_2$.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
-|Cost\_of\_Demand\_Curtailment\_per\_Tonne |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
+|Cost\_of\_Demand\_Curtailment\_per\_MW |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
 |Time\_Index |Index defining time step in the model.|
 |Load\_liqH2\_MW\_z* |Load profile of a zone z* in MWh; if multiple zones, this parameter will be a matrix with columns equal to number of zones (each column named appropriate zone number appended to parameter) and rows equal to number of time periods of grid operations being modeled.|
@@ -346,18 +346,18 @@ Reports optimal values of investment variables (except StartCap, which is an inp
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
-| StartCap |Initial H$_2$ production or discharge capacity (for storage units) of each resource type in each zone; this is an input |H$_2$ Tonnes / Hr |
-| RetCap |Retired H$_2$ production or discharge capacity (for storage units) of each resource type in each zone |Tonnes / Hr |
-| NewCap |Installed H$_2$ production or discharge capacity (for storage units) of each resource type in each zone |Tonnes / Hr|
-| EndCap| Total H$_2$ production or discharge capacity of each resource type in each zone |Tonnes / Hr |
-| StartEnergyCap |Initial H$_2$ energy capacity of each resource type in each zone; this is an input and applies only to H$_2$ storage tech.| Tonnes |
-| RetEnergyCap |Retired H$_2$ energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. |Tonnes |
-| NewEnergyCap| Installed energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. |Tonnes |
-| EndEnergyCap |Total installed energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. |Tonnes |
-| StartChargeCap| Initial H$_2$ charging capacity of `H2_STOR = 1` resource type in each zone; this is an input |Tonnes / Hr |
-| RetChargeCap |Retired H$_2$ charging capacity of `H2_STOR = 1` resource type in each zone |Tonnes / Hr |
-| NewChargeCap |Installed H$_2$ charging capacity of each resource type in each zone |Tonnes / Hr |
-| EndChargeCap |Total H$_2$ charging capacity of each resource type in each zone |Tonnes / Hr|
+| StartCap |Initial H$_2$ production or discharge capacity (for storage units) of each resource type in each zone; this is an input |H$_2$ MWh |
+| RetCap |Retired H$_2$ production or discharge capacity (for storage units) of each resource type in each zone | MWh |
+| NewCap |Installed H$_2$ production or discharge capacity (for storage units) of each resource type in each zone |MWh|
+| EndCap| Total H$_2$ production or discharge capacity of each resource type in each zone |MWh |
+| StartEnergyCap |Initial H$_2$ energy capacity of each resource type in each zone; this is an input and applies only to H$_2$ storage tech.| MW |
+| RetEnergyCap |Retired H$_2$ energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. | MW |
+| NewEnergyCap| Installed energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. | MW |
+| EndEnergyCap |Total installed energy capacity of each resource type in each zone; applies only to H$_2$ storage tech. | MW |
+| StartChargeCap| Initial H$_2$ charging capacity of `H2_STOR = 1` resource type in each zone; this is an input | MWh |
+| RetChargeCap |Retired H$_2$ charging capacity of `H2_STOR = 1` resource type in each zone | MWh |
+| NewChargeCap |Installed H$_2$ charging capacity of each resource type in each zone | MWh |
+| EndChargeCap |Total H$_2$ charging capacity of each resource type in each zone |MWh|
 
 
 #### 3.1.2 HSC_emissions.csv
