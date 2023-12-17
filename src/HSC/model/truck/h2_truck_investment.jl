@@ -117,7 +117,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     )
 
 
-    # Total available energy capacity in tonnes
+    # Total available energy capacity in MW
     @expression(
         EP,
         eTotalH2TruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],

@@ -103,7 +103,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     )
 
 
-    # Total available energy capacity in tonnes
+    # Total available energy capacity in MW
     @expression(EP, eTotalH2CapEnergy[y in H2_STOR_ALL],
     if (y in intersect(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
         dfH2Gen[!,:Existing_Energy_Cap_MW][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]

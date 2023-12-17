@@ -89,14 +89,14 @@ function load_h2_pipeline_data(
         collect(skipmissing(pipeline_var[!, :Max_Flow_MW_p_Hr_Per_Pipe])),
     )
 
-    #Maximum Pipeline storage capacity in tonnes per pipe
+    #Maximum Pipeline storage capacity in MW per pipe
     inputs_nw["pH2_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :H2PipeCap_MW_per_mile])),
         ) .* inputs_nw["pPipe_length_miles"]
 
-    #Minimum Pipeline storage capacity in tonnes per pipe
+    #Minimum Pipeline storage capacity in MW per pipe
     inputs_nw["pH2_Pipe_Min_Cap"] =
         convert(
             Array{Float64},
@@ -110,7 +110,7 @@ function load_h2_pipeline_data(
             collect(skipmissing(pipeline_var[!, :H2Pipe_Inv_Cost_per_mile_yr])),
         ) .* inputs_nw["pPipe_length_miles"]
 
-    #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
+    #Capital cost associated with booster compressors per pipe= capex per MWh flow rate x pipe max flow rate (MWh) x number of booster compressor stations per pipe route
     inputs_nw["pCAPEX_Comp_H2_Pipe"] =
         inputs_nw["pH2_Pipe_Max_Flow"] .* (
             convert(

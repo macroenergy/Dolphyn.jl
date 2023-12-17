@@ -59,7 +59,7 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
 
     ### Variables ###
 
-    #H2 injected to hydrogen grid from hydrogen generation resource k (tonnes of H2/hr) in time t
+    #H2 injected to hydrogen grid from hydrogen generation resource k (MW of H2/hr) in time t
     @variable(EP, vH2Gen[k=1:H, t = 1:T] >= 0)
 
     ### Expressions ###
