@@ -12,22 +12,22 @@ Model settings parameters are specified in a `besc_Settings.yml` file which shou
 |ModelBESC | Flag to turn or off Bioenergy Supply Chain modelling capabilities.|
 ||0 = no bioenergy supply chain modeling.
 ||1 = modeling bioenergy supply chain.|
-|Bio_H2_On | Flag for activating or deactivating modeling of bio hydrogen.|
+|Bio\_H2\_On | Flag for activating or deactivating modeling of bio hydrogen.|
 ||0 = not modeling bio hydrogen.|
 ||1 = modeling bio hydrogen.|
-|Bio_Electricity_On | Flag for activating or deactivating modeling of bio electricity.|
+|Bio\_Electricity\_On | Flag for activating or deactivating modeling of bio electricity.|
 ||0 = not modeling bio electricity.|
 ||1 = modeling bio electricity.|
-|Bio_Diesel_On | Flag for activating or deactivating modeling of bio diesel.|
+|Bio\_Diesel\_On | Flag for activating or deactivating modeling of bio diesel.|
 ||0 = not modeling bio diesel.|
 ||1 = modeling bio diesel.|
-|Bio_Jetfuel_On | Flag for activating or deactivating modeling of bio jetfuel.|
+|Bio\_Jetfuel\_On | Flag for activating or deactivating modeling of bio jetfuel.|
 ||0 = not modeling bio jetfuel.|
 ||1 = modeling bio jetfuel.|
-|Bio_Gasoline_On | Flag for activating or deactivating modeling of bio gasoline.|
+|Bio\_Gasoline\_On | Flag for activating or deactivating modeling of bio gasoline.|
 ||0 = not modeling bio gasoline.|
 ||1 = modeling bio gasoline.|
-|Bio_Ethanol_On | Flag for activating or deactivating modeling of bio ethanol.|
+|Bio\_Ethanol\_On | Flag for activating or deactivating modeling of bio ethanol.|
 ||0 = not modeling bio ethanol.|
 ||1 = modeling bio ethanol.|
 
@@ -122,7 +122,7 @@ The table below summarizes the output variables reported as part of the various 
 
 ### 3.1 Default output files
 
-#### 3.1.1 BESC_biorefinery_capacity.csv
+#### 3.1.1 BESC\_biorefinery\_capacity.csv
 
 Reports optimal values of investment variables for biorefinery resource.
 
@@ -148,38 +148,38 @@ Reports optimal values of investment variables for biorefinery resource.
 | Capacity\_Factor |Capacity factor by dividing actual annual biomass input by maximum annual possible biomass input based on built capacity | |
 | Annual\_CO2\_Emission |Actual annual CO2 emissions = Biorefinery emissions - Biomass CO2 content |Tonnes CO2 |
 
-#### 3.1.2 BESC_costs.csv
+#### 3.1.2 BESC\_costs.csv
 
 Reports BESC costs for each zone, including sum of fixed and variable costs for biorefinery resources, biomass supply costs and total costs. 
 
-#### 3.1.3 BESC_zone_bioelectricity_produced.csv
+#### 3.1.3 BESC\_zone\_bioelectricity\_produced.csv
 
 Reports production of bio electricity for each zone and time step.
 
-#### 3.1.4 BESC_zone_biohydrogen_produced.csv
+#### 3.1.4 BESC\_zone\_biohydrogen\_produced.csv
 
 Reports production of bio hydrogen for each zone and time step.
 
-#### 3.1.5 BESC_zone_biodiesel_produced.csv
+#### 3.1.5 BESC\_zone\_biodiesel\_produced.csv
 
 Reports production of bio diesel for each zone and time step.
 
-#### 3.1.6 BESC_zone_biojetfuel_produced.csv
+#### 3.1.6 BESC\_zone\_biojetfuel\_produced.csv
 
 Reports production of bio jetfuel for each zone and time step.
 
-#### 3.1.7 BESC_zone_biogasoline_produced.csv
+#### 3.1.7 BESC\_zone\_biogasoline\_produced.csv
 
 Reports production of bio gasoline for each zone and time step.
 
-#### 3.1.8 BESC_zone_bioethanol_produced.csv
+#### 3.1.8 BESC\_zone\_bioethanol\_produced.csv
 
 Reports production of bio ethanol for each zone and time step.
 
-#### 3.1.9 BESC_zone_supply_herb_consumed.csv
+#### 3.1.9 BESC\_zone\_supply\_herb\_consumed.csv
 
 Reports consumption of herbaceous biomass for each zone and time step.
 
-#### 3.1.10 BESC_zone_supply_wood_consumed.csv
+#### 3.1.10 BESC\_zone\_supply\_wood\_consumed.csv
 
 Reports consumption of woody biomass for each zone and time step.

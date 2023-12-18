@@ -21,7 +21,7 @@ Sets up wood biomass variables
 
 This module defines the wood biomass resource decision variable $x_{z,t}^{\textrm{B,Wood}} \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing wood biomass utilized in zone $z$ at time period $t$. 
 
-The variables defined in this file named after ```vWood\textunderscore{biomass}\textunderscore{utilized}\textunderscore{per}\textunderscore{zone}\textunderscore{per}\textunderscore{time}``` covers all variables $x_{z,t}^{\textrm{B,Wood}}$.
+The variables defined in this file named after ```vWood_biomass_utilized_per_zone_per_time``` covers all variables $x_{z,t}^{\textrm{B,Wood}}$.
 
 **Cost expressions**
 
@@ -43,7 +43,6 @@ This module additionally defines contributions to the objective function from va
 
 This function creates expression to add the CO2 emissions for wood biomass in each zone, which is subsequently added to the total emissions.
 """
-
 function bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)
 
 	println("Bioenergy woody biomass supply cost module")

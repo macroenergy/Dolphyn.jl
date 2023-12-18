@@ -1,13 +1,13 @@
 ## Biorefinery Resources Investment
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["BESC/model/core/biorefinery_investment.jl"]
+Pages = ["BESC/model/core/bioenergy_investment.jl"]
 ```
 
 ## Biorefinery Variable Cost
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["BESC/model/core/biorefinery_var_cost.jl"]
+Pages = ["BESC/model/core/bioenergy_var_cost.jl"]
 ```
 
 ## Bioenergy Production

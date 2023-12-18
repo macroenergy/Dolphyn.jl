@@ -21,11 +21,11 @@ Sets up variables common to all biorefinery resources.
 
 This module defines the biorefinery resource decision variable $x_{r,t}^{\textrm{B,Bio}} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing biomass input into the biorefinery resource $r$ at time period $t$, $x_{r,t}^{\textrm{E,Bio}} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing power input into the biorefinery resource $r$ at time period $t$ (if any), and $x_{r,t}^{\textrm{H,Bio}} \forall r \in \mathcal{R}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing hydrogen input into the biorefinery resource $r$ at time period $t$ (if any). 
 
-The variables defined in this file named after ```vBiomass\textunderscore{consumed}\textunderscore{per}\textunderscore{plant}\textunderscore{per}\textunderscore{time}``` covers all variables $x_{r,t}^{\textrm{B,Bio}}$.
+The variables defined in this file named after ```vBiomass_consumed_per_plant_per_time``` covers all variables $x_{r,t}^{\textrm{B,Bio}}$.
 
-The variables defined in this file named after ```vPower\textunderscore{BIO}``` covers all variables $x_{r,t}^{\textrm{E,Bio}}$ (if any).
+The variables defined in this file named after ```vPower_BIO``` covers all variables $x_{r,t}^{\textrm{E,Bio}}$ (if any).
 
-The variables defined in this file named after ```vH2\textunderscore{BIO}``` covers all variables $x_{r,t}^{\textrm{H,Bio}}$ (if any).
+The variables defined in this file named after ```vH2_BIO``` covers all variables $x_{r,t}^{\textrm{H,Bio}}$ (if any).
 
 **Cost expressions**
 

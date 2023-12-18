@@ -127,7 +127,7 @@ This file contains cost and performance parameters for various synthetic fuels r
 |**By-products parameters (if applicable only)**|
 |mmbtu\_p\_tonne\_co2\_pb* | MMBtu of byproduct b output per tonne of CO2 input by synthetic fuel resource.|
 |price\_p\_mmbtu\_pb* | Selling price of byproduct b (\$/MMBtu).|
-|co2\_out\_p\_mmbtu\_pb* | CO2 emission rate of byproduct b (\tonne/MMBtu).|
+|co2\_out\_p\_mmbtu\_pb* | CO2 emission rate of byproduct b (tonne/MMBtu).|
 
 ## 3 Outputs
 
@@ -136,11 +136,11 @@ The table below summarizes the output variables reported as part of the various 
 ### 3.1 Default output files
 
 
-#### 3.1.1 SynFuel_capacity.csv
+#### 3.1.1 SynFuel\_capacity.csv
 
 Reports optimal values of investment variables for synthetic fuel resource.
 
-###### Table 9: Structure of the SynFuel_capacity.csv file
+###### Table 9: Structure of the SynFuel\_capacity.csv file
 ---
 |**Output** |**Description** |**Units** |
 | :------------ | :-----------|:-----------|
@@ -156,38 +156,38 @@ Reports optimal values of investment variables for synthetic fuel resource.
 | Capacity\_Factor |Capacity factor by dividing actual annual CO2 input by maximum annual possible CO2 input based on built capacity | |
 
 
-#### 3.1.2 SynFuel_costs.csv
+#### 3.1.2 SynFuel\_costs.csv
 
 Reports LFSC costs for each zone, including sum of fixed and variable costs for synthetic fuel resources, byproduct revenues (if any), conventional fuel costs and total costs. 
 
-#### 3.1.3 Syn_Fuel_balance.csv
+#### 3.1.3 Syn\_Fuel\_balance.csv
 
 Reports balance of input CO2, power, and H2, as well as output synthetic diesel, jetfuel, gasoline, and byproducts (if any) for each zone and time step. 
 
-#### 3.1.4 Syn_Fuel_Emissions_Balance.csv
+#### 3.1.4 Syn\_Fuel\_Emissions\_Balance.csv
 
 Reports balance of input CO2, process and byproducts (if any) emissions, CO2 captured, and CO2 emissions from synthetic, and conventional diesel, jetfuel, gasoline utilization for each zone and time step. 
 
-#### 3.1.5 Synfuel_diesel_production.csv
+#### 3.1.5 Synfuel\_diesel\_production.csv
 
 Reports production of synthetic diesel for each synthetic fuel resource and time step.
 
-#### 3.1.6 Synfuel_jetfuel_production.csv
+#### 3.1.6 Synfuel\_jetfuel\_production.csv
 
 Reports production of synthetic jetfuel for each synthetic fuel resource and time step.
 
-#### 3.1.7 Synfuel_gasoline_production.csv
+#### 3.1.7 Synfuel\_gasoline\_production.csv
 
 Reports production of synthetic gasoline for each synthetic fuel resource and time step.
 
-#### 3.1.8 LF_Diesel_balance.csv
+#### 3.1.8 LF\_Diesel\_balance.csv
 
 Reports balance of synthetic and conventional diesel for each zone and time step. 
 
-#### 3.1.9 LF_Jetfuel_balance.csv
+#### 3.1.9 LF\_Jetfuel\_balance.csv
 
 Reports balance of synthetic and conventional jetfuel for each zone and time step. 
 
-#### 3.1.10 LF_Gasoline_balance.csv
+#### 3.1.10 LF\_Gasoline\_balance.csv
 
 Reports balance of synthetic and conventional gasoline for each zone and time step. 

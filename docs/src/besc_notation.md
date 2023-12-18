@@ -9,8 +9,8 @@
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the output in the first time step of each year (or each representative period)|
 |$t \in \mathcal{T}^{interior}$|This set of time-coupling constraints wrap around to ensure the output in the inner time step of each year (or each representative period)|
 |$r \in \mathcal{R}$ | Index and set of all bioenergy resources|
-|$r \in \herb$ | Index and set of all bioenergy resources taking in herbaceous biomass as inputs|
-|$r \in \wood$ | Index and set of all bioenergy resources taking in woody biomass as inputs|
+|$r \in herb$ | Index and set of all bioenergy resources taking in herbaceous biomass as inputs|
+|$r \in wood$ | Index and set of all bioenergy resources taking in woody biomass as inputs|
 
 ## Decision Variables
 ---

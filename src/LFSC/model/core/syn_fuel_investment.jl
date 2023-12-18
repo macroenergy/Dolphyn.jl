@@ -21,7 +21,7 @@ Sets up constraints common to all synthetic fuels resources.
 
 This function defines the expressions and constraints keeping track of total available synthetic fuels capacity $y_{f}^{\textrm{C,Syn}}$ based on its input CO2 in tonne per hour as well as constraints on capacity.
 
-The expression defined in this file named after ```vCapacity\textunderscore{Syn}\textunderscore{Fuel}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{f}^{\textrm{C,Syn}}$.
+The expression defined in this file named after ```vCapacity_Syn_Fuel_per_type``` covers all variables $y_{f}^{\textrm{C,Syn}}$.
 
 The total capacity of each synthetic fuels resource is defined as the sum of newly invested capacity based on the assumption there are no existing synthetic fuels resources. 
 

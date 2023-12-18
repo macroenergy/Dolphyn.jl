@@ -21,7 +21,7 @@ Sets up constraints common to all biorefinery resources.
 
 This function defines the expressions and constraints keeping track of total available biorefinery capacity $y_{r}^{\textrm{B,Bio}}$ based on its input biomass in tonne per hour as well as constraints on capacity.
 
-The expression defined in this file named after ```vCapacity\textunderscore{BIO}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{r}^{\textrm{B,Bio}}$.
+The expression defined in this file named after ```vCapacity_BIO_per_type``` covers all variables $y_{r}^{\textrm{B,Bio}}$.
 
 The total capacity of each biorefinery resource is defined as the sum of newly invested capacity based on the assumption there are no existing biorefinery resources. 
 

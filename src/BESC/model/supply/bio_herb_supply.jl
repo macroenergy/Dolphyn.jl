@@ -21,7 +21,7 @@ Sets up herb biomass variables
 
 This module defines the herb biomass resource decision variable $x_{z,t}^{\textrm{B,Herb}} \forall z \in \mathcal{Z}, t \in \mathcal{T}$, representing herb biomass utilized in zone $z$ at time period $t$. 
 
-The variables defined in this file named after ```vHerb\textunderscore{biomass}\textunderscore{utilized}\textunderscore{per}\textunderscore{zone}\textunderscore{per}\textunderscore{time}``` covers all variables $x_{z,t}^{\textrm{B,Herb}}$.
+The variables defined in this file named after ```vHerb_biomass_utilized_per_zone_per_time``` covers all variables $x_{z,t}^{\textrm{B,Herb}}$.
 
 **Cost expressions**
 
