@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     write_co2_spur_pipeline_flow(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-	Function for reporting co2 flow in the spur pipelines
+Function for reporting co2 flow in the spur pipelines
 """
 function write_co2_spur_pipeline_flow(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	T = inputs["T"]     # Number of time steps (hours)

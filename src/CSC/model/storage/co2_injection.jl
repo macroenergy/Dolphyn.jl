@@ -51,7 +51,19 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 		x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 	\end{equation*}
 	```
-	
+
+	Additionally, CO2 is injected into a site only through the flow on the spur pipelines. This is expressed as follows
+
+	\begin{equation*}
+		x_{s,z,t}^{\textrm{C,INJ}} = \sum_{l^S \in P^{Spur}_{Map}}Flow^{Spur}_{l^S(z, t \rightarrow s,t)} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
+
+	The flow of CO2 into a site is also constrained by the maximum hourly flow on the spur pipelines
+
+	\begin{equation*}
+		\sum_{l^S \in P^{Spur}_{Map}}Flow^{Spur}_{l^S(z,t \rightarrow s,t)} \leq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
+
 	**Maximum injection per year according to CO2 storage capacity per year**
 	
 	```math

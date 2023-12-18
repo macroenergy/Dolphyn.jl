@@ -17,45 +17,66 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-    This function includes the variables, expressions and objective funtion of both CO2 trunk and spur pipelines.
+    This function includes the variables, expressions and objective funtion of CO2 trunk and spur pipelines.
 
-    This function expresses trunk CO2 exchange through pipeline i between two zones and can be split into CO2 delivering and flowing out.
+    This function expresses CO2 exchange through trunk pipeline i between two zones which can be split into CO2 delivering and flowing out.
     
-    This function expresses spur CO2 exchange through pipeline i between a zone and a CO2 Storage site and is the amount of CO2 flowing out of a zone into a co2 storage site.
-
+    This function also expresses CO2 exchange through spur pipeline i between a zone and a CO2 storage site. 
+    
     This module defines the CO2 trunk pipeline construction decision variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}$, representing newly constructed CO2 trunk pipeline of type $i$ through path $z \rightarrow z^{\prime}$.
-
-    This module defines the CO2 trunk pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
-
-    This module defines the CO2 trunk pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
-
-    The variable defined in this file named after ```vCO2NPipe``` covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}}$.
-
-    The variable defined in this file named after ```vCO2PipeFlow_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP+}}$.
-
-    The variable defined in this file named after ```vCO2PipeFlow_neg``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP-}}$.
-
-    The variable defined in this file named after ```vCO2PipeLevel``` covers variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}}$.
-
+    
+    Similarly, the module also defines the CO2 spur pipeline construction decision variable $y_{i, z \rightarrow s}^{\textrm(C, PIP)} \forall i in \mathcal{I}, z \rightarrow s \in \mathcal{B}$, representing newly constructed CO2 spur pipeline of type $i$ through path $z \rightarrow s$.   
+    
+    This module defines the CO2 trunk pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 flow via trunk pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+    
+    This module defines the CO2 spur pipeline flow decision variable $x_{i,z \rightarrow s,t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow s \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 flow via spur pipeline of type $i$ through path $z \rightarrow s$ at time period $t$.
+    
+    This module defines the CO2 trunk pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 stored in trunk pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+    
+    The variable defined in this file named after ```vCO2NPipe\_Trunk''' covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}}$ and the variable named after ```vCO2NPipe\_Spur''' covers variable $y_{i,z \rightarrow s}^{\textrm{C,PIP}}$  
+    
+    The variable defined in this file named after ```vCO2PipeFlow\_trunk\_pos''' covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP+}}$, and the variable defined in this file named after ```vCO2PipeFlow\_spur\_pos''' covers the variable $x_{i,z \rightarrow s,t}^{\textrm{C,PIP+}}$
+    
+    The variable defined in this file named after ```vCO2PipeFlow\_trunk\_neg''' covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP-}}$, and the variable defined in this file named after ```vCO2PipeFlow\_spur\_neg''' covers variable $x_{i,z \rightarrow s,t}^{\textrm{C,PIP-}}$ .
+    
+    The variable defined in this file named after ```vCO2PipeLevel\_Trunk``` covers variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}}$ and the variable defined in this file named after ```vCO2PipeLevel\_Spur``` covers variable $U_{i,z \rightarrow s,t}^{\textrm{C,PIP}}$.  
+    
     **Cost expressions**
 
-    This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus construction) from all pipeline resources $i \in \mathcal{I}$:
+    This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus construction) from all trunk pipeline resources $i \in \mathcal{I}$:
 
     ```math
     \begin{equation*}
-        \textrm{C}^{\textrm{C,PIP,c}}=\delta_{i}^{\textrm{C,PIP}} \sum_{i \in \mathbb{I}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \textrm{c}_{i}^{\textrm{C,PIP}} \textrm{L}_{z \rightarrow z^{\prime}} l_{i,z \rightarrow z^{\prime}}
-        h_{i,z \rightarrow z^{\prime}, t}^{\textrm{C,PIP}}=h_{i, z \rightarrow z^{\prime}, t}^{\textrm{C,PIP+}}-h_{i, z \rightarrow z^{\prime}, t}^{\textrm{PIP-}} \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
+    \textrm{C}^{\textrm{C,PIP,c}}=\delta_{i}^{\textrm{C,PIP}} \sum_{i \in \mathbb{I}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \textrm{c}_{i}^{\textrm{C,PIP}} \textrm{L}_{z \rightarrow z^{\prime}} l_{i,z \rightarrow z^{\prime}}
+    h_{i,z \rightarrow z^{\prime}, t}^{\textrm{C,PIP}}=h_{i, z \rightarrow z^{\prime}, t}^{\textrm{C,PIP+}}-h_{i, z \rightarrow z^{\prime}, t}^{\textrm{PIP-}} \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
     \end{equation*}
     ```
 
-    The flow rate of CO2 through pipeline type $i$ is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline $i$
+    This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus construction) from all spur pipeline resources $i \in \mathcal{I}$:
+    
+    ```math
+    \begin{equation*}
+    \textrm{C}^{\textrm{C,PIP,c}}=\delta_{i}^{\textrm{C,PIP}} \sum_{i \in \mathbb{I}} \sum_{z \rightarrow s \in \mathbb{B}} \textrm{c}_{i}^{\textrm{C,PIP}} \textrm{L}_{z \rightarrow s} l_{i,z \rightarrow s}
+    h_{i,z \rightarrow s, t}^{\textrm{C,PIP}}=h_{i, z \rightarrow s, t}^{\textrm{C,PIP+}}-h_{i, z \rightarrow s, t}^{\textrm{PIP-}} \quad \forall i \in \mathbb{I}, z \rightarrow s \in \mathbb{B}, t \in \mathbb{T}
+    \end{equation*}
+    ```
+
+    The flow rate of CO2 through trunk pipeline type $i$ is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline $i$
     ```math
     \begin{equation*}
         \overline{\textrm{F}}_{i} l_{i,z \rightarrow z^{\prime}} \geq x_{i,z \rightarrow z^{\prime}, t}^{\textrm{\textrm{C,PIP+}}}, x_{i,z \rightarrow z^{\prime}, t}^{\textrm{\textrm{C,PIP-}}} \geq 0 \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
     \end{equation*}    
     ```
 
-    The pipeline has storage capacity via line packing:
+    The flow rate of CO2 through spur pipeline type $i$ is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline $i$
+
+    ```math
+    \begin{equation*}
+        \overline{\textrm{F}}_{i} l_{i,z \rightarrow s} \geq x_{i,z \rightarrow s, t}^{\textrm{\textrm{C,PIP+}}}, x_{i,z \rightarrow s, t}^{\textrm{\textrm{C,PIP-}}} \geq 0 \quad \forall i \in \mathbb{I}, z \rightarrow s \in \mathbb{B}, t \in \mathbb{T}
+    \end{equation*}
+    ```
+
+    The trunk pipeline has storage capacity via line packing:
     ```math
     \begin{equation*}
         \overline{\textrm{U}}_{i}^{\textrm{\textrm{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \geq -\sum_{\tau=t_{0}}^{t}\left(x_{i,z^{\prime} \rightarrow z, \tau}^{\textrm{\textrm{C,PIP}}}+x_{i,z \rightarrow z^{\prime}, \tau}^{\textrm{\textrm{C,PIP}}}\right) \Delta t \geq \underline{\textrm{R}}_{i}^{\textrm{\textrm{C,PIP}}} \overline{\textrm{E}}_{i}^{\textrm{\textrm{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \\
@@ -63,7 +84,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     \end{equation*}   
     ```
 
-    The change of CO2 pipeline storage inventory is modeled as follows:
+    The change of CO2 trunk pipeline storage inventory is modeled as follows:
     ```math
     \begin{equation*}
         U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} - U_{i,z \rightarrow z^{\prime},t-1} = x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP-}} + x_{i,z^{\prime} \rightarrow z,t}^{\textrm{C,PIP-}}
