@@ -195,7 +195,7 @@ This file contains cost and performance parameters for various generators and ot
 |**H2GenCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints (`H2_GEN_TYPE = 1`).|
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
-|Start\_Cost\_per\_tonne\_p\_hr |Cost per tonne/hr of nameplate capacity to start a generator ($/tonne/hr per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+|Start\_Cost\_per\_tonne\_p\_hr |Cost per MWh of nameplate capacity to start a generator (\$/MWh per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 |**TimeMatchingRequirement > 0**||
 |H2\_TMR\_*| Flag to indicate which resources are considered for the Time Matching Requirement constraint (constraint number denoted by value after "\_"). Similar Flag should also be added to Generators_data.csv for eligible_power_sector_resources|
 ||1- included|

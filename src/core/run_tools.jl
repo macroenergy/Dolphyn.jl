@@ -66,18 +66,29 @@ function setup_logging(mysetup::Dict{Any, Any})
     return nothing
 end
 
+function notAllFilesExist(path::String, f_list::Vector{String})
+    v_c = findall(ispath(joinpath(path,f)) for f in f_list)
+    if length(v_c) < length(f_list) 
+        return true
+    end
+    return false
+end
+
 function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any,Any})
     TDRpath = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
+    genx_tdr_file_list = ["Load_data.csv", "Generators_variability.csv", "Fuels_data.csv"]
+    H2_tdr_file_list = append!(genx_tdr_file_list, ["HSC_generators_variability.csv", "HSC_load_data.csv", "HSC_g2p_variability"])
+
     if mysetup["TimeDomainReduction"] == 1
         if mysetup["ModelH2"] == 1
-            if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
+	    if notAllFilesExist(TDRpath, H2_tdr_file_list)
                 print_and_log("Clustering Time Series Data...")
                 cluster_inputs(inputs_path, settings_path, mysetup)
             else
                 print_and_log("Time Series Data Already Clustered.")
             end
         else
-            if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
+	    if notAllFilesExist(TDRpath, genx_tdr_file_list)
                 print_and_log("Clustering Time Series Data...")
                 cluster_inputs(inputs_path, settings_path, mysetup)
             else

@@ -14,52 +14,28 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-cd(dirname(@__FILE__))
-
-settings_path = joinpath(pwd(), "Settings")
-
-#environment_path = "../../package_activate.jl"
-#include(environment_path) #Run this line to activate the Julia virtual environment for GenX; skip it, if the appropriate package versions are installed
-
-### Set relevant directory paths
-src_path = "../../src/"
-
-inpath = pwd()
-
-### Load GenX
-println("Loading packages")
-push!(LOAD_PATH, src_path)
-
 using DOLPHYN
 using YAML
 
+# The directory that contains configuration files
+settings_path = joinpath(@__DIR__, "Settings")
+
+# The directory that contains your input data 
+inputs_path = @__DIR__
+
+# Load settings 
+mysetup = load_settings(settings_path)
+
+# Setup logging
+global_logger = setup_logging(mysetup)
+
+# Load DOLPHYN
+println("Loading packages")
+
 @info("PACKAGE LOADED")
 
-genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
-hsc_settings = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC modelgrated model
-mysetup_genx = YAML.load(open(genx_settings)) # mysetup dictionary stores GenX-specific parameters
-mysetup_hsc = YAML.load(open(hsc_settings)) # mysetup dictionary stores H2 supply chain-specific parameters
-global_settings = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
-mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
-mysetup_global = YAML.load(open(global_settings)) # mysetup dictionary stores global settings
-combined_settings = Dict()
-combined_settings = merge(mysetup_hsc, mysetup_genx, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
-
-## Update settings by adding default values for various unspecified parameters
-mysetup = Dict()
-mysetup = configure_settings(combined_settings)
-# Start logging
-
-## Cluster time series inputs if necessary and if specified by the user
-TDRpath = joinpath(inpath, mysetup["TimeDomainReductionFolder"])
-if mysetup["TimeDomainReduction"] == 1
-    if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-        println("Clustering Time Series Data...")
-        cluster_inputs(inpath, settings_path, mysetup)
-    else
-        println("Time Series Data Already Clustered.")
-    end
-end
+# Setup time domain reduction and cluster inputs if necessary
+setup_TDR(inputs_path, settings_path, mysetup)
 
 # ### Configure solver
 println("Configuring Solver")
@@ -69,12 +45,11 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 
 # ### Load inputs
 # println("Loading Inputs")
- myinputs = Dict() # myinputs dictionary will store read-in data and computed parameters
- myinputs = load_inputs(mysetup, inpath)
+myinputs = load_inputs(mysetup, inputs_path)
 
 # ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
-    myinputs = load_h2_inputs(myinputs, mysetup, inpath)
+    myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
 end
 
 # ### Generate model
