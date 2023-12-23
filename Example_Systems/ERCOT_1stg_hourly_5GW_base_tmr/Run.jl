@@ -64,7 +64,7 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 ### Write power system output
 
 println("Writing Output")
-outpath = "$inpath/Results"
+outpath = joinpath(inputs_path,"Results")
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs

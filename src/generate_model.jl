@@ -116,9 +116,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @expression(EP, eH2LiqBalance[t=1:T, z=1:Z], 0)
     end
 
-    if setup["ModelCSC"] == 1
-        # Initialize CO2 Capture Balance Expression
+    if "ModelCSC" in keys(setup)
+        if setup["ModelCSC"] == 1
+            # Initialize CO2 Capture Balance Expression
 	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+        end
     end
 
 
