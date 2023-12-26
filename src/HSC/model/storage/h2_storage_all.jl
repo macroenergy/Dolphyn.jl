@@ -130,7 +130,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
     ### Variables ###
-    # Storage level of resource "y" at hour "t" [MWh] on zone "z" 
+    # Storage level of resource "y" at hour "t" [MW] on zone "z" 
     @variable(EP, vH2S[y in H2_STOR_ALL, t=1:T] >= 0)
 
     # Rate of energy withdrawn from HSC by resource "y" at hour "t" [MW/hour] on zone "z"

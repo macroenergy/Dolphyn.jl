@@ -135,7 +135,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     ### Variables ###
 
-    # Truck flow volume [MWh] through type 'j' at time 't' on zone 'z'
+    # Truck flow volume [MW] through type 'j' at time 't' on zone 'z'
     @variable(EP, vH2TruckFlow[z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T])
 
     # Number of available full truck type 'j' in transit at time 't' on zone 'z'
