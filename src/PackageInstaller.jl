@@ -1,39 +1,36 @@
 using Pkg
+import TOML
 
-# List of required packages
-required_packages = [
-    "JuMP",
-    "DataFrames",
-    "CSV",
-    "StatsBase",
-    "LinearAlgebra",
-    "YAML",
-    "Dates",
-    "Clustering",
-    "Distances",
-    "Combinatorics",
-    "Revise",
-    "Glob",
-    "LoggingExtras",
-    "Random",
-    "RecursiveArrayTools",
-    "Statistics",
-    "HiGHS"
-]
+# Define the path to the 'Project.toml' file
+const PROJECT_TOML_PATH = "./Project.toml"
 
-# Function to check and install missing packages
-function install_missing_packages(packages)
-    for package in packages
-        if !any(x -> x.name == package, Pkg.installed())
-            println("Installing missing package: ", package)
-            Pkg.add(package)
-        else
-            println("Package already installed: ", package)
-        end
+# Read dependency information from 'Project.toml'
+function read_deps_from_project_toml(path)
+    # Parse the TOML file
+    parsed_toml = TOML.parsefile(path)
+    # Retrieve the dictionary of dependencies
+    return get(parsed_toml, "deps", Dict())
+end
+
+# Install dependency packages
+function install_dependencies(deps)
+    for pkg in keys(deps)
+        # Print installation message
+        println("Installing package: ", pkg)
+        # Install (or update to) the latest version
+        Pkg.add(pkg)
     end
 end
 
-# Install missing packages
-install_missing_packages(required_packages)
+# Read and install dependencies from 'Project.toml'
+function install_from_project_toml(path)
+    # Read dependencies
+    deps = read_deps_from_project_toml(path)
+    # Install dependencies
+    install_dependencies(deps)
+    println("All required packages have been installed.")
+end
 
-println("All required packages are installed.")
+# Execute the installation process
+install_from_project_toml(PROJECT_TOML_PATH)
+
