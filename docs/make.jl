@@ -142,6 +142,17 @@ pages = OrderedDict(
         ],
     ],
 
+    "Bioenergy Supply Chain (BESC)" => [
+        "BESC Inputs Functions" => "load_bio_inputs.md",
+        "BESC Outputs Functions" => "write_bio_outputs.md",
+        "BESC Notation" => "besc_notation.md",
+
+        "BESC Function Reference" => [
+            "BESC Core" => "bioenergy_core.md",
+            "BECS Supply" => "bioenergy_supply.md",
+        ],
+    ],
+
     "Additional Tools" => "additional_tools.md",
     "Solving the Model" => "solve_model.md",
     "Methods" => "methods.md",
