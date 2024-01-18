@@ -172,6 +172,9 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	  println("Time elapsed for writing net revenue is")
 	  println(elapsed_time_net_rev)
 	end
+
+	write_co2_emission_balance_system(path, inputs, setup, EP)
+
 	## Print confirmation
 	println("Wrote outputs to $path")
 

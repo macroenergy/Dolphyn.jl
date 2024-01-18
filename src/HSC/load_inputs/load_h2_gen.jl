@@ -58,7 +58,12 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
     # Identify electrolyzer resources - to include for eligibility in the Capacity Reserve Margin constraint
     inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[(h2_gen_in.etaP2G_MWh_p_tonne.>0) .& (h2_gen_in.etaFuel_MMBtu_p_tonne.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
-
+    #inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[h2_gen_in.H2_Electrolyzer.==1,:R_ID]
+    
+    #BLUE_H2
+	inputs_gen["BLUE_H2"] = h2_gen_in[h2_gen_in.Blue_H2.==1,:R_ID]
+	#GREY_H2
+	inputs_gen["GREY_H2"] = h2_gen_in[h2_gen_in.Grey_H2.==1,:R_ID]
 
     # Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
     inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.>=1),:R_ID]

@@ -25,10 +25,14 @@ export setup_TDR
 export configure_solver
 export load_inputs
 export load_h2_inputs
+export load_co2_inputs
+export load_liquid_fuels_inputs
 export generate_model
 export solve_model
 export write_outputs
 export write_HSC_outputs
+export write_CSC_outputs
+export write_liquid_fuels_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
@@ -119,7 +123,22 @@ genx_to_exclude = [
     joinpath(genxsubmod_path,"model","solve_model.jl"),
     joinpath(genxsubmod_path,"model","generate_model.jl"),
     joinpath(genxsubmod_path,"configure_solver"),
+    joinpath(genxsubmod_path,"write_outputs","write_capacity.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_capacityfactor.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_charging_cost.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_energy_revenue.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_net_revenue.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_nw_expansion.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_outputs.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_price.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_reliability.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_storage.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_storagedual.jl"),
+    joinpath(genxsubmod_path,"write_outputs","write_subsidy_revenue.jl"),
+    joinpath(genxsubmod_path,"model","core","emissions.jl"),
+    joinpath(genxsubmod_path,"model","policies","co2_cap.jl"),
+    joinpath(genxsubmod_path,"model","policies","cap_reserve_margin.jl"),
+    joinpath(genxsubmod_path,"model","resources","thermal","thermal_commit.jl"),
     # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
 include_from_dir(genxsubmod_path, ".jl", genx_to_exclude)
@@ -134,6 +153,9 @@ include_from_dir(joinpath(@__DIR__,"GenX_extensions"), ".jl")
 # Load all .jl files from the HSC directory
 include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
 
+# Load all .jl files from the LFSC directory
+include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
+
 # Load all .jl files from the core directory
 include_from_dir(joinpath(@__DIR__,"core"), ".jl")
 
@@ -145,6 +167,9 @@ include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
 
 # Files which involve multiple sectors
 include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
+
+# Files which involve multiple sectors
+include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
 
 # Load model generation and solving scripts
 include(joinpath(@__DIR__,"generate_model.jl"))

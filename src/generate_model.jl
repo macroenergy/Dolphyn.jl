@@ -116,6 +116,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @expression(EP, eH2LiqBalance[t=1:T, z=1:Z], 0)
     end
 
+    if setup["ModelCSC"] == 1
+        # Initialize CO2 Capture Balance Expression
+	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+    end
+
+
     # Initialize Objective Function Expression
     @expression(EP, eObj, 0)
 
@@ -124,7 +130,25 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
     @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)    
+    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)  
+    
+    # Energy Share Requirement
+	if setup["EnergyShareRequirement"] >= 1
+		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
+	end
+
+    # Initialize Capacity Reserve Margin Expression
+    if setup["CapacityReserveMargin"] > 0
+		@expression(EP, eCapResMarBalance[res=1:inputs["NCapacityReserveMargin"], t=1:T], 0)
+	end
+
+	if setup["MinCapReq"] == 1
+		@expression(EP, eMinCapRes[mincap = 1:inputs["NumberOfMinCapReqs"]], 0)
+	end
+
+	if setup["MaxCapReq"] == 1
+		@expression(EP, eMaxCapRes[maxcap = 1:inputs["NumberOfMaxCapReqs"]], 0)
+	end
 
     ##### Power System related modules ############
     # Infrastructure
@@ -139,7 +163,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     end
 
     # Emissions of various power sector resources
-    emissions!(EP, inputs)
+    emissions!(EP, inputs, setup)
 
     if setup["Reserves"] > 0
         reserves!(EP, inputs, setup)
@@ -246,16 +270,130 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             )
         end
 
+        # Modeling Time matching requirement for electricity use for hydrogen production
+		if setup["TimeMatchingRequirement"] > 0
+			EP = time_matching_requirement(EP, inputs, setup)
+		end
+
+        if setup["GreenH2ShareRequirement"] == 1
+			EP = green_h2_share_requirement(EP, inputs, setup)
+		end
+
         EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
-    end
+    
+	end
+
+    if setup["ModelCSC"] == 1
+
+		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
+		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Variable costs and carbon captured per DAC resource "k" and time "t"
+		EP = DAC_var_cost(EP, inputs, setup)
+
+		# Fixed costs of DAC
+		EP = DAC_investment(EP, inputs, setup)
+	
+		#model CO2 capture
+		EP = co2_capture(EP, inputs, setup)
+
+		# Fixed costs of storage storage
+		
+		EP = co2_storage_investment(EP, inputs, setup)
+
+		if !isempty(inputs["CO2_STORAGE"])
+			#model CO2 injection
+			EP = co2_injection(EP, inputs, setup)
+		end
+
+		# Fixed costs of carbon capture compression
+
+		EP = co2_capture_compression_investment(EP, inputs, setup)
+
+		if !isempty(inputs["CO2_CAPTURE_COMP"])
+			#model CO2 capture
+			EP = co2_capture_compression(EP, inputs, setup)
+		end
+
+		if setup["ModelCO2Pipelines"] == 1
+			# model CO2 transmission via pipelines
+			EP = co2_pipeline(EP, inputs, setup)
+		end
+
+		# Direct emissions of various carbon capture sector resources
+		EP = emissions_csc(EP, inputs,setup)
+
+		EP[:eAdditionalDemandByZone] += EP[:eCSCNetpowerConsumptionByAll]
+
+	end
+
+    if setup["ModelLiquidFuels"] == 1
+
+		# Initialize Liquid Fuel Balance
+		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
+		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
+
+		
+		EP = syn_fuel_outputs(EP, inputs, setup)
+		EP = syn_fuel_investment(EP, inputs, setup)
+		EP = syn_fuel_resources(EP, inputs, setup)
+		EP = liquid_fuel_demand(EP, inputs, setup)
+		EP = liquid_fuel_emissions(EP, inputs, setup)
+
+        ###HLiquid Fuel Demand Constraints
+		#Diesel
+		
+        @expression(EP, eGlobalLFDieselBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFDieselBalance][t,z] for z = 1:Z) )
+        @expression(EP, eGlobalLFDieselDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) )
+
+        #Demand constraint for each time t for global liquid fuel demand
+        #@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
+
+        #Demand constraint for annual global liquid fuel demand
+        @expression(EP, eAnnualGlobalLFDieselBalance, sum(EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
+        @expression(EP, eAnnualGlobalLFDieselDemand, sum(EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
+        @constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
+    
+
+		#Jetfuel
+		
+        @expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
+        @expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
+
+        #Demand constraint for each time t for global liquid fuel demand
+        #@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
+
+        #Demand constraint for annual global liquid fuel demand
+        @expression(EP, eAnnualGlobalLFJetfuelBalance, sum(EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
+        @expression(EP, eAnnualGlobalLFJetfuelDemand, sum(EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
+        @constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
+		
+
+		#Gasoline
+		
+        @expression(EP, eGlobalLFGasolineBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFGasolineBalance][t,z] for z = 1:Z) )
+        @expression(EP, eGlobalLFGasolineDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) )
+
+        #Demand constraint for each time t for global liquid fuel demand
+        #@constraint(EP, cLFGasolineBalance[t=1:T], eGlobalLFGasolineBalance[t] >= eGlobalLFGasolineDemand[t])
+
+        #Demand constraint for annual global liquid fuel demand
+        @expression(EP, eAnnualGlobalLFGasolineBalance, sum(EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
+        @expression(EP, eAnnualGlobalLFGasolineDemand, sum(EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
+        @constraint(EP, cLFAnnualGasolineBalance, eAnnualGlobalLFGasolineBalance >= eAnnualGlobalLFGasolineDemand)
+		
+	end
 
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
-    if setup["ModelH2"] ==0
-        co2_cap!(EP, inputs, setup)
-    elseif setup["ModelH2"]==1
-        EP = co2_cap_power_hsc(EP, inputs, setup)
+    if (setup["CO2Cap"] < 4) & (setup["CO2Cap"] > 0)
+        if setup["ModelH2"] ==0
+            co2_cap!(EP, inputs, setup)
+        elseif setup["ModelH2"]==1
+            EP = co2_cap_power_hsc(EP, inputs, setup)
+        end
     end
 
     # Endogenous Retirements
@@ -263,14 +401,14 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         endogenous_retirement!(EP, inputs, setup)
     end
 
-    # Energy Share Requirement
-    if setup["EnergyShareRequirement"] >= 1
+     # Energy Share Requirement
+     if setup["EnergyShareRequirement"] == 1
         energy_share_requirement!(EP, inputs, setup)
     end
-
+		
     #Capacity Reserve Margin
     if setup["CapacityReserveMargin"] > 0
-        cap_reserve_margin!(EP, inputs, setup)
+        EP = cap_reserve_margin(EP, inputs, setup)
     end
 
     if (setup["MinCapReq"] == 1)
@@ -299,6 +437,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         ###Hydrogen Liquid Balance constraints
         @constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
     end
+
+    if setup["ModelCSC"] == 1
+		###Captured CO2 Balanace constraints
+		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
+	end
     
     ## Record pre-solver time
     presolver_time = time() - presolver_start_time

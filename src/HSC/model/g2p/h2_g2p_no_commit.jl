@@ -103,7 +103,7 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
         #Power Balance
         [k in H2_G2P_NO_COMMIT, t = 1:T], EP[:vPG2P][k,t] == EP[:vH2G2P][k,t] * dfH2G2P[!,:etaG2P_MWh_p_tonne][k]
     end)
-    
+
     @constraints(EP, begin
     # Maximum power generated per technology "k" at hour "t"
     [k in H2_G2P_NO_COMMIT, t=1:T], EP[:vPG2P][k,t] <= EP[:eH2G2PTotalCap][k]* inputs["pH2_g2p_Max"][k,t]

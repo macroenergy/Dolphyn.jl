@@ -33,15 +33,15 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     capNumber = zeros(size(H2_TRUCK_TYPES))
     retNumber = zeros(size(H2_TRUCK_TYPES))
     endNumber = zeros(size(H2_TRUCK_TYPES))
-    for j in H2_TRUCK_TYPES
-        if j in NEW_CAP_TRUCK
-            capNumber[j] = value(EP[:vH2TruckNumber][j])
-        end
-        if j in RET_CAP_TRUCK
-            retNumber[j] = value(EP[:vH2RetTruckNumber][j])
-        end
-        endNumber[j] = value(EP[:eTotalH2TruckNumber][j])
+    truck_new_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["NEW_CAP_TRUCK"])
+    truck_ret_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["RET_CAP_TRUCK"])
+    if !isempty(truck_new_cap)
+        capNumber[truck_new_cap] = value.(EP[:vH2TruckNumber][truck_new_cap]).data
     end
+    if !isempty(truck_ret_cap)
+        retNumber[truck_ret_cap] = value.(EP[:vH2RetTruckNumber][truck_ret_cap]).data
+    end
+    endNumber[H2_TRUCK_TYPES] = value.(EP[:eTotalH2TruckNumber][H2_TRUCK_TYPES]).data
 
     dfH2TruckCap = DataFrame(
         TruckType = inputs["H2_TRUCK_TYPE_NAMES"],
@@ -54,19 +54,13 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     for z in 1:Z
         dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in NEW_CAP_TRUCK
-                tempEnergy[j] = value(EP[:vH2TruckEnergy][z,j])
-            end
-        end
+        truck_new_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["NEW_CAP_TRUCK"])
+        tempEnergy[truck_new_cap] = value.(EP[:vH2TruckEnergy][z,truck_new_cap]).data
         dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
 
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
-        for j in H2_TRUCK_TYPES
-            if j in RET_CAP_TRUCK
-                tempEnergy[j] = value(EP[:vH2RetTruckEnergy][z,j])
-            end
-        end
+        truck_ret_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["RET_CAP_TRUCK"])
+        tempEnergy[truck_ret_cap] = value.(EP[:vH2RetTruckEnergy][z,truck_ret_cap]).data
         dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
 
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
@@ -101,5 +95,6 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     end
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)
-    CSV.write(string(path, sep, "h2_truck_capacity.csv"), dftranspose(dfH2TruckCap, false))
+    
+    CSV.write(string(path, sep, "HSC_h2_truck_capacity.csv"), dftranspose(dfH2TruckCap, false))
 end

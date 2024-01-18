@@ -33,6 +33,12 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     ### MODEL SOLUTION AND OUTPUT PARAMETERS
     ## Write the model formulation as an output; 0 = active; 1 = not active
     set_default_if_absent!(settings, "PrintModel", 0)
+
+    ## Sets Solver Log file Name
+    set_default_if_absent!(settings, "Log", true)
+
+    ## Sets Solver Log file Name
+    set_default_if_absent!(settings, "LogFile", "my_log_file.txt")
    
     ## Set HiGHS as the solver if none is set
     set_default_if_absent!(settings, "Solver", "HiGHS")
@@ -107,6 +113,54 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "H2TrucksMaxDistance", 0)
     # Down-select Zones to model
     set_default_if_absent!(settings, "Zones", [])
+    #TimeMatchingRequirement: 0 # Modeling time matching requiremnet for electricity based H2 production - 0 - not included, 1 - hourly with excess sales, 2- hourly without excess sales, 3 - annual 
+    set_default_if_absent!(settings, "TimeMatchingRequirement", 0)                
+    #TMRSalestoESR: 0 # Modeling whether or not resources contracted for time matching requiremnet forelectricity based H2 production can sell their excess electricity to ESR market - 0 - not allowed, 1 - allowed
+    set_default_if_absent!(settings, "TMRSalestoESR", 0) 
+
+    #GreenH2ShareRequirement: 0 # Modeling whether or not resources there is a share of green H2 required. 
+    set_default_if_absent!(settings, "GreenH2ShareRequirement", 0) 
+
+
+    ############################################################
+    ###CSC Model Settings Options#####
+    set_default_if_absent!(settings, "ModelCSC", 0)
+    set_default_if_absent!(settings, "DAC_Nonlinear_CAPEX", 0)
+    set_default_if_absent!(settings, "CO2PipeInteger", 0)
+    set_default_if_absent!(settings, "ModelCO2Pipelines", 0)
+    set_default_if_absent!(settings, "CO2NetworkExpansion", 0)
+    set_default_if_absent!(settings, "CO2Pipeline_Loss", 0)  
+    
+    set_default_if_absent!(settings, "ModelBIO", 0)
+    set_default_if_absent!(settings, "BIO_H2_On", 0)
+
+
+    ############################################################
+    ###LF Model Settings Options#####
+
+    set_default_if_absent!(settings, "ModelLiquidFuels",0)
+    set_default_if_absent!(settings, "AllowConventionalDiesel",1)
+    set_default_if_absent!(settings, "SpecifySynDieselPercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_diesel",0)
+    set_default_if_absent!(settings, "AllowConventionalJetfuel",1)
+    set_default_if_absent!(settings, "SpecifySynJetfuelPercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_jetfuel",0)
+    set_default_if_absent!(settings, "AllowConventionalGasoline",1)
+    set_default_if_absent!(settings, "SpecifySynGasolinePercentFlag",0)
+    set_default_if_absent!(settings, "percent_sf_gasoline",0)
+
+    set_default_if_absent!(settings, "BIO_Diesel_On",0)
+    set_default_if_absent!(settings, "BIO_Jetfuel_On",0)
+    set_default_if_absent!(settings, "BIO_Gasoline_On",0)
+
+    #Parameter Scaling for Liquid Fuels is untested
+    if settings["ModelLiquidFuels"] == 1
+        settings["ParameterScale"] = 0
+    end
+
+    if (settings["SpecifySynDieselPercentFlag"] + settings["SpecifySynJetfuelPercentFlag"] + settings["SpecifySynGasolinePercentFlag"] ) > 1
+        error("Only one of SpecifySynDieselPercentFlag, SpecifySynJetfuelPercentFlag, and SpecifySynGasolinePercentFlag can be on")
+    end
 
 return settings
 end

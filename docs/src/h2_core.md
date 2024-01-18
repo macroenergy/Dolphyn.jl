@@ -4,6 +4,11 @@ Modules = [Dolphyn]
 Pages = ["HSC/model/policies/co2_cap_hsc.jl"]
 ```
 
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["HSC/model/policies/time_matching_requirement.jl"]
+```
+
 ## Hydrogen Resources Investment
 ```@autodocs
 Modules = [Dolphyn]
