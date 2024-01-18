@@ -1,7 +1,7 @@
 name = "Dolphyn"
 uuid = "2a466132-4b02-429f-9994-5df6ddd3977f"
 authors = ["Guannan He <>", "Dharik Mallapragada <dharik@mit.edu>", "Ruaridh Macdonald <rmacd@mit.edu>", "Mary Bennett <>", "Shantanu Chakraborty <>", "Anna Cybulsky <>", "Michael Giovanniello <>", "Jun Wen Law <>", "Youssef Shaker <>", "Nicole Shi <>", "Yuheng Zhang <>"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
