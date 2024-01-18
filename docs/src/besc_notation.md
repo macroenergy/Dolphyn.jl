@@ -1,4 +1,4 @@
-# BESC Model Notation
+# [BESC Model Notation](@id besc_notation)
 
 ## Model Indices and Sets
 ---
