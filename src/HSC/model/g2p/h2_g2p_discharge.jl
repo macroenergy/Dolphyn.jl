@@ -65,8 +65,8 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
         inputs["omega"][t] * dfH2G2P[!,:Var_OM_Cost_p_MWh][k] * vPG2P[k,t])
     end
 
-    @expression(EP, eTotalCH2G2PVarOutT[t=1:T], sum(eCH2G2PVar_out[k,t] for k in 1:H))
-    @expression(EP, eTotalCH2G2PVarOut, sum(eTotalCH2G2PVarOutT[t] for t in 1:T))
+    @expression(EP, eTotalCH2G2PVarOutT[t=1:T], sum_expression(eCH2G2PVar_out[1:H,t]))
+    @expression(EP, eTotalCH2G2PVarOut, sum_expression(eTotalCH2G2PVarOutT[1:T]))
     
     # Add total variable discharging cost contribution to the objective function
     EP[:eObj] += eTotalCH2G2PVarOut

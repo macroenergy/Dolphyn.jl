@@ -88,18 +88,21 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	# Identify number of ESRR requirements
 	nESR = count(s -> startswith(String(s), "ESR_"), names(dfGen))
 
-
+	# Get all values larger than zero
+	Gen_H2_TMR_P_Values = findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")])
+	H2Gen_H2_TMR_P_Values = findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")])
+        
 	# Export expression regarding excess electricity generation from contracted VRE resources over the entire year that can be used for meeting RPS requirements
 
 	# Hourly excess electricity supply from contracted electricity resources for H2 production
 	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
-	sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
-	- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-	-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
+	sum_expression(dfGen[!,Symbol("H2_TMR_$TMR")][dfGen[H2_TMR_P_Values,:R_ID]]*EP[:vP][dfGen[H2_TMR_P_Values,:R_ID],t]) 
+	- sum_expression(dfGen[!,Symbol("H2_TMR_$TMR")][intersect(dfGen[H2_TMR_P_Values,:R_ID], inputs["STOR_ALL"])]*EP[:vCHARGE][intersect(dfGen[H2_TMR_P_Values,:R_ID], inputs["STOR_ALL"]),t])
+	-sum_expression(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][intersect(H2_GEN, dfH2Gen[H2Gen_H2_TMR_P_Values,:R_ID])])
 	)
 
 	# Annual excess electricity supply from contracted electricity resources for H2 production
-	@expression(EP, eExcessAnnualElectricitySupplyTMR[TMR=1:nH2_TMR], sum(eExcessElectricitySupplyTMR[TMR,t]*inputs["omega"][t] for t = 1:T))
+	@expression(EP, eExcessAnnualElectricitySupplyTMR[TMR=1:nH2_TMR], sum_expression(eExcessElectricitySupplyTMR[TMR,1:T]*inputs["omega"][1:T]))
 
 	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
 	if setup["TimeMatchingRequirement"] == 1 # hourly with excess sales allowed
@@ -143,7 +146,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 		for curr_esr in 1:nESR
 			dfGen_curr_esr = filter(row -> row[Symbol("ESR_$curr_esr")] == 1, dfGen)
 			for curr_tmr in 1:nH2_TMR
-				if sum(dfGen_curr_esr[!, Symbol("H2_TMR_$curr_tmr")]) >= 1
+				if sum_expression(dfGen_curr_esr[!, Symbol("H2_TMR_$curr_tmr")]) >= 1
 					push!(esr_tmr_df, (ESR = curr_esr, TMR = curr_tmr))	
 				end
 			end
@@ -151,7 +154,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 		if nrow(esr_tmr_df) != 0
 			#Summing excess energy across all TMR resources in the same ESR group, creating an excess annual electricity supply variable from TMR resources for each ESR. 
-			@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum(eExcessElectricitySupplyTMR[TMR] for TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
+			@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum_expression(eExcessElectricitySupplyTMR[esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]]))
 			EP[:eESR] += eExcessAnnualElectricitySupplyESR
 		end
 

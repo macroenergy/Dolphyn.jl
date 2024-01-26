@@ -123,7 +123,7 @@ function h2_g2p_investment(EP::Model, inputs::Dict, setup::Dict)
 
     end
 
-    @expression(EP, eTotalH2G2PCFix, sum(EP[:eH2G2PCFix][k] for k in 1:H))
+    @expression(EP, eTotalH2G2PCFix, sum_expression(EP[:eH2G2PCFix][1:H]))
 
     # Add term to objective function expression
     EP[:eObj] += eTotalH2G2PCFix

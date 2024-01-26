@@ -33,23 +33,23 @@ function green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 	if setup["GreenH2ShareRequirement"] == 1
 		if setup["ModelH2G2P"] == 1
 			## Green H2 Share Requirements (minimum H2 share from electrolyzer) constraint
-			@expression(EP, eGlobalGreenH2Balance[t=1:T], sum(EP[:vH2Gen][y,t] for y in H2_ELECTROLYZER) )
-			@expression(EP, eGlobalGreenH2Demand[t=1:T], sum(inputs["H2_D"][t,z] for z = 1:Z) )
-			@expression(EP, eH2DemandG2P[t=1:T], sum(EP[:eH2DemandByZoneG2P][z,t] for z = 1:Z))	
+			@expression(EP, eGlobalGreenH2Balance[t=1:T], sum_expression(EP[:vH2Gen][H2_ELECTROLYZER,t]) )
+			@expression(EP, eGlobalGreenH2Demand[t=1:T], sum_expression(inputs["H2_D"][t,1:Z]) )
+			@expression(EP, eH2DemandG2P[t=1:T], sum_expression(EP[:eH2DemandByZoneG2P][1:Z,t]))	
 
-			@expression(EP, eAnnualGlobalGreenH2Balance, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Balance][t] for t = 1:T) )
-			@expression(EP, eAnnualGlobalGreenH2Demand, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Demand][t] for t = 1:T) )
-			@expression(EP, eAnnualGlobalGreenH2DemandG2P, sum(inputs["omega"][t] * EP[:eH2DemandG2P][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalGreenH2Balance, sum_expression(inputs["omega"][1:T] * EP[:eGlobalGreenH2Balance][1:T]) )
+			@expression(EP, eAnnualGlobalGreenH2Demand, sum_expression(inputs["omega"][1:T] * EP[:eGlobalGreenH2Demand][1:T]) )
+			@expression(EP, eAnnualGlobalGreenH2DemandG2P, sum_expression(inputs["omega"][1:T] * EP[:eH2DemandG2P][1:T]) )
 
 			@constraint(EP, cGreenH2ShareRequirement, eAnnualGlobalGreenH2Balance == GreenH2Share * (eAnnualGlobalGreenH2Demand + eAnnualGlobalGreenH2DemandG2P))
 			
 		else
 			## Green H2 Share Requirements (minimum H2 share from electrolyzer) constraint
-			@expression(EP, eGlobalGreenH2Balance[t=1:T], sum(EP[:vH2Gen][y,t] for y in H2_ELECTROLYZER) )
-			@expression(EP, eGlobalGreenH2Demand[t=1:T], sum(inputs["H2_D"][t,z] for z = 1:Z) )
+			@expression(EP, eGlobalGreenH2Balance[t=1:T], sum_expression(EP[:vH2Gen][H2_ELECTROLYZER,t]) )
+			@expression(EP, eGlobalGreenH2Demand[t=1:T], sum_expression(inputs["H2_D"][t,1:Z]) )
 
-			@expression(EP, eAnnualGlobalGreenH2Balance, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Balance][t] for t = 1:T) )
-			@expression(EP, eAnnualGlobalGreenH2Demand, sum(inputs["omega"][t] * EP[:eGlobalGreenH2Demand][t] for t = 1:T) )
+			@expression(EP, eAnnualGlobalGreenH2Balance, sum_expression(inputs["omega"][1:T] * EP[:eGlobalGreenH2Balance][1:T] ) )
+			@expression(EP, eAnnualGlobalGreenH2Demand, sum_expression(inputs["omega"][1:T] * EP[:eGlobalGreenH2Demand][1:T]) )
 
 			@constraint(EP, cGreenH2ShareRequirement, eAnnualGlobalGreenH2Balance == GreenH2Share * eAnnualGlobalGreenH2Demand)
 		end

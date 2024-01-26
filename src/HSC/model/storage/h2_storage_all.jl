@@ -161,8 +161,8 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     end
 
     # Sum individual resource contributions to variable charging costs to get total variable charging costs
-    @expression(EP, eTotalCVarH2StorInT[t=1:T], sum(eCVarH2Stor_in[y,t] for y in H2_STOR_ALL))
-    @expression(EP, eTotalCVarH2StorIn, sum(eTotalCVarH2StorInT[t] for t in 1:T))
+    @expression(EP, eTotalCVarH2StorInT[t=1:T], sum_expression(eCVarH2Stor_in[H2_STOR_ALL,t]))
+    @expression(EP, eTotalCVarH2StorIn, sum_expression(eTotalCVarH2StorInT[1:T]))
     EP[:eObj] += eTotalCVarH2StorIn
 
 
@@ -181,8 +181,11 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2Stor
  
        # H2 Balance expressions
+    RES_Z = [dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID] for z in 1:Z]
+    H2_STOR_Z = reduce(union, [intersect(Set(H2_STOR_GAS), v) for v in RES_Z])
+    #S_Z = intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==1:Z,:][!,:R_ID]) 
     @expression(EP, eH2BalanceStor[t=1:T, z=1:Z],
-    sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+    sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t]  for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
     EP[:eH2Balance] += eH2BalanceStor   
 

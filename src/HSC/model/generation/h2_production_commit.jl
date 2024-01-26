@@ -193,21 +193,21 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     end
 
     # Julia is fastest when summing over one row one column at a time
-    @expression(EP, eTotalH2GenCStartT[t=1:T], sum(eH2GenCStart[k,t] for k in H2_GEN_COMMIT))
-    @expression(EP, eTotalH2GenCStart, sum(eTotalH2GenCStartT[t] for t=1:T))
+    @expression(EP, eTotalH2GenCStartT[t=1:T], sum_expression(eH2GenCStart[H2_GEN_COMMIT,t]))
+    @expression(EP, eTotalH2GenCStart, sum_expression(eTotalH2GenCStartT[1:T]))
 
     EP[:eObj] += eTotalH2GenCStart
 
     #H2 Balance expressions
     @expression(EP, eH2GenCommit[t=1:T, z=1:Z],
-    sum(EP[:vH2Gen][k,t] for k in intersect(H2_GAS_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+    sum_expression(EP[:vH2Gen][intersect(H2_GAS_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t]))
 
     EP[:eH2Balance] += eH2GenCommit
 
     if setup["ModelH2Liquid"]==1
         #H2 LIQUID Balance expressions
         @expression(EP, eH2LiqCommit[t=1:T, z=1:Z],
-        sum(EP[:vH2Gen][k,t] for k in intersect(H2_LIQ_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+        sum_expression(EP[:vH2Gen][intersect(H2_LIQ_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t]))
         
         # Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
         EP[:eH2Balance] -= eH2LiqCommit
@@ -216,7 +216,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
         #H2 EVAPORATION Balance expressions
         if !isempty(H2_EVAP_COMMIT)
             @expression(EP, eH2EvapCommit[t=1:T, z=1:Z],
-            sum(EP[:vH2Gen][k,t] for k in intersect(H2_EVAP_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+            sum_expression(EP[:vH2Gen][intersect(H2_EVAP_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t]))
         
             # Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
             EP[:eH2Balance] += eH2EvapCommit
@@ -227,11 +227,11 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     #Power Consumption for H2 Generation
     if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
-        sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+        sum_expression(EP[:vP2G][intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t]/ModelScalingFactor)) 
 
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
         @expression(EP, ePowerBalanceH2GenCommit[t=1:T, z=1:Z],
-        sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+        sum_expression(EP[:vP2G][intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t])) 
     end
 
     EP[:ePowerBalance] += -ePowerBalanceH2GenCommit
@@ -327,15 +327,15 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
         @constraints(EP, begin
             # cUpTimeInterior: Constraint looks back over last n hours, where n = dfH2Gen[!,:Up_Time][y]
-            [t in setdiff(INTERIOR_SUBPERIODS,Up_Time_HOURS)], EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenStart][y,e] for e=(t-dfH2Gen[!,:Up_Time][y]):t)
+            [t in setdiff(INTERIOR_SUBPERIODS,Up_Time_HOURS)], EP[:vH2GenCOMMIT][y,t] >= sum_expression(EP[:vH2GenStart][y,(t-dfH2Gen[!,:Up_Time][y]):t])
 
             # cUpTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
             # cUpTimeWrap constraint equivalant to: sum(EP[:vH2GenStart][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenStart][y,e] for e=(hours_per_subperiod_max-(dfH2Gen[!,:Up_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
-            [t in Up_Time_HOURS], EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenStart][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenStart][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2Gen[!,:Up_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
+            [t in Up_Time_HOURS], EP[:vH2GenCOMMIT][y,t] >= sum_expression(EP[:vH2GenStart][y,(t-((t%hours_per_subperiod)-1):t)])+sum_expression(EP[:vH2GenStart][y,((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2Gen[!,:Up_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod))])
 
             # cUpTimeStart:
             # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
-            [t in START_SUBPERIODS], EP[:vH2GenCOMMIT][y,t] >= EP[:vH2GenStart][y,t]+sum(EP[:vH2GenStart][y,e] for e=((t+hours_per_subperiod-1)-(dfH2Gen[!,:Up_Time][y]-1)):(t+hours_per_subperiod-1))
+            [t in START_SUBPERIODS], EP[:vH2GenCOMMIT][y,t] >= EP[:vH2GenStart][y,t]+sum_expression(EP[:vH2GenStart][y,((t+hours_per_subperiod-1)-(dfH2Gen[!,:Up_Time][y]-1)):(t+hours_per_subperiod-1)])
         end)
 
         ## down time
@@ -349,15 +349,15 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
         # TODO: Replace LHS of constraints in this block with eNumPlantsOffline[y,t]
         @constraints(EP, begin
             # cDownTimeInterior: Constraint looks back over last n hours, where n = inputs["pDMS_Time"][y]
-            [t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-dfH2Gen[!,:Down_Time][y]):t)
+            [t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum_expression(EP[:vH2GenShut][y,(t-dfH2Gen[!,:Down_Time][y]):t])
 
             # cDownTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
             # cDownTimeWrap constraint equivalant to: EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenShut][y,e] for e=(hours_per_subperiod_max-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
-            [t in Down_Time_HOURS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenShut][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
+            [t in Down_Time_HOURS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum_expression(EP[:vH2GenShut][y,(t-((t%hours_per_subperiod)-1):t)])+sum_expression(EP[:vH2GenShut][y,((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod))])
 
             # cDownTimeStart:
             # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
-            [t in START_SUBPERIODS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t]  >= EP[:vH2GenShut][y,t]+sum(EP[:vH2GenShut][y,e] for e=((t+hours_per_subperiod-1)-(dfH2Gen[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1))
+            [t in START_SUBPERIODS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t]  >= EP[:vH2GenShut][y,t]+sum_expression(EP[:vH2GenShut][y,((t+hours_per_subperiod-1)-(dfH2Gen[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1)])
         end)
     end
 
