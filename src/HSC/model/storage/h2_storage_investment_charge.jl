@@ -129,7 +129,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     end
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixH2Charge, sum(EP[:eCFixH2Charge][y] for y in H2_STOR_ALL))
+    @expression(EP, eTotalCFixH2Charge, sum_expression(EP[:eCFixH2Charge][H2_STOR_ALL]))
 
     # Add term to objective function expression
     EP[:eObj] += eTotalCFixH2Charge

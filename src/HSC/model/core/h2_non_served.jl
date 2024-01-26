@@ -90,9 +90,9 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         eTotalH2CNSETS[t = 1:T, z = 1:Z],
-        sum(eH2CNSE[s, t, z] for s = 1:H2_SEG)
+        sum_expression(eH2CNSE[1:H2_SEG, t, z])
     )
-    @expression(EP, eTotalH2CNSET[t = 1:T], sum(eTotalH2CNSETS[t, z] for z = 1:Z))
+    @expression(EP, eTotalH2CNSET[t = 1:T], sum_expression(eTotalH2CNSETS[t, 1:Z]))
 
     #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     #  ParameterScale = 0 --> objective function is in $
@@ -100,10 +100,10 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eTotalH2CNSE,
-            sum(eTotalH2CNSET[t] / (ModelScalingFactor)^2 for t = 1:T)
+            sum_expression(eTotalH2CNSET[1:T] / (ModelScalingFactor)^2)
         )
     else
-        @expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t] for t = 1:T))
+        @expression(EP, eTotalH2CNSE, sum_expression(eTotalH2CNSET[1:T]))
     end
 
 
@@ -111,7 +111,7 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     EP[:eObj] += eTotalH2CNSE
 
     ## Power Balance Expressions ##
-    @expression(EP, eH2BalanceNse[t = 1:T, z = 1:Z], sum(vH2NSE[s, t, z] for s = 1:H2_SEG))
+    @expression(EP, eH2BalanceNse[t = 1:T, z = 1:Z], sum_expression(vH2NSE[1:H2_SEG, t, z]))
 
     # Add non-served energy/curtailed demand contribution to power balance expression
     EP[:eH2Balance] += eH2BalanceNse
@@ -129,7 +129,7 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cMaxH2NSE[t = 1:T, z = 1:Z],
-        sum(vH2NSE[s, t, z] for s = 1:H2_SEG) <= inputs["H2_D"][t, z]
+        sum_expression(vH2NSE[1:H2_SEG, t, z]) <= inputs["H2_D"][t, z]
     )
 
     return EP

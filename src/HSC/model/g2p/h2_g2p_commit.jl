@@ -191,26 +191,27 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
     end
 
     # Julia is fastest when summing over one row one column at a time
-    @expression(EP, eTotalH2G2PCStartT[t=1:T], sum(eH2G2PCStart[k,t] for k in H2_G2P_COMMIT))
-    @expression(EP, eTotalH2G2PCStartK[k = H2_G2P_COMMIT], sum(eH2G2PCStart[k,t] for t in 1:T))
-    @expression(EP, eTotalH2G2PCStart, sum(eTotalH2G2PCStartT[t] for t=1:T))
+    @expression(EP, eTotalH2G2PCStartT[t=1:T], sum_expression(eH2G2PCStart[H2_G2P_COMMIT,t]))
+    @expression(EP, eTotalH2G2PCStartK[k = H2_G2P_COMMIT], sum_expression(eH2G2PCStart[k,1:T]))
+    @expression(EP, eTotalH2G2PCStart, sum_expression(eTotalH2G2PCStartT[1:T]))
 
     EP[:eObj] += eTotalH2G2PCStart
 
     # H2 Balance expressions
+    h2g2p_row_values = intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])
     @expression(EP, eH2G2PCommit[t=1:T, z=1:Z],
-    sum(EP[:vH2G2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
+    sum_expression(EP[:vH2G2P][h2g2p_row_values,t]))
 
     EP[:eH2Balance] -= eH2G2PCommit
 
     # Power generation from g2p units
     if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-        sum(EP[:vPG2P][k,t]/ModelScalingFactor for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
+        sum_expression(EP[:vPG2P][intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]),t]/ModelScalingFactor)) 
 
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
         @expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-        sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
+        sum_expression(EP[:vPG2P][h2g2p_row_values,t])) 
     end
 
     EP[:ePowerBalance] += ePowerBalanceH2G2PCommit
@@ -302,15 +303,15 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
         @constraints(EP, begin
             # cUpTimeInterior: Constraint looks back over last n hours, where n = dfH2G2P[!,:Up_Time][y]
-            [t in setdiff(INTERIOR_SUBPERIODS,Up_Time_HOURS)], EP[:vH2G2PCOMMIT][y,t] >= sum(EP[:vH2G2PStart][y,e] for e=(t-dfH2G2P[!,:Up_Time][y]):t)
+            [t in setdiff(INTERIOR_SUBPERIODS,Up_Time_HOURS)], EP[:vH2G2PCOMMIT][y,t] >= sum_expression(EP[:vH2G2PStart][y,(t-dfH2G2P[!,:Up_Time][y]):t])
 
             # cUpTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
             # cUpTimeWrap constraint equivalant to: sum(EP[:vH2G2PStart][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2G2PStart][y,e] for e=(hours_per_subperiod_max-(dfH2G2P[!,:Up_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
-            [t in Up_Time_HOURS], EP[:vH2G2PCOMMIT][y,t] >= sum(EP[:vH2G2PStart][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2G2PStart][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2G2P[!,:Up_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
+            [t in Up_Time_HOURS], EP[:vH2G2PCOMMIT][y,t] >= sum_expression(EP[:vH2G2PStart][y,(t-((t%hours_per_subperiod)-1):t)])+sum_expression(EP[:vH2G2PStart][y,((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2G2P[!,:Up_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod))])
 
             # cUpTimeStart:
             # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
-            [t in START_SUBPERIODS], EP[:vH2G2PCOMMIT][y,t] >= EP[:vH2G2PStart][y,t]+sum(EP[:vH2G2PStart][y,e] for e=((t+hours_per_subperiod-1)-(dfH2G2P[!,:Up_Time][y]-1)):(t+hours_per_subperiod-1))
+            [t in START_SUBPERIODS], EP[:vH2G2PCOMMIT][y,t] >= EP[:vH2G2PStart][y,t]+sum_expression(EP[:vH2G2PStart][y,((t+hours_per_subperiod-1)-(dfH2G2P[!,:Up_Time][y]-1)):(t+hours_per_subperiod-1)])
         end)
 
         ## down time
@@ -324,15 +325,15 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
         # TODO: Replace LHS of constraints in this block with eNumPlantsOffline[y,t]
         @constraints(EP, begin
             # cDownTimeInterior: Constraint looks back over last n hours, where n = inputs["pDMS_Time"][y]
-            [t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t] >= sum(EP[:vH2G2PShut][y,e] for e=(t-dfH2G2P[!,:Down_Time][y]):t)
+            [t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t] >= sum_expression(EP[:vH2G2PShut][y,((t-dfH2G2P[!,:Down_Time][y]):t)])
 
             # cDownTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
             # cDownTimeWrap constraint equivalant to: EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t] >= sum(EP[:vH2G2PShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2G2PShut][y,e] for e=(hours_per_subperiod_max-(dfH2G2P[!,:Down_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
-            [t in Down_Time_HOURS], EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t] >= sum(EP[:vH2G2PShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2G2PShut][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2G2P[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
+            [t in Down_Time_HOURS], EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t] >= sum_expression(EP[:vH2G2PShut][y,(t-((t%hours_per_subperiod)-1):t)])+sum_expression(EP[:vH2G2PShut][y,((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2G2P[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod))])
 
             # cDownTimeStart:
             # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
-            [t in START_SUBPERIODS], EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t]  >= EP[:vH2G2PShut][y,t]+sum(EP[:vH2G2PShut][y,e] for e=((t+hours_per_subperiod-1)-(dfH2G2P[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1))
+            [t in START_SUBPERIODS], EP[:eH2G2PTotalCap][y]/dfH2G2P[!,:Cap_Size_MW][y]-EP[:vH2G2PCOMMIT][y,t]  >= EP[:vH2G2PShut][y,t]+sum_expression(EP[:vH2G2PShut][y,((t+hours_per_subperiod-1)-(dfH2G2P[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1)])
         end)
     end
 

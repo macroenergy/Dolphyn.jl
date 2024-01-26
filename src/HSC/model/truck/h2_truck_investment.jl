@@ -160,7 +160,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     end
 
 	# Sum individual resource contributions to fixed costs to get total fixed costs
-	@expression(EP, eTotalCFixH2TruckCharge, sum(EP[:eCFixH2TruckCharge][j] for j in H2_TRUCK_TYPES))
+	@expression(EP, eTotalCFixH2TruckCharge, sum_expression(EP[:eCFixH2TruckCharge][H2_TRUCK_TYPES]))
 
 	# Add term to objective function expression
 	EP[:eObj] += eTotalCFixH2TruckCharge
@@ -189,7 +189,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	end
 
     # Sum individual zone and individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixH2TruckEnergy, sum(EP[:eCFixH2TruckEnergy][z, j] for z = 1:Z, j in H2_TRUCK_TYPES))
+    @expression(EP, eTotalCFixH2TruckEnergy, sum_expression(EP[:eCFixH2TruckEnergy][1:Z, H2_TRUCK_TYPES]))
 
     # Add term to objective function expression
     EP[:eObj] += eTotalCFixH2TruckEnergy

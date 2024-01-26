@@ -80,7 +80,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         eH2EmissionsByZone[z = 1:Z, t = 1:T],
-        sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
+        sum_expression(eH2EmissionsByPlant[dfH2Gen[(dfH2Gen[!,:Zone].==z), :R_ID], t])
     )
 
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices
@@ -90,29 +90,27 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCH2EmissionsPenaltybyZone[z = 1:Z],
-            sum(
-                inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfH2CO2Price"][z, cap] for
-                    cap in findall(x -> x == 1, inputs["dfH2CO2CapZones"][z, :])
-                ) for t = 1:T
+            sum_expression(
+                inputs["omega"][1:T] * sum_expression(
+                    eH2EmissionsByZone[z, 1:T] * inputs["dfH2CO2Price"][z, findall(x -> x == 1, inputs["dfH2CO2CapZones"][z, :])]
+                ) 
             )
         )
         # Sum over each policy type, each zone and each time step
         @expression(
             EP,
             eCH2EmissionsPenaltybyPolicy[cap = 1:inputs["H2NCO2Cap"]],
-            sum(
-                inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfH2CO2Price"][z, cap] for
-                    z in findall(x -> x == 1, inputs["dfH2CO2CapZones"][:, cap])
-                ) for t = 1:T
+            sum_expression(
+                inputs["omega"][1:T] * sum_expression(
+                    eH2EmissionsByZone[findall(x -> x == 1, inputs["dfH2CO2CapZones"][:, cap]), 1:T] * inputs["dfH2CO2Price"][findall(x -> x == 1, inputs["dfH2CO2CapZones"][:, cap]), cap] 
+                ) 
             )
         )
         # Total emissions penalty across all policy constraints
         @expression(
             EP,
             eCH2GenTotalEmissionsPenalty,
-            sum(eCH2EmissionsPenaltybyPolicy[cap] for cap = 1:inputs["H2NCO2Cap"])
+            sum_expression(eCH2EmissionsPenaltybyPolicy[1:inputs["H2NCO2Cap"]])
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies
@@ -125,28 +123,26 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         @expression(
             EP,
             eCH2EmissionsPenaltybyZone[z = 1:Z],
-            sum(
-                inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
-                    cap in findall(x -> x == 1, inputs["dfCO2CapZones"][z, :])
-                ) for t = 1:T
+            sum_expression(
+                inputs["omega"][1:T] * sum_expression(
+                    eH2EmissionsByZone[z, 1:T] * inputs["dfCO2Price"][z, findall(x -> x == 1, inputs["dfCO2CapZones"][z, :])] 
+                ) 
             )
         )
         # Sum over each policy type, each zone and each time step
         @expression(
             EP,
             eCH2EmissionsPenaltybyPolicy[cap = 1:inputs["NCO2Cap"]],
-            sum(
-                inputs["omega"][t] * sum(
-                    eH2EmissionsByZone[z, t] * inputs["dfCO2Price"][z, cap] for
-                    z in findall(x -> x == 1, inputs["dfCO2CapZones"][:, cap])
-                ) for t = 1:T
+            sum_expression(
+                inputs["omega"][1:T] * sum_expression(
+                    eH2EmissionsByZone[findall(x -> x == 1, inputs["dfCO2CapZones"][:, cap]), 1:T] * inputs["dfCO2Price"][findall(x -> x == 1, inputs["dfCO2CapZones"][:, cap]), cap] 
+               ) 
             )
         )
         @expression(
             EP,
             eCH2GenTotalEmissionsPenalty,
-            sum(eCH2EmissionsPenaltybyPolicy[cap] for cap = 1:inputs["NCO2Cap"])
+            sum_expression(eCH2EmissionsPenaltybyPolicy[1:inputs["NCO2Cap"]])
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies

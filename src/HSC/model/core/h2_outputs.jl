@@ -81,8 +81,8 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
         (inputs["omega"][t] * ((dfH2Gen[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k])) * vH2Gen[k,t]))
     end
 
-    @expression(EP, eTotalCH2GenVarOutT[t=1:T], sum(eCH2GenVar_out[k,t] for k in 1:H))
-    @expression(EP, eTotalCH2GenVarOut, sum(eTotalCH2GenVarOutT[t] for t in 1:T))
+    @expression(EP, eTotalCH2GenVarOutT[t=1:T], sum_expression(eCH2GenVar_out[1:H,t]))
+    @expression(EP, eTotalCH2GenVarOut, sum_expression(eTotalCH2GenVarOutT[1:T]))
     
     # Add total variable discharging cost contribution to the objective function
     EP[:eObj] += eTotalCH2GenVarOut

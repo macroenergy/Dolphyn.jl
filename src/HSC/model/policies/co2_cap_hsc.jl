@@ -61,31 +61,32 @@ Note that the generator-side rate-based constraint can be used to represent a fe
 function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
 
     T = inputs["T"]     # Number of time steps (hours)
-    H2_SEG= inputs["H2_SEG"] # Number of demand response segments for H2 demand
+    H2_SEG = inputs["H2_SEG"] # Number of demand response segments for H2 demand
+    H2CO2CapZones_Ones = findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]) ##get all equal to one
 
     # NOTE: If ParameterScale = 1 , then emisisons constraint written in units of ktonnes, else emissions constraint units is tonnes
     ## Mass-based: Emissions constraint in absolute emissions limit (tons)
     # eH2emissionsbyZones scaled in emissions_hsc.jl. RHS of constraint adjusted by modifying unit of CO2 intensity constraint
     if setup["H2CO2Cap"] == 1
         @constraint(EP, cH2CO2Emissions_systemwide[cap=1:inputs["H2NCO2Cap"]],
-            sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) <=
-            sum(inputs["dfH2MaxCO2"][z,cap] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]))
+            sum_expression(inputs["omega"][1:T] * EP[:eH2EmissionsByZone][H2CO2CapZones_Ones,1:T]) <=
+            sum_expression(inputs["dfH2MaxCO2"][H2CO2CapZones_Ones,cap])
         )
 
     ## Load + Rate-based: Emissions constraint in terms of rate (tons/tonnes)
     elseif setup["H2CO2Cap"] == 2 
         @constraint(EP, cH2CO2Emissions_systemwide[cap=1:inputs["H2NCO2Cap"]],
-            sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) <=
-            sum(inputs["dfH2MaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * 
-            (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] -
-             sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]))
+            sum_expression(inputs["omega"][1:T] * EP[:eH2EmissionsByZone][H2CO2CapZones_Ones,1:T]) <=
+            sum_expression(inputs["dfH2MaxCO2Rate"][H2CO2CapZones_Ones,cap] * sum_expression(inputs["omega"][1:T] * 
+            (inputs["H2_D"][1:T,H2CO2CapZones_Ones] + EP[:eH2DemandByZoneG2P][H2CO2CapZones_Ones,1:T] -
+             sum_expression(EP[:vH2NSE][1:H2_SEG,1:T,z]))))
         )
 
     ## Generation + Rate-based: Emissions constraint in terms of rate (tonne CO2/tonne H2)
     elseif (setup["H2CO2Cap"]==3)
         @constraint(EP, cH2CO2Emissions_systemwide[cap=1:inputs["H2NCO2Cap"]],
-            sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]), t=1:T) <=
-            sum(inputs["dfH2MaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eH2GenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap]))
+            sum_expression(inputs["omega"][1:T] * EP[:eH2EmissionsByZone][H2CO2CapZones_Ones,1:T])  <=
+            sum_expression(inputs["dfH2MaxCO2Rate"][H2CO2CapZones_Ones,cap] * inputs["omega"][1:T] * EP[:eH2GenerationByZone][H2CO2CapZones_Ones,1:T])
         )
     end 
 
