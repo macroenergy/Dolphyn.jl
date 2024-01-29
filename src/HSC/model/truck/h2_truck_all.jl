@@ -218,7 +218,9 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             EP,
             OPEX_Truck_Compression,
             sum(
-		truck_compression(inputs["omega"][t], vH2TruckFlow[z,j,t], dfH2Truck[!, :H2TruckCompressionUnitOpex][j]) for z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T
+		inputs["omega"][t] *
+                (vH2TruckFlow[z, j, t] * dfH2Truck[!, :H2TruckCompressionUnitOpex][j]) for
+                z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T
             )
         ) / ModelScalingFactor^2
     else
@@ -229,7 +231,9 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             EP,
             OPEX_Truck_Compression,
             sum(
-	 	truck_compression(inputs["omega"][t], vH2TruckFlow[z,j,t], dfH2Truck[!, :H2TruckCompressionUnitOpex][j]) for z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T
+		inputs["omega"][t] *
+                (vH2TruckFlow[z, j, t] * dfH2Truck[!, :H2TruckCompressionUnitOpex][j]) for
+                z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T
             )
         )
     end
@@ -243,11 +247,15 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         ePowerbalanceH2TruckCompression[t = 1:T, z = 1:Z],
         if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GWh rather than MWh
             sum(
-		balance_truck_comp(vH2Ncharged[z, j, t], dfH2Truck[!, :TruckCap_tonne_per_unit][j], dfH2Truck[!, :H2TruckCompressionEnergy][j]) for j in H2_TRUCK_TYPES, z in 1:Z, t in 1:T
+		vH2Ncharged[z, j, t] *
+                dfH2Truck[!, :TruckCap_tonne_per_unit][j] *
+                dfH2Truck[!, :H2TruckCompressionEnergy][j] for j in H2_TRUCK_TYPES
             ) / ModelScalingFactor
         else
             sum(
-		balance_truck_comp(vH2Ncharged[z, j, t], dfH2Truck[!, :TruckCap_tonne_per_unit][j], dfH2Truck[!, :H2TruckCompressionEnergy][j]) for j in H2_TRUCK_TYPES, z in 1:Z, t in 1:T
+		vH2Ncharged[z, j, t] *
+                dfH2Truck[!, :TruckCap_tonne_per_unit][j] *
+                dfH2Truck[!, :H2TruckCompressionEnergy][j] for j in H2_TRUCK_TYPES
             )
         end
     )
@@ -630,6 +638,6 @@ function truck_compression(omega::Float64, truck_flow::VariableRef, truck_types:
     return (omega*(truck_flow*truck_types))
 end
 
-function balance_truck_comp (charged::Float64, truck_cap_tonne_p_unit, truck_comp_energy)
+function balance_truck_comp(charged::Float64, truck_cap_tonne_p_unit::Int64, truck_comp_energy::Float64)
     return charged * truck_cap_tonne_p_unit * truck_comp_energy
 end
