@@ -56,7 +56,6 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
     ## In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     ## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.
     #  ParameterScale = 0 --> objective function is in $
-
     if setup["ParameterScale"] ==1
         @expression(EP, eCH2G2PVar_out[k = 1:H,t = 1:T], 
         inputs["omega"][t] * (dfH2G2P[!,:Var_OM_Cost_p_MWh][k]/ModelScalingFactor^2) * vPG2P[k,t])
@@ -64,7 +63,6 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
         @expression(EP, eCH2G2PVar_out[k = 1:H,t = 1:T], 
         inputs["omega"][t] * dfH2G2P[!,:Var_OM_Cost_p_MWh][k] * vPG2P[k,t])
     end
-
     @expression(EP, eTotalCH2G2PVarOutT[t=1:T], sum_expression(eCH2G2PVar_out[1:H,t]))
     @expression(EP, eTotalCH2G2PVarOut, sum_expression(eTotalCH2G2PVarOutT[1:T]))
     

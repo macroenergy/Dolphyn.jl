@@ -198,9 +198,8 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
     EP[:eObj] += eTotalH2G2PCStart
 
     # H2 Balance expressions
-    h2g2p_row_values = intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])
     @expression(EP, eH2G2PCommit[t=1:T, z=1:Z],
-    sum_expression(EP[:vH2G2P][h2g2p_row_values,t]))
+    sum_expression(EP[:vH2G2P][intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]),t]))
 
     EP[:eH2Balance] -= eH2G2PCommit
 
@@ -211,7 +210,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
         @expression(EP, ePowerBalanceH2G2PCommit[t=1:T, z=1:Z],
-        sum_expression(EP[:vPG2P][h2g2p_row_values,t])) 
+        sum_expression(EP[:vPG2P][intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]),t])) 
     end
 
     EP[:ePowerBalance] += ePowerBalanceH2G2PCommit

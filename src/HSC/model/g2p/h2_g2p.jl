@@ -45,13 +45,12 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
     end
 
     ## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
-    G2P_Z = intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==1:Z,:R_ID])
     @expression(EP, eGenerationByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
-        sum_expression(EP[:vPG2P][G2P_Z,t])
+        sum_expression(EP[:vPG2P][intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==1:Z,:R_ID]),t])
     )
 
     @expression(EP, eH2DemandByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
-        sum_expression(EP[:vH2G2P][G2P_Z,t])
+        sum_expression(EP[:vH2G2P][intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==1:Z,:R_ID]),t])
     )
     EP[:eGenerationByZone] += eGenerationByZoneG2P
 
