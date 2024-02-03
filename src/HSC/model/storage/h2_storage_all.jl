@@ -180,12 +180,9 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Adding power consumption by storage
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2Stor
  
-       # H2 Balance expressions
-    RES_Z = [dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID] for z in 1:Z]
-    H2_STOR_Z = reduce(union, [intersect(Set(H2_STOR_GAS), v) for v in RES_Z])
-    #S_Z = intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==1:Z,:][!,:R_ID]) 
+    # H2 Balance expressions
     @expression(EP, eH2BalanceStor[t=1:T, z=1:Z],
-    sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t]  for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
+    sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
     EP[:eH2Balance] += eH2BalanceStor   
 

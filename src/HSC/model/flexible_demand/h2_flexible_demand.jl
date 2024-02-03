@@ -103,7 +103,6 @@ EP[:eH2Balance] += eH2BalanceDemandFlex
 
 ## Objective Function Expressions ##
 
-
 # Variable costs of "charging" for technologies "k" during hour "t" in zone "z"
 #  ParameterScale = 1 --> objective function is in million $
 #  ParameterScale = 0 --> objective function is in $
