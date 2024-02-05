@@ -199,7 +199,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
 
     # H2 Balance expressions
     @expression(EP, eH2G2PCommit[t=1:T, z=1:Z],
-    sum_expression(EP[:vH2G2P][intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]),t]))
+    sum(EP[:vH2G2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
 
     EP[:eH2Balance] -= eH2G2PCommit
 

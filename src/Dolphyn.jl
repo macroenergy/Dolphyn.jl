@@ -36,6 +36,8 @@ export write_liquid_fuels_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
+export @benchmarked
+export generate_benchmark_csv 
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix

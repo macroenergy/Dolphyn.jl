@@ -259,6 +259,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             ))
         )
     end
+    expr = nothing
+
     EP[:eObj] += OPEX_Truck_Compression
     ## End Objective Function Expressions ##
 
