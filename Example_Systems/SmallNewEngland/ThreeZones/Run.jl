@@ -53,7 +53,12 @@ end
 
 # ### Generate model
 # print_and_log("Generating the Optimization Model")
-EP = generate_model(mysetup, myinputs, OPTIMIZER)
+# Get the benchmark results for generate_model
+if mysetup["Benchmark"] == 1
+    EP, bm_results = @benchmarked generate_model(mysetup, myinputs, OPTIMIZER) seconds=30 samples=1000 evals=1
+else
+    EP = generate_model(mysetup, myinputs, OPTIMIZER)
+end
 
 ### Solve model
 print_and_log("Solving Model")
@@ -65,6 +70,9 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 print_and_log("Writing Output")
 outpath = joinpath(inputs_path,"Results")
 outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
+
+## Generate csv file for  benchmark results
+generate_benchmark_csv(outpath_GenX, bm_results)
 
 # Write hydrogen supply chain outputs
 # outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
