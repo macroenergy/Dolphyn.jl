@@ -71,8 +71,10 @@ print_and_log("Writing Output")
 outpath = joinpath(inputs_path,"Results")
 outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
 
-## Generate csv file for  benchmark results
-generate_benchmark_csv(outpath_GenX, bm_results)
+## Generate csv file for  benchmark results if flag is set to be true
+if mysetup["Benchmark"] == 1 
+    generate_benchmark_csv(outpath_GenX, bm_results)
+end
 
 # Write hydrogen supply chain outputs
 # outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
