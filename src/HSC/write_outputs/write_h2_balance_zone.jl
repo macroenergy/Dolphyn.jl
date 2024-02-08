@@ -37,6 +37,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total"])
 
 	#Try this form of summing otherwise just create z dimensions and sum later
+	
 	if !isempty(inputs["H2_ELECTROLYZER"])
 		Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
 	else
