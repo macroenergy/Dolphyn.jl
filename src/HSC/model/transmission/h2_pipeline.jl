@@ -25,15 +25,22 @@ This module defines the hydrogen pipeline construction decision variable $y_{i,z
 
 This module defines the hydrogen pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
 
-This module defines the hydrogen pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+This module defines the hydrogen pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$. This type of storage is known as "Line Packing".
 
 The variable defined in this file named after ```vH2NPipe``` covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{H,PIP}}$.
 
-The variable defined in this file named after ```vH2PipeFlow_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP+}}$.
+Variable to track positive hydrogen flow through pipeline
+This variable tracks the positive (unidirectional) flow of hydrogen through each pipeline in each time period. It is indexed by pipeline type `i`, pipeline path `z -> z'`, and time period `t`. Along with the corresponding negative flow variable, it is used to calculate net pipeline flow. Tracks the positive hydrogen flow through the pipeline in the forward direction
+in the direction from zone z to zone z'# Variable to track positive hydrogen flow through pipeline
+Variable to track positive hydrogen flow through pipeline 
+_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP+}}$.
 
 The variable defined in this file named after ```vH2PipeFlow_neg``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP-}}$.
 
 The variable defined in this file named after ```vH2PipeLevel``` covers variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}}$.
+
+The key to understanding how the pipeline flow works is through the expression '''eH2PipeFlow_net'''. This expression can be split up into 4 components that represent the inflow and outflow at each end of a single pipeline. For each zone that the pipeline connects, that side of the pipeline could either import hydrogen from the zone or export it into the zone. The unidirectional flow setting turns off the source side of the pipeline's ability to export hydrogen into the zone and the sink side of the pipeline's ability to import hydrogen from the zone.
+
 
 **Cost expressions**
 
