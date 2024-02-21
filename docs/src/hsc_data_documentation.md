@@ -21,6 +21,9 @@ Model settings parameters are specified in a `hsc_Settings.yml` file which shoul
 |H2PipeInteger |Whether to model pipeline capacity as discrete or integer. |
 ||0 = continuous capacity of hydrogen pipeline.|
 ||1 = discrete capacity of hydrogen pipeline.|
+|H2PipeDirection |Whether to model pipelines as unidirectional or bidirectional (+)-->(-). |
+||1 = Unidirectional pipelines.|
+||2 = Bidirectional pipelines (Default).|
 |ModelH2Trucks | Whether to model truck in hydrogen supply chain. |
 ||0 = not modeling hydrogen trucks. |
 ||1 = modeling hydrogen trucks. |
