@@ -52,6 +52,12 @@ if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
 end
 
+# ### Load CO2 inputs if modeling the carbon supply chain
+if mysetup["ModelCSC"] == 1
+    myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
+end
+
+
 # ### Generate model
 # print_and_log("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
@@ -71,6 +77,11 @@ outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
 # outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
 if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
+end
+
+# Write carbon supply chain outputs
+if mysetup["ModelCSC"] == 1
+    write_CSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
 compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))

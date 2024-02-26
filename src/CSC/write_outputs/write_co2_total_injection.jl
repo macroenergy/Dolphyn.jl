@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting CO2 storage injection.
 """
+
 function write_co2_total_injection(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	dfCO2Storage = inputs["dfCO2Storage"]
@@ -33,13 +34,13 @@ function write_co2_total_injection(path::AbstractString, sep::AbstractString, in
 	end
 
 	dfCap = DataFrame(
-		Resource = inputs["CO2_STORAGE_NAME"], Zone = dfCO2Storage[!,:Zone],
+		Resource = inputs["CO2_STORAGE_NAME"], Site = dfCO2Storage[!,:Site],
 		Injection_tonne_per_yr = capcapture[:],
 	)
 
 
 	total = DataFrame(
-			Resource = "Total", Zone = "n/a",
+			Resource = "Total", Site = "n/a",
 			Injection_tonne_per_yr = sum(dfCap[!,:Injection_tonne_per_yr]),
 		)
 

@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting the expansion of CO2 pipelines.    
 """
+
 function write_co2_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	L = inputs["CO2_P"]     # Number of CO2 pipelines
     

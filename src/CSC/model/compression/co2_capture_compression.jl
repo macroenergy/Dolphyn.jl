@@ -15,32 +15,34 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_capture_compression(EP::Model, inputs::Dict,setup::Dict)
+	co2_capture_compression(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-The CO2 compression module creates decision variables, expressions, and constraints related to CO2 compression infrastructure for captured CO2 by DAC units.
+	The CO2 compression module creates decision variables, expressions, and constraints related to CO2 compression infrastructure for captured CO2 by DAC units.
 
-This module defines the CO2 compression decision variable $x_{k,z,t}^{\textrm{C,COMP}} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 compressed by resource $k$ in zone $z$ at time period $t$ after being captured by DAC.
+	This module defines the CO2 compression decision variable $x_{k,z,t}^{\textrm{C,COMP}} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 compressed by resource $k$ in zone $z$ at time period $t$ after being captured by DAC.
 
-The variable defined in this file named after ```vDAC\textunderscore{CO2}\textunderscore{Capture}\textunderscore{Compressed}$``` covers all variables $x_{k,z,t}^{\textrm{C,COMP}}$.
+	The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Capture\textunderscore Compressed$``` covers all variables $x_{k,z,t}^{\textrm{C,COMP}}$.
 
-This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,COMP}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 compression in zone $z$ at time period $t$.
+	This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,COMP}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 compression in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vPower\textunderscore{CO2}\textunderscore{Capture}\textunderscore{Compressed}``` cover variable $x_{z,t}^{E,COMP}$.
+	The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Capture\textunderscore Compressed``` cover variable $x_{z,t}^{E,COMP}$.
 
-**Minimum and maximum CO2 compression output**
+	**Minimum and maximum CO2 compression output**
 
-```math
-\begin{equation*}
-	x_{k,z,t}^{\textrm{C,COMP}} \geq \underline{R_{k,z}^{\textrm{C,COMP}}} \times y_{k,z}^{\textrm{C,COMP}} \quad \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
+	```math
+	\begin{equation*}
+		x_{k,z,t}^{\textrm{C,COMP}} \geq \underline{R_{k,z}^{\textrm{C,COMP}}} \times y_{k,z}^{\textrm{C,COMP}} \quad \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
+	```
 
-```math
-\begin{equation*}
-	x_{k,z,t}^{\textrm{C,COMP}} \leq \overline{R_{k,z}^{\textrm{C,COMP}}} \times y_{k,z}^{\textrm{C,COMP}} \quad \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
+	```math
+	\begin{equation*}
+		x_{k,z,t}^{\textrm{C,COMP}} \leq \overline{R_{k,z}^{\textrm{C,COMP}}} \times y_{k,z}^{\textrm{C,COMP}} \quad \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
+	```
+
 """
+
 function co2_capture_compression(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename CO2CaptureComp dataframe
@@ -67,7 +69,7 @@ function co2_capture_compression(EP::Model, inputs::Dict,setup::Dict)
 	sum(EP[:vPower_CO2_Capture_Comp][k,t] for k in dfCO2CaptureComp[dfCO2CaptureComp[!,:Zone].==z,:][!,:R_ID]))
 
 	#Add to power balance to take power away from generated
-	EP[:ePowerBalance] += -ePower_Balance_CO2_Capture_Comp
+	EP[:ePowerBalance] -= ePower_Balance_CO2_Capture_Comp
 
 	##For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_CO2_Capture_Comp

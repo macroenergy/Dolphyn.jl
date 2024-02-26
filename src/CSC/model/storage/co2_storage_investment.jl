@@ -15,37 +15,38 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
+    co2_storage_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the total fixed cost (Investment + Fixed O&M) of the CO2 storage infrastructure in the CO2 supply chain
+	This module defines the total fixed cost (Investment + Fixed O&M) of the CO2 storage infrastructure in the CO2 supply chain
 
-Sets up constraints common to all CO2 storage resources.
+	Sets up constraints common to all CO2 storage resources.
+	
+	This function defines the expressions and constraints keeping track of total available CO2 storage capacity $y_{s}^{\textrm{C,STO}}$ (per year) as well as constraints on capacity.
+	
+	The expression defined in this file named after ```vCapacity\textunderscore CO2\textunderscore Storage\textunderscore per\textunderscore type``` covers all variables $y_{s}^{\textrm{C,STO}}$.
+	
+	The total capacity (per year) of each CO2 storage resource is defined as the sum of newly invested capacity (per year) based on the assumption there are no existing CO2 storage resources. 
+	
+	**Cost expressions**
+	
+	This module additionally defines contributions to the objective function from investment costs of CO2 storage (fixed O\&M plus investment costs) from all resources $s \in \mathcal{S}$:
+	
+	```math
+	\begin{equation*}
+		\textrm{C}^{\textrm{C,STO,c}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} y_{s, z}^{\textrm{C,STO}}\times \textrm{c}_{s}^{\textrm{STO,INV}} + \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,STO,total}} \times \textrm{c}_{s}^{\textrm{STO,FOM}}
+	\end{equation*}
+	```
 
-This function defines the expressions and constraints keeping track of total available CO2 storage capacity $y_{s}^{\textrm{C,STO}}$ (per year) as well as constraints on capacity.
+	**Constraints on CO2 storage capacity (per year)**
 
-The expression defined in this file named after ```vCapacity\textunderscore{CO2}\textunderscore{Storage}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{s}^{\textrm{C,STO}}$.
+	For resources where upper bound $\overline{y_{s}^{\textrm{C,STO}}}$ and lower bound $\underline{y_{s}^{\textrm{C,STO}}}$ of capacity is defined, then we impose constraints on minimum and maximum storage capacity (per year).
+	
+	```math
+	\begin{equation*}
+		\underline{y_{s,z}^{\textrm{C,STO}}} \leq y_{s,z}^{\textrm{C,STO}} \leq \overline{y_{s,z}^{\textrm{C,STO}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}
+	\end{equation*}
+	```
 
-The total capacity (per year) of each CO2 storage resource is defined as the sum of newly invested capacity (per year) based on the assumption there are no existing CO2 storage resources. 
-
-**Cost expressions**
-
-This module additionally defines contributions to the objective function from investment costs of CO2 storage (fixed O\&M plus investment costs) from all resources $s \in \mathcal{S}$:
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,STO,c}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} y_{s, z}^{\textrm{C,STO}}\times \textrm{c}_{s}^{\textrm{STO,INV}} + \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,STO,total}} \times \textrm{c}_{s}^{\textrm{STO,FOM}}
-\end{equation*}
-```
-
-**Constraints on CO2 storage capacity (per year)**
-
-For resources where upper bound $\overline{y_{s}^{\textrm{C,STO}}}$ and lower bound $\underline{y_{s}^{\textrm{C,STO}}}$ of capacity is defined, then we impose constraints on minimum and maximum storage capacity (per year).
-
-```math
-\begin{equation*}
-	\underline{y_{s,z}^{\textrm{C,STO}}} \leq y_{s,z}^{\textrm{C,STO}} \leq \overline{y_{s,z}^{\textrm{C,STO}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}
-\end{equation*}
-```
 """
 function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Model the capacity and cost of injecting the CO2 into geological storage, ignore the cost of the geological storage itself as assume it is naturally ocurring and very large so no limit to how much can be stored
