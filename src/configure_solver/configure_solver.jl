@@ -26,7 +26,7 @@ The "solver\_settings\_path" argument is a string which specifies the path to th
 
 """
 function configure_solver(solver_name::String, solver_settings_path::String, solver::DataType=HiGHS.Optimizer)
-
+    @show solver_name
     solver_name = lowercase(solver_name)
 
     solvers = Dict{String,Dict{String,Any}}(
