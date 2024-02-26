@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting CO2 storage capacity.
 """
+
 function write_co2_storage_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfCO2Storage = inputs["dfCO2Storage"]

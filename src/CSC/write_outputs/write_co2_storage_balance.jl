@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -19,6 +19,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 Function for reporting CO2 storage balance of resources across different zones with time.
 """
+
 function write_co2_storage_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -28,9 +29,9 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	dfCO2StorBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "Synfuel Production Consumption", "CO2 Pipeline Import",
-	           "CO2 Storage"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 10)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "Synfuel Production Consumption", "CO2 Trunk Pipeline Import",
+	           "CO2 Spur Pipeline Outflow", "CO2 Demand"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 
@@ -52,7 +53,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,5] = 0
 			end
 			
-			if setup["ModelLiquidFuels"] == 1
+			if setup["ModelSynFuels"] == 1
 				dfTemp1[t+rowoffset,6] = value(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])
 				dfTemp1[t+rowoffset,7] = - value(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time][z,t])
 			else
@@ -61,12 +62,18 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 			end
 
 			if setup["ModelCO2Pipelines"] == 1
-				dfTemp1[t+rowoffset,8] = value(EP[:ePipeZoneCO2Demand][t,z])
+				dfTemp1[t+rowoffset,8] = value(EP[:ePipeZoneCO2Demand_Trunk][t,z])
 			else
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
-			dfTemp1[t+rowoffset,9] = - value(EP[:eCO2_Injected_per_zone][z,t])
+			if setup["ModelCO2Pipelines"] == 1
+				dfTemp1[t+rowoffset,9] = - value(EP[:ePipeZoneCO2Demand_Outflow_Spur][t,z])
+			else
+				dfTemp1[t+rowoffset,9] = 0
+			end
+
+			dfTemp1[t+rowoffset,10] = inputs["CO2_D"][t,z]
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
@@ -78,6 +85,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,7] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
 				dfTemp1[t+rowoffset,8] = dfTemp1[t+rowoffset,8] * ModelScalingFactor
 				dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,9] * ModelScalingFactor
+				dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,10] * ModelScalingFactor
 			end
 			# DEV NOTE: need to add terms for electricity consumption from H2 balance
 	   	end
@@ -91,5 +99,5 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	   	dfCO2StorBalance[rowoffset,c]=sum(inputs["omega"].*dfCO2StorBalance[(rowoffset+1):size(dfCO2StorBalance,1),c])
 	end
 	dfCO2StorBalance = DataFrame(dfCO2StorBalance, :auto)
-	CSV.write(string(path,sep,"Zone_CO2_storage_balance.csv"), dfCO2StorBalance, writeheader=false)
+	CSV.write(string(path,sep,"Zone_CO2_capture_outflow_balance.csv"), dfCO2StorBalance, writeheader=false)
 end
