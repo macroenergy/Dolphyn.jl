@@ -1,0 +1,19 @@
+ModelSynFuels: 0 #Flag to turn or off Syn Fuel modelling capabilities - 0 - no SF, 1- SF modeled
+
+Syn_Fuel_CAPEX_Piecewise: 0 #Linear modeling of SF Plant CAPEX - 0, Piecewise modeling of 6/10 rule of SF Plant CAPEX - 1
+Syn_Fuel_CAPEX_Piecewise_Segments: 3
+
+AllowConventionalDiesel: 1
+SpecifySynBioDieselPercentFlag: 0
+percent_sbf_diesel: 0.1
+
+AllowConventionalJetfuel: 1
+SpecifySynJetfuelPercentFlag: 0
+percent_sf_jetfuel: 0.1
+
+AllowConventionalGasoline: 1
+SpecifySynBioGasolinePercentFlag: 0
+percent_bf_gasoline: 0.1
+
+#Syn_Fuel_Commit: 1 # Continuous or binary capacity representation of Syn Fuel production technologies with unit commitment; 0 = modeled as continuous variables; 1 = modeled as binary variables;
+#Not yet modeled
