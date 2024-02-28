@@ -2,7 +2,7 @@
 
 # Step 1: Load julia and gurobi
 module load julia/1.8.5
-module load gurobi/gurobi-951
+module load gurobi/gurobi-1000
 
 # Step 2: Navigate to the DOLPHYNJulEnv directory and remove the Manifest.toml file
 cd DOLPHYNJulEnv/
