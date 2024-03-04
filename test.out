@@ -1,0 +1,494 @@
+ --- The following files are not being included from /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src: --- 
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/GenX.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/simple_operation.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/time_domain_reduction/time_domain_reduction.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/model/solve_model.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/model/generate_model.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_cbc.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_clp.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_cplex.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_gurobi.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_highs.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_scip.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/configure_solver/configure_solver.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_capacity.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_capacityfactor.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_charging_cost.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_energy_revenue.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_net_revenue.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_nw_expansion.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_outputs.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_price.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_reliability.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_storage.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_storagedual.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/write_outputs/write_subsidy_revenue.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/model/core/emissions.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/model/policies/co2_cap.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/model/policies/cap_reserve_margin.jl
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/GenX/src/model/resources/thermal/thermal_commit.jl
+ --- End of excluded files --- 
+ --- The following files are not being included from /home/gridsan/larmstrong/Dolphyn.jl/src/time_domain_reduction: --- 
+Excluding /home/gridsan/larmstrong/Dolphyn.jl/src/time_domain_reduction/PreCluster.jl
+ --- End of excluded files --- 
+Set parameter TokenServer to value "flexlm"
+Set parameter Presolve to value 1
+Set parameter AggFill to value 10
+Set parameter PreDual to value 0
+Set parameter TimeLimit to value 110000
+Set parameter Method to value 2
+Set parameter Crossover to value 0
+Set parameter BarHomogeneous to value 0
+Set parameter PreDual to value 0
+Set parameter Method to value 2
+Set parameter Crossover to value 0
+Set parameter TimeLimit to value 110000
+Set parameter BarHomogeneous to value 0
+Set parameter AggFill to value 10
+Set parameter Presolve to value 1
+Gurobi Optimizer version 9.5.1 build v9.5.1rc2 (linux64)
+Thread count: 48 physical cores, 96 logical processors, using up to 32 threads
+Optimize a model with 14241420 rows, 6644364 columns and 56685257 nonzeros
+Model fingerprint: 0x833e09b6
+Coefficient statistics:
+  Matrix range     [5e-11, 5e+03]
+  Objective range  [2e-02, 6e+08]
+  Bounds range     [0e+00, 0e+00]
+  RHS range        [3e-06, 2e+08]
+Warning: Model contains large matrix coefficient range
+         Consider reformulating model or setting NumericFocus parameter
+         to avoid numerical issues.
+Presolve removed 2604380 rows and 1296033 columns (presolve time = 6s) ...
+Presolve removed 2842940 rows and 1319887 columns (presolve time = 11s) ...
+Presolve removed 3200964 rows and 1677911 columns (presolve time = 16s) ...
+Presolve removed 3200964 rows and 1677911 columns (presolve time = 27s) ...
+Presolve removed 3200964 rows and 1677911 columns (presolve time = 30s) ...
+Presolve removed 3248004 rows and 1677911 columns
+Presolve time: 31.99s
+Presolved: 10993416 rows, 5013493 columns, 49954252 nonzeros
+Elapsed ordering time = 5s
+Elapsed ordering time = 10s
+Elapsed ordering time = 73s
+Elapsed ordering time = 75s
+Elapsed ordering time = 80s
+Elapsed ordering time = 85s
+Ordering time: 181.44s
+
+Barrier statistics:
+ Dense cols : 604
+ AA' NZ     : 1.306e+08
+ Factor NZ  : 6.258e+08 (roughly 12.0 GB of memory)
+ Factor Ops : 5.928e+11 (roughly 2 seconds per iteration)
+ Threads    : 32
+
+                  Objective                Residual
+Iter       Primal          Dual         Primal    Dual     Compl     Time
+   0   8.93279044e+14 -6.31844732e+14  2.21e+09 6.46e+04  7.84e+10   245s
+   1   6.88269180e+14 -1.17093053e+15  1.64e+09 1.88e+06  4.77e+10   252s
+   2   6.25696049e+14 -1.50390955e+15  1.48e+09 1.13e+06  3.43e+10   259s
+   3   4.96235826e+14 -2.03138723e+15  1.17e+09 6.92e+05  2.48e+10   269s
+   4   4.17291183e+14 -3.79313746e+15  1.00e+09 3.08e+05  1.95e+10   278s
+   5   1.97163454e+14 -5.75808549e+15  5.05e+08 7.15e+04  9.83e+09   288s
+   6   5.80192022e+13 -4.24005439e+15  1.28e+08 2.29e+04  2.68e+09   299s
+   7   3.37669331e+13 -3.09428310e+15  3.26e+07 1.27e+04  8.42e+08   309s
+   8   2.78715213e+13 -1.22649889e+15  1.01e+07 2.89e+03  2.59e+08   317s
+   9   2.54599163e+13 -9.71789211e+14  4.77e+06 2.21e+03  1.54e+08   323s
+  10   2.47692790e+13 -8.40546055e+14  3.89e+06 1.87e+03  1.29e+08   328s
+  11   2.31031783e+13 -5.21852761e+14  2.24e+06 1.07e+03  7.70e+07   334s
+  12   2.13777462e+13 -4.02676905e+14  1.53e+06 7.72e+02  5.57e+07   340s
+  13   1.90427167e+13 -1.98493253e+14  9.27e+05 3.48e+02  3.00e+07   346s
+  14   1.57117365e+13 -1.47814550e+14  5.33e+05 2.47e+02  1.99e+07   352s
+  15   1.35920789e+13 -1.04713558e+14  3.57e+05 1.64e+02  1.38e+07   357s
+  16   1.10025224e+13 -6.36791144e+13  1.82e+05 8.90e+01  7.91e+06   363s
+  17   8.47052029e+12 -2.74293418e+13  8.73e+04 2.83e+01  3.59e+06   369s
+  18   6.45566862e+12 -1.35765227e+13  4.21e+04 1.41e+01  1.83e+06   375s
+  19   4.60618005e+12 -8.01741972e+12  1.92e+04 8.31e+00  1.03e+06   383s
+  20   2.78355898e+12 -5.41102347e+12  7.57e+03 5.50e+00  6.12e+05   388s
+  21   1.50225497e+12 -3.41698360e+12  2.70e+03 3.34e+00  3.47e+05   396s
+  22   6.80945004e+11 -1.64448651e+12  9.07e+02 1.86e+00  1.59e+05   405s
+  23   5.56652918e+11 -9.41026496e+11  7.00e+02 9.00e-01  1.02e+05   412s
+  24   4.63569400e+11 -6.47490094e+11  5.53e+02 7.11e-01  7.50e+04   418s
+  25   3.83923936e+11 -4.75684948e+11  4.32e+02 6.49e-01  5.78e+04   424s
+  26   3.65740010e+11 -3.79915917e+11  4.06e+02 5.39e-01  5.01e+04   431s
+  27   3.38305837e+11 -2.82004202e+11  3.66e+02 4.22e-01  4.16e+04   441s
+  28   2.97261845e+11 -2.19932048e+11  3.09e+02 3.50e-01  3.46e+04   452s
+  29   2.75949966e+11 -1.65994558e+11  2.81e+02 2.73e-01  2.95e+04   463s
+  30   2.53749603e+11 -9.93072856e+10  2.50e+02 1.98e-01  2.36e+04   475s
+  31   2.35912757e+11 -8.26455900e+10  2.25e+02 1.74e-01  2.12e+04   486s
+  32   2.04389465e+11 -6.15128958e+10  1.81e+02 1.43e-01  1.77e+04   497s
+  33   1.93221328e+11 -4.75107716e+10  1.66e+02 1.27e-01  1.60e+04   509s
+  34   1.84816645e+11 -3.59312459e+10  1.55e+02 1.14e-01  1.47e+04   520s
+  35   1.73151785e+11 -1.82926924e+10  1.38e+02 1.00e-01  1.27e+04   531s
+  36   1.59737964e+11 -7.34193351e+09  1.19e+02 8.64e-02  1.11e+04   543s
+  37   1.53309824e+11  5.50516856e+09  1.10e+02 7.78e-02  9.82e+03   554s
+  38   1.45181135e+11  1.23789526e+10  9.78e+01 7.18e-02  8.82e+03   565s
+  39   1.39454931e+11  1.65473489e+10  8.95e+01 6.78e-02  8.16e+03   577s
+  40   1.35672397e+11  2.26927934e+10  8.38e+01 6.18e-02  7.50e+03   586s
+  41   1.30045186e+11  2.83477351e+10  7.58e+01 5.60e-02  6.75e+03   598s
+  42   1.27087756e+11  3.26474811e+10  7.17e+01 5.15e-02  6.27e+03   609s
+  43   1.24549317e+11  3.51544458e+10  6.81e+01 4.88e-02  5.93e+03   620s
+  44   1.23819217e+11  3.63130377e+10  6.70e+01 4.75e-02  5.80e+03   632s
+  45   1.20935779e+11  3.82423173e+10  6.29e+01 4.53e-02  5.48e+03   643s
+  46   1.17953474e+11  4.06023782e+10  5.88e+01 4.26e-02  5.13e+03   654s
+  47   1.16568324e+11  4.19546473e+10  5.69e+01 4.10e-02  4.95e+03   664s
+  48   1.14942203e+11  4.48423830e+10  5.46e+01 3.77e-02  4.65e+03   675s
+  49   1.12520620e+11  4.68556624e+10  5.13e+01 3.54e-02  4.35e+03   687s
+  50   1.09869349e+11  4.81881532e+10  4.76e+01 3.38e-02  4.09e+03   698s
+  51   1.08885187e+11  4.87707227e+10  4.63e+01 3.31e-02  3.98e+03   709s
+  52   1.06936440e+11  5.05479865e+10  4.36e+01 3.09e-02  3.74e+03   721s
+  53   1.06089316e+11  5.16896440e+10  4.24e+01 2.91e-02  3.60e+03   728s
+  54   1.03051760e+11  5.27093453e+10  3.83e+01 2.75e-02  3.34e+03   738s
+  55   1.01967529e+11  5.42419044e+10  3.69e+01 2.56e-02  3.16e+03   749s
+  56   1.00526929e+11  5.52484469e+10  3.50e+01 2.44e-02  3.00e+03   760s
+  57   9.82560498e+10  5.67278542e+10  3.21e+01 2.25e-02  2.75e+03   772s
+  58   9.66575419e+10  5.83770881e+10  3.00e+01 2.03e-02  2.54e+03   783s
+  59   9.50149374e+10  5.96378009e+10  2.80e+01 1.86e-02  2.34e+03   794s
+  60   9.39676228e+10  6.07017033e+10  2.67e+01 1.72e-02  2.20e+03   806s
+  61   9.32189899e+10  6.10959087e+10  2.57e+01 1.67e-02  2.13e+03   815s
+  62   9.19757525e+10  6.21521708e+10  2.42e+01 1.52e-02  1.97e+03   827s
+  63   9.03558546e+10  6.29857557e+10  2.22e+01 1.40e-02  1.81e+03   838s
+  64   8.88484876e+10  6.39527875e+10  2.03e+01 1.27e-02  1.65e+03   849s
+  65   8.75699616e+10  6.49079013e+10  1.87e+01 1.14e-02  1.50e+03   861s
+  66   8.68645625e+10  6.52925680e+10  1.78e+01 1.08e-02  1.43e+03   870s
+  67   8.57789900e+10  6.57905411e+10  1.64e+01 1.02e-02  1.32e+03   882s
+  68   8.48877332e+10  6.63355438e+10  1.53e+01 9.40e-03  1.23e+03   893s
+  69   8.45526935e+10  6.67165970e+10  1.49e+01 8.86e-03  1.18e+03   904s
+  70   8.43006058e+10  6.67491571e+10  1.45e+01 8.82e-03  1.16e+03   912s
+  71   8.33150634e+10  6.71128762e+10  1.33e+01 8.21e-03  1.07e+03   923s
+  72   8.25105345e+10  6.75545971e+10  1.23e+01 7.59e-03  9.90e+02   935s
+  73   8.21276929e+10  6.79549444e+10  1.18e+01 7.03e-03  9.38e+02   946s
+  74   8.14963729e+10  6.82972969e+10  1.10e+01 6.54e-03  8.74e+02   957s
+  75   8.11008112e+10  6.86380223e+10  1.05e+01 6.06e-03  8.25e+02   968s
+  76   8.05980331e+10  6.88523727e+10  9.91e+00 5.76e-03  7.77e+02   980s
+  77   8.04795729e+10  6.90662781e+10  9.75e+00 5.45e-03  7.55e+02   991s
+  78   7.97162449e+10  6.93401473e+10  8.79e+00 5.06e-03  6.87e+02  1002s
+  79   7.92550304e+10  6.95860103e+10  8.20e+00 4.71e-03  6.40e+02  1014s
+  80   7.87467243e+10  6.98244315e+10  7.57e+00 4.36e-03  5.90e+02  1025s
+  81   7.83560972e+10  6.99583001e+10  7.07e+00 4.16e-03  5.56e+02  1036s
+  82   7.80209038e+10  7.01660104e+10  6.66e+00 3.86e-03  5.20e+02  1048s
+  83   7.77369912e+10  7.02894599e+10  6.31e+00 3.67e-03  4.93e+02  1059s
+  84   7.75046747e+10  7.03965992e+10  6.02e+00 3.51e-03  4.70e+02  1070s
+  85   7.72618325e+10  7.05999155e+10  5.72e+00 3.20e-03  4.41e+02  1082s
+  86   7.68488660e+10  7.07180126e+10  5.21e+00 3.02e-03  4.06e+02  1093s
+  87   7.67018201e+10  7.08267668e+10  5.03e+00 2.86e-03  3.89e+02  1102s
+  88   7.65454271e+10  7.08851474e+10  4.84e+00 2.77e-03  3.74e+02  1114s
+  89   7.63558212e+10  7.10306500e+10  4.60e+00 2.55e-03  3.52e+02  1125s
+  90   7.61483464e+10  7.11278668e+10  4.35e+00 2.39e-03  3.32e+02  1136s
+  91   7.59370528e+10  7.12370764e+10  4.09e+00 2.22e-03  3.11e+02  1148s
+  92   7.57931013e+10  7.12821879e+10  3.91e+00 2.14e-03  2.98e+02  1159s
+  93   7.56271747e+10  7.13755029e+10  3.71e+00 1.99e-03  2.81e+02  1170s
+  94   7.54165740e+10  7.14481764e+10  3.45e+00 1.88e-03  2.62e+02  1182s
+  95   7.52773247e+10  7.15109263e+10  3.28e+00 1.78e-03  2.49e+02  1193s
+  96   7.51681141e+10  7.15636481e+10  3.15e+00 1.69e-03  2.38e+02  1204s
+  97   7.50392201e+10  7.16238126e+10  2.99e+00 1.60e-03  2.26e+02  1216s
+  98   7.49041445e+10  7.16867124e+10  2.83e+00 1.50e-03  2.13e+02  1227s
+  99   7.47494929e+10  7.17507266e+10  2.63e+00 1.40e-03  1.98e+02  1238s
+ 100   7.46429380e+10  7.18010959e+10  2.50e+00 1.32e-03  1.88e+02  1250s
+ 101   7.45127704e+10  7.18604780e+10  2.35e+00 1.23e-03  1.75e+02  1261s
+ 102   7.44127076e+10  7.19073717e+10  2.22e+00 1.16e-03  1.66e+02  1272s
+ 103   7.43342311e+10  7.19493004e+10  2.12e+00 1.09e-03  1.58e+02  1284s
+ 104   7.42171064e+10  7.19838857e+10  1.98e+00 1.04e-03  1.48e+02  1295s
+ 105   7.41635232e+10  7.20104088e+10  1.91e+00 1.00e-03  1.42e+02  1306s
+ 106   7.40365567e+10  7.20468675e+10  1.75e+00 9.47e-04  1.32e+02  1318s
+ 107   7.39809003e+10  7.20791857e+10  1.68e+00 8.99e-04  1.26e+02  1329s
+ 108   7.39107751e+10  7.21220864e+10  1.59e+00 8.35e-04  1.18e+02  1340s
+ 109   7.38553634e+10  7.21475932e+10  1.52e+00 7.96e-04  1.13e+02  1348s
+ 110   7.37825013e+10  7.21785786e+10  1.43e+00 7.49e-04  1.06e+02  1359s
+ 111   7.37413261e+10  7.22028411e+10  1.37e+00 7.13e-04  1.02e+02  1371s
+ 112   7.36813715e+10  7.22240137e+10  1.30e+00 6.82e-04  9.63e+01  1382s
+ 113   7.36207213e+10  7.22519463e+10  1.22e+00 6.40e-04  9.05e+01  1393s
+ 114   7.35706099e+10  7.22771377e+10  1.16e+00 6.02e-04  8.55e+01  1405s
+ 115   7.35383925e+10  7.23123293e+10  1.11e+00 5.50e-04  8.10e+01  1416s
+ 116   7.34961423e+10  7.23393041e+10  1.06e+00 5.11e-04  7.64e+01  1428s
+ 117   7.34547018e+10  7.23562416e+10  1.01e+00 4.86e-04  7.26e+01  1442s
+ 118   7.34177504e+10  7.23605551e+10  9.59e-01 4.80e-04  6.98e+01  1457s
+ 119   7.33896900e+10  7.23704189e+10  9.22e-01 4.66e-04  6.73e+01  1470s
+ 120   7.33508357e+10  7.23907860e+10  8.71e-01 4.37e-04  6.34e+01  1484s
+ 121   7.33119045e+10  7.24056020e+10  8.20e-01 4.15e-04  5.99e+01  1498s
+ 122   7.32724081e+10  7.24216352e+10  7.68e-01 3.93e-04  5.62e+01  1511s
+ 123   7.32431646e+10  7.24282524e+10  7.29e-01 3.84e-04  5.38e+01  1525s
+ 124   7.32122995e+10  7.24418136e+10  6.88e-01 3.64e-04  5.09e+01  1537s
+ 125   7.31959744e+10  7.24542058e+10  6.66e-01 3.47e-04  4.90e+01  1551s
+ 126   7.31617500e+10  7.24667748e+10  6.20e-01 3.26e-04  4.59e+01  1563s
+ 127   7.31319802e+10  7.24740999e+10  5.80e-01 3.16e-04  4.34e+01  1574s
+ 128   7.31219025e+10  7.24801175e+10  5.66e-01 3.08e-04  4.24e+01  1587s
+ 129   7.31057526e+10  7.24866881e+10  5.44e-01 2.99e-04  4.09e+01  1599s
+ 130   7.30830550e+10  7.24943271e+10  5.14e-01 2.89e-04  3.89e+01  1613s
+ 131   7.30724742e+10  7.25070747e+10  4.99e-01 2.71e-04  3.73e+01  1625s
+ 132   7.30525139e+10  7.25148961e+10  4.72e-01 2.60e-04  3.55e+01  1638s
+ 133   7.30344678e+10  7.25199595e+10  4.48e-01 2.53e-04  3.40e+01  1650s
+ 134   7.30207083e+10  7.25359265e+10  4.30e-01 2.32e-04  3.20e+01  1662s
+ 135   7.30005414e+10  7.25449069e+10  4.02e-01 2.20e-04  3.01e+01  1677s
+ 136   7.29868619e+10  7.25499525e+10  3.83e-01 2.13e-04  2.88e+01  1690s
+ 137   7.29641723e+10  7.25597267e+10  3.52e-01 2.00e-04  2.67e+01  1704s
+ 138   7.29537928e+10  7.25652287e+10  3.38e-01 1.92e-04  2.56e+01  1716s
+ 139   7.29359543e+10  7.25769248e+10  3.14e-01 1.77e-04  2.37e+01  1730s
+ 140   7.29292635e+10  7.25800591e+10  3.04e-01 1.72e-04  2.30e+01  1744s
+ 141   7.29288845e+10  7.25806651e+10  3.04e-01 1.72e-04  2.30e+01  1759s
+ 142   7.29149848e+10  7.25882789e+10  2.84e-01 1.54e-04  2.15e+01  1774s
+ 143   7.29081386e+10  7.25940667e+10  2.75e-01 1.47e-04  2.07e+01  1787s
+ 144   7.28977078e+10  7.26030033e+10  2.61e-01 1.35e-04  1.94e+01  1801s
+ 145   7.28875283e+10  7.26074267e+10  2.47e-01 1.29e-04  1.84e+01  1816s
+ 146   7.28732423e+10  7.26138654e+10  2.28e-01 1.21e-04  1.71e+01  1833s
+ 147   7.28644449e+10  7.26150533e+10  2.15e-01 1.20e-04  1.64e+01  1850s
+ 148   7.28531407e+10  7.26223982e+10  2.01e-01 1.10e-04  1.52e+01  1864s
+ 149   7.28436435e+10  7.26278025e+10  2.01e-01 1.03e-04  1.42e+01  1879s
+ 150   7.28364333e+10  7.26338169e+10  2.01e-01 9.56e-05  1.33e+01  1895s
+ 151   7.28276875e+10  7.26403335e+10  1.99e-01 8.72e-05  1.23e+01  1909s
+ 152   7.28254296e+10  7.26421310e+10  1.99e-01 8.49e-05  1.20e+01  1921s
+ 153   7.28211022e+10  7.26441759e+10  1.98e-01 8.24e-05  1.16e+01  1941s
+ 154   7.28159836e+10  7.26452338e+10  1.98e-01 8.10e-05  1.12e+01  1957s
+ 155   7.28127995e+10  7.26466655e+10  1.99e-01 7.92e-05  1.09e+01  1980s
+ 156   7.28082752e+10  7.26498627e+10  2.00e-01 7.52e-05  1.04e+01  1995s
+ 157   7.28032201e+10  7.26522655e+10  1.97e-01 7.21e-05  9.91e+00  2013s
+ 158   7.27980333e+10  7.26553831e+10  1.95e-01 6.82e-05  9.36e+00  2029s
+ 159   7.27956904e+10  7.26567059e+10  1.96e-01 6.62e-05  9.12e+00  2039s
+ 160   7.27900609e+10  7.26596326e+10  1.99e-01 6.18e-05  8.55e+00  2057s
+ 161   7.27848028e+10  7.26637219e+10  1.99e-01 5.64e-05  7.93e+00  2074s
+ 162   7.27786718e+10  7.26674884e+10  1.98e-01 5.15e-05  7.28e+00  2090s
+ 163   7.27707250e+10  7.26693369e+10  1.96e-01 4.91e-05  6.63e+00  2107s
+ 164   7.27659541e+10  7.26721838e+10  1.95e-01 4.56e-05  6.13e+00  2122s
+ 165   7.27651632e+10  7.26732112e+10  1.94e-01 4.44e-05  6.01e+00  2134s
+ 166   7.27622498e+10  7.26751251e+10  1.93e-01 4.20e-05  5.69e+00  2151s
+ 167   7.27578648e+10  7.26768693e+10  1.92e-01 3.98e-05  5.29e+00  2172s
+ 168   7.27551265e+10  7.26791040e+10  1.94e-01 3.70e-05  4.96e+00  2187s
+ 169   7.27531323e+10  7.26813814e+10  1.90e-01 3.41e-05  4.68e+00  2206s
+ 170   7.27509147e+10  7.26825901e+10  1.94e-01 3.26e-05  4.45e+00  2225s
+ 171   7.27468771e+10  7.26841201e+10  1.91e-01 3.05e-05  4.08e+00  2241s
+ 172   7.27448991e+10  7.26866758e+10  1.89e-01 2.72e-05  3.78e+00  2257s
+ 173   7.27430022e+10  7.26877802e+10  1.91e-01 2.58e-05  3.59e+00  2271s
+ 174   7.27412113e+10  7.26891994e+10  1.94e-01 2.40e-05  3.37e+00  2291s
+ 175   7.27382825e+10  7.26904903e+10  2.03e-01 2.24e-05  3.10e+00  2307s
+ 176   7.27374041e+10  7.26917935e+10  2.04e-01 2.07e-05  2.95e+00  2322s
+ 177   7.27351974e+10  7.26930405e+10  2.01e-01 1.91e-05  2.72e+00  2338s
+ 178   7.27335075e+10  7.26940212e+10  2.05e-01 1.78e-05  2.55e+00  2352s
+ 179   7.27324880e+10  7.26948082e+10  2.00e-01 1.68e-05  2.43e+00  2367s
+ 180   7.27310377e+10  7.26955775e+10  1.92e-01 1.58e-05  2.28e+00  2382s
+ 181   7.27294259e+10  7.26964898e+10  1.85e-01 1.47e-05  2.12e+00  2397s
+ 182   7.27279748e+10  7.26970564e+10  1.85e-01 1.40e-05  1.98e+00  2415s
+ 183   7.27266491e+10  7.26978717e+10  2.00e-01 1.29e-05  1.84e+00  2428s
+ 184   7.27245209e+10  7.26985095e+10  2.13e-01 1.21e-05  1.66e+00  2443s
+ 185   7.27239376e+10  7.26987386e+10  2.15e-01 1.18e-05  1.61e+00  2467s
+ 186   7.27224759e+10  7.26994937e+10  2.20e-01 1.08e-05  1.46e+00  2482s
+ 187   7.27217947e+10  7.27002481e+10  2.07e-01 9.84e-06  1.37e+00  2497s
+ 188   7.27211969e+10  7.27007974e+10  2.00e-01 9.12e-06  1.29e+00  2513s
+ 189   7.27206707e+10  7.27014447e+10  1.92e-01 8.28e-06  1.22e+00  2530s
+ 190   7.27197006e+10  7.27018080e+10  1.77e-01 7.79e-06  1.13e+00  2545s
+ 191   7.27186984e+10  7.27021350e+10  1.69e-01 7.33e-06  1.04e+00  2559s
+ 192   7.27181635e+10  7.27024969e+10  1.60e-01 6.87e-06  9.81e-01  2576s
+ 193   7.27175966e+10  7.27027864e+10  1.57e-01 6.50e-06  9.25e-01  2591s
+ 194   7.27169784e+10  7.27031501e+10  1.62e-01 6.01e-06  8.60e-01  2606s
+ 195   7.27163362e+10  7.27033052e+10  1.50e-01 5.80e-06  8.07e-01  2629s
+ 196   7.27158960e+10  7.27036954e+10  1.43e-01 5.28e-06  7.52e-01  2646s
+ 197   7.27154967e+10  7.27038926e+10  1.45e-01 5.02e-06  7.13e-01  2666s
+ 198   7.27150335e+10  7.27040825e+10  1.51e-01 4.78e-06  6.70e-01  2681s
+ 199   7.27149279e+10  7.27042018e+10  1.48e-01 4.61e-06  6.55e-01  2695s
+ 200   7.27143308e+10  7.27043403e+10  1.34e-01 4.43e-06  6.07e-01  2713s
+ 201   7.27137555e+10  7.27046624e+10  1.21e-01 4.00e-06  5.48e-01  2728s
+ 202   7.27133944e+10  7.27048670e+10  1.11e-01 3.70e-06  5.10e-01  2744s
+ 203   7.27129058e+10  7.27050342e+10  1.01e-01 3.47e-06  4.66e-01  2762s
+ 204   7.27124235e+10  7.27051905e+10  9.10e-02 3.26e-06  4.24e-01  2777s
+ 205   7.27121168e+10  7.27055364e+10  8.09e-02 3.77e-06  3.80e-01  2793s
+ 206   7.27119269e+10  7.27058387e+10  8.67e-02 3.56e-06  3.49e-01  2808s
+ 207   7.27117141e+10  7.27058827e+10  8.08e-02 3.41e-06  3.32e-01  2822s
+ 208   7.27112833e+10  7.27060655e+10  1.23e-01 2.35e-06  2.91e-01  2836s
+ 209   7.27111268e+10  7.27062083e+10  1.15e-01 2.10e-06  2.72e-01  2851s
+ 210   7.27108957e+10  7.27063348e+10  1.12e-01 2.92e-06  2.48e-01  2868s
+ 211   7.27107420e+10  7.27064574e+10  1.38e-01 1.75e-05  2.30e-01  2884s
+ 212   7.27105825e+10  7.27064829e+10  1.07e-01 1.44e-05  2.18e-01  2898s
+ 213   7.27104320e+10  7.27065784e+10  9.59e-02 2.45e-05  2.02e-01  2911s
+ 214   7.27102552e+10  7.27066314e+10  8.46e-02 2.33e-05  1.87e-01  2932s
+ 215   7.27101864e+10  7.27067045e+10  7.89e-02 2.71e-05  1.78e-01  2947s
+ 216   7.27099958e+10  7.27067871e+10  7.54e-02 1.80e-05  1.59e-01  2960s
+ 217   7.27099021e+10  7.27068632e+10  8.37e-02 1.77e-05  1.48e-01  2975s
+ 218   7.27097410e+10  7.27069290e+10  6.24e-02 1.73e-06  1.33e-01  2990s
+ 219   7.27096143e+10  7.27069747e+10  6.22e-02 1.39e-06  1.22e-01  3006s
+ 220   7.27095509e+10  7.27069993e+10  6.03e-02 1.78e-06  1.16e-01  3017s
+ 221   7.27094527e+10  7.27070481e+10  6.24e-02 9.10e-05  1.07e-01  3033s
+ 222   7.27093779e+10  7.27070724e+10  5.68e-02 8.24e-05  1.00e-01  3050s
+ 223   7.27093217e+10  7.27071204e+10  4.75e-02 7.31e-05  9.32e-02  3065s
+ 224   7.27092928e+10  7.27071289e+10  4.66e-02 1.77e-04  9.07e-02  3079s
+ 225   7.27092149e+10  7.27071875e+10  5.23e-02 2.90e-04  8.21e-02  3094s
+ 226   7.27091565e+10  7.27072244e+10  5.38e-02 5.73e-04  7.57e-02  3109s
+ 227   7.27091502e+10  7.27072306e+10  5.12e-02 5.57e-04  7.49e-02  3120s
+ 228   7.27091003e+10  7.27072489e+10  5.38e-02 4.40e-04  7.03e-02  3137s
+ 229   7.27090806e+10  7.27072809e+10  5.43e-02 4.20e-04  6.68e-02  3152s
+ 230   7.27090251e+10  7.27073088e+10  5.62e-02 1.97e-05  6.12e-02  3167s
+ 231   7.27089742e+10  7.27073279e+10  6.44e-02 6.70e-05  5.65e-02  3181s
+ 232   7.27089101e+10  7.27073540e+10  6.08e-02 2.17e-04  5.05e-02  3195s
+ 233   7.27089098e+10  7.27073542e+10  6.07e-02 2.17e-04  5.05e-02  3207s
+ 234   7.27088563e+10  7.27073866e+10  6.56e-02 3.32e-05  4.48e-02  3222s
+ 235   7.27088563e+10  7.27073866e+10  6.56e-02 3.32e-05  4.48e-02  3236s
+ 236   7.27088257e+10  7.27074016e+10  5.98e-02 1.50e-04  4.18e-02  3251s
+ 237   7.27087782e+10  7.27074078e+10  5.66e-02 9.04e-05  3.83e-02  3265s
+ 238   7.27087770e+10  7.27074083e+10  5.66e-02 9.01e-05  3.82e-02  3278s
+ 239   7.27087506e+10  7.27074389e+10  5.63e-02 1.68e-04  3.44e-02  3293s
+ 240   7.27087415e+10  7.27074449e+10  5.63e-02 1.60e-04  3.34e-02  3305s
+ 241   7.27087405e+10  7.27074463e+10  5.58e-02 1.58e-04  3.32e-02  3319s
+ 242   7.27087330e+10  7.27074500e+10  5.41e-02 1.56e-04  3.25e-02  3331s
+ 243   7.27086967e+10  7.27074632e+10  4.69e-02 5.84e-05  2.92e-02  3345s
+ 244   7.27086910e+10  7.27074669e+10  5.01e-02 5.63e-05  2.85e-02  3357s
+ 245   7.27086717e+10  7.27074813e+10  6.75e-02 7.24e-05  2.62e-02  3371s
+ 246   7.27086704e+10  7.27074821e+10  6.72e-02 7.19e-05  2.61e-02  3384s
+ 247   7.27086359e+10  7.27074972e+10  6.57e-02 5.97e-05  2.28e-02  3400s
+ 248   7.27086018e+10  7.27075155e+10  6.25e-02 4.67e-05  1.93e-02  3417s
+ 249   7.27085985e+10  7.27075175e+10  6.18e-02 4.59e-05  1.90e-02  3429s
+ 250   7.27085948e+10  7.27075195e+10  5.75e-02 4.43e-05  1.86e-02  3440s
+ 251   7.27085872e+10  7.27075232e+10  5.41e-02 4.25e-05  1.79e-02  3453s
+ 252   7.27085729e+10  7.27075244e+10  4.85e-02 4.19e-05  1.69e-02  3464s
+ 253   7.27085660e+10  7.27075270e+10  5.09e-02 4.06e-05  1.62e-02  3475s
+ 254   7.27085550e+10  7.27075343e+10  4.71e-02 3.59e-05  1.50e-02  3486s
+ 255   7.27085332e+10  7.27075504e+10  3.58e-02 2.88e-05  1.26e-02  3502s
+ 256   7.27085269e+10  7.27075531e+10  4.11e-02 2.76e-05  1.20e-02  3513s
+ 257   7.27085254e+10  7.27075537e+10  4.31e-02 2.71e-05  1.18e-02  3526s
+ 258   7.27085238e+10  7.27075563e+10  4.06e-02 2.61e-05  1.15e-02  3538s
+ 259   7.27085237e+10  7.27075565e+10  4.01e-02 2.60e-05  1.15e-02  3551s
+ 260   7.27085236e+10  7.27075565e+10  4.00e-02 2.59e-05  1.15e-02  3563s
+ 261   7.27085217e+10  7.27075576e+10  3.96e-02 2.56e-05  1.13e-02  3576s
+ 262   7.27085216e+10  7.27075576e+10  3.96e-02 2.56e-05  1.13e-02  3590s
+ 263   7.27085210e+10  7.27075578e+10  3.95e-02 2.55e-05  1.13e-02  3603s
+ 264   7.27085209e+10  7.27075579e+10  3.95e-02 2.54e-05  1.13e-02  3616s
+ 265   7.27085101e+10  7.27075611e+10  4.47e-02 2.35e-05  1.03e-02  3628s
+ 266   7.27085064e+10  7.27075649e+10  4.67e-02 2.20e-05  9.87e-03  3640s
+ 267   7.27085028e+10  7.27075664e+10  4.52e-02 2.11e-05  9.50e-03  3653s
+ 268   7.27085027e+10  7.27075664e+10  4.51e-02 2.11e-05  9.49e-03  3666s
+ 269   7.27085027e+10  7.27075665e+10  4.51e-02 2.11e-05  9.49e-03  3677s
+ 270   7.27085016e+10  7.27075672e+10  4.48e-02 2.08e-05  9.37e-03  3689s
+ 271   7.27085015e+10  7.27075682e+10  4.48e-02 2.07e-05  9.34e-03  3702s
+ 272   7.27085005e+10  7.27075688e+10  4.45e-02 2.04e-05  9.24e-03  3714s
+ 273   7.27084992e+10  7.27075694e+10  4.39e-02 2.01e-05  9.11e-03  3727s
+ 274   7.27084947e+10  7.27075830e+10  7.31e-02 1.79e-05  8.52e-03  3743s
+ 275   7.27084821e+10  7.27075864e+10  6.73e-02 1.62e-05  7.40e-03  3757s
+ 276   7.27084821e+10  7.27075864e+10  6.73e-02 1.62e-05  7.40e-03  3770s
+ 277   7.27084806e+10  7.27075882e+10  6.52e-02 1.53e-05  7.16e-03  3781s
+ 278   7.27084806e+10  7.27075882e+10  6.52e-02 1.53e-05  7.16e-03  3792s
+ 279   7.27084806e+10  7.27075882e+10  6.52e-02 1.53e-05  7.16e-03  3805s
+ 280   7.27084806e+10  7.27075882e+10  6.52e-02 1.53e-05  7.16e-03  3817s
+ 281   7.27084805e+10  7.27075883e+10  6.51e-02 1.53e-05  7.15e-03  3830s
+ 282   7.27084805e+10  7.27075883e+10  6.52e-02 1.53e-05  7.15e-03  3843s
+ 283   7.27084801e+10  7.27075890e+10  6.50e-02 1.52e-05  7.11e-03  3857s
+ 284   7.27084797e+10  7.27075891e+10  6.50e-02 1.51e-05  7.06e-03  3870s
+ 285   7.27084797e+10  7.27075891e+10  6.50e-02 1.51e-05  7.06e-03  3883s
+
+Barrier performed 285 iterations in 3882.73 seconds (3793.06 work units)
+Sub-optimal termination - objective 7.27087330e+10
+
+
+User-callback calls 196664, time in user-callback 0.22 sec
+Configuring Settings
+Configuring Settings
+Loading packages
+Time Series Data Already Clustered.
+CSC and SF TDR not implemented.
+Configuring Solver
+solver_name = "Gurobi"
+-- Using Gurobi
+Reading Input CSV Files
+Network.csv Successfully Read!
+Load_data.csv Successfully Read!
+Fuels_data.csv Successfully Read!
+Generators_data.csv Successfully Read!
+Generators_variability.csv Successfully Read!
+Validating time basis
+Capacity_reserve_margin.csv Successfully Read!
+CO2_cap.csv Successfully Read!
+Period_map.csv Successfully Read!
+CSV Files Successfully Read In From /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red
+0
+Reading H2 Input CSV Files
+HSC_generation.csv Successfully Read!
+HSC_load_data.csv Successfully Read!
+HSC_generators_variability.csv Successfully Read!
+HSC_pipelines.csv Successfully Read!
+HSC_CO2_cap.csv Successfully Read!
+HSC Input CSV Files Successfully Read In From /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red/
+Reading CO2 Input CSV Files
+CSC_capture.csv Successfully Read!
+CSC_capture_variability.csv Successfully Read!
+CSC_storage.csv Successfully Read!
+CSC_capture_compression.csv Successfully Read!
+CO2_trunk_pipelines.csv Successfully Read!
+CO2_spur_pipelines.csv Successfully Read!
+CSC Input CSV Files Successfully Read In From /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red/
+Discharge Module
+Non-served Energy Module
+Investment Discharge Module
+Unit Commitment Module
+Emissions Module (for CO2 Policy modularization
+Transmission Module
+Dispatchable Resources Module
+Must-Run Resources Module
+Storage Resources Module
+Storage Investment Module
+Storage Core Resources Module
+Long Duration Storage Module
+Storage Resources with Symmetric Charge/Discharge Capacity Module
+Hydro Reservoir Core Resources Module
+Thermal (Unit Commitment) Resources Module
+Hydrogen Generation and Storage Discharge Module
+Hydrogen Investment Discharge Module
+Hydrogen Production Module
+H2 Production Core Module
+H2 Production (No Unit Commitment) Module
+H2 Emissions Module for CO2 Policy modularization
+Hydrogen Non-served Energy Module
+Hydrogen Storage Module
+H2 Storage Energy Investment Module
+H2 Storage Charging Investment Module
+H2 Storage Core Resources Module
+Hydrogen Long Duration Storage Module
+Hydrogen Pipeline Module
+DAC variable cost module
+DAC Fixed Cost module
+Carbon Storage Injection Cost module
+CO2 Pipeline Module
+Carbon Capture Compression Cost module
+CO2 Emissions Module for CO2 Policy modularization
+C02 Policies Module for power and hydrogen system combined
+Capacity Reserve Margin Policies Module
+Solving Model
+LP solved for primal
+Writing Output
+Time elapsed for writing costs is
+6.927407988
+Time elapsed for writing storage is
+1.532019125
+Time elapsed for writing nse is
+1.522034166
+Time elapsed for writing power balance is
+2.736950371
+Time elapsed for writing transmission flows is
+0.466433209
+Time elapsed for writing transmission losses is
+0.098427462
+Time elapsed for writing network expansion is
+0.157329965
+Time elapsed for writing emissions is
+3.035118783
+Time elapsed for writing reliability is
+0.574069774
+Time elapsed for writing storage duals is
+2.073415189
+Time elapsed for writing commitment is
+1.251454225
+Time elapsed for writing startup is
+1.40511655
+Time elapsed for writing shutdown is
+1.396306672
+Time elapsed for writing lds init is
+0.315722816
+Time elapsed for writing lds dstor is
+0.150919767
+Time elapsed for writing time weights is
+0.173576606
+Time elapsed for writing reserve margin is
+0.500905678
+Time elapsed for writing capacity value is
+20.79128831
+Time elapsed for writing net revenue is
+4.71412328
+Wrote outputs to /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red/Results_4
+Wrote outputs HSC outputs to /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red/Results_4/Results_HSC/
+Wrote CSC outputs to /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red/Results_4/Results_CSC/
+One or Both of the Paths Doesn't Exist or They are the Same
+Fri Mar  1 17:19:50 EST 2024
