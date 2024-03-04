@@ -47,6 +47,7 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path, Gurobi.Optimizer)
 # print_and_log("Loading Inputs")
  myinputs = load_inputs(mysetup, inputs_path)
 
+println(mysetup["ModelSynFuels"])
 # ### Load H2 inputs if modeling the hydrogen supply chain
 if mysetup["ModelH2"] == 1
     myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)

@@ -1,0 +1,10 @@
+ERROR: LoadError: ArgumentError: Package Dolphyn not found in current path.
+- Run `import Pkg; Pkg.add("Dolphyn")` to install the Dolphyn package.
+Stacktrace:
+ [1] macro expansion
+   @ ./loading.jl:1163 [inlined]
+ [2] macro expansion
+   @ ./lock.jl:223 [inlined]
+ [3] require(into::Module, mod::Symbol)
+   @ Base ./loading.jl:1144
+in expression starting at /home/gridsan/larmstrong/Dolphyn.jl/Example_Systems/PJM_with_MI_subregions_with_caverns_0_red/Run.jl:17

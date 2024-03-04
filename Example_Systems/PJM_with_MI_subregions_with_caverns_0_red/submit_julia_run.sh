@@ -15,7 +15,7 @@ cd ..
 julia << EOF
 # Step 5: Go to packages and activate the DOLPHYNJulEnv
 using Pkg
-Pkg.activate("DOLPHYN")
+Pkg.activate("Dolphyn")
 
 # Step 7: Instantiate the packages
 Pkg.instantiate()

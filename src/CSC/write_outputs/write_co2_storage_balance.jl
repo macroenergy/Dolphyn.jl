@@ -73,7 +73,12 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,9] = 0
 			end
 
-			dfTemp1[t+rowoffset,10] = inputs["CO2_D"][t,z]
+			if setup["Exogeneous_CO2_Demand"] == 1
+				dfTemp1[t+rowoffset,10] = inputs["CO2_D"][t,z]
+			else
+				dfTemp1[t+rowoffset,10] = 0
+			end			
+
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor
