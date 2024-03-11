@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_co2_trunk_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-	Function for reporting co2 trunk pipeline expansion
+Function for reporting co2 trunk pipeline expansion
 """
 function write_co2_trunk_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	L = inputs["Trunk_CO2_P"]     # Number of CO2 pipelines

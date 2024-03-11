@@ -62,3 +62,39 @@ Pages = ["CSC/write_outputs/write_co2_emission_balance_system.jl"]
 Modules = [Dolphyn]
 Pages = ["CSC/write_outputs/write_co2_emission_balance_zone.jl"]
 ```
+
+## Write Balancing of CO2 Outflow from a zone
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["CSC/write_outputs/write_co2_capture_outflow_balance.jl"]
+```
+
+## Write Balancing of CO2 Inflow from Spur pipeline to a CO2 Storage site
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["CSC/write_outputs/write_co2_spur_inflow_storage_balance.jl"]
+```
+
+## Write amount of CO2 flowing across trunk pipelines at a given time t
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["CSC/write_outputs/write_co2_trunk_pipeline_flow.jl"]
+```
+
+## Write amount of CO2 flowing across spur pipelines at a given time t
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["CSC/write_outputs/write_co2_spur_pipeline_flow.jl"]
+```
+
+## Write expansion of trunk pipelines
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["CSC/write_outputs/write_co2_trunk_pipeline_expansion.jl"]
+```
+
+## Write expansion of spur pipelines
+```@autodocs
+Modules = [Dolphyn]
+Pages = ["CSC/write_outputs/write_co2_spur_pipeline_expansion.jl"]
+```
