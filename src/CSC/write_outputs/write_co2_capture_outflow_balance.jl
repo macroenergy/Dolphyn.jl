@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_co2_capture_outflow_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for reporting co2 capture and outflow across all zones.
+Function for reporting co2 capture and outflow from zone across all zones
 """
 function write_co2_capture_outflow_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	
