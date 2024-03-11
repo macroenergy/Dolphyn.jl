@@ -17,13 +17,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     co2_injection(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-	This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $s$ in zone $z$ at time period $t$.
+	This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $k$ at site $S$ at time period $t$.
 
 	The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Injected$``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
 	
-	This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection in zone $z$ at time period $t$.
+	This module defines the power consumption decision variable $x_{s,z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection at site $s$ in zone $z$ at time period $t$.
 	
-	The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Injection``` cover variable $x_{z,t}^{E,INJ}$.
+	The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Injection``` cover variable $x_{s,z,t}^{E,INJ}$.
 	
 	**Cost expressions**
 	
@@ -42,13 +42,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	
 	```math
 	\begin{equation*}
-		x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+		x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 	\end{equation*}
 	```
 	
 	```math
 	\begin{equation*}
-		x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+		x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 	\end{equation*}
 	```
 
@@ -61,7 +61,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 	The flow of CO2 into a site is also constrained by the maximum hourly flow on the spur pipelines
 
 	\begin{equation*}
-		\sum_{l^S \in P^{Spur}_{Map}}Flow^{Spur}_{l^S(z,t \rightarrow s,t)} \leq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+		\sum_{s \in S}x_{i,z \rightarrow s,t}^{\textrm{C,Spur}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
 	\end{equation*}
 
 	**Maximum injection per year according to CO2 storage capacity per year**
