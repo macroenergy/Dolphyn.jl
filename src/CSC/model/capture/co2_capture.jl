@@ -47,7 +47,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, ePower_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(ePower_CO2_captured_per_plant_per_time[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
 	
 	#ADD TO CO2 BALANCE
-	EP[:eCaptured_CO2_Balance] += EP[:ePower_CO2_captured_per_time_per_zone]
+	add_similar_to_expression!(EP[:eCaptured_CO2_Balance], EP[:ePower_CO2_captured_per_time_per_zone])
 
 	#################################################################################################################################################################
 
@@ -57,7 +57,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP, eHydrogen_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eHydrogen_CO2_captured_per_plant_per_time[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
 
 		#ADD TO CO2 BALANCE
-		EP[:eCaptured_CO2_Balance] += EP[:eHydrogen_CO2_captured_per_time_per_zone]
+		add_similar_to_expression!(EP[:eCaptured_CO2_Balance], EP[:eHydrogen_CO2_captured_per_time_per_zone])
 	end
 	#################################################################################################################################################################
 	#CO2 captued by DAC CCS plants
@@ -76,7 +76,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eDAC_Fuel_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
 	
 	#ADD TO CO2 BALANCE
-	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
+	add_similar_to_expression!(EP[:eCaptured_CO2_Balance], EP[:eDAC_Fuel_CO2_captured_per_time_per_zone])
 
 
 	return EP

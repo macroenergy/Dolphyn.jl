@@ -105,8 +105,8 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCSFByProdRevenueOut, sum(eTotalCSFByProdRevenueOutT[t] for t = 1:T))
 	
 	#Add total variable discharging cost contribution to the objective function
-	EP[:eObj] += eTotalCSFProdVarOut
-    EP[:eObj] -= eTotalCSFByProdRevenueOut
+	add_similar_to_expression!(EP[:eObj], eTotalCSFProdVarOut)
+	add_similar_to_expression!(EP[:eObj], -eTotalCSFByProdRevenueOut)
 
 	return EP
 

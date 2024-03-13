@@ -72,7 +72,7 @@ function DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eVar_OM_DAC, sum(EP[:eVar_OM_DAC_per_time][t] for t in 1:T))
 
 	# Add total variable cost contribution to the objective function
-	EP[:eObj] += EP[:eVar_OM_DAC]
+	add_similar_to_expression!(EP[:eObj], EP[:eVar_OM_DAC])
 
 	return EP
 

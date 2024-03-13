@@ -96,7 +96,7 @@ function co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict
 	@expression(EP,eFixed_Cost_CO2_Capture_Comp_total, sum(EP[:eFixed_Cost_CO2_Capture_Comp_per_type][i] for i in 1:CO2_CAPTURE_COMP_ALL))
 	
 	# Add term to objective function expression
-	EP[:eObj] += EP[:eFixed_Cost_CO2_Capture_Comp_total]
+	add_similar_to_expression!(EP[:eObj], EP[:eFixed_Cost_CO2_Capture_Comp_total])
 
     return EP
 

@@ -163,8 +163,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Sum individual resource contributions to variable charging costs to get total variable charging costs
     @expression(EP, eTotalCVarH2StorInT[t=1:T], sum_expression(eCVarH2Stor_in[H2_STOR_ALL,t]))
     @expression(EP, eTotalCVarH2StorIn, sum_expression(eTotalCVarH2StorInT[1:T]))
-    EP[:eObj] += eTotalCVarH2StorIn
-
+    add_similar_to_expression!(EP[:eObj], eTotalCVarH2StorIn)
 
     # Term to represent electricity consumption associated with H2 storage charging and discharging
     @expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
@@ -175,23 +174,23 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     end
     )
 
-    EP[:ePowerBalance] += -ePowerBalanceH2Stor
+    add_similar_to_expression!(EP[:ePowerBalance], -ePowerBalanceH2Stor)
 
     # Adding power consumption by storage
-    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2Stor
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerBalanceH2Stor)
  
     # H2 Balance expressions
     @expression(EP, eH2BalanceStor[t=1:T, z=1:Z],
     sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_GAS, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eH2Balance] += eH2BalanceStor   
+    add_similar_to_expression!(EP[:eH2Balance], eH2BalanceStor)
 
     # LIQUID H2 Balance expressions
     if setup["ModelH2Liquid"]==1
         @expression(EP, eH2LiqBalanceStor[t=1:T, z=1:Z],
         sum(EP[:vH2Gen][y,t] - EP[:vH2_CHARGE_STOR][y,t] for y in intersect(H2_STOR_LIQ, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
-        EP[:eH2LiqBalance] += eH2LiqBalanceStor
+        add_similar_to_expression!(EP[:eH2LiqBalance], eH2LiqBalanceStor)
     end
 
     ### End Expressions ###

@@ -62,7 +62,7 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP, eCTotalCO2CapSlack, 
 		sum(EP[:eCCO2Cap_slack][cap] for cap = 1:inputs["NCO2Cap"]))
 		
-		EP[:eObj] += eCTotalCO2CapSlack
+		add_to_expression!(EP[:eObj], eCTotalCO2CapSlack)
 	else 
 		@variable(EP, vCO2Cap_slack[cap = 1:inputs["NCO2Cap"]]==0)
 	end
@@ -102,7 +102,7 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
                 - sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
         )
 
-        eEmissionsConstraintLHS += eEmissionsConstraintLHSCSC
+		add_similar_to_expression!(eEmissionsConstraintLHS, eEmissionsConstraintLHSCSC)
 
         if setup["CO2Cap"] == 2
 
@@ -110,7 +110,7 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
                 sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (EP[:eCSCNetpowerConsumptionByAll][t,z]) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) 
             )
 
-            eEmissionsConstraintRHS += eEmissionsConstraintRHSCSC
+			add_similar_to_expression!(eEmissionsConstraintRHS, eEmissionsConstraintRHSCSC)
         end 
 
 	end

@@ -76,6 +76,8 @@ T = inputs["T"]     # Number of time steps (hours)
 Z = inputs["Z"]     # Number of zones
 H2_FLEX = inputs["H2_FLEX"] # Set of flexible demand resources
 
+setup["ParameterScale"]==1 ? SCALING = ModelScalingFactor : SCALING = 1.0
+
 START_SUBPERIODS = inputs["START_SUBPERIODS"]
 INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
 
@@ -96,44 +98,36 @@ END_HOURS = START_SUBPERIODS .+ hours_per_subperiod .- 1 # Last subperiod of eac
 ## Power Balance Expressions ##
 # vH2Gen refers to deferred demand that is met and hence has a negative sign
 # vH2_CHARGE_FLEX refers to deferred demand in period in t
-@expression(EP, eH2BalanceDemandFlex[t=1:T, z=1:Z],
-    sum(-EP[:vH2Gen][k,t]+EP[:vH2_CHARGE_FLEX][k,t] for k in intersect(H2_FLEX, dfH2Gen[(dfH2Gen[!,:Zone].==z),:][!,:R_ID])))
-
-EP[:eH2Balance] += eH2BalanceDemandFlex
+h2BalanceDemandFlex(T, Z, EP[:vH2Gen], EP[:vH2_CHARGE_FLEX], H2_FLEX, dfH2Gen[!,:R_ID], dfH2Gen[!,:Zone], EP)
 
 ## Objective Function Expressions ##
 
 # Variable costs of "charging" for technologies "k" during hour "t" in zone "z"
 #  ParameterScale = 1 --> objective function is in million $
 #  ParameterScale = 0 --> objective function is in $
-if setup["ParameterScale"] ==1 
-    @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t]/ModelScalingFactor^2)
-else
-    @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t])
-end
-
+@expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t] * dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k] * vH2_CHARGE_FLEX[k,t] / SCALING^2)
 
 # Sum individual resource contributions to variable charging costs to get total variable charging costs
-@expression(EP, eTotalCH2VarFlexInT[t=1:T], sum_expression(eCH2VarFlex_in[H2_FLEX,t]))
-@expression(EP, eTotalCH2VarFlexIn, sum_expression(eTotalCH2VarFlexInT[1:T]))
-EP[:eObj] += eTotalCH2VarFlexIn
+eTotalCH2VarFlexIn = sum_expression(eCH2VarFlex_in[H2_FLEX,:])
+EP[:eTotalCH2VarFlexIn] = eTotalCH2VarFlexIn
+add_similar_to_expression!(EP[:eObj], eTotalCH2VarFlexIn)
 
 ### Constraints ###
 
 ###Constraints###
 @constraints(EP, begin
-# State of "charge" constraint (equals previous state + charge - discharge)
-# NOTE: no maximum energy "stored" or deferred for later hours
-# NOTE: Flexible_Demand_Energy_Eff corresponds to energy loss due to time shifting
-[k in H2_FLEX, t in INTERIOR_SUBPERIODS], EP[:vS_H2_FLEX][k,t] == EP[:vS_H2_FLEX][k,t-1]-dfH2Gen[!,:Flexible_Demand_Energy_Eff][k]*(EP[:vH2Gen][k,t])+(EP[:vH2_CHARGE_FLEX][k,t])
-# Links last time step with first time step, ensuring position in hour 1 is within eligible change from final hour position
-[k in H2_FLEX, t in START_SUBPERIODS], EP[:vS_H2_FLEX][k,t] == EP[:vS_H2_FLEX][k,t+hours_per_subperiod-1]-dfH2Gen[!,:Flexible_Demand_Energy_Eff][k]*(EP[:vH2Gen][k,t])+(EP[:vH2_CHARGE_FLEX][k,t])
+    # State of "charge" constraint (equals previous state + charge - discharge)
+    # NOTE: no maximum energy "stored" or deferred for later hours
+    # NOTE: Flexible_Demand_Energy_Eff corresponds to energy loss due to time shifting
+    [k in H2_FLEX, t in INTERIOR_SUBPERIODS], EP[:vS_H2_FLEX][k,t] == EP[:vS_H2_FLEX][k,t-1] - dfH2Gen[!,:Flexible_Demand_Energy_Eff][k] * (EP[:vH2Gen][k,t]) + (EP[:vH2_CHARGE_FLEX][k,t])
+    # Links last time step with first time step, ensuring position in hour 1 is within eligible change from final hour position
+    [k in H2_FLEX, t in START_SUBPERIODS], EP[:vS_H2_FLEX][k,t] == EP[:vS_H2_FLEX][k,t+hours_per_subperiod-1] - dfH2Gen[!,:Flexible_Demand_Energy_Eff][k] * (EP[:vH2Gen][k,t]) + (EP[:vH2_CHARGE_FLEX][k,t])
 
-# Maximum charging rate
-# NOTE: the maximum amount that can be shifted is given by hourly availability of the resource times the maximum capacity of the resource
-#Removed generator variability
-[k in H2_FLEX, t=1:T], EP[:vH2_CHARGE_FLEX][k,t] <= inputs["pH2_Max"][k,t] * EP[:eH2GenTotalCap][k] 
-# NOTE: no maximum discharge rate unless constrained by other factors like transmission, etc.
+    # Maximum charging rate
+    # NOTE: the maximum amount that can be shifted is given by hourly availability of the resource times the maximum capacity of the resource
+    #Removed generator variability
+    [k in H2_FLEX, t=1:T], EP[:vH2_CHARGE_FLEX][k,t] <= inputs["pH2_Max"][k,t] * EP[:eH2GenTotalCap][k] 
+    # NOTE: no maximum discharge rate unless constrained by other factors like transmission, etc.
 end)
 
 # NOTE: no maximum discharge rate unless constrained by other factors like transmission, etc.
@@ -155,7 +149,7 @@ for k in H2_FLEX
 
         # cFlexibleDemandDelayWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
         # cFlexibleDemandDelayWrap constraint is equivalant to: sum(EP[:vH2Gen][k,e] for e=(t+1):(hours_per_subperiod_max)+sum(EP[:vH2Gen][k,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfH2Gen[!,:Max_Flexible_Demand_Delay][k]-(hours_per_subperiod-(t%hours_per_subperiod)))) >= EP[:vS_H2_FLEX][k,t]
-        [t in H2_FLEXIBLE_DEMAND_DELAY_HOURS], sum_expression(EP[:vH2Gen][k,(t+1):(t+hours_per_subperiod-(t%hours_per_subperiod))])+sum_expression(EP[:vH2Gen][k,(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+dfH2Gen[!,:Max_Flexible_Demand_Delay][k]-(hours_per_subperiod-(t%hours_per_subperiod)))]) >= EP[:vS_H2_FLEX][k,t]
+        [t in H2_FLEXIBLE_DEMAND_DELAY_HOURS], sum_expression(EP[:vH2Gen][k,(t+1):(t+hours_per_subperiod-(t%hours_per_subperiod))]) + sum_expression(EP[:vH2Gen][k,(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+dfH2Gen[!,:Max_Flexible_Demand_Delay][k]-(hours_per_subperiod-(t%hours_per_subperiod)))]) >= EP[:vS_H2_FLEX][k,t]
 
         # cFlexibleDemandDelayEnd: cFlexibleDemandDelayEnd constraint is equivalant to: sum(EP[:vH2Gen][k,e] for e=hours_per_subperiod_min:(hours_per_subperiod_min-1+dfH2Gen[!,:Max_Flexible_Demand_Delay][k])) >= EP[:vS_H2_FLEX][k,t]
         [t in END_HOURS], sum_expression(EP[:vH2Gen][k,(hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1):((hours_per_subperiod*Int(floor((t-1)/hours_per_subperiod))+1)-1+dfH2Gen[!,:Max_Flexible_Demand_Delay][k])]) >= EP[:vS_H2_FLEX][k,t]
@@ -187,4 +181,19 @@ for k in H2_FLEX
 end
 
 return EP
+end
+
+function h2BalanceDemandFlex(T::Int, Z::Int, vH2Gen::AbstractArray{VariableRef}, vH2_CHARGE_FLEX::AbstractArray{VariableRef}, H2_FLEX::Vector{Int}, rid::Vector{Int}, zone::Vector{Int}, EP::Model)
+    eH2BalanceDemandFlex = create_empty_expression((T,Z))
+
+    @inbounds for z = 1:Z
+        active_rid = intersect(H2_FLEX, rid[(zone.==z)])
+        @inbounds for t = 1:T
+            eH2BalanceDemandFlex[t,z] = sum_expression(-vH2Gen[k,t] for k in active_rid)
+            add_similar_to_expression!(eH2BalanceDemandFlex[t,z], sum_expression(vH2_CHARGE_FLEX[k,t] for k in active_rid))
+        end
+    end
+
+    add_similar_to_expression!(EP[:eH2Balance], eH2BalanceDemandFlex)
+    return eH2BalanceDemandFlex
 end

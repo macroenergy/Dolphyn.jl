@@ -108,13 +108,13 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
 
     # Add total cost contribution of non-served energy/curtailed demand to the objective function
-    EP[:eObj] += eTotalH2CNSE
+    add_similar_to_expression!(EP[:eObj], eTotalH2CNSE)
 
     ## Power Balance Expressions ##
     @expression(EP, eH2BalanceNse[t = 1:T, z = 1:Z], sum_expression(vH2NSE[1:H2_SEG, t, z]))
 
     # Add non-served energy/curtailed demand contribution to power balance expression
-    EP[:eH2Balance] += eH2BalanceNse
+    add_similar_to_expression!(EP[:eH2Balance], eH2BalanceNse)
 
     ### Constratints ###
 

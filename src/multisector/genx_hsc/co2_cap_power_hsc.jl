@@ -60,7 +60,8 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
             sum(inputs["omega"][t] * EP[:eH2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             )
 
-            eEmissionsConstraintLHS += eEmissionsConstraintLHSH2
+            add_similar_to_expression!(eEmissionsConstraintLHS, eEmissionsConstraintLHSH2)
+
         end
 
 
@@ -108,7 +109,8 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
                     )
                 end 
 
-                eEmissionsConstraintRHS += eEmissionsConstraintRHSH2
+                add_similar_to_expression!(eEmissionsConstraintRHS, eEmissionsConstraintRHSH2)
+
             elseif setup["CO2Cap"] == 3
                 if setup["ParameterScale"] ==1
                     @expression(EP, eEmissionsConstraintRHSH2[cap=1:inputs["NCO2Cap"]],
@@ -120,7 +122,8 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
                     )
                 end 
 
-                eEmissionsConstraintRHS += eEmissionsConstraintRHSH2
+                add_similar_to_expression!(eEmissionsConstraintRHS, eEmissionsConstraintRHSH2)
+
             end
         end 
 
@@ -131,7 +134,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
                 - sum(inputs["omega"][t] * EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             )
 
-            eEmissionsConstraintLHS += eEmissionsConstraintLHSCSC
+            add_similar_to_expression!(eEmissionsConstraintLHS, eEmissionsConstraintLHSCSC)
 
             if setup["CO2Cap"] == 2
 
@@ -139,7 +142,8 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
                     sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (EP[:eCSCNetpowerConsumptionByAll][t,z]) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) 
                 )
 
-                eEmissionsConstraintRHS += eEmissionsConstraintRHSCSC
+                add_similar_to_expression!(eEmissionsConstraintRHS, eEmissionsConstraintRHSCSC)
+
             end 
 
         end
@@ -157,7 +161,8 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
             + sum(inputs["omega"][t] * EP[:eByProdConsCO2EmissionsByZone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             )
 
-            eEmissionsConstraintLHS += eEmissionsConstraintLHSLF
+            add_similar_to_expression!(eEmissionsConstraintLHS, eEmissionsConstraintLHSLF)
+
         end 
 
         @constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],

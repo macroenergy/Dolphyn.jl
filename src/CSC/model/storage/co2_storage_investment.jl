@@ -103,7 +103,7 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP,eFixed_Cost_CO2_Storage_total, sum(EP[:eFixed_Cost_CO2_Storage_per_type][i] for i in 1:CO2_STOR_ALL))
 	
 	# Add term to objective function expression
-	EP[:eObj] += EP[:eFixed_Cost_CO2_Storage_total]
+	add_similar_to_expression!(EP[:eObj], EP[:eFixed_Cost_CO2_Storage_total])
 
     return EP
 

@@ -95,7 +95,7 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
         sum_expression(EP[:vPG2P][intersect(H2_G2P_NO_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]),t])) 
     end
 
-    EP[:ePowerBalance] += ePowerBalanceH2G2PNoCommit
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2G2PNoCommit)
 
     ###Constraints###
     # Power and natural gas consumption associated with H2 generation in each time step

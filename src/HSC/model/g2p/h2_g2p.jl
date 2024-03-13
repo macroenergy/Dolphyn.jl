@@ -52,7 +52,7 @@ function h2_g2p(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eH2DemandByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
         sum_expression(EP[:vH2G2P][intersect(inputs["H2_G2P"], dfH2G2P[dfH2G2P[!,:Zone].==1:Z,:R_ID]),t])
     )
-    EP[:eGenerationByZone] += eGenerationByZoneG2P
+    add_similar_to_expression!(EP[:eGenerationByZone], eGenerationByZoneG2P)
 
     return EP
 end

@@ -67,7 +67,7 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCH2G2PVarOut, sum_expression(eTotalCH2G2PVarOutT[1:T]))
     
     # Add total variable discharging cost contribution to the objective function
-    EP[:eObj] += eTotalCH2G2PVarOut
+    add_similar_to_expression!(EP[:eObj], eTotalCH2G2PVarOut)
 
     return EP
 

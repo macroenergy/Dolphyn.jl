@@ -74,8 +74,8 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         @expression(EP, eTotalCLFDieselVarOut, sum(eTotalCLFDieselVarOutT[t] for t in 1:T))
 
         #Liquid Fuel Balance
-        EP[:eLFDieselBalance] += vConvLFDieselDemand
-        EP[:eObj] += eTotalCLFDieselVarOut
+        add_similar_to_expression!(EP[:eLFDieselBalance], vConvLFDieselDemand)
+        add_similar_to_expression!(EP[:eObj], eTotalCLFDieselVarOut)
 
         ####Constraining amount of syn fuel
         
@@ -119,8 +119,8 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         @expression(EP, eTotalCLFJetfuelVarOut, sum(eTotalCLFJetfuelVarOutT[t] for t in 1:T))
     
         #Liquid Fuel Balance
-        EP[:eLFJetfuelBalance] += vConvLFJetfuelDemand
-        EP[:eObj] += eTotalCLFJetfuelVarOut
+        add_similar_to_expression!(EP[:eLFJetfuelBalance], vConvLFJetfuelDemand)
+        add_similar_to_expression!(EP[:eObj], eTotalCLFJetfuelVarOut)
     
         ####Constraining amount of syn fuel
         
@@ -164,9 +164,9 @@ function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
         @expression(EP, eTotalCLFGasolineVarOut, sum(eTotalCLFGasolineVarOutT[t] for t in 1:T))
     
         #Liquid Fuel Balance
-        EP[:eLFGasolineBalance] += vConvLFGasolineDemand
-        EP[:eObj] += eTotalCLFGasolineVarOut
-    
+        add_similar_to_expression!(EP[:eLFGasolineBalance], vConvLFGasolineDemand)
+        add_similar_to_expression!(EP[:eObj], eTotalCLFGasolineVarOut)
+
         ####Constraining amount of syn fuel
         
         if setup["SpecifySynGasolinePercentFlag"] == 1

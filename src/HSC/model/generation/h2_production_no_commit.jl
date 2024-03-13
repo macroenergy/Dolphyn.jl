@@ -76,70 +76,45 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     #Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
-    H = inputs["H2_GEN"]        #NUmber of hydrogen generation units 
+    T = inputs["T"]::Int64     # Number of time steps (hours)
+    Z = inputs["Z"]::Int64     # Number of zones
+    H = inputs["H"]::Int64     # NUmber of hydrogen generation units 
     
-    H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+    H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]::Vector{Int64} 
 
     if setup["ModelH2Liquid"] ==1
-        H2_LIQ_NO_COMMIT = inputs["H2_LIQ_NO_COMMIT"]
-        H2_EVAP_NO_COMMIT = inputs["H2_EVAP_NO_COMMIT"]
+        H2_LIQ_NO_COMMIT = inputs["H2_LIQ_NO_COMMIT"]::Vector{Int64} 
+        H2_EVAP_NO_COMMIT = inputs["H2_EVAP_NO_COMMIT"]::Vector{Int64} 
         H2_GEN_NO_COMMIT = union(H2_GAS_NO_COMMIT, H2_LIQ_NO_COMMIT, H2_EVAP_NO_COMMIT)
     else
         H2_GEN_NO_COMMIT = H2_GAS_NO_COMMIT
     end
 
     #Define start subperiods and interior subperiods
-    START_SUBPERIODS = inputs["START_SUBPERIODS"]
-    INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
-    hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
+    START_SUBPERIODS = inputs["START_SUBPERIODS"]::StepRange{Int64,Int64} 
+    INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]::Vector{Int64} 
+    hours_per_subperiod = inputs["hours_per_subperiod"]::Int64  #total number of hours per subperiod
 
+    setup["ParameterScale"]==1 ? SCALING = ModelScalingFactor : SCALING = 1.0
+    
     ###Expressions###
 
     #H2 Balance expressions
-    @expression(EP, eH2GenNoCommit[t=1:T, z=1:Z],
-    sum_expression(EP[:vH2Gen][intersect(H2_GAS_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t] ))
-
-    EP[:eH2Balance] += eH2GenNoCommit
+    h2_prod_nocommit_h2_balance!(EP, T, Z, EP[:vH2Gen], H2_GAS_NO_COMMIT, dfH2Gen)
 
     if setup["ModelH2Liquid"]==1
         #H2 LIQUID Balance expressions
-        @expression(EP, eH2LiqNoCommit[t=1:T, z=1:Z],
-        sum_expression(EP[:vH2Gen][intersect(H2_LIQ_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t]))
-
-        # Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
-        EP[:eH2Balance] -= eH2LiqNoCommit
-        EP[:eH2LiqBalance] += eH2LiqNoCommit
-
-        #H2 Evaporation Balance expressions
+        h2_prod_nocommit_h2_liq_balance!(EP, T, Z, EP[:vH2Gen], H2_LIQ_NO_COMMIT, dfH2Gen)
+        
         if !isempty(H2_EVAP_NO_COMMIT)
-            @expression(EP, eH2EvapNoCommit[t=1:T, z=1:Z],
-            sum_expression(EP[:vH2Gen][intersect(H2_EVAP_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t] ))
-
-            # Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
-            EP[:eH2Balance] += eH2EvapNoCommit
-            EP[:eH2LiqBalance] -= eH2EvapNoCommit
+            #H2 Evaporation Balance expressions
+            h2_prod_nocommit_h2_evap_balance!(EP, T, Z, EP[:vH2Gen], H2_EVAP_NO_COMMIT, dfH2Gen)
         end
     end
 
     #Power Consumption for H2 Generation
-    if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
-        @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-        sum_expression(EP[:vP2G][intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t]/ModelScalingFactor )) 
-
-    else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
-        @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-        sum_expression(EP[:vP2G][intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]),t])) 
-    end
-
-    EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
-
-
-    ##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
-
-
+    h2_prod_nocommit_power_consumption!(EP, T, Z, EP[:vP2G], H2_GEN_NO_COMMIT, dfH2Gen)
+    
     ###Constraints###
     # Power and natural gas consumption associated with H2 generation in each time step
     @constraints(EP, begin
@@ -181,6 +156,67 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
 end
 
+function h2_prod_nocommit_h2_balance!(EP::Model, T::Int, Z::Int, vH2Gen::AbstractArray{VariableRef}, H2_GAS_NO_COMMIT::Vector{Int64}, dfH2Gen::DataFrame)
+    eH2GenNoCommit = create_empty_expression((T,Z))
+    @inbounds for z = 1:Z
+        zone_set = dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
+        gen_set = intersect(H2_GAS_NO_COMMIT, zone_set)
+        @inbounds for t = 1:T
+            eH2GenNoCommit[t,z] = sum_expression(vH2Gen[gen_set, t])
+        end
+    end
+    EP[:eH2GenNoCommit] = eH2GenNoCommit
+    add_similar_to_expression!(EP[:eH2Balance], eH2GenNoCommit)
+    return eH2GenNoCommit
+end
+
+function h2_prod_nocommit_h2_liq_balance!(EP::Model, T::Int, Z::Int, vH2Gen::AbstractArray{VariableRef}, H2_LIQ_NO_COMMIT::Vector{Int64}, dfH2Gen::DataFrame)
+    eH2LiqNoCommit = create_empty_expression((T,Z))
+    @inbounds for z = 1:Z
+        zone_set = dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
+        gen_set = intersect(H2_LIQ_NO_COMMIT, zone_set)
+        @inbounds for t = 1:T
+            eH2LiqNoCommit[t,z] = sum_expression(vH2Gen[gen_set, t])
+        end
+    end
+    EP[:eH2LiqNoCommit] = eH2LiqNoCommit
+    # Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
+    add_similar_to_expression!(EP[:eH2Balance], -eH2LiqNoCommit)
+    add_similar_to_expression!(EP[:eH2LiqBalance], eH2LiqNoCommit)
+    return eH2LiqNoCommit
+end
+
+function h2_prod_nocommit_h2_evap_balance!(EP::Model, T::Int, Z::Int, vH2Gen::AbstractArray{VariableRef}, H2_EVAP_NO_COMMIT::Vector{Int64}, dfH2Gen::DataFrame)
+    eH2EvapNoCommit = create_empty_expression((T,Z))
+    @inbounds for z = 1:Z
+        zone_set = dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
+        gen_set = intersect(H2_EVAP_NO_COMMIT, zone_set)
+        @inbounds for t = 1:T
+            eH2EvapNoCommit[t,z] = sum_expression(vH2Gen[gen_set, t])
+        end
+    end
+    EP[:eH2EvapNoCommit] = eH2EvapNoCommit
+     # Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
+     add_similar_to_expression!(EP[:eH2Balance], eH2EvapNoCommit)
+     add_similar_to_expression!(EP[:eH2LiqBalance], -eH2EvapNoCommit)
+end
+
+function h2_prod_nocommit_power_consumption!(EP::Model, T::Int, Z::Int, vP2G::AbstractArray{VariableRef}, H2_GEN_NO_COMMIT::Vector{Int64}, dfH2Gen::DataFrame)
+    # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
+    ePowerBalanceH2GenNoCommit = create_empty_expression((T,Z))
+    @inbounds for z = 1:Z
+        zone_set = dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
+        gen_set = intersect(H2_GEN_NO_COMMIT, zone_set)
+        @inbounds for t = 1:T
+            ePowerBalanceH2GenNoCommit[t,z] = sum_expression(vP2G[gen_set,t] / ModelScalingFactor )
+        end
+    end
+    EP[:ePowerBalanceH2GenNoCommit] = ePowerBalanceH2GenNoCommit
+    add_similar_to_expression!(EP[:ePowerBalance], -ePowerBalanceH2GenNoCommit)
+    ##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerBalanceH2GenNoCommit)
+end
 
 
 

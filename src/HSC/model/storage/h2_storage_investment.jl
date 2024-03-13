@@ -147,7 +147,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCFixH2Charge, sum_expression(EP[:eCFixH2Charge][H2_STOR_ALL]))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixH2Charge
+    add_similar_to_expression!(EP[:eObj], eTotalCFixH2Charge)
 
     # Energy capacity costs
     # Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
@@ -176,8 +176,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCFixH2Energy, sum_expression(EP[:eCFixH2Energy][H2_STOR_ALL]))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixH2Energy
-
+    add_similar_to_expression!(EP[:eObj], eTotalCFixH2Energy)
 
     ### Constratints ###
 

@@ -2,22 +2,28 @@
 # Create dense arrays of expressions filled with zeros to be added to later
 ###### ###### ###### ###### ###### ######
 
-# Single element version
-function create_empty_expression!(EP::Model, exprname::Symbol)
-    EP[exprname] = AffExpr(0.0)
+function create_empty_expression(dims::NTuple{N, Int64}) where N
+    return Array{AffExpr}(undef, dims)
+end
+
+function create_empty_expression(dims::Vector{Int64})
+    return Array{AffExpr}(undef, dims...)
+end
+
+function create_empty_expression!(EP::Model, exprname::Symbol, dims::NTuple{N, Int64}) where N
+    temp = Array{AffExpr}(undef, dims)
+    EP[exprname] = temp
     return nothing
 end
 
-# Vector version, to avoid needing to wrap the dimension in a tuple or array
-function create_empty_expression!(EP::Model, exprname::Symbol, dim1::Int64)
-    temp = Array{AffExpr}(undef, dim1)
-    fill_with_zeros!(temp)
+function create_empty_expression!(EP::Model, exprname::Symbol, dims::Vector{Int64})
+    temp = Array{AffExpr}(undef, dims...)
     EP[exprname] = temp
     return nothing
 end
 
 @doc raw"""
-    create_empty_expression!(EP::Model, exprname::Symbol, dims::NTuple{N, Int64}) where N
+    create_zeros_expression!(EP::Model, exprname::Symbol, dims::NTuple{N, Int64}) where N
 
 Create an dense array filled with zeros which can be altered later.
 Other approaches to creating zero-filled arrays will often return an array of floats, not expressions.
@@ -25,19 +31,51 @@ This can lead to errors later if a method can only operate on expressions.
     
 We don't currently have a method to do this with non-contiguous indexing.
 """
-function create_empty_expression!(EP::Model, exprname::Symbol, dims::NTuple{N, Int64}) where N
-    temp = Array{AffExpr}(undef, dims)
+function create_zeros_expression!(EP::Model, exprname::Symbol, dims::NTuple{N, Int64}) where N
+    temp = create_empty_expression(dims)
     fill_with_zeros!(temp)
     EP[exprname] = temp
     return nothing
 end
 
 # Version with the dimensions wrapped in an array. This requires slightly more memory than using tuples
-function create_empty_expression!(EP::Model, exprname::Symbol, dims::Vector{Int64})
-    temp = Array{AffExpr}(undef, dims...)
+function create_zeros_expression!(EP::Model, exprname::Symbol, dims::Vector{Int64})
+    temp = create_empty_expression(dims)
     fill_with_zeros!(temp)
     EP[exprname] = temp
     return nothing
+end
+
+# Single element version
+function create_zeros_expression!(EP::Model, exprname::Symbol)
+    EP[exprname] = AffExpr(0.0)
+    return nothing
+end
+
+# Vector version, to avoid needing to wrap the dimension in a tuple or array
+function create_zeros_expression!(EP::Model, exprname::Symbol, dim1::Int64)
+    temp = create_empty_expression(dim1)
+    fill_with_zeros!(temp)
+    EP[exprname] = temp
+    return nothing
+end
+
+function create_zeros_expression(dim1::Int64)
+    temp = create_empty_expression(dim1)
+    fill_with_zeros!(temp)
+    return temp
+end
+
+function create_zeros_expression(dims::NTuple{N, Int64}) where N
+    temp = create_empty_expression(dims)
+    fill_with_zeros!(temp)
+    return temp
+end
+
+function create_zeros_expression(dims::Vector{Int64})
+    temp = create_empty_expression(dims)
+    fill_with_zeros!(temp)
+    return temp
 end
 
 ###### ###### ###### ###### ###### ######
@@ -106,7 +144,7 @@ end
 # Version for single element
 function add_similar_to_expression!(expr1::GenericAffExpr{C,T}, expr2::V) where {C,T,V}
     add_to_expression!(expr1, expr2)
-    return nothing
+    return expr1
 end
 
 @doc raw"""
@@ -125,13 +163,15 @@ function add_similar_to_expression!(expr1::AbstractArray{GenericAffExpr{C,T}, di
     for i in eachindex(expr1)
         add_to_expression!(expr1[i], expr2[i])
     end
-    return nothing
+    return expr1
 end
+
+# Maybe add a version with coefficients to give (e1 + e2) * c
 
 # Version for single element
 function add_similar_to_expression!(expr1::GenericVariableRef{C}, expr2::V) where {C,V}
     add_to_expression!(expr1, expr2)
-    return nothing
+    return expr1
 end
 
 @doc raw"""
@@ -150,7 +190,7 @@ function add_similar_to_expression!(expr1::AbstractArray{GenericVariableRef{C}, 
     for i in eachindex(expr1)
         add_to_expression!(1 * expr1[i], expr2[i])
     end
-    return nothing
+    return expr1
 end
 
 ###### ###### ###### ###### ###### ######
@@ -161,7 +201,7 @@ end
 # Version for single element
 function add_term_to_expression!(expr1::GenericAffExpr{C,T}, expr2::V) where {C,T,V}
     add_to_expression!(expr1, expr2)
-    return nothing
+    return expr1
 end
 
 @doc raw"""
@@ -174,13 +214,13 @@ function add_term_to_expression!(expr1::AbstractArray{GenericAffExpr{C,T}, dims}
     for i in eachindex(expr1)
         add_to_expression!(expr1[i], expr2)
     end
-    return nothing
+    return expr1
 end
 
 # Version for single element
 function add_term_to_expression!(expr1::GenericVariableRef{C}, expr2::V) where {C,V}
     add_to_expression!(1 * expr1, expr2)
-    return nothing
+    return expr1
 end
 
 @doc raw"""
@@ -194,7 +234,7 @@ function add_term_to_expression!(expr1::AbstractArray{GenericVariableRef{C}, dim
     for i in eachindex(expr1)
         add_to_expression!(1 * expr1[i], expr2)
     end
-    return nothing
+    return expr1
 end
 
 ###### ###### ###### ###### ###### ######
@@ -240,9 +280,25 @@ end
 
 Sum an array of expressions into a single expression and return the result.
 """
-function sum_expression(expr::AbstractArray{C, dims}) :: AffExpr where {C,dims}
+function sum_expression(expr::AbstractArray{C, dims})::AffExpr where {C,dims}
     # check_addable_to_expr(C,C)
     total = AffExpr(0.0)
     add_to_expression!.(total, expr)
     return total
 end
+
+function sum_expression(expr::Base.Generator{C,T})::AffExpr where {C,T}
+    total = AffExpr(0.0)
+    foreach(expr) do e
+        add_to_expression!(total, e)
+    end
+    return total
+end
+
+# function sum_expression(expr::Base.Generator{C,T})::AffExpr where {C,T}
+#     total = AffExpr(0.0)
+#     foreach(expr) do e::Union{AffExpr, VariableRef}
+#         add_to_expression!(total, e)
+#     end
+#     return total
+# end
