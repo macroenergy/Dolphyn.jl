@@ -78,7 +78,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
     T = inputs["T"]::Int64     # Number of time steps (hours)
     Z = inputs["Z"]::Int64     # Number of zones
-    H = inputs["H"]::Int64     # NUmber of hydrogen generation units 
+    H = inputs["H2_GEN"]::Int64     # NUmber of hydrogen generation units 
     
     H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]::Vector{Int64} 
 
