@@ -118,7 +118,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     if setup["ModelCSC"] == 1
         # Initialize CO2 Capture Balance Expression
-	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+        create_zeros_expression!(EP, :eCaptured_CO2_Balance, (T,Z))
+	    # @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
     end
 
 
@@ -286,7 +287,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     if setup["ModelCSC"] == 1
 
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+		create_zeros_expression!(EP, :eCSCNetpowerConsumptionByAll, (T,Z))
+        # @expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
 		# Variable costs and carbon captured per DAC resource "k" and time "t"
 		EP = DAC_var_cost(EP, inputs, setup)
@@ -330,10 +332,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     if setup["ModelLiquidFuels"] == 1
 
 		# Initialize Liquid Fuel Balance
-		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
-		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
-		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
-
+        create_zeros_expression!(EP, :eLFDieselBalance, (T,Z))
+        create_zeros_expression!(EP, :eLFJetfuelBalance, (T,Z))
+        create_zeros_expression!(EP, :eLFGasolineBalance, (T,Z))
 		
 		EP = syn_fuel_outputs(EP, inputs, setup)
 		EP = syn_fuel_investment(EP, inputs, setup)
