@@ -104,11 +104,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     # Initialize Power Balance Expression
     # Expression for "baseline" power balance constraint
-    @expression(EP, ePowerBalance[t=1:T, z=1:Z], 0)
+    create_zeros_expression!(EP, :ePowerBalance, (T,Z))
 
     # Initialize Hydrogen Balance Expression
     # Expression for "baseline" H2 balance constraint
-    @expression(EP, eH2Balance[t=1:T, z=1:Z], 0)
+    create_zeros_expression!(EP, :eH2Balance, (T,Z))
 
     # Initialize Liquid Hydrogen Balance Expression
     if setup["ModelH2Liquid"]==1
@@ -118,7 +118,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     if setup["ModelCSC"] == 1
         # Initialize CO2 Capture Balance Expression
-	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+        create_zeros_expression!(EP, :eCaptured_CO2_Balance, (T,Z))
+	    # @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
     end
 
 
@@ -126,11 +127,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     @expression(EP, eObj, 0)
 
     # Power supply by z and timestep - used in emissions constraints
-    @expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)
-    @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
+    create_zeros_expression!(EP, :eGenerationByZone, (Z,T))
+    create_zeros_expression!(EP, :eTransmissionByZone, (Z,T))
     @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)  
+    create_zeros_expression!(EP, :eAdditionalDemandByZone, (T,Z))
     
     # Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
@@ -216,11 +217,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
     if setup["ModelH2"] == 1
-        @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
-        @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
+        create_zeros_expression!(EP, :eHGenerationByZone, (Z,T))
+        create_zeros_expression!(EP, :eHTransmissionByZone, (T,Z))
         @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
         # Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-        @expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
+        create_zeros_expression!(EP, :eH2NetpowerConsumptionByAll, (T,Z))    
 
         # Infrastructure
         EP = h2_outputs(EP, inputs, setup)
@@ -279,14 +280,15 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = green_h2_share_requirement(EP, inputs, setup)
 		end
 
-        EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
+        add_similar_to_expression!(EP[:eAdditionalDemandByZone], EP[:eH2NetpowerConsumptionByAll])
     
 	end
 
     if setup["ModelCSC"] == 1
 
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
-		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+		create_zeros_expression!(EP, :eCSCNetpowerConsumptionByAll, (T,Z))
+        # @expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
 		# Variable costs and carbon captured per DAC resource "k" and time "t"
 		EP = DAC_var_cost(EP, inputs, setup)
@@ -323,17 +325,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions of various carbon capture sector resources
 		EP = emissions_csc(EP, inputs,setup)
 
-		EP[:eAdditionalDemandByZone] += EP[:eCSCNetpowerConsumptionByAll]
+        add_similar_to_expression!(EP[:eAdditionalDemandByZone], EP[:eCSCNetpowerConsumptionByAll])
 
 	end
 
     if setup["ModelLiquidFuels"] == 1
 
 		# Initialize Liquid Fuel Balance
-		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
-		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
-		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
-
+        create_zeros_expression!(EP, :eLFDieselBalance, (T,Z))
+        create_zeros_expression!(EP, :eLFJetfuelBalance, (T,Z))
+        create_zeros_expression!(EP, :eLFGasolineBalance, (T,Z))
 		
 		EP = syn_fuel_outputs(EP, inputs, setup)
 		EP = syn_fuel_investment(EP, inputs, setup)
@@ -351,8 +352,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         #@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
 
         #Demand constraint for annual global liquid fuel demand
-        @expression(EP, eAnnualGlobalLFDieselBalance, sum(EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
-        @expression(EP, eAnnualGlobalLFDieselDemand, sum(EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
+        eAnnualGlobalLFDieselBalance = sum_expression(EP[:eGlobalLFDieselBalance])
+        eAnnualGlobalLFDieselDemand = sum_expression(EP[:eGlobalLFDieselDemand])
+        # EP[:eAnnualGlobalLFDieselDemand] = eAnnualGlobalLFDieselDemand
+        # EP[:eAnnualGlobalLFDieselBalance] = eAnnualGlobalLFDieselBalance
         @constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
     
 
