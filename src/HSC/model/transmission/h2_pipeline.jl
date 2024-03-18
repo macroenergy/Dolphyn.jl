@@ -122,7 +122,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-    EP[:eObj] += eCH2Pipe
+    add_similar_to_expression!(EP[:eObj], eCH2Pipe)
 
     # Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
     # YS Formula doesn't make sense to me
@@ -142,7 +142,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-    EP[:eObj] += eCH2CompPipe
+    add_similar_to_expression!(EP[:eObj], eCH2CompPipe)
 
     ## End Objective Function Expressions ##
 
@@ -171,8 +171,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-    EP[:ePowerBalance] += -ePowerBalanceH2PipeCompression
-    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2PipeCompression
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2PipeCompression, -1.0)
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerBalanceH2PipeCompression)
 
 
     # H2 balance - net flows of H2 from between z and zz via pipeline p over time period t
@@ -185,9 +185,9 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         )
     )
 
-    EP[:eH2Balance] += ePipeZoneDemand
+    add_similar_to_expression!(EP[:eH2Balance], ePipeZoneDemand)
 
-    EP[:eHTransmissionByZone] += ePipeZoneDemand
+    add_similar_to_expression!(EP[:eHTransmissionByZone], ePipeZoneDemand)
 
     ## End Balance Expressions ##
     ### End Expressions ###

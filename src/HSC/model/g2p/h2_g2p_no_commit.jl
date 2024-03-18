@@ -83,7 +83,7 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
     @expression(EP, eH2G2PNoCommit[t=1:T, z=1:Z],
     sum(EP[:vH2G2P][k,t] for k in intersect(H2_G2P_NO_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eH2Balance] -= eH2G2PNoCommit
+    add_similar_to_expression!(EP[:eH2Balance], eH2G2PNoCommit, -1.0)
 
     #Power Consumption for H2 Generation
     if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
@@ -95,7 +95,7 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
         sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_NO_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
     end
 
-    EP[:ePowerBalance] += ePowerBalanceH2G2PNoCommit
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2G2PNoCommit)
 
     ###Constraints###
     # Power and natural gas consumption associated with H2 generation in each time step

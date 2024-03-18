@@ -55,7 +55,7 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
     )
 
 
-    EP[:eH2GenerationByZone] += eH2GenerationByZone
+    add_similar_to_expression!(EP[:eH2GenerationByZone], eH2GenerationByZone)
 
     return EP
 end

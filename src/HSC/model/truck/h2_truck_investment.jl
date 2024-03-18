@@ -163,7 +163,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eTotalCFixH2TruckCharge, sum(EP[:eCFixH2TruckCharge][j] for j in H2_TRUCK_TYPES))
 
 	# Add term to objective function expression
-	EP[:eObj] += eTotalCFixH2TruckCharge
+	add_similar_to_expression!(EP[:eObj], eTotalCFixH2TruckCharge)
 
     # Energy capacity costs
 	# Fixed costs for truck type "j" on zone "z" = annuitized investment cost plus fixed O&M costs
@@ -192,7 +192,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCFixH2TruckEnergy, sum(EP[:eCFixH2TruckEnergy][z, j] for z = 1:Z, j in H2_TRUCK_TYPES))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixH2TruckEnergy
+    add_similar_to_expression!(EP[:eObj], eTotalCFixH2TruckEnergy)
 
 
 	### Constratints ###

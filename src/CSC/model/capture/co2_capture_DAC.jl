@@ -84,7 +84,7 @@ function co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 	sum(EP[:vDAC_CO2_Captured][k,t] for k in intersect(CO2_CAPTURE_DAC, dfDAC[dfDAC[!,:Zone].==z,:][!,:R_ID])))
 
 	#ADD TO CO2 BALANCE
-	EP[:eCaptured_CO2_Balance] += eDAC_CO2_captured_per_time_per_zone
+	add_similar_to_expression!(EP[:eCaptured_CO2_Balance], eDAC_CO2_captured_per_time_per_zone)
 
 	#Power Balance
 	# If ParameterScale = 1, power system operation/capacity modeled in GW, no need to scale as MW/ton = GW/kton 
@@ -95,18 +95,18 @@ function co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 	sum(EP[:vPower_DAC][k,t] for k in intersect(CO2_CAPTURE_DAC, dfDAC[dfDAC[!,:Zone].==z,:][!,:R_ID])))
 
 	#Add to power balance to take power away from generated
-	EP[:ePowerBalance] += -ePower_Balance_DAC
+	add_similar_to_expression!(EP[:ePowerBalance], ePower_Balance_DAC, -1.0)
 
 	##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_DAC
+	add_similar_to_expression!(EP[:eCSCNetpowerConsumptionByAll], ePower_Balance_DAC)
 
 	#Power produced by DAC
 	@expression(EP, ePower_Produced_Balance_DAC[t=1:T, z=1:Z],
 	sum(EP[:vPower_Produced_DAC][k,t] for k in intersect(CO2_CAPTURE_DAC, dfDAC[dfDAC[!,:Zone].==z,:][!,:R_ID])))
 
 	#Add to power balance to add power produced by DAC
-	EP[:ePowerBalance] += ePower_Produced_Balance_DAC
-	EP[:eCSCNetpowerConsumptionByAll] -= ePower_Produced_Balance_DAC
+	add_similar_to_expression!(EP[:ePowerBalance], ePower_Produced_Balance_DAC)
+	add_similar_to_expression!(EP[:eCSCNetpowerConsumptionByAll], ePower_Produced_Balance_DAC, -1.0)
 
 	###############################################################################################################################
 	##Constraints

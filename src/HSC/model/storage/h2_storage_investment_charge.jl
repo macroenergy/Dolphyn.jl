@@ -132,7 +132,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCFixH2Charge, sum(EP[:eCFixH2Charge][y] for y in H2_STOR_ALL))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixH2Charge
+    add_similar_to_expression!(EP[:eObj], eTotalCFixH2Charge)
 
     ### Constratints ###
 

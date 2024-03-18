@@ -200,7 +200,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             )
         )
     end
-    EP[:eObj] += OPEX_Truck
+    add_similar_to_expression!(EP[:eObj], OPEX_Truck)
 
     # Operating expenditure for truck h2 compression
     if setup["ParameterScale"] == 1
@@ -224,7 +224,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             )
         )
     end
-    EP[:eObj] += OPEX_Truck_Compression
+    add_similar_to_expression!(EP[:eObj], OPEX_Truck_Compression)
     ## End Objective Function Expressions ##
 
     ## Balance Expressions ##
@@ -247,8 +247,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    EP[:ePowerBalance] += -ePowerbalanceH2TruckCompression
-    EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckCompression
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerbalanceH2TruckCompression, -1.0)
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerbalanceH2TruckCompression)
     
     # H2 Power Truck Travelling Consumption balance
     @expression(
@@ -271,8 +271,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         end
     )
 
-    EP[:ePowerBalance] += -ePowerbalanceH2TruckTravel
-    EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckTravel
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerbalanceH2TruckTravel, -1.0)
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerbalanceH2TruckTravel)
 
     # H2 balance
     @expression(
@@ -280,7 +280,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         eH2TruckFlow[t = 1:T, z = 1:Z],
         sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_GAS)
     )
-    EP[:eH2Balance] += eH2TruckFlow
+    add_similar_to_expression!(EP[:eH2Balance], eH2TruckFlow)
 
     # H2 liquid balance
     if setup["ModelH2Liquid"]==1
@@ -289,7 +289,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             eH2TruckLiqFlow[t = 1:T, z = 1:Z],
             sum(vH2TruckFlow[z, j, t] for j in H2_TRUCK_LIQ)
         )
-        EP[:eH2LiqBalance] += eH2TruckLiqFlow
+        add_similar_to_expression!(EP[:eH2LiqBalance], eH2TruckLiqFlow)
     end
 
     # H2 Truck Traveling Consumption balance
@@ -304,7 +304,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         )
     )
 
-    EP[:eH2Balance] += -eH2TruckTravelConsumption
+    add_similar_to_expression!(EP[:eH2Balance], eH2TruckTravelConsumption, -1.0)
 
     # H2 truck emission penalty
     @expression(
@@ -319,7 +319,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
             zz = 1:Z, z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T if zz != z
         )
     )
-    # EP[:eCarbonBalance] += Truck_carbon_emission
+    # add_similar_to_expression!(EP[:eCarbonBalance], Truck_carbon_emission)
     ## End Balance Expressions ##
     ### End Expressions ###
 

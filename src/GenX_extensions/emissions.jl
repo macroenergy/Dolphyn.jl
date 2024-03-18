@@ -53,7 +53,7 @@ function emissions!(EP::Model, inputs::Dict, setup::Dict)
 		)
 
 		# Add total emissions penalty associated with direct emissions from power generation technologies
-		EP[:eObj] += eCGenTotalEmissionsPenalty
+		add_similar_to_expression!(EP[:eObj], eCGenTotalEmissionsPenalty)
 
 	end
 

@@ -195,13 +195,13 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalH2G2PCStartK[k = H2_G2P_COMMIT], sum(eH2G2PCStart[k,t] for t in 1:T))
     @expression(EP, eTotalH2G2PCStart, sum(eTotalH2G2PCStartT[t] for t=1:T))
 
-    EP[:eObj] += eTotalH2G2PCStart
+    add_similar_to_expression!(EP[:eObj], eTotalH2G2PCStart)
 
     # H2 Balance expressions
     @expression(EP, eH2G2PCommit[t=1:T, z=1:Z],
     sum(EP[:vH2G2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eH2Balance] -= eH2G2PCommit
+    add_similar_to_expression!(EP[:eH2Balance], eH2G2PCommit, -1.0)
 
     # Power generation from g2p units
     if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
@@ -213,7 +213,7 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
         sum(EP[:vPG2P][k,t] for k in intersect(H2_G2P_COMMIT, dfH2G2P[dfH2G2P[!,:Zone].==z,:][!,:R_ID]))) 
     end
 
-    EP[:ePowerBalance] += ePowerBalanceH2G2PCommit
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2G2PCommit)
 
     ### Constraints ###
     ## Declaration of integer/binary variables

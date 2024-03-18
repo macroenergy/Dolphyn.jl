@@ -101,7 +101,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     @expression(EP, eH2GenNoCommit[t=1:T, z=1:Z],
     sum(EP[:vH2Gen][k,t] for k in intersect(H2_GAS_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eH2Balance] += eH2GenNoCommit
+    add_similar_to_expression!(EP[:eH2Balance], eH2GenNoCommit)
 
     if setup["ModelH2Liquid"]==1
         #H2 LIQUID Balance expressions
@@ -109,8 +109,8 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
         sum(EP[:vH2Gen][k,t] for k in intersect(H2_LIQ_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
         # Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
-        EP[:eH2Balance] -= eH2LiqNoCommit
-        EP[:eH2LiqBalance] += eH2LiqNoCommit
+        add_similar_to_expression!(EP[:eH2Balance], eH2LiqNoCommit, -1.0)
+        add_similar_to_expression!(EP[:eH2LiqBalance], eH2LiqNoCommit)
 
         #H2 Evaporation Balance expressions
         if !isempty(H2_EVAP_NO_COMMIT)
@@ -118,8 +118,8 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
             sum(EP[:vH2Gen][k,t] for k in intersect(H2_EVAP_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
             # Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
-            EP[:eH2Balance] += eH2EvapNoCommit
-            EP[:eH2LiqBalance] -= eH2EvapNoCommit
+            add_similar_to_expression!(EP[:eH2Balance], eH2EvapNoCommit)
+            add_similar_to_expression!(EP[:eH2LiqBalance], eH2EvapNoCommit, -1.0)
         end
     end
 
@@ -133,11 +133,11 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
         sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
     end
 
-    EP[:ePowerBalance] += -ePowerBalanceH2GenNoCommit
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2GenNoCommit, -1.0)
 
 
     ##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenNoCommit
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerBalanceH2GenNoCommit)
 
 
     ###Constraints###

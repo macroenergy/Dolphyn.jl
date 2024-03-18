@@ -124,7 +124,7 @@ function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalCFixH2Energy, sum(EP[:eCFixH2Energy][y] for y in H2_STOR_ALL))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixH2Energy
+    add_similar_to_expression!(EP[:eObj], eTotalCFixH2Energy)
 
     ### Constratints ###
     # Cannot retire more energy capacity than existing energy capacity

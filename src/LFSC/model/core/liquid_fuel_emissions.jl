@@ -82,7 +82,7 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
 
 
     #ADD TO CO2 BALANCE
-    EP[:eCaptured_CO2_Balance] += EP[:eSyn_Fuels_CO2_Capture_Per_Time_Per_Zone]
+    add_similar_to_expression!(EP[:eCaptured_CO2_Balance], EP[:eSyn_Fuels_CO2_Capture_Per_Time_Per_Zone])
 
     #CO2 emitted by fuel usage per zone
     @expression(EP, eSyn_Fuels_CO2_Emissions_By_Zone[z=1:Z, t=1:T], 

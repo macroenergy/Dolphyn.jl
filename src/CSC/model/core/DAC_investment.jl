@@ -102,7 +102,7 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Expression for total Fixed Cost for all resoruce types (For output and to add to objective function)
 	@expression(EP,eFixed_Cost_DAC_total, sum(EP[:eFixed_Cost_DAC_per_type][i] for i in 1:DAC_RES_ALL))
 	
-	EP[:eObj] += EP[:eFixed_Cost_DAC_total]
+	add_similar_to_expression!(EP[:eObj], EP[:eFixed_Cost_DAC_total])
 
     return EP
 

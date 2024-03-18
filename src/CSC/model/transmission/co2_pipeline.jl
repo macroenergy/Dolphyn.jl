@@ -102,7 +102,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         @expression(EP, eCCO2Pipe,  sum(eCO2NPipeNew[p] * inputs["pCAPEX_CO2_Pipe"][p] for p = 1:CO2_P) + sum(vCO2NPipe[p] * inputs["pFixed_OM_CO2_Pipe"][p] for p = 1:CO2_P))
     end
 
-    EP[:eObj] += eCCO2Pipe
+    add_similar_to_expression!(EP[:eObj], eCCO2Pipe)
 
     # Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
      #  ParameterScale = 1 --> objective function is in million $
@@ -115,7 +115,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 	end
 	
 
-    EP[:eObj] += eCCO2CompPipe
+    add_similar_to_expression!(EP[:eObj], eCCO2CompPipe)
 
 	## End Objective Function Expressions ##
 
@@ -138,11 +138,11 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, ePowerDemandCO2PipeCompression_zt[z=1:Z,t=1:T],
     sum(vCO2PipeFlow_neg[p,t,CO2_Pipe_Map[(CO2_Pipe_Map[!,:Zone] .== z) .& (CO2_Pipe_Map[!,:pipe_no] .== p), :][!,:d][1]] * inputs["pComp_MWh_per_tonne_CO2_Pipe"][p] for  p in CO2_Pipe_Map[CO2_Pipe_Map[!,:Zone].==z,:][!,:pipe_no]))    
 
-    EP[:ePowerBalance] += -ePowerDemandCO2Pipe
-    EP[:ePowerBalance] += -ePowerDemandCO2PipeCompression
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerDemandCO2Pipe, -1.0)
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerDemandCO2PipeCompression, -1.0)
 
-    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2Pipe
-    EP[:eCSCNetpowerConsumptionByAll] += ePowerDemandCO2PipeCompression
+    add_similar_to_expression!(EP[:eCSCNetpowerConsumptionByAll], ePowerDemandCO2Pipe)
+    add_similar_to_expression!(EP[:eCSCNetpowerConsumptionByAll], ePowerDemandCO2PipeCompression)
 
 
 	### Constraints ###
@@ -188,8 +188,8 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # CO2 balance - net flows of CO2 from between z and zz via pipeline p over time period t
     @expression(EP, ePipeZoneCO2Demand[t=1:T,z=1:Z],ePipeZoneCO2Demand_No_Loss[t,z] - eCO2Loss_Pipes[t,z])
 
-    #EP[:eCaptured_CO2_Balance] -= eCO2Loss_Pipes #No need as we have already deducted the loss from the balance
-    EP[:eCaptured_CO2_Balance] += ePipeZoneCO2Demand
+    #add_similar_to_expression!(EP[:eCaptured_CO2_Balance], eCO2Loss_Pipes) #No need as we have already deducted the loss from the balance
+    add_similar_to_expression!(EP[:eCaptured_CO2_Balance], ePipeZoneCO2Demand)
 
     if setup["ParameterScale"] ==1 
         #Pipe flow constraint

@@ -99,7 +99,7 @@ END_HOURS = START_SUBPERIODS .+ hours_per_subperiod .- 1 # Last subperiod of eac
 @expression(EP, eH2BalanceDemandFlex[t=1:T, z=1:Z],
     sum(-EP[:vH2Gen][k,t]+EP[:vH2_CHARGE_FLEX][k,t] for k in intersect(H2_FLEX, dfH2Gen[(dfH2Gen[!,:Zone].==z),:][!,:R_ID])))
 
-EP[:eH2Balance] += eH2BalanceDemandFlex
+add_similar_to_expression!(EP[:eH2Balance], eH2BalanceDemandFlex)
 
 ## Objective Function Expressions ##
 
@@ -117,7 +117,7 @@ end
 # Sum individual resource contributions to variable charging costs to get total variable charging costs
 @expression(EP, eTotalCH2VarFlexInT[t=1:T], sum(eCH2VarFlex_in[k,t] for k in H2_FLEX))
 @expression(EP, eTotalCH2VarFlexIn, sum(eTotalCH2VarFlexInT[t] for t in 1:T))
-EP[:eObj] += eTotalCH2VarFlexIn
+add_similar_to_expression!(EP[:eObj], eTotalCH2VarFlexIn)
 
 ### Constraints ###
 

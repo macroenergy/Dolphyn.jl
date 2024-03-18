@@ -193,11 +193,11 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     # Adding conditional for when liquefaction is considered
     if setup["ModelH2Liquid"] ==1
         @expression(EP, eTotalH2LiqCFix, sum(EP[:eH2GenCFix][k] for k in union(H2_LIQ, H2_EVAP)))
-        EP[:eObj] += eTotalH2LiqCFix
+        add_similar_to_expression!(EP[:eObj], eTotalH2LiqCFix)
     end
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalH2GenCFix
+    add_similar_to_expression!(EP[:eObj], eTotalH2GenCFix)
     
 
     return EP

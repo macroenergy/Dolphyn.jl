@@ -116,7 +116,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies
-        EP[:eObj] += eCH2GenTotalEmissionsPenalty
+        add_similar_to_expression!(EP[:eObj], eCH2GenTotalEmissionsPenalty)
 
 
     elseif (setup["CO2Cap"] == 4 && setup["SystemCO2Constraint"] == 2)
@@ -150,7 +150,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
         )
 
         # Add total emissions penalty associated with direct emissions from H2 generation technologies
-        EP[:eObj] += eCH2GenTotalEmissionsPenalty
+        add_similar_to_expression!(EP[:eObj], eCH2GenTotalEmissionsPenalty)
 
     end
 

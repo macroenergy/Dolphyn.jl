@@ -196,13 +196,13 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalH2GenCStartT[t=1:T], sum(eH2GenCStart[k,t] for k in H2_GEN_COMMIT))
     @expression(EP, eTotalH2GenCStart, sum(eTotalH2GenCStartT[t] for t=1:T))
 
-    EP[:eObj] += eTotalH2GenCStart
+    add_similar_to_expression!(EP[:eObj], eTotalH2GenCStart)
 
     #H2 Balance expressions
     @expression(EP, eH2GenCommit[t=1:T, z=1:Z],
     sum(EP[:vH2Gen][k,t] for k in intersect(H2_GAS_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eH2Balance] += eH2GenCommit
+    add_similar_to_expression!(EP[:eH2Balance], eH2GenCommit)
 
     if setup["ModelH2Liquid"]==1
         #H2 LIQUID Balance expressions
@@ -210,8 +210,8 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
         sum(EP[:vH2Gen][k,t] for k in intersect(H2_LIQ_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
         
         # Add Liquid H2 to liquid balance, AND REMOVE it from the gas balance
-        EP[:eH2Balance] -= eH2LiqCommit
-        EP[:eH2LiqBalance] += eH2LiqCommit
+        add_similar_to_expression!(EP[:eH2Balance], eH2LiqCommit, -1.0)
+        add_similar_to_expression!(EP[:eH2LiqBalance], eH2LiqCommit)
 
         #H2 EVAPORATION Balance expressions
         if !isempty(H2_EVAP_COMMIT)
@@ -219,8 +219,8 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
             sum(EP[:vH2Gen][k,t] for k in intersect(H2_EVAP_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID])))
         
             # Add evaporated H2 to gas balance, AND REMOVE it from the liquid balance
-            EP[:eH2Balance] += eH2EvapCommit
-            EP[:eH2LiqBalance] -= eH2EvapCommit
+            add_similar_to_expression!(EP[:eH2Balance], eH2EvapCommit)
+            add_similar_to_expression!(EP[:eH2LiqBalance], eH2EvapCommit, -1.0)
         end
     end
 
@@ -234,11 +234,11 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
         sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
     end
 
-    EP[:ePowerBalance] += -ePowerBalanceH2GenCommit
+    add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2GenCommit, -1.0)
 
 
     ##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
-    EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenCommit
+    add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerBalanceH2GenCommit)
 
     ### Constraints ###
     ## Declaration of integer/binary variables
