@@ -77,21 +77,23 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     dfH2Gen = inputs["dfH2Gen"]
 
     # Define sets
-    H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
-    H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
-    H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+    H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]::Vector{Int64}
+    H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]::Vector{Int64}
+    H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]::Vector{Int64}
     if setup["ModelH2Liquid"] ==1
-        H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
-        H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
+        H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]::Vector{Int64}
+        H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]::Vector{Int64}
         H2_COMMIT = union(H2_GEN_COMMIT, H2_LIQ_COMMIT, H2_EVAP_COMMIT)
-        H2_LIQ = inputs["H2_LIQ"]
-        H2_EVAP = inputs["H2_EVAP"]
+        H2_LIQ = inputs["H2_LIQ"]::Vector{Int64}
+        H2_EVAP = inputs["H2_EVAP"]::Vector{Int64}
     else
         H2_COMMIT = H2_GEN_COMMIT
     end
-    H2_GEN = inputs["H2_GEN"]
-    H2_STOR_ALL = inputs["H2_STOR_ALL"]
-    H = inputs["H2_RES_ALL"]
+    H2_GEN = inputs["H2_GEN"]::Vector{Int64}
+    H2_STOR_ALL = inputs["H2_STOR_ALL"]::Vector{Int64}
+    H = inputs["H2_RES_ALL"]::Int64
+
+    setup["ParameterScale"]==1 ? SCALING = ModelScalingFactor : SCALING = 1.0 
 
     # Capacity of New H2 Gen units (tonnes/hr)
     # For generation with unit commitment, this variable refers to the number of units, not capacity. 
@@ -103,103 +105,154 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     ### Expressions ###
     # Cap_Size is set to 1 for all variables when unit UCommit == 0
     # When UCommit > 0, Cap_Size is set to 1 for all variables except those where THERM == 1
-    @expression(
-        EP,
-        eH2GenTotalCap[k in 1:H],
-        if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
-            if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
-                (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
-            else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k] -
-                EP[:vH2GenRetCap][k]
-            end
-        elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
-            if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
-            else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k]
-            end
-        elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
-            if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] -
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
-            else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] - EP[:vH2GenRetCap][k]
-            end
-        else
-            # Resources not eligible for new capacity or retirements
-            dfH2Gen[!, :Existing_Cap_tonne_p_hr][k]
-        end
-    )
-
+    eH2GenTotalCap = calc_h2_gen_totalcap!(EP, H, H2_GEN_NEW_CAP, H2_GEN_RET_CAP, H2_COMMIT, dfH2Gen[!, :Existing_Cap_tonne_p_hr], dfH2Gen[!, :Cap_Size_tonne_p_hr])
+    
     ## Objective Function Expressions ##
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
     #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     #  ParameterScale = 0 --> objective function is in $
-    if setup["ParameterScale"] == 1
-        # Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
-        # If resource is not eligible for new capacity, fixed costs are only O&M costs
-        @expression(
-            EP,
-            eH2GenCFix[k in 1:H],
-            if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_COMMIT
-                    1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                        dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
-                        EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
-                    )
-                else
-                    1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
-                    )
-                end
-            else
-                (dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]) /
-                ModelScalingFactor^2
-            end
-        )
-    else
-        # Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
-        # If resource is not eligible for new capacity, fixed costs are only O&M costs
-        @expression(
-            EP,
-            eH2GenCFix[k in 1:H],
-            if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_COMMIT
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                    dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
-                    EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
-                else
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
-                end
-            else
-                dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
-            end
-        )
-    end
-
-    # Calculate total costs for each zone, for each gen type
-    @expression(EP, eTotalH2GenCFix, sum_expression(EP[:eH2GenCFix][H2_GEN]))
+    # Fixed costs for resource "y" = annuitized investment cost plus fixed O&M costs
+    # If resource is not eligible for new capacity, fixed costs are only O&M costs
+    # eH2GenCFix = h2_invest_fixed_cost!(EP, vH2GenNewCap, eH2GenTotalCap, setup["ModelH2Liquid"], inputs, dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr], dfH2Gen[!, :Cap_Size_tonne_p_hr], dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr], SCALING)   
+    eH2GenCFix = h2_invest_fixed_cost!(EP, vH2GenNewCap, eH2GenTotalCap, H, H2_GEN, H2_GEN_NEW_CAP, H2_COMMIT, dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr], dfH2Gen[!, :Cap_Size_tonne_p_hr], dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr], SCALING)   
 
     # Adding conditional for when liquefaction is considered
-    if setup["ModelH2Liquid"] ==1
-        @expression(EP, eTotalH2LiqCFix, sum_expression(EP[:eH2GenCFix][union(H2_LIQ, H2_EVAP)]))
-        add_similar_to_expression!(EP[:eObj], eTotalH2LiqCFix)
+    # FIX ME: Should this be added to eTotalH2GenCFix?
+    if setup["ModelH2Liquid"] == 1
+        h2_liq_invest_fixed_cost!(EP, eH2GenCFix, H2_LIQ, H2_EVAP)
     end
-
-    # Add term to objective function expression
-    add_similar_to_expression!(EP[:eObj], eTotalH2GenCFix)
     
 
     return EP
 
+end
+
+function calc_h2_gen_totalcap!(EP::Model, H2_RES::Int, H2_GEN_NEW_CAP::Vector{Int}, H2_GEN_RET_CAP::Vector{Int}, H2_COMMIT::Vector{Int}, existing_cap::Vector{<:Real}, cap_size::Vector{<:Real})
+    
+    canBuild_canRetire = intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP)
+    canBuild_noRetire = setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP)
+    noBuild_canRetire = setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP)
+
+    eH2GenTotalCap = create_empty_expression(H2_RES)
+    @inbounds for k in 1:H2_RES
+        if k in canBuild_canRetire # Resources eligible for new capacity and retirements
+            if k in H2_COMMIT
+                eH2GenTotalCap[k] = existing_cap[k] + cap_size[k] * (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
+            else
+                eH2GenTotalCap[k] = existing_cap[k] + EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k]
+            end
+        elseif k in canBuild_noRetire # Resources eligible for only new capacity
+            if k in H2_COMMIT
+                eH2GenTotalCap[k] = existing_cap[k] + cap_size[k] * EP[:vH2GenNewCap][k]
+            else
+                eH2GenTotalCap[k] = existing_cap[k] + EP[:vH2GenNewCap][k]
+            end
+        elseif k in noBuild_canRetire # Resources eligible for only capacity retirements
+            if k in H2_COMMIT
+                eH2GenTotalCap[k] = existing_cap[k] - cap_size[k] * EP[:vH2GenRetCap][k]
+            else
+                eH2GenTotalCap[k] = existing_cap[k] - EP[:vH2GenRetCap][k]
+            end
+        else
+            # Resources not eligible for new capacity or retirements
+            eH2GenTotalCap[k] = existing_cap[k]
+        end
+    end
+    EP[:eH2GenTotalCap] = eH2GenTotalCap
+    return eH2GenTotalCap
+end
+
+# function calc_eH2GenCFix(EP::Model, vH2GenNewCap::AbstractArray{VariableRef}, eH2GenTotalCap::AbstractArray{AffExpr}, H2_RES::Int, H2_GEN_NEW_CAP::Vector{Int}, H2_COMMIT::Vector{Int}, inv_cost::Vector{<:Real}, cap_size::Vector{<:Real}, fom_cost::Vector{<:Real}, scaling::Float64)
+#     @expression(
+#     EP,
+#     eH2GenCFix[k in 1:H2_RES],
+#     if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
+#         if k in H2_COMMIT
+#             (
+#                 inv_cost[k] * cap_size[k] * vH2GenNewCap[k]
+#                 + fom_cost[k] * eH2GenTotalCap[k]
+#             ) / scaling^2
+#         else
+#             (
+#                 inv_cost[k] * vH2GenNewCap[k]
+#                 + fom_cost[k] * eH2GenTotalCap[k]
+#             ) / scaling^2
+#         end
+#     else
+#         fom_cost[k] * eH2GenTotalCap[k] / scaling^2
+#     end
+#     )
+#     return eH2GenCFix
+# end
+
+function calc_eH2GenCFix(EP::Model, vH2GenNewCap::AbstractArray{VariableRef}, eH2GenTotalCap::AbstractArray{AffExpr}, H2_RES::Int, H2_GEN_NEW_CAP::Vector{Int}, H2_COMMIT::Vector{Int}, inv_cost::Vector{<:Real}, cap_size::Vector{<:Real}, fom_cost::Vector{<:Real}, scaling::Float64)
+#     eH2GenCFix = create_empty_expression(H2_RES)
+#     @inbounds for k in 1:H2_RES
+#         if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
+#             if k in H2_COMMIT
+#                 eH2GenCFix[k] = (
+#                     inv_cost[k] * cap_size[k] * vH2GenNewCap[k]
+#                     + fom_cost[k] * eH2GenTotalCap[k]
+#                 ) / scaling^2
+#             else
+#                 eH2GenCFix[k] = (
+#                     inv_cost[k] * vH2GenNewCap[k]
+#                     + fom_cost[k] * eH2GenTotalCap[k]
+#                 ) / scaling^2
+#             end
+#         else
+#             eH2GenCFix[k] = fom_cost[k] * eH2GenTotalCap[k] / scaling^2
+#         end
+#     end
+#     EP[:eH2GenCFix] = eH2GenCFix
+# end
+    @expression(
+    EP,
+    eH2GenCFix[k in 1:H2_RES],
+    if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
+        if k in H2_COMMIT
+            (
+                inv_cost[k] * cap_size[k] * vH2GenNewCap[k]
+                + fom_cost[k] * eH2GenTotalCap[k]
+            ) / scaling^2
+        else
+            (
+                inv_cost[k] * vH2GenNewCap[k]
+                + fom_cost[k] * eH2GenTotalCap[k]
+            ) / scaling^2
+        end
+    else
+        fom_cost[k] * eH2GenTotalCap[k] / scaling^2
+    end
+    )
+    return eH2GenCFix
+end
+
+function h2_liq_invest_fixed_cost!(EP::Model, eH2GenCFix::AbstractArray{AffExpr}, H2_LIQ::Vector{Int}, H2_EVAP::Vector{Int})
+    eTotalH2LiqCFix = sum_expression(eH2GenCFix[union(H2_LIQ, H2_EVAP)])
+    EP[:eTotalH2LiqCFix] = eTotalH2LiqCFix
+    add_similar_to_expression!(EP[:eObj], eTotalH2LiqCFix)
+    return eTotalH2LiqCFix
+end
+
+# function h2_invest_fixed_cost!(EP::Model, vH2GenNewCap::AbstractArray{VariableRef}, eH2GenTotalCap::AbstractArray{AffExpr}, include_h2_liquid::Int, inputs::Dict, inv_cost::Vector{<:Real}, cap_size::Vector{<:Real}, fom_cost::Vector{<:Real}, scaling::Float64)
+function h2_invest_fixed_cost!(EP::Model, vH2GenNewCap::AbstractArray{VariableRef}, eH2GenTotalCap::AbstractArray{AffExpr}, H2_RES::Int, H2_GEN::Vector{<:Int}, H2_GEN_NEW_CAP::Vector{<:Int}, H2_COMMIT::Vector{<:Int}, inv_cost::Vector{<:Real}, cap_size::Vector{<:Real}, fom_cost::Vector{<:Real}, scaling::Float64)
+
+    eH2GenCFix = calc_eH2GenCFix(EP, vH2GenNewCap, eH2GenTotalCap, H2_RES, H2_GEN_NEW_CAP, H2_COMMIT, inv_cost, cap_size, fom_cost, scaling)
+
+    # Calculate total costs for each zone, for each gen type
+    eTotalH2GenCFix = sum_expression(eH2GenCFix[H2_GEN])
+    EP[:eTotalH2GenCFix] = eTotalH2GenCFix
+
+    # # Adding conditional for when liquefaction is considered
+    # # FIX ME: Should this be added to eTotalH2GenCFix?
+    # if include_h2_liquid == 1
+    #     h2_liq_invest_fixed_cost!(EP, eH2GenCFix, H2_LIQ, H2_EVAP)
+    # end
+
+    # Add term to objective function expression
+    add_similar_to_expression!(EP[:eObj], eTotalH2GenCFix)
+
+    return eH2GenCFix    
 end
