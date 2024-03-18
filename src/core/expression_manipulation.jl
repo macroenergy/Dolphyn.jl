@@ -2,12 +2,22 @@
 # Create dense arrays of expressions filled with zeros to be added to later
 ###### ###### ###### ###### ###### ######
 
+function create_empty_expression(dims::Int64)
+    return Vector{AffExpr}(undef, dims)
+end
+
 function create_empty_expression(dims::NTuple{N, Int64}) where N
     return Array{AffExpr}(undef, dims)
 end
 
 function create_empty_expression(dims::Vector{Int64})
     return Array{AffExpr}(undef, dims...)
+end
+
+function create_empty_expression!(EP::Model, exprname::Symbol, dims::Int64)
+    temp = Vector{AffExpr}(undef, dims)
+    EP[exprname] = temp
+    return nothing
 end
 
 function create_empty_expression!(EP::Model, exprname::Symbol, dims::NTuple{N, Int64}) where N
