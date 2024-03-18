@@ -147,8 +147,8 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     print_and_log("H2 Production (Unit Commitment) Module")
     
     # Rename H2Gen dataframe
-    dfH2Gen = inputs["dfH2Gen"]
-    H2GenCommit = setup["H2GenCommit"]
+    dfH2Gen = inputs["dfH2Gen"]::DataFrame
+    H2GenCommit = setup["H2GenCommit"]::Int64
 
     T = inputs["T"]::Int64     # Number of time steps (hours)
     Z = inputs["Z"]::Int64     # Number of zones
@@ -233,24 +233,8 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     end)
 
     ### Maximum ramp up and down between consecutive hours (Constraints #5-6)
-    
-    ramp_up_cap, min_output, max_min_up, max_min_up_start = prep_ramp_limits(dfH2Gen, dfH2Gen[!,:Ramp_Up_Percentage], inputs["pH2_Max"], H2_GEN_COMMIT, START_SUBPERIODS, INTERIOR_SUBPERIODS)
-    ramp_down_cap, min_output, max_min_down, max_min_down_start = prep_ramp_limits(dfH2Gen, dfH2Gen[!,:Ramp_Up_Percentage], inputs["pH2_Max"], H2_GEN_COMMIT, START_SUBPERIODS, INTERIOR_SUBPERIODS)
-
-    ## For Start Hours
-    # Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
-    # rampup constraints
-    h2_prod_commit_ramp_up!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, START_SUBPERIODS, ramp_up_cap, min_output, max_min_up_start, hours_per_subperiod)
-
-    # rampdown constraints
-    h2_prod_commit_ramp_down!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, START_SUBPERIODS, ramp_down_cap, min_output, max_min_down_start, hours_per_subperiod)
-
-    ## For Interior Hours
-    # rampup constraints
-    h2_prod_commit_ramp_up!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, INTERIOR_SUBPERIODS, ramp_up_cap, min_output, max_min_up, 0)
-
-    # rampdown constraints
-    h2_prod_commit_ramp_down!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, INTERIOR_SUBPERIODS, ramp_down_cap, min_output, max_min_down, 0)
+    h2_prod_commit_ramp_up!(EP, dfH2Gen, inputs["pH2_Max"], H2_GEN_COMMIT, START_SUBPERIODS, INTERIOR_SUBPERIODS, hours_per_subperiod)
+    h2_prod_commit_ramp_down!(EP, dfH2Gen, inputs["pH2_Max"], H2_GEN_COMMIT, START_SUBPERIODS, INTERIOR_SUBPERIODS, hours_per_subperiod)
 
     @constraints(EP, begin
         # Minimum stable generated per technology "k" at hour "t" > = Min stable output level
@@ -468,7 +452,19 @@ function h2_prod_commit_downtime_start!(EP::Model, y::Int, t::Int, vH2GenCOMMIT_
     return nothing
 end
 
-function h2_prod_commit_ramp_up!(EP::Model, vH2Gen::AbstractArray{VariableRef}, vH2GenCOMMIT::AbstractArray{VariableRef}, vH2GenStart::AbstractArray{VariableRef}, vH2GenShut::AbstractArray{VariableRef}, H2_GEN_COMMIT::Array{Int64,1}, time_steps::AbstractArray{Int64}, ramp_up_cap::Dict{Int64,Float64}, min_output::Dict{Int64,Float64}, max_min::Dict{Tuple{Int64,Int64},Float64}, t_shift::Int64=0)
+function h2_prod_commit_ramp_up!(EP::Model, dfH2Gen::DataFrame, pH2_Max::AbstractArray{Float64}, H2_GEN_COMMIT::Array{Int64,1}, START_SUBPERIODS::StepRange{Int64, Int64}, INTERIOR_SUBPERIODS::Array{Int64,1}, hours_per_subperiod::Int64)
+    ramp_up_cap, min_output, max_min_up, max_min_up_start = prep_ramp_up_coeff(dfH2Gen, dfH2Gen[!,:Ramp_Up_Percentage], pH2_Max, H2_GEN_COMMIT, START_SUBPERIODS, INTERIOR_SUBPERIODS)
+    h2_prod_commit_ramp_up_constraint!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, START_SUBPERIODS, ramp_up_cap, min_output, max_min_up_start, hours_per_subperiod)
+    h2_prod_commit_ramp_up_constraint!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, INTERIOR_SUBPERIODS, ramp_up_cap, min_output, max_min_up, 0)
+end
+
+function h2_prod_commit_ramp_down!(EP::Model, dfH2Gen::DataFrame, pH2_Max::AbstractArray{Float64}, H2_GEN_COMMIT::Array{Int64,1}, START_SUBPERIODS::StepRange{Int64, Int64}, INTERIOR_SUBPERIODS::Array{Int64,1}, hours_per_subperiod::Int64)
+    ramp_down_cap, min_output, max_min_down, max_min_down_start = prep_ramp_down_coeff(dfH2Gen, dfH2Gen[!,:Ramp_Down_Percentage], pH2_Max, H2_GEN_COMMIT, START_SUBPERIODS, INTERIOR_SUBPERIODS)
+    h2_prod_commit_ramp_down_constraint!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, START_SUBPERIODS, ramp_down_cap, min_output, max_min_down_start, hours_per_subperiod)
+    h2_prod_commit_ramp_down_constraint!(EP, EP[:vH2Gen], EP[:vH2GenCOMMIT], EP[:vH2GenStart], EP[:vH2GenShut], H2_GEN_COMMIT, INTERIOR_SUBPERIODS, ramp_down_cap, min_output, max_min_down, 0)
+end
+
+function h2_prod_commit_ramp_up_constraint!(EP::Model, vH2Gen::AbstractArray{VariableRef}, vH2GenCOMMIT::AbstractArray{VariableRef}, vH2GenStart::AbstractArray{VariableRef}, vH2GenShut::AbstractArray{VariableRef}, H2_GEN_COMMIT::Array{Int64,1}, time_steps::AbstractArray{Int64}, ramp_up_cap::Dict{Int64,Float64}, min_output::Dict{Int64,Float64}, max_min::Dict{Tuple{Int64,Int64},Float64}, t_shift::Int64=0)
     @inbounds for t in time_steps
         t_mod = t+t_shift-1
         @inbounds for k in H2_GEN_COMMIT
@@ -484,7 +480,7 @@ function h2_prod_commit_ramp_up!(EP::Model, vH2Gen::AbstractArray{VariableRef}, 
     end
 end
 
-function h2_prod_commit_ramp_down!(EP::Model, vH2Gen::AbstractArray{VariableRef}, vH2GenCOMMIT::AbstractArray{VariableRef}, vH2GenStart::AbstractArray{VariableRef}, vH2GenShut::AbstractArray{VariableRef}, H2_GEN_COMMIT::Array{Int64,1}, time_steps::AbstractArray{Int64}, ramp_down_cap::Dict{Int64,Float64}, min_output::Dict{Int64,Float64}, max_min::Dict{Tuple{Int64,Int64},Float64}, t_shift::Int64=0)
+function h2_prod_commit_ramp_down_constraint!(EP::Model, vH2Gen::AbstractArray{VariableRef}, vH2GenCOMMIT::AbstractArray{VariableRef}, vH2GenStart::AbstractArray{VariableRef}, vH2GenShut::AbstractArray{VariableRef}, H2_GEN_COMMIT::Array{Int64,1}, time_steps::AbstractArray{Int64}, ramp_down_cap::Dict{Int64,Float64}, min_output::Dict{Int64,Float64}, max_min::Dict{Tuple{Int64,Int64},Float64}, t_shift::Int64=0)
     @inbounds for t in time_steps
         t_mod = t+t_shift-1
         @inbounds for k in H2_GEN_COMMIT
@@ -493,14 +489,14 @@ function h2_prod_commit_ramp_down!(EP::Model, vH2Gen::AbstractArray{VariableRef}
             - vH2Gen[k,t] 
             <=
             + ramp_down_cap[k] * vH2GenCOMMIT[k,t]
-            + max_min[k,t] * vH2GenStart[k,t]
-            - min_output[k] * vH2GenShut[k,t]
+            + max_min[k,t] * vH2GenShut[k,t]
+            - min_output[k] * vH2GenStart[k,t]
             )
         end
     end
 end
 
-function prep_ramp_limits(dfH2Gen::DataFrame, ramp_percent::AbstractArray{Float64}, pH2_Max::AbstractArray{Float64}, H2_GEN_COMMIT::Vector{Int64}, START_SUBPERIODS::OrdinalRange{Int64, Int64}, INTERIOR_SUBPERIODS::Vector{Int64})
+function prep_ramp_up_coeff(dfH2Gen::DataFrame, ramp_percent::AbstractArray{Float64}, pH2_Max::AbstractArray{Float64}, H2_GEN_COMMIT::Vector{Int64}, START_SUBPERIODS::AbstractArray{Int64}, INTERIOR_SUBPERIODS::Vector{Int64})
     cap_size = dfH2Gen[!,:Cap_Size_tonne_p_hr]::Array{Float64,1}
     h2Gen_min_output = dfH2Gen[!,:H2Gen_min_output]::Array{Float64,1}
 
@@ -515,27 +511,48 @@ function prep_ramp_limits(dfH2Gen::DataFrame, ramp_percent::AbstractArray{Float6
         min_output[k] = h2Gen_min_output[k] * cap_size[k]
     end
 
-    max_min_start = prep_max_min_lim(max_ramp_or_min_output, cap_size, pH2_Max, ramp_cap, H2_GEN_COMMIT, START_SUBPERIODS)
-    max_min = prep_max_min_lim(max_ramp_or_min_output, cap_size, pH2_Max, ramp_cap, H2_GEN_COMMIT, INTERIOR_SUBPERIODS)
+    max_min_start = h2_prod_ramp_up_start_coeff(max_ramp_or_min_output, cap_size, pH2_Max, ramp_cap, H2_GEN_COMMIT, START_SUBPERIODS)
+    max_min = h2_prod_ramp_up_start_coeff(max_ramp_or_min_output, cap_size, pH2_Max, ramp_cap, H2_GEN_COMMIT, INTERIOR_SUBPERIODS)
 
     return ramp_cap, min_output, max_min, max_min_start
 end
 
-function prep_max_min_lim(max_ramp_or_min_output::Dict{Int64,Float64}, cap_size::AbstractArray{Float64},  pH2_Max::AbstractArray{Float64}, ramp_up_cap::Dict{Int64,Float64}, H2_GEN_COMMIT::Vector{Int64}, time_steps::OrdinalRange{Int64, Int64})
+function prep_ramp_down_coeff(dfH2Gen::DataFrame, ramp_percent::AbstractArray{Float64}, pH2_Max::AbstractArray{Float64}, H2_GEN_COMMIT::Vector{Int64}, START_SUBPERIODS::AbstractArray{Int64}, INTERIOR_SUBPERIODS::Vector{Int64})
+    cap_size = dfH2Gen[!,:Cap_Size_tonne_p_hr]::Array{Float64,1}
+    h2Gen_min_output = dfH2Gen[!,:H2Gen_min_output]::Array{Float64,1}
+
+    ramp_cap = Dict{Int64,Float64}()
+    max_ramp_or_min_output = Dict{Int64,Float64}()
+    min_output = Dict{Int64,Float64}()
+    max_min = Dict{Tuple{Int64,Int64},Float64}()
+
+    @inbounds for k in H2_GEN_COMMIT
+        ramp_cap[k] = ramp_percent[k] * cap_size[k]
+        max_ramp_or_min_output[k] = max(h2Gen_min_output[k], ramp_percent[k])
+        min_output[k] = h2Gen_min_output[k] * cap_size[k] + ramp_cap[k]
+    end
+
+    max_min_start = h2_prod_ramp_down_start_coeff(max_ramp_or_min_output, cap_size, pH2_Max, ramp_cap, H2_GEN_COMMIT, START_SUBPERIODS)
+    max_min = h2_prod_ramp_down_start_coeff(max_ramp_or_min_output, cap_size, pH2_Max, ramp_cap, H2_GEN_COMMIT, INTERIOR_SUBPERIODS)
+
+    return ramp_cap, min_output, max_min, max_min_start
+end
+
+function h2_prod_ramp_up_start_coeff(max_ramp_or_min_output::Dict{Int64,Float64}, cap_size::AbstractArray{Float64},  pH2_Max::AbstractArray{Float64}, ramp_cap::Dict{Int64,Float64}, H2_GEN_COMMIT::Vector{Int64}, time_steps::AbstractArray{Int64})
     max_min = Dict{Tuple{Int64,Int64},Float64}()
     @inbounds for t in time_steps
         @inbounds for k in H2_GEN_COMMIT
-            max_min[(k,t)] = min(pH2_Max[k,t], max_ramp_or_min_output[k]) * cap_size[k] - ramp_up_cap[k]
+            max_min[(k,t)] = min(pH2_Max[k,t], max_ramp_or_min_output[k]) * cap_size[k] - ramp_cap[k]
         end
     end
     return max_min
 end
 
-function prep_max_min_lim(max_ramp_or_min_output::Dict{Int64,Float64}, cap_size::AbstractArray{Float64},  pH2_Max::AbstractArray{Float64}, ramp_up_cap::Dict{Int64,Float64}, H2_GEN_COMMIT::Vector{Int64}, time_steps::Vector{Int64})
+function h2_prod_ramp_down_start_coeff(max_ramp_or_min_output::Dict{Int64,Float64}, cap_size::AbstractArray{Float64},  pH2_Max::AbstractArray{Float64}, ramp_cap::Dict{Int64,Float64}, H2_GEN_COMMIT::Vector{Int64}, time_steps::AbstractArray{Int64})
     max_min = Dict{Tuple{Int64,Int64},Float64}()
     @inbounds for t in time_steps
         @inbounds for k in H2_GEN_COMMIT
-            max_min[(k,t)] = min(pH2_Max[k,t], max_ramp_or_min_output[k]) * cap_size[k] - ramp_up_cap[k]
+            max_min[(k,t)] = min(pH2_Max[k,t], max_ramp_or_min_output[k]) * cap_size[k]
         end
     end
     return max_min

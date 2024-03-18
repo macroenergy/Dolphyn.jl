@@ -25,15 +25,18 @@ function compare_results(
     output_filename::AbstractString = "summary.txt",
 )
     ## Check that the paths are valid
+    println("Comparing the following folders:\nFolder 1: $path1\nFolder 2: $path2\n")
     if !isdir(path1) || !isdir(path2) || path1 == path2
         println("One or Both of the Paths Doesn't Exist or They are the Same")
     else
         lines_to_write, identical_structure, identical_contents = compare_dir(path1, path2)
         if identical_structure
-            println("Structure of $path1 and $path2 is Identical")
+            println("Structure of folder 1 and folder 2 are identical")
         end
         if identical_contents
-            println("Contents of $path1 and $path2 is Identical")
+            println("Contents of folder 1 and folder 2 are identical")
+        else
+            println("Contents of folder 1 and folder 2 are different")
         end
         if !identical_structure || !identical_contents
             print_comparison(lines_to_write, output_filename)

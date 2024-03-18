@@ -113,7 +113,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     end
 
     #Power Consumption for H2 Generation
-    h2_prod_nocommit_power_consumption!(EP, T, Z, EP[:vP2G], H2_GEN_NO_COMMIT, dfH2Gen)
+    h2_prod_nocommit_power_consumption!(EP, T, Z, EP[:vP2G], H2_GEN_NO_COMMIT, dfH2Gen, SCALING)
     
     ###Constraints###
     # Power and natural gas consumption associated with H2 generation in each time step
@@ -201,7 +201,7 @@ function h2_prod_nocommit_h2_evap_balance!(EP::Model, T::Int, Z::Int, vH2Gen::Ab
      add_similar_to_expression!(EP[:eH2LiqBalance], -eH2EvapNoCommit)
 end
 
-function h2_prod_nocommit_power_consumption!(EP::Model, T::Int, Z::Int, vP2G::AbstractArray{VariableRef}, H2_GEN_NO_COMMIT::Vector{Int64}, dfH2Gen::DataFrame)
+function h2_prod_nocommit_power_consumption!(EP::Model, T::Int, Z::Int, vP2G::AbstractArray{VariableRef}, H2_GEN_NO_COMMIT::Vector{Int64}, dfH2Gen::DataFrame, scaling::Float64=1.0)
     # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
     # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
     ePowerBalanceH2GenNoCommit = create_empty_expression((T,Z))
@@ -209,7 +209,7 @@ function h2_prod_nocommit_power_consumption!(EP::Model, T::Int, Z::Int, vP2G::Ab
         zone_set = dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]
         gen_set = intersect(H2_GEN_NO_COMMIT, zone_set)
         @inbounds for t = 1:T
-            ePowerBalanceH2GenNoCommit[t,z] = sum_expression(vP2G[gen_set,t] / ModelScalingFactor )
+            ePowerBalanceH2GenNoCommit[t,z] = sum_expression(vP2G[gen_set,t] / scaling )
         end
     end
     EP[:ePowerBalanceH2GenNoCommit] = ePowerBalanceH2GenNoCommit
