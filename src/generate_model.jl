@@ -92,6 +92,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
 
+    if setup["ModelCSC"] == 1
+        S = inputs["S"]     # Number of CO2 Storage Sites
+    end
+
     ## Start pre-solve timer
     presolver_start_time = time()
 
@@ -119,6 +123,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     if setup["ModelCSC"] == 1
         # Initialize CO2 Capture Balance Expression
 	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
+        @expression(EP, eCO2Store_Flow_Balance[t=1:T, z=1:S], 0) # Note this is indexed by the number of CO2 Storage Sites
     end
 
 
@@ -301,7 +306,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		
 		EP = co2_storage_investment(EP, inputs, setup)
 
-		if !isempty(inputs["CO2_STORAGE"])
+        if setup["ModelCO2Pipelines"] == 1
+			# model CO2 transmission via pipelines
+			EP = co2_pipeline(EP, inputs, setup)
+		end
+
+        if !isempty(inputs["CO2_STORAGE"])
 			#model CO2 injection
 			EP = co2_injection(EP, inputs, setup)
 		end
@@ -313,11 +323,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		if !isempty(inputs["CO2_CAPTURE_COMP"])
 			#model CO2 capture
 			EP = co2_capture_compression(EP, inputs, setup)
-		end
-
-		if setup["ModelCO2Pipelines"] == 1
-			# model CO2 transmission via pipelines
-			EP = co2_pipeline(EP, inputs, setup)
 		end
 
 		# Direct emissions of various carbon capture sector resources

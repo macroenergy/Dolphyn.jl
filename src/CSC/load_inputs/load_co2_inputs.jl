@@ -16,7 +16,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 
 @doc raw"""
-	load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
+    load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
@@ -27,6 +27,7 @@ path - string path to working directory
 
 returns: Dict (dictionary) object containing all data inputs of carbon supply chain.
 """
+
 function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config
@@ -48,6 +49,11 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	inputs = load_co2_storage(setup, path, sep, inputs)
 	inputs = load_co2_capture_compression(setup, path, sep, inputs)
 	inputs = load_co2_pipeline_data(setup, path, sep, inputs)
+
+	# Adding a new line over here to specify loading of exogeneous CO2 demand
+	if setup["Exogeneous_CO2_Demand"] == 1
+		inputs = load_co2_demand(setup, path, sep, inputs)
+	end
 	
 	println("CSC Input CSV Files Successfully Read In From $path$sep")
 
