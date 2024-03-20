@@ -90,3 +90,85 @@ function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any
         print_and_log("CSC and SF TDR not implemented.")
     end
 end
+
+function run_single_case()
+    return nothing
+end
+
+function benchmark_single_case(inputs_path::String, settings_path::String)
+    # Load settings
+    mysetup = load_settings(settings_path)
+
+    # Setup logging 
+    global_logger = setup_logging(mysetup)
+
+    # Setup time domain reduction and cluster inputs if necessary
+    setup_TDR(inputs_path, settings_path, mysetup)
+
+    ### Configure solver
+    print_and_log("Configuring Solver")
+
+    OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
+
+    ### Load inputs
+    myinputs = load_inputs(mysetup, inputs_path)
+
+    ### Load H2 inputs if modeling the hydrogen supply chain
+    if mysetup["ModelH2"] == 1
+        myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    ### Generate model
+    EP = generate_model(mysetup, myinputs, OPTIMIZER)
+
+    ### Solve model
+    EP, solve_time = solve_model(EP, mysetup)
+    myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
+
+    ### Write power system output
+
+    # print_and_log("Writing Output")
+    outpath = joinpath(inputs_path,"Results")
+    outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
+
+    # Write hydrogen supply chain outputs
+    # if mysetup["ModelH2"] == 1
+    write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
+    # end
+    return nothing
+    # return EP, mysetup, myinputs
+end
+
+function benchmark_generate_case(inputs_path::String, settings_path::String)
+    # Load settings
+    mysetup = load_settings(settings_path)
+
+    # Setup logging 
+    global_logger = setup_logging(mysetup)
+
+    # Setup time domain reduction and cluster inputs if necessary
+    setup_TDR(inputs_path, settings_path, mysetup)
+
+    # ### Configure solver
+    print_and_log("Configuring Solver")
+
+    OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
+
+    # ### Load inputs
+    myinputs = load_inputs(mysetup, inputs_path)
+
+    # ### Load H2 inputs if modeling the hydrogen supply chain
+    if mysetup["ModelH2"] == 1
+        myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    ### Generate model
+    EP, bm_results = @benchmarked generate_model($mysetup, $myinputs, $OPTIMIZER) seconds=30 samples=1000 evals=1
+
+    outpath = joinpath(inputs_path,"Results")
+
+    ## Generate csv file for  benchmark results if flag is set to be true
+    generate_benchmark_csv(outpath, bm_results)
+
+    return nothing
+end

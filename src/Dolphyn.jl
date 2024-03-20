@@ -38,6 +38,8 @@ export mga
 export h2_inherit_clusters
 export @benchmarked
 export generate_benchmark_csv 
+export benchmark_single_case
+export benchmark_generate_case
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
