@@ -57,14 +57,43 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
 
     #Identify electrolyzer resources - to include for eligibility in the Capacity Reserve Margin constraint
-    inputs_gen["H2_ELECTROLYZER"] = h2_gen_in[(h2_gen_in.etaP2G_MWh_p_tonne.>0) .& (h2_gen_in.etaFuel_MMBtu_p_tonne.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
-   
+    if "H2_Electrolyzer" in names(h2_gen_in)
+        H2_electrolyzer_declared = h2_gen_in[h2_gen_in.H2_Electrolyzer.==1,:R_ID]
+    else
+        H2_electrolyzer_declared = Int64[]
+    end
+    try
+        H2_Electrolyzer_infered = h2_gen_in[(h2_gen_in.etaP2G_MWh_p_tonne.>0) .& (h2_gen_in.etaFuel_MMBtu_p_tonne.==0) .& (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    catch
+        H2_Electrolyzer_infered = Int64[]
+    end
+    inputs_gen["H2_ELECTROLYZER"] = union(H2_electrolyzer_declared, H2_Electrolyzer_infered)
+
     #BLUE_H2
-    inputs_gen["BLUE_H2"] = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_tonne.>0) .& (h2_gen_in.CCS_Rate.>0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    if "Blue_H2" in names(h2_gen_in)
+        blue_h2_declared = h2_gen_in[h2_gen_in.Blue_H2.==1,:R_ID]
+    else
+        blue_h2_declared = Int64[]
+    end
+    try
+        blue_h2_infered = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_tonne.>0) .& (h2_gen_in.CCS_Rate.>0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    catch
+        blue_h2_infered = Int64[]
+    end
+    inputs_gen["BLUE_H2"] = union(blue_h2_declared, blue_h2_infered)
 
 	#GREY_H2
-    inputs_gen["GREY_H2"] = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_tonne.>0) .& (h2_gen_in.CCS_Rate.==0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
-
+    if "Grey_H2" in names(h2_gen_in)
+        grey_h2_declared = h2_gen_in[h2_gen_in.Grey_H2.==1,:R_ID]
+    else
+        grey_h2_declared = Int64[]
+    end
+    try
+        grey_h2_infered = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_tonne.>0) .& (h2_gen_in.CCS_Rate.==0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    catch
+        grey_h2_infered = Int64[]
+    end
+    inputs_gen["GREY_H2"] = union(grey_h2_declared, grey_h2_infered)
 
     # Defining whether H2 storage is modeled as long-duration (inter-period energy transfer allowed) or short-duration storage (inter-period energy transfer disallowed)
     inputs_gen["H2_STOR_LONG_DURATION"] = h2_gen_in[(h2_gen_in.LDS.==1) .& (h2_gen_in.H2_STOR.>=1),:R_ID]
