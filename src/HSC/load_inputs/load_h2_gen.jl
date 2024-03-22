@@ -52,6 +52,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     # H2_STOR = 1 : Charging and energy capacity sized and modeled but discharging capacity not sized or modeled. Mimicks gas storage
     inputs_gen["H2_STOR_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
     inputs_gen["H2_STOR_LIQ"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
+    inputs_gen["H2_STOR_UHS"] = h2_gen_in[h2_gen_in.H2_STOR.==3,:R_ID]
     #inputs_gen["H2_STOR_ASYMMETRIC"] = h2_gen_in[h2_gen_in.H2_STOR.==2,:R_ID]
     # DEV NOTE: Duplicated currently since we have only one storage option can define it as a union when we have more storage options
     inputs_gen["H2_STOR_ALL"] =  h2_gen_in[h2_gen_in.H2_STOR.>=1,:R_ID]
@@ -78,6 +79,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["NEW_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Charge_Cap_tonne_p_hr.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
     # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
     inputs_gen["RET_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Charge_Cap_tonne_p_hr.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
+
+    inputs_gen["NEW_CAP_H2_STOR_DISCHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_tonne_p_hr.!=0,:R_ID], inputs_gen["H2_STOR_UHS"])
+    inputs_gen["RET_CAP_H2_STOR_DISCHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_tonne_p_hr.>0,:R_ID], inputs_gen["H2_STOR_UHS"])
 
     # Set of H2 generation resources
     # Set of h2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["H2GenCommit"]

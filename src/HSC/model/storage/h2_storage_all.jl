@@ -119,6 +119,8 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     H2_STOR_LIQ = inputs["H2_STOR_LIQ"] # Set of all liquid storage resources
     H2_STOR_GAS = inputs["H2_STOR_GAS"] # Set of all gaseous storage resources
 
+    H2_STOR_UHS = inputs["H2_STOR_UHS"] # Set of underground H2 storage resources
+
     Z = inputs["Z"]     # Number of zones
     T = inputs["T"] # Number of time steps (hours) 
       
@@ -228,10 +230,17 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
 
 
     # Hydrogen storage discharge and charge power (and reserve contribution) related constraints for symmetric storage resources:
+    
     # Maximum charging rate must be less than charge power rating
     @constraint(EP,
         [y in H2_STOR_ALL, t in 1:T],
         EP[:vH2_CHARGE_STOR][y, t] <= EP[:eTotalH2CapCharge][y]
+    )
+
+    # Maximum discharge rate
+    @constraint(EP,
+        [y in H2_STOR_UHS, t in 1:T],
+        EP[:vH2Gen][y, t] <= EP[:eTotalH2CapDischarge][y]
     )
 
     ### End Constraints ###
