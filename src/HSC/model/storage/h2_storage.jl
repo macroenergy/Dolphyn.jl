@@ -32,6 +32,9 @@ function h2_storage(EP::Model, inputs::Dict, setup::Dict)
         #  Investment corresponding to charging component of storage (e.g. Liquefier, compressor)
         EP = h2_storage_investment_charge(EP, inputs, setup)
 
+        #  Investment corresponding to discharging component of storage (only for underground hydrogen storage)
+        EP = h2_storage_investment_discharge(EP, inputs, setup)
+
         # Operating variables, expressions and constraints related to H2 storage
         # Applies to all H2 storage resources
         EP = h2_storage_all(EP, inputs, setup)
