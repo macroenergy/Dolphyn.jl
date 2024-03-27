@@ -278,6 +278,10 @@ function sum_expression(expr::Base.Generator{C,T})::AffExpr where {C,T}
     return total
 end
 
+function sum_expression(expr::AffExpr)::AffExpr
+    return expr
+end
+
 # function sum_expression(expr::Base.Generator{C,T})::AffExpr where {C,T}
 #     total = AffExpr(0.0)
 #     foreach(expr) do e::Union{AffExpr, VariableRef}

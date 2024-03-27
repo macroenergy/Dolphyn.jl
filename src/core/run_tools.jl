@@ -95,7 +95,7 @@ function run_single_case()
     return nothing
 end
 
-function benchmark_single_case(inputs_path::String, settings_path::String)
+function benchmark_single_case(inputs_path::String, settings_path::String, return_results::Bool=false)
     # Load settings
     mysetup = load_settings(settings_path)
 
@@ -135,8 +135,11 @@ function benchmark_single_case(inputs_path::String, settings_path::String)
     # if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
     # end
-    return nothing
-    # return EP, mysetup, myinputs
+    if return_results
+        return EP, mysetup, myinputs
+    else
+        return nothing
+    end
 end
 
 function benchmark_generate_case(inputs_path::String, settings_path::String)
