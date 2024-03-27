@@ -166,6 +166,7 @@ function benchmark_generate_case(inputs_path::String, settings_path::String)
     EP, bm_results = @benchmarked generate_model($mysetup, $myinputs, $OPTIMIZER) seconds=30 samples=1000 evals=1
 
     outpath = joinpath(inputs_path,"Results")
+    mkpath(outpath)
 
     ## Generate csv file for  benchmark results if flag is set to be true
     generate_benchmark_csv(outpath, bm_results)
