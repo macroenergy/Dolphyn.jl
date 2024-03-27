@@ -9,7 +9,7 @@ function write_net_revenue(path::AbstractString, inputs::Dict, setup::Dict, EP::
 	Z = inputs["Z"]::Int     			# Number of zones
 	G = inputs["G"]::Int     			# Number of generators
 	COMMIT = inputs["COMMIT"]		# Thermal units for unit commitment
-	STOR_ALL = inputs["STOR_ALL"]
+	STOR_ALL = inputs["STOR_ALL"]::Vector{<:Int}
 
 	# Create a NetRevenue dataframe
  	dfNetRevenue = DataFrame(region = dfGen[!,:region], Resource = inputs["RESOURCES"], zone = dfGen[!,:Zone], Cluster = dfGen[!,:cluster], R_ID = dfGen[!,:R_ID])

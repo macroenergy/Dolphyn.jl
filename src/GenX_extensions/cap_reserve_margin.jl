@@ -41,18 +41,18 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 	T = inputs["T"]::Int     # Number of time steps (hours)
 	Z = inputs["Z"]::Int     # Number of zonests
 	L = inputs["L"] # Number of lines
-	THERM_ALL = inputs["THERM_ALL"]
-	VRE = inputs["VRE"]
-	HYDRO_RES = inputs["HYDRO_RES"]
+	THERM_ALL = inputs["THERM_ALL"]::Vector{<:Int}
+	VRE = inputs["VRE"]::Vector{<:Int}
+	HYDRO_RES = inputs["HYDRO_RES"]::Vector{<:Int}
 	# VRE_HYDRO_RES = union(inputs["HYDRO_RES"],inputs["VRE"])
-	STOR_ALL = inputs["STOR_ALL"]
-	FLEX = inputs["FLEX"]
+	STOR_ALL = inputs["STOR_ALL"]::Vector{<:Int}
+	FLEX = inputs["FLEX"]::Vector{<:Int}
 
 	if setup["ModelH2"] == 1
 
-		dfH2Gen = inputs["dfH2Gen"]
-		H2_GEN = inputs["H2_GEN"]
-		H2_ELECTROLYZER = inputs["H2_ELECTROLYZER"]
+		dfH2Gen = inputs["dfH2Gen"]::DataFrame
+		H2_GEN = inputs["H2_GEN"]::Vector{<:Int}
+		H2_ELECTROLYZER = inputs["H2_ELECTROLYZER"]::Vector{<:Int}
 		
 		if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
 			@expression(EP, eP2G[k = H2_GEN, t = 1:T], EP[:vP2G][k,t]/ModelScalingFactor) 
@@ -62,8 +62,8 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 
 		if setup["ModelH2G2P"] == 1
 			
-			dfH2G2P = inputs["dfH2G2P"]
-			H2_G2P_ALL = inputs["H2_G2P_ALL"]
+			dfH2G2P = inputs["dfH2G2P"]::DataFrame
+			H2_G2P_ALL = inputs["H2_G2P_ALL"]::Int
 
 			if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
 				@expression(EP, ePG2P[k = 1:H2_G2P_ALL, t = 1:T], EP[:vPG2P][k,t]/ModelScalingFactor) 

@@ -79,8 +79,8 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	T = inputs["T"]::Int     # Number of time steps (hours)
 	Z = inputs["Z"]::Int     # Number of zones
 	#H = inputs["H2_RES_ALL"]::Int #Number of Hydrogen gen units
-	H2_GEN = inputs["H2_GEN"]
-	dfH2Gen = inputs["dfH2Gen"]
+	H2_GEN = inputs["H2_GEN"]::Vector{<:Int}
+	dfH2Gen = inputs["dfH2Gen"]::DataFrame
 
 	# Identify number of time matching requirements
 	nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))

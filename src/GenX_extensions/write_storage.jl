@@ -7,9 +7,9 @@ function write_storage(path::AbstractString, inputs::Dict,setup::Dict, EP::Model
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]::Int     # Number of time steps (hours)
 	G = inputs["G"]::Int
-	STOR_ALL = inputs["STOR_ALL"]
-	HYDRO_RES = inputs["HYDRO_RES"]
-	FLEX = inputs["FLEX"]
+	STOR_ALL = inputs["STOR_ALL"]::Vector{<:Int}
+	HYDRO_RES = inputs["HYDRO_RES"]::Vector{<:Int}
+	FLEX = inputs["FLEX"]::Vector{<:Int}
 	# Storage level (state of charge) of each resource in each time step
 	dfStorage = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone])
 	storagevcapvalue = zeros(G,T)

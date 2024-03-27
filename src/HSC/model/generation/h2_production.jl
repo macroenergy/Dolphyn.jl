@@ -1,18 +1,4 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
+
 
 @doc raw"""
     h2_production(EP::Model, inputs::Dict, setup::Dict)
@@ -34,10 +20,10 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
         H2_GEN_COMMIT = union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
         H2_GEN_NO_COMMIT = union(inputs["H2_GEN_NO_COMMIT"], inputs["H2_LIQ_NO_COMMIT"], inputs["H2_EVAP_NO_COMMIT"])
     else
-        H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+        H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]::Vector{<:Int}
         H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
     end
-    dfH2Gen = inputs["dfH2Gen"]  # Input H2 generation and storage data
+    dfH2Gen = inputs["dfH2Gen"]::DataFrame  # Input H2 generation and storage data
     Z = inputs["Z"]::Int  # Model demand zones - assumed to be same for H2 and electricity
     T = inputs["T"]::Int     # Model operating time steps
 

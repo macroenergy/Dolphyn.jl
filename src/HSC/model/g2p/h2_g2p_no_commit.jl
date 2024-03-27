@@ -1,18 +1,4 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
+
 
 @doc raw"""
     h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
@@ -64,13 +50,13 @@ When not modeling regulation and reserves, hydrogen units not subject to unit co
 function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
     #Rename H2Gen dataframe
-    dfH2G2P = inputs["dfH2G2P"]
+    dfH2G2P = inputs["dfH2G2P"]::DataFrame
 
     T = inputs["T"]::Int     # Number of time steps (hours)
     Z = inputs["Z"]::Int     # Number of zones
     H = inputs["H2_G2P"]        #NUmber of hydrogen generation units 
     
-    H2_G2P_NO_COMMIT = inputs["H2_G2P_NO_COMMIT"]
+    H2_G2P_NO_COMMIT = inputs["H2_G2P_NO_COMMIT"]::Vector{<:Int}
     
     #Define start subperiods and interior subperiods
     START_SUBPERIODS = inputs["START_SUBPERIODS"]

@@ -7,7 +7,7 @@ function write_energy_revenue(path::AbstractString, inputs::Dict, setup::Dict, E
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]::Int     # Number of time steps (hours)
-	FLEX = inputs["FLEX"]
+	FLEX = inputs["FLEX"]::Vector{<:Int}
 	NONFLEX = setdiff(collect(1:G), FLEX)
 	dfEnergyRevenue = DataFrame(Region = dfGen.region, Resource = inputs["RESOURCES"], Zone = dfGen.Zone, Cluster = dfGen.cluster, AnnualSum = Array{Float64}(undef, G),)
 	energyrevenue = zeros(G, T)

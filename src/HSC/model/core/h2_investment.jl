@@ -1,19 +1,3 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
 @doc raw"""
     h2_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
@@ -74,12 +58,12 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
     print_and_log("Hydrogen Investment Discharge Module")
 
-    dfH2Gen = inputs["dfH2Gen"]
+    dfH2Gen = inputs["dfH2Gen"]::DataFrame
 
     # Define sets
     H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
-    H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+    H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]::Vector{<:Int}
     if setup["ModelH2Liquid"] ==1
         H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
         H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
@@ -89,7 +73,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     else
         H2_COMMIT = H2_GEN_COMMIT
     end
-    H2_GEN = inputs["H2_GEN"]
+    H2_GEN = inputs["H2_GEN"]::Vector{<:Int}
     H2_STOR_ALL = inputs["H2_STOR_ALL"]
     H = inputs["H2_RES_ALL"]::Int
 

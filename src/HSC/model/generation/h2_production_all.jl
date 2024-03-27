@@ -1,18 +1,4 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
+
 
 @doc raw"""
     h2_production_all(EP::Model, inputs::Dict, setup::Dict)
@@ -45,7 +31,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
     print_and_log("H2 Production Core Module")
     
-    dfH2Gen = inputs["dfH2Gen"]
+    dfH2Gen = inputs["dfH2Gen"]::DataFrame
 
     #Define sets
     if setup["ModelH2Liquid"] ==1
@@ -53,9 +39,9 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
         H2_GEN_COMMIT = union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
         H2_GEN = union(inputs["H2_GEN"], inputs["H2_LIQ"], inputs["H2_EVAP"])
     else
-        H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
+        H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]::Vector{<:Int}
         H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
-        H2_GEN = inputs["H2_GEN"]    
+        H2_GEN = inputs["H2_GEN"]::Vector{<:Int}    
     end
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
     H =inputs["H2_RES_ALL"]::Int

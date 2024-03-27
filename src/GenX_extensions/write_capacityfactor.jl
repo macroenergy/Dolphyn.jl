@@ -7,9 +7,9 @@ function write_capacityfactor(path::AbstractString, inputs::Dict, setup::Dict, E
     dfGen = inputs["dfGen"]
     G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
     T = inputs["T"]::Int     # Number of time steps (hours)
-    THERM_ALL = inputs["THERM_ALL"]
-    VRE = inputs["VRE"]
-    HYDRO_RES = inputs["HYDRO_RES"]
+    THERM_ALL = inputs["THERM_ALL"]::Vector{<:Int}
+    VRE = inputs["VRE"]::Vector{<:Int}
+    HYDRO_RES = inputs["HYDRO_RES"]::Vector{<:Int}
     MUST_RUN = inputs["MUST_RUN"]
 
     dfCapacityfactor = DataFrame(Resource=inputs["RESOURCES"], Zone=dfGen[!, :Zone], AnnualSum=zeros(G), Capacity=zeros(G), CapacityFactor=zeros(G))

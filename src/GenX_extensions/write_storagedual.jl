@@ -12,7 +12,7 @@ function write_storagedual(path::AbstractString, inputs::Dict, setup::Dict, EP::
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
 	REP_PERIOD = inputs["REP_PERIOD"]
-	STOR_ALL = inputs["STOR_ALL"]
+	STOR_ALL = inputs["STOR_ALL"]::Vector{<:Int}
 	hours_per_subperiod = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
 	# # Dual of storage level (state of charge) balance of each resource in each time step
