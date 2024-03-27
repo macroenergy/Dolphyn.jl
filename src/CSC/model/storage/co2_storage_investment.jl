@@ -55,8 +55,8 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     dfCO2Storage = inputs["dfCO2Storage"]
 	CO2_STOR_ALL = inputs["CO2_STOR_ALL"]
 
-	Z = inputs["Z"]
-	T = inputs["T"]
+	Z = inputs["Z"]::Int
+	T = inputs["T"]::Int
 	
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_CO2_Storage_per_type[i in 1:CO2_STOR_ALL])

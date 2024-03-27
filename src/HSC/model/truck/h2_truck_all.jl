@@ -117,8 +117,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     H2_TRUCK_GAS = inputs["H2_TRUCK_GAS"]
     H2_TRUCK_LIQ = inputs["H2_TRUCK_LIQ"]
 
-    T = inputs["T"] # Number of time steps (hours)
-    Z = inputs["Z"] # Number of zones
+    T = inputs["T"]::Int # Number of time steps (hours)
+    Z = inputs["Z"]::Int # Number of zones
     max_route_time = zeros(length(H2_TRUCK_TYPES))
 
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period

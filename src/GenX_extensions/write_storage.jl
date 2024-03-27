@@ -5,8 +5,8 @@ Function for writing the capacities of different storage technologies, including
 """
 function write_storage(path::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
-	T = inputs["T"]     # Number of time steps (hours)
-	G = inputs["G"]
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	G = inputs["G"]::Int
 	STOR_ALL = inputs["STOR_ALL"]
 	HYDRO_RES = inputs["HYDRO_RES"]
 	FLEX = inputs["FLEX"]

@@ -39,13 +39,13 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
 
 	#Define sets
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"] #Number of Syn fuel units
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
     NSFByProd = inputs["NSFByProd"] #Number of by products
 
     dfSynFuelsByProdEmissions = inputs["dfSynFuelsByProdEmissions"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 	
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes

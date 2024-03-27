@@ -72,8 +72,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     print_and_log("Hydrogen Pipeline Module")
 
-    T = inputs["T"] # Model operating time steps
-    Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
+    T = inputs["T"]::Int # Model operating time steps
+    Z = inputs["Z"]::Int  # Model demand zones - assumed to be same for H2 and electricity
 
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
     START_SUBPERIODS = inputs["START_SUBPERIODS"]

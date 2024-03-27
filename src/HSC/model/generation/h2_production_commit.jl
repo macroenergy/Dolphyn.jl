@@ -150,8 +150,8 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     dfH2Gen = inputs["dfH2Gen"]
     H2GenCommit = setup["H2GenCommit"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
     H = inputs["H"]        #NUmber of hydrogen generation units 
 
     H2_GAS_COMMIT = inputs["H2_GEN_COMMIT"] #This is needed only for H2 balance

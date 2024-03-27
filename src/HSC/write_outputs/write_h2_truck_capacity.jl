@@ -27,7 +27,7 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
    # RET_CAP_TRUCK = inputs["RET_CAP_TRUCK"]
 
     dfH2Truck = inputs["dfH2Truck"]
-    Z = inputs["Z"]
+    Z = inputs["Z"]::Int
 
     # H2 truck capacity
     capNumber = zeros(size(H2_TRUCK_TYPES))

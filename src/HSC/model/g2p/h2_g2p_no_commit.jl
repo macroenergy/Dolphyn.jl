@@ -66,8 +66,8 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
     #Rename H2Gen dataframe
     dfH2G2P = inputs["dfH2G2P"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
     H = inputs["H2_G2P"]        #NUmber of hydrogen generation units 
     
     H2_G2P_NO_COMMIT = inputs["H2_G2P_NO_COMMIT"]

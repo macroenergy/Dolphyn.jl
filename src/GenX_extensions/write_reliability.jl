@@ -4,8 +4,8 @@
 Function for reporting dual variable of maximum non-served energy constraint (shadow price of reliability constraint) for each model zone and time step.
 """
 function write_reliability(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	# reliability: Dual variable of maximum NSE constraint = shadow value of reliability constraint
 	dfReliability = DataFrame(Zone = 1:Z)

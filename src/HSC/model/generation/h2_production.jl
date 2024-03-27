@@ -38,8 +38,8 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
         H2_GEN_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
     end
     dfH2Gen = inputs["dfH2Gen"]  # Input H2 generation and storage data
-    Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
-    T = inputs["T"]     # Model operating time steps
+    Z = inputs["Z"]::Int  # Model demand zones - assumed to be same for H2 and electricity
+    T = inputs["T"]::Int     # Model operating time steps
 
     if !isempty(H2_GEN_COMMIT)
         EP = h2_production_commit(EP::Model, inputs::Dict, setup::Dict)

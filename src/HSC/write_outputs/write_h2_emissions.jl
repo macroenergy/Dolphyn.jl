@@ -21,9 +21,9 @@ Function for reporting time-dependent CO$_2$ emissions by zone in hydrogen suppl
 """
 function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
     dfH2Gen = inputs["dfH2Gen"]
-    G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
 
 
     if ((setup["H2CO2Cap"] in [1,2,3]) && setup["SystemCO2Constraint"]==1)

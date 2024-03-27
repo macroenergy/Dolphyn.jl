@@ -9,9 +9,9 @@ function emissions!(EP::Model, inputs::Dict, setup::Dict)
 
 	dfGen = inputs["dfGen"]
 
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	@expression(EP, eEmissionsByPlant[y=1:G,t=1:T],
 

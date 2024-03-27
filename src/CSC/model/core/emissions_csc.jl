@@ -38,8 +38,8 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
     dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes

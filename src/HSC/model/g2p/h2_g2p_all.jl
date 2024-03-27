@@ -48,7 +48,7 @@ function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
     H2_G2P_RET_CAP = inputs["H2_G2P_RET_CAP"]
     H =inputs["H2_G2P_ALL"]
 
-    T = inputs["T"]     # Number of time steps (hours)
+    T = inputs["T"]::Int     # Number of time steps (hours)
 
     ####Variables####
     #Define variables needed across both commit and no commit sets

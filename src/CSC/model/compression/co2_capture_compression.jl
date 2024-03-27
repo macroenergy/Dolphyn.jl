@@ -47,8 +47,8 @@ function co2_capture_compression(EP::Model, inputs::Dict,setup::Dict)
 	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	CO2_CAPTURE_COMP_ALL = inputs["CO2_CAPTURE_COMP_ALL"]
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	#####################################################################################################################################
 	##Variables

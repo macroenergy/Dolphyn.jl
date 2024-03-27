@@ -91,7 +91,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     end
     H2_GEN = inputs["H2_GEN"]
     H2_STOR_ALL = inputs["H2_STOR_ALL"]
-    H = inputs["H2_RES_ALL"]
+    H = inputs["H2_RES_ALL"]::Int
 
     # Capacity of New H2 Gen units (tonnes/hr)
     # For generation with unit commitment, this variable refers to the number of units, not capacity. 

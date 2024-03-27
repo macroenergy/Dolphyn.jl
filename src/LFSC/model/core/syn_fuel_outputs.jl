@@ -53,7 +53,7 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 
 	#Define sets
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"] #Number of Syn fuel units
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
     NSFByProd = inputs["NSFByProd"] #Number of by products
 
     ## Variables ##

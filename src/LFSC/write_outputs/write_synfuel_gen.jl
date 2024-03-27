@@ -23,7 +23,7 @@ function write_synfuel_gen(path::AbstractString, sep::AbstractString, inputs::Di
 
 	dfSynFuels = inputs["dfSynFuels"]
 	H = inputs["SYN_FUELS_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 
 	# Power injected by each resource in each time step
 	# dfSynFuelsDieselGenOut_annual = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfSynFuels [!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))

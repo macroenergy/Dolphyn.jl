@@ -24,8 +24,8 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	dfDAC = inputs["dfDAC"]
 	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	dfCO2Storage = inputs["dfCO2Storage"]
-	Z = inputs["Z"]     # Number of zones
-	T = inputs["T"]     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
 	
 	dfCost = DataFrame(Costs = ["cTotal", "cDACFix", "cDACVar", "cCO2Comp", "cCO2Stor", "cCO2Injection", "cCO2NetworkExp"])
 	if setup["ParameterScale"] == 1

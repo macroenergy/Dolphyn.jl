@@ -31,8 +31,8 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		H2_G2P_ALL = inputs["H2_G2P_ALL"]
 	end
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 	
 	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total"])
 

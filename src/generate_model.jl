@@ -89,8 +89,8 @@ The power balance constraint of the model ensures that electricity demand is met
 ################################################################################
 function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAttributes,modeloutput = nothing)
 
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones - assumed to be same for power and hydrogen system
 
     ## Start pre-solve timer
     presolver_start_time = time()
@@ -234,16 +234,16 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             EP = h2_production(EP, inputs, setup)
         end
 
+        # Model hydrogen storage technologies
+        if !isempty(inputs["H2_STOR_ALL"])
+            EP = h2_storage(EP,inputs,setup)
+        end
+        
         # Direct emissions of various hydrogen sector resources
         EP = emissions_hsc(EP, inputs,setup)
 
         # Model H2 non-served
         EP = h2_non_served(EP, inputs,setup)
-
-        # Model hydrogen storage technologies
-        if !isempty(inputs["H2_STOR_ALL"])
-            EP = h2_storage(EP,inputs,setup)
-        end
 
         if !isempty(inputs["H2_FLEX"])
             #model H2 flexible demand resources

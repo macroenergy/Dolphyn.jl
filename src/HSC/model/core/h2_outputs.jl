@@ -53,8 +53,8 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
     dfH2Gen = inputs["dfH2Gen"]
 
     #Define sets
-    H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
-    T = inputs["T"]     # Number of time steps (hours)
+    H = inputs["H2_RES_ALL"]::Int #Number of Hydrogen gen units
+    T = inputs["T"]::Int     # Number of time steps (hours)
 
 
     ### Variables ###

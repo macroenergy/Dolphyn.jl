@@ -52,8 +52,8 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	dfDAC = inputs["dfDAC"]
 	DAC_RES_ALL = inputs["DAC_RES_ALL"]
 
-	Z = inputs["Z"]
-	T = inputs["T"]
+	Z = inputs["Z"]::Int
+	T = inputs["T"]::Int
 	
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_DAC_per_type[i in 1:DAC_RES_ALL])

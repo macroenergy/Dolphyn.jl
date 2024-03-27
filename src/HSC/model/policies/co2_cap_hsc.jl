@@ -60,7 +60,7 @@ Note that the generator-side rate-based constraint can be used to represent a fe
 """
 function co2_cap_hsc(EP::Model, inputs::Dict, setup::Dict)
 
-    T = inputs["T"]     # Number of time steps (hours)
+    T = inputs["T"]::Int     # Number of time steps (hours)
     H2_SEG= inputs["H2_SEG"] # Number of demand response segments for H2 demand
 
     # NOTE: If ParameterScale = 1 , then emisisons constraint written in units of ktonnes, else emissions constraint units is tonnes

@@ -22,8 +22,8 @@ Function for reporting the liquid fuels balance of resources across different zo
 function write_liquid_fuel_demand_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfSynFuels= inputs["dfSynFuels"]
 	
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 	## SynFuel diesel balance for each zone
 	dfSFDieselBalance = Array{Any}
 	rowoffset=3

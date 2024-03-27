@@ -22,8 +22,8 @@ Function for reporting input and output balance of synthetic fuels resources acr
 function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfSynFuels= inputs["dfSynFuels"]
 	
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	NSFByProd = inputs["NSFByProd"]
 

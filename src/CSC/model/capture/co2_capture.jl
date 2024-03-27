@@ -27,15 +27,15 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 
 	if setup["ModelH2"] == 1
 		dfH2Gen = inputs["dfH2Gen"]
-		H = inputs["H2_RES_ALL"]
+		H = inputs["H2_RES_ALL"]::Int
 	end
 
 	dfDAC = inputs["dfDAC"]  # Input CO2 capture data
 
 	D = inputs["DAC_RES_ALL"]
-	G = inputs["G"]  # Number of resources (generators, storage, DR, and DERs)
-	Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2, H2 and electricity
-	T = inputs["T"]	 # Model operating time steps
+	G = inputs["G"]::Int  # Number of resources (generators, storage, DR, and DERs)
+	Z = inputs["Z"]::Int  # Model demand zones - assumed to be same for CO2, H2 and electricity
+	T = inputs["T"]::Int	 # Model operating time steps
 
 	if !isempty(CO2_CAPTURE_DAC)
 		EP = co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)

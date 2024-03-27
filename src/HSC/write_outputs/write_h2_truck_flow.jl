@@ -22,8 +22,8 @@ Fucntion for reporting hydrogen flow via trucsk.
 function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
 	H2_TRUCK_TYPE_NAMES = inputs["H2_TRUCK_TYPE_NAMES"]
-    Z = inputs["Z"]
-	T = inputs["T"]
+    Z = inputs["Z"]::Int
+	T = inputs["T"]::Int
 
     # H2 truck flow
 	truck_flow_path = string(path, sep, "H2TruckFlow")

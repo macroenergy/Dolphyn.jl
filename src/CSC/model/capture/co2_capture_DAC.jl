@@ -66,8 +66,8 @@ function co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 	#Rename CO2Capture dataframe
 	dfDAC = inputs["dfDAC"]
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 	
 	CO2_CAPTURE_DAC = inputs["CO2_CAPTURE_DAC"]
 	

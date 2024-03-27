@@ -21,8 +21,8 @@ Function for reporting the liquid fuels balance dual of resources across differe
 """
 function write_liquid_fuel_balance_dual(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	# # Dual of storage level (state of charge) balance of each resource in each time step
 	dfDieselBalanceDual = DataFrame(Zone = 1:Z)

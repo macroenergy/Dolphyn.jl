@@ -26,8 +26,8 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		dfH2G2P = inputs["dfH2G2P"]
 	end
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
 	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
 	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources

@@ -130,9 +130,9 @@ function thermal_commit!(EP::Model, inputs::Dict, setup::Dict)
 
 	dfGen = inputs["dfGen"]
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
-	G = inputs["G"]     # Number of resources
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
+	G = inputs["G"]::Int     # Number of resources
 
 	p = inputs["hours_per_subperiod"] #total number of hours per subperiod
 
@@ -270,7 +270,7 @@ function thermal_commit_reserves!(EP::Model, inputs::Dict)
 
 	dfGen = inputs["dfGen"]
 
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 
 	THERM_COMMIT = inputs["THERM_COMMIT"]
 

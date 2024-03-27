@@ -156,8 +156,8 @@ function h2_g2p_commit(EP::Model, inputs::Dict, setup::Dict)
     dfH2G2P = inputs["dfH2G2P"]
     H2G2PCommit = setup["H2G2PCommit"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
     H = inputs["H"]        #NUmber of hydrogen generation units 
     
     H2_G2P_COMMIT = inputs["H2_G2P_COMMIT"]

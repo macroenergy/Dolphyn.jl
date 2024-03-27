@@ -29,9 +29,9 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
     
     SEG = inputs["SEG"]  # Number of non-served energy segments for power demand
     H2_SEG = inputs["H2_SEG"]  # Number of non-served energy segments for H2 demand
-    G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
 
     if setup["SystemCO2Constraint"] ==1 # Independent constraints for Power and HSC
         if setup["CO2Cap"] != 0

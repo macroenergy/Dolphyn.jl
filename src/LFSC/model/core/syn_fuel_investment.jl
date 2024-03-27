@@ -51,7 +51,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfSynFuels = inputs["dfSynFuels"]
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 	
 	##Load cost parameters
 	#  ParameterScale = 1 --> objective function is in million $ . 

@@ -24,8 +24,8 @@ function green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 	print_and_log("Green H2 Share Requirement Policies Module")
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	H2_ELECTROLYZER = inputs["H2_ELECTROLYZER"]
 	GreenH2Share = setup["GreenH2Share"]

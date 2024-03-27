@@ -76,8 +76,8 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     #Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]
 
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
     H = inputs["H2_GEN"]        #NUmber of hydrogen generation units 
     
     H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]

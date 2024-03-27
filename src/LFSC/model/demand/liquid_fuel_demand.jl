@@ -49,8 +49,8 @@ This module also constraints the amount of each type of non conventional fuels d
 function liquid_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
 	#Define sets
-    Z = inputs["Z"]     # Number of zones
-	T = inputs["T"]     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
     
     if setup["AllowConventionalDiesel"] == 1
 

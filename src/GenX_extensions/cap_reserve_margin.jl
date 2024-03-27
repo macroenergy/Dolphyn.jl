@@ -36,10 +36,10 @@ function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 	# capacity reserve margin constraint
 	println("Capacity Reserve Margin Policies Module")
 	dfGen = inputs["dfGen"]
-	G = inputs["G"]
+	G = inputs["G"]::Int
 	SEG = inputs["SEG"]  # Number of lines
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zonests
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zonests
 	L = inputs["L"] # Number of lines
 	THERM_ALL = inputs["THERM_ALL"]
 	VRE = inputs["VRE"]

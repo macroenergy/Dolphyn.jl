@@ -65,8 +65,8 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
     print_and_log("Hydrogen Non-served Energy Module")
 
-    T = inputs["T"]     # Number of time steps
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps
+    Z = inputs["Z"]::Int     # Number of zones
     H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
 
     ### Variables ###

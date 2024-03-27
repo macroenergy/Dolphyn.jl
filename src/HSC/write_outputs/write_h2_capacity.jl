@@ -22,7 +22,7 @@ Function for reporting the capacities for the different hydrogen resources (star
 function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions
 	dfH2Gen = inputs["dfH2Gen"]
-	H = inputs["H2_RES_ALL"]
+	H = inputs["H2_RES_ALL"]::Int
 
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
     new_cap_and_commit = intersect(inputs["H2_GEN_NEW_CAP"], inputs["H2_GEN_COMMIT"])

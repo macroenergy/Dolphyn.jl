@@ -6,8 +6,8 @@ Function for reporting dual of storage level (state of charge) balance of each r
 function write_storagedual(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
 
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps (hours)
+	G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 
 	START_SUBPERIODS = inputs["START_SUBPERIODS"]
 	INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]

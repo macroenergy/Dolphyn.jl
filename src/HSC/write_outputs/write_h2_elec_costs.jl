@@ -24,8 +24,8 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
     ## Cost results
     dfH2Gen = inputs["dfH2Gen"]
 
-    Z = inputs["Z"]     # Number of zones
-    T = inputs["T"]     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
 
     # Recreate ELEC PRICE Dataframe (like in GenX, write_price function)
     # Dividing dual variable for each hour with corresponding hourly weight to retrieve marginal cost of generation

@@ -5,9 +5,9 @@ Function for writing net revenue of different generation technologies.
 """
 function write_net_revenue(path::AbstractString, inputs::Dict, setup::Dict, EP::Model, dfCap::DataFrame, dfESRRev::DataFrame, dfResRevenue::DataFrame, dfChargingcost::DataFrame, dfPower::DataFrame, dfEnergyRevenue::DataFrame, dfSubRevenue::DataFrame, dfRegSubRevenue::DataFrame)
 	dfGen = inputs["dfGen"]
-	T = inputs["T"]     			# Number of time steps (hours)
-	Z = inputs["Z"]     			# Number of zones
-	G = inputs["G"]     			# Number of generators
+	T = inputs["T"]::Int     			# Number of time steps (hours)
+	Z = inputs["Z"]::Int     			# Number of zones
+	G = inputs["G"]::Int     			# Number of generators
 	COMMIT = inputs["COMMIT"]		# Thermal units for unit commitment
 	STOR_ALL = inputs["STOR_ALL"]
 

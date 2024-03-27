@@ -23,8 +23,8 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 	## Cost results
 	dfSynFuels= inputs["dfSynFuels"]
 
-	Z = inputs["Z"]     # Number of zones
-	T = inputs["T"]     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
 
 	dfSynFuelsCost = DataFrame(Costs = ["cSFTotal", "cSFFix", "cSFVar", "cSFByProdRev", "CSFConvDieselFuelCost","CSFConvJetfuelFuelCost","CSFConvGasolineFuelCost"])
 	if setup["ParameterScale"]==1 # Convert costs in millions to $

@@ -33,7 +33,7 @@ function h2_storage_asymmetric(EP::Model, inputs::Dict)
 
     println("H2 Storage Resources with Asmymetric Charge/Discharge Capacity Module")
 
-    T = inputs["T"]     # Number of time steps (hours)
+    T = inputs["T"]::Int     # Number of time steps (hours)
 
     H2_STOR_ASYMMETRIC = inputs["H2_STOR_ASYMMETRIC"]
 

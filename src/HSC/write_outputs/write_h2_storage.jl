@@ -21,8 +21,8 @@ Function for reporting the capacities of different hydrogen storage technologies
 """
 function write_h2_storage(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
 	dfH2Gen = inputs["dfH2Gen"]
-	T = inputs["T"]     # Number of time steps (hours)
-	H = inputs["H2_RES_ALL"]  # Set of H2 storage resources
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	H = inputs["H2_RES_ALL"]::Int  # Set of H2 storage resources
 
 	# Storage level (state of charge) of each resource in each time step
 	dfH2Storage = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone])

@@ -21,8 +21,8 @@ Function for reporting non-served hydrogen for every model zone, time step and c
 """
 function write_h2_nse(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
     dfGen = inputs["dfGen"]
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
     H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
     # Non-served energy/demand curtailment by segment in each time step
     dfNse = DataFrame()

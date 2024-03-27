@@ -1,7 +1,7 @@
 function write_charging_cost(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfGen = inputs["dfGen"]
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps (hours)
+	G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 	STOR_ALL = inputs["STOR_ALL"]
 	FLEX = inputs["FLEX"]
 	dfChargingcost = DataFrame(Region = dfGen[!, :region], Resource = inputs["RESOURCES"], Zone = dfGen[!, :Zone], Cluster = dfGen[!, :cluster], AnnualSum = Array{Float64}(undef, G),)

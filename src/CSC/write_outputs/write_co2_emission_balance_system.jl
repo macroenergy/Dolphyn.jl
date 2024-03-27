@@ -21,8 +21,8 @@ Function for reporting CO2 balance of resources across the entire system
 """
 function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-    T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	## CO2 balance for each type of resources
 	dfCO2Balance = Array{Any}

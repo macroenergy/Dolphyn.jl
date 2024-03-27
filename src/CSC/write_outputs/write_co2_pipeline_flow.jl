@@ -20,8 +20,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting the CO2 flow via pipeliens.    
 """
 function write_co2_pipeline_flow(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 	CO2_P= inputs["CO2_P"] # Number of Hydrogen Pipelines
     CO2_Pipe_Map = inputs["CO2_Pipe_Map"]
 

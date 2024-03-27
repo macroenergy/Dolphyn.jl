@@ -72,8 +72,8 @@ print_and_log("H2 Flexible Demand Resources Module")
 
 dfH2Gen = inputs["dfH2Gen"]
 
-T = inputs["T"]     # Number of time steps (hours)
-Z = inputs["Z"]     # Number of zones
+T = inputs["T"]::Int     # Number of time steps (hours)
+Z = inputs["Z"]::Int     # Number of zones
 H2_FLEX = inputs["H2_FLEX"] # Set of flexible demand resources
 
 START_SUBPERIODS = inputs["START_SUBPERIODS"]

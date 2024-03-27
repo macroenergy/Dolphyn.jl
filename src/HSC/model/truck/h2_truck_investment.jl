@@ -75,7 +75,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfH2Truck = inputs["dfH2Truck"]
 
-	Z = inputs["Z"] # Model zones - assumed to be same for H2 and electricity 
+	Z = inputs["Z"]::Int # Model zones - assumed to be same for H2 and electricity 
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"] # Set of all truck types
 
     NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"] # Set of hydrogen truck types eligible for new capacity

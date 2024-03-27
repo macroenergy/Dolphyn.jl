@@ -5,8 +5,8 @@ Function for writing the capacity factor of different resources.
 """
 function write_capacityfactor(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
     dfGen = inputs["dfGen"]
-    G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-    T = inputs["T"]     # Number of time steps (hours)
+    G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+    T = inputs["T"]::Int     # Number of time steps (hours)
     THERM_ALL = inputs["THERM_ALL"]
     VRE = inputs["VRE"]
     HYDRO_RES = inputs["HYDRO_RES"]

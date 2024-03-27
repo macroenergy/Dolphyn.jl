@@ -25,8 +25,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 	GREY_H2 = inputs["GREY_H2"]
 	H2_STOR_ALL = inputs["H2_STOR_ALL"]
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	################################################################################################################################
 	################################################################################################################################

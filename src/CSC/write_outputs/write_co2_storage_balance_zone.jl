@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting total CO2 storage balance across different zones.
 """
 function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	Z = inputs["Z"]     # Number of zones
+	Z = inputs["Z"]::Int     # Number of zones
 
 	dfCost = DataFrame(Costs = ["Power_CCS", "H2_CCS", "DAC_Capture", "DAC_Fuel_CCS", "Biorefinery_Capture", "Synfuel_Production_Capture", "Synfuel_Production_Consumption", "CO2_Pipeline_Import", "CO2_Storage", "Total"])
 

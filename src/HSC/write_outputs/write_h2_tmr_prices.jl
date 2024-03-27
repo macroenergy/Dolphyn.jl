@@ -23,7 +23,7 @@ function write_h2_tmr_prices(path::AbstractString, sep::AbstractString, inputs::
 
 	dfGen = inputs["dfGen"] # Power sector inputs
 	dfH2Gen = inputs["dfH2Gen"]
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 
 	# Identify number of time matching requirements
 	nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))

@@ -21,8 +21,8 @@ Function for reporting the hydrogen flow via pipeliens.
 """
 function write_h2_pipeline_flow(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
     dfH2Gen = inputs["dfH2Gen"]
-    T = inputs["T"]     # Number of time steps (hours)
-    Z = inputs["Z"]     # Number of zones
+    T = inputs["T"]::Int     # Number of time steps (hours)
+    Z = inputs["Z"]::Int     # Number of zones
     H2_P= inputs["H2_P"] # Number of Hydrogen Pipelines
     H2_Pipe_Map = inputs["H2_Pipe_Map"]
 

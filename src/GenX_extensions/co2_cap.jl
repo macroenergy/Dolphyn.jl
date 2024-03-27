@@ -48,9 +48,9 @@ function co2_cap!(EP::Model, inputs::Dict, setup::Dict)
 
 	dfGen = inputs["dfGen"]
 	SEG = inputs["SEG"]  # Number of lines
-	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	### Variable ###
 	# if input files are present, add CO2 cap slack variables

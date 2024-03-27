@@ -45,8 +45,8 @@ function co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict
 	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	CO2_CAPTURE_COMP_ALL = inputs["CO2_CAPTURE_COMP_ALL"]
 
-	Z = inputs["Z"]
-	T = inputs["T"]
+	Z = inputs["Z"]::Int
+	T = inputs["T"]::Int
 	
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_CO2_Capture_Comp_per_type[i in 1:CO2_CAPTURE_COMP_ALL])

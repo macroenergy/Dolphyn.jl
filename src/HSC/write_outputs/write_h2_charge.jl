@@ -21,8 +21,8 @@ Function for reporting the h2 storage charging values of the different hydrogen 
 """
 function write_h2_charge(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
     dfH2Gen = inputs["dfH2Gen"]
-    H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, DR, and DERs)
-    T = inputs["T"]     # Number of time steps (hours)
+    H = inputs["H2_RES_ALL"]::Int     # Number of resources (generators, storage, DR, and DERs)
+    T = inputs["T"]::Int     # Number of time steps (hours)
     # Power withdrawn to charge each resource in each time step
     dfCharge = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum =  Array{Union{Missing,Float32}}(undef, H))
     charge = zeros(H,T)

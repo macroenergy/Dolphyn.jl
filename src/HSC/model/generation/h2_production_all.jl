@@ -58,9 +58,9 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
         H2_GEN = inputs["H2_GEN"]    
     end
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
-    H =inputs["H2_RES_ALL"]
+    H =inputs["H2_RES_ALL"]::Int
 
-    T = inputs["T"]     # Number of time steps (hours)
+    T = inputs["T"]::Int     # Number of time steps (hours)
 
     ####Variables####
     #Define variables needed across both commit and no commit sets

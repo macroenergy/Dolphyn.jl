@@ -119,8 +119,8 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     H2_STOR_LIQ = inputs["H2_STOR_LIQ"] # Set of all liquid storage resources
     H2_STOR_GAS = inputs["H2_STOR_GAS"] # Set of all gaseous storage resources
 
-    Z = inputs["Z"]     # Number of zones
-    T = inputs["T"] # Number of time steps (hours) 
+    Z = inputs["Z"]::Int     # Number of zones
+    T = inputs["T"]::Int # Number of time steps (hours) 
       
     START_SUBPERIODS = inputs["START_SUBPERIODS"] # Starting subperiod index for each representative period
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"] # Index of interior subperiod for each representative period

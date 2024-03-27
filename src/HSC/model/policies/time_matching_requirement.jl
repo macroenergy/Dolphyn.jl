@@ -76,9 +76,9 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 	dfGen = inputs["dfGen"] # Power sector inputs
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
-	#H = inputs["H2_RES_ALL"] #Number of Hydrogen gen units
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
+	#H = inputs["H2_RES_ALL"]::Int #Number of Hydrogen gen units
 	H2_GEN = inputs["H2_GEN"]
 	dfH2Gen = inputs["dfH2Gen"]
 

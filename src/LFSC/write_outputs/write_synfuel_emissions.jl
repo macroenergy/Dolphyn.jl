@@ -22,8 +22,8 @@ Function for reporting CO2 emissions of different liquid fuel types across diffe
 function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfSynFuels= inputs["dfSynFuels"]
 	
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	NSFByProd = inputs["NSFByProd"]
 

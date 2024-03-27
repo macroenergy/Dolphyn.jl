@@ -39,7 +39,7 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
     # Define sets
     H = inputs["H2_G2P_ALL"] #Number of Hydrogen gen units
-    T = inputs["T"]     # Number of time steps (hours)
+    T = inputs["T"]::Int     # Number of time steps (hours)
 
     ### Variables ###
 

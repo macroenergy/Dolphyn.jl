@@ -66,8 +66,8 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	dfCO2Storage = inputs["dfCO2Storage"]
 	CO2_STOR_ALL = inputs["CO2_STOR_ALL"]
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
 	#####################################################################################################################################
 	##Variables

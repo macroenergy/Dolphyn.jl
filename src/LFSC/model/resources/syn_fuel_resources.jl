@@ -45,8 +45,8 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	dfSynFuels = inputs["dfSynFuels"]
     dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
 
-	T = inputs["T"]     # Number of time steps (hours)
-	Z = inputs["Z"]     # Number of zones
+	T = inputs["T"]::Int     # Number of time steps (hours)
+	Z = inputs["Z"]::Int     # Number of zones
 
     NSFByProd = inputs["NSFByProd"]
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]

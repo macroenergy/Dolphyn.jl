@@ -42,7 +42,7 @@ function DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 	DAC_RES_ALL = inputs["DAC_RES_ALL"]
 
 	#Define sets
-	T = inputs["T"]     # Number of time steps (hours)
+	T = inputs["T"]::Int     # Number of time steps (hours)
 
 	#####################################################################################################################################
 	##Variables
