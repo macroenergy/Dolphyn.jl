@@ -79,7 +79,9 @@ end
 
 # ### Generate model
 # println("Generating the Optimization Model")
-EP = generate_model(mysetup, myinputs, OPTIMIZER)
+# EP = generate_model(mysetup, myinputs, OPTIMIZER)
+EP = generate_Distributed_model(mysetup, myinputs, OPTIMIZER)
+
 
 ### Solve model
 println("Solving Model")

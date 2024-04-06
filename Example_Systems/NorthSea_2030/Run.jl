@@ -53,7 +53,9 @@ end
 
 # ### Generate model
 # print_and_log("Generating the Optimization Model")
-EP = generate_model(mysetup, myinputs, OPTIMIZER)
+# EP = generate_model(mysetup, myinputs, OPTIMIZER)
+EP = generate_Distributed_model(mysetup, myinputs, OPTIMIZER)
+
 
 ### Solve model
 print_and_log("Solving Model")

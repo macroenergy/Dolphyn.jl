@@ -27,7 +27,7 @@ export load_inputs
 export load_h2_inputs
 export load_co2_inputs
 export load_liquid_fuels_inputs
-export generate_model
+export generate_Distributed_model
 export solve_model
 export write_outputs
 export write_HSC_outputs
@@ -150,6 +150,9 @@ include_from_dir(tdr_path, ".jl", [joinpath(tdr_path,"PreCluster.jl")])
 # Extensions to GenX
 include_from_dir(joinpath(@__DIR__,"GenX_extensions"), ".jl")
 
+# Load all .jl files from the Hub directory
+include_from_dir(joinpath(@__DIR__,"Hub"), ".jl")
+
 # Load all .jl files from the HSC directory
 include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
 
@@ -172,7 +175,14 @@ include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
 include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
 
 # Load model generation and solving scripts
-include(joinpath(@__DIR__,"generate_model.jl"))
+ 
+include(joinpath(@__DIR__,"generate_Distributed_model.jl"))
+include(joinpath(@__DIR__,"generate_GenX.jl"))
+include(joinpath(@__DIR__,"generate_HSC.jl"))
+include(joinpath(@__DIR__,"generate_CSC.jl"))
+include(joinpath(@__DIR__,"generate_LFSC.jl"))
+include(joinpath(@__DIR__,"generate_Hub.jl"))
+include(joinpath(@__DIR__,"generate_Hub_Constraints.jl"))
 include(joinpath(@__DIR__, "solve_model.jl"))
 
 end
