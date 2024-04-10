@@ -81,6 +81,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     H = inputs["H2_GEN"]        #NUmber of hydrogen generation units 
     
     H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
+    H2_ELECTROLYZER_PW = inputs["H2_ELECTROLYZER_PW"]
 
     if setup["ModelH2Liquid"] ==1
         H2_LIQ_NO_COMMIT = inputs["H2_LIQ_NO_COMMIT"]
@@ -142,10 +143,17 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
     ###Constraints###
     # Power and natural gas consumption associated with H2 generation in each time step
-    @constraints(EP, begin
-        #Power Balance
-        [k in H2_GEN_NO_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
-    end)
+    for k in H2_GEN_NO_COMMIT
+        if k in H2_ELECTROLYZER_PW
+            for t = 1:T
+                piecewise_linear_constraints!(EP, EP[:vP2G][k,t], EP[:vH2Gen][k,t], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
+            end
+        else
+            for t = 1:T
+                EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
+            end
+        end
+    end
     
     @constraints(EP, begin
     # Minimum stable generated per technology "k" at hour "t" > = Min stable output level

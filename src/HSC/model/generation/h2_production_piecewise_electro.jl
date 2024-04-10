@@ -31,7 +31,7 @@ function h2_production_piecewise_electro(EP::Model, inputs::Dict, setup::Dict)
     H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"] 
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"] 
 
-    H2_GEN_COMMIT_PW = inputs["H2_GEN_COMMIT_PW"]
+    H2_ELECTROLYZER_PW = inputs["H2_GEN_COMMIT_PW"]
     # Find all H2_GEN_COMMIT resources not in H2_GEN_COMMIT_PW
     H2_GEN_COMMIT_CONST = setdiff(H2_GEN_COMMIT, H2_GEN_COMMIT_PW)
     

@@ -155,6 +155,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     H = inputs["H"]        #NUmber of hydrogen generation units 
 
     H2_GAS_COMMIT = inputs["H2_GEN_COMMIT"] #This is needed only for H2 balance
+    H2_ELECTROLYZER_PW = inputs["H2_ELECTROLYZER_PW"]
 
     if setup["ModelH2Liquid"]==1
         H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
@@ -257,10 +258,18 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     end #END unit commitment configuration
 
     ###Constraints###
-    @constraints(EP, begin
-        #Power Balance
-        [k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
-    end)
+    #Power Balance
+    for k in H2_GEN_COMMIT
+        if k in H2_ELECTROLYZER_PW
+            for t = 1:T
+                piecewise_linear_constraints!(EP, EP[:vP2G][k,t], EP[:vH2Gen][k,t], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
+            end
+        else
+            for t = 1:T
+                EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
+            end
+        end
+    end
 
     ### Capacitated limits on unit commitment decision variables (Constraints #1-3)
     @constraints(EP, begin
