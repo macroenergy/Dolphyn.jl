@@ -85,6 +85,13 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     # Set of h2 resources eligible for unit committment
     inputs_gen["H2_GEN_NO_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
 
+    # set of electrolyzers with piecewise-linear efficiency curves
+    if :PW_EFF in names(h2_gen_in)
+        inputs_gen["H2_GEN_COMMIT_PW"] = h2_gen_in[h2_gen_in.PW_EFF.==1,:R_ID]
+    else
+        inputs_gen["H2_GEN_COMMIT_PW"] = Int64[]
+    end
+
     if setup["ModelH2Liquid"] ==1
         # Set of h2 resources for liquefaction - unit commitment
         inputs_gen["H2_LIQ_COMMIT"] = h2_gen_in[h2_gen_in.H2_LIQ.==1,:R_ID]

@@ -49,6 +49,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     inputs = load_h2_gen(setup, path, sep, inputs)
     inputs = load_h2_demand(setup, path, sep, inputs)
     inputs = load_h2_generators_variability(setup, path, sep, inputs)
+    load_electro_efficiency!(inputs, path)
 
     # Read input data about power network topology, operating and expansion attributes
 

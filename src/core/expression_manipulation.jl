@@ -122,3 +122,18 @@ end
 function sum_expression(expr::AbstractArray{AbstractJuMPScalar, dims}) where {dims}
     return _sum_expression(expr)
 end
+
+function sum_expression(expr::AbstractArray{C, dims})::AffExpr where {C,dims}
+    # check_addable_to_expr(C,C)
+    total = AffExpr(0.0)
+    add_to_expression!.(total, expr)
+    return total
+end
+
+function sum_expression(expr::Base.Generator{C,T})::AffExpr where {C,T}
+    total = AffExpr(0.0)
+    foreach(expr) do e
+        add_to_expression!(total, e)
+    end
+    return total
+end
