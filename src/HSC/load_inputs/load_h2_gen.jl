@@ -86,8 +86,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["H2_GEN_NO_COMMIT"] = intersect(h2_gen_in[h2_gen_in.H2_GEN_TYPE.==2 ,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1 ,:R_ID])
 
     # Set of electrolyzers with piecewise-linear efficiency curves
-    if :PW_Power in names(h2_gen_in)
-        inputs_gen["H2_ELECTROLYZER_PW"] = intersect.(h2_gen_in[h2_gen_in.PW_Power.==1,:R_ID], inputs_gen["H2_ELECTROLYZER"])
+    if "PW_Power" in names(h2_gen_in)
+        inputs_gen["H2_ELECTROLYZER_PW"] = intersect(h2_gen_in[h2_gen_in.PW_Power.==1,:R_ID], inputs_gen["H2_ELECTROLYZER"])
     else
         inputs_gen["H2_ELECTROLYZER_PW"] = Int64[]
     end

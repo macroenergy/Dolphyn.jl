@@ -145,9 +145,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     # Power and natural gas consumption associated with H2 generation in each time step
     for k in H2_GEN_NO_COMMIT
         if k in H2_ELECTROLYZER_PW
-            for t = 1:T
-                piecewise_linear_constraints!(EP, EP[:vP2G][k,t], EP[:vH2Gen][k,t], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
-            end
+            piecewise_linear_constraints!(EP, EP[:vH2Gen][k,:] / EP[:eH2GenTotalCap][k], EP[:vP2G][k,:], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
         else
             for t = 1:T
                 EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
@@ -162,7 +160,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
     @constraints(EP, begin
     # Maximum power generated per technology "k" at hour "t"
-    [k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k]* inputs["pH2_Max"][k,t]
+    [k in H2_GEN_NO_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= EP[:eH2GenTotalCap][k] * inputs["pH2_Max"][k,t]
     end)
 
     #Ramping cosntraints 

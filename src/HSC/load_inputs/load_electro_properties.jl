@@ -17,7 +17,7 @@ function load_electro_efficiency!(inputs::Dict, path::AbstractString, filename="
     # saving the output and power vectors for each
     # as a Dictionary, indexed on the electrolyzer R_ID
     for k in H2_ELECTROLYZER_PW
-        resource_name = h2_gen_in[k, :H2_Resource]
+        resource_name = String(h2_gen_in[k, :H2_Resource])
         electro_efficiency[k] = [
             electro_power_df[!,Symbol("$(resource_name)_output")],
             electro_power_df[!,Symbol("$(resource_name)_power")],

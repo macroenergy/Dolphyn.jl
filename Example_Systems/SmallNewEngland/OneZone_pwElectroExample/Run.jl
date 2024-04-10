@@ -15,6 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 using Dolphyn
+using Gurobi
 
 # The directory containing your settings folder and files
 settings_path = joinpath(@__DIR__, "Settings")
@@ -38,7 +39,7 @@ setup_TDR(inputs_path, settings_path, mysetup)
 # ### Configure solver
 print_and_log("Configuring Solver")
 
-OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
+OPTIMIZER = configure_solver(mysetup["Solver"], settings_path, Gurobi.Optimizer)
 
 # #### Running a case
 

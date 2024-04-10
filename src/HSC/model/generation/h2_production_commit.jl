@@ -261,9 +261,7 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     #Power Balance
     for k in H2_GEN_COMMIT
         if k in H2_ELECTROLYZER_PW
-            for t = 1:T
-                piecewise_linear_constraints!(EP, EP[:vP2G][k,t], EP[:vH2Gen][k,t], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
-            end
+            piecewise_linear_constraints!(EP, EP[:vH2Gen][k,:] / EP[:eH2GenTotalCap][k], EP[:vP2G][k,:], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
         else
             for t = 1:T
                 EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
