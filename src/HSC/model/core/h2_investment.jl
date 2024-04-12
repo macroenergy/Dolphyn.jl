@@ -131,12 +131,9 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             end
         else
             # Resources not eligible for new capacity or retirements
-            println(k)
             dfH2Gen[!, :Existing_Cap_tonne_p_hr][k]
         end
     )
-
-    println(EP[:eH2GenTotalCap][1])
 
     ## Objective Function Expressions ##
 

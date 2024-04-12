@@ -38,9 +38,21 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 	#Try this form of summing otherwise just create z dimensions and sum later
 	
-	Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
-	Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2))
-	Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2))
+	if !isempty(H2_ELECTROLYZER)
+		Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
+	else
+		Green_H2_Generation = 0
+	end
+	if !isempty(BLUE_H2)
+		Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2))
+	else 
+		Blue_H2_Generation = 0
+	end
+	if !isempty(GREY_H2)
+		Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2))
+	else
+		Grey_H2_Generation = 0
+	end
 
 	if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
 		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z) - sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z])) for z in 1:Z)

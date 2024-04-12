@@ -24,7 +24,7 @@ description: fixes the iteger variables ones the model has been solved in order 
 returns: none (modifies an existing-solved model in the memory). solve() must be run again to solve and getdual veriables
 
 """
-function fix_integers(jump_model::Model)
+function fix_integers(EP::Model)
     ################################################################################
     ## function fix_integers()
     ##
@@ -37,16 +37,21 @@ function fix_integers(jump_model::Model)
     ## solve() must be run again to solve and getdual veriables
     ##
     ################################################################################
-    values = Dict(v => value(v) for v in all_variables(jump_model))
-    for v in all_variables(jump_model)
+    values = Dict(v => value(v) for v in all_variables(EP))
+    lambdas = pw_lambdas(EP)
+    for v in all_variables(EP)
         if is_integer(v)
             fix(v,values[v],force=true)
             unset_integer(v)
         elseif is_binary(v)
             fix(v,values[v],force=true)
             unset_binary(v)
+        elseif v in lambdas
+            # fix_pw_lambda(v, values[v])
+            fix_small_pw_lambda(v, values[v])
         end
     end
+    delete_cSOS2!(EP::Model)
 end
 
 @doc raw"""

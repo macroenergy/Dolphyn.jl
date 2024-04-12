@@ -145,7 +145,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     # Power and natural gas consumption associated with H2 generation in each time step
     for k in H2_GEN_NO_COMMIT
         if k in H2_ELECTROLYZER_PW
-            piecewise_linear_constraints!(EP, EP[:vH2Gen][k,:] / EP[:eH2GenTotalCap][k], EP[:vP2G][k,:], inputs["H2ElectroEff"][k][1], inputs["H2ElectroEff"][k][2])
+            piecewise_linear_constraints!(EP, EP[:vH2Gen][k,:], EP[:vP2G][k,:], EP[:eH2GenTotalCap][k] .* inputs["H2ElectroEff"][k][1], EP[:eH2GenTotalCap][k] .* inputs["H2ElectroEff"][k][2])
         else
             for t = 1:T
                 EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
