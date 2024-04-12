@@ -15,9 +15,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    fix_integers(jump_model::Model)
+    fix_integers(EP::Model)
 
-inputs: jump_model - a model object containing that has been previously solved.
+inputs: EP - a model object containing that has been previously solved.
 
 description: fixes the iteger variables ones the model has been solved in order to calculate approximations of dual variables
 
@@ -28,7 +28,7 @@ function fix_integers(EP::Model)
     ################################################################################
     ## function fix_integers()
     ##
-    ## inputs: jump_model - a model object containing that has been previously solved.
+    ## inputs: EP - a model object containing that has been previously solved.
     ##
     ## description: fixes the iteger variables ones the model has been solved in order
     ## to calculate approximations of dual variables
