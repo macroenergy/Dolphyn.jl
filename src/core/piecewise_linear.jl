@@ -158,7 +158,7 @@ end
 
 function delete_cSOS2!(EP::Model)::Nothing
     try
-        delete.(EP, cSOS2(jump_model))
+        delete.(EP, cSOS2(EP))
     catch e
         @info e
         println(" -- SOS2 constraints already deleted")
