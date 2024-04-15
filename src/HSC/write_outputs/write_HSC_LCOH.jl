@@ -63,22 +63,40 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempBlue_H2_CO2_Emission = tempBlue_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
-		tempCO2Price = zeros(inputs["NCO2Cap"])
+		tempCO2Price_z = 0
+		try
+			# Try to access "NCO2Cap" and proceed with the calculations
+			tempCO2Price = zeros(inputs["NCO2Cap"])
 
-		if has_duals(EP) == 1
-			for cap in 1:inputs["NCO2Cap"]
-				for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
-					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
-					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
-					if setup["ParameterScale"] ==1
-						tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
+			if has_duals(EP) == 1
+				for cap in 1:inputs["NCO2Cap"]
+					for z in findall(x -> x == 1, inputs["dfCO2CapZones"][:, cap])
+						tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
+						if setup["ParameterScale"] == 1
+							tempCO2Price[cap] *= ModelScalingFactor
+						end
 					end
 				end
+				tempCO2Price_z = sum(tempCO2Price)
+			else
+				tempCO2Price_z = 0
 			end
-			tempCO2Price_z = sum(tempCO2Price)
-		else
-			tempCO2Price_z = 0
+
+		catch e
+			if isa(e, KeyError) && e.key == "NCO2Cap"
+				# Handle the case where "NCO2Cap" is missing by logging or doing nothing
+				println("Warning: 'NCO2Cap' not found in inputs. No CO2 cap calculations performed.")
+				tempCO2Price_z = 0
+			else
+				# Re-throw the exception if it's not the expected KeyError
+				rethrow(e)
+			end
 		end
+
+		# Continue with other parts of your code
+
+		# Consulting vs
+
 
 		tempBlue_H2_CO2_MAC = abs(tempCO2Price_z) * tempBlue_H2_CO2_Emission
 
@@ -135,13 +153,15 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		cCO2Injection = value(EP[:eVar_OM_CO2_Injection_total])
 
 		if setup["ModelCO2Pipelines"] == 1
-			cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
+			cCO2TrunkNetworkExpansion = value(EP[:eCCO2Pipe_Trunk])
+			cCO2SpurNetworkExpansion = value(EP[:eCCO2Pipe_Spur])
 		else
-			cCO2NetworkExpansion = 0
+			cCO2TrunkNetworkExpansion = 0
+			cCO2SpurNetworkExpansion = 0
 		end
 
 		Blue_H2_CO2_Stor_Cost = (cCO2Injection + cCO2Stor) * Fraction_H2_CCS
-		Blue_H2_CO2_Pipeline_Cost = cCO2NetworkExpansion * Fraction_H2_CCS
+		Blue_H2_CO2_Pipeline_Cost = (cCO2TrunkNetworkExpansion + cCO2SpurNetworkExpansion) * Fraction_H2_CCS
 
 	else
 		Blue_H2_CO2_Stor_Cost = 0
@@ -263,21 +283,28 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempGrey_H2_CO2_Emission = tempGrey_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
-		tempCO2Price = zeros(inputs["NCO2Cap"])
+		tempCO2Price_z = 0
+		# Check to see if inputs["NCO2Cap"] exists before trying to access it
+		if haskey(inputs, "NCO2Cap")
+			tempCO2Price = zeros(inputs["NCO2Cap"])
 
-		if has_duals(EP) == 1
-			for cap in 1:inputs["NCO2Cap"]
-				for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
-					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
-					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
-					if setup["ParameterScale"] ==1
-						tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
+			if has_duals(EP) == 1
+				for cap in 1:inputs["NCO2Cap"]
+					for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
+						tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
+						# when scaled, Thse objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
+						if setup["ParameterScale"] ==1
+							tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
+						end
 					end
 				end
+				tempCO2Price_z = sum(tempCO2Price)
+			else
+				tempCO2Price_z = 0
 			end
-			tempCO2Price_z = sum(tempCO2Price)
 		else
-			tempCO2Price_z = 0
+		# do nothing if inputs["NCO2Cap"] does not exist
+		tempCO2Price_z = 0
 		end
 
 		tempGrey_H2_CO2_MAC = abs(tempCO2Price_z) * tempGrey_H2_CO2_Emission
