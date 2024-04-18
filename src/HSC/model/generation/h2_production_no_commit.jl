@@ -148,7 +148,7 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
             piecewise_linear_constraints!(EP, EP[:vH2Gen][k,:], EP[:vP2G][k,:], EP[:eH2GenTotalCap][k] .* inputs["H2ElectroEff"][k][1], EP[:eH2GenTotalCap][k] .* inputs["H2ElectroEff"][k][2])
         else
             for t = 1:T
-                EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
+                @constraint(EP, EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k])
             end
         end
     end

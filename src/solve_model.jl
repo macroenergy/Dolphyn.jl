@@ -37,6 +37,7 @@ function fix_integers(EP::Model)
     ## solve() must be run again to solve and getdual veriables
     ##
     ################################################################################
+     
     values = Dict(v => value(v) for v in all_variables(EP))
     lambdas = pw_lambdas(EP)
     for v in all_variables(EP)
@@ -47,8 +48,8 @@ function fix_integers(EP::Model)
             fix(v,values[v],force=true)
             unset_binary(v)
         elseif v in lambdas
-            # fix_pw_lambda(v, values[v])
-            fix_small_pw_lambda(v, values[v])
+            fix_pw_lambda(v, values[v])
+            # fix_small_pw_lambda(v, values[v])
         end
     end
     delete_cSOS2!(EP::Model)
