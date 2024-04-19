@@ -63,7 +63,9 @@ if mysetup["ModelLiquidFuels"] == 1
 end
 
 # ### Generate model
-EP = generate_model(mysetup, myinputs, OPTIMIZER)
+# EP = generate_model(mysetup, myinputs, OPTIMIZER)
+EP = generate_Distributed_model(mysetup, myinputs, OPTIMIZER)
+
 
 ### Solve model
 print_and_log("Solving Model")  
