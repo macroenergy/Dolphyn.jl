@@ -18,7 +18,7 @@ function load_generators_data!(setup::Dict, path::AbstractString, inputs_gen::Di
     # Add Resource IDs after reading to prevent user errors
     gen_in[!,:R_ID] = 1:G
 
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 	## Defining sets of generation and storage resources
 
 	# Set of storage resources with symmetric charge/discharge capacity

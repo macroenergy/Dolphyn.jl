@@ -13,7 +13,7 @@ function write_capacityfactor(path::AbstractString, inputs::Dict, setup::Dict, E
     MUST_RUN = inputs["MUST_RUN"]
 
     dfCapacityfactor = DataFrame(Resource=inputs["RESOURCES"], Zone=dfGen[!, :Zone], AnnualSum=zeros(G), Capacity=zeros(G), CapacityFactor=zeros(G))
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
     dfCapacityfactor.AnnualSum .= value.(EP[:vP]) * inputs["omega"] * scale_factor
     dfCapacityfactor.Capacity .= value.(EP[:eTotalCap]) * scale_factor
     # We only calcualte the resulted capacity factor with total capacity > 1MW and total generation > 1MWh

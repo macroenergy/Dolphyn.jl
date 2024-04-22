@@ -5,6 +5,8 @@ function write_h2_balance_dual(path::AbstractString, sep::AbstractString, inputs
 	T = inputs["T"]::Int     # Number of time steps (hours)
 	Z = inputs["Z"]::Int     # Number of zones
 
+	SCALING = setup["scaling"]::Float64
+
 	# # Dual of storage level (state of charge) balance of each resource in each time step
 	dfH2BalanceDual = DataFrame(Zone = 1:Z)
 	# Define an empty array
@@ -20,11 +22,7 @@ function write_h2_balance_dual(path::AbstractString, sep::AbstractString, inputs
 
 	# Incorporating effect of time step weights (When OperationWrapping=1) and Parameter scaling (ParameterScale=1) on dual variables
 	for z in 1:Z
-		if setup["ParameterScale"]==1
-			dual_values[z,:] = x1[z,:]./inputs["omega"] *ModelScalingFactor
-		else
-			dual_values[z,:] = x1[z,:]./inputs["omega"]
-		end
+		dual_values[z,:] = x1[z,:]./inputs["omega"] * SCALING
 	end
 
 	dfH2BalanceDual=hcat(dfH2BalanceDual, DataFrame(dual_values, :auto))

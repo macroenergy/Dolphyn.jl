@@ -16,7 +16,7 @@ function load_reserves!(setup::Dict, path::AbstractString, inputs::Dict)
 	# Spinning up reserve requirement as a percent of hourly wind and solar generation (which is summed across all zones)
 	inputs["pRsv_Req_VRE"] = float(res_in[1,:Rsv_Req_Percent_VRE])
 
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 
     # Penalty for not meeting hourly spinning reserve requirement
     inputs["pC_Rsv_Penalty"] = float(res_in[1,:Unmet_Rsv_Penalty_Dollar_per_MW]) / scale_factor # convert to million $/GW with objective function in millions

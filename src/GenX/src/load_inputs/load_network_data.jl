@@ -6,7 +6,7 @@ Function for reading input parameters related to the electricity transmission ne
 #DEV NOTE:  add DC power flow related parameter inputs in a subsequent commit
 function load_network_data!(setup::Dict, path::AbstractString, inputs_nw::Dict)
 
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 
     filename = "Network.csv"
     network_var = load_dataframe(joinpath(path, filename))

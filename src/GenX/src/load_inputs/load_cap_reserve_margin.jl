@@ -4,7 +4,7 @@
 Read input parameters related to planning reserve margin constraints
 """
 function load_cap_reserve_margin!(setup::Dict, path::AbstractString, inputs::Dict)
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
     
     filename = "Capacity_reserve_margin_slack.csv"
     if isfile(joinpath(path, filename))

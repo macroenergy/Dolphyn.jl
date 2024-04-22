@@ -4,7 +4,7 @@
 Read input parameters related to CO$_2$ emissions cap constraints
 """
 function load_co2_cap!(setup::Dict, path::AbstractString, inputs::Dict)
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
     
     filename = "CO2_cap_slack.csv"
     if isfile(joinpath(path, filename))

@@ -14,6 +14,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 	T = inputs["T"]::Int     # Number of time steps (hours)
 	Z = inputs["Z"]::Int     # Number of zones
 
+	SCALING = setup["scaling"]::Float64
+
 	################################################################################################################################
 	################################################################################################################################
 	# Blue H2 LCOH
@@ -57,7 +59,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
 					if setup["ParameterScale"] ==1
-						tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
+						tempCO2Price[cap] = tempCO2Price[cap] * SCALING
 					end
 				end
 			end
@@ -257,7 +259,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
 					if setup["ParameterScale"] ==1
-						tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
+						tempCO2Price[cap] = tempCO2Price[cap] * SCALING
 					end
 				end
 			end

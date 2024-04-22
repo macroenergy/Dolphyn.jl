@@ -52,6 +52,8 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]::Int     # Number of time steps
     Z = inputs["Z"]::Int     # Number of zones
     H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
+    
+    SCALING = setup["scaling"]::Float64 
 
     ### Variables ###
 
@@ -71,25 +73,8 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
     # Sum individual demand segment contributions to non-served energy costs to get total non-served energy costs
     # Julia is fastest when summing over one row one column at a time
-    @expression(
-        EP,
-        eTotalH2CNSETS[t = 1:T, z = 1:Z],
-        sum(eH2CNSE[s, t, z] for s = 1:H2_SEG)
-    )
-    @expression(EP, eTotalH2CNSET[t = 1:T], sum(eTotalH2CNSETS[t, z] for z = 1:Z))
-
-    #  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
-    #  ParameterScale = 0 --> objective function is in $
-    if setup["ParameterScale"] == 1
-        @expression(
-            EP,
-            eTotalH2CNSE,
-            sum(eTotalH2CNSET[t] / (ModelScalingFactor)^2 for t = 1:T)
-        )
-    else
-        @expression(EP, eTotalH2CNSE, sum(eTotalH2CNSET[t] for t = 1:T))
-    end
-
+    eTotalH2CNSE = sum_expression(eH2CNSE, SCALING^2)
+    EP[:eTotalH2CNSE] = eTotalH2CNSE
 
     # Add total cost contribution of non-served energy/curtailed demand to the objective function
     add_similar_to_expression!(EP[:eObj], eTotalH2CNSE)
@@ -113,7 +98,7 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cMaxH2NSE[t = 1:T, z = 1:Z],
-        sum(vH2NSE[s, t, z] for s = 1:H2_SEG) <= inputs["H2_D"][t, z]
+        eH2BalanceNse[t,z] <= inputs["H2_D"][t, z]
     )
 
     return EP

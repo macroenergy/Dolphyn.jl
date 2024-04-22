@@ -40,6 +40,7 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
     H = inputs["H2_RES_ALL"]::Int #Number of Hydrogen gen units
     T = inputs["T"]::Int     # Number of time steps (hours)
 
+    SCALING = setup["scaling"]::Float64 
 
     ### Variables ###
 
@@ -57,20 +58,36 @@ function h2_outputs(EP::Model, inputs::Dict, setup::Dict)
     ## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.
     #  ParameterScale = 0 --> objective function is in $
 
-    if setup["ParameterScale"] ==1
-        @expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
-        (inputs["omega"][t] * (dfH2Gen[!,:Var_OM_Cost_p_tonne][k]/ModelScalingFactor^2 + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k]/ModelScalingFactor) * vH2Gen[k,t]))
-    else
-        @expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T], 
-        (inputs["omega"][t] * ((dfH2Gen[!,:Var_OM_Cost_p_tonne][k] + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k])) * vH2Gen[k,t]))
-    end
+    @expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T],
+        vH2Gen[k,t] * inputs["omega"][t] * (
+            dfH2Gen[!,:Var_OM_Cost_p_tonne][k] / SCALING^2 
+            + inputs["fuel_costs"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_tonne][k] / SCALING
+        )
+    )
 
-    @expression(EP, eTotalCH2GenVarOutT[t=1:T], sum(eCH2GenVar_out[k,t] for k in 1:H))
-    @expression(EP, eTotalCH2GenVarOut, sum(eTotalCH2GenVarOutT[t] for t in 1:T))
-    
+    eTotalCH2GenVarOut = sum_expression(eCH2GenVar_out)
+    EP[:eTotalCH2GenVarOut] = eTotalCH2GenVarOut
+
     # Add total variable discharging cost contribution to the objective function
     add_similar_to_expression!(EP[:eObj], eTotalCH2GenVarOut)
 
     return EP
 
+end
+
+# [k,t] * [t] * ([k] / s^2 + [k,t] *[k] / s)
+
+function add_h2_gen_var_cost!(EP::Model, H::Int, T::Int, vH2Gen::AbstractArray{VariableRef}, omega::Array{Float64,1}, Var_OM_Cost_p_tonne::AbstractVector{Float64}, fuel_costs, etaFuel_MMBtu_p_tonne::AbstractVector{Float64}, SCALING::Float64)
+    @expression(EP, eCH2GenVar_out[k = 1:H,t = 1:T],
+        vH2Gen[k,t] * omega[t] * (
+            + Var_OM_Cost_p_tonne[k] / SCALING^2 
+            + fuel_costs[dfH2Gen[!,:Fuel][k]][t] * etaFuel_MMBtu_p_tonne[k] / SCALING
+        )
+    )
+
+    eTotalCH2GenVarOut = sum_expression(eCH2GenVar_out)
+    EP[:eTotalCH2GenVarOut] = eTotalCH2GenVarOut
+
+    # Add total variable discharging cost contribution to the objective function
+    add_similar_to_expression!(EP[:eObj], eTotalCH2GenVarOut)
 end

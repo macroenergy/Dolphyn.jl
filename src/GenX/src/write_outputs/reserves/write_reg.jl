@@ -4,7 +4,7 @@ function write_reg(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	REG = inputs["REG"]
-	scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+	scale_factor = setup["scaling"]::Float64
 	# Regulation contributions for each resource in each time step
 	dfReg = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone])
 	reg = zeros(G,T)

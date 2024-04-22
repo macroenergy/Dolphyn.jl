@@ -10,7 +10,7 @@ function write_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Mo
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
-	scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+	scale_factor = setup["scaling"]::Float64
 
 
 	if (setup["WriteShadowPrices"]==1 || setup["UCommit"]==0 || (setup["UCommit"]==2 && (setup["Reserves"]==0 || (setup["Reserves"]>0 && inputs["pDynamic_Contingency"]==0)))) # fully linear model

@@ -6,7 +6,7 @@ function write_maximum_capacity_requirement(path::AbstractString, inputs::Dict, 
     # Generally the scale_factor is used to convert
     # GW (in the model) back to MW (for output)
     # and likewise for $M to $.
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 
     dfMaxCapPrice.Price *= scale_factor
 

@@ -65,6 +65,8 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     T = inputs["T"]::Int     # Number of time steps (hours)
     Z = inputs["Z"]::Int     # Number of zones
     H = inputs["H2_GEN"]        #NUmber of hydrogen generation units 
+
+    SCALING = setup["scaling"]::Float64
     
     H2_GAS_NO_COMMIT = inputs["H2_GEN_NO_COMMIT"]
 
@@ -110,14 +112,10 @@ function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
     end
 
     #Power Consumption for H2 Generation
-    if setup["ParameterScale"] ==1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
-        @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-        sum(EP[:vP2G][k,t]/ModelScalingFactor for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
-
-    else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
-        @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
-        sum(EP[:vP2G][k,t] for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
-    end
+    # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    @expression(EP, ePowerBalanceH2GenNoCommit[t=1:T, z=1:Z],
+    sum(EP[:vP2G][k,t] / SCALING for k in intersect(H2_GEN_NO_COMMIT, dfH2Gen[dfH2Gen[!,:Zone].==z,:][!,:R_ID]))) 
+    # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
 
     add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2GenNoCommit, -1.0)
 

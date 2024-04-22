@@ -5,7 +5,7 @@ Read input parameters related to mimimum energy share requirement constraints
 (e.g. renewable portfolio standard or clean electricity standard policies)
 """
 function load_energy_share_requirement!(setup::Dict, path::AbstractString, inputs::Dict)
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 
     filename = "Energy_share_requirement_slack.csv"
     if isfile(joinpath(path, filename))

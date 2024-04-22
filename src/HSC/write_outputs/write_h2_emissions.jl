@@ -10,7 +10,8 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
     G = inputs["G"]::Int     # Number of resources (generators, storage, DR, and DERs)
     T = inputs["T"]::Int     # Number of time steps (hours)
     Z = inputs["Z"]::Int     # Number of zones
-
+    
+    SCALING = setup["scaling"]::Float64
 
     if ((setup["H2CO2Cap"] in [1,2,3]) && setup["SystemCO2Constraint"]==1)
         # Dual variable of CO2 constraint = shadow price of CO2
@@ -20,9 +21,7 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
                 for z in findall(x->x==1, inputs["dfH2CO2CapZones"][:,cap])
                     tempCO2Price[z,cap] = dual.(EP[:cH2CO2Emissions_systemwide])[cap]
                     # when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
-                    if setup["ParameterScale"] ==1
-                        tempCO2Price[z,cap] = tempCO2Price[z,cap]* ModelScalingFactor
-                    end
+                    tempCO2Price[z,cap] = tempCO2Price[z,cap] * SCALING
                 end
             end
         end
@@ -35,9 +34,7 @@ function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::D
 
     emissions = value.(EP[:eH2EmissionsByZone])
  
-    if setup["ParameterScale"]==1
-        emissions *= ModelScalingFactor
-    end
+    emissions *= SCALING
 
     dfEmissions.AnnualSum .= emissions * inputs["omega"]
 

@@ -61,6 +61,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]::Int # Model operating time steps
     Z = inputs["Z"]::Int  # Model demand zones - assumed to be same for H2 and electricity
 
+    SCALING = setup["scaling"]::Float64
+
     INTERIOR_SUBPERIODS = inputs["INTERIOR_SUBPERIODS"]
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
     hours_per_subperiod = inputs["hours_per_subperiod"]
@@ -91,22 +93,14 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # DEV NOTE: To add fixed cost of existing + new pipelines
     #  ParameterScale = 1 --> objective function is in million $
     #  ParameterScale = 0 --> objective function is in $
-    if setup["ParameterScale"] == 1
-        @expression(
-            EP,
-            eCH2Pipe,
-            sum(
-                eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p] / (ModelScalingFactor)^2 for
-                p = 1:H2_P
-            )
+    @expression(
+        EP,
+        eCH2Pipe,
+        sum(
+            eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p] / (SCALING)^2 for
+            p = 1:H2_P
         )
-    else
-        @expression(
-            EP,
-            eCH2Pipe,
-            sum(eH2NPipeNew[p] * inputs["pCAPEX_H2_Pipe"][p] for p = 1:H2_P)
-        )
-    end
+    )
 
     add_similar_to_expression!(EP[:eObj], eCH2Pipe)
 
@@ -114,19 +108,11 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     # YS Formula doesn't make sense to me
     #  ParameterScale = 1 --> objective function is in million $
     #  ParameterScale = 0 --> objective function is in $
-    if setup["ParameterScale"] == 1
-        @expression(
-            EP,
-            eCH2CompPipe,
-            sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P) / ModelScalingFactor^2
-        )
-    else
-        @expression(
-            EP,
-            eCH2CompPipe,
-            sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P)
-        )
-    end
+    @expression(
+        EP,
+        eCH2CompPipe,
+        sum(eH2NPipeNew[p] * inputs["pCAPEX_Comp_H2_Pipe"][p] for p = 1:H2_P) / SCALING^2
+    )
 
     add_similar_to_expression!(EP[:eObj], eCH2CompPipe)
 
@@ -135,7 +121,7 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ## Balance Expressions ##
     # H2 Power Consumption balance
 
-    if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
+    # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
         @expression(
             EP,
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
@@ -143,19 +129,9 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
                 vH2PipeFlow_neg[
                     p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
                 ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
-            ) / ModelScalingFactor
+            ) / SCALING
         )
-    else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
-        @expression(
-            EP,
-            ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
-            sum(
-                vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
-            )
-        )
-    end
+    # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption
 
     add_similar_to_expression!(EP[:ePowerBalance], ePowerBalanceH2PipeCompression, -1.0)
     add_similar_to_expression!(EP[:eH2NetpowerConsumptionByAll], ePowerBalanceH2PipeCompression)

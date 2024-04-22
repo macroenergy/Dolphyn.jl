@@ -9,7 +9,7 @@ function load_maximum_capacity_requirement!(path::AbstractString, inputs::Dict, 
     inputs["NumberOfMaxCapReqs"] = nrow(df)
     inputs["MaxCapReq"] = df[!, :Max_MW]
 
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 
     inputs["MaxCapReq"] /= scale_factor
     if "PriceCap" in names(df)

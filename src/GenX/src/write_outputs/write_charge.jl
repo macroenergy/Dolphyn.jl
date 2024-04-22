@@ -13,7 +13,7 @@ function write_charge(path::AbstractString, inputs::Dict, setup::Dict, EP::Model
 	dfCharge = DataFrame(Resource = inputs["RESOURCES"], Zone = dfGen[!,:Zone], AnnualSum = Array{Union{Missing,Float64}}(undef, G))
 	charge = zeros(G,T)
 
-	scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+	scale_factor = setup["scaling"]::Float64
 	if !isempty(STOR_ALL)
 	    charge[STOR_ALL, :] = value.(EP[:vCHARGE][STOR_ALL, :]) * scale_factor
 	end

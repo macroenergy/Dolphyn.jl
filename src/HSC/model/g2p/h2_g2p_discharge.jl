@@ -27,6 +27,8 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
     H = inputs["H2_G2P_ALL"]::Int #Number of Hydrogen gen units
     T = inputs["T"]::Int     # Number of time steps (hours)
 
+    SCALING = setup["scaling"]::Float64
+
     ### Variables ###
 
     #Electricity Discharge from hydrogen G2P resource k (MWh) in time t
@@ -42,14 +44,8 @@ function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
     ## In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
     ## Fue cost already scaled by 1000 in load_fuels_data.jl sheet, so  need to scale variable OM cost component by million and fuel cost component by 1000 here.
     #  ParameterScale = 0 --> objective function is in $
-
-    if setup["ParameterScale"] ==1
-        @expression(EP, eCH2G2PVar_out[k = 1:H,t = 1:T], 
-        inputs["omega"][t] * (dfH2G2P[!,:Var_OM_Cost_p_MWh][k]/ModelScalingFactor^2) * vPG2P[k,t])
-    else
-        @expression(EP, eCH2G2PVar_out[k = 1:H,t = 1:T], 
-        inputs["omega"][t] * dfH2G2P[!,:Var_OM_Cost_p_MWh][k] * vPG2P[k,t])
-    end
+    @expression(EP, eCH2G2PVar_out[k = 1:H,t = 1:T], 
+    inputs["omega"][t] * (dfH2G2P[!,:Var_OM_Cost_p_MWh][k] / SCALING^2) * vPG2P[k,t])
 
     @expression(EP, eTotalCH2G2PVarOutT[t=1:T], sum(eCH2G2PVar_out[k,t] for k in 1:H))
     @expression(EP, eTotalCH2G2PVarOut, sum(eTotalCH2G2PVarOutT[t] for t in 1:T))

@@ -29,7 +29,7 @@ function load_fuels_data!(setup::Dict, path::AbstractString, inputs::Dict)
     fuel_costs = Dict{AbstractString, Array{Float64}}()
     fuel_CO2 = Dict{AbstractString, Float64}()
 
-    scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
+    scale_factor = setup["scaling"]::Float64
 
     for i = 1:length(fuels)
             fuel_costs[fuels[i]] = costs[:,i] / scale_factor

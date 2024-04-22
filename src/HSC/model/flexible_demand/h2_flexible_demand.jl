@@ -69,6 +69,8 @@ hours_per_subperiod = inputs["hours_per_subperiod"] # Total number of hours per 
 
 END_HOURS = START_SUBPERIODS .+ hours_per_subperiod .- 1 # Last subperiod of each representative period
 
+SCALING = setup["scaling"]::Float64
+
 ### Variables ###
 
 # Variable tracking total advanced (negative) or deferred (positive) demand for demand flex resource k in period t
@@ -93,11 +95,7 @@ add_similar_to_expression!(EP[:eH2Balance], eH2BalanceDemandFlex)
 # Variable costs of "charging" for technologies "k" during hour "t" in zone "z"
 #  ParameterScale = 1 --> objective function is in million $
 #  ParameterScale = 0 --> objective function is in $
-if setup["ParameterScale"] ==1 
-    @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t]/ModelScalingFactor^2)
-else
-    @expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t])
-end
+@expression(EP, eCH2VarFlex_in[k in H2_FLEX,t=1:T], inputs["omega"][t]*dfH2Gen[!,:Var_OM_Cost_Charge_p_tonne][k]*vH2_CHARGE_FLEX[k,t] / SCALING^2)
 
 
 # Sum individual resource contributions to variable charging costs to get total variable charging costs

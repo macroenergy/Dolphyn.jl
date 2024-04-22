@@ -13,13 +13,11 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
     Z = inputs["Z"]::Int     # Number of zones
     T = inputs["T"]::Int     # Number of time steps (hours)
 
+    SCALING = setup["scaling"]::Float64
+
     # Recreate ELEC PRICE Dataframe (like in GenX, write_price function)
     # Dividing dual variable for each hour with corresponding hourly weight to retrieve marginal cost of generation
-    if setup["ParameterScale"] == 1
-        dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]*ModelScalingFactor), :auto)
-    else
-        dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"]), :auto)
-    end
+    dfPrice = DataFrame(transpose(dual.(EP[:cPowerBalance])./inputs["omega"] * SCALING), :auto)
 
 	dfP2G = DataFrame()
 	dfElecCost = DataFrame()
@@ -52,11 +50,7 @@ function write_h2_elec_costs(path::AbstractString, sep::AbstractString, inputs::
     end
 
 
-    if setup["ParameterScale"]==1 # Convert costs in millions to $
-        cH2VarElec = sum(ElecCostSum) * ModelScalingFactor^2
-    else
-        cH2VarElec = sum(ElecCostSum)
-    end
+    cH2VarElec = sum(ElecCostSum) * SCALING^2
 
     dfH2ElecCost = DataFrame()
     for z in 1:Z

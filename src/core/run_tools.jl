@@ -39,6 +39,9 @@ function load_settings(settings_path::AbstractString)
     mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
     mysetup = configure_settings(mysetup)
 
+    ModelScalingFactor = 1e+3
+    mysetup["ParameterScale"]==1 ? mysetup["scaling"] = ModelScalingFactor : mysetup["scaling"] = 1.0
+
     return mysetup
 end
 
