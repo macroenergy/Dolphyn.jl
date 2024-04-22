@@ -54,7 +54,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
     #Power required by hydrogen generation resource k to make hydrogen (MW)
     @variable(EP, vP2G[k in H2_GEN, t = 1:T] >= 0 )
 
-    ### Constratints ###
+    ### Constraints ###
 
     ## Constraints on retirements and capacity additions
     # Cannot retire more capacity than existing capacity

@@ -163,7 +163,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
     add_similar_to_expression!(EP[:eObj], eTotalCFixH2TruckEnergy)
 
 
-	### Constratints ###
+	### Constraints ###
 
 	## Constraints on truck retirements
 	#Cannot retire more charge capacity than existing charge capacity

@@ -145,7 +145,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     add_similar_to_expression!(EP[:eObj], eTotalCFixH2Energy)
 
 
-    ### Constratints ###
+    ### Constraints ###
 
     ## Constraints on retirements and capacity additions
     #Cannot retire more charge capacity than existing charge capacity

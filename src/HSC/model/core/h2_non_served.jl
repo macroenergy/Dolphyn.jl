@@ -85,7 +85,7 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     # Add non-served energy/curtailed demand contribution to power balance expression
     add_similar_to_expression!(EP[:eH2Balance], eH2BalanceNse)
 
-    ### Constratints ###
+    ### Constraints ###
 
     # Demand curtailed in each segment of curtailable demands cannot exceed maximum allowable share of demand
     @constraint(

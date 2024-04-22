@@ -42,7 +42,7 @@ function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
     #H2 required by G2P resource k to make hydrogen (Tonne/Hr)
     @variable(EP, vH2G2P[k in H2_G2P, t = 1:T] >= 0 )
 
-    ### Constratints ###
+    ### Constraints ###
 
     ## Constraints on retirements and capacity additions
     # Cannot retire more capacity than existing capacity
