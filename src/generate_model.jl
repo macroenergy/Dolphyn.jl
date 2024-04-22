@@ -73,7 +73,7 @@ The power balance constraint of the model ensures that electricity demand is met
 ## returns: Model EP object containing the entire optimization problem model to be solved by SolveModel.jl
 ##
 ################################################################################
-function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAttributes,modeloutput = nothing)
+function generate_model(setup::Dict, inputs::Dict, OPTIMIZER::MOI.OptimizerWithAttributes, modeloutput = nothing)::Model
 
     T = inputs["T"]::Int     # Number of time steps (hours)
     Z = inputs["Z"]::Int     # Number of zones - assumed to be same for power and hydrogen system

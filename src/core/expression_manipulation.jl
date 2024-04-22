@@ -282,6 +282,21 @@ function sum_expression(expr::AffExpr)::AffExpr
     return expr
 end
 
+function sum_expression(expr::AbstractArray{C, dims}, mult::Real)::AffExpr where {C,dims}
+    # check_addable_to_expr(C,C)
+    total = AffExpr(0.0)
+    add_to_expression!.(total, expr, mult)
+    return total
+end
+
+function sum_expression(expr::Base.Generator{C,T}, mult::Real)::AffExpr where {C,T}
+    total = AffExpr(0.0)
+    foreach(expr) do e
+        add_to_expression!(total, e, mult)
+    end
+    return total
+end
+
 # function sum_expression(expr::Base.Generator{C,T})::AffExpr where {C,T}
 #     total = AffExpr(0.0)
 #     foreach(expr) do e::Union{AffExpr, VariableRef}
