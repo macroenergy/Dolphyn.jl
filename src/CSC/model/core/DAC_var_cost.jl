@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    DAC_var_cost(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
 Sets up variables common to all direct air capture (DAC) resources.
 

@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	load_co2_capture_compression(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
+	load_co2_capture_compression(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_capture_comp::Dict)
 
 Function for reading input parameters related to CO2 compression resources in the carbon supply chain.
 """

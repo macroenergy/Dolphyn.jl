@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_injection(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    co2_injection(EP::Model, inputs::Dict, setup::Dict)
 
 	This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $k$ at site $S$ at time period $t$.
 

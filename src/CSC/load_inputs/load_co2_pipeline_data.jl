@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_nw::Dict)
+    load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_nw::Dict)
 
 Function for reading input parameters related to the CO2 transmission network via trunk and spur pipelines.
 """

@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+co2_capture(EP::Model, inputs::Dict, setup::Dict)
 
 This module models the CO2 captured by flue gas CCS units present in power, H2, and DAC plants and adds them to the total captured CO2 balance 
 """

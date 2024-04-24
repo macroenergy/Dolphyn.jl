@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_capture_compression(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+	co2_capture_compression(EP::Model, inputs::Dict, setup::Dict)
 
 	The CO2 compression module creates decision variables, expressions, and constraints related to CO2 compression infrastructure for captured CO2 by DAC units.
 

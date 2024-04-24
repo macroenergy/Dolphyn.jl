@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    co2_storage_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
+    co2_storage_investment(EP::Model, inputs::Dict, setup:Dict)
 
 	This module defines the total fixed cost (Investment + Fixed O&M) of the CO2 storage infrastructure in the CO2 supply chain
 
