@@ -15,51 +15,64 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_injection(EP::Model, inputs::Dict,setup::Dict)
+    co2_injection(EP::Model, inputs::Dict, setup::Dict)
 
-This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $s$ in zone $z$ at time period $t$.
+	This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $k$ at site $S$ at time period $t$.
 
-The variable defined in this file named after ```vDAC\textunderscore{CO2}\textunderscore{Injected}``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
+	The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Injected$``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
+	
+	This module defines the power consumption decision variable $x_{s,z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection at site $s$ in zone $z$ at time period $t$.
+	
+	The variable defined in this file named after ```vPower\textunderscore CO2\textunderscore Injection``` cover variable $x_{s,z,t}^{E,INJ}$.
+	
+	**Cost expressions**
+	
+	This module additionally defines contributions to the objective function from variable costs of CO2 injection (variable OM) from all resources over all time periods.
+	
+	```math
+	\begin{equation*}
+		\textrm{C}^{\textrm{C,INJ,o}} = \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s}^{\textrm{INJ,VOM}} \times x_{s,z,t}^{\textrm{C,INJ}}
+	\end{equation*}
+	```
+	
+	**Minimum and maximum injection output hourly**
+	
+	For resources where upper bound $\overline{x_{s}^{\textrm{C,INJ}}}$ of injection rate is defined, then we impose constraints on minimum and maximum injection rate
+	
+	
+	```math
+	\begin{equation*}
+		x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
+	```
+	
+	```math
+	\begin{equation*}
+		x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
+	```
 
-This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection in zone $z$ at time period $t$.
+	Additionally, CO2 is injected into a site only through the flow on the spur pipelines. This is expressed as follows
 
-The variable defined in this file named after ```vPower\textunderscore{CO2}\textunderscore{Injection}``` cover variable $x_{z,t}^{E,INJ}$.
+	\begin{equation*}
+		x_{s,z,t}^{\textrm{C,INJ}} = \sum_{l^S \in P^{Spur}_{Map}}Flow^{Spur}_{l^S(z, t \rightarrow s,t)} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
 
-**Cost expressions**
+	The flow of CO2 into a site is also constrained by the maximum hourly flow on the spur pipelines
 
-This module additionally defines contributions to the objective function from variable costs of CO2 injection (variable OM) from all resources over all time periods.
+	\begin{equation*}
+		\sum_{s \in S}x_{i,z \rightarrow s,t}^{\textrm{C,Spur}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
+	\end{equation*}
 
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,INJ,o}} = \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s}^{\textrm{INJ,VOM}} \times x_{s,z,t}^{\textrm{C,INJ}}
-\end{equation*}
-```
-
-**Minimum and maximum injection output hourly**
-
-For resources where upper bound $\overline{x_{s}^{\textrm{C,INJ}}}$ of injection rate is defined, then we impose constraints on minimum and maximum injection rate
-
-
-```math
-\begin{equation*}
-	x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
-
-**Maximum injection per year according to CO2 storage capacity per year**
-
-```math
-\begin{equation*}
-	\sum_{t \in \mathcal{T}} x_{s,z,t}^{\textrm{C,INJ}} \leq y_{s,z}^{\textrm{C,STO}}
-\end{equation*}
-```
+	**Maximum injection per year according to CO2 storage capacity per year**
+	
+	```math
+	\begin{equation*}
+		\sum_{t \in \mathcal{T}} x_{s,z,t}^{\textrm{C,INJ}} \leq y_{s,z}^{\textrm{C,STO}}
+	\end{equation*}
+	```
 """
+
 function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename CO2Storage dataframe
@@ -68,6 +81,12 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+
+	S = inputs["S"] # Number of CO2 Storage Sites
+
+	## Adding Fields from CO2 Pipelines ##
+	CO2_P = inputs["Spur_CO2_P"] # Number of Spur Pipelines
+	CO2_Pipe_Map = inputs["CO2_Spur_Pipe_Map"]
 
 	#####################################################################################################################################
 	##Variables
@@ -87,21 +106,22 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	sum(EP[:vPower_CO2_Injection][k,t] for k in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]))
 
 	#Add to power balance to take power away from generated
-	EP[:ePowerBalance] += -ePower_Balance_CO2_Storage
+	EP[:ePowerBalance] -= ePower_Balance_CO2_Storage
 
 	##For CO2 Policy constraint right hand side development - power consumption by zone and each time step
 	EP[:eCSCNetpowerConsumptionByAll] += ePower_Balance_CO2_Storage
 
 	#CO2 Balance expressions
-	@expression(EP, eStored_Captured_CO2[t=1:T, z=1:Z],
-	sum(EP[:vCO2_Injected][k,t] for k in dfCO2Storage[(dfCO2Storage[!,:Zone].==z),:R_ID]))
+	@expression(EP, eStored_Captured_CO2[t=1:T, z=1:S],
+	sum(EP[:vCO2_Injected][k,t] for k in dfCO2Storage[(dfCO2Storage[!,:Site].==z),:R_ID]))
 
 	#ADD TO CO2 BALANCE
-	EP[:eCaptured_CO2_Balance] -= eStored_Captured_CO2
+	EP[:eCO2Store_Flow_Balance] -= eStored_Captured_CO2
+
 
 	##Storage
 	#Amount of carbon injected into geological sequestration in zone z at time t
-	@expression(EP, eCO2_Injected_per_zone[z=1:Z, t=1:T], sum(EP[:vCO2_Injected][k,t] for k in dfCO2Storage[(dfCO2Storage[!,:Zone].==z),:R_ID]))
+	@expression(EP, eCO2_Injected_per_zone[z=1:S, t=1:T], sum(EP[:vCO2_Injected][k,t] for k in dfCO2Storage[(dfCO2Storage[!,:Site].==z),:R_ID]))
 
 	#Amount of carbon injected into geological sequestration in zone z at time t
 	@expression(EP, eCO2_Injected_per_year[k=1:CO2_STOR_ALL], sum(inputs["omega"][t]*EP[:vCO2_Injected][k,t] for t in 1:T))
@@ -120,6 +140,23 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
 	###############################################################################################################################
 
+	## Constraint that ensures that the summation of multiple pipelines injecting into a zone does not exceed its injection limit ##
+	eTotal_Flow_CO2_In = EP[:ePipeZoneCO2Demand_Inflow_Spur]
+	df_pipeInflow = DataFrame(eTotal_Flow_CO2_In, :auto)
+	df_pipeInflow = DataFrame(permutedims((df_pipeInflow)))
+
+	for col in names(df_pipeInflow)
+		df_pipeInflow[!, col] = convert(Vector{AffExpr}, df_pipeInflow[!, col])
+	end
+
+	ePipeZoneTotalCO2InFlowOfCO2 = Matrix(df_pipeInflow)
+
+	EP[:ePipeZoneTotalCO2InFlowOfCO2] = ePipeZoneTotalCO2InFlowOfCO2
+
+	@constraint(EP,cMax_Flow_in_per_time_per_type[k=1:CO2_STOR_ALL, t=1:T], EP[:ePipeZoneTotalCO2InFlowOfCO2][k,t] <=  dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
+
+	###################################################################################################################################
+	
 	#Variable Cost of CO2 Storage (Injection)
 	if setup["ParameterScale"] ==1
 		@expression(EP, eVar_OM_CO2_Injection_per_type_per_time[k = 1:CO2_STOR_ALL,t = 1:T], 

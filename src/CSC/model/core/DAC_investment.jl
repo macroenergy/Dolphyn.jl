@@ -15,13 +15,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	DAC_investment(EP::Model, inputs::Dict, setup::Dict)
+    DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 
 Sets up constraints common to all DAC resources.
 
 This function defines the expressions and constraints keeping track of total available DAC CO2 capture capacity $y_{d}^{\textrm{C,DAC}}$ as well as constraints on capacity.
 
-The expression defined in this file named after ```vCapacity\textunderscore{DAC}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{d}^{\textrm{C,DAC}}$.
+The expression defined in this file named after ```vCapacity\textunderscore DAC\textunderscore per\textunderscore type``` covers all variables $y_{d}^{\textrm{C,DAC}}$.
 
 The total capacity of each DAC resource is defined as the sum of newly invested capacity based on the assumption there are no existing DAC resources. 
 
@@ -44,6 +44,7 @@ For resources where upper bound $\overline{y_{d}^{\textrm{C,DAC}}}$ and lower bo
 	\underline{y_{d}^{\textrm{C,DAC}}} \leq y_{d}^{\textrm{C,DAC}} \leq \overline{y_{d}^{\textrm{C,DAC}}} \quad \forall d \in \mathcal{D}
 \end{equation*}
 ```
+
 """
 function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	

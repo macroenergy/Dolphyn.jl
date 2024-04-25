@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_co2_emission_balance_system(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_co2_emission_balance_system(path::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting CO2 balance of resources across the entire system
 """
@@ -39,14 +39,10 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
             dfTemp1[t+rowoffset,2] = 0
         end
 
-        if setup["ModelCSC"] == 1 
-            if setup["ModelCO2Pipelines"] == 1 && setup["CO2Pipeline_Loss"] == 1
-                dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) + value(sum(EP[:eCO2Loss_Pipes_zt][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
-            else
-                dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
-            end
+        if setup["ModelCO2Pipelines"] == 1 && setup["CO2Pipeline_Loss"] == 1
+            dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) + value(sum(EP[:eCO2Loss_Pipes_Trunk_zt][z,t] for z in 1:Z)) + + value(sum(EP[:eCO2Loss_Pipes_Spur_zt][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
         else
-            dfTemp1[t+rowoffset,3] = 0
+            dfTemp1[t+rowoffset,3] = value(sum(EP[:eDAC_Emissions_per_zone_per_time][z,t] for z in 1:Z)) - value(sum(EP[:eDAC_CO2_Captured_per_zone_per_time][z,t] for z in 1:Z))
         end
 
         if setup["ModelBIO"] == 1
@@ -59,7 +55,7 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
             dfTemp1[t+rowoffset,6] = 0
         end
 
-        if setup["ModelLiquidFuels"] == 1
+        if setup["ModelSynFuels"] == 1
             dfTemp1[t+rowoffset,7] = value(sum(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eByProdConsCO2EmissionsByZone][z,t] for z in 1:Z))
             dfTemp1[t+rowoffset,8] = value(sum(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eLiquid_Fuels_Con_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eLiquid_Fuels_Con_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
             dfTemp1[t+rowoffset,9] = value(sum(EP[:eSyn_Fuels_Diesel_Cons_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Fuels_Jetfuel_Cons_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Fuels_Gasoline_Cons_CO2_Emissions_By_Zone][z,t] for z in 1:Z))

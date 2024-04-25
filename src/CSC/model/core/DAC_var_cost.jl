@@ -15,13 +15,13 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
+    DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
 Sets up variables common to all direct air capture (DAC) resources.
 
 This module defines the DAC decision variable $x_{d,z,t}^{\textrm{C,DAC}} \forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into the grid by DAC resource $d$ in zone $z$ at time period $t$.
 
-The variable defined in this file named after ```vDAC\textunderscore{CO2}\textunderscore{Captured}``` covers all variables $x_{d,z,t}^{\textrm{C,DAC}}$.
+The variable defined in this file named after ```$vDAC\textunderscore CO2\textunderscore Captured$``` covers all variables $x_{d,z,t}^{\textrm{C,DAC}}$.
 
 
 **Cost expressions**
@@ -34,6 +34,7 @@ This module additionally defines contributions to the objective function from va
 \end{equation*}
 ```
 """
+
 function DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
 	println("DAC variable cost module")
