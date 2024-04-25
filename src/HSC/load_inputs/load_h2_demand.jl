@@ -51,6 +51,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
         inputs_load["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_per_Tonne]))[s]*inputs_load["H2_Voll"][1]
         # Maximum hourly demand curtailable as % of the max demand (for each segment)
         inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
+
     end
     
     print_and_log("HSC_load_data.csv Successfully Read!")
