@@ -1,0 +1,56 @@
+┌ Info: 2024-04-29 11:57:33 Time Series Data Already Clustered.
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:33 CSC TDR not implemented.
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:33 Configuring Solver
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:42 Reading H2 Input CSV Files
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:43 HSC_load_data.csv Successfully Read!
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:43 HSC_generators_variability.csv Successfully Read!
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:44 HSC_pipelines.csv Successfully Read!
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:44 HSC_g2p_variability.csv Successfully Read!
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:45 HSC_CO2_cap.csv Successfully Read!
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:57:45 HSC Input CSV Files Successfully Read In From /Users/junlaw/Documents/GitHub/DOLPHYN-dev/Example_Systems/US/NineZones_Liquids_E+/
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:58:57 Hydrogen Generation and Storage Discharge Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:58:57 Hydrogen Investment Discharge Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:58:57 Hydrogen Production Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:58:57 H2 Production Core Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:58:57 H2 Production (No Unit Commitment) Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:01 H2 Emissions Module for CO2 Policy modularization
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:02 Hydrogen Non-served Energy Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:03 Hydrogen Storage Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:03 H2 Storage Energy Investment Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:03 H2 Storage Charging Investment Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:04 H2 Storage Core Resources Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:05 Hydrogen Long Duration Storage Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Warning: Axis contains one element: 365. If intended, you can safely ignore this warning. To explicitly pass the axis with one element, pass `[365]` instead of `365`.
+└ @ JuMP.Containers /Users/junlaw/.julia/packages/JuMP/as6Ji/src/Containers/DenseAxisArray.jl:186
+┌ Info: 2024-04-29 11:59:06 Hydrogen Pipeline Module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 11:59:13 H2 g2p demand module
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Warning: The addition operator has been used on JuMP expressions a large number of times. This warning is safe to ignore but may indicate that model generation is slower than necessary. For performance reasons, you should not add expressions in a loop. Instead of x += y, use add_to_expression!(x,y) to modify x in place. If y is a single variable, you may also use add_to_expression!(x, coef, y) for x += coef*y.
+└ @ JuMP /Users/junlaw/.julia/packages/JuMP/as6Ji/src/operators.jl:279
+┌ Info: 2024-04-29 11:59:55 C02 Policies Module for power and hydrogen system combined
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29
+┌ Info: 2024-04-29 12:00:05 Solving Model
+└ @ Dolphyn /Users/junlaw/Documents/GitHub/DOLPHYN-dev/src/core/print_and_log.jl:29

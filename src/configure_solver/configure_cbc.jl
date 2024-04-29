@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    configure_cbc(solver_settings_path::String)
+    configure_cbc(solver_settings_path::String, solver::DataType)
 
 Reads user-specified solver settings from cbc\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -32,7 +32,7 @@ The Cbc optimizer instance is configured with the following default parameters i
  - threads = 1
 
 """
-function configure_cbc(solver_settings_path::String)
+function configure_cbc(solver_settings_path::String, solver::DataType)
 
     solver_settings = YAML.load(open(solver_settings_path))
 
@@ -53,7 +53,8 @@ function configure_cbc(solver_settings_path::String)
         if(haskey(solver_settings, "threads")) Mythreads = solver_settings["threads"] end
     ########################################################################
 
-    OPTIMIZER = optimizer_with_attributes(Cbc.Optimizer,
+    OPTIMIZER = optimizer_with_attributes(
+        solver,
         "seconds" => Myseconds,
         "logLevel" => MylogLevel,
         "maxSolutions" => MymaxSolutions,

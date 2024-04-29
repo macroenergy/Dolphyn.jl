@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    configure_highs(solver_settings_path::String)
+    configure_highs(solver_settings_path::String, solver::DataType)
 
 Reads user-specified solver settings from highs\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -418,7 +418,7 @@ The HiGHS optimizer instance is configured with the following default parameters
     less_infeasible_DSE_choose_row = true
 
 """
-function configure_highs(solver_settings_path::String)
+function configure_highs(solver_settings_path::String, solver::DataType)
 
     solver_settings = YAML.load(open(solver_settings_path))
 
@@ -819,7 +819,7 @@ function configure_highs(solver_settings_path::String)
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
-        HiGHS.Optimizer,
+        solver,
         "primal_feasibility_tolerance" => MyFeasibilityTol,
         "dual_feasibility_tolerance" => MyOptimalityTol,
         "time_limit" => MyTimeLimit,

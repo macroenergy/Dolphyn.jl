@@ -344,7 +344,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         ###Liquid Fuel Demand Constraints
 		#Diesel
 		
-        if setup["Bio_Diesel_On"] == 0
+        if setup["Bio_Diesel_On"] == 0 || setup["ModelBESC"] == 0
             @expression(EP, eGlobalLFDieselBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFDieselBalance][t,z] for z = 1:Z) )
             @expression(EP, eGlobalLFDieselDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) )
 
@@ -359,7 +359,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		#Jetfuel
 		
-        if setup["Bio_Jetfuel_On"] == 0
+        if setup["Bio_Jetfuel_On"] == 0 || setup["ModelBESC"] == 0
             @expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
             @expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
 
@@ -374,7 +374,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		#Gasoline
 		
-        if setup["Bio_Gasoline_On"] == 0
+        if setup["Bio_Gasoline_On"] == 0 || setup["ModelBESC"] == 0
             @expression(EP, eGlobalLFGasolineBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFGasolineBalance][t,z] for z = 1:Z) )
             @expression(EP, eGlobalLFGasolineDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) )
 

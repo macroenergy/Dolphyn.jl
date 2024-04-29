@@ -88,6 +88,12 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow
     @variable(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
 
+    # Unidirectional pipeline flow constraints. hsc_pipeline inputs file must have 2 pipelines in between each zone for this to work properly (flipping the -1 and +1 directions)
+    # Constraints force the source zone to only export H2 through pipeline p while the destination zone can only import
+    if setup["H2PipeDirection"] == 1
+        @constraint(EP, vH2PipeFlow_pos[:, :, 1] .== 0)
+        @constraint(EP, vH2PipeFlow_neg[:, :, -1] .== 0)
+    end
 
     ### Expressions ###
     # Calculate the number of new pipes

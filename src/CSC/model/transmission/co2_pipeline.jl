@@ -87,6 +87,13 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vCO2PipeFlow_neg[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #negative pipeflow
     @variable(EP, vCO2Loss[t=1:T,z=1:Z] >= 0 ) #CO2 Loss in Pipe
 
+    # Unidirectional pipeline flow constraints. hsc_pipeline inputs file must have 2 pipelines in between each zone for this to work properly (flipping the -1 and +1 directions)
+    # Constraints force the source zone to only export H2 through pipeline p while the destination zone can only import
+    if setup["CO2PipeDirection"] == 1
+        @constraint(EP, vCO2PipeFlow_pos[:, :, 1] .== 0)
+        @constraint(EP, vCO2PipeFlow_neg[:, :, -1] .== 0)
+    end
+
 	### Expressions ###
     #Calculate the number of new pipes
     @expression(EP, eCO2NPipeNew[p = 1:CO2_P], vCO2NPipe[p] - inputs["pCO2_Pipe_No_Curr"][p])

@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    configure_cplex(solver_settings_path::String)
+    configure_cplex(solver_settings_path::String, solver::DataType)
 
 Reads user-specified solver settings from cplex\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -36,7 +36,7 @@ The CPLEX optimizer instance is configured with the following default parameters
  - CPX\_PARAM\_SOLUTIONTYPE = 2 (Solution type for LP or QP. See [here](https://www.ibm.com/support/knowledgecenter/hr/SSSA5P_12.8.0/ilog.odms.cplex.help/CPLEX/Parameters/topics/SolutionType.html).)
 
 """
-function configure_cplex(solver_settings_path::String)
+function configure_cplex(solver_settings_path::String, solver::DataType)
 
     solver_settings = YAML.load(open(solver_settings_path))
 
@@ -88,7 +88,7 @@ function configure_cplex(solver_settings_path::String)
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
-        CPLEX.Optimizer,
+        solver,
         "CPX_PARAM_EPRHS" => MyFeasibilityTol,
         "CPX_PARAM_EPOPT" => MyOptimalityTol,
         "CPX_PARAM_AGGFILL" => MyAggFill,

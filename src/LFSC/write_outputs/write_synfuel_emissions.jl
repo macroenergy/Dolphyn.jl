@@ -82,7 +82,7 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 				dfTemp1[t+rowoffset,4]=value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,5] = 0
 				
-				if setup["Bio_Diesel_On"] == 1
+				if setup["Bio_Diesel_On"] == 1 && setup["ModelBESC"] == 1
 					dfTemp1[t+rowoffset,5]=value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t])
 				end
 
@@ -90,7 +90,7 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 				dfTemp1[t+rowoffset,7]=value.(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t])
 
 				dfTemp1[t+rowoffset,8] = 0
-				if setup["Bio_Jetfuel_On"] == 1
+				if setup["Bio_Jetfuel_On"] == 1 && setup["ModelBESC"] == 1
 					dfTemp1[t+rowoffset,8]=value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t])*ModelScalingFactor
 				end
 
@@ -98,7 +98,7 @@ function write_synfuel_emissions(path::AbstractString, sep::AbstractString, inpu
 				dfTemp1[t+rowoffset,10]=value.(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,11] = 0
 				
-				if setup["Bio_Gasoline_On"] == 1
+				if setup["Bio_Gasoline_On"] == 1 && setup["ModelBESC"] == 1
 					dfTemp1[t+rowoffset,11]=value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t])
 				end
 

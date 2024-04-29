@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    configure_clp(solver_settings_path::String)
+    configure_clp(solver_settings_path::String, solver::DataType)
 
 Reads user-specified solver settings from clp\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -36,7 +36,7 @@ The Clp optimizer instance is configured with the following default parameters i
  - Perturbation = 100 (switch on perturbation (50), automatic (100), don't try perturbing (102))
 
 """
-function configure_clp(solver_settings_path::String)
+function configure_clp(solver_settings_path::String, solver::DataType)
 
     solver_settings = YAML.load(open(solver_settings_path))
 
@@ -92,7 +92,7 @@ function configure_clp(solver_settings_path::String)
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
-        Clp.Optimizer,
+        solver,
         "PrimalTolerance" => MyPrimalTolerance,
         "DualTolerance" => MyDualTolerance,
         "DualObjectiveLimit" => MyDualObjectiveLimit,
