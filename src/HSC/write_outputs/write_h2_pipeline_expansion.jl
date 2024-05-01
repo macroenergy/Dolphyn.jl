@@ -24,7 +24,7 @@ function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, 
     L = inputs["H2_P"]     # Number of H2 pipelines
 
     Existing_Trans_Cap = zeros(L)
-    transcap = zeros(L) # Transmission network reinforcements in tonne/hour
+    transcap = zeros(L) # Transmission network reinforcements in MW/hour
     Pipes = zeros(L)
     Fixed_Cost = zeros(L)
 

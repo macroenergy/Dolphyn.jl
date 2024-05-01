@@ -378,6 +378,9 @@ This file contains cost and performance parameters for various generators and ot
 |MinCapTag\_*| Eligibility of resources to participate in Minimum Technology Carveout constraint. \* corresponds to the ith row of the file `Minimum_capacity_requirement.csv`.|
 |**MaxCapReq = 1**|
 |MaxCapTag\_*| Eligibility of resources to participate in Maximum Technology Carveout constraint. \* corresponds to the ith row of the file `Maximum_capacity_requirement.csv`.|
+|H2\_TMR\_*| Flag to indicate which resources are considered for the Time Matching Requirement constraint for H2 (constraint number denoted by value after "\_"). Similar Flag should also be added to hsc_generation.csv for eligible_power_sector_resources|
+||1- included|
+||0- excluded|
 
 ### 2.2 Optional inputs files
 

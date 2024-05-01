@@ -65,10 +65,6 @@ using HiGHS
 # To translate $/MWh to $M/GWh, multiply by ModelScalingFactor
 const ModelScalingFactor = 1e+3
 
-# Lower heating value of Hydrogen
-# LHV is used when defining a system-wide CO2 constraint for the joint hydrogen and electricity infrastructures (SystemCO2Constraint =2)
-const H2_LHV = 33.33 # MWh per tonne
-
 # Logging flag
 Log = true
 
