@@ -3,7 +3,7 @@ using Test
 
 example_path = joinpath(dirname(@__DIR__), "Example_Systems", "DistDolphyn_ThreeZones")
 if !isdir(example_path)
-    error("Example directory not found. Run `git submodule update --init` to download the example data.")
+    error("Example directory not found")
 end 
 println("Testing using data from $example_path")
 
@@ -14,7 +14,8 @@ setup = Dict{String, Any}(
     "ParameterScale" => 0,
 )
 inputs = Dict{String, Any}()
-DOLPHYN.load_external_elec_prices!(setup, example_path, inputs)
+DOLPHYN.load_elec_import_prices(setup, example_path, inputs)
+DOLPHYN.load_elec_import_limits(setup, example_path, inputs)
 
 # Test with parameter scaling
 setup = Dict{String, Any}(
@@ -23,4 +24,9 @@ setup = Dict{String, Any}(
     "ParameterScale" => 1,
 )
 inputs = Dict{String, Any}()
-DOLPHYN.load_external_elec_prices!(setup, example_path, inputs)
+DOLPHYN.load_elec_import_prices(setup, example_path, inputs)
+DOLPHYN.load_elec_import_limits(setup, example_path, inputs)
+
+# Test that load_elec_import_limits fails gracefull
+DOLPHYN.load_elec_import_limits(setup, example_path, inputs, "file_that_does_not_exist.csv")
+
