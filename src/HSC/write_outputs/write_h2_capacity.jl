@@ -20,6 +20,9 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting the capacities for the different hydrogen resources (starting capacities or, existing capacities, retired capacities, and new-built capacities).
 """
 function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+	H = inputs["H2_RES_ALL"]
+
     # Capacity decisions
     dfH2Gen = inputs["dfH2Gen"]
     if setup["ModelH2Liquid"] ==1
@@ -73,7 +76,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
     ret_cap_and_commit = intersect(inputs["H2_GEN_RET_CAP"], inputs["H2_GEN_COMMIT"])
     ret_cap_not_commit = setdiff(inputs["H2_GEN_RET_CAP"], inputs["H2_GEN_COMMIT"])
     if !isempty(ret_cap_and_commit)
-        retcapdischarge[ret_cap_and_commit] .= value.(EP[:vH2GenRetCap][ret_cap_and_commit]).data .* dfH2Gen[ret_cap_and_commit,:Cap_Size_tonne_p_hr]
+        retcapdischarge[ret_cap_and_commit] .= value.(EP[:vH2GenRetCap][ret_cap_and_commit]).data .* dfH2Gen[ret_cap_and_commit,:Cap_Size_MWh]
     end
     
 	if !isempty(ret_cap_not_commit)
@@ -137,7 +140,11 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
         StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh],
         RetChargeCap = retcapcharge[:],
         NewChargeCap = capcharge[:],
-        EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh]+capcharge[:]-retcapcharge[:]
+        EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh]+capcharge[:]-retcapcharge[:],
+		MaxAnnualGeneration = MaxGen[:],
+		AnnualGeneration = AnnualGen[:],
+		CapacityFactor = CapFactor[:],
+		AnnualEmissions = AnnualCO2Emissions[:]
     )
 
 	total = DataFrame(

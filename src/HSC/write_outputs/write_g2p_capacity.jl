@@ -22,6 +22,8 @@ Function for reporting the diferent capacities for the different hydrogen to pow
 function write_g2p_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
     # Capacity decisions
     dfH2G2P = inputs["dfH2G2P"]
+	H = inputs["H2_G2P_ALL"]     # Number of resources (generators, storage, DR, and DERs)
+	
     capdischarge = zeros(size(inputs["H2_G2P_NAME"]))
     new_cap_and_commit = intersect(inputs["H2_G2P_NEW_CAP"], inputs["H2_G2P_COMMIT"])
     new_cap_not_commit = setdiff(inputs["H2_G2P_NEW_CAP"], inputs["H2_G2P_COMMIT"])

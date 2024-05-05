@@ -90,7 +90,3 @@ end
 if mysetup["ModelLiquidFuels"] == 1
     write_liquid_fuels_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
-
-compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))
-
-

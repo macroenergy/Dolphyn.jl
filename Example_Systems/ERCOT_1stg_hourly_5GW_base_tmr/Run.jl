@@ -14,7 +14,7 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-using DOLPHYN
+using Dolphyn
 using YAML
 
 # The directory that contains configuration files
@@ -64,7 +64,7 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 ### Write power system output
 
 println("Writing Output")
-outpath = "$inpath/Results"
+outpath = joinpath(inputs_path,"Results")
 outpath=write_outputs(EP, outpath, mysetup, myinputs)
 
 # Write hydrogen supply chain outputs

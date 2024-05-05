@@ -60,7 +60,7 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         eCO2CaptureByH2Plant[k = 1:H, t = 1:T],
-        if (dfH2Gen[!, :H2Stor_Charge_MMBtu_p_tonne][k] > 0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
+        if (dfH2Gen[!, :H2Stor_Charge_MMBtu_p_MWh][k] > 0) # IF storage consumes fuel during charging or not - not a default parameter input so hence the use of if condition
             inputs["fuel_CO2"][dfH2Gen[!, :Fuel][k]] *
             dfH2Gen[!, :etaFuel_MMBtu_p_MWh][k] *
             EP[:vH2Gen][k, t] * 

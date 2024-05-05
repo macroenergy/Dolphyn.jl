@@ -29,7 +29,6 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	dfH2GenOut = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
     h2gen = value.(EP[:vH2Gen])
-
     dfH2GenOut.AnnualSum .= h2gen * inputs["omega"] 
 
     # Load hourly values
@@ -38,6 +37,8 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	# Add labels
 	auxNew_Names=[Symbol("Resource");Symbol("Zone");Symbol("AnnualSum");[Symbol("t$t") for t in 1:T]]
 	rename!(dfH2GenOut,auxNew_Names)
+
+	total = DataFrame(["Total" 0 sum(dfH2GenOut[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 
  	total[:,4:T+3] .= sum(h2gen, dims=1)
 

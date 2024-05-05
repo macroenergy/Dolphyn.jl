@@ -141,7 +141,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cMaxRetH2Charge[y in RET_CAP_H2_STOR_CHARGE],
-        vH2RETCAPCHARGE[y] <= dfH2Gen[!, :Existing_Cap_Charge_tonne_p_hr][y]
+        vH2RETCAPCHARGE[y] <= dfH2Gen[!, :Existing_Charge_Cap_MWh][y]
     )
 
     # Constraints on new built capacity

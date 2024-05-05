@@ -57,8 +57,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempBlue_H2_Generation = tempBlue_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
 			tempBlue_H2_Fixed_Cost = tempBlue_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-			tempBlue_H2_Var_Cost = tempBlue_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_tonne][y].* (value.(EP[:vH2Gen])[y,:])))
-			tempBlue_H2_Fuel_Cost = tempBlue_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,:]))
+			tempBlue_H2_Var_Cost = tempBlue_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_MWh][y].* (value.(EP[:vH2Gen])[y,:])))
+			tempBlue_H2_Fuel_Cost = tempBlue_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_MWh][y].* (value.(EP[:vH2Gen])[y,:]))
 			tempBlue_H2_Electricity_Cost = tempBlue_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
 			tempBlue_H2_CO2_Emission = tempBlue_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
@@ -257,8 +257,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGrey_H2_Generation = tempGrey_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
 			tempGrey_H2_Fixed_Cost = tempGrey_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-			tempGrey_H2_Var_Cost = tempGrey_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_tonne][y].* (value.(EP[:vH2Gen])[y,:])))
-			tempGrey_H2_Fuel_Cost = tempGrey_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,:]))
+			tempGrey_H2_Var_Cost = tempGrey_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_MWh][y].* (value.(EP[:vH2Gen])[y,:])))
+			tempGrey_H2_Fuel_Cost = tempGrey_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_MWh][y].* (value.(EP[:vH2Gen])[y,:]))
 			tempGrey_H2_Electricity_Cost = tempGrey_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
 			tempGrey_H2_CO2_Emission = tempGrey_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
