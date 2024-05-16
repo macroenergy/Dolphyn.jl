@@ -1041,7 +1041,8 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     mkpath(joinpath(inpath, TimeDomainReductionFolder))
 
     ### Load_data_clustered.csv
-    load_in = DataFrame(CSV.File(string(inpath,sep,"Load_data.csv"), header=true), copycols=true) #Setting header to false doesn't take the names of the columns; not including it, not including copycols, or, setting copycols to false has no effect
+    system_path = inpath*"/inputs/genx/system/"
+    load_in = DataFrame(CSV.File(string(system_path,"Load_data.csv"), header=true), copycols=true) #Setting header to false doesn't take the names of the columns; not including it, not including copycols, or, setting copycols to false has no effect
     load_in[!,:Sub_Weights] = load_in[!,:Sub_Weights] * 1.
     load_in[1:length(W),:Sub_Weights] .= W
     load_in[!,:Rep_Periods][1] = length(W)
@@ -1075,7 +1076,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     ### Fuels_data_clustered.csv
 
-    fuel_in = DataFrame(CSV.File(string(inpath,sep,"Fuels_data.csv"), header=true), copycols=true)
+    fuel_in = DataFrame(CSV.File(string(system_path,"Fuels_data.csv"), header=true), copycols=true)
     select!(fuel_in, Not(:Time_Index))
     SepFirstRow = DataFrame(fuel_in[1, :])
     NewFuelOutput = vcat(SepFirstRow, FPOutputData)
@@ -1091,7 +1092,8 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ### Write Hydrogen Outputs
     if mysetup["ModelH2"] == 1
         #Write h2_load_data.csv
-        h2_load_in = DataFrame(CSV.File(string(inpath,sep,"HSC_load_data.csv"), header=true), copycols=true)
+        hsc_system_path = inpath*"/inputs/hsc/system/"
+        h2_load_in = DataFrame(CSV.File(string(hsc_system_path,"HSC_load_data.csv"), header=true), copycols=true)
         h2_load_in[!,:Sub_Weights] = h2_load_in[!,:Sub_Weights] * 1.
         h2_load_in[1:length(W),:Sub_Weights] .= W
         h2_load_in[!,:Rep_Periods][1] = length(W)

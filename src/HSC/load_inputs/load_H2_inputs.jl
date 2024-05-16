@@ -39,6 +39,11 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
     data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
+    # Set up paths for files from different folders
+    system_path = joinpath(path, "inputs/hsc", setup["SystemFolder"])
+    policies_path = joinpath(path, "inputs/hsc", setup["PoliciesFolder"])
+    resources_path = joinpath(path, "inputs/hsc", setup["ResourcesFolder"])
+
     # Select zones which will be included. This currently only works for the non-GenX sectors
     # select_zones!(inputs, setup, path)
     # println("HSC Sector using zones: ", inputs["Zones"])
@@ -46,15 +51,15 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     ## Read input files
     print_and_log("Reading H2 Input CSV Files")
     ## Declare Dict (dictionary) object used to store parameters
-    inputs = load_h2_gen(setup, path, sep, inputs)
-    inputs = load_h2_demand(setup, path, sep, inputs)
-    inputs = load_h2_generators_variability(setup, path, sep, inputs)
+    inputs = load_h2_gen(setup, resources_path, sep, inputs)
+    inputs = load_h2_demand(setup, system_path, sep, inputs)
+    inputs = load_h2_generators_variability(setup, system_path, sep, inputs)
 
     # Read input data about power network topology, operating and expansion attributes
 
     if setup["ModelH2Pipelines"] == 1
-        if isfile(joinpath(path, "HSC_pipelines.csv"))         
-            inputs  = load_h2_pipeline_data(setup, path, sep, inputs)
+        if isfile(joinpath(system_path, "HSC_pipelines.csv"))         
+            inputs  = load_h2_pipeline_data(setup, system_path, sep, inputs)
         else
             inputs["H2_P"] = 0
         end
@@ -63,29 +68,29 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
     # Read input data about hydrogen transport truck types
     if setup["ModelH2Trucks"] ==1
-        inputs = load_h2_truck(path, sep, inputs)
+        inputs = load_h2_truck(system_path, sep, inputs)
     end
     
 
     # Read input data about hydrogen transport truck types
     if setup["ModelH2Liquid"] ==1
-        inputs = load_h2_demand_liquid(setup, path, sep, inputs)
+        inputs = load_h2_demand_liquid(setup, system_path, sep, inputs)
     end
     
 
     # Read input data about G2P Resources
-    if isfile(joinpath(path, "HSC_G2P.csv"))
+    if isfile(joinpath(system_path, "HSC_G2P.csv"))
         # Create flag for other parts of the code
         setup["ModelH2G2P"] = 1
-        inputs = load_h2_g2p(setup,path, sep, inputs)
-        inputs = load_h2_g2p_variability(setup, path, sep, inputs)
+        inputs = load_h2_g2p(setup, system_path, sep, inputs)
+        inputs = load_h2_g2p_variability(setup, system_path, sep, inputs)
     else
         setup["ModelH2G2P"] = 0
     end
     
     # If emissions flag is on, read in emissions related inputs
     if setup["H2CO2Cap"]>=1
-        inputs = load_co2_cap_hsc(setup, path, sep, inputs)
+        inputs = load_co2_cap_hsc(setup, policies_path, sep, inputs)
     end
 
     #Check whether or not there is LDS for trucks and H2 storage
