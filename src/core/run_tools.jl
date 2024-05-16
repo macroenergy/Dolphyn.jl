@@ -1,19 +1,3 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
 # Methods to simplify the process of running DOLPHYN cases
 
 """
@@ -23,7 +7,11 @@ Loads Global, GenX and HSC settings and returns a merged settings dict called my
 """
 function load_settings(settings_path::AbstractString)
     genx_settings_path = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
-    mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
+    if isfile(genx_settings_path)
+        mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
+    else
+        mysetup_genx = Dict()
+    end
 
     hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC  model
     if isfile(hsc_settings_path)
@@ -47,13 +35,42 @@ function load_settings(settings_path::AbstractString)
     end 
 
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
-    mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
+    if isfile(global_settings_path)
+        mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
+    else
+        error("A global settings file is required to run Dolphyn")
+    end
 
     mysetup = Dict{Any,Any}()
     mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
     mysetup = configure_settings(mysetup)
 
     return mysetup
+end
+
+function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString)
+    myinputs = Dict{String, Any}() # myinputs dictionary will store read-in data and computed parameters
+
+    # To do: make this conditional on modelling the electricity sector
+    myinputs = load_inputs(mysetup, inputs_path)
+
+    # ### Load H2 inputs if modeling the hydrogen supply chain
+    if mysetup["ModelH2"] == 1
+        myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    # ### Load CO2 inputs if modeling the carbon supply chain
+    if mysetup["ModelCSC"] == 1
+        myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    ### Load LF inputs if modeling the synthetic fuels supply chain
+    if mysetup["ModelLiquidFuels"] == 1
+        myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    return myinputs
+
 end
 
 function setup_logging(mysetup::Dict{Any, Any})
@@ -89,4 +106,27 @@ function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any
     if mysetup["ModelCSC"] == 1
         print_and_log("CSC and SF TDR not implemented.")
     end
+end
+
+function write_all_outputs(EP::Model, mysetup::Dict{Any, Any}, myinputs::Dict{Any, Any}, inputs_path::String)
+    outpath = joinpath(inputs_path, "Results")
+    outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
+
+    # Write hydrogen supply chain outputs
+    if mysetup["ModelH2"] == 1
+        write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
+    end
+
+    # Write carbon supply chain outputs
+    if mysetup["ModelCSC"] == 1
+        write_CSC_outputs(EP, outpath_GenX, mysetup, myinputs)
+    end
+
+    # Write synthetic fuels supply chain outputs
+    if mysetup["ModelLiquidFuels"] == 1
+        write_liquid_fuels_outputs(EP, outpath_GenX, mysetup, myinputs)
+    end
+
+    return nothing
+
 end

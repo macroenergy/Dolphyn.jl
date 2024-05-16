@@ -20,6 +20,7 @@ export compare_results
 export print_and_log
 export configure_settings
 export load_settings
+export load_all_inputs
 export setup_logging
 export setup_TDR
 export configure_solver
@@ -29,6 +30,7 @@ export load_co2_inputs
 export load_liquid_fuels_inputs
 export generate_model
 export solve_model
+export write_all_outputs
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
