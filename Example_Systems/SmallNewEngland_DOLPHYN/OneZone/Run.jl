@@ -43,13 +43,7 @@ OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
 # #### Running a case
 
 # ### Load inputs
-# print_and_log("Loading Inputs")
- myinputs = load_inputs(mysetup, inputs_path)
-
-# ### Load H2 inputs if modeling the hydrogen supply chain
-if mysetup["ModelH2"] == 1
-    myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
-end
+myinputs = load_all_inputs(mysetup, inputs_path)
 
 # ### Generate model
 # print_and_log("Generating the Optimization Model")
@@ -63,13 +57,4 @@ myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
 ### Write power system output
 
 print_and_log("Writing Output")
-outpath = joinpath(inputs_path,"Results")
-outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
-
-# Write hydrogen supply chain outputs
-# outpath_H2 = joinpath(outpath_GenX,"Results_HSC")
-if mysetup["ModelH2"] == 1
-    write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
-end
-
-compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))
+write_all_outputs(EP, mysetup, myinputs, inputs_path)
