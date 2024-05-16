@@ -124,7 +124,7 @@ function load_h2_pipeline_data(
         )
 
     #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
-    inputs_nw["pComp_MWh_per_tonne_Pipe"] =
+    inputs_nw["pComp_MWh_per_MWh_Pipe"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :H2PipeCompEnergy]))

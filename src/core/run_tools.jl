@@ -81,7 +81,7 @@ function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any
 
     if mysetup["TimeDomainReduction"] == 1
         if mysetup["ModelH2"] == 1
-	    if notAllFilesExist(TDRpath, H2_tdr_file_list)
+	        if notAllFilesExist(TDRpath, H2_tdr_file_list)
                 print_and_log("Clustering Time Series Data...")
                 cluster_inputs(inputs_path, settings_path, mysetup)
             else

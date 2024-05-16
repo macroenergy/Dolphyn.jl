@@ -15,6 +15,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 using Dolphyn
+using Gurobi
+
 
 # The directory containing your settings folder and files
 settings_path = joinpath(@__DIR__, "Settings")
@@ -30,7 +32,6 @@ global_logger = setup_logging(mysetup)
 
 ### Load DOLPHYN
 println("Loading packages")
-# push!(LOAD_PATH, src_path)
 
 # Setup time domain reduction and cluster inputs if necessary
 setup_TDR(inputs_path, settings_path, mysetup)
@@ -38,7 +39,7 @@ setup_TDR(inputs_path, settings_path, mysetup)
 # ### Configure solver
 print_and_log("Configuring Solver")
 
-OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
+OPTIMIZER = configure_solver(mysetup["Solver"], settings_path, Gurobi.Optimizer)
 
 # #### Running a case
 
@@ -71,3 +72,5 @@ outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
 if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
+
+

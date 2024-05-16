@@ -15,31 +15,26 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 using Dolphyn
+using Gurobi
 using YAML
 
-# The directory that contains configuration files
-settings_path = joinpath(@__DIR__, "Settings")
-
-# The directory that contains your input data 
+# The directory containing your input data
 inputs_path = @__DIR__
 
-# Load settings 
-mysetup = load_settings(settings_path)
-
-# Setup logging
-global_logger = setup_logging(mysetup)
-
-# Load DOLPHYN
-println("Loading packages")
-
 @info("PACKAGE LOADED")
+
+# The directory containing your settings folder and files
+settings_path = joinpath(@__DIR__, "Settings")
+
+# Load settings
+mysetup = load_settings(settings_path)
 
 # Setup time domain reduction and cluster inputs if necessary
 setup_TDR(inputs_path, settings_path, mysetup)
 
 # ### Configure solver
 println("Configuring Solver")
-OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
+OPTIMIZER = configure_solver(mysetup["Solver"], settings_path, Gurobi.Optimizer)
 
 # #### Running a case
 
@@ -77,10 +72,5 @@ end
 # Only valid for power system analysis at this point
 if mysetup["ModelingToGenerateAlternatives"] == 1
     println("Starting Model to Generate Alternatives (MGA) Iterations")
-    mga(EP,inpath,mysetup,myinputs,outpath)
+    mga(EP,inputs_path,mysetup,myinputs,outpath)
 end
-
-
-# Write combined_settings that was used to solve the model file to help with troubleshooting
-YAML.write_file(joinpath(settings_path,"combined_settings_output.yml"), mysetup)
-

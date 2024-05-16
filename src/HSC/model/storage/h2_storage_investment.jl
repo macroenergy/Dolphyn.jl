@@ -183,7 +183,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
     ## Constraints on retirements and capacity additions
     #Cannot retire more charge capacity than existing charge capacity
-     @constraint(EP, cMaxRetH2Charge[y in RET_CAP_H2_CHARGE], vH2RETCAPCHARGE[y] <= dfH2Gen[!,:Existing_Cap_Charge_tonne_p_hr][y])
+     @constraint(EP, cMaxRetH2Charge[y in RET_CAP_H2_CHARGE], vH2RETCAPCHARGE[y] <= dfH2Gen[!,:Existing_Cap_Charge_MWh][y])
 
       #Constraints on new built capacity
 
