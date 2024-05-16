@@ -37,6 +37,11 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
 
+    # HOTFIX - If CCS_Rate is not in the dfGen, then add it and set it to 0
+	if "CCS_Rate" ∉ names(dfH2Gen)
+		dfH2Gen[!,:CCS_Rate] .= 0
+	end
+
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
     # Adjustment of Fuel_CO2 units carried out in load_fuels_data.jl
