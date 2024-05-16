@@ -39,7 +39,7 @@ function h2_storage(EP::Model, inputs::Dict, setup::Dict)
         # DEV NOTE: add if conditions here for other types of storage technologies
 
         # Include LongDurationStorage only when modeling representative periods and long-duration storage
-        if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"])
+        if setup["TimeDomainReduction"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"])
             EP = h2_long_duration_storage(EP, inputs)
         end
     end
