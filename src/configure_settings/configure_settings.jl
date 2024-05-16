@@ -26,7 +26,7 @@ function set_default_if_absent!(settings::Dict, key::String, defaultval)
     end
 end
 
-function configure_settings(settings::Dict) #! This function needs to be edited after all tests finish
+function configure_settings(settings::Dict{String, Any}) #! This function needs to be edited after all tests finish
     println("Configuring Settings")
     # settings = YAML.load(open(settings_path))
 
