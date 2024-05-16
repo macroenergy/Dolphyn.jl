@@ -31,6 +31,7 @@ export load_liquid_fuels_inputs
 export load_bio_inputs
 export generate_model
 export solve_model
+export run_case
 export write_all_outputs
 export write_outputs
 export write_HSC_outputs

@@ -1,7 +1,8 @@
 # Methods to simplify the process of running DOLPHYN cases
+using HiGHS
 
 """
-    load_settings(settings_path::AbstractString) :: Dict{Any, Any}
+    load_settings(settings_path::AbstractString) :: Dict{String, Any}
 
 Loads Global, GenX and HSC settings and returns a merged settings dict called mysetup
 """
@@ -10,35 +11,28 @@ function load_settings(settings_path::AbstractString)
     if isfile(genx_settings_path)
         mysetup_genx = configure_settings(genx_settings_path) # mysetup dictionary stores GenX-specific parameters
     else
-        mysetup_genx = Dict()
+        mysetup_genx = Dict{String,Any}()
     end
 
     hsc_settings_path = joinpath(settings_path, "hsc_settings.yml") #Settings YAML file path for HSC  model
     if isfile(hsc_settings_path)
         mysetup_hsc = YAML.load(open(hsc_settings_path)) # mysetup dictionary stores H2 supply chain-specific parameters
     else
-        mysetup_hsc = Dict()
+        mysetup_hsc = Dict{String,Any}()
     end
 
     csc_settings_path = joinpath(settings_path, "csc_settings.yml") #Settings YAML file path for CSC model
     if isfile(csc_settings_path)
         mysetup_csc = YAML.load(open(csc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
     else
-        mysetup_csc = Dict()
+        mysetup_csc = Dict{String,Any}()
     end 
 
     lf_settings_path = joinpath(settings_path, "lf_settings.yml") #Settings YAML file path for LF model
     if isfile(lf_settings_path)
         mysetup_lf = YAML.load(open(lf_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
     else
-        mysetup_lf = Dict()
-    end 
-
-    besc_settings_path = joinpath(settings_path, "besc_settings.yml") #Settings YAML file path for BESC model
-    if isfile(lf_settings_path)
-        mysetup_besc = YAML.load(open(besc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
-    else
-        mysetup_besc = Dict()
+        mysetup_lf = Dict{String,Any}()
     end 
 
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
@@ -48,8 +42,8 @@ function load_settings(settings_path::AbstractString)
         error("A global settings file is required to run Dolphyn")
     end
 
-    mysetup = Dict{Any,Any}()
-    mysetup = merge(mysetup_hsc, mysetup_genx, mysetup_csc, mysetup_lf, mysetup_besc, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+    mysetup = Dict{String,Any}()
+    merge!(mysetup, mysetup_genx, mysetup_hsc, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
     mysetup = configure_settings(mysetup)
 
     return mysetup
@@ -71,21 +65,16 @@ function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString
         myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
     end
 
-    ### Load LF inputs if modeling the liquid fuels supply chain
+    ### Load LF inputs if modeling the synthetic fuels supply chain
     if mysetup["ModelLiquidFuels"] == 1
         myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
-    end
-
-    ### Load BESC inputs if modeling the bioenergy supply chain
-    if mysetup["ModelBESC"] == 1
-        myinputs = load_bio_inputs(myinputs, mysetup, inputs_path)
     end
 
     return myinputs
 
 end
 
-function setup_logging(mysetup::Dict{Any, Any})
+function setup_logging(mysetup::Dict{String, Any})
     # Start logging
     global Log = mysetup["Log"]
     if Log
@@ -95,7 +84,7 @@ function setup_logging(mysetup::Dict{Any, Any})
     return nothing
 end
 
-function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any,Any})
+function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, mysetup::Dict{String,Any})
     TDRpath = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
     if mysetup["TimeDomainReduction"] == 1
         if mysetup["ModelH2"] == 1
@@ -116,42 +105,81 @@ function setup_TDR(inputs_path::String, settings_path::String, mysetup::Dict{Any
     end
 
     if mysetup["ModelCSC"] == 1
-        print_and_log("CSC TDR not implemented.")
-    end
-
-    if mysetup["ModelLiquidFuels"] == 1
-        print_and_log("LFSC TDR not implemented.")
-    end
-
-    if mysetup["ModelBESC"] == 1
-        print_and_log("BESC TDR not implemented.")
+        print_and_log("CSC and SF TDR not implemented.")
     end
 end
 
-function write_all_outputs(EP::Model, mysetup::Dict{Any, Any}, myinputs::Dict{Any, Any}, inputs_path::String)
+function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict{String, Any}, inputs_path::AbstractString)
     outpath = joinpath(inputs_path, "Results")
-    outpath_GenX = write_outputs(EP, outpath, mysetup, myinputs)
+    adjusted_outpath = write_outputs(EP, outpath, mysetup, myinputs)
 
     # Write hydrogen supply chain outputs
     if mysetup["ModelH2"] == 1
-        write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
+        write_HSC_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
 
     # Write carbon supply chain outputs
     if mysetup["ModelCSC"] == 1
-        write_CSC_outputs(EP, outpath_GenX, mysetup, myinputs)
+        write_CSC_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
 
-    # Write liquid fuels supply chain outputs
+    # Write synthetic fuels supply chain outputs
     if mysetup["ModelLiquidFuels"] == 1
-        write_liquid_fuels_outputs(EP, outpath_GenX, mysetup, myinputs)
+        write_liquid_fuels_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
 
-    ### Write bioenergy  supply chain outputs
-    if mysetup["ModelBESC"] == 1
-        myinputs = write_bio_outputs(myinputs, mysetup, inputs_path)
-    end
-
-    return nothing
+    return adjusted_outpath
 
 end
+
+function generate_model(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false)
+    mysetup = load_settings(settings_path)
+    global_logger = setup_logging(mysetup)
+
+    # Check if TDR is forced on or off
+    # If both are set to on, force_TDR_on will take precedence
+    if force_TDR_on
+        mysetup["TimeDomainReduction"] = 1
+    elseif force_TDR_off
+        mysetup["TimeDomainReduction"] = 0
+    end
+
+    if mysetup["TimeDomainReduction"] == 1
+        setup_TDR(inputs_path, settings_path, mysetup)
+    end
+    
+    solver = configure_solver(settings_path, optimizer)
+    myinputs = load_all_inputs(mysetup, inputs_path)
+    EP = generate_model(mysetup, myinputs, solver)
+    return EP, mysetup, myinputs
+end
+
+function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false)
+    settings_path = joinpath(local_dir, "Settings")
+    inputs_path = local_dir
+    return generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on)
+end
+
+function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, with_outputs::Bool=false)
+    EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on)
+    EP, solve_time = solve_model(EP, mysetup)
+    myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
+    adjusted_outpath = write_all_outputs(EP, mysetup, myinputs, inputs_path)
+    if with_outputs
+        return EP, myinputs, mysetup, adjusted_outpath
+    else
+        return nothing
+    end
+end
+
+function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, with_outputs::Bool=false)
+    settings_path = joinpath(local_dir, "Settings")
+    inputs_path = local_dir
+    EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, with_outputs=true)
+    if with_outputs
+        return EP, myinputs, mysetup, adjusted_outpath
+    else
+        return nothing
+    end
+end
+
