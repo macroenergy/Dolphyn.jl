@@ -51,7 +51,6 @@ function load_load_data!(setup::Dict, path::AbstractString, inputs::Dict)
 	inputs["INTERIOR_SUBPERIODS"] = setdiff(1:T, inputs["START_SUBPERIODS"]) # set of indexes for all time periods that do not start a subperiod
 
 	# Demand in MW for each zone
-	#println(names(load_in))
 	start = findall(s -> s == "Load_MW_z1", names(load_in))[1] #gets the starting column number of all the columns, with header "Load_MW_z1"
     scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
     # Max value of non-served energy
@@ -65,14 +64,14 @@ function load_load_data!(setup::Dict, path::AbstractString, inputs::Dict)
     # Maximum hourly demand curtailable as % of the max demand (for each segment)
     inputs["pMax_D_Curtail"] = as_vector(:Max_Demand_Curtailment)
 
-	println(filename * " Successfully Read!")
+	println(" -- " * filename * " Successfully Read!")
 end
 
 # ensure that the length of load data exactly matches
 # the number of subperiods times their length
 # and that the number of subperiods equals the list of provided weights
 function validatetimebasis(inputs::Dict)
-    println("Validating time basis")
+    println(" -- Validating time basis")
     demand_length = size(inputs["pD"], 1)
     generators_variability_length = size(inputs["pP_Max"], 2)
 

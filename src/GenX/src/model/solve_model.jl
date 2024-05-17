@@ -63,16 +63,16 @@ function solve_model(EP::Model, setup::Dict)
 	optimize!(EP)
 
 	if has_duals(EP) # fully linear model
-		println("LP solved for primal")
+		println(" -- LP solved for primal")
 	else
-		println("MILP solved for primal")
+		println(" -- MILP solved for primal")
 	end
 
 	if !has_duals(EP) && setup["WriteShadowPrices"] == 1
 		# function to fix integers and linearize problem
 		fix_integers(EP)
 		# re-solve statement for LP solution
-		println("Solving LP solution for duals")
+		println(" -- Solving LP solution for duals")
 		optimize!(EP)
 	end
 

@@ -151,6 +151,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     ##### Power System related modules ############
+    println("Generating Electricity System model")
+
     # Infrastructure
     discharge!(EP, inputs, setup)
 

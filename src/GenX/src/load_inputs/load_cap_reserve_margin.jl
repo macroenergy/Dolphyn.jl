@@ -20,7 +20,7 @@ function load_cap_reserve_margin!(setup::Dict, path::AbstractString, inputs::Dic
     inputs["dfCapRes"] = mat
     inputs["NCapacityReserveMargin"] = size(mat, 2)
 
-    println(filename * " Successfully Read!")
+    println(" -- " * filename * " Successfully Read!")
 end
 
 @doc raw"""
