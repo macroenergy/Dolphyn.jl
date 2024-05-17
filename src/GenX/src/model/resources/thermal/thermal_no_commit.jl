@@ -43,7 +43,7 @@ When not modeling regulation and reserves, thermal units not subject to unit com
 """
 function thermal_no_commit!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Thermal (No Unit Commitment) Resources Module")
+	println(" -- Thermal (No Unit Commitment) Resources Module")
 
 	dfGen = inputs["dfGen"]
 
@@ -136,7 +136,7 @@ Note there are multiple versions of these constraints in the code in order to av
 """
 function thermal_no_commit_reserves!(EP::Model, inputs::Dict)
 
-	println("Thermal No Commit Reserves Module")
+	println(" -- Thermal No Commit Reserves Module")
 
 	dfGen = inputs["dfGen"]
 

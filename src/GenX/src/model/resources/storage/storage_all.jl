@@ -5,7 +5,7 @@ Sets up variables and constraints common to all storage resources. See ```storag
 """
 function storage_all!(EP::Model, inputs::Dict, setup::Dict)
 	# Setup variables, constraints, and expressions common to all storage resources
-	println("Storage Core Resources Module")
+	println(" -- Storage Core Resources Module")
 
 	dfGen = inputs["dfGen"]
 	Reserves = setup["Reserves"]

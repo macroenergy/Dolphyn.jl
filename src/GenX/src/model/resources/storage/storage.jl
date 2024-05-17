@@ -99,7 +99,7 @@ The above reserve related constraints are established by ```storage_all_reserves
 """
 function storage!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Storage Resources Module")
+	println(" -- Storage Resources Module")
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]
 	STOR_ALL = inputs["STOR_ALL"]

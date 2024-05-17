@@ -608,7 +608,6 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
       myinputs = load_h2_inputs(myinputs, mysetup_local, inpath)
     end
-    println(myinputs["RESOURCE_ZONES"])
 
     if v println() end
 

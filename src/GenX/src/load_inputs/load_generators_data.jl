@@ -203,5 +203,5 @@ function load_generators_data!(setup::Dict, path::AbstractString, inputs_gen::Di
 			#   thus the overall is MTons/GW, and thus gen_in[g,:CO2_per_Start] is ton
 		end
 	end
-	println(filename * " Successfully Read!")
+	println(" -- " * filename * " Successfully Read!")
 end

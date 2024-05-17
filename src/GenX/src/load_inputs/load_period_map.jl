@@ -14,5 +14,5 @@ function load_period_map!(setup::Dict, path::AbstractString, inputs::Dict)
 	file_path = joinpath(my_dir, period_map)
     inputs["Period_Map"] = load_dataframe(file_path)
 
-	println(period_map * " Successfully Read!")
+	println(" -- " * period_map * " Successfully Read!")
 end

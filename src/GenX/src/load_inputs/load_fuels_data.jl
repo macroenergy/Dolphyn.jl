@@ -41,7 +41,7 @@ function load_fuels_data!(setup::Dict, path::AbstractString, inputs::Dict)
     inputs["fuel_costs"] = fuel_costs
     inputs["fuel_CO2"] = fuel_CO2
 
-    println(filename * " Successfully Read!")
+    println(" -- " * filename * " Successfully Read!")
 
     return fuel_costs, fuel_CO2
 end
