@@ -56,7 +56,7 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     set_default_if_absent!(settings, "TimeDomainReductionFolder", "TDR_Results")
 
     ## Time domain reduce (i.e. cluster) inputs based on Load_data.csv, Generators_variability.csv, and Fuels_data.csv; 0 = not active (use input data as provided); 0 = active (cluster input data, or use data that has already been clustered)
-    set_default_if_absent!(settings, "TimeDomainReductionFolder", "TimeDomainReduction")
+    set_default_if_absent!(settings, "TimeDomainReduction", 0)
     
     ###########################################
     ### GenX-specific settings 
