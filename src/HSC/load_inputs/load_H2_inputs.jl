@@ -37,7 +37,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
         sep = "/"
     end
 
-    data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
+    data_directory = data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 
     # Select zones which will be included. This currently only works for the non-GenX sectors
     # select_zones!(inputs, setup, path)

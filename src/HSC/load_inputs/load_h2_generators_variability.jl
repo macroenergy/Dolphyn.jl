@@ -22,7 +22,7 @@ Function for reading input parameters related to hourly maximum capacity factors
 function load_h2_generators_variability(setup::Dict, path::AbstractString, sep::AbstractString, inputs_genvar::Dict)
 
     # Hourly capacity factors
-    #data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
+    #data_directory = data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
     data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
     if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) # Use Time Domain Reduced data for GenX
         gen_var = DataFrame(CSV.File(string(joinpath(data_directory,"HSC_generators_variability.csv")), header=true), copycols=true)
