@@ -22,7 +22,7 @@ Function for reading input parameters related to hourly maximum capacity factors
 function load_co2_capture_DAC_variability(setup::Dict, path::AbstractString, sep::AbstractString, inputs_capturevar::Dict)
 
 	# Hourly capacity factors
-	#data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
+	#data_directory = data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 	if setup["TimeDomainReduction"] == 1 && isfile(joinpath(data_directory,"CSC_capture_variability.csv")) # Use Time Domain Reduced data for GenX
 		capture_var = DataFrame(CSV.File(string(joinpath(data_directory,"CSC_capture_variability.csv")), header=true), copycols=true)

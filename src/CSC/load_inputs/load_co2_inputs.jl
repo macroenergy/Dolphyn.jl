@@ -38,7 +38,7 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
         sep = "/"
 	end
 
-	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
+	data_directory = data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 
 	## Read input files
 	println("Reading CO2 Input CSV Files")
