@@ -96,6 +96,6 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     end
 
     ## Print confirmation
-    print_and_log(" --  -- Wrote HSC outputs to $path$sep")
+    print_and_log(" -- Wrote HSC outputs to $path$sep")
 
 end # END output()
