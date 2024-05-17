@@ -47,7 +47,7 @@ For resources where upper bound $\overline{y_{d}^{\textrm{C,DAC}}}$ and lower bo
 """
 function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	
-	println("DAC Fixed Cost module")
+	println(" -- DAC Fixed Cost module")
 
 	dfDAC = inputs["dfDAC"]
 	DAC_RES_ALL = inputs["DAC_RES_ALL"]

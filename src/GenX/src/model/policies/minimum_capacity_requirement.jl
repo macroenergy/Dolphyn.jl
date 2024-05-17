@@ -10,7 +10,7 @@ Note that $\epsilon_{y,z,p}^{MinCapReq}$ is the eligiblity of a generator of tec
 """
 function minimum_capacity_requirement!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Minimum Capacity Requirement Module")
+	println(" -- Minimum Capacity Requirement Module")
 	NumberOfMinCapReqs = inputs["NumberOfMinCapReqs"]
 
 	@constraint(EP, cZoneMinCapReq[mincap = 1:NumberOfMinCapReqs], EP[:eMinCapRes][mincap] >= inputs["MinCapReq"][mincap])

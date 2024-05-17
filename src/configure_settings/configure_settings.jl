@@ -26,7 +26,7 @@ function set_default_if_absent!(settings::Dict, key::String, defaultval)
     end
 end
 
-function configure_settings(settings::Dict) #! This function needs to be edited after all tests finish
+function configure_settings(settings::Dict{String, Any}) #! This function needs to be edited after all tests finish
     println("Configuring Settings")
     # settings = YAML.load(open(settings_path))
 
@@ -56,7 +56,10 @@ function configure_settings(settings::Dict) #! This function needs to be edited 
     set_default_if_absent!(settings, "TimeDomainReductionFolder", "TDR_Results")
 
     ## Time domain reduce (i.e. cluster) inputs based on Load_data.csv, Generators_variability.csv, and Fuels_data.csv; 0 = not active (use input data as provided); 0 = active (cluster input data, or use data that has already been clustered)
-    set_default_if_absent!(settings, "TimeDomainReductionFolder", "TimeDomainReduction")
+    set_default_if_absent!(settings, "TimeDomainReduction", 0)
+
+    ## Force re-clustering of time series data; 0 = not active; 1 = active
+    set_default_if_absent!(settings, "Force_TDR_recluster", 0)
     
     ###########################################
     ### GenX-specific settings 

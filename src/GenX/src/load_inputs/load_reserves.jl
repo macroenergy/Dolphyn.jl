@@ -39,5 +39,5 @@ function load_reserves!(setup::Dict, path::AbstractString, inputs::Dict)
 		end
 	end
 
-	println(filename * " Successfully Read!")
+	println(" -- " * filename * " Successfully Read!")
 end

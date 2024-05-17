@@ -37,7 +37,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
         sep = "/"
     end
 
-    data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
+    data_directory = data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
 
     # Select zones which will be included. This currently only works for the non-GenX sectors
     # select_zones!(inputs, setup, path)
@@ -90,7 +90,7 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
     #Check whether or not there is LDS for trucks and H2 storage
     if !haskey(inputs, "Period_Map") && 
-        (setup["OperationWrapping"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
+        (setup["TimeDomainReduction"]==1 && (setup["ModelH2Trucks"] == 1 || !isempty(inputs["H2_STOR_LONG_DURATION"])) && (isfile(data_directory*"/Period_map.csv") || isfile(joinpath(data_directory,string(joinpath(setup["TimeDomainReductionFolder"],"Period_map.csv")))))) # Use Time Domain Reduced data for GenX)
         load_period_map!(setup, path, inputs)
     end
     print_and_log("HSC Input CSV Files Successfully Read In From $path$sep")

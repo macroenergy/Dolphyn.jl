@@ -43,7 +43,7 @@ Finally, the next constraint enforces that the initial storage level for each in
 """
 function hydro_inter_period_linkage!(EP::Model, inputs::Dict)
 
-	println("Long Duration Storage Module for Hydro Reservoir")
+	println(" -- Long Duration Storage Module for Hydro Reservoir")
 
 	dfGen = inputs["dfGen"]
 

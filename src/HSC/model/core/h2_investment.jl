@@ -72,7 +72,7 @@ One cannot retire more capacity than existing capacity.
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("Hydrogen Investment Discharge Module")
+    print_and_log(" -- H2 Investment Discharge Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

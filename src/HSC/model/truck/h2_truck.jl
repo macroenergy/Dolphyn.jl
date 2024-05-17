@@ -21,7 +21,7 @@ This function includes three parts of the Truck Model.The details can be found s
 """
 function h2_truck(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("Hydrogen Truck Module")
+    print_and_log(" -- H2 Truck Module")
 
     # investment variables expressions and related constraints for H2 trucks
     EP = h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
@@ -30,7 +30,7 @@ function h2_truck(EP::Model, inputs::Dict, setup::Dict)
     EP = h2_truck_all(EP, inputs, setup)
 
     # Include LongDurationTruck only when modeling representative periods and long-duration truck
-    if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_TRUCK_LONG_DURATION"])
+    if setup["TimeDomainReduction"] == 1 && !isempty(inputs["H2_TRUCK_LONG_DURATION"])
         EP = h2_long_duration_truck(EP, inputs)
     end
 
