@@ -84,28 +84,41 @@ function setup_logging(mysetup::Dict{String, Any})
     return nothing
 end
 
-function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, mysetup::Dict{String,Any})
-    TDRpath = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
-    if mysetup["TimeDomainReduction"] == 1
+function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, mysetup::Dict{String,Any}, TDR_files::Union{Nothing, Vector{String}}=nothing)
+
+    if isnothing(TDR_files)
+        TDR_files = String[]
+        # Need to add check if electricity is being modelled
+            append!(TDR_files, [
+                "Load_data.csv",
+                "Generators_variability.csv",
+                "Fuels_data.csv"
+            ])
         if mysetup["ModelH2"] == 1
-            if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv")) || (!isfile(TDRpath*"/HSC_generators_variability.csv")) || (!isfile(TDRpath*"/HSC_load_data.csv"))
-                print_and_log("Clustering Time Series Data...")
-                cluster_inputs(inputs_path, settings_path, mysetup)
-            else
-                print_and_log("Time Series Data Already Clustered.")
-            end
-        else
-            if (!isfile(TDRpath*"/Load_data.csv")) || (!isfile(TDRpath*"/Generators_variability.csv")) || (!isfile(TDRpath*"/Fuels_data.csv"))
-                print_and_log("Clustering Time Series Data...")
-                cluster_inputs(inputs_path, settings_path, mysetup)
-            else
-                print_and_log("Time Series Data Already Clustered.")
-            end
+            append!(TDR_files, [
+                "HSC_generators_variability.csv",
+                "HSC_load_data.csv"
+            ])
+        end
+        if mysetup["ModelCSC"] == 1
+            print_and_log("Carbon supply chain TDR not implemented.")
+        end
+        if mysetup["ModelLiquidFuels"] == 1
+            print_and_log("Liquid Fuels TDR not implemented.")
         end
     end
 
-    if mysetup["ModelCSC"] == 1
-        print_and_log("CSC and SF TDR not implemented.")
+    TDR_path = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
+    TDR_filepaths = joinpath.(TDR_path, TDR_files)
+
+    if mysetup["TimeDomainReduction"] == 1
+        # If any of the TDR files are missing, cluster the data
+        if any(!isfile, TDR_filepaths) || mysetup["Force_TDR_recluster"] == 1
+            print_and_log("Clustering Time Series Data...")
+            cluster_inputs(inputs_path, settings_path, mysetup)
+        else
+            print_and_log("Time Series Data Already Clustered.")
+        end
     end
 end
 
@@ -132,7 +145,7 @@ function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict
 
 end
 
-function generate_model(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false)
+function generate_model(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     mysetup = load_settings(settings_path)
     global_logger = setup_logging(mysetup)
 
@@ -142,6 +155,10 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
         mysetup["TimeDomainReduction"] = 1
     elseif force_TDR_off
         mysetup["TimeDomainReduction"] = 0
+    end
+
+    if force_TDR_recluster
+        mysetup["Force_TDR_recluster"] = 1
     end
 
     if mysetup["TimeDomainReduction"] == 1
@@ -154,14 +171,14 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
     return EP, mysetup, myinputs
 end
 
-function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false)
+function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     settings_path = joinpath(local_dir, "Settings")
     inputs_path = local_dir
-    return generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on)
+    return generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
 end
 
-function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, with_outputs::Bool=false)
-    EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on)
+function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false, with_outputs::Bool=false)
+    EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
     EP, solve_time = solve_model(EP, mysetup)
     myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
     adjusted_outpath = write_all_outputs(EP, mysetup, myinputs, inputs_path)
@@ -172,10 +189,10 @@ function run_case(inputs_path::AbstractString, settings_path::AbstractString; op
     end
 end
 
-function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, with_outputs::Bool=false)
+function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false, with_outputs::Bool=false)
     settings_path = joinpath(local_dir, "Settings")
     inputs_path = local_dir
-    EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, with_outputs=true)
+    EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster, with_outputs=true)
     if with_outputs
         return EP, myinputs, mysetup, adjusted_outpath
     else

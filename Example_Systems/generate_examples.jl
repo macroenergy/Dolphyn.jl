@@ -6,6 +6,7 @@ using Dolphyn
 force_highs = false
 gurobi_installed = Dolphyn.check_if_solver_installed("Gurobi")
 use_TDR = true
+force_TDR_recluster = true
 
 highs_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "OneZone"),
@@ -21,15 +22,6 @@ gurobi_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "ThreeZones_Gurobi"),
 ]
 
-if gurobi_installed && !force_highs
-    println("Gurobi is installed. Will use Gurobi for all cases")
-    # Combine highs_cases and gurobi_cases
-    gurobi_cases = vcat(highs_cases, gurobi_cases)
-    highs_cases = String[]
-else
-    println("Gurobi is not installed. Will use HiGHS for all cases")
-end
-
 if use_TDR
     println("Time Domain Reduction is enabled")
     force_TDR_on = true
@@ -40,13 +32,17 @@ else
     force_TDR_off = true
 end
 
+if force_TDR_recluster
+    println("Forcing TDR recluster")
+end
+
 for case in highs_cases
     split_case = split(case, '/')
     case_name = string(split_case[end-1], split_case[end])
 
     println(" ------ ------ ------")
     println("Generating model for $case_name ...")
-    generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off)
+    generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
     println("Generated model for $case_name.")
 end
 
@@ -59,7 +55,7 @@ if gurobi_installed
 
         println(" ------ ------ ------")
         println("Generating model for $case_name ...")
-        generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off)
+        generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
         println("Generated model for $case.")
     end
 else 
