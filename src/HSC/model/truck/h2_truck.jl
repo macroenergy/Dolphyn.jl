@@ -30,7 +30,7 @@ function h2_truck(EP::Model, inputs::Dict, setup::Dict)
     EP = h2_truck_all(EP, inputs, setup)
 
     # Include LongDurationTruck only when modeling representative periods and long-duration truck
-    if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_TRUCK_LONG_DURATION"])
+    if setup["TimeDomainReduction"] == 1 && !isempty(inputs["H2_TRUCK_LONG_DURATION"])
         EP = h2_long_duration_truck(EP, inputs)
     end
 
