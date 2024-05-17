@@ -71,7 +71,7 @@ This set of time-coupling constraints wrap around to ensure the hydrogen output 
 """
 function h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
 
-    print_and_log("H2 Production (No Unit Commitment) Module")
+    print_and_log(" -- H2 Production (No Unit Commitment) Module")
     
     #Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]

@@ -36,7 +36,7 @@ This module additionally defines contributions to the objective function from va
 """
 function DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
-	println("DAC variable cost module")
+	println(" -- DAC variable cost module")
 
     dfDAC = inputs["dfDAC"]
 	DAC_RES_ALL = inputs["DAC_RES_ALL"]

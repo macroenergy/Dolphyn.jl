@@ -216,6 +216,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
     if setup["ModelH2"] == 1
+        println("Generating Hydrogen Supply Chain model")
         @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
         @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
         @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
@@ -284,7 +285,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     if setup["ModelCSC"] == 1
-
+        println("Generating Carbon Supply Chain model")
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
@@ -328,7 +329,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     if setup["ModelLiquidFuels"] == 1
-
+        println("Generating Liquid Fuels model")
 		# Initialize Liquid Fuel Balance
 		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
 		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)

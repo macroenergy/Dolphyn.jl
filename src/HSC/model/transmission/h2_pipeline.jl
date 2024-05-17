@@ -70,7 +70,7 @@ The change of hydrogen pipeline storage inventory is modeled as follows:
 """
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("Hydrogen Pipeline Module")
+    print_and_log(" -- H2 Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity

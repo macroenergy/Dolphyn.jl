@@ -29,7 +29,7 @@ This function creates expression to add the CO2 emissions for hydrogen supply ch
 """
 function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("H2 Emissions Module for CO2 Policy modularization")
+    print_and_log(" -- H2 Emissions Module for CO2 Policy modularization")
 
     dfH2Gen = inputs["dfH2Gen"]
 

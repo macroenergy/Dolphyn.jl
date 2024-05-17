@@ -39,7 +39,7 @@ function load_liquid_fuels_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading Syn Fuel Input CSV Files")
+	println(" -- Reading Syn Fuel Input CSV Files")
     inputs = load_syn_fuels_resources(setup, path, sep, inputs)
 	inputs = load_liquid_fuel_demand(setup, path, sep, inputs)
 

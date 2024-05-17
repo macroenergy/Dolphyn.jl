@@ -43,7 +43,7 @@ For resources where upper bound $\overline{y_{g}^{\textrm{H,GEN}}}$ and lower bo
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("H2 Production Core Module")
+    print_and_log(" -- H2 Production Core Module")
     
     dfH2Gen = inputs["dfH2Gen"]
 

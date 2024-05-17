@@ -40,7 +40,7 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
     inputs["Syn_diesel_co2_per_mmbtu"] = Liquid_Fuels_Diesel_demand_in[!, "Syn_diesel_co2_per_mmbtu"][1]
 	#inputs["Bio_diesel_co2_per_mmbtu"] = Liquid_Fuels_Diesel_demand_in[!, "Bio_diesel_co2_per_mmbtu"][1]
 
-	println("Liquid_Fuels_Diesel_demand.csv Successfully Read!")
+	println(" -- Liquid_Fuels_Diesel_demand.csv Successfully Read!")
 
 	###########################################################################################################################################
 
@@ -63,7 +63,7 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
 	inputs["Syn_jetfuel_co2_per_mmbtu"] = Liquid_Fuels_Jetfuel_demand_in[!, "Syn_jetfuel_co2_per_mmbtu"][1]
 	#inputs["Bio_jetfuel_co2_per_mmbtu"] = Liquid_Fuels_Jetfuel_demand_in[!, "Bio_jetfuel_co2_per_mmbtu"][1]
 
-	println("Liquid_Fuels_Jetfuel_demand.csv Successfully Read!")
+	println(" -- Liquid_Fuels_Jetfuel_demand.csv Successfully Read!")
 
 	###########################################################################################################################################
 
@@ -86,7 +86,7 @@ function load_liquid_fuel_demand(setup::Dict, path::AbstractString, sep::Abstrac
     inputs["Syn_gasoline_co2_per_mmbtu"] = Liquid_Fuels_Gasoline_Demand_in[!, "Syn_gasoline_co2_per_mmbtu"][1]
 	#inputs["Bio_gasoline_co2_per_mmbtu"] = Liquid_Fuels_Gasoline_Demand_in[!, "Bio_gasoline_co2_per_mmbtu"][1]
 
-	println("Liquid_Fuels_Gasoline_Demand.csv Successfully Read!")
+	println(" -- Liquid_Fuels_Gasoline_Demand.csv Successfully Read!")
 
     return inputs
 

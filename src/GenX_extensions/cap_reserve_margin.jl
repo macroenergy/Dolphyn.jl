@@ -34,7 +34,7 @@ Note that multiple capacity reserve margin requirements can be specified coverin
 """
 function cap_reserve_margin(EP::Model, inputs::Dict, setup::Dict)
 	# capacity reserve margin constraint
-	println("Capacity Reserve Margin Policies Module")
+	println(" -- Capacity Reserve Margin Policies Module")
 	dfGen = inputs["dfGen"]
 	G = inputs["G"]
 	SEG = inputs["SEG"]  # Number of lines
