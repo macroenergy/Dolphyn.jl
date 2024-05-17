@@ -1,6 +1,6 @@
 using Dolphyn
 
-EP, myinputs, mysetup, adjusted_outpath = run_case(@__DIR__; with_outputs=true)
+EP, myinputs, mysetup, adjusted_outpath = run_case(@__DIR__)
 
 # Run MGA if the MGA flag is set to 1 else only save the least cost solution
 # Only valid for power system analysis at this point
