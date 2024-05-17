@@ -50,7 +50,7 @@ For resources where upper bound $\overline{y_{s}^{\textrm{C,STO}}}$ and lower bo
 function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Model the capacity and cost of injecting the CO2 into geological storage, ignore the cost of the geological storage itself as assume it is naturally ocurring and very large so no limit to how much can be stored
 
-	println("Carbon Storage Injection Cost module")
+	println(" -- Carbon Storage Injection Cost module")
 
     dfCO2Storage = inputs["dfCO2Storage"]
 	CO2_STOR_ALL = inputs["CO2_STOR_ALL"]

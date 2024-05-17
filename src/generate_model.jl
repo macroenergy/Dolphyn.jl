@@ -216,6 +216,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ###### START OF H2 INFRASTRUCTURE MODEL ######
     if setup["ModelH2"] == 1
+        println("Generating Hydrogen Supply Chain model")
         @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
         @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
         @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
@@ -285,7 +286,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ###### START OF CO2 INFRASTRUCTURE MODEL ######
     if setup["ModelCSC"] == 1
-
+        println("Generating Carbon Supply Chain model")
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
@@ -332,6 +333,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ###### START OF LIQUID FUELS INFRASTRUCTURE MODEL ######
     if setup["ModelLiquidFuels"] == 1
 
+        println("Generating Liquid Fuels model")
+        
         if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
             # Initialize Global Hourly Conventional Fuel Balance [t]
             @expression(EP, eCFDieselBalance[t=1:T, z=1:Z], 0)

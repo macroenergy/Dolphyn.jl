@@ -133,7 +133,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
     # end
 
-    println("HSC_generation.csv Successfully Read!")
+    println(" -- HSC_generation.csv Successfully Read!")
 
     return inputs_gen
 

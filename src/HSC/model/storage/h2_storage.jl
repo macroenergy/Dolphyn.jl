@@ -23,7 +23,7 @@ A wide range of energy storage devices (all $s \in \mathcal{S}$) can be modeled 
 """
 function h2_storage(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("Hydrogen Storage Module")
+    print_and_log(" -- H2 Storage Module")
 
     if !isempty(inputs["H2_STOR_ALL"])
         # investment variables expressions and related constraints for H2 storage tehcnologies

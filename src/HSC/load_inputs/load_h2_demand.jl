@@ -54,7 +54,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 
     end
     
-    print_and_log("HSC_load_data.csv Successfully Read!")
+    print_and_log(" -- HSC_load_data.csv Successfully Read!")
 
     return inputs_load
 

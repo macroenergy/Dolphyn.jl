@@ -72,7 +72,7 @@ In addition, when ```EnergyShareRequirement``` is set to 1, excess sales from a 
 """
 function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
-	print_and_log("Electricity Time Matching Requirement for H2 Production Module")
+	print_and_log(" -- Electricity Time Matching Requirement for H2 Production Module")
 
 	dfGen = inputs["dfGen"] # Power sector inputs
 

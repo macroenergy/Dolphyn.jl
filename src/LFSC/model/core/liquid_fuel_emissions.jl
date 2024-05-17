@@ -23,7 +23,7 @@ These include emissions from synthetic fuels production and by-products (if any)
 """
 function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
 
-	println("CO2 Emissions Module for Liquid Fuels")
+	println(" -- CO2 Emissions Module for Liquid Fuels")
 
     if setup["ModelSyntheticFuels"] == 1
         dfSynFuels = inputs["dfSynFuels"]

@@ -52,7 +52,7 @@ function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractS
         inputs_load["pMax_H2_D_Curtail_L"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
     end
     
-    print_and_log("HSC_load_data_liquid.csv Successfully Read!")
+    print_and_log(" -- HSC_load_data_liquid.csv Successfully Read!")
 
     return inputs_load
 

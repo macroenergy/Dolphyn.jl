@@ -40,7 +40,7 @@ This module additionally defines contributions to the objective function from in
 function co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Model the capacity and cost of compressing the CO2 after capture
 
-	println("Carbon Capture Compression Cost module")
+	println(" -- Carbon Capture Compression Cost module")
 
 	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	CO2_CAPTURE_COMP_ALL = inputs["CO2_CAPTURE_COMP_ALL"]

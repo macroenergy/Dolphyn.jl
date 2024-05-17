@@ -36,7 +36,7 @@ function load_co2_capture_DAC_variability(setup::Dict, path::AbstractString, sep
 	# Maximum capture output and variability of each carbon capture resource
 	inputs_capturevar["CO2_Capture_Max_Output"] = transpose(Matrix{Float64}(capture_var[1:inputs_capturevar["T"],2:(inputs_capturevar["DAC_RES_ALL"]+1)]))
 
-	println("CSC_capture_variability.csv Successfully Read!")
+	println(" -- CSC_capture_variability.csv Successfully Read!")
 
 	return inputs_capturevar
 end
