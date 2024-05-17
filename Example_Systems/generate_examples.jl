@@ -37,7 +37,7 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    split_case = split(case, '/')
+    split_case = splitpath(case)
     case_name = string(split_case[end-1], split_case[end])
 
     println(" ------ ------ ------")
@@ -50,7 +50,7 @@ if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        split_case = split(case, '/')
+        split_case = splitpath(case)
         case_name = string(split_case[end-1], split_case[end])
 
         println(" ------ ------ ------")
