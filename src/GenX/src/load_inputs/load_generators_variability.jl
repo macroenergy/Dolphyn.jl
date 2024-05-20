@@ -3,10 +3,10 @@
 
 Read input parameters related to hourly maximum capacity factors for generators, storage, and flexible demand resources
 """
-function load_generators_variability!(setup::Dict, path::AbstractString, inputs::Dict)
+function load_generators_variability!(setup::Dict, path::AbstractString, tdr_path::AbstractString, inputs::Dict)
 
 	# Hourly capacity factors
-	data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
+	data_directory = joinpath(tdr_path, setup["TimeDomainReductionFolder"])
     if setup["TimeDomainReduction"] == 1  && time_domain_reduced_files_exist(data_directory)
         my_dir = data_directory
 	else

@@ -3,10 +3,10 @@
 
 Read input parameters related to fuel costs and CO$_2$ content of fuels
 """
-function load_fuels_data!(setup::Dict, path::AbstractString, inputs::Dict)
+function load_fuels_data!(setup::Dict, path::AbstractString, tdr_path::AbstractString, inputs::Dict)
 
     # Fuel related inputs - read in different files depending on if time domain reduction is activated or not
-    data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
+    data_directory = joinpath(tdr_path, setup["TimeDomainReductionFolder"])
     if setup["TimeDomainReduction"] == 1  && time_domain_reduced_files_exist(data_directory)
         my_dir = data_directory
     else

@@ -85,7 +85,7 @@ end
 
 function is_period_map_exist(setup::Dict, path::AbstractString, inputs::Dict)
 	filename = "Period_map.csv"
-	is_here = isfile(joinpath(system_path, filename))
+	is_here = isfile(joinpath(path, filename))
 	is_in_folder = isfile(joinpath(path, setup["TimeDomainReductionFolder"], filename))
 	is_here || is_in_folder
 end

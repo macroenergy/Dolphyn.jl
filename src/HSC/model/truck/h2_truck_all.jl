@@ -259,18 +259,17 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
                 (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
                 dfH2Truck[!, :Power_MW_per_mile][j] *
                 inputs["RouteLength"][zz, z] for
-                zz = 1:Z, j in H2_TRUCK_TYPES if zz != z
+                zz = 1:Z, j in H2_TRUCK_TYPES if zz != z; init=0
             ) / ModelScalingFactor
         else
             sum(
                 (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
                 dfH2Truck[!, :Power_MW_per_mile][j] *
                 inputs["RouteLength"][zz, z] for
-                zz = 1:Z, j in H2_TRUCK_TYPES if zz != z
+                zz = 1:Z, j in H2_TRUCK_TYPES if zz != z; init=0
             )
         end
     )
-
     EP[:ePowerBalance] += -ePowerbalanceH2TruckTravel
     EP[:eH2NetpowerConsumptionByAll] += ePowerbalanceH2TruckTravel
 
