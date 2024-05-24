@@ -46,7 +46,7 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     inputs = load_co2_capture_DAC(setup, path, sep, inputs)
     inputs = load_co2_capture_DAC_variability(setup, path, sep, inputs)
 	
-	if setup["ModelCO2Pipelines"] == 1
+	if setup["ModelCO2Storage"] == 1
 		inputs = load_co2_storage(setup, path, sep, inputs)
 	end
 

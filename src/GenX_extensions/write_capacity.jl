@@ -126,6 +126,9 @@ function write_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Mod
 			CapacityFactor = "-"
 		)
 
+	dfCap = vcat(dfCap, total)
+	CSV.write(joinpath(path, "capacity.csv"), dfCap)
+
 	#If H2G2P modeled, write new output capacity file with H2G2P capacity combined
 	if setup["ModelH2"] == 1 && setup["ModelH2G2P"] == 1
 		# Capacity decisions
@@ -224,8 +227,8 @@ function write_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Mod
 				CapacityFactor = "-"
 			)
 
-		dfCap_Total_w_H2G2P = vcat(dfCap, dfCap_H2G2P, total_w_H2G2P)
-		CSV.write(joinpath(path, "capacity_w_H2G2P.csv"), dfCap_Total_w_H2G2P)
+		dfCap_Combined = vcat(dfCap, dfCap_H2G2P, total_w_H2G2P)
+		#CSV.write(joinpath(path, "capacity_w_H2G2P.csv"), dfCap_Combined)
 
 	end
 
@@ -323,8 +326,8 @@ function write_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Mod
 				CapacityFactor = "-"
 			)
 	
-		dfCap_Total_w_BioE = vcat(dfCap, dfBioE_Cap, total_w_BioE)
-		CSV.write(joinpath(path, "capacity_w_BioE.csv"), dfCap_Total_w_BioE)
+		dfCap_Combined = vcat(dfCap, dfBioE_Cap, total_w_BioE)
+		#CSV.write(joinpath(path, "capacity.csv"), dfCap_Combined)
 	end
 
 	if setup["ModelH2"] == 1 && setup["ModelH2G2P"] == 1 && setup["ModelBESC"] == 1 && setup["Bio_Electricity_On"] == 1
@@ -340,11 +343,10 @@ function write_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Mod
 			AnnualEmissions = sum(dfCap[!,:AnnualEmissions]) + sum(dfCap_H2G2P[!,:AnnualEmissions]) + sum(dfBioE_Cap[!,:AnnualEmissions]),
 			CapacityFactor = "-")
 		
-		dfCap_Total_w_BioE = vcat(dfCap, dfCap_H2G2P, dfBioE_Cap, total_w_H2G2P_BioE)
-		CSV.write(joinpath(path, "capacity_w_H2G2P_BioE.csv"), dfCap_Total_w_BioE)
+		dfCap_Combined = vcat(dfCap, dfCap_H2G2P, dfBioE_Cap, total_w_H2G2P_BioE)
+		#CSV.write(joinpath(path, "capacity.csv"), dfCap_Combined)
 	end
 
-	dfCap = vcat(dfCap, total)
-	CSV.write(joinpath(path, "capacity.csv"), dfCap)
+	CSV.write(joinpath(path, "capacity_multi_sector.csv"), dfCap_Combined)
 	return dfCap
 end

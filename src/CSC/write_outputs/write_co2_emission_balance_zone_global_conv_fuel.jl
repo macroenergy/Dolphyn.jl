@@ -161,30 +161,42 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 	dfCO2Balance_Conv_Fuels[2,1:size(dfCO2Balance_Conv_Fuels,2)] = repeat(["Global"],size(dfCO2Balance_Conv_Fuels,2))
 
 	for t in 1:T
-		if setup["Liquid_Fuels_Hourly_Demand"] == 1
-			dfCO2Balance_Conv_Fuels[t+rowoffset,1] = value.(EP[:eConv_Gasoline_CO2_Emissions][t])
-			dfCO2Balance_Conv_Fuels[t+rowoffset,2] = value.(EP[:eConv_Jetfuel_CO2_Emissions][t])
-			dfCO2Balance_Conv_Fuels[t+rowoffset,3] = value.(EP[:eConv_Diesel_CO2_Emissions][t])
+		if setup["ModelLiquidFuels"] == 1
+			if setup["Liquid_Fuels_Hourly_Demand"] == 1
+				dfCO2Balance_Conv_Fuels[t+rowoffset,1] = value.(EP[:eConv_Gasoline_CO2_Emissions][t])
+				dfCO2Balance_Conv_Fuels[t+rowoffset,2] = value.(EP[:eConv_Jetfuel_CO2_Emissions][t])
+				dfCO2Balance_Conv_Fuels[t+rowoffset,3] = value.(EP[:eConv_Diesel_CO2_Emissions][t])
+			else
+				dfCO2Balance_Conv_Fuels[t+rowoffset,1] = "-"
+				dfCO2Balance_Conv_Fuels[t+rowoffset,2] = "-"
+				dfCO2Balance_Conv_Fuels[t+rowoffset,3] = "-"
+			end
 		else
-			dfCO2Balance_Conv_Fuels[t+rowoffset,1] = "-"
-			dfCO2Balance_Conv_Fuels[t+rowoffset,2] = "-"
-			dfCO2Balance_Conv_Fuels[t+rowoffset,3] = "-"
+			dfCO2Balance_Conv_Fuels[t+rowoffset,1] = 0
+			dfCO2Balance_Conv_Fuels[t+rowoffset,2] = 0
+			dfCO2Balance_Conv_Fuels[t+rowoffset,3] = 0
 		end
 	end
 
 	
 	## Annual values
-	if setup["Liquid_Fuels_Hourly_Demand"] == 1
-		dfCO2Balance_Conv_Fuels[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eConv_Gasoline_CO2_Emissions][t]) for t in 1:T)
+	if setup["ModelLiquidFuels"] == 1
+		if setup["Liquid_Fuels_Hourly_Demand"] == 1
+			dfCO2Balance_Conv_Fuels[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eConv_Gasoline_CO2_Emissions][t]) for t in 1:T)
 
-		dfCO2Balance_Conv_Fuels[rowoffset,2] = sum(inputs["omega"][t] * value.(EP[:eConv_Jetfuel_CO2_Emissions][t]) for t in 1:T)
+			dfCO2Balance_Conv_Fuels[rowoffset,2] = sum(inputs["omega"][t] * value.(EP[:eConv_Jetfuel_CO2_Emissions][t]) for t in 1:T)
 
-		dfCO2Balance_Conv_Fuels[rowoffset,3] = sum(inputs["omega"][t] * value.(EP[:eConv_Diesel_CO2_Emissions][t]) for t in 1:T)
+			dfCO2Balance_Conv_Fuels[rowoffset,3] = sum(inputs["omega"][t] * value.(EP[:eConv_Diesel_CO2_Emissions][t]) for t in 1:T)
 
+		else
+			dfCO2Balance_Conv_Fuels[rowoffset,1] = value.(EP[:eConv_Gasoline_CO2_Emissions])
+			dfCO2Balance_Conv_Fuels[rowoffset,2] = value.(EP[:eConv_Jetfuel_CO2_Emissions])
+			dfCO2Balance_Conv_Fuels[rowoffset,3] = value.(EP[:eConv_Diesel_CO2_Emissions])
+		end
 	else
-		dfCO2Balance_Conv_Fuels[rowoffset,1] = value.(EP[:eConv_Gasoline_CO2_Emissions])
-		dfCO2Balance_Conv_Fuels[rowoffset,2] = value.(EP[:eConv_Jetfuel_CO2_Emissions])
-		dfCO2Balance_Conv_Fuels[rowoffset,3] = value.(EP[:eConv_Diesel_CO2_Emissions])
+		dfCO2Balance_Conv_Fuels[rowoffset,1] = 0
+		dfCO2Balance_Conv_Fuels[rowoffset,2] = 0
+		dfCO2Balance_Conv_Fuels[rowoffset,3] = 0
 	end
 
 	dfCO2Balance =  hcat(dfCO2Balance,dfCO2Balance_Conv_Fuels)

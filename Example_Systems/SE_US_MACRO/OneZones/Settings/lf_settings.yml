@@ -1,0 +1,15 @@
+ModelLiquidFuels: 1 #Flag to turn on or off Liquid Fuel modelling capabilities - 0 - No Liquid Fuels, 1 - Liquid Fuels Modeled
+ModelSyntheticFuels: 1 #Flas to turn on or off Synthetic Fuel modeling
+
+Liquid_Fuels_Regional_Demand: 0 #1: Regional resolution, 0: Global resolution for liquid fuels demand
+Liquid_Fuels_Hourly_Demand: 0 #1: Hourly resolution, 0: Annual resolution for liquid fuels demand
+
+#Conventional fuel shares in global percentage 
+Conventional_Diesel_Share_Requirement: 0 # Specify Conventional Diesel Share ; 0 = not active; 1 = active systemwide
+Conv_Diesel_Share: 0.5 # Enter a value between 0 and 1 to specify the fraction of systemwide conventional diesel
+
+Conventional_Jetfuel_Share_Requirement: 0 # Specify Conventional Jetfuel Share ; 0 = not active; 1 = active systemwide
+Conv_Jetfuel_Share: 0.8 # Enter a value between 0 and 1 to specify the fraction of systemwide conventional jetfuel
+
+Conventional_Gasoline_Share_Requirement: 0 # Specify Conventional Gasoline Share ; 0 = not active; 1 = active systemwide
+Conv_Gasoline_Share: 0.5 # Enter a value between 0 and 1 to specify the fraction of systemwide conventional gasoline
