@@ -36,7 +36,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 	dfDAC = inputs["dfDAC"]
     DAC_RES_ALL = inputs["DAC_RES_ALL"]
 
-    dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
+    #dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 
     T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -55,7 +55,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     end
 
     #Total DAC carbon captured per zone by
-    @expression(EP, eDAC_CO2_Captured_per_zone_per_time[z=1:Z, t=1:T], sum(EP[:vDAC_CO2_Captured][k,t] for k in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
+    #@expression(EP, eDAC_CO2_Captured_per_zone_per_time[z=1:Z, t=1:T], sum(EP[:vDAC_CO2_Captured][k,t] for k in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
 
 
     #Total emission per zone, need to minus CO2 loss in pipelines
@@ -72,8 +72,8 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     ##Compression
     #Amount of carbon compressed for storage or transport
     #Carbon compressed = Carbon captured per zone by DAC
-    @expression(EP, eCO2_Capture_Compressed_per_zone[z=1:Z, t=1:T], sum(EP[:vCO2_Capture_Compressed][k,t] for k in dfCO2CaptureComp[(dfCO2CaptureComp[!,:Zone].==z),:R_ID]))
-    @constraint(EP,cCaptured_Equals_Compressed_CO2[z=1:Z, t=1:T], eCO2_Capture_Compressed_per_zone[z,t] == eDAC_CO2_Captured_per_zone_per_time[z,t])
+    #@expression(EP, eCO2_Capture_Compressed_per_zone[z=1:Z, t=1:T], sum(EP[:vCO2_Capture_Compressed][k,t] for k in dfCO2CaptureComp[(dfCO2CaptureComp[!,:Zone].==z),:R_ID]))
+    #@constraint(EP,cCaptured_Equals_Compressed_CO2[z=1:Z, t=1:T], eCO2_Capture_Compressed_per_zone[z,t] == eDAC_CO2_Captured_per_zone_per_time[z,t])
     ###################################################################################################################################################################
 
     return EP

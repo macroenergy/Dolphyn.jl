@@ -51,8 +51,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 
     dfSynFuels = inputs["dfSynFuels"]
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
-	T = inputs["T"]     # Number of time steps (hours)
-	
+
 	##Load cost parameters
 	#  ParameterScale = 1 --> objective function is in million $ . 
 	# In powedfSynFuelr system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
@@ -83,7 +82,9 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	#####################################################################################################################################
 	#Min and max capacity constraints
 	@constraint(EP,cMinSFCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  >= MinCapacity_tonne_p_hr[i])
-	@constraint(EP,cMaxSFCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  <= MaxCapacity_tonne_p_hr[i])
+
+	#Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
+	@constraint(EP, cMaxSFCapacity_per_unit[i in intersect(dfSynFuels[dfSynFuels.MaxCapacity_tonne_p_hr.>0, :R_ID], 1:SYN_FUELS_RES_ALL)], EP[:vCapacity_Syn_Fuel_per_type][i] <= MaxCapacity_tonne_p_hr[i])
 
 	#####################################################################################################################################
 	##Expressions

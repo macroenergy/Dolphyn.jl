@@ -21,10 +21,46 @@ Function for reading input parameters related to biomass supply in the bioenergy
 """
 function load_bio_supply(setup::Dict, path::AbstractString, sep::AbstractString, inputs_bio_supply::Dict)
 
-	inputs_bio_supply["Herb_biomass_supply_df"] = DataFrame(CSV.File(string(path,sep,"BESC_Herb_Supply.csv"), header=true), copycols=true)
+	#Read in herb biomass related inputs
+    Herb_biomass_supply = DataFrame(CSV.File(string(path,sep,"BESC_Herb_Supply.csv"), header=true), copycols=true)
+
+	# Add Resource IDs after reading to prevent user errors
+	Herb_biomass_supply[!,:R_ID] = 1:size(collect(skipmissing(Herb_biomass_supply[!,1])),1)
+
+    # Store DataFrame of resources input data for use in model
+	inputs_bio_supply["dfHerb"] = Herb_biomass_supply
+
+    # Index of supply resources
+	inputs_bio_supply["HERB_SUPPLY_RES_ALL"] = size(collect(skipmissing(Herb_biomass_supply[!,:R_ID])),1)
+
+	# Name of supply resources
+	inputs_bio_supply["HERB_SUPPLY_NAME"] = collect(skipmissing(Herb_biomass_supply[!,:Biomass_Supply][1:inputs_bio_supply["HERB_SUPPLY_RES_ALL"]]))
+
+	# Set of supply resources
+	inputs_bio_supply["BESC_HERB_SUPPLY"] = Herb_biomass_supply[!,:R_ID]
+
 	println("Herb Biomass Supply Curves Successfully Read!")
 
-	inputs_bio_supply["Wood_biomass_supply_df"] = DataFrame(CSV.File(string(path,sep,"BESC_Wood_Supply.csv"), header=true), copycols=true)
+	####################################################
+
+	#Read in wood biomass related inputs
+    Wood_biomass_supply = DataFrame(CSV.File(string(path,sep,"BESC_Wood_Supply.csv"), header=true), copycols=true)
+
+	# Add Resource IDs after reading to prevent user errors
+	Wood_biomass_supply[!,:R_ID] = 1:size(collect(skipmissing(Wood_biomass_supply[!,1])),1)
+
+    # Store DataFrame of resources input data for use in model
+	inputs_bio_supply["dfWood"] = Wood_biomass_supply
+
+    # Index of supply resources
+	inputs_bio_supply["WOOD_SUPPLY_RES_ALL"] = size(collect(skipmissing(Wood_biomass_supply[!,:R_ID])),1)
+
+	# Name of supply resources
+	inputs_bio_supply["WOOD_SUPPLY_NAME"] = collect(skipmissing(Wood_biomass_supply[!,:Biomass_Supply][1:inputs_bio_supply["WOOD_SUPPLY_RES_ALL"]]))
+
+	# Set of supply resources
+	inputs_bio_supply["BESC_WOOD_SUPPLY"] = Wood_biomass_supply[!,:R_ID]
+
 	println("Wood Biomass Supply Curves Successfully Read!")
 
     return inputs_bio_supply

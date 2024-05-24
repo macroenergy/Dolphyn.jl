@@ -1,5 +1,5 @@
-Conventional_jetfuel_co2_per_mmbtu,Conventional_jetfuel_price_per_mmbtu,Syn_jetfuel_co2_per_mmbtu,Bio_jetfuel_co2_per_mmbtu,Time_Index,Load_mmbtu_z1,Load_mmbtu_z2,Load_mmbtu_z3
-0.0722,20.31,0.0722,0.0722,1,59244.77,32395.61,33613.87
+Global_conventional_jetfuel_price_per_mmbtu,Conventional_jetfuel_co2_per_mmbtu,Syn_jetfuel_co2_per_mmbtu,Bio_jetfuel_co2_per_mmbtu,Time_Index,Load_mmbtu_z1,Load_mmbtu_z2,Load_mmbtu_z3
+20.31,0.0722,0.0722,0.0722,1,59244.77,32395.61,33613.87
 ,,,,2,59244.77,32395.61,33613.87
 ,,,,3,59244.77,32395.61,33613.87
 ,,,,4,59244.77,32395.61,33613.87

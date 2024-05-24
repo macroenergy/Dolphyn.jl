@@ -41,7 +41,7 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 		#capbioethanol[i] = 0
 	end
 
-	for i in inputs["BIO_E"]
+	for i in inputs["BIO_ELEC"]
 		capbioelectricity[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioElectricity_yield_MWh_per_tonne][i]
 	end
 

@@ -18,13 +18,13 @@ Pages = ["BESC/write_outputs/write_bio_plant_capacity.jl"]
 ## Write Herb Biomass Consumption
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["BESC/write_outputs/write_bio_zone_herb_consumed.jl"]
+Pages = ["BESC/write_outputs/write_bio_herb_supply.jl"]
 ```
 
 ## Write Wood Biomass Consumption
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["BESC/write_outputs/write_bio_zone_wood_consumed.jl"]
+Pages = ["BESC/write_outputs/write_bio_wood_supply.jl"]
 ```
 
 ## Write Bio-Electricitiy Production

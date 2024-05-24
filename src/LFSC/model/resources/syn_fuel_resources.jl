@@ -76,9 +76,9 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eSynFuelProd_Gasoline[t=1:T, z=1:Z],
     	sum(EP[:vSFProd_Gasoline][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
-    EP[:eLFDieselBalance] += eSynFuelProd_Diesel
-	EP[:eLFJetfuelBalance] += eSynFuelProd_Jetfuel
-	EP[:eLFGasolineBalance] += eSynFuelProd_Gasoline
+    EP[:eSBFDieselBalance] += eSynFuelProd_Diesel
+	EP[:eSBFJetfuelBalance] += eSynFuelProd_Jetfuel
+	EP[:eSBFGasolineBalance] += eSynFuelProd_Gasoline
 
 	#H2 Balance expressions
 	@expression(EP, eSynFuelH2Cons[t=1:T, z=1:Z],

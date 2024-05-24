@@ -51,39 +51,51 @@ function bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)
 	T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Zones
 
-	#Variables
-	@variable(EP,vWood_biomass_utilized_per_zone_per_time[z in 1:Z, t in 1:T] >= 0)
-	@variable(EP,vWood_biomass_supply_cost_per_zone_per_time[z in 1:Z, t in 1:T] >= 0)
+	dfWood = inputs["dfWood"]
+	WOOD_SUPPLY_RES_ALL = inputs["WOOD_SUPPLY_RES_ALL"]
+	BESC_WOOD_SUPPLY = inputs["BESC_WOOD_SUPPLY"]
 
-	Wood_biomass_supply_df = inputs["Wood_biomass_supply_df"]
+	##Variables
+	#Wood Biomass purchased from supply = k (tonnes/hr) in time t
+	@variable(EP, vWood_biomass_purchased[k=1:WOOD_SUPPLY_RES_ALL, t = 1:T] >= 0 )
 
 	if setup["ParameterScale"] ==1
-		Wood_biomass_Supply_Max = Wood_biomass_supply_df[!,:Max_tonne_per_hr]/ModelScalingFactor #Convert to ktonne
-		Wood_biomass_cost_per_tonne = Wood_biomass_supply_df[!,:Cost_per_tonne_per_hr]/ModelScalingFactor #Convert to $M/ktonne
-		Wood_biomass_emission_per_tonne = Wood_biomass_supply_df[!,:Emissions_tonne_per_tonne] #Convert to ktonne/ktonne = tonne/tonne
+		Wood_biomass_supply_max = dfWood[!,:Max_tonne_per_hr]/ModelScalingFactor #Convert to ktonne
+		Wood_biomass_cost_per_tonne = dfWood[!,:Cost_per_tonne]/ModelScalingFactor #Convert to $M/ktonne
+		Wood_biomass_emission_per_tonne = dfWood[!,:Emissions_tonne_per_tonne] #Convert to ktonne/ktonne = tonne/tonne
 	else
-		Wood_biomass_Supply_Max = Wood_biomass_supply_df[!,:Max_tonne_per_hr]
-		Wood_biomass_cost_per_tonne = Wood_biomass_supply_df[!,:Cost_per_tonne_per_hr]
-		Wood_biomass_emission_per_tonne = Wood_biomass_supply_df[!,:Emissions_tonne_per_tonne]
+		Wood_biomass_supply_max = dfWood[!,:Max_tonne_per_hr]
+		Wood_biomass_cost_per_tonne = dfWood[!,:Cost_per_tonne]
+		Wood_biomass_emission_per_tonne = dfWood[!,:Emissions_tonne_per_tonne]
 	end
 
-	#Add to Obj, need to account for time weight omega
-	@expression(EP, eWood_biomass_supply_cost_per_zone_per_time[z in 1:Z, t in 1:T], inputs["omega"][t] * EP[:vWood_biomass_utilized_per_zone_per_time][z,t] * Wood_biomass_cost_per_tonne[z])
-	@expression(EP, eWood_biomass_emission_per_zone_per_time[z in 1:Z, t in 1:T], EP[:vWood_biomass_utilized_per_zone_per_time][z,t] * Wood_biomass_emission_per_tonne[z])
+	#Wood Biomass Balance Expressions
+	@expression(EP, eWood_biomass_purchased_per_time_per_zone[t=1:T, z=1:Z],
+	sum(EP[:vWood_biomass_purchased][k,t] for k in intersect(BESC_WOOD_SUPPLY, dfWood[dfWood[!,:Zone].==z,:][!,:R_ID])))
 
-	#Output without time weight to show hourly cost
-	@expression(EP, eWood_biomass_supply_cost_per_zone_per_time_output[z in 1:Z, t in 1:T], EP[:vWood_biomass_utilized_per_zone_per_time][z,t] * Wood_biomass_cost_per_tonne[z])
+	EP[:eWood_Biomass_Supply] += EP[:eWood_biomass_purchased_per_time_per_zone]
 
-	#Total biomass supply cost per zone
-	@expression(EP, eWood_biomass_supply_cost_per_zone[z in 1:Z], sum(EP[:eWood_biomass_supply_cost_per_zone_per_time][z,t] for t in 1:T))
+	#Wood Biomass VOM
+	@expression(EP,eWood_biomass_supply_cost_per_type_per_time[k=1:WOOD_SUPPLY_RES_ALL, t = 1:T], inputs["omega"][t] * EP[:vWood_biomass_purchased][k,t] * Wood_biomass_cost_per_tonne[k])
 
-	#Total biomass supply cost
+	@expression(EP, eWood_biomass_supply_cost_per_zone_per_time[z=1:Z,t=1:T],
+	sum(EP[:eWood_biomass_supply_cost_per_type_per_time][k,t] for k in intersect(BESC_WOOD_SUPPLY, dfWood[dfWood[!,:Zone].==z,:][!,:R_ID])))
+
+	@expression(EP, eWood_biomass_supply_cost_per_zone[z=1:Z], sum(EP[:eWood_biomass_supply_cost_per_zone_per_time][z,t] for t in 1:T))
+
 	@expression(EP, eWood_biomass_supply_cost, sum(EP[:eWood_biomass_supply_cost_per_zone][z] for z in 1:Z))
 
-	#Max biomass supply constraint
-	@constraint(EP,cWood_biomass_Max[z in 1:Z, t in 1:T], EP[:vWood_biomass_utilized_per_zone_per_time][z,t] <= Wood_biomass_Supply_Max[z])
-
 	EP[:eObj] += EP[:eWood_biomass_supply_cost]
+
+
+	#Emission
+	@expression(EP,eWood_biomass_emission_per_type_per_time[k=1:WOOD_SUPPLY_RES_ALL, t = 1:T], EP[:vWood_biomass_purchased][k,t] * Wood_biomass_emission_per_tonne[k])
+
+	@expression(EP, eWood_biomass_emission_per_zone_per_time[z=1:Z,t=1:T], sum(EP[:eWood_biomass_emission_per_type_per_time][k,t] for k in intersect(BESC_WOOD_SUPPLY, dfWood[dfWood[!,:Zone].==z,:][!,:R_ID])))
+
+
+	#Max biomass supply constraint
+	@constraint(EP,cWood_biomass_Max[k in 1:WOOD_SUPPLY_RES_ALL, t in 1:T], EP[:vWood_biomass_purchased][k,t] <= Wood_biomass_supply_max[k])
 
 	return EP
 

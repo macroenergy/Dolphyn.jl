@@ -54,11 +54,11 @@ Pages = ["CSC/write_outputs/write_co2_total_injection.jl"]
 ## Write Total CO2 System Zone Balance
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["CSC/write_outputs/write_co2_emission_balance_system.jl"]
+Pages = ["CSC/write_outputs/write_co2_emission_balance_system_global_conv_fuel.jl"]
 ```
 
 ## Write Total CO2 Emission Zone Balance
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["CSC/write_outputs/write_co2_emission_balance_zone.jl"]
+Pages = ["CSC/write_outputs/write_co2_emission_balance_zone_global_conv_fuel.jl"]
 ```

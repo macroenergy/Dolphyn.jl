@@ -15,26 +15,26 @@ Model settings parameters are specified in a `lfsc_Settings.yml` file which shou
 |AllowConventionalDiesel | Flag for allowing purchase of conventional diesel.|
 ||0 = purchase of conventional diesel is not allowed.|
 ||1 = active|
-|SpecifySynBioDieselPercentFlag | Flag for allowing the specification of the percentage of non-conventional diesel.|
+|SpecifyConvDieselPercentFlag | Flag for allowing the specification of the percentage of non-conventional diesel.|
 ||0 = no user specified percentage of conventional diesel.|
 ||1 = active|
-|percent_sbf_diesel | Specify the percentage value of non-conventional diesel.|
+|percent_conv_diesel | Specify the percentage value of non-conventional diesel.|
 ||Enter a fraction from 0 to 1.|
 |AllowConventionalJetfuel | Flag for allowing purchase of conventional jetfuel.|
 ||0 = purchase of conventional jetfuel is not allowed.|
 ||1 = active|
-|SpecifySynBioJetfuelPercentFlag | Flag for allowing the specification of the percentage of non-conventional jetfuel.|
+|SpecifyConvJetfuelPercentFlag | Flag for allowing the specification of the percentage of non-conventional jetfuel.|
 ||0 = no user specified percentage of conventional jetfuel.|
 ||1 = active|
-|percent_sbf_jetfuel | Specify the percentage value of non-conventional jetfuel.|
+|percent_conv_jetfuel | Specify the percentage value of non-conventional jetfuel.|
 ||Enter a fraction from 0 to 1.|
 |AllowConventionalGasoline | Flag for allowing purchase of conventional gasoline.|
 ||0 = purchase of conventional gasoline is not allowed.|
 ||1 = active|
-|SpecifySynBioGasolinePercentFlag | Flag for allowing the specification of the percentage of non-conventional gasoline.|
+|SpecifyConvGasolinePercentFlag | Flag for allowing the specification of the percentage of non-conventional gasoline.|
 ||0 = no user specified percentage of conventional gasoline.|
 ||1 = active|
-|percent_sbf_gasoline | Specify the percentage value of non-conventional gasoline.|
+|percent_conv_gasoline | Specify the percentage value of non-conventional gasoline.|
 ||Enter a fraction from 0 to 1.|
 
 ## 2 Inputs

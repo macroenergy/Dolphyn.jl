@@ -40,8 +40,16 @@ function load_liquid_fuels_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 	## Read input files
 	println("Reading Syn Fuel Input CSV Files")
-    inputs = load_syn_fuels_resources(setup, path, sep, inputs)
-	inputs = load_liquid_fuel_demand(setup, path, sep, inputs)
+
+	if setup["ModelSyntheticFuels"] == 1
+    	inputs = load_syn_fuels_resources(setup, path, sep, inputs)
+	end
+	
+	inputs = load_liquid_fuels_demand(setup, path, sep, inputs)
+	
+	if setup["Liquid_Fuels_Regional_Demand"] == 1
+		inputs = load_conventional_fuel_prices(setup, path, sep, inputs)
+	end
 
 	return inputs
 end

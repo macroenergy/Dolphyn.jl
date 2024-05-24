@@ -72,13 +72,13 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	BIO_WOOD = inputs["BIO_WOOD"]
 	
 	BIO_H2 = inputs["BIO_H2"]
-	BIO_E = inputs["BIO_E"]
+	BIO_ELEC = inputs["BIO_ELEC"]
 	BIO_DIESEL = inputs["BIO_DIESEL"]
 	BIO_GASOLINE = inputs["BIO_GASOLINE"]
 	BIO_ETHANOL = inputs["BIO_ETHANOL"]
 
 	#####################################################################################################################################
-	################################################ Power/H2 and Plant Operational Constraints #########################################
+	######################################### Power/H2 consumption and Plant Operational Constraints ####################################
 	#####################################################################################################################################
 	
 	#Power constraint
@@ -98,19 +98,19 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	#####################################################################################################################################
 
 	#Herbaceous biomass consumed per zone
-	@expression(EP, eTotal_herb_biomass_consumed_per_zone_per_time[z in 1:Z, t in 1:T],
+	@expression(EP, eTotal_herb_biomass_consumed_per_zone_per_time[t in 1:T, z in 1:Z],
 	sum(EP[:vBiomass_consumed_per_plant_per_time][i,t] for i in intersect(BIO_HERB, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 
-	#Herbaceous biomass consumed equals to biomass utilized from supply curve
-	@constraint(EP, cHerb_biomass_consumed_per_zone[z in 1:Z, t in 1:T], EP[:eTotal_herb_biomass_consumed_per_zone_per_time][z,t] == EP[:vHerb_biomass_utilized_per_zone_per_time][z,t])
+	#Subtract from supply
+	EP[:eHerb_Biomass_Supply] -= EP[:eTotal_herb_biomass_consumed_per_zone_per_time]
 
 	#####################################################################################################################################
 	#Woody biomass consumed per zone
-	@expression(EP, eTotal_wood_biomass_consumed_per_zone_per_time[z in 1:Z, t in 1:T],
+	@expression(EP, eTotal_wood_biomass_consumed_per_zone_per_time[t in 1:T, z in 1:Z],
 	sum(EP[:vBiomass_consumed_per_plant_per_time][i,t] for i in intersect(BIO_WOOD, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 
-	#Woody biomass consumed equals to biomass utilized from supply curve
-	@constraint(EP, cWood_biomass_consumed_per_zone[z in 1:Z, t in 1:T], EP[:eTotal_wood_biomass_consumed_per_zone_per_time][z,t] == EP[:vWood_biomass_utilized_per_zone_per_time][z,t])
+	#Subtract from supply
+	EP[:eWood_Biomass_Supply] -= EP[:eTotal_wood_biomass_consumed_per_zone_per_time]
 
 	#####################################################################################################################################
 	########################################################### Power Consumption #######################################################
@@ -157,8 +157,8 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 
 	if setup["Bio_Electricity_On"] == 1
 		#Bioelectricity demand
-		@expression(EP,eBioelectricity_produced_MWh_per_plant_per_time[i in BIO_E, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioElectricity_yield_MWh_per_tonne][i])
-		@expression(EP,eBioelectricity_produced_MWh_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBioelectricity_produced_MWh_per_plant_per_time][i,t] for i in intersect(BIO_E, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
+		@expression(EP,eBioelectricity_produced_MWh_per_plant_per_time[i in BIO_ELEC, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioElectricity_yield_MWh_per_tonne][i])
+		@expression(EP,eBioelectricity_produced_MWh_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBioelectricity_produced_MWh_per_plant_per_time][i,t] for i in intersect(BIO_ELEC, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 
 		EP[:ePowerBalance] += EP[:eBioelectricity_produced_MWh_per_time_per_zone]
 		EP[:eBioNetpowerConsumptionByAll] -= EP[:eBioelectricity_produced_MWh_per_time_per_zone]
@@ -189,28 +189,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP,eBiogasoline_produced_MMBtu_per_plant_per_time[i in BIO_GASOLINE, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioGasoline_yield_MMBtu_per_tonne][i])
 		@expression(EP,eBiogasoline_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiogasoline_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_GASOLINE, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 	
-		EP[:eLFGasolineBalance] += EP[:eBiogasoline_produced_MMBtu_per_time_per_zone]
-	
-		####Constraining amount of syn fuel
-		if setup["SpecifySynBioGasolinePercentFlag"] == 1
-	
-			percent_sbf_gasoline = setup["percent_sbf_gasoline"]
-	
-			#Sum up conventional gasoline production
-			@expression(EP, eConvLFGasolineDemandT[t=1:T], sum(inputs["omega"][t]*EP[:vConvLFGasolineDemand][t, z] for z in 1:Z))
-			@expression(EP, eConvLFGasolineDemandTZ, sum(eConvLFGasolineDemandT[t] for t in 1:T))
-	
-			#Sum up syngasoline production
-			@expression(EP, eSynFuelProd_GasolineT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Gasoline][t, z] for z in 1:Z))
-			@expression(EP, eSynFuelProd_GasolineTZ, sum(eSynFuelProd_GasolineT[t] for t in 1:T))
-	
-			#Sum up biogasoline production
-			@expression(EP, eBioFuelProd_GasolineT[t=1:T], sum(inputs["omega"][t]*EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t, z] for z in 1:Z))
-			@expression(EP, eBioFuelProd_GasolineTZ, sum(eBioFuelProd_GasolineT[t] for t in 1:T))
-		
-			@constraint(EP, cBioFuelGasolineShare, (percent_sbf_gasoline - 1) * (eBioFuelProd_GasolineTZ + eSynFuelProd_GasolineTZ) + percent_sbf_gasoline *  eConvLFGasolineDemandTZ == 0)
-	
-		end 
+		EP[:eSBFGasolineBalance] += EP[:eBiogasoline_produced_MMBtu_per_time_per_zone]
 	
 		#Emissions from biogasoline utilization
 		Bio_gasoline_co2_per_mmbtu = inputs["Bio_gasoline_co2_per_mmbtu"]
@@ -235,29 +214,8 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP,eBiojetfuel_produced_MMBtu_per_plant_per_time[i in BIO_GASOLINE, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioJetfuel_yield_MMBtu_per_tonne][i])
 		@expression(EP,eBiojetfuel_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiojetfuel_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_GASOLINE, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 	
-		EP[:eLFJetfuelBalance] += EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone]
-	
-		####Constraining amount of syn fuel
-		if setup["SpecifySynBioJetfuelPercentFlag"] == 1
-	
-			percent_sbf_jetfuel = setup["percent_sbf_jetfuel"]
-	
-			#Sum up conventional jetfuel production
-			@expression(EP, eConvLFJetfuelDemandT[t=1:T], sum(inputs["omega"][t]*EP[:vConvLFJetfuelDemand][t, z] for z in 1:Z))
-			@expression(EP, eConvLFJetfuelDemandTZ, sum(eConvLFJetfuelDemandT[t] for t in 1:T))
-	
-			#Sum up synjetfuel production
-			@expression(EP, eSynFuelProd_JetfuelT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Jetfuel][t, z] for z in 1:Z))
-			@expression(EP, eSynFuelProd_JetfuelTZ, sum(eSynFuelProd_JetfuelT[t] for t in 1:T))
-	
-			#Sum up biojetfuel production
-			@expression(EP, eBioFuelProd_JetfuelT[t=1:T], sum(inputs["omega"][t]*EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t, z] for z in 1:Z))
-			@expression(EP, eBioFuelProd_JetfuelTZ, sum(eBioFuelProd_JetfuelT[t] for t in 1:T))
-		
-			@constraint(EP, cBioFuelJetfuelShare, (percent_sbf_jetfuel - 1) * (eBioFuelProd_JetfuelTZ + eSynFuelProd_JetfuelTZ) + percent_sbf_jetfuel *  eConvLFJetfuelDemandTZ == 0)
-	
-		end 
-	
+		EP[:eSBFJetfuelBalance] += EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone]
+
 		#Emissions from biojetfuel utilization
 		Bio_jetfuel_co2_per_mmbtu = inputs["Bio_jetfuel_co2_per_mmbtu"]
 	
@@ -281,28 +239,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP,eBiodiesel_produced_MMBtu_per_plant_per_time[i in BIO_DIESEL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioDiesel_yield_MMBtu_per_tonne][i])
 		@expression(EP,eBiodiesel_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBiodiesel_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_DIESEL, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 	
-		EP[:eLFDieselBalance] += EP[:eBiodiesel_produced_MMBtu_per_time_per_zone]
-	
-		####Constraining amount of syn fuel
-		if setup["SpecifySynBioDieselPercentFlag"] == 1
-	
-			percent_sbf_diesel = setup["percent_sbf_diesel"]
-	
-			#Sum up conventional diesel production
-			@expression(EP, eConvLFDieselDemandT[t=1:T], sum(inputs["omega"][t]*EP[:vConvLFDieselDemand][t, z] for z in 1:Z))
-			@expression(EP, eConvLFDieselDemandTZ, sum(eConvLFDieselDemandT[t] for t in 1:T))
-
-			#Sum up syndiesel production
-			@expression(EP, eSynFuelProd_DieselT[t=1:T], sum(inputs["omega"][t]*EP[:eSynFuelProd_Diesel][t, z] for z in 1:Z))
-			@expression(EP, eSynFuelProd_DieselTZ, sum(eSynFuelProd_DieselT[t] for t in 1:T))
-
-			#Sum up biodiesel production
-			@expression(EP, eBioFuelProd_DieselT[t=1:T], sum(inputs["omega"][t]*EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t, z] for z in 1:Z))
-			@expression(EP, eBioFuelProd_DieselTZ, sum(eBioFuelProd_DieselT[t] for t in 1:T))
-		
-			@constraint(EP, cBioFuelDieselShare, (percent_sbf_diesel - 1) * (eBioFuelProd_DieselTZ + eSynFuelProd_DieselTZ) + percent_sbf_diesel *  eConvLFDieselDemandTZ == 0)
-	
-		end 
+		EP[:eSBFDieselBalance] += EP[:eBiodiesel_produced_MMBtu_per_time_per_zone]
 	
 		#Emissions from biodiesel utilization
 		Bio_diesel_co2_per_mmbtu = inputs["Bio_diesel_co2_per_mmbtu"]

@@ -15,62 +15,45 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_liquid_fuel_costs_global_conv_fuel(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the cost for the different sectors of the liquid fuels supply chain (Synthetic fuel resources CAPEX and OPEX, different types of conventional gasoline, jetfuel, and diesel).
 """
-function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_liquid_fuel_costs_global_conv_fuel(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
-	dfSynFuels= inputs["dfSynFuels"]
+	if setup["ModelSyntheticFuels"] == 1
+		dfSynFuels= inputs["dfSynFuels"]
+	end
 
 	Z = inputs["Z"]     # Number of zones
-	T = inputs["T"]     # Number of time steps (hours)
 
 	dfSynFuelsCost = DataFrame(Costs = ["cSFTotal", "cSFFix", "cSFVar", "cSFByProdRev", "CSFConvDieselFuelCost","CSFConvJetfuelFuelCost","CSFConvGasolineFuelCost"])
+	
+	cSFVar = 0
+	cSFFix = 0
+	cSFByProdRev = 0
+
 	if setup["ParameterScale"]==1 # Convert costs in millions to $
-		cSFVar = value(EP[:eTotalCSFProdVarOut])*ModelScalingFactor^2
-		cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])*ModelScalingFactor^2
-		cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])*ModelScalingFactor^2
-
-		if setup["AllowConventionalDiesel"] == 1
-			cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])*ModelScalingFactor^2
-		else
-			cSFConvDieselFuelCost = 0
+		if setup["ModelSyntheticFuels"] == 1
+			cSFVar = value(EP[:eTotalCSFProdVarOut])*ModelScalingFactor^2
+			cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])*ModelScalingFactor^2
+			cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])*ModelScalingFactor^2
 		end
 
-		if setup["AllowConventionalJetfuel"] == 1
-			cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])*ModelScalingFactor^2
-		else
-			cSFConvJetfuelFuelCost = 0
-		end
+		cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])*ModelScalingFactor^2
+		cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])*ModelScalingFactor^2
+		cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])*ModelScalingFactor^2
 
-		if setup["AllowConventionalGasoline"] == 1
-			cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])*ModelScalingFactor^2
-		else
-			cSFConvGasolineFuelCost = 0
-		end
 	else
-		cSFVar = value(EP[:eTotalCSFProdVarOut])
-		cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])
-		cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])
-
-		if setup["AllowConventionalDiesel"] == 1
-			cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])
-		else
-			cSFConvDieselFuelCost = 0
+		if setup["ModelSyntheticFuels"] == 1
+			cSFVar = value(EP[:eTotalCSFProdVarOut])
+			cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])
+			cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])
 		end
 
-		if setup["AllowConventionalJetfuel"] == 1
-			cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])
-		else
-			cSFConvJetfuelFuelCost = 0
-		end
-
-		if setup["AllowConventionalGasoline"] == 1
-			cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])
-		else
-			cSFConvGasolineFuelCost = 0
-		end
+		cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])
+		cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])
+		cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])
 	end
 
 	if setup["CO2Cap"]==4 
@@ -92,56 +75,34 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 		tempC_SF_Fix = 0
 		tempC_SF_Var = 0
 		tempC_SF_ByProd = 0
-		tempCDieselConvFuel = 0
-		tempCJetfuelConvFuel = 0
-		tempCGasolineConvFuel = 0
+		tempCDieselConvFuel = "-"
+		tempCJetfuelConvFuel = "-"
+		tempCGasolineConvFuel = "-"
 
-		if setup["AllowConventionalDiesel"] == 1
-			tempCDieselConvFuel = sum(value.(EP[:eCLFDieselVar_out])[z,:])
-		else
-			tempCDieselConvFuel = 0
+		if setup["ModelSyntheticFuels"] == 1
+			for y in dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]
+				tempC_SF_Fix = tempC_SF_Fix +
+					value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y]
+
+				tempC_SF_Var = tempC_SF_Var +
+					sum(value.(EP[:eCSFProdVar_out])[y,:])
+
+				tempC_SF_ByProd = tempC_SF_ByProd + -sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y])
+
+				tempCTotal = tempCTotal +
+						value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y] +
+						sum(value.(EP[:eCSFProdVar_out])[y,:]) +
+						-sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y]) 
+			end
 		end
-
-		if setup["AllowConventionalJetfuel"] == 1
-			tempCJetfuelConvFuel = sum(value.(EP[:eCLFJetfuelVar_out])[z,:])
-		else
-			tempCJetfuelConvFuel = 0
-		end
-
-		if setup["AllowConventionalGasoline"] == 1
-			tempCGasolineConvFuel = sum(value.(EP[:eCLFGasolineVar_out])[z,:])
-		else
-			tempCGasolineConvFuel = 0
-		end
-
-		for y in dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]
-			tempC_SF_Fix = tempC_SF_Fix +
-				value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y]
-
-			tempC_SF_Var = tempC_SF_Var +
-				sum(value.(EP[:eCSFProdVar_out])[y,:])
-
-			tempC_SF_ByProd = tempC_SF_ByProd + -sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y])
-
-
-			tempCTotal = tempCTotal +
-					value.(EP[:eFixed_Cost_Syn_Fuels_per_type])[y] +
-					sum(value.(EP[:eCSFProdVar_out])[y,:]) +
-					-sum(value.(EP[:eTotalCSFByProdRevenueOutTK])[:,y]) 
-					
-
-			
-		end
-
-		tempCTotal = tempCTotal +  tempCDieselConvFuel + tempCJetfuelConvFuel + tempCGasolineConvFuel
 
 		if setup["ParameterScale"] == 1 # Convert costs in millions to $
 			tempC_SF_Fix = tempC_SF_Fix * (ModelScalingFactor^2)
 			tempC_SF_Var = tempC_SF_Var * (ModelScalingFactor^2)
 			tempC_SF_ByProd = tempC_SF_ByProd * (ModelScalingFactor^2)
-			tempCDieselConvFuel = tempCDieselConvFuel * (ModelScalingFactor^2)
-			tempCJetfuelConvFuel = tempCJetfuelConvFuel * (ModelScalingFactor^2)
-			tempCGasolineConvFuel = tempCGasolineConvFuel * (ModelScalingFactor^2)
+			tempCDieselConvFuel = "-"
+			tempCJetfuelConvFuel = "-"
+			tempCGasolineConvFuel = "-"
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 		end
 
@@ -158,5 +119,7 @@ function write_synfuel_costs(path::AbstractString, sep::AbstractString, inputs::
 
 		dfSynFuelsCost[!,Symbol("Zone$z")] = [tempCTotal, tempC_SF_Fix, tempC_SF_Var, tempC_SF_ByProd, tempCDieselConvFuel, tempCJetfuelConvFuel, tempCGasolineConvFuel]
 	end
-	CSV.write(string(path,sep,"SynFuel_costs.csv"), dfSynFuelsCost)
+	
+
+	CSV.write(string(path,sep,"LF_costs.csv"), dfSynFuelsCost)
 end

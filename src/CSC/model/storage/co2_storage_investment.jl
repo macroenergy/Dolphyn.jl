@@ -83,8 +83,10 @@ function co2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 	#####################################################################################################################################
 	#Min and max capacity constraints
 	@constraint(EP,cMinCapacity_CO2_Storage[i in 1:CO2_STOR_ALL], EP[:vCapacity_CO2_Storage_per_type][i] >= CO2_Storage_Capacity_Min_Limit[i])
-	@constraint(EP,cMaxCapacity_CO2_Storage[i in 1:CO2_STOR_ALL], EP[:vCapacity_CO2_Storage_per_type][i] <= CO2_Storage_Capacity_Max_Limit[i])
-	
+
+	#Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
+	@constraint(EP, cMaxCapacity_CO2_Storage[i in intersect(dfCO2Storage[dfCO2Storage.Max_capacity_tonne_per_yr.>0, :R_ID], 1:CO2_STOR_ALL)], EP[:vCapacity_CO2_Storage_per_type][i] <= CO2_Storage_Capacity_Max_Limit[i])
+
 	#####################################################################################################################################
 	##Expressions
 	#Cost per type of technology

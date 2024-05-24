@@ -132,7 +132,12 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		Fraction_H2_CCS = H2_CCS/Total_CO2_Stored
 
 		cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total])
-		cCO2Injection = value(EP[:eVar_OM_CO2_Injection_total])
+
+		if setup["ModelCO2Pipelines"] == 1
+			cCO2Injection = value(EP[:eVar_OM_CO2_Injection_total])
+		else
+			cCO2Injection = 0
+		end
 
 		if setup["ModelCO2Pipelines"] == 1
 			cCO2NetworkExpansion = value(EP[:eCCO2Pipe])

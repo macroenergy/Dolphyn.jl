@@ -6,7 +6,7 @@ Pages = ["LFSC/write_outputs/write_liquid_fuels_outputs.jl"]
 ## Write Liquid Fuels Supply Chain Costs
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["LFSC/write_outputs/write_synfuel_costs.jl"]
+Pages = ["LFSC/write_outputs/write_liquid_fuel_costs_global_conv_fuel.jl"]
 ```
 
 ## Write Synthetic Fuels Resources Capacity
@@ -30,11 +30,11 @@ Pages = ["LFSC/write_outputs/write_synfuel_gen.jl"]
 ## Write Liquid Fuels Emissions
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["LFSC/write_outputs/write_synfuel_emissions.jl"]
+Pages = ["LFSC/write_outputs/write_liquid_fuel_emissions_global_conv_fuel.jl"]
 ```
 
 ## Write Liquid Fuels Demand Balance
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["LFSC/write_outputs/write_liquid_fuel_demand_balance.jl"]
+Pages = ["LFSC/write_outputs/write_liquid_fuel_demand_balance_global_conv_fuel.jl"]
 ```

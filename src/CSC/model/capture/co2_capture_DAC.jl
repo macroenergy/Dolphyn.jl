@@ -86,6 +86,10 @@ function co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 	#ADD TO CO2 BALANCE
 	EP[:eCaptured_CO2_Balance] += eDAC_CO2_captured_per_time_per_zone
 
+	#CO2 Balance expressions
+	@expression(EP, eDAC_CO2_Captured_per_zone_per_time[z=1:Z, t=1:T],
+	sum(EP[:vDAC_CO2_Captured][k,t] for k in intersect(CO2_CAPTURE_DAC, dfDAC[dfDAC[!,:Zone].==z,:][!,:R_ID])))
+
 	#Power Balance
 	# If ParameterScale = 1, power system operation/capacity modeled in GW, no need to scale as MW/ton = GW/kton 
 	# If ParameterScale = 0, power system operation/capacity modeled in MW

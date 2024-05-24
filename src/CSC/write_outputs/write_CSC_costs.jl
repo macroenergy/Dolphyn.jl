@@ -22,7 +22,7 @@ Function for writing the cost for the different sectors of the carbon supply cha
 function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	## Cost results
 	dfDAC = inputs["dfDAC"]
-	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
+	#dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	dfCO2Storage = inputs["dfCO2Storage"]
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
@@ -31,9 +31,16 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	if setup["ParameterScale"] == 1
 		cDACVar = value(EP[:eVar_OM_DAC]) * ModelScalingFactor^2
 		cDACFix = value(EP[:eFixed_Cost_DAC_total]) * ModelScalingFactor^2
-		cCO2Comp =  value(EP[:eFixed_Cost_CO2_Capture_Comp_total]) * ModelScalingFactor^2
-		cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total]) * ModelScalingFactor^2
-		cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total]) * ModelScalingFactor^2
+		#cCO2Comp =  value(EP[:eFixed_Cost_CO2_Capture_Comp_total]) * ModelScalingFactor^2
+		cCO2Comp = 0
+		#cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total]) * ModelScalingFactor^2
+		cCO2Stor = 0
+
+		if setup["ModelCO2Storage"] == 1
+			cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total]) * ModelScalingFactor^2
+		else
+			cCO2Injection = 0
+		end
 		
 		if setup["ModelCO2Pipelines"] != 0
 			cCO2NetworkExpansion = value(EP[:eCCO2Pipe]) * ModelScalingFactor^2
@@ -44,9 +51,17 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	else
 		cDACVar = value(EP[:eVar_OM_DAC])
 		cDACFix = value(EP[:eFixed_Cost_DAC_total])
-		cCO2Comp = value(EP[:eFixed_Cost_CO2_Capture_Comp_total])
-		cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total])
-		cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total])
+		#cCO2Comp = value(EP[:eFixed_Cost_CO2_Capture_Comp_total])
+		cCO2Comp = 0
+		#cCO2Stor = value(EP[:eFixed_Cost_CO2_Storage_total])
+		cCO2Stor = 0
+
+		if setup["ModelCO2Storage"] == 1
+			cCO2Injection= value(EP[:eVar_OM_CO2_Injection_total])
+		else
+			cCO2Injection = 0
+		end
+
 		if setup["ModelCO2Pipelines"] != 0
 			cCO2NetworkExpansion = value(EP[:eCCO2Pipe])
 		else
@@ -77,19 +92,23 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 			tempCTotal = tempCTotal + value.(EP[:eFixed_Cost_DAC_per_type])[y] + sum(value.(EP[:eVar_OM_DAC_per_type])[y,:])
 		end
 
-		for y in dfCO2CaptureComp[dfCO2CaptureComp[!,:Zone].==z,:][!,:R_ID]
-			tempCCO2Comp = tempCCO2Comp + value.(EP[:eFixed_Cost_CO2_Capture_Comp_per_type])[y]
-			tempCTotal = tempCTotal + value.(EP[:eFixed_Cost_CO2_Capture_Comp_per_type])[y]
-		end
+		#for y in dfCO2CaptureComp[dfCO2CaptureComp[!,:Zone].==z,:][!,:R_ID]
+		#	tempCCO2Comp = tempCCO2Comp + value.(EP[:eFixed_Cost_CO2_Capture_Comp_per_type])[y]
+		#	tempCTotal = tempCTotal + value.(EP[:eFixed_Cost_CO2_Capture_Comp_per_type])[y]
+		#end
+		tempCCO2Comp = 0
+	
+		#for y in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]
+		#	tempCCO2Stor = tempCCO2Stor + value.(EP[:eFixed_Cost_CO2_Storage_per_type])[y]
+		#	tempCTotal = tempCTotal + value.(EP[:eFixed_Cost_CO2_Storage_per_type])[y]
+		#end\
+		tempCCO2Stor = 0
 
-		for y in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]
-			tempCCO2Stor = tempCCO2Stor + value.(EP[:eFixed_Cost_CO2_Storage_per_type])[y]
-			tempCTotal = tempCTotal + value.(EP[:eFixed_Cost_CO2_Storage_per_type])[y]
-		end
-
-		for y in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]
-			tempCCO2Injection = tempCCO2Injection + value.(EP[:eVar_OM_CO2_Injection_per_type])[y]
-			tempCTotal = tempCTotal + value.(EP[:eVar_OM_CO2_Injection_per_type])[y]
+		if setup["ModelCO2Storage"] == 1
+			for y in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]
+				tempCCO2Injection = tempCCO2Injection + value.(EP[:eVar_OM_CO2_Injection_per_type])[y]
+				tempCTotal = tempCTotal + value.(EP[:eVar_OM_CO2_Injection_per_type])[y]
+			end
 		end
 
 
@@ -97,8 +116,8 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 			tempCTotal = tempCTotal * (ModelScalingFactor^2)
 			tempCDACFix = tempCDACFix * (ModelScalingFactor^2)
 			tempCDACVar = tempCDACVar * (ModelScalingFactor^2)
-			tempCCO2Comp = tempCCO2Comp * (ModelScalingFactor^2)
-			tempCCO2Stor = tempCCO2Stor * (ModelScalingFactor^2)
+			tempCCO2Comp = 0
+			tempCCO2Stor = 0
 			tempCCO2Injection = tempCCO2Injection * (ModelScalingFactor^2)
 		end
 

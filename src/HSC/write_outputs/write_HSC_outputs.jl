@@ -57,11 +57,11 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     write_h2_capacity(path, sep, inputs, setup, EP)
     write_h2_gen(path, sep, inputs, setup, EP)
     write_h2_nse(path, sep, inputs, setup, EP)
-    write_h2_costs(path, sep, inputs, setup, EP)
+    #write_h2_costs(path, sep, inputs, setup, EP)
     write_h2_balance(path, sep, inputs, setup, EP)
     write_h2_balance_zone(path, sep, inputs, setup, EP)
-    write_h2_balance_dual(path, sep, inputs, setup, EP)
-    write_HSC_LCOH(path, sep, inputs, setup, EP)
+    #write_h2_balance_dual(path, sep, inputs, setup, EP)
+    #write_HSC_LCOH(path, sep, inputs, setup, EP)
     write_h2_emissions(path, sep, inputs, setup, EP)
     write_h2_charge(path, sep, inputs, setup, EP)
     write_h2_storage(path, sep, inputs, setup, EP)
@@ -96,6 +96,6 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     end
 
     ## Print confirmation
-    print_and_log("Wrote outputs HSC outputs to $path$sep")
+    print_and_log("Wrote HSC outputs to $path$sep")
 
 end # END output()

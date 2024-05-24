@@ -14,7 +14,6 @@ function emissions!(EP::Model, inputs::Dict, setup::Dict)
 	Z = inputs["Z"]     # Number of zones
 
 	@expression(EP, eEmissionsByPlant[y=1:G,t=1:T],
-
 		if y in inputs["COMMIT"]
 			(dfGen[y,:CO2_per_MWh]*EP[:vP][y,t]+dfGen[y,:CO2_per_Start]*EP[:vSTART][y,t])*(1-dfGen[!, :CCS_Rate][y])
 		else
@@ -22,9 +21,7 @@ function emissions!(EP::Model, inputs::Dict, setup::Dict)
 		end
 	)
 
-	@expression(
-        EP,
-        eCO2CaptureByPlant[y = 1:G, t = 1:T],
+	@expression(EP, eCO2CaptureByPlant[y = 1:G, t = 1:T],
         if y in inputs["COMMIT"]
 			(dfGen[y,:CO2_per_MWh]*EP[:vP][y,t]+dfGen[y,:CO2_per_Start]*EP[:vSTART][y,t])*(dfGen[!, :CCS_Rate][y])
 		else

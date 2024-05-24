@@ -21,8 +21,6 @@ This module models the CO2 captured by flue gas CCS units present in power, H2, 
 """
 function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 
-	CO2_CAPTURE_DAC = inputs["CO2_CAPTURE_DAC"]
-
 	dfGen = inputs["dfGen"] #To account for the CO2 captured by power sector
 
 	if setup["ModelH2"] == 1
@@ -37,9 +35,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2, H2 and electricity
 	T = inputs["T"]	 # Model operating time steps
 
-	if !isempty(CO2_CAPTURE_DAC)
-		EP = co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
-	end
+	EP = co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 
 	#CO2 captued by power sector CCS plants
 	@expression(EP, ePower_CO2_captured_per_plant_per_time[y=1:G,t=1:T], EP[:eCO2CaptureByPlant][y,t])
@@ -77,7 +73,6 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	
 	#ADD TO CO2 BALANCE
 	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
-
 
 	return EP
 end

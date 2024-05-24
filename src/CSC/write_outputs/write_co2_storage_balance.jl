@@ -52,7 +52,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,5] = 0
 			end
 			
-			if setup["ModelLiquidFuels"] == 1
+			if setup["ModelLiquidFuels"] == 1 && setup["ModelSyntheticFuels"] == 1
 				dfTemp1[t+rowoffset,6] = value(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])
 				dfTemp1[t+rowoffset,7] = - value(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time][z,t])
 			else
@@ -66,7 +66,11 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
-			dfTemp1[t+rowoffset,9] = - value(EP[:eCO2_Injected_per_zone][z,t])
+			if setup["ModelCO2Storage"] == 1
+				dfTemp1[t+rowoffset,9] = - value(EP[:eCO2_Injected_per_zone][z,t])
+			else
+				dfTemp1[t+rowoffset,9] = 0
+			end
 
 			if setup["ParameterScale"] == 1
 				dfTemp1[t+rowoffset,1] = dfTemp1[t+rowoffset,1] * ModelScalingFactor

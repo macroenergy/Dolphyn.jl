@@ -7,7 +7,7 @@ Pages = ["LFSC/load_inputs/load_liquid_fuels_inputs.jl"]
 ## Load Liquid Fuels Demand
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["LFSC/load_inputs/load_liquid_fuel_demand.jl"]
+Pages = ["LFSC/load_inputs/load_conventional_fuel_demand.jl"]
 ```
 
 ## Load Synthetic Fuels Resources

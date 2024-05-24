@@ -34,7 +34,7 @@ function load_bio_refinery(setup::Dict, path::AbstractString, sep::AbstractStrin
 
 	inputs_bioenergy["BIO_H2"] = bioenergy[bioenergy.BioH2_Production.== 1 ,:R_ID]
 
-	inputs_bioenergy["BIO_E"] = bioenergy[bioenergy.BioElectricity_Production.== 1 ,:R_ID]
+	inputs_bioenergy["BIO_ELEC"] = bioenergy[bioenergy.BioElectricity_Production.== 1 ,:R_ID]
 
 	inputs_bioenergy["BIO_DIESEL"] = bioenergy[bioenergy.BioDiesel_Production.== 1 ,:R_ID]
 

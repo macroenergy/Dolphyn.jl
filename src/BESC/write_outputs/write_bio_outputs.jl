@@ -55,8 +55,8 @@ function write_bio_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
 
     write_BESC_costs(path, sep, inputs, setup, EP)
     write_bio_plant_capacity(path, sep, inputs, setup, EP)
-    write_bio_zone_herb_consumed(path, sep, inputs, setup, EP)
-    write_bio_zone_wood_consumed(path, sep, inputs, setup, EP)
+    write_bio_herb_supply(path, sep, inputs, setup, EP)
+    write_bio_wood_supply(path, sep, inputs, setup, EP)
 
     if setup["Bio_Electricity_On"] == 1
       write_bio_zone_bioelectricity_produced(path, sep, inputs, setup, EP)

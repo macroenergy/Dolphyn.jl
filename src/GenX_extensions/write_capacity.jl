@@ -234,7 +234,7 @@ function write_capacity(path::AbstractString, inputs::Dict, setup::Dict, EP::Mod
 		B = inputs["BIO_RES_ALL"]
 
 		newcap_BioE = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-		for i in inputs["BIO_E"]
+		for i in inputs["BIO_ELEC"]
 			newcap_BioE[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioElectricity_yield_MWh_per_tonne][i]
 		end
 

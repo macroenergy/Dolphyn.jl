@@ -130,7 +130,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     @expression(EP, eTransmissionByZone[z=1:Z, t=1:T], 0)
     @expression(EP, eDemandByZone[t=1:T, z=1:Z], inputs["pD"][t, z])
     # Additional demand by z and timestep - used to record power consumption in other sectors like hydrogen and carbon
-    @expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)  
+    #@expression(EP, eAdditionalDemandByZone[t=1:T, z=1:Z], 0)  
     
     # Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
@@ -214,7 +214,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         EP = retrofit(EP, inputs)
     end
 
-    ###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
+    ###### START OF H2 INFRASTRUCTURE MODEL ######
     if setup["ModelH2"] == 1
         @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
         @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
@@ -279,10 +279,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 			EP = green_h2_share_requirement(EP, inputs, setup)
 		end
 
-        EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
+        #EP[:eAdditionalDemandByZone] += EP[:eH2NetpowerConsumptionByAll]
     
 	end
 
+    ###### START OF CO2 INFRASTRUCTURE MODEL ######
     if setup["ModelCSC"] == 1
 
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
@@ -299,20 +300,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		# Fixed costs of storage storage
 		
-		EP = co2_storage_investment(EP, inputs, setup)
-
-		if !isempty(inputs["CO2_STORAGE"])
+		if setup["ModelCO2Storage"] == 1
 			#model CO2 injection
 			EP = co2_injection(EP, inputs, setup)
-		end
 
-		# Fixed costs of carbon capture compression
-
-		EP = co2_capture_compression_investment(EP, inputs, setup)
-
-		if !isempty(inputs["CO2_CAPTURE_COMP"])
-			#model CO2 capture
-			EP = co2_capture_compression(EP, inputs, setup)
+            #EP = co2_storage_investment(EP, inputs, setup)
 		end
 
 		if setup["ModelCO2Pipelines"] == 1
@@ -323,80 +315,73 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions of various carbon capture sector resources
 		EP = emissions_csc(EP, inputs,setup)
 
-		EP[:eAdditionalDemandByZone] += EP[:eCSCNetpowerConsumptionByAll]
+
+		# Fixed costs of external carbon capture compression
+
+		#EP = co2_capture_compression_investment(EP, inputs, setup)
+
+		#if !isempty(inputs["CO2_CAPTURE_COMP"])
+			#model CO2 capture
+		#	EP = co2_capture_compression(EP, inputs, setup)
+		#end
+
+		#EP[:eAdditionalDemandByZone] += EP[:eCSCNetpowerConsumptionByAll]
 
 	end
 
+    ###### START OF LIQUID FUELS INFRASTRUCTURE MODEL ######
     if setup["ModelLiquidFuels"] == 1
 
-		# Initialize Liquid Fuel Balance
-		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
-		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)
-		@expression(EP, eLFGasolineBalance[t=1:T, z=1:Z], 0)
+        if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+            # Initialize Global Hourly Conventional Fuel Balance [t]
+            @expression(EP, eCFDieselBalance[t=1:T, z=1:Z], 0)
+            @expression(EP, eCFJetfuelBalance[t=1:T, z=1:Z], 0)
+            @expression(EP, eCFGasolineBalance[t=1:T, z=1:Z], 0)
 
-		
-		EP = syn_fuel_outputs(EP, inputs, setup)
-		EP = syn_fuel_investment(EP, inputs, setup)
-		EP = syn_fuel_resources(EP, inputs, setup)
-		EP = liquid_fuel_demand(EP, inputs, setup)
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+            # Initialize Global Hourly Conventional Fuel Balance [t]
+            @expression(EP, eCFDieselBalance[z=1:Z], 0)
+            @expression(EP, eCFJetfuelBalance[z=1:Z], 0)
+            @expression(EP, eCFGasolineBalance[z=1:Z], 0)
+
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+            # Initialize Global Hourly Conventional Fuel Balance [t]
+            @expression(EP, eCFDieselBalance[t=1:T], 0)
+            @expression(EP, eCFJetfuelBalance[t=1:T], 0)
+            @expression(EP, eCFGasolineBalance[t=1:T], 0)
+
+        elseif setup["Liquid_Fuels_Hourly_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+            # Initialize Global Annual Conventional Fuel Balance
+            @expression(EP, eCFDieselBalance, 0)
+            @expression(EP, eCFJetfuelBalance, 0)
+            @expression(EP, eCFGasolineBalance, 0)
+
+        end
+
+        # Initialize Syn and biofuel Balance [z,t]
+        @expression(EP, eSBFDieselBalance[t=1:T, z=1:Z], 0)
+        @expression(EP, eSBFJetfuelBalance[t=1:T, z=1:Z], 0)
+        @expression(EP, eSBFGasolineBalance[t=1:T, z=1:Z], 0)
+        
+        if setup["ModelSyntheticFuels"] == 1
+            EP = syn_fuel_outputs(EP, inputs, setup)
+            EP = syn_fuel_investment(EP, inputs, setup)
+            EP = syn_fuel_resources(EP, inputs, setup)
+        end
+        
+		EP = conventional_fuel_demand(EP, inputs, setup)
 		EP = liquid_fuel_emissions(EP, inputs, setup)
+    
+        #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynFuelRes]
+    end
 
-        ###Liquid Fuel Demand Constraints
-		#Diesel
-		
-        if setup["Bio_Diesel_On"] == 0 || setup["ModelBESC"] == 0
-            @expression(EP, eGlobalLFDieselBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFDieselBalance][t,z] for z = 1:Z) )
-            @expression(EP, eGlobalLFDieselDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) )
 
-            #Demand constraint for each time t for global liquid fuel demand
-            #@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
-
-            #Demand constraint for annual global liquid fuel demand
-            @expression(EP, eAnnualGlobalLFDieselBalance, sum(EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
-            @expression(EP, eAnnualGlobalLFDieselDemand, sum(EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
-            @constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
-        end
-
-		#Jetfuel
-		
-        if setup["Bio_Jetfuel_On"] == 0 || setup["ModelBESC"] == 0
-            @expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
-            @expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
-
-            #Demand constraint for each time t for global liquid fuel demand
-            #@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
-
-            #Demand constraint for annual global liquid fuel demand
-            @expression(EP, eAnnualGlobalLFJetfuelBalance, sum(EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
-            @expression(EP, eAnnualGlobalLFJetfuelDemand, sum(EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
-            @constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
-        end
-
-		#Gasoline
-		
-        if setup["Bio_Gasoline_On"] == 0 || setup["ModelBESC"] == 0
-            @expression(EP, eGlobalLFGasolineBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFGasolineBalance][t,z] for z = 1:Z) )
-            @expression(EP, eGlobalLFGasolineDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) )
-
-            #Demand constraint for each time t for global liquid fuel demand
-            #@constraint(EP, cLFGasolineBalance[t=1:T], eGlobalLFGasolineBalance[t] >= eGlobalLFGasolineDemand[t])
-
-            #Demand constraint for annual global liquid fuel demand
-            @expression(EP, eAnnualGlobalLFGasolineBalance, sum(EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
-            @expression(EP, eAnnualGlobalLFGasolineDemand, sum(EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
-            @constraint(EP, cLFAnnualGasolineBalance, eAnnualGlobalLFGasolineBalance >= eAnnualGlobalLFGasolineDemand)
-		end
-
-        EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynFuelRes]
-
-	end
-
+    ###### START OF BIOENERGY INFRASTRUCTURE MODEL ######
     if setup["ModelBESC"] == 1
 
-		#Ethanol
-		if setup["Bio_Ethanol_On"] == 1
-			@expression(EP, eEthanolBalance[t=1:T, z=1:Z], 0)
-		end
+        # Initialize Herb and Wood Biomass Supply Balance 
+        @expression(EP, eHerb_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eWood_Biomass_Supply[t=1:T, z=1:Z], 0)
 
 		# Net Power consumption
 		@expression(EP, eBioNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
@@ -418,73 +403,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions
 		EP = emissions_besc(EP, inputs,setup)
 
-        ###Liquid Fuel Demand Constraints
-
-        if setup["ModelLiquidFuels"] == 1
-
-            #Diesel
-            if setup["Bio_Diesel_On"] == 1
-                @expression(EP, eGlobalLFDieselBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFDieselBalance][t,z] for z = 1:Z) )
-                @expression(EP, eGlobalLFDieselDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) )
-
-                #Demand constraint for each time t for global liquid fuel demand
-                #@constraint(EP, cLFDieselBalance[t=1:T], eGlobalLFDieselBalance[t] >= eGlobalLFDieselDemand[t])
-
-                #Demand constraint for annual global liquid fuel demand
-                @expression(EP, eAnnualGlobalLFDieselBalance, sum(EP[:eGlobalLFDieselBalance][t] for t = 1:T) )
-                @expression(EP, eAnnualGlobalLFDieselDemand, sum(EP[:eGlobalLFDieselDemand][t] for t = 1:T) )
-                @constraint(EP, cLFAnnualDieselBalance, eAnnualGlobalLFDieselBalance >= eAnnualGlobalLFDieselDemand)
-            end
-
-            #Jetfuel
-            if setup["Bio_Jetfuel_On"] == 1
-                @expression(EP, eGlobalLFJetfuelBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFJetfuelBalance][t,z] for z = 1:Z) )
-                @expression(EP, eGlobalLFJetfuelDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) )
-            
-                #Demand constraint for each time t for global liquid fuel demand
-                #@constraint(EP, cLFJetfuelBalance[t=1:T], eGlobalLFJetfuelBalance[t] >= eGlobalLFJetfuelDemand[t])
-            
-                #Demand constraint for annual global liquid fuel demand
-                @expression(EP, eAnnualGlobalLFJetfuelBalance, sum(EP[:eGlobalLFJetfuelBalance][t] for t = 1:T) )
-                @expression(EP, eAnnualGlobalLFJetfuelDemand, sum(EP[:eGlobalLFJetfuelDemand][t] for t = 1:T) )
-                @constraint(EP, cLFAnnualJetfuelBalance, eAnnualGlobalLFJetfuelBalance >= eAnnualGlobalLFJetfuelDemand)
-            end
-
-            #Gasoline
-            if setup["Bio_Gasoline_On"] == 1
-                @expression(EP, eGlobalLFGasolineBalance[t=1:T], sum(inputs["omega"][t] * EP[:eLFGasolineBalance][t,z] for z = 1:Z) )
-                @expression(EP, eGlobalLFGasolineDemand[t=1:T], sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) )
-
-                #Demand constraint for each time t for global liquid fuel demand
-                #@constraint(EP, cLFGasolineBalance[t=1:T], eGlobalLFGasolineBalance[t] >= eGlobalLFGasolineDemand[t])
-
-                #Demand constraint for annual global liquid fuel demand
-                @expression(EP, eAnnualGlobalLFGasolineBalance, sum(EP[:eGlobalLFGasolineBalance][t] for t = 1:T) )
-                @expression(EP, eAnnualGlobalLFGasolineDemand, sum(EP[:eGlobalLFGasolineDemand][t] for t = 1:T) )
-                @constraint(EP, cLFAnnualGasolineBalance, eAnnualGlobalLFGasolineBalance >= eAnnualGlobalLFGasolineDemand)
-            end
-
-            #Ethanol
-            if setup["Bio_Ethanol_On"] == 1
-                @expression(EP, eGlobalEthanolBalance[t=1:T], sum(inputs["omega"][t] * EP[:eEthanolBalance][t,z] for z = 1:Z) )
-                @expression(EP, eGlobalEthanolDemand[t=1:T], sum(inputs["omega"][t] * inputs["Bio_Fuels_Ethanol_D"][t,z] for z = 1:Z) )
-
-
-                #Demand constraint for each time t for global liquid fuel demand
-                #@constraint(EP, cEthanolBalanceGlobal[t=1:T], EP[:eGlobalEthanolBalance][t] >= eGlobalEthanolDemand[t])
-
-                #Demand constraint for annual global liquid fuel demand
-                @expression(EP, eAnnualGlobalEthanolBalance, sum(EP[:eGlobalEthanolBalance][t] for t = 1:T) )
-                @expression(EP, eAnnualGlobalEthanolDemand, sum(EP[:eGlobalEthanolDemand][t] for t = 1:T) )
-                @constraint(EP, cAnnualEthanolBalance, eAnnualGlobalEthanolBalance >= eAnnualGlobalEthanolDemand)
-
-            end
+        if setup["ModelLiquidFuels"] == 1 && setup["Bio_Ethanol_On"] == 1
+            @expression(EP, eEthanolBalance[t=1:T, z=1:Z], 0)
         end
 
-		EP[:eAdditionalDemandByZone] += EP[:eBioNetpowerConsumptionByAll]
-
-	end
-
+        #EP[:eAdditionalDemandByZone] += EP[:eBioNetpowerConsumptionByAll]
+    end
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
@@ -523,26 +447,107 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ## Define the objective function
     @objective(EP,Min,EP[:eObj])
 
+    #########################################################################################
     ## Power balance constraints
     # demand = generation + storage discharge - storage charge - demand deferral + deferred demand satisfaction - demand curtailment (NSE)
     #          + incoming power flows - outgoing power flows - flow losses - charge of heat storage + generation from NACC
     @constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z])
 
+    #########################################################################################
+
     if setup["ModelH2"] == 1
         ###Hydrogen Balance constraints
         @constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t,z] == inputs["H2_D"][t,z])
+
+        if setup["ModelH2Liquid"] == 1
+            ###Hydrogen Liquid Balance constraints
+            @constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
+        end
     end
 
-    if setup["ModelH2Liquid"] == 1
-        ###Hydrogen Liquid Balance constraints
-        @constraint(EP, cH2LiqBalance[t=1:T, z=1:Z], EP[:eH2LiqBalance][t,z] == inputs["H2_D_L"][t,z])
-    end
+    #########################################################################################
 
     if setup["ModelCSC"] == 1
 		###Captured CO2 Balanace constraints
 		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
 	end
+
+    #########################################################################################
+    ###Liquid Fuel Demand Constraints
+
+    if setup["ModelLiquidFuels"] == 1
     
+        ##Gasoline
+        if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+    
+            #Demand constraint for hourly regional liquid fuel demand[t,z]
+            @constraint(EP, cLFGasolineBalance_T_Z[t=1:T,z=1:Z], (EP[:eSBFGasolineBalance][t,z] + EP[:eCFGasolineBalance][t,z]) >= inputs["Liquid_Fuels_Gasoline_D"][t,z])
+            @constraint(EP, cLFJetfuelBalance_T_Z[t=1:T,z=1:Z], (EP[:eSBFJetfuelBalance][t,z] + EP[:eCFJetfuelBalance][t,z]) >= inputs["Liquid_Fuels_Jetfuel_D"][t,z])
+            @constraint(EP, cLFDieselBalance_T_Z[t=1:T,z=1:Z], (EP[:eSBFDieselBalance][t,z] + EP[:eCFDieselBalance][t,z]) >= inputs["Liquid_Fuels_Diesel_D"][t,z])
+    
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+    
+            #Demand constraint for annual regional liquid fuel demand[z]
+            @constraint(EP, cLFGasolineBalance_Z[z=1:Z], (sum(inputs["omega"][t] * EP[:eSBFGasolineBalance][t,z] for t = 1:T) + EP[:eCFGasolineBalance][z]) >= sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for t = 1:T))
+            @constraint(EP, cLFJetfuelBalance_Z[z=1:Z], (sum(inputs["omega"][t] * EP[:eSBFJetfuelBalance][t,z] for t = 1:T) + EP[:eCFJetfuelBalance][z]) >= sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for t = 1:T))
+            @constraint(EP, cLFDieselBalance_Z[z=1:Z], (sum(inputs["omega"][t] * EP[:eSBFDieselBalance][t,z] for t = 1:T) + EP[:eCFDieselBalance][z]) >= sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for t = 1:T))
+
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+    
+            #Demand constraint for hourly global liquid fuel demand[t]
+            @constraint(EP, cLFGasolineBalance_T[t=1:T], (sum(EP[:eSBFGasolineBalance][t,z] for z = 1:Z) + EP[:eCFGasolineBalance][t]) >= sum(inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z))
+            @constraint(EP, cLFJetfuelBalance_T[t=1:T], (sum(EP[:eSBFJetfuelBalance][t,z] for z = 1:Z) + EP[:eCFJetfuelBalance][t]) >= sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z))
+            @constraint(EP, cLFDieselBalance_T[t=1:T], (sum(EP[:eSBFDieselBalance][t,z] for z = 1:Z) + EP[:eCFDieselBalance][t]) >= sum(inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z))
+
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+    
+            #Demand constraint for annual global liquid fuel demand
+            @constraint(EP, cLFGasolineBalance, (sum(sum(inputs["omega"][t] * EP[:eSBFGasolineBalance][t,z] for z = 1:Z) for t = 1:T) + EP[:eCFGasolineBalance]) >= sum(sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) for t = 1:T))
+            @constraint(EP, cLFJetfuelBalance, (sum(sum(inputs["omega"][t] * EP[:eSBFJetfuelBalance][t,z] for z = 1:Z) for t = 1:T) + EP[:eCFJetfuelBalance]) >= sum(sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) for t = 1:T))
+            @constraint(EP, cLFDieselBalance, (sum(sum(inputs["omega"][t] * EP[:eSBFDieselBalance][t,z] for z = 1:Z) for t = 1:T) + EP[:eCFDieselBalance]) >= sum(sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) for t = 1:T))
+        end
+        
+        # Conventional Fuels Share Policy
+        if setup["Conventional_Diesel_Share_Requirement"] == 1 || setup["Conventional_Jetfuel_Share_Requirement"] == 1 || setup["Conventional_Gasoline_Share_Requirement"] == 1
+            EP = conventional_fuel_share(EP, inputs, setup)
+        end
+
+    end
+
+
+
+    if setup["ModelBESC"] == 1
+        ###Herb and Wood Biomass Balanace constraints
+        @constraint(EP, cHerbBiomassBalance[t=1:T, z=1:Z], EP[:eHerb_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cWoodBiomassBalance[t=1:T, z=1:Z], EP[:eWood_Biomass_Supply][t,z] == 0)
+
+        if setup["ModelLiquidFuels"] == 1 && setup["Bio_Ethanol_On"] == 1
+
+            if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+
+                #Demand constraint for hourly regional liquid fuel demand[t,z]
+                @constraint(EP, cEthanolBalance_T_Z[t=1:T,z=1:Z], EP[:eEthanolBalance][t,z] >= inputs["Bio_Fuels_Ethanol_D"][t,z])
+
+            elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+
+                #Demand constraint for annual regional liquid fuel demand[z]
+                @constraint(EP, cEthanolBalance_Z[z=1:Z], sum(inputs["omega"][t] * EP[:eEthanolBalance][t,z] for t = 1:T) >= sum(inputs["omega"][t] * inputs["Bio_Fuels_Ethanol_D"][t,z] for t = 1:T))
+
+            elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+
+                #Demand constraint for hourly global liquid fuel demand[t]
+                @constraint(EP, cEthanolBalance_T[t=1:T], sum(EP[:eEthanolBalance][t,z] for z = 1:Z) >= sum(inputs["Bio_Fuels_Ethanol_D"][t,z] for z = 1:Z))
+
+            elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+
+                #Demand constraint for annual global liquid fuel demand
+                @constraint(EP, cEthanolBalance, sum(sum(inputs["omega"][t] * EP[:eEthanolBalance][t,z] for z = 1:Z) for t = 1:T) >= sum(sum(inputs["omega"][t] * inputs["Bio_Fuels_Ethanol_D"][t,z] for z = 1:Z) for t = 1:T))
+
+            end
+        end
+    end
+
+
     ## Record pre-solver time
     presolver_time = time() - presolver_start_time
         #### Question - What do we do with this time now that we've split this function into 2?

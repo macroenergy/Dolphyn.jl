@@ -33,7 +33,7 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6 + NSFByProd)
 		byprodHead = "ByProd_Out_" .* string.(collect(1:NSFByProd))
-	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","Power_In", "H2_In","Syn_Fuel_Diesel_Out","Syn_Fuel_Jetfuel_Out","Syn_Gasoline_Out"], byprodHead)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","Power_In", "H2_In","Syn_Gasoline_Out","Syn_Fuel_Jetfuel_Out","Syn_Fuel_Diesel_Out"], byprodHead)
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 	   	for t in 1:T
@@ -46,10 +46,10 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 			end
 
 			dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelH2Cons][t,z])
-			dfTemp1[t+rowoffset,4]= sum(value.(EP[:vSFProd_Diesel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,4]= sum(value.(EP[:vSFProd_Gasoline][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
 			dfTemp1[t+rowoffset,5]= sum(value.(EP[:vSFProd_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
-			dfTemp1[t+rowoffset,6]= sum(value.(EP[:vSFProd_Gasoline][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
-
+			dfTemp1[t+rowoffset,6]= sum(value.(EP[:vSFProd_Diesel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			
 			for b in 1:NSFByProd
 				dfTemp1[t+rowoffset, 6 + b] = sum(value.(EP[:vSFByProd][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],b,t]))
 			end
@@ -67,5 +67,5 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 		dfSFBalance[rowoffset,c]=sum(inputs["omega"].*dfSFBalance[(rowoffset+1):size(dfSFBalance,1),c])
 	end
 	dfSFBalance = DataFrame(dfSFBalance, :auto)
-	CSV.write(string(path,sep,"Syn_Fuel_balance.csv"), dfSFBalance, writeheader=false)
+	CSV.write(string(path,sep,"Synfuel_balance.csv"), dfSFBalance, writeheader=false)
 end
