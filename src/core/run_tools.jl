@@ -70,6 +70,11 @@ function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString
         myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
     end
 
+     ### Load BESC inputs if modeling the bioenergy  supply chain
+     if mysetup["ModelBESC"] == 1
+        myinputs = load_bio_inputs(myinputs, mysetup, inputs_path)
+    end
+
     return myinputs
 
 end
@@ -126,6 +131,11 @@ function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict
     # Write synthetic fuels supply chain outputs
     if mysetup["ModelLiquidFuels"] == 1
         write_liquid_fuels_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+
+    ### Write bioenergy  supply chain outputs
+    if mysetup["ModelBESC"] == 1
+        write_bio_outputs(myinputs, mysetup, inputs_path)
     end
 
     return adjusted_outpath
