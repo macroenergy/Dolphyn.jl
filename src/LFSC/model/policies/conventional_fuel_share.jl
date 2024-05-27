@@ -21,9 +21,8 @@ This function establishes constraints that can be flexibily applied to define al
 
 	"""
 function conventional_fuel_share(EP::Model, inputs::Dict, setup::Dict)
-
-	print_and_log("Conventional Fuel Share Requirement Policies Module")
-
+	println(" -- Conventional Fuel Share Requirement Policies Module")
+	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 

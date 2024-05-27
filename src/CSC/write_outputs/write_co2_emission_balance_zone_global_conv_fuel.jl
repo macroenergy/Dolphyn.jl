@@ -70,7 +70,7 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 			dfTemp1[t+rowoffset,16] = 0
 			dfTemp1[t+rowoffset,17] = 0
 
-			if setup["ModelLiquidFuels"] == 1
+			if setup["ModelLFSC"] == 1
 
 				if setup["ModelSyntheticFuels"] == 1
 					dfTemp1[t+rowoffset,9] = value(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t])
@@ -128,7 +128,7 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 		dfTemp1[rowoffset,16] = 0
 		dfTemp1[rowoffset,17] = 0
 
-		if setup["ModelLiquidFuels"] == 1
+		if setup["ModelLFSC"] == 1
 
 			if setup["ModelSyntheticFuels"] == 1
 				dfTemp1[rowoffset,9] = sum(inputs["omega"][t] * value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
@@ -161,7 +161,7 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 	dfCO2Balance_Conv_Fuels[2,1:size(dfCO2Balance_Conv_Fuels,2)] = repeat(["Global"],size(dfCO2Balance_Conv_Fuels,2))
 
 	for t in 1:T
-		if setup["ModelLiquidFuels"] == 1
+		if setup["ModelLFSC"] == 1
 			if setup["Liquid_Fuels_Hourly_Demand"] == 1
 				dfCO2Balance_Conv_Fuels[t+rowoffset,1] = value.(EP[:eConv_Gasoline_CO2_Emissions][t])
 				dfCO2Balance_Conv_Fuels[t+rowoffset,2] = value.(EP[:eConv_Jetfuel_CO2_Emissions][t])
@@ -180,7 +180,7 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 
 	
 	## Annual values
-	if setup["ModelLiquidFuels"] == 1
+	if setup["ModelLFSC"] == 1
 		if setup["Liquid_Fuels_Hourly_Demand"] == 1
 			dfCO2Balance_Conv_Fuels[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eConv_Gasoline_CO2_Emissions][t]) for t in 1:T)
 

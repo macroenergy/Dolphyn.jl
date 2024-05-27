@@ -39,7 +39,7 @@ function load_bio_supply(setup::Dict, path::AbstractString, sep::AbstractString,
 	# Set of supply resources
 	inputs_bio_supply["BESC_HERB_SUPPLY"] = Herb_biomass_supply[!,:R_ID]
 
-	println("Herb Biomass Supply Curves Successfully Read!")
+	println(" -- BESC_Herb_Supply.csv Successfully Read!")
 
 	####################################################
 
@@ -61,7 +61,7 @@ function load_bio_supply(setup::Dict, path::AbstractString, sep::AbstractString,
 	# Set of supply resources
 	inputs_bio_supply["BESC_WOOD_SUPPLY"] = Wood_biomass_supply[!,:R_ID]
 
-	println("Wood Biomass Supply Curves Successfully Read!")
+	println(" -- BESC_Wood_Supply.csv Successfully Read!")
 
     return inputs_bio_supply
 

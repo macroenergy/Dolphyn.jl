@@ -123,7 +123,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			Biorefinery_Capture = 0
 		end
 	
-		if setup["ModelLiquidFuels"] == 1
+		if setup["ModelLFSC"] == 1
 			Synfuel_Production_Capture = sum(sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
 		else
 			Synfuel_Production_Capture = 0

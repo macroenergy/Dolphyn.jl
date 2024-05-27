@@ -41,7 +41,7 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 		Biorefinery_Capture = 0
 	end
 
-	if setup["ModelLiquidFuels"] == 1 && setup["ModelSyntheticFuels"] == 1
+	if setup["ModelLFSC"] == 1 && setup["ModelSyntheticFuels"] == 1
 		Synfuel_Production_Capture = sum(sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
 		Synfuel_Production_Consumption = - sum(sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time])[z,:])) for z in 1:Z)
 	else
@@ -106,7 +106,7 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 			tempBiorefinery_Capture = tempBiorefinery_Capture + sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:]))
 		end
 
-		if setup["ModelLiquidFuels"] == 1 && setup["ModelSyntheticFuels"] == 1
+		if setup["ModelLFSC"] == 1 && setup["ModelSyntheticFuels"] == 1
 			tempSynfuel_Production_Capture = tempSynfuel_Production_Capture + sum(inputs["omega"].* (value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time])[z,:]))
 			tempSynfuel_Production_Consumption = tempSynfuel_Production_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time])[z,:]))
 		end

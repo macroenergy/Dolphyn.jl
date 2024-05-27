@@ -20,6 +20,7 @@ highs_cases = [
 
 gurobi_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "ThreeZones_Gurobi"),
+    joinpath(@__DIR__, "SE_US_MACRO", "OneZone_Gurobi"),
 ]
 
 if gurobi_installed && !force_highs

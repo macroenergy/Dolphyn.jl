@@ -47,7 +47,7 @@ For resources where upper bound $\overline{y_{f}^{\textrm{C,Syn}}}$ and lower bo
 """
 function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	
-	println(" -- Syn Fuel Cost module")
+	println(" -- Syn Fuel Fixed Cost Module")
 
     dfSynFuels = inputs["dfSynFuels"]
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]

@@ -74,7 +74,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 			dfTemp1[t+rowoffset,19] = 0
 			dfTemp1[t+rowoffset,20] = 0
 
-			if setup["ModelLiquidFuels"] == 1
+			if setup["ModelLFSC"] == 1
 				if setup["Liquid_Fuels_Hourly_Demand"] == 1
 					dfTemp1[t+rowoffset,9] = value(EP[:eConv_Gasoline_CO2_Emissions][z,t])
 					dfTemp1[t+rowoffset,10] = value(EP[:eConv_Jetfuel_CO2_Emissions][z,t])
@@ -147,7 +147,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 		dfTemp1[rowoffset,19] = 0
 		dfTemp1[rowoffset,20] = 0
 
-		if setup["ModelLiquidFuels"] == 1
+		if setup["ModelLFSC"] == 1
 			if setup["Liquid_Fuels_Hourly_Demand"] == 1
 				dfTemp1[rowoffset,9] = sum(inputs["omega"][t] * value.(EP[:eConv_Gasoline_CO2_Emissions][z,t]) for t in 1:T)
 				dfTemp1[rowoffset,10] = sum(inputs["omega"][t] * value.(EP[:eConv_Jetfuel_CO2_Emissions][z,t]) for t in 1:T)

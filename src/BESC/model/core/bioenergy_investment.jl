@@ -47,7 +47,7 @@ For resources where upper bound $\overline{y_{r}^{\textrm{B,Bio}}}$ and lower bo
 """
 function bioenergy_investment(EP::Model, inputs::Dict, setup::Dict)
 	
-	println("Biorefinery Fixed Cost module")
+	println(" -- Biorefinery Fixed Cost Module")
 
 	dfbioenergy = inputs["dfbioenergy"]
 	BIO_RES_ALL = inputs["BIO_RES_ALL"]

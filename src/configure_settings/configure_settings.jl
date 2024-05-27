@@ -137,7 +137,7 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     ############################################################
     ###LF Model Settings Options#####
 
-    set_default_if_absent!(settings, "ModelLiquidFuels",0)
+    set_default_if_absent!(settings, "ModelLFSC",0)
     set_default_if_absent!(settings, "ModelSyntheticFuels",0)
     set_default_if_absent!(settings, "SpecifySynDieselPercentFlag",0)
     set_default_if_absent!(settings, "percent_conv_diesel",0)
@@ -147,7 +147,7 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     set_default_if_absent!(settings, "percent_conv_gasoline",0)
 
     #Parameter Scaling for Liquid Fuels is untested
-    if settings["ModelLiquidFuels"] == 1
+    if settings["ModelLFSC"] == 1
         settings["ParameterScale"] = 0
     end
 

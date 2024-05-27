@@ -45,7 +45,7 @@ This function creates expression to add the CO2 emissions for wood biomass in ea
 """
 function bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Bioenergy woody biomass supply cost module")
+	println(" -- Bioenergy Woody Biomass Supply Cost Module")
 
 	#Define sets
 	T = inputs["T"]     # Number of time steps (hours)

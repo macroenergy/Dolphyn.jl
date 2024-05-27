@@ -21,7 +21,7 @@ This function creates expression to add the CO2 emissions from the biorefinery, 
 """
 function emissions_besc(EP::Model, inputs::Dict, setup::Dict)
 
-	println("CO2 Capture and Emissions Module for Biorefineries")
+	println(" -- Bioenergy Emissions Module for CO2 Policy modularization")
 
 	dfbioenergy = inputs["dfbioenergy"]
     BIO_RES_ALL = inputs["BIO_RES_ALL"]

@@ -64,7 +64,7 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
         dfTemp1[t+rowoffset,9] = 0
         dfTemp1[t+rowoffset,10] = 0
 
-        if setup["ModelLiquidFuels"] == 1
+        if setup["ModelLFSC"] == 1
             if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
                 dfTemp1[t+rowoffset,7] = value(sum(EP[:eConv_Diesel_CO2_Emissions][z,t] for z in 1:Z)) + value(sum(EP[:eConv_Jetfuel_CO2_Emissions][z,t] for z in 1:Z)) + value(sum(EP[:eConv_Gasoline_CO2_Emissions][z,t] for z in 1:Z))
                 
@@ -102,7 +102,7 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
             dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
         end
         
-        if setup["ModelLiquidFuels"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+        if setup["ModelLFSC"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
             dfTemp1[t+rowoffset,11] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10]
         else
             dfTemp1[t+rowoffset,11] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10]
@@ -146,7 +146,7 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
     dfTemp1[rowoffset,10] = 0
 
     
-    if setup["ModelLiquidFuels"] == 1
+    if setup["ModelLFSC"] == 1
         if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1 
             dfTemp1[rowoffset,7] = sum(sum(inputs["omega"].* (value.(EP[:eConv_Diesel_CO2_Emissions][z,:]) + value.(EP[:eConv_Jetfuel_CO2_Emissions][z,:]) + value.(EP[:eConv_Gasoline_CO2_Emissions][z,:]))) for z in 1:Z)
 

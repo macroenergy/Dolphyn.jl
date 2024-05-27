@@ -45,7 +45,7 @@ This function creates expression to add the CO2 emissions for herb biomass in ea
 """
 function bio_herb_supply(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Bioenergy herbaceous biomass supply cost module")
+	println(" -- Bioenergy Herbaceous Biomass Supply Cost Module")
 
 	#Define sets
 	T = inputs["T"]     # Number of time steps (hours)

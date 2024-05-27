@@ -62,6 +62,8 @@ For resources where upper bound $\overline{x_{s}^{\textrm{C,INJ}}}$ of injection
 """
 function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
+	println(" -- Carbon Storage Injection Cost Module")
+
 	#Rename CO2Storage dataframe
 	dfCO2Storage = inputs["dfCO2Storage"]
 	CO2_STOR_ALL = inputs["CO2_STOR_ALL"]

@@ -41,7 +41,7 @@ function load_bio_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading bioenergy Input CSV Files")
+	println("Reading Bioenergy Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
     inputs = load_bio_refinery(setup, path, sep, inputs)
     inputs = load_bio_supply(setup, path, sep, inputs)

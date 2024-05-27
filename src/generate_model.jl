@@ -333,9 +333,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     ###### START OF LIQUID FUELS INFRASTRUCTURE MODEL ######
-    if setup["ModelLiquidFuels"] == 1
+    if setup["ModelLFSC"] == 1
 
-        println("Generating Liquid Fuels model")
+        println("Generating Liquid Fuels Supply Chain model")
         
         if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
             # Initialize Global Hourly Conventional Fuel Balance [t]
@@ -384,6 +384,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ###### START OF BIOENERGY INFRASTRUCTURE MODEL ######
     if setup["ModelBESC"] == 1
 
+        println("Generating Bioenergy Supply Chain model")
+
         # Initialize Herb and Wood Biomass Supply Balance 
         @expression(EP, eHerb_Biomass_Supply[t=1:T, z=1:Z], 0)
         @expression(EP, eWood_Biomass_Supply[t=1:T, z=1:Z], 0)
@@ -408,7 +410,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions
 		EP = emissions_besc(EP, inputs,setup)
 
-        if setup["ModelLiquidFuels"] == 1 && setup["Bio_Ethanol_On"] == 1
+        if setup["ModelLFSC"] == 1 && setup["Bio_Ethanol_On"] == 1
             @expression(EP, eEthanolBalance[t=1:T, z=1:Z], 0)
         end
 
@@ -417,6 +419,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
+    println("Generating Policy model")
+    
     if (setup["CO2Cap"] < 4) & (setup["CO2Cap"] > 0)
         if setup["ModelH2"] ==0
             co2_cap!(EP, inputs, setup)
@@ -480,7 +484,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     #########################################################################################
     ###Liquid Fuel Demand Constraints
 
-    if setup["ModelLiquidFuels"] == 1
+    if setup["ModelLFSC"] == 1
     
         ##Gasoline
         if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
@@ -526,7 +530,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @constraint(EP, cHerbBiomassBalance[t=1:T, z=1:Z], EP[:eHerb_Biomass_Supply][t,z] == 0)
         @constraint(EP, cWoodBiomassBalance[t=1:T, z=1:Z], EP[:eWood_Biomass_Supply][t,z] == 0)
 
-        if setup["ModelLiquidFuels"] == 1 && setup["Bio_Ethanol_On"] == 1
+        if setup["ModelLFSC"] == 1 && setup["Bio_Ethanol_On"] == 1
 
             if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
 

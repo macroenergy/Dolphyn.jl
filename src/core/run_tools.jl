@@ -1,5 +1,5 @@
 # Methods to simplify the process of running DOLPHYN cases
-using HiGHS
+using Gurobi
 
 """
     load_settings(settings_path::AbstractString) :: Dict{String, Any}
@@ -35,6 +35,13 @@ function load_settings(settings_path::AbstractString)
         mysetup_lf = Dict{String,Any}()
     end 
 
+    besc_settings_path = joinpath(settings_path, "besc_settings.yml") #Settings YAML file path for LF model
+    if isfile(besc_settings_path)
+        mysetup_besc = YAML.load(open(besc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
+    else
+        mysetup_besc = Dict{String,Any}()
+    end 
+
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
     if isfile(global_settings_path)
         mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
@@ -43,7 +50,7 @@ function load_settings(settings_path::AbstractString)
     end
 
     mysetup = Dict{String,Any}()
-    merge!(mysetup, mysetup_genx, mysetup_hsc, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+    merge!(mysetup, mysetup_genx, mysetup_hsc, mysetup_csc, mysetup_lf, mysetup_besc, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
     mysetup = configure_settings(mysetup)
 
     return mysetup
@@ -66,7 +73,7 @@ function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString
     end
 
     ### Load LF inputs if modeling the synthetic fuels supply chain
-    if mysetup["ModelLiquidFuels"] == 1
+    if mysetup["ModelLFSC"] == 1
         myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
     end
 
@@ -108,7 +115,7 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
         if mysetup["ModelCSC"] == 1
             print_and_log("Carbon supply chain TDR not implemented.")
         end
-        if mysetup["ModelLiquidFuels"] == 1
+        if mysetup["ModelLFSC"] == 1
             print_and_log("Liquid Fuels TDR not implemented.")
         end
     end
@@ -142,20 +149,20 @@ function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict
     end
 
     # Write synthetic fuels supply chain outputs
-    if mysetup["ModelLiquidFuels"] == 1
+    if mysetup["ModelLFSC"] == 1
         write_liquid_fuels_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
 
     ### Write bioenergy  supply chain outputs
     if mysetup["ModelBESC"] == 1
-        write_bio_outputs(myinputs, mysetup, inputs_path)
+        write_bio_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
 
     return adjusted_outpath
 
 end
 
-function generate_model(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function generate_model(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=Gurobi.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     mysetup = load_settings(settings_path)
     global_logger = setup_logging(mysetup)
 
@@ -181,13 +188,13 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
     return EP, mysetup, myinputs
 end
 
-function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=Gurobi.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     settings_path = joinpath(local_dir, "Settings")
     inputs_path = local_dir
     return generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
 end
 
-function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=Gurobi.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
     EP, solve_time = solve_model(EP, mysetup)
     myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
@@ -195,7 +202,7 @@ function run_case(inputs_path::AbstractString, settings_path::AbstractString; op
     return EP, myinputs, mysetup, adjusted_outpath
 end
 
-function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=Gurobi.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     settings_path = joinpath(local_dir, "Settings")
     inputs_path = local_dir
     EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)

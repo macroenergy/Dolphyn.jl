@@ -24,7 +24,7 @@ The CO$_2$ emissions limit can be defined in one of the following ways: a) a mas
 """
 function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log(" -- CO2 Policies Module for power and hydrogen system combined")
+    print_and_log(" -- CO2 Policies Module for Multi-Sector System")
 
     
     SEG = inputs["SEG"]  # Number of non-served energy segments for power demand
@@ -75,7 +75,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
         end
         
         #Using an additive approach where terms are added to LHS of emissions constraint
-        if setup["ModelLiquidFuels"] == 1
+        if setup["ModelLFSC"] == 1
 
             if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
 

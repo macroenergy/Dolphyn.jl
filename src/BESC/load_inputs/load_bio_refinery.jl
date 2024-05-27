@@ -60,7 +60,7 @@ function load_bio_refinery(setup::Dict, path::AbstractString, sep::AbstractStrin
 	# Set of plants accepting woody biomass
 	inputs_bioenergy["BIO_WOOD"] = bioenergy[bioenergy.Biomass_type.== 2 ,:R_ID]
 
-	println("BESC_Biorefinery.csv Successfully Read!")
+	println(" -- BESC_Biorefinery.csv Successfully Read!")
 
     return inputs_bioenergy
 

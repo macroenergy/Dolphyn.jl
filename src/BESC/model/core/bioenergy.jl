@@ -59,7 +59,7 @@ The total amount of biomass consumed by biorefinery with woody biomass input can
 """
 function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	
-	println("Biorefinery module")
+	println(" -- Bioenergy Production Module")
 
 	dfbioenergy = inputs["dfbioenergy"]
 	BIO_RES_ALL = inputs["BIO_RES_ALL"]

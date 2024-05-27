@@ -48,6 +48,8 @@ This module also constraints the amount of each type of non conventional fuels d
 """
 function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
+    println(" -- Conventional Fuel Demand Module")
+
 	#Define sets
     Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)

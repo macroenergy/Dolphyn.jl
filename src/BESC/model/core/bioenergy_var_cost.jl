@@ -39,7 +39,7 @@ This module additionally defines contributions to the objective function from va
 """
 function bioenergy_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Biorefinery variable cost module")
+	println(" -- Biorefinery Variable Cost Module")
 
     dfbioenergy = inputs["dfbioenergy"]
 	BIO_RES_ALL = inputs["BIO_RES_ALL"]
