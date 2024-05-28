@@ -2,7 +2,8 @@
 OverwriteResults: 0 # Overwrite existing results in output folder or create a new one; 0 = create new folder; 1 = overwrite existing results
 PrintModel: 0 # Write the model formulation as an output; 0 = active; 1 = not active
 SystemCO2Constraint: 1 # CO2 emissions constraint representation; 1 = Separate emissions constraint for HSC and Power; 2 = Combined emissions constraint for HSC and Power sectors (i.e. allow trading, with constraint form adopted from genx_settings)
-Solver: HiGHS # Available solvers: Gurobi, CPLEX, CLP, Cbc, HiGHS
+Solver: Gurobi # Available solvers: Gurobi, CPLEX, CLP, Cbc, HiGHS
+#Solver: HiGHS # Available solvers: Gurobi, CPLEX, CLP, Cbc, HiGHS
 WriteShadowPrices: 1 # Write shadow prices of LP or relaxed MILP; 0 = not active; 1 = active
 
 TimeDomainReductionFolder: "TDR_Results" # Directory name where results from time domain reduction will be saved. If results already exist here, these will be used without running time domain reduction script again.
@@ -14,4 +15,9 @@ Log: false # Flag whether log directed to file, turing this on will record basic
 LogFile: ""  # Filename for log file
 
 # Zone selection
-Zones: [1, 2, 3] # List of zones to be included in the model
+Zones: [1, 2, 3] # List of zones to be included in the model# Model scaling settings
+
+# Model scaling settings
+Model_Scaling: 1 # 0 for off and 1 for on
+Lower_Target: 1.0e-03
+Upper_Target: 1.0e+06
