@@ -1,7 +1,7 @@
 ModelLFSC: 1 #Flag to turn on or off Liquid Fuel modelling capabilities - 0 - No Liquid Fuels, 1 - Liquid Fuels Modeled
 ModelSyntheticFuels: 1 #Flas to turn on or off Synthetic Fuel modeling
 
-Liquid_Fuels_Regional_Demand: 1 #1: Regional resolution, 0: Global resolution for liquid fuels demand
+Liquid_Fuels_Regional_Demand: 0 #1: Regional resolution, 0: Global resolution for liquid fuels demand
 Liquid_Fuels_Hourly_Demand: 0 #1: Hourly resolution, 0: Annual resolution for liquid fuels demand
 
 #Conventional fuel shares in global percentage 
