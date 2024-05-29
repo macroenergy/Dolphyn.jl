@@ -51,5 +51,7 @@ function load_liquid_fuels_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 		inputs = load_conventional_fuel_prices(setup, path, sep, inputs)
 	end
 
+	println("LFSC Input CSV Files Successfully Read In From $path$sep")
+
 	return inputs
 end

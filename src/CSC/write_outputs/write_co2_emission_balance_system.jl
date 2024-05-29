@@ -28,8 +28,8 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
 	dfCO2Balance = Array{Any}
 	rowoffset=2
 
-    dfTemp1 = Array{Any}(nothing, T+rowoffset, 11)
-    dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "HSC Emissions", "CSC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "Biomass Capture", "Conventional Fuels", "Synfuel Production Emissions" ,"Synfuels", "Biofuels", "Total"]
+    dfTemp1 = Array{Any}(nothing, T+rowoffset, 14)
+    dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "HSC Emissions", "CSC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "Biomass Capture", "Conventional NG", "Syn NG", "Bio NG", "Conventional Liquid Fuels", "Synfuel Production Emissions" ,"Synfuels", "Biofuels", "Total"]
     for t in 1:T
         dfTemp1[t+rowoffset,1] = value(sum(EP[:eEmissionsByZone][z,t] for z in 1:Z))
         
@@ -62,30 +62,46 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
         dfTemp1[t+rowoffset,7] = 0
         dfTemp1[t+rowoffset,8] = 0
         dfTemp1[t+rowoffset,9] = 0
+
+        if setup["ModelNGSC"] == 1
+            dfTemp1[t+rowoffset,7] = value(sum(EP[:eConv_NG_CO2_Emissions][z,t] for z in 1:Z))
+
+            #if setup["ModelSyntheticNG"] == 1
+            #    dfTemp1[t+rowoffset,8] = value(sum(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
+            #end
+
+            #if setup["ModelBESC"] == 1 && setup["Bio_NG_On"]
+            #    dfTemp1[t+rowoffset,9] = - value(sum(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
+            #end
+        end
+
         dfTemp1[t+rowoffset,10] = 0
+        dfTemp1[t+rowoffset,11] = 0
+        dfTemp1[t+rowoffset,12] = 0
+        dfTemp1[t+rowoffset,13] = 0
 
         if setup["ModelLFSC"] == 1
             if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
-                dfTemp1[t+rowoffset,7] = value(sum(EP[:eConv_Diesel_CO2_Emissions][z,t] for z in 1:Z)) + value(sum(EP[:eConv_Jetfuel_CO2_Emissions][z,t] for z in 1:Z)) + value(sum(EP[:eConv_Gasoline_CO2_Emissions][z,t] for z in 1:Z))
+                dfTemp1[t+rowoffset,10] = value(sum(EP[:eConv_Diesel_CO2_Emissions][z,t] for z in 1:Z)) + value(sum(EP[:eConv_Jetfuel_CO2_Emissions][z,t] for z in 1:Z)) + value(sum(EP[:eConv_Gasoline_CO2_Emissions][z,t] for z in 1:Z))
                 
             elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-                dfTemp1[t+rowoffset,7] = "-"
+                dfTemp1[t+rowoffset,10] = "-"
 
             elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
-                dfTemp1[t+rowoffset,7] = value(EP[:eConv_Diesel_CO2_Emissions][t]) + value(EP[:eConv_Jetfuel_CO2_Emissions][t]) + value(EP[:eConv_Gasoline_CO2_Emissions][t])
+                dfTemp1[t+rowoffset,10] = value(EP[:eConv_Diesel_CO2_Emissions][t]) + value(EP[:eConv_Jetfuel_CO2_Emissions][t]) + value(EP[:eConv_Gasoline_CO2_Emissions][t])
             
             elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-                dfTemp1[t+rowoffset,7] = "-"
+                dfTemp1[t+rowoffset,10] = "-"
 
             end
 
             if setup["ModelSyntheticFuels"] == 1
-                dfTemp1[t+rowoffset,8] = value(sum(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eByProdConsCO2EmissionsByZone][z,t] for z in 1:Z))
-                dfTemp1[t+rowoffset,9] = value(sum(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
+                dfTemp1[t+rowoffset,11] = value(sum(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eByProdConsCO2EmissionsByZone][z,t] for z in 1:Z))
+                dfTemp1[t+rowoffset,12] = value(sum(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
             end
 
             if setup["ModelBESC"] == 1
-                dfTemp1[t+rowoffset,10] = value(sum(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Ethanol_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
+                dfTemp1[t+rowoffset,13] = value(sum(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Ethanol_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
             end
         end
 
@@ -100,12 +116,15 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
             dfTemp1[t+rowoffset,8] = dfTemp1[t+rowoffset,8] * ModelScalingFactor
             dfTemp1[t+rowoffset,9] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
             dfTemp1[t+rowoffset,10] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
+            dfTemp1[t+rowoffset,11] = dfTemp1[t+rowoffset,8] * ModelScalingFactor
+            dfTemp1[t+rowoffset,12] = dfTemp1[t+rowoffset,6] * ModelScalingFactor
+            dfTemp1[t+rowoffset,13] = dfTemp1[t+rowoffset,7] * ModelScalingFactor
         end
         
         if setup["ModelLFSC"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-            dfTemp1[t+rowoffset,11] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10]
+            dfTemp1[t+rowoffset,14] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,11] + dfTemp1[t+rowoffset,12] + dfTemp1[t+rowoffset,13]
         else
-            dfTemp1[t+rowoffset,11] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10]
+            dfTemp1[t+rowoffset,14] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] +dfTemp1[t+rowoffset,10] + dfTemp1[t+rowoffset,11] + dfTemp1[t+rowoffset,12] + dfTemp1[t+rowoffset,13]
         end
 
     end
@@ -143,36 +162,53 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
     dfTemp1[rowoffset,7] = 0
     dfTemp1[rowoffset,8] = 0
     dfTemp1[rowoffset,9] = 0
-    dfTemp1[rowoffset,10] = 0
 
-    
+    if setup["ModelNGSC"] == 1
+
+        dfTemp1[rowoffset,7] = sum(sum(inputs["omega"].* (value.(EP[:eConv_NG_CO2_Emissions])[z,:])) for z in 1:Z)
+
+        #if setup["ModelSyntheticNG"] == 1
+        #    dfTemp1[rowoffset,8] = sum(sum(inputs["omega"].* (value.(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eSyn_NG_CO2_Emissions_By_Zone])[z,:])) for z in 1:Z)
+        #end
+
+        #if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
+        #  dfTemp1[rowoffset,9] = - sum(sum(inputs["omega"].* (value.(EP[:eBio_NG_CO2_Emissions_By_Zone])[z,:])) for z in 1:Z)
+        #end
+
+    end
+
+    dfTemp1[rowoffset,10] = 0
+    dfTemp1[rowoffset,11] = 0
+    dfTemp1[rowoffset,12] = 0
+    dfTemp1[rowoffset,13] = 0
+
     if setup["ModelLFSC"] == 1
         if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1 
-            dfTemp1[rowoffset,7] = sum(sum(inputs["omega"].* (value.(EP[:eConv_Diesel_CO2_Emissions][z,:]) + value.(EP[:eConv_Jetfuel_CO2_Emissions][z,:]) + value.(EP[:eConv_Gasoline_CO2_Emissions][z,:]))) for z in 1:Z)
+            dfTemp1[rowoffset,10] = sum(sum(inputs["omega"].* (value.(EP[:eConv_Diesel_CO2_Emissions][z,:]) + value.(EP[:eConv_Jetfuel_CO2_Emissions][z,:]) + value.(EP[:eConv_Gasoline_CO2_Emissions][z,:]))) for z in 1:Z)
 
         elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-            dfTemp1[rowoffset,7] = sum(value.(EP[:eConv_Diesel_CO2_Emissions][z]) for z in 1:Z) + sum(value.(EP[:eConv_Jetfuel_CO2_Emissions][z]) for z in 1:Z) + sum(value.(EP[:eConv_Gasoline_CO2_Emissions][z]) for z in 1:Z)
+            dfTemp1[rowoffset,10] = sum(value.(EP[:eConv_Diesel_CO2_Emissions][z]) for z in 1:Z) + sum(value.(EP[:eConv_Jetfuel_CO2_Emissions][z]) for z in 1:Z) + sum(value.(EP[:eConv_Gasoline_CO2_Emissions][z]) for z in 1:Z)
 
         elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
-            dfTemp1[rowoffset,7] = sum(inputs["omega"].* value.(EP[:eConv_Diesel_CO2_Emissions][:])) + sum(inputs["omega"].* value.(EP[:eConv_Jetfuel_CO2_Emissions][:])) + sum(inputs["omega"].* value.(EP[:eConv_Gasoline_CO2_Emissions][:]))
+            dfTemp1[rowoffset,10] = sum(inputs["omega"].* value.(EP[:eConv_Diesel_CO2_Emissions][:])) + sum(inputs["omega"].* value.(EP[:eConv_Jetfuel_CO2_Emissions][:])) + sum(inputs["omega"].* value.(EP[:eConv_Gasoline_CO2_Emissions][:]))
        
         elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-            dfTemp1[rowoffset,7] = value.(EP[:eConv_Diesel_CO2_Emissions]) + value.(EP[:eConv_Jetfuel_CO2_Emissions]) + value.(EP[:eConv_Gasoline_CO2_Emissions])
+            dfTemp1[rowoffset,10] = value.(EP[:eConv_Diesel_CO2_Emissions]) + value.(EP[:eConv_Jetfuel_CO2_Emissions]) + value.(EP[:eConv_Gasoline_CO2_Emissions])
 
         end
         
         if setup["ModelSyntheticFuels"] == 1
-            dfTemp1[rowoffset,8] = sum(sum(inputs["omega"].* (value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eByProdConsCO2EmissionsByZone])[z,:])) for z in 1:Z)
-            dfTemp1[rowoffset,9] = sum(sum(inputs["omega"].* (value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone])[z,:])) for z in 1:Z)
+            dfTemp1[rowoffset,11] = sum(sum(inputs["omega"].* (value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eByProdConsCO2EmissionsByZone])[z,:])) for z in 1:Z)
+            dfTemp1[rowoffset,12] = sum(sum(inputs["omega"].* (value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone])[z,:])) for z in 1:Z)
         end
 
         if setup["ModelBESC"] == 1
-            dfTemp1[rowoffset,10] = sum(sum(inputs["omega"].* (value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone])[z,:])) for z in 1:Z)
+            dfTemp1[rowoffset,13] = sum(sum(inputs["omega"].* (value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone])[z,:] + value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone])[z,:])) for z in 1:Z)
         end
     end
 
     
-    dfTemp1[rowoffset,11] =  dfTemp1[rowoffset,1] + dfTemp1[rowoffset,2] + dfTemp1[rowoffset,3] + dfTemp1[rowoffset,4] + dfTemp1[rowoffset,5] + dfTemp1[rowoffset,6] + dfTemp1[rowoffset,7] + dfTemp1[rowoffset,8] + dfTemp1[rowoffset,9] + dfTemp1[rowoffset,10]
+    dfTemp1[rowoffset,14] =  dfTemp1[rowoffset,1] + dfTemp1[rowoffset,2] + dfTemp1[rowoffset,3] + dfTemp1[rowoffset,4] + dfTemp1[rowoffset,5] + dfTemp1[rowoffset,6] + dfTemp1[rowoffset,7] + dfTemp1[rowoffset,8] + dfTemp1[rowoffset,9] + dfTemp1[rowoffset,10] + dfTemp1[rowoffset,11] + dfTemp1[rowoffset,12] + dfTemp1[rowoffset,13]
     
 
     dfCO2Balance =  hcat(vcat(["", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)

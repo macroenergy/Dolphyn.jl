@@ -28,8 +28,8 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 	dfCO2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 17)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions", "DAC Capture",  "CO2 Pipeline Loss", "Biorefinery Emissions", "Bioresource Emissions",  "Biomass Capture", "Synfuel Production Emissions","Synfuel Byproducts Emissions","Syn Gasoline Utilization","Syn Jetfuel Utilization","Syn Diesel Utilization","Bio Gasoline Utilization","Bio Jetfuel Utilization", "Bio Diesel Utilization","Bio Ethanol Utilization"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 21)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions", "DAC Capture",  "CO2 Pipeline Loss", "Biorefinery Emissions", "Bioresource Emissions",  "Biomass Capture", "Synfuel Production Emissions","Synfuel Byproducts Emissions","Syn Gasoline","Syn Jetfuel","Syn Diesel","Bio Gasoline", "Bio Jetfuel", "Bio Diesel","Bio Ethanol", "Syn NG Production Emissions", "Synthetic NG", "Bio NG", "Conventional NG"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			dfTemp1[t+rowoffset,1] = value(EP[:eEmissionsByZone][z,t])
@@ -88,6 +88,26 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 				end
 
 			end
+
+			dfTemp1[t+rowoffset,18] = 0
+			dfTemp1[t+rowoffset,19] = 0
+			dfTemp1[t+rowoffset,20] = 0
+			dfTemp1[t+rowoffset,21] = 0
+
+			if setup["ModelNGSC"] == 1
+
+				#if setup["ModelSyntheticNG"] == 1
+				#	dfTemp1[t+rowoffset,18] = value(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t])
+				#	dfTemp1[t+rowoffset,19] = value(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t])
+				#end
+
+				#if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
+				#	dfTemp1[t+rowoffset,20] = value(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t])
+				#end
+
+				dfTemp1[t+rowoffset,21] = value(EP[:eConv_NG_CO2_Emissions][z,t])
+			end
+
 	   	end
 
 		## Annual values
@@ -147,6 +167,25 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 
 		end
 
+		dfTemp1[rowoffset,18] = 0
+		dfTemp1[rowoffset,19] = 0
+		dfTemp1[rowoffset,20] = 0
+		dfTemp1[rowoffset,21] = 0
+
+		if setup["ModelNGSC"] == 1
+				
+			#if setup["ModelSyntheticNG"] == 1
+			#	dfTemp1[rowoffset,18] = sum(inputs["omega"][t] * value.(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+			#	dfTemp1[rowoffset,19] = sum(inputs["omega"][t] * value.(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+			#end
+
+			#if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
+			#	dfTemp1[rowoffset,20] = sum(inputs["omega"][t] * value.(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+			#end
+
+			dfTemp1[rowoffset,21] = sum(inputs["omega"][t] * value.(EP[:eConv_NG_CO2_Emissions][z,t]) for t in 1:T)
+		end
+
 
 		if z==1
 			dfCO2Balance =  hcat(vcat(["", "Zone", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)
@@ -157,7 +196,7 @@ function write_co2_emission_balance_zone_global_conv_fuel(path::AbstractString, 
 
 	#############################################################
 	dfCO2Balance_Conv_Fuels = Array{Any}(nothing, T+rowoffset, 3)
-	dfCO2Balance_Conv_Fuels[1,1:size(dfCO2Balance_Conv_Fuels,2)] = ["Conventional_Gasoline","Conventional_Jetfuel","Conventional_Diesel"]
+	dfCO2Balance_Conv_Fuels[1,1:size(dfCO2Balance_Conv_Fuels,2)] = ["Conventional Gasoline","Conventional Jetfuel","Conventional Diesel"]
 	dfCO2Balance_Conv_Fuels[2,1:size(dfCO2Balance_Conv_Fuels,2)] = repeat(["Global"],size(dfCO2Balance_Conv_Fuels,2))
 
 	for t in 1:T

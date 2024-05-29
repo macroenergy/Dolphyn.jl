@@ -153,6 +153,24 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
             eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC
         end 
 
+
+        if setup["ModelNGSC"] == 1
+            @expression(EP, eEmissionsConstraintLHSCNG[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eConv_NG_CO2_Emissions][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+            eEmissionsConstraintLHS += eEmissionsConstraintLHSCNG
+
+            #To be completed when synthetic NG modeled
+            #if setup["ModelSyntheticNG"] == 1
+                #@expression(EP, eEmissionsConstraintLHSSNG[cap=1:inputs["NCO2Cap"]],
+                #sum(inputs["omega"][t] * EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                #+ sum(inputs["omega"][t] * EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+                #eEmissionsConstraintLHS += eEmissionsConstraintLHSSNG
+            #end
+            
+        end
+
         ############################################################################################
         ## Mass-based: Emissions constraint in absolute emissions limit (tons)
         if setup["CO2Cap"] == 1

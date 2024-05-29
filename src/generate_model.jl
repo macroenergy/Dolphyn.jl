@@ -121,6 +121,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
     end
 
+    if setup["ModelNGSC"] == 1
+        # Initialize NG Balance Expression
+	    @expression(EP, eNGBalance[t=1:T, z=1:Z], 0)
+    end
+
 
     # Initialize Objective Function Expression
     @expression(EP, eObj, 0)
@@ -417,6 +422,38 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         #EP[:eAdditionalDemandByZone] += EP[:eBioNetpowerConsumptionByAll]
     end
 
+
+    ###### START OF LIQUID FUELS INFRASTRUCTURE MODEL ######
+    if setup["ModelNGSC"] == 1
+
+        println("Generating Natural Gas Supply Chain model")
+        #@expression(EP, eNGenerationByZone[z=1:Z, t=1:T], 0)
+        #@expression(EP, eNTransmissionByZone[t=1:T, z=1:Z], 0)
+        #@expression(EP, eNDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
+        # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, eNGNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
+
+        EP = conventional_ng_demand(EP, inputs, setup)
+		EP = ng_emissions(EP, inputs, setup)
+
+        if setup["ModelNGPipelines"] == 1
+            # model natural gas transmission via pipelines
+            EP = ng_pipeline(EP, inputs, setup)
+        end
+
+        ### To be completed
+        # Initialize Syn and bio NG Balance [z,t]
+        #@expression(EP, eSB_NG_Balance[t=1:T, z=1:Z], 0)
+        
+        #if setup["ModelSyntheticNG"] == 1
+        #    EP = syn_NG_outputs(EP, inputs, setup)
+        #    EP = syn_NG_investment(EP, inputs, setup)
+        #    EP = syn_NG_resources(EP, inputs, setup)
+        #end
+        
+        #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynNGRes]
+    end
+
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
     println("Generating Policy model")
@@ -554,6 +591,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
             end
         end
+    end
+
+    if setup["ModelNGSC"] == 1
+        ###Natural Gas Balance constraints
+        @constraint(EP, cNG_Balance_T_Z[t=1:T,z=1:Z], EP[:eNGBalance][t,z] == inputs["NG_D"][t,z])
     end
 
 
