@@ -139,7 +139,7 @@ function h2_long_duration_storage(EP::Model, inputs::Dict)
 
     # Storage at beginning of each modeled period cannot exceed installed energy capacity
     @constraint(EP, cH2SoCBalLongDurationStorageUpper[y in H2_STOR_LONG_DURATION, r in MODELED_PERIODS_INDEX],
-                    vH2SOCw[y,r] <= EP[:eH2GenTotalCap][y])
+                    vH2SOCw[y,r] <= EP[:eH2TotalCapEnergy][y])
 
     # Initial storage level for representative periods must also adhere to sub-period storage inventory balance
     # Initial storage = Final storage - change in storage inventory across representative period
