@@ -23,7 +23,11 @@ function write_CSC_costs(path::AbstractString, sep::AbstractString, inputs::Dict
 	## Cost results
 	dfDAC = inputs["dfDAC"]
 	#dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
-	dfCO2Storage = inputs["dfCO2Storage"]
+
+	if setup["ModelCO2Storage"] == 1
+		dfCO2Storage = inputs["dfCO2Storage"]
+	end
+	
 	Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 	

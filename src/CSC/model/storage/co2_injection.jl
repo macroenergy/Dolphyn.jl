@@ -123,7 +123,7 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	DAC_Injection_Max_Limit_per_year_scaled = dfCO2Storage[!,:Max_capacity_tonne_per_yr]/CO2_Injection_Scaling
 
 	@expression(EP, eCO2_Injected_per_year_scaled[k=1:CO2_STOR_ALL], sum(inputs["omega"][t]*EP[:vCO2_Injected][k,t] for t in 1:T)/CO2_Injection_Scaling)
-	@constraint(EP,cMax_CO2_Injected_per_type_per_year_Kt[k in intersect(dfCO2Storage[dfCO2Storage.Max_capacity_tonne_per_yr.>0, :R_ID], 1:CO2_STOR_ALL)], EP[:eCO2_Injected_per_year_scaled][k] <=  DAC_Injection_Max_Limit_per_year_scaled[k])
+	@constraint(EP,cMax_CO2_Injected_per_type_per_year_Kt[k in intersect(dfCO2Storage[dfCO2Storage.Max_capacity_tonne_per_yr.>=0, :R_ID], 1:CO2_STOR_ALL)], EP[:eCO2_Injected_per_year_scaled][k] <=  DAC_Injection_Max_Limit_per_year_scaled[k])
 
 	#Max carbon injected into geological sequestration per resoruce type k (If using investment in storage capacity)
 	#@expression(EP, eCO2_Injected_per_year[k=1:CO2_STOR_ALL], sum(inputs["omega"][t]*EP[:vCO2_Injected][k,t] for t in 1:T))

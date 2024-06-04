@@ -1,4 +1,4 @@
-ModelNGSC: 1 #Flag to turn on or off NG supply chain modelling capabilities - 0 - No NG Supply Chain, 1 - NG Supply Chain Modeled
+ModelNGSC: 0 #Flag to turn on or off NG supply chain modelling capabilities - 0 - No NG Supply Chain, 1 - NG Supply Chain Modeled
 
 ModelNGPipelines: 0 # Whether to model pipeline in hydrogen supply chain - 0 - not included, 1 - included
 NGNetworkExpansion: 0 # Transmission network expansional; 0 = not active; 1 = active systemwide
