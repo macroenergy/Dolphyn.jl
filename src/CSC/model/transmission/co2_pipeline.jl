@@ -14,62 +14,9 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@doc raw"""
-    co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
-
-This function includes the variables, expressions and objective funtion of CO2 pipeline.
-
-This function expresses CO2 exchange through pipeline i between two zones and can be split into CO2 delivering and flowing out.
-
-This module defines the CO2 pipeline construction decision variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}$, representing newly constructed CO2 pipeline of type $i$ through path $z \rightarrow z^{\prime}$.
-
-This module defines the CO2 pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
-
-This module defines the CO2 pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing CO2 stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
-
-The variable defined in this file named after ```vCO2NPipe``` covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{C,PIP}}$.
-
-The variable defined in this file named after ```vCO2PipeFlow_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP+}}$.
-
-The variable defined in this file named after ```vCO2PipeFlow_neg``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP-}}$.
-
-The variable defined in this file named after ```vCO2PipeLevel``` covers variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}}$.
-
-**Cost expressions**
-
-This module additionally defines contributions to the objective function from investment costs of generation (fixed OM plus construction) from all pipeline resources $i \in \mathcal{I}$:
-
-```math
-\begin{equation*}
-    \textrm{C}^{\textrm{C,PIP,c}}=\delta_{i}^{\textrm{C,PIP}} \sum_{i \in \mathbb{I}} \sum_{z \rightarrow z^{\prime} \in \mathbb{B}} \textrm{c}_{i}^{\textrm{C,PIP}} \textrm{L}_{z \rightarrow z^{\prime}} l_{i,z \rightarrow z^{\prime}}
-    h_{i,z \rightarrow z^{\prime}, t}^{\textrm{C,PIP}}=h_{i, z \rightarrow z^{\prime}, t}^{\textrm{C,PIP+}}-h_{i, z \rightarrow z^{\prime}, t}^{\textrm{PIP-}} \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
-\end{equation*}
-```
-
-The flow rate of CO2 through pipeline type $i$ is capped by the operational limits of the pipeline, multiplied by the number of constructed pipeline $i$
-```math
-\begin{equation*}
-    \overline{\textrm{F}}_{i} l_{i,z \rightarrow z^{\prime}} \geq x_{i,z \rightarrow z^{\prime}, t}^{\textrm{\textrm{C,PIP+}}}, x_{i,z \rightarrow z^{\prime}, t}^{\textrm{\textrm{C,PIP-}}} \geq 0 \quad \forall i \in \mathbb{I}, z \rightarrow z^{\prime} \in \mathbb{B}, t \in \mathbb{T}
-\end{equation*}    
-```
-
-The pipeline has storage capacity via line packing:
-```math
-\begin{equation*}
-    \overline{\textrm{U}}_{i}^{\textrm{\text{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \geq -\sum_{\tau=t_{0}}^{t}\left(x_{i,z^{\prime}\rightarrow z, \tau}^{\textrm{\textrm{C,PIP}}}+x_{i,z \rightarrow z^{\prime} \tau}^{\textrm{\textrm{C,PIP}}}\right)\Delta t \geq\underline{\textrm{R}}_{i}^{\textrm{\textrm{C,PIP}}}\overline{\textrm{E}}_{i}^{\textrm{\textrm{C,PIP}}} l_{i,z \rightarrow z^{\prime}} \forall z^{\prime} \in Z, z \in Z, i \in I, t \in T
-\end{equation*}  
-```
-
-The change of CO2 pipeline storage inventory is modeled as follows:
-```math
-\begin{equation*}
-    U_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP}} - U_{i,z \rightarrow z^{\prime},t-1} = x_{i,z \rightarrow z^{\prime},t}^{\textrm{C,PIP-}} + x_{i,z^{\prime} \rightarrow z,t}^{\textrm{C,PIP-}}
-\end{equation*}
-```
-"""
 function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-	println(" -- CO2 Pipeline Module")
+	println("CO2 Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2 and electricity
@@ -77,7 +24,7 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     START_SUBPERIODS = inputs["START_SUBPERIODS"]
     hours_per_subperiod = inputs["hours_per_subperiod"]
 
-	CO2_P = inputs["CO2_P"] # Number of CO2 Pipelines
+	CO2_P = inputs["CO2_P"] # Number of Hydrogen Pipelines
     CO2_Pipe_Map = inputs["CO2_Pipe_Map"] 
 
 	### Variables ###
@@ -86,6 +33,13 @@ function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vCO2PipeFlow_pos[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #positive pipeflow
     @variable(EP, vCO2PipeFlow_neg[p=1:CO2_P, t = 1:T, d = [1,-1]] >= 0) #negative pipeflow
     @variable(EP, vCO2Loss[t=1:T,z=1:Z] >= 0 ) #CO2 Loss in Pipe
+
+    # Unidirectional pipeline flow constraints. hsc_pipeline inputs file must have 2 pipelines in between each zone for this to work properly (flipping the -1 and +1 directions)
+    # Constraints force the source zone to only export H2 through pipeline p while the destination zone can only import
+    if setup["CO2PipeDirection"] == 1
+        @constraint(EP, vCO2PipeFlow_pos[:, :, 1] .== 0)
+        @constraint(EP, vCO2PipeFlow_neg[:, :, -1] .== 0)
+    end
 
 	### Expressions ###
     #Calculate the number of new pipes

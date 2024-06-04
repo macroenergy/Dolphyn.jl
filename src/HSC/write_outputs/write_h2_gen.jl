@@ -28,9 +28,9 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 	# dfH2GenOut_annual = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 	dfH2GenOut = DataFrame(Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, H))
 
-	h2gen = value.(EP[:vH2Gen])
-    dfH2GenOut.AnnualSum .= h2gen * inputs["omega"]
-
+	for i in 1:H
+		dfH2GenOut[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:vH2Gen])[i,:]))
+	end
 	# Load hourly values
 	dfH2GenOut = hcat(dfH2GenOut, DataFrame((value.(EP[:vH2Gen])), :auto))
 
@@ -40,7 +40,9 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 
 	total = DataFrame(["Total" 0 sum(dfH2GenOut[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 
- 	total[:,4:T+3] .= sum(h2gen, dims=1)
+	for t in  1:T
+		total[:,t+3] .= sum(dfH2GenOut[:,Symbol("t$t")][1:H])
+	end
 
 	rename!(total,auxNew_Names)
 
@@ -51,8 +53,10 @@ function write_h2_gen(path::AbstractString, sep::AbstractString, inputs::Dict, s
 		# Power injected by each resource in each time step
 		dfOut_BioH2 = DataFrame(Resource = inputs["BIO_RESOURCES_NAME"], Zone = dfbiorefinery[!,:Zone], AnnualSum = Array{Union{Missing,Float32}}(undef, B))
 		
-		biohydrogen_produced = value.(EP[:eBiohydrogen_produced_per_plant_per_time])
-		dfOut_BioH2.AnnualSum .= biohydrogen_produced * inputs["omega"]
+		for i in 1:B
+			dfOut_BioH2[!,:AnnualSum][i] = sum(inputs["omega"].* (value.(EP[:eBiohydrogen_produced_per_plant_per_time])[i,:]))
+		end
+		
 		# Load hourly values
 		dfOut_BioH2 = hcat(dfOut_BioH2, DataFrame((value.(EP[:eBiohydrogen_produced_per_plant_per_time])), :auto))
 		

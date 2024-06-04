@@ -27,27 +27,25 @@ The expression defined in this file named after ```eH2GenTotalCap``` covers all 
 
 ```math
 \begin{equation*}
-    y_{g, z}^{\textrm{H,GEN}} = 
-    \begin{cases}
-        y_{k, z}^{\textrm{H,THE}} \quad if \quad g \in \mathcal{K} \\
-        y_{s, z}^{\textrm{\textrm{H,STO},DIS}} \quad if \quad g \in \mathcal{S}
-    \end{cases}
+	y_{g, z}^{\textrm{H,GEN}} = 
+	\begin{cases}
+		y_{k, z}^{\textrm{H,THE}} \quad if \quad g \in \mathcal{K} \\
+		y_{s, z}^{\textrm{\textrm{H,STO},DIS}} \quad if \quad g \in \mathcal{S}
+	\end{cases}
     \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
-
-This module additionally defines contributions to the objective function from variable costs of generation (variable OM plus fuel cost) from all resources over all time periods.
 
 The total capacity of each resource (SMR, storage, electrolysis) is defined as the sum of the existing capacity plus the newly invested capacity minus any retired capacity. 
 Note for energy storage resources in hydrogen sector, additional energy and charge capacity decisions and constraints are defined in the storage module.
 
 ```math
 \begin{equation*}
-    \begin{split}
-    y_{g, z}^{\textrm{H,GEN}} &= y_{g}^{\textrm{H,GEN,total}} \\ 
-    & = y_{g, z}^{\textrm{H,GEN,existing}} + y_{g, z}^{\textrm{H,GEN,new}} - y_{g, z}^{\textrm{H,GEN,retired}}
-    \end{split}
-    \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+	\begin{split}
+	y_{g, z}^{\textrm{H,GEN}} &= y_{g}^{\textrm{H,GEN,total}} \\ 
+	& = y_{g, z}^{\textrm{H,GEN,existing}} + y_{g, z}^{\textrm{H,GEN,new}} - y_{g, z}^{\textrm{H,GEN,retired}}
+	\end{split}
+	\quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -57,7 +55,7 @@ This module additionally defines contributions to the objective function from in
 
 ```math
 \begin{equation*}
-    \textrm{C}^{\textrm{H,GEN,c}} = \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,new}}\times \textrm{c}_{g}^{\textrm{H,INV}} + \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,total}} \times \textrm{c}_{g}^{\textrm{H,FOM}}
+	\textrm{C}^{\textrm{H,GEN,c}} = \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,new}}\times \textrm{c}_{g}^{\textrm{H,INV}} + \sum_{g \in \mathcal{G}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{H,GEN,total}} \times \textrm{c}_{g}^{\textrm{H,FOM}}
 \end{equation*}
 ```
 
@@ -66,13 +64,13 @@ This module additionally defines contributions to the objective function from in
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-    0 \leq y_{g, z}^{\textrm{H,GEN,retired}} \leq y_{g, z}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
+	0 \leq y_{g, z}^{\textrm{H,GEN,retired}} \leq y_{g, z}^{\textrm{H,GEN,existing}} \quad \forall g \in \mathcal{G}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """
 function h2_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log(" -- H2 Investment Discharge Module")
+	print_and_log("Hydrogen Investment Discharge Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 
@@ -80,17 +78,6 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     H2_GEN_NEW_CAP = inputs["H2_GEN_NEW_CAP"]
     H2_GEN_RET_CAP = inputs["H2_GEN_RET_CAP"]
     H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]
-    if setup["ModelH2Liquid"] ==1
-        H2_LIQ_COMMIT = inputs["H2_LIQ_COMMIT"]
-        H2_EVAP_COMMIT = inputs["H2_EVAP_COMMIT"]
-        H2_COMMIT = union(H2_GEN_COMMIT, H2_LIQ_COMMIT, H2_EVAP_COMMIT)
-        H2_LIQ = inputs["H2_LIQ"]
-        H2_EVAP = inputs["H2_EVAP"]
-    else
-        H2_COMMIT = H2_GEN_COMMIT
-    end
-    H2_GEN = inputs["H2_GEN"]
-    H2_STOR_ALL = inputs["H2_STOR_ALL"]
     H = inputs["H2_RES_ALL"]
 
     # Capacity of New H2 Gen units (tonnes/hr)
@@ -107,7 +94,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eH2GenTotalCap[k in 1:H],
         if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
-            if k in H2_COMMIT
+            if k in H2_GEN_COMMIT
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
                 (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
@@ -116,14 +103,14 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
                 EP[:vH2GenRetCap][k]
             end
         elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
-            if k in H2_COMMIT
+            if k in H2_GEN_COMMIT
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
             else
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k]
             end
         elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
-            if k in H2_COMMIT
+            if k in H2_GEN_COMMIT
                 dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] -
                 dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
             else
@@ -147,7 +134,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             EP,
             eH2GenCFix[k in 1:H],
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_COMMIT
+                if k in H2_GEN_COMMIT
                     1 / ModelScalingFactor^2 * (
                         dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
                         dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
@@ -172,7 +159,7 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             EP,
             eH2GenCFix[k in 1:H],
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
-                if k in H2_COMMIT
+                if k in H2_GEN_COMMIT
                     dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
                     dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
                     EP[:vH2GenNewCap][k] +
@@ -187,18 +174,10 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         )
     end
 
-    # Calculate total costs for each zone, for each gen type
-    @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in H2_GEN))
-
-    # Adding conditional for when liquefaction is considered
-    if setup["ModelH2Liquid"] ==1
-        @expression(EP, eTotalH2LiqCFix, sum(EP[:eH2GenCFix][k] for k in union(H2_LIQ, H2_EVAP)))
-        EP[:eObj] += eTotalH2LiqCFix
-    end
+    @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k = 1:H))
 
     # Add term to objective function expression
     EP[:eObj] += eTotalH2GenCFix
-    
 
     return EP
 

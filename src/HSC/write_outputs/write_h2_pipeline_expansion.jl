@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting the expansion of hydrogen pipelines.    
 """
@@ -23,10 +23,10 @@ function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, 
 
     L = inputs["H2_P"]     # Number of H2 pipelines
 
-    Existing_Trans_Cap = zeros(L)
-    transcap = zeros(L) # Transmission network reinforcements in tonne/hour
-    Pipes = zeros(L)
-    Fixed_Cost = zeros(L)
+	Existing_Trans_Cap = zeros(L)
+	transcap = zeros(L) # Transmission network reinforcements in tonne/hour
+	Pipes = zeros(L)
+	Fixed_Cost = zeros(L)
 
     for i in 1:L
         Existing_Trans_Cap = inputs["pH2_Pipe_Max_Flow"].*inputs["pH2_Pipe_No_Curr"]
@@ -43,5 +43,5 @@ function write_h2_pipeline_expansion(path::AbstractString, sep::AbstractString, 
     Fixed_Cost_Pipes = convert(Array{Union{Missing,Float32}}, Fixed_Cost),
     )
     
-    CSV.write(joinpath(path, "HSC_pipeline_expansion.csv"), dfTransCap)
+    CSV.write(string(path, sep, "HSC_pipeline_expansion.csv"), dfTransCap)
 end

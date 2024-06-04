@@ -17,9 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_co2_emission_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for reporting CO2 balance of resources across different zones.
+Function for reporting co2 balance of resources across different zones.
 """
 function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -66,7 +67,7 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 			end
 
 
-			if setup["ModelLiquidFuels"] == 1
+			if setup["ModelSynFuels"] == 1
 				dfTemp1[t+rowoffset,9] = value(EP[:eSyn_Fuels_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,10] = value(EP[:eByProdConsCO2EmissionsByZone][z,t])
 				dfTemp1[t+rowoffset,11] = value(EP[:eLiquid_Fuels_Con_Diesel_CO2_Emissions_By_Zone][z,t])

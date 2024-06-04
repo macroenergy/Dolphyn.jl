@@ -15,51 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_injection(EP::Model, inputs::Dict,setup::Dict)
+    co2_injection(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the CO2 injection decision variable $x_{s,z,t}^{\textrm{C,INJ}} \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}$, representing CO2 injected into storage resource $s$ in zone $z$ at time period $t$.
-
-The variable defined in this file named after ```vDAC\textunderscore{CO2}\textunderscore{Injected}``` covers all variables $x_{s,z,t}^{\textrm{C,INJ}}$.
-
-This module defines the power consumption decision variable $x_{z,t}^{\textrm{E,INJ}} \forall z\in \mathcal{Z}, t \in \mathcal{T}$, representing power consumed by CO2 injection in zone $z$ at time period $t$.
-
-The variable defined in this file named after ```vPower\textunderscore{CO2}\textunderscore{Injection}``` cover variable $x_{z,t}^{E,INJ}$.
-
-**Cost expressions**
-
-This module additionally defines contributions to the objective function from variable costs of CO2 injection (variable OM) from all resources over all time periods.
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,INJ,o}} = \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s}^{\textrm{INJ,VOM}} \times x_{s,z,t}^{\textrm{C,INJ}}
-\end{equation*}
-```
-
-**Minimum and maximum injection output hourly**
-
-For resources where upper bound $\overline{x_{s}^{\textrm{C,INJ}}}$ of injection rate is defined, then we impose constraints on minimum and maximum injection rate
-
-
-```math
-\begin{equation*}
-	x_{s,z,t}^{\textrm{C,INJ}} \geq \underline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	x_{s,z,t}^{\textrm{C,INJ}} \leq \overline{R_{s,z}^{\textrm{C,INJ}}} \times \overline{x_{s,z,t}^{\textrm{INJ}}} \quad \forall k \in \mathcal{S}, z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
-
-**Maximum injection per year according to CO2 storage capacity per year**
-
-```math
-\begin{equation*}
-	\sum_{t \in \mathcal{T}} x_{s,z,t}^{\textrm{C,INJ}} \leq y_{s,z}^{\textrm{C,STO}}
-\end{equation*}
-```
+The co2_injection module creates decision variables, expressions, and constraints related to injecting the captured carbon into geological sequestration
 """
+
 function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 
 	#Rename CO2Storage dataframe
@@ -75,7 +35,7 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	@variable(EP, vCO2_Injected[k=1:CO2_STOR_ALL, t = 1:T] >= 0 )
 
 	#Power required by carbon storage resource k (MW)
-	@variable(EP, vPower_CO2_Injection[k=1:CO2_STOR_ALL, t = 1:T] >= 0 )
+	@variable(EP, vPower_CO2_Storage[k=1:CO2_STOR_ALL, t = 1:T] >= 0 )
 	
 	###############################################################################################################################
 
@@ -84,7 +44,7 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	# If ParameterScale = 0, power system operation/capacity modeled in MW
 
 	@expression(EP, ePower_Balance_CO2_Storage[t=1:T, z=1:Z],
-	sum(EP[:vPower_CO2_Injection][k,t] for k in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]))
+	sum(EP[:vPower_CO2_Storage][k,t] for k in dfCO2Storage[dfCO2Storage[!,:Zone].==z,:][!,:R_ID]))
 
 	#Add to power balance to take power away from generated
 	EP[:ePowerBalance] += -ePower_Balance_CO2_Storage
@@ -109,7 +69,9 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	###############################################################################################################################
 	##Constraints
 	#Power constraint
-	@constraint(EP,cPower_Consumption_CO2_Storage[k=1:CO2_STOR_ALL, t = 1:T], EP[:vPower_CO2_Injection][k,t] == EP[:vCO2_Injected][k,t] * dfCO2Storage[!,:etaPCO2_MWh_per_tonne][k])
+	@constraint(EP,cPower_Consumption_CO2_Storage[k=1:CO2_STOR_ALL, t = 1:T], EP[:vPower_CO2_Storage][k,t] == EP[:vCO2_Injected][k,t] * dfCO2Storage[!,:etaPCO2_MWh_per_tonne][k])
+
+	#Include constraint of min storage operation
 
 	#Max carbon injected into geological sequestration per resoruce type k
 	@constraint(EP,cMax_CO2_Injected_per_type_per_year[k=1:CO2_STOR_ALL], EP[:eCO2_Injected_per_year][k] <= EP[:vCapacity_CO2_Storage_per_type][k])

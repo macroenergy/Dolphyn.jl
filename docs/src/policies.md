@@ -1,36 +1,24 @@
 # Emission mitigation policies
-
-## [Capacity Reserve Margin](@id cap_reserve_margin_policy)
-
+## Capacity Reserve Margin
 ```@autodocs
-Modules = [Dolphyn]
-Pages = ["GenX/src/model/policies/cap_reserve_margin.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/policies/cap_reserve_margin.jl"]
 ```
 
-## [CO$_2$ Capacity](@id co2_cap_policy)
-
+## CO$_2$ Capacity
 ```@autodocs
-Modules = [Dolphyn]
-Pages = ["co2_cap_power_hsc.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/policies/co2_cap_power.jl"]
 ```
 
-## [Energy Share Requirement](@id energy_share_requirement_policy)
-
+## Energy Share Requirement
 ```@autodocs
-Modules = [Dolphyn]
-Pages = ["GenX/src/model/policies/energy_share_requirement.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/policies/energy_share_requirement.jl"]
 ```
 
-## [Minimum Capacity Requirement](@id min_capacity_requirement_policy)
-
+## Minimum Capacity Requirement
 ```@autodocs
-Modules = [Dolphyn]
-Pages = ["GenX/src/model/policies/minimum_capacity_requirement.jl"]
-```
-
-## [Maximum Capacity Requirement](@id max_capacity_requirement_policy)
-
-```@autodocs
-Modules = [Dolphyn]
-Pages = ["GenX/src/model/policies/maximum_capacity_requirement.jl"]
+Modules = [DOLPHYN]
+Pages = ["GenX/model/policies/minimum_capacity_requirement.jl"]
 ```

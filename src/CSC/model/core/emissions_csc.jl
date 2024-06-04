@@ -15,23 +15,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    emissions_csc(EP::Model, inputs::Dict, setup::Dict)
+	emissions_csc(EP::Model, inputs::Dict, UCommit::Int)
 
-This function creates expression to add the CO2 emissions for carbon supply chain in each zone, which is subsequently added to the total emissions. 
-
-These include emissions from fuel utilization in DAC minus CO2 captured by flue gas CCS and also pipeline losses.
-
-In addition, there is a constraint that specify that amount of CO2 that undergoes compression in each zone has to be equal to the amount of CO2 captured by DAC
-
-```math
-\begin{equation*}
-    x_{z,t}^{\textrm{C,DAC}} = x_{z,t}^{\textrm{C,COMP}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
-\end{equation*}
-```
+    This function creates expression to add the CO2 emissions for carbon supply chain in each zone, which is subsequently added to the total emissions. 
+    
+    These include emissions from fuel utilization in DAC minus CO2 captured by flue gas CCS and also pipeline losses.
 """
 function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
-	println(" -- CO2 Emissions Module for CO2 Policy modularization")
+	println("CO2 Emissions Module for CO2 Policy modularization")
 
 	dfDAC = inputs["dfDAC"]
     DAC_RES_ALL = inputs["DAC_RES_ALL"]
@@ -61,17 +53,22 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     #Total emission per zone, need to minus CO2 loss in pipelines
     @expression(EP, eDAC_Emissions_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_Production_per_plant_per_time[k,t] for k in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
 
-    if setup["ModelCO2Pipelines"] ==1 & setup["CO2Pipeline_Loss"] ==1 
-        @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t] + EP[:eCO2Loss_Pipes_zt][z,t])
+
+    #Carbon compressed = Carbon captured per zone
+    if setup["ModelCO2Pipelines"] ==1 
+        if setup["CO2Pipeline_Loss"] ==1 
+            @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t] + EP[:eCO2Loss_Pipes_zt][z,t])
+        else
+            @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t])
+        end
     else
         @expression(EP, eCSC_Emissions_per_zone_per_time[z=1:Z, t=1:T], EP[:eDAC_Emissions_per_zone_per_time][z,t])
     end
-    
+
     ###################################################################################################################################################################
 
     ##Compression
     #Amount of carbon compressed for storage or transport
-    #Carbon compressed = Carbon captured per zone by DAC
     @expression(EP, eCO2_Capture_Compressed_per_zone[z=1:Z, t=1:T], sum(EP[:vCO2_Capture_Compressed][k,t] for k in dfCO2CaptureComp[(dfCO2CaptureComp[!,:Zone].==z),:R_ID]))
     @constraint(EP,cCaptured_Equals_Compressed_CO2[z=1:Z, t=1:T], eCO2_Capture_Compressed_per_zone[z,t] == eDAC_CO2_Captured_per_zone_per_time[z,t])
     ###################################################################################################################################################################

@@ -34,7 +34,7 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	for j in H2_TRUCK_TYPES
 		dfH2TruckFlow = DataFrame(Time = 1:T)
 		for z in 1:Z
-			dfH2TruckFlow[!,Symbol("Zone$z")] = value.(EP[:vH2TruckFlow][z,j,:])
+			dfH2TruckFlow[!,Symbol("Zone$z")] = value.(EP[:vH2TruckFlow])[z,j,:]
 		end
 		CSV.write(string(truck_flow_path, sep, string("H2TruckFlow_",H2_TRUCK_TYPE_NAMES[j],".csv")), dfH2TruckFlow)
 	end
@@ -48,8 +48,8 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	dfH2TruckNumberFull = DataFrame(Time = 1:T)
 	dfH2TruckNumberEmpty = DataFrame(Time = 1:T)
 	for j in H2_TRUCK_TYPES
-		dfH2TruckNumberFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2N_full][j,:])
-		dfH2TruckNumberEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2N_empty][j,:])
+		dfH2TruckNumberFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2N_full])[j,:]
+		dfH2TruckNumberEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = value.(EP[:vH2N_empty])[j,:]
 	end
 	CSV.write(string(truck_number_path, sep, "H2TruckNumberFull.csv"), dfH2TruckNumberFull)
 	CSV.write(string(truck_number_path, sep, "H2TruckNumberEmpty.csv"), dfH2TruckNumberEmpty)
@@ -65,10 +65,10 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	dfH2TruckDischarged = DataFrame(Time = 1:T)
 	for j in H2_TRUCK_TYPES
 		for z in 1:Z
-			dfH2TruckAvailFull[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Navail_full][z,j,:])
-			dfH2TruckAvailEmpty[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Navail_empty][z,j,:])
-			dfH2TruckCharged[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Ncharged][z,j,:])
-			dfH2TruckDischarged[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Ndischarged][z,j,:])
+			dfH2TruckAvailFull[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Navail_full])[z,j,:]
+			dfH2TruckAvailEmpty[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Navail_empty])[z,j,:]
+			dfH2TruckCharged[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Ncharged])[z,j,:]
+			dfH2TruckDischarged[!,Symbol(string("Zone$z-",H2_TRUCK_TYPE_NAMES[j]))] = value.(EP[:vH2Ndischarged])[z,j,:]
 		end
 	end
 	CSV.write(string(truck_state_path, sep, string("H2TruckAvailFull.csv")), dfH2TruckAvailFull)
@@ -89,13 +89,13 @@ function write_h2_truck_flow(path::AbstractString, sep::AbstractString, inputs::
 	dfH2TruckArriveEmpty = DataFrame(Time = 1:T)
 	dfH2TruckDepartEmpty = DataFrame(Time = 1:T)
 	for j in H2_TRUCK_TYPES
-		dfH2TruckTravelFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_full][zz,z,j,:]) for zz in 1:Z, z in 1:Z)
-		dfH2TruckArriveFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_full][zz,z,j,:]) for zz in 1:Z, z in 1:Z)
-		dfH2TruckDepartFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_full][zz,z,j,:]) for zz in 1:Z, z in 1:Z)
+		dfH2TruckTravelFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_full])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
+		dfH2TruckArriveFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_full])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
+		dfH2TruckDepartFull[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_full])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
 
-		dfH2TruckTravelEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_empty][zz,z,j,:]) for zz in 1:Z, z in 1:Z)
-		dfH2TruckArriveEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_empty][zz,z,j,:]) for zz in 1:Z, z in 1:Z)
-		dfH2TruckDepartEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_empty][zz,z,j,:]) for zz in 1:Z, z in 1:Z)
+		dfH2TruckTravelEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ntravel_empty])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
+		dfH2TruckArriveEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Narrive_empty])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
+		dfH2TruckDepartEmpty[!,Symbol(H2_TRUCK_TYPE_NAMES[j])] = sum(value.(EP[:vH2Ndepart_empty])[zz,z,j,:] for zz in 1:Z, z in 1:Z)
 	end
 
 	CSV.write(string(truck_transit_path, sep, "H2TruckTravelFull.csv"), dfH2TruckTravelFull)

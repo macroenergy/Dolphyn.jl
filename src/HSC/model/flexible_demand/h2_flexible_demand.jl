@@ -68,7 +68,7 @@ If $t$ is first time step of the year (or the first time step of the representat
 function h2_flexible_demand(EP::Model, inputs::Dict, setup::Dict)
 ## Flexible demand resources available during all hours and can be either delayed or advanced (virtual storage-shiftable demand) - DR ==1
 
-print_and_log(" -- H2 Flexible Demand Resources Module")
+print_and_log("H2 Flexible Demand Resources Module")
 
 dfH2Gen = inputs["dfH2Gen"]
 

@@ -40,6 +40,13 @@ function write_h2_g2p(path::AbstractString, sep::AbstractString, inputs::Dict, s
 
 	total = DataFrame(["Total" 0 sum(dfH2G2POut[!,:AnnualSum]) fill(0.0, (1,T))], :auto)
 
+	# for t in  1:T
+	# 	total[:,t+3] .= sum(dfH2G2POut[:,Symbol("t$t")][1:H])
+	# end
+
+	# rename!(total,auxNew_Names)
+	# dfPower = vcat(dfH2G2POut, total)
+
  	CSV.write(string(path,sep,"HSC_G2P_H2_Consumption.csv"), dftranspose(dfH2G2POut, false), writeheader=false)
 	return dfH2G2POut
 

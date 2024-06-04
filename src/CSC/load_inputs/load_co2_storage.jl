@@ -14,11 +14,7 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@doc raw"""
-	load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_storage::Dict)
 
-Function for reading input parameters related to CO2 storage resources in the carbon supply chain.
-"""
 function load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_storage::Dict)
 
 	#Read in CO2 capture related inputs
@@ -39,7 +35,7 @@ function load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString
 	# Set of CO2 resources not eligible for unit committment
 	inputs_co2_storage["CO2_STORAGE"] = co2_storage[!,:R_ID]
 
-	println(" -- CSC_storage.csv Successfully Read!")
+	println("CSC_storage.csv Successfully Read!")
 
     return inputs_co2_storage
 

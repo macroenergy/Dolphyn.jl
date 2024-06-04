@@ -1,5 +1,5 @@
 # Solving the Model
 ```@autodocs
-Modules = [Dolphyn]
+Modules = [DOLPHYN]
 Pages = ["solve_model.jl"]
 ```

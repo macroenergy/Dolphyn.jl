@@ -14,11 +14,7 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-@doc raw"""
-	load_co2_capture_compression(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_capture_comp::Dict)
 
-Function for reading input parameters related to CO2 compression resources in the carbon supply chain.
-"""
 function load_co2_capture_compression(setup::Dict, path::AbstractString, sep::AbstractString, inputs_co2_capture_comp::Dict)
 
 	#Read in CO2 capture related inputs
@@ -39,7 +35,7 @@ function load_co2_capture_compression(setup::Dict, path::AbstractString, sep::Ab
 	# Set of CO2 resources not eligible for unit committment
 	inputs_co2_capture_comp["CO2_CAPTURE_COMP"] = co2_capture_comp[!,:R_ID]
 
-	println(" -- CSC_capture_compression.csv Successfully Read!")
+	println("CSC_capture_compression.csv Successfully Read!")
 
     return inputs_co2_capture_comp
 

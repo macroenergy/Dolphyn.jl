@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
+	h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines the expressions and constraints keeping track of total available hydrogen storage charge capacity ($s \in \mathcal{S}^{asym}, \mathcal{S}^{asym} \subseteq \mathcal{S}$) as well as constraints on capacity retirements. 
 The function also adds investment and fixed OM costs related to charge capacity to the objective function.
@@ -24,7 +24,7 @@ The total capacity of each hydrogen storage resource is defined as the sum of th
 
 ```math
 \begin{equation*}
-    y_{s,z}^{\textrm{H,CHA,total}} = y_{s,z}^{\textrm{H,CHA,existing}} + y_{s,z}^{\textrm{H,CHA,new}} - y_{s,z}^{\textrm{H,CHA,retired}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	y_{s,z}^{\textrm{H,CHA,total}} = y_{s,z}^{\textrm{H,CHA,existing}} + y_{s,z}^{\textrm{H,CHA,new}} - y_{s,z}^{\textrm{H,CHA,retired}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -33,7 +33,7 @@ The total capacity of each hydrogen storage resource is defined as the sum of th
 In addition, this module adds investment and fixed OM costs related to charge capacity to the objective function:
 ```math
 \begin{equation*}
-    \sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (\textrm{c}_{s,z}^{\textrm{H,CHA,INV}} \times y_{s,z}^{\textrm{H,CHA,new}} + \textrm{c}_{s,z}^{\textrm{H,CHA,FOM}} \times y_{s,z}^{\textrm{H,CHA,total}})
+	\sum_{s \in \mathcal{S}^{asym}} \sum_{z \in \mathcal{Z}} (\textrm{c}_{s,z}^{\textrm{H,CHA,INV}} \times y_{s,z}^{\textrm{H,CHA,new}} + \textrm{c}_{s,z}^{\textrm{H,CHA,FOM}} \times y_{s,z}^{\textrm{H,CHA,total}})
 \end{equation*}
 ```
 
@@ -42,20 +42,20 @@ In addition, this module adds investment and fixed OM costs related to charge ca
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-    0 \leq y_{s,z}^{\textrm{H,CHA,retired}} \leq y_{s,z}^{\textrm{H,CHA,existing}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	0 \leq y_{s,z}^{\textrm{H,CHA,retired}} \leq y_{s,z}^{\textrm{H,CHA,existing}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
 For storage resources where upper bound $\overline{R_{s,z}^{\textrm{H,CHA}}}$ and lower bound $\underline{R_{s,z}^{\textrm{H,CHA}}}$ is defined, then we impose constraints on minimum and maximum storage charge capacity.
 ```math
 \begin{equation*}
-    \underline{R_{s,z}^{\textrm{H,CHA}}} \leq y_{s,z}^{\textrm{H,CHA}} \leq \overline{R_{s,z}^{\textrm{H,CHA}}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
+	\underline{R_{s,z}^{\textrm{H,CHA}}} \leq y_{s,z}^{\textrm{H,CHA}} \leq \overline{R_{s,z}^{\textrm{H,CHA}}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """
 function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log(" -- H2 Storage Charging Investment Module")
+    print_and_log("H2 Storage Charging Investment Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

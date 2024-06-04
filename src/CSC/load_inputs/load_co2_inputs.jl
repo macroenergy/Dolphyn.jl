@@ -16,17 +16,17 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 
 
 @doc raw"""
-	load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
+	load_inputs(setup::Dict,path::AbstractString)
 
 Loads various data inputs from multiple input .csv files in path directory and stores variables in a Dict (dictionary) object for use in model() function
 
 inputs:
-inputs - dict object containing input data
 setup - dict object containing setup parameters
 path - string path to working directory
 
-returns: Dict (dictionary) object containing all data inputs of carbon supply chain.
+returns: Dict (dictionary) object containing all data inputs
 """
+
 function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 
 	## Use appropriate directory separator depending on Mac or Windows config
@@ -38,10 +38,10 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
         sep = "/"
 	end
 
-	data_directory = data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
+	data_directory = chop(replace(path, pwd() => ""), head = 1, tail = 0)
 
 	## Read input files
-	println("Reading CO2 Input CSV Files")
+	println("Reading co2 Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
     inputs = load_co2_capture_DAC(setup, path, sep, inputs)
     inputs = load_co2_capture_DAC_variability(setup, path, sep, inputs)
@@ -49,7 +49,7 @@ function load_co2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	inputs = load_co2_capture_compression(setup, path, sep, inputs)
 	inputs = load_co2_pipeline_data(setup, path, sep, inputs)
 	
-	println(" -- CSC Input CSV Files Successfully Read In From $path$sep")
+	println("CSC Input CSV Files Successfully Read In From $path$sep")
 
 	return inputs
 end

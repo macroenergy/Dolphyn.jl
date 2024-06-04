@@ -1,5 +1,5 @@
 # Hydrogen Storage Investment
 ```@autodocs
-Modules = [Dolphyn]
+Modules = [DOLPHYN]
 Pages = ["HSC/model/storage/h2_storage_investment.jl"]
 ```

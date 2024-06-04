@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_co2_storage_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for reporting CO2 storage capacity.
+Function for writing the diferent capacities for CO2 storage
 """
 function write_co2_storage_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity decisions

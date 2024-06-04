@@ -1,6 +1,6 @@
 # Objective Function
 
-The objective function 'Obj' of DOLPHYN minimizes total annual investment and operation costs from the power, hydrogen, CO2, liquid fuels, and bioenergy sectors denoted by superscripts 'c' and 'o', respectively.
+The objective function 'Obj' of DOLPHYN minimizes total annual investment and operation costs from the power and hydrogen sectors denoted by superscripts 'c' and 'o', respectively.
 
 ## Power Sector
 
@@ -164,112 +164,6 @@ The fifth term $\textrm{C}^{\textrm{H,GEN,o}}$ correspond to the operational cos
 The sixth term $\textrm{C^{\textrm{H,start}}$corresponds to the startup costs incurred by technologies to which unit commitment decisions apply (e.g. $g \in \mathcal{UC}$), equal to the cost of start-up, $\textrm{c}_{k}^{\textrm{H,start}}$, times the number of startup events, $\textrm{n}_{k,z,t}^{\textrm{H,UP}}$, for the cluster of units in each zone and time step (weighted by $\omega_t$).
 
 The seventh term $\textrm{C}^{\textrm{H,NSD}}$ represents the total cost of unserved demand across all segments $s$ of a segment-wise price-elastic demand curve, equal to the marginal value of consumption (or cost of non-served hydrogen), $\textrm{n}_{s}^{\textrm{H,NSD}}$, times the amount of non-served energy, $x_{s,z,t}^{\textrm{H,NSD}}$, for each segment on each zone during each time step (weighted by $\omega_t$).
-
-## CO2 Supply Chain
-
-In the CO2 supply chain, cost terms include DAC and CO2 storage resources investment and operational costs, transmission costs, as well as CO2 injection costs.
-
-```math
-\begin{equation*}
-	Obj_{CO2} = \textrm{C}^{\textrm{C,DAC,c}} + \textrm{C}^{\textrm{C,DAC,o}} + \textrm{C}^{\textrm{C,STO,c}} + \textrm{C}^{\textrm{C,INJ,o}} +
-    \textrm{C}^{\textrm{C,PIP,c}}
-\end{equation*}
-```
-
-These are derived from the components as shown in the following equations:
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,DAC,c}} = \sum_{d \in \mathcal{D}} \sum_{z \in \mathcal{Z}} y_{d, z}^{\textrm{C,DAC}}\times \textrm{c}_{d}^{\textrm{DAC,INV}} + \sum_{d \in \mathcal{D}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,DAC,total}} \times \textrm{c}_{d}^{\textrm{DAC,FOM}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,DAC,o}} = \sum_{d \in \mathcal{K}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{d}^{\textrm{DAC,VOM}} + \textrm{c}_{d}^{\textrm{DAC,FUEL}}\right) \times x_{d,z,t}^{\textrm{C,DAC}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,STO,c}} = \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} y_{s, z}^{\textrm{C,STO}}\times \textrm{c}_{s}^{\textrm{STO,INV}} + \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,STO,total}} \times \textrm{c}_{s}^{\textrm{STO,FOM}}
-\end{equation*}
-```	
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,INJ,o}} = \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{s}^{\textrm{INJ,VOM}} \times x_{s,z,t}^{\textrm{C,INJ}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,TRA,c}} = \sum_{l \in \mathcal{L}}\left(\textrm{c}_{l}^{\textrm{C,TRA}} \times y_{l}^{\textrm{C,TRA,new}}\right)
-\end{equation*}
-```
-
-The first term $\textrm{C}^{\textrm{C,DAC,o}}$ represents the fixed costs of direct air capture (DAC) resources over all zones and technologies (e.g. $d \in \mathcal{D}$), which reflects the sum of the annualized capital cost, $\textrm{c}_{d}^{\textrm{DAC,INV}}$, times the total capacity $y_{d, z}^{\textrm{C,DAC}}$, plus the Fixed O&M cost, $\textrm{c}_{d}^{\textrm{DAC,FOM}}$, times the total capacity $y_{d, z}^{\textrm{C,DAC}}$.
-
-The second term $\textrm{C}^{\textrm{C,DAC,o}}$ correspond to the operational cost across all zones, technologies, and time steps. It represents the sum of fuel cost, $\textrm{c}_{d}^{\textrm{DAC,FUEL}}$ (if any), plus variable O&M cost, $\textrm{c}_{d}^{DAC,VOM}$ times the CO2 capture by DAC resources in time step $t$, $x_{d,z,t}^{\textrm{C,DAC}}$, and the weight of each time step $t$, $\omega_t$. 
-
-The third term $\textrm{C}^{\textrm{C,STO,o}}$ represents the fixed costs of CO2 storage resources over all zones and technologies (e.g. $s \in \mathcal{S}$), which reflects the sum of the annualized capital cost, $\textrm{c}_{s}^{\textrm{STO,INV}}$, times the total capacity $y_{s, z}^{\textrm{C,STO}}$, plus the Fixed O&M cost, $\textrm{c}_{s}^{\textrm{STO,FOM}}$, times the total capacity $y_{s, z}^{\textrm{C,STO}}$.
-
-The fourth term $\textrm{C}^{\textrm{C,INJ,o}}$ correspond to the operational cost across all zones, technologies, and time steps. It represents the sum of variable O&M cost, $\textrm{c}_{s}^{INJ,VOM}$ times the CO2 injection to CO2 storage resource in time step $t$, $x_{s,z,t}^{\textrm{C,INJ}}$, and the weight of each time step $t$, $\omega_t$.
-
-The fifth term $\textrm{C}^{\textrm{C,TRA,c}}$ corresponds to the transmission reinforcement or construction costs, for each pipeline (if modeled). Transmission reinforcement costs are equal to the sum across all pipelines of the product between the transmission reinforcement/construction cost, $\textrm{c}_{l}^{\textrm{C,NET}}$, times the additional transmission capacity variable, $y_{l}^{\textrm{C,NET,new}}$. Note that fixed O&M and replacement capital costs (depreciation) for existing transmission capacity is treated as a sunk cost and not included explicitly in the objective function.
-
-## Liquid Fuels Supply Chain
-
-In the liquid fuels supply chain, cost terms include synthetic fuels resources investment and operational costs, as well as conventional fossil fuel costs.
-
-```math
-\begin{equation*}
-	Obj_{CO2} = \textrm{C}^{\textrm{LF,Syn,c}} + \textrm{C}^{\textrm{LF,Syn,o}} + \textrm{C}^{\textrm{Gasoline,Conv,o}} + \textrm{C}^{\textrm{Jetfuel,Conv,o}} +
-    \textrm{C}^{\textrm{Diesel,Conv,o}}
-\end{equation*}
-```
-
-These are derived from the components as shown in the following equations:
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{LF,Syn,c}} = \sum_{f \in \mathcal{F}} \sum_{z \in \mathcal{Z}} y_{f, z}^{\textrm{C,Syn}}\times \textrm{c}_{f}^{\textrm{Syn,INV}} + \sum_{f \in \mathcal{F}} \sum_{z \in \mathcal{Z}} y_{f, z}^{\textrm{C,Syn}} \times \textrm{c}_{f}^{\textrm{Syn,FOM}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{LF,Syn,o}} = \sum_{f \in \mathcal{F}} \sum_{t \in \mathcal{T}} \omega_t \times \left(\textrm{c}_{f}^{\textrm{Syn,VOM}} + \textrm{c}_{f}^{\textrm{Syn,FUEL}}\right) \times x_{f,t}^{\textrm{C,Syn}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{Gasoline,Conv,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{z}^{\textrm{Gasoline,Conv,VOM}} \times x_{z,t}^{\textrm{Gasoline,Conv}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{Jetfuel,Conv,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{z}^{\textrm{Jetfuel,Conv,VOM}} \times x_{z,t}^{\textrm{Jetfuel,Conv}}
-\end{equation*}
-```
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{Diesel,Conv,o}} = \sum_{z \in \mathcal{Z}} \sum_{t \in \mathcal{T}} \omega_t \times \textrm{c}_{z}^{\textrm{Diesel,Conv,VOM}} \times x_{z,t}^{\textrm{Diesel,Conv}}
-\end{equation*}
-```
-
-The first term $\textrm{C}^{\textrm{LF,Syn,c}}$ represents the fixed costs of synthetic fuels resources over all zones and technologies (e.g. $f \in \mathcal{F}$), which reflects the sum of the annualized capital cost, $\textrm{c}_{f}^{\textrm{Syn,INV}}$, times the total capacity $y_{f, z}^{\textrm{C,Syn}}$, plus the Fixed O&M cost, $\textrm{c}_{f}^{\textrm{Syn,FOM}}$, times the total capacity $y_{f, z}^{\textrm{C,Syn}}$.
-
-The second term $\textrm{C}^{\textrm{LF,Syn,o}}$ correspond to the operational cost across all zones, technologies, and time steps. It represents the sum of fuel cost, $\textrm{c}_{f}^{\textrm{Syn,FUEL}}$ (if any), plus variable O&M cost, $\textrm{c}_{f}^{Syn,VOM}$ times the CO2 consumed by synthetic fuels resources in time step $t$, $x_{f,z,t}^{\textrm{C,Syn}}$, and the weight of each time step $t$, $\omega_t$. 
-
-The third term $\textrm{C}^{\textrm{Gasoline,Conv,o}}$ correspond to the cost of conventional fossil gasoline across all zones, technologies, and time steps. It represents the sum of variable O&M cost, $\textrm{c}_{f}^{Gasoline,Conv,VOM}$ times the conventional gasoline utilized in time step $t$, $x_{z,t}^{\textrm{Gasoline,Conv}}$, and the weight of each time step $t$, $\omega_t$. 
-
-The fourth term $\textrm{C}^{\textrm{Jetfuel,Conv,o}}$ correspond to the cost of conventional fossil jetfuel across all zones, technologies, and time steps. It represents the sum of variable O&M cost, $\textrm{c}_{f}^{Jetfuel,Conv,VOM}$ times the conventional jetfuel utilized in time step $t$, $x_{z,t}^{\textrm{Jetfuel,Conv}}$, and the weight of each time step $t$, $\omega_t$. 
-
-The fifth term $\textrm{C}^{\textrm{Diesel,Conv,o}}$ correspond to the cost of conventional fossil diesel across all zones, technologies, and time steps. It represents the sum of variable O&M cost, $\textrm{c}_{f}^{Diesel,Conv,VOM}$ times the conventional diesel utilized in time step $t$, $x_{z,t}^{\textrm{Diesel,Conv}}$, and the weight of each time step $t$, $\omega_t$. 
 
 In summary, the objective function can be understood as the minimization of costs associated with five sets of different decisions:
 1. Where and how to invest on capacity,

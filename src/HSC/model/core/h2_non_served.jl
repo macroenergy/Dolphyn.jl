@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_non_served(EP::Model, inputs::Dict, setup::Dict)
+	h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines the non-served hydrogen demand decision variable $x_{s,z,t}^{\textrm{H,NSD}} \forall z \in \mathcal{Z}, \forall t \in \mathcal{T}$, representing the total amount of hydrogen demand curtailed in demand segment $s$ at time period $t$ in zone $z$. 
 The first segment of non-served hydrogen, $s=1$, is used to denote the cost of involuntary hydrogen demand curtailment, specified as the value of $c_{1}^{\textrm{H,NSD}}$.
@@ -39,7 +39,7 @@ Contributions to the hydrogen balance expression from non-served hydrogen/curtai
 
 ```math
 \begin{equation*}
-    HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	HydrogenBal_{NSE} = \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -49,7 +49,7 @@ Hydrogen demand curtailed in each segment of curtailable demands $s \in \mathcal
 
 ```math
 \begin{equation*}
-    x_{s,z,t}^{\textrm{H,NSD}} \leq \textrm{n}_{s}^{\textrm{H,NSD}} \times \textrm{D}_{z,t}^{\textrm{H}} \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
+	x_{s,z,t}^{\textrm{H,NSD}} \leq \textrm{n}_{s}^{\textrm{H,NSD}} \times \textrm{D}_{z,t}^{\textrm{H}} \quad \forall s \in \mathcal{SEG}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 
@@ -57,13 +57,13 @@ Additionally, total demand curtailed in each time step cannot exceed total hydro
 
 ```math
 \begin{equation*}
-    \sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \leq \textrm{D}_{z,t}^{\textrm{H}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
+	\sum_{s \in \mathcal{SEG}} x_{s,z,t}^{\textrm{H,NSD}} \leq \textrm{D}_{z,t}^{\textrm{H}} \quad \forall z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 """
 function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log(" -- H2 Non-served Energy Module")
+    print_and_log("Hydrogen Non-served Energy Module")
 
     T = inputs["T"]     # Number of time steps
     Z = inputs["Z"]     # Number of zones
@@ -110,12 +110,14 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     # Add total cost contribution of non-served energy/curtailed demand to the objective function
     EP[:eObj] += eTotalH2CNSE
 
-    ## Expression to be added to H2 Balance##
+    ## Power Balance Expressions ##
     @expression(EP, eH2BalanceNse[t = 1:T, z = 1:Z], sum(vH2NSE[s, t, z] for s = 1:H2_SEG))
 
-    # Add non-served energy/curtailed demand contribution to H2 balance expression
+    # Add non-served energy/curtailed demand contribution to power balance expression
     EP[:eH2Balance] += eH2BalanceNse
 
+    EP[:eHDemandByZone] -= eH2BalanceNse
+    
     ### Constratints ###
 
     # Demand curtailed in each segment of curtailable demands cannot exceed maximum allowable share of demand

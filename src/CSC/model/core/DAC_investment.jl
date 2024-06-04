@@ -15,39 +15,40 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	DAC_investment(EP::Model, inputs::Dict, setup::Dict)
+    DAC_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
 Sets up constraints common to all DAC resources.
 
-This function defines the expressions and constraints keeping track of total available DAC CO2 capture capacity $y_{d}^{\textrm{C,DAC}}$ as well as constraints on capacity.
+This function defines the expressions and constraints keeping track of total available DAC CO2 capture capacity $y_{k}^{\textrm{C,DAC}}$ as well as constraints on capacity.
 
-The expression defined in this file named after ```vCapacity\textunderscore{DAC}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{d}^{\textrm{C,DAC}}$.
+The expression defined in this file named after ```vCapacity\textunderscore DAC\textunderscore per\textunderscore type``` covers all variables $y_{k}^{\textrm{C,DAC}}$.
 
 The total capacity of each DAC resource is defined as the sum of newly invested capacity based on the assumption there are no existing DAC resources. 
 
 **Cost expressions**
 
-This module additionally defines contributions to the objective function from investment costs of DAC (fixed O\&M plus investment costs) from all generation resources $d \in \mathcal{D}$:
+This module additionally defines contributions to the objective function from investment costs of DAC (fixed O\&M plus investment costs) from all generation resources $k \in \mathcal{K}$:
 
 ```math
 \begin{equation*}
-	\textrm{C}^{\textrm{C,DAC,c}} = \sum_{d \in \mathcal{D}} \sum_{z \in \mathcal{Z}} y_{d, z}^{\textrm{C,DAC}}\times \textrm{c}_{d}^{\textrm{DAC,INV}} + \sum_{d \in \mathcal{D}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,DAC,total}} \times \textrm{c}_{d}^{\textrm{DAC,FOM}}
+	\textrm{C}^{\textrm{C,DAC,c}} = \sum_{k \in \mathcal{K}} \sum_{z \in \mathcal{Z}} y_{k, z}^{\textrm{C,DAC}}\times \textrm{c}_{k}^{\textrm{DAC,INV}} + \sum_{k \in \mathcal{K}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,DAC,total}} \times \textrm{c}_{k}^{\textrm{DAC,FOM}}
 \end{equation*}
 ```
 
 **Constraints on DAC capacity**
 
-For resources where upper bound $\overline{y_{d}^{\textrm{C,DAC}}}$ and lower bound $\underline{y_{d}^{\textrm{C,DAC}}}$ of capacity is defined, then we impose constraints on minimum and maximum capture capacity.
+For resources where upper bound $\overline{y_{k}^{\textrm{C,DAC}}}$ and lower bound $\underline{y_{k}^{\textrm{C,DAC}}}$ of capacity is defined, then we impose constraints on minimum and maximum capture capacity.
 
 ```math
 \begin{equation*}
-	\underline{y_{d}^{\textrm{C,DAC}}} \leq y_{d}^{\textrm{C,DAC}} \leq \overline{y_{d}^{\textrm{C,DAC}}} \quad \forall d \in \mathcal{D}
+	\underline{y_{k}^{\textrm{C,DAC}}} \leq y_{k}^{\textrm{C,DAC}} \leq \overline{y_{k}^{\textrm{C,DAC}}} \quad \forall k \in \mathcal{K}
 \end{equation*}
 ```
+
 """
 function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	
-	println(" -- DAC Fixed Cost module")
+	println("DAC Fixed Cost module")
 
 	dfDAC = inputs["dfDAC"]
 	DAC_RES_ALL = inputs["DAC_RES_ALL"]
@@ -66,6 +67,7 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 		DAC_Capacity_Max_Limit = dfDAC[!,:Max_capacity_tonne_per_hr] # t/h
 	end
 	
+	
 	if setup["ParameterScale"] == 1
 		DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
 		DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
@@ -80,6 +82,7 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Fixed OM cost
 	@expression(EP, eFixed_OM_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * DAC_Fixed_OM_Cost_per_tonne_per_hr_yr[i])
 
+	
 	#####################################################################################################################################
 	#Min and max capacity constraints
 	@constraint(EP,cMinCapacity_per_unit[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] >= DAC_Capacity_Min_Limit[i])

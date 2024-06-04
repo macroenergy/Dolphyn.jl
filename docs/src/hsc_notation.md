@@ -8,8 +8,8 @@
 |$t \in \mathcal{T}$ | $t$ denotes an time step and $\mathcal{T}$ is the set of time steps|
 |$t \in \mathcal{T}^{start}$|This set of time-coupling constraints wrap around to ensure the power output in the first time step of each year (or each representative period)|
 |$t \in \mathcal{T}^{interior}$|This set of time-coupling constraints wrap around to ensure the power output in the inner time step of each year (or each representative period)|
-|$g \in \mathcal{G}$ | Index and set of all hydrogen generation resources (electrolysis, SMR plants and liquefiers and evaporators, if modeled)|
-|$k \in \mathcal{K}$ | Index and set of all gas-to-power resources (CCGT-H2, fuel cells)|
+|$g \in \mathcal{G}$ | Index and set of all hydrogen generation resources (electrolysis, SMR plants and hydrogen storage devices)|
+|$k \in \mathcal{K}$ | Index and set of thermal generation resources in hydrogen energy system representing hydrogen production resource|
 |$s \in \mathcal{S}$ | Index and set of storage resources in hydrogen energy system representing hydrogen storage devices such as underground or above-ground storage|
 |$z \in \mathcal{Z}^{CO_2}_{p,mass}$ |we define a set of zones that can trade CO$_2$ allowance|
 
@@ -18,9 +18,7 @@
 |**Notation** | **Description**|
 | :------------ | :-----------|
 |$x_{z,t}^{\textrm{H,EMI}}$| The amount of carbon dioxide emitted by the hydrogen supply chain at time $t$ in region $z$ |
-|$x_{g,z,t}^{\textrm{H,GEN}}$| this term represents hydrogen injected into the grid by hydrogen generation resource $g$ in zone $z$ at time period $t$|
-|$x_{g,z,t}^{\textrm{H,LIQ}}$| this term represents liquefied hydrogen (gas to liquid) injected into the grid by hydrogen generation resource $g$ in zone $z$ at time period $t$|
-|$x_{g,z,t}^{\textrm{H,EVAP}}$| this term represents evaporated hydrogen (liquid to gas) injected into the grid by hydrogen generation resource $g$ in zone $z$ at time period $t$|
+|$x_{k,z,t}^{\textrm{H,GEN}}$| this term represents hydrogen injected into the grid by hydrogen generation resource $k$ in zone $z$ at time period $t$|
 |$x_{s,z,t}^{\textrm{H,NSD}}$| this term represents the total amount of hydrogen demand curtailed in demand segment $s$ at time period $t$ in zone $z$ |
 |$x_{s,z,t}^{\textrm{H,DIS}}$| this term represents hydrogen injected into the grid by hydrogen storage resource $s$ in zone $z$ at time period $t$|
 |$x_{s,z,t}^{\textrm{H,CHA}}$| this term represents charged hydrogen into the storage device $s$ in zone $z$ at time period $t$|

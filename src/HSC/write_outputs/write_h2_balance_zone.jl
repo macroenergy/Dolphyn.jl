@@ -24,11 +24,10 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	BLUE_H2 = inputs["BLUE_H2"]
 	GREY_H2 = inputs["GREY_H2"]
 	H2_STOR_ALL = inputs["H2_STOR_ALL"]
-	
+	H2_G2P_ALL = inputs["H2_G2P_ALL"]
 
 	if setup["ModelH2G2P"] == 1
 		dfH2G2P = inputs["dfH2G2P"]
-		H2_G2P_ALL = inputs["H2_G2P_ALL"]
 	end
 
 	T = inputs["T"]     # Number of time steps (hours)
@@ -37,7 +36,6 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total"])
 
 	#Try this form of summing otherwise just create z dimensions and sum later
-	
 	if !isempty(inputs["H2_ELECTROLYZER"])
 		Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
 	else
@@ -55,7 +53,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	else
 		Grey_H2_Generation = 0
 	end
-	
+
 	if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
 		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z) - sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z])) for z in 1:Z)
 	else
@@ -94,7 +92,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 	Demand = - sum(sum(inputs["omega"].* (inputs["H2_D"][:,z]) for z in 1:Z))
 
-	if setup["ModelLiquidFuels"] == 1
+	if setup["ModelSynFuels"] == 1
 		Synfuel_Consumption = sum(sum(inputs["omega"].* value.(EP[:eSynFuelH2Cons])[:,z] for z in 1:Z))
 	else
 		Synfuel_Consumption = 0 
@@ -164,7 +162,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 		tempDemand = tempDemand - sum(inputs["omega"].* (inputs["H2_D"][:,z]))
 
-		if setup["ModelLiquidFuels"] == 1
+		if setup["ModelSynFuels"] == 1
 			tempSynfuel_Consumption = tempSynfuel_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelH2Cons])[:,z]))
 		end
 
@@ -174,6 +172,6 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		dfCost[!,Symbol("Zone$z")] = [tempGreen_H2_Generation, tempBlue_H2_Generation, tempGrey_H2_Generation, tempBio_H2, tempStorage_Discharging, tempStorage_Charging, tempNonserved_Energy, tempH2_Pipeline_Import_Export, tempH2_Truck_Import_Export, tempTruck_Consumption, tempH2G2P, tempDemand, tempSynfuel_Consumption, tempCTotal]
 	end
 
-	CSV.write(string(path,sep,"HSC_balance_zone.csv"), dfCost)
+	CSV.write(string(path,sep,"HSC_balanace_zone.csv"), dfCost)
 
 end

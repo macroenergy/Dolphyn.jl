@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    configure_gurobi(solver_settings_path::String, solver::DataType)
+	configure_gurobi(solver_settings_path::String)
 
 Reads user-specified solver settings from gurobi\_settings.yml in the directory specified by the string solver\_settings\_path.
 
@@ -28,15 +28,15 @@ The Gurobi optimizer instance is configured with the following default parameter
  - Presolve = -1 (Controls presolve level. See [here](https://www.gurobi.com/documentation/8.1/refman/presolve.html).)
  - AggFill = -1 (Allowed fill during presolve aggregation. See [here](https://www.gurobi.com/documentation/8.1/refman/aggfill.html#parameter:AggFill).)
  - PreDual = -1 (Presolve dualization. See [here](https://www.gurobi.com/documentation/8.1/refman/predual.html#parameter:PreDual).)
- - TimeLimit = Inf    (Limits total time solver. See [here](https://www.gurobi.com/documentation/8.1/refman/timelimit.html).)
+ - TimeLimit = Inf	(Limits total time solver. See [here](https://www.gurobi.com/documentation/8.1/refman/timelimit.html).)
  - MIPGap = 1e-4 (Relative (p.u. of optimal) mixed integer optimality tolerance for MIP problems (ignored otherwise). See [here](https://www.gurobi.com/documentation/8.1/refman/mipgap2.html).)
  - Crossover = -1 (Barrier crossver strategy. See [here](https://www.gurobi.com/documentation/8.1/refman/crossover.html#parameter:Crossover).)
- - Method = -1    (Algorithm used to solve continuous models (including MIP root relaxation). See [here](https://www.gurobi.com/documentation/8.1/refman/method.html).)
+ - Method = -1	(Algorithm used to solve continuous models (including MIP root relaxation). See [here](https://www.gurobi.com/documentation/8.1/refman/method.html).)
  - BarConvTol = 1e-8 (Barrier convergence tolerance (determines when barrier terminates). See [here](https://www.gurobi.com/documentation/8.1/refman/barconvtol.html).)
  - NumericFocus = 0 (Numerical precision emphasis. See [here](https://www.gurobi.com/documentation/8.1/refman/numericfocus.html).)
 
 """
-function configure_gurobi(solver_settings_path::String, solver::DataType)
+function configure_gurobi(solver_settings_path::String)
 
     solver_settings = YAML.load(open(solver_settings_path))
 
@@ -101,7 +101,7 @@ function configure_gurobi(solver_settings_path::String, solver::DataType)
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
-        solver,
+        Gurobi.Optimizer,
         "OptimalityTol" => MyOptimalityTol,
         "FeasibilityTol" => MyFeasibilityTol,
         "Presolve" => MyPresolve,
@@ -114,7 +114,7 @@ function configure_gurobi(solver_settings_path::String, solver::DataType)
         "NumericFocus" => MyNumericFocus,
         "Crossover" => MyCrossover,
         "LogFile" => MyGurobiLogFile,
-        "BarHomogeneous" => MyBarHomogeneous,
+        "BarHomogeneous" => MyBarHomogeneous
     )
 
     return OPTIMIZER

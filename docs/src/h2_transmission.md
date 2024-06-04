@@ -1,5 +1,5 @@
 # Hydrogen Transmission
 ```@autodocs
-Modules = [Dolphyn]
+Modules = [DOLPHYN]
 Pages = ["HSC/model/transmission/h2_pipeline.jl"]
 ```

@@ -1,6 +1,6 @@
 """
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
+GenX: An Configurable Capacity Expansion Model
+Copyright (C) 2021,  Massachusetts Institute of Technology
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -17,9 +17,10 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	write_co2_storage_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
-Function for reporting CO2 storage balance of resources across different zones with time.
+Function for reporting co2 storage balance of resources across different zones.
 """
 function write_co2_storage_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	dfGen = inputs["dfGen"]
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -52,7 +53,7 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,5] = 0
 			end
 			
-			if setup["ModelLiquidFuels"] == 1
+			if setup["ModelSynFuels"] == 1
 				dfTemp1[t+rowoffset,6] = value(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])
 				dfTemp1[t+rowoffset,7] = - value(EP[:eSynFuelCO2Cons_Per_Zone_Per_Time][z,t])
 			else

@@ -14,34 +14,32 @@ in LICENSE.txt.  Users uncompressing this from an archive may not have
 received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-module Dolphyn
+module DOLPHYN
 
+#export package_activate
 export compare_results
 export print_and_log
 export configure_settings
-export load_settings
-export load_all_inputs
-export setup_logging
-export setup_TDR
 export configure_solver
 export load_inputs
 export load_h2_inputs
 export load_co2_inputs
-export load_liquid_fuels_inputs
+export load_syn_fuels_inputs
+export load_bio_inputs
 export generate_model
 export solve_model
-export run_case
-export write_all_outputs
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
-export write_liquid_fuels_outputs
+export write_synfuel_outputs
+export write_BESC_outputs
 export cluster_inputs
 export mga
-export h2_inherit_clusters
+
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
+using MathProgBase #for fix_integers
 using CSV
 using StatsBase
 using LinearAlgebra
@@ -50,132 +48,319 @@ using Dates
 using Clustering
 using Distances
 using Combinatorics
+#using Documenter
 using Revise
-using Glob
-using LoggingExtras
-
-using Random
-using RecursiveArrayTools
-using Statistics
-
-# HiGHS is the default solver, but there is an option to employ other optimizers
+# Uncomment if Gurobi or CPLEX active license and installations are there and the user intends to use either of them
+using Gurobi
 using HiGHS
+
+using Clp
+using Cbc
 
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)
 # To translate MW to GW, divide by ModelScalingFactor
 # To translate $ to $M, multiply by ModelScalingFactor^2
 # To translate $/MWh to $M/GWh, multiply by ModelScalingFactor
-const ModelScalingFactor = 1e+3
+ModelScalingFactor = 1e+3
 
 # Lower heating value of Hydrogen
 # LHV is used when defining a system-wide CO2 constraint for the joint hydrogen and electricity infrastructures (SystemCO2Constraint =2)
-const H2_LHV = 33.33 # MWh per tonne
+H2_LHV = 33.33 # MWh per tonne
 
 # Logging flag
 Log = true
 
-function find_all_to_include(dir::String, file_type::String=".jl", recursive::Bool=false)::Vector{String}
-    if recursive
-        result = String[]
-        for (root, dirs, files) in walkdir(dir)
-            append!(result, filter!(f -> occursin(file_type, f), joinpath.(root, files)))
-        end
-        return result
-    else
-        search_string = "*$(file_type)"
-        return glob(search_string, dir)
-    end
-end
+# Auxiliary logging function
+include("print_and_log.jl")
 
-function include_from_dir(dir::String, file_type::String=".jl", exclusions::Vector{String}=String[])::Nothing
-    files = find_all_to_include(dir, file_type, true)
-    files_to_exclude = String[]
-    for exclusion in exclusions
-        if isdir(exclusion)
-            # If it's a directory, remove all files in that directory
-            push!(files_to_exclude, find_all_to_include(exclusion, ".jl", true)...)
-        else
-            # Otherwise, just remove the file
-            push!(files_to_exclude, exclusion)
-        end
-    end
-    if length(files_to_exclude) > 0
-        println(" --- The following files are not being included from $dir: --- ")
-        for file in files_to_exclude
-            println("Excluding $file")
-        end
-        println(" --- End of excluded files --- ")
-    end
-    # Filter out all the files we want to exclude
-    filter!(x -> !(x in files_to_exclude), files)
-    # Include the remaining files
-    for file in files
-        include(file)
-    end
-end
-
-# We can't easily run GenX.jl because that creates a module
-# which doesn't export all the functions we need.
-# Instead, we'll include all the GenX functions and then overwrite them
-genxsubmod_path = joinpath(@__DIR__,"GenX","src")
-genx_to_exclude = [
-    joinpath(genxsubmod_path,"GenX.jl"),
-    joinpath(genxsubmod_path,"simple_operation.jl"),
-    joinpath(genxsubmod_path,"time_domain_reduction","time_domain_reduction.jl"),
-    joinpath(genxsubmod_path,"model","solve_model.jl"),
-    joinpath(genxsubmod_path,"model","generate_model.jl"),
-    joinpath(genxsubmod_path,"configure_solver"),
-    joinpath(genxsubmod_path,"write_outputs","write_capacity.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_capacityfactor.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_charging_cost.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_energy_revenue.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_net_revenue.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_nw_expansion.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_outputs.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_price.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_reliability.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_storage.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_storagedual.jl"),
-    joinpath(genxsubmod_path,"write_outputs","write_subsidy_revenue.jl"),
-    joinpath(genxsubmod_path,"model","core","emissions.jl"),
-    joinpath(genxsubmod_path,"model","policies","co2_cap.jl"),
-    joinpath(genxsubmod_path,"model","policies","cap_reserve_margin.jl"),
-    joinpath(genxsubmod_path,"model","resources","thermal","thermal_commit.jl"),
-    # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
-]
-include_from_dir(genxsubmod_path, ".jl", genx_to_exclude)
-
-# Load time domain reduction related scripts
-tdr_path = joinpath(@__DIR__,"time_domain_reduction")
-include_from_dir(tdr_path, ".jl", [joinpath(tdr_path,"PreCluster.jl")])
-
-# Extensions to GenX
-include_from_dir(joinpath(@__DIR__,"GenX_extensions"), ".jl")
-
-# Load all .jl files from the HSC directory
-include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
-
-# Load all .jl files from the LFSC directory
-include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
-
-# Load all .jl files from the core directory
-include_from_dir(joinpath(@__DIR__,"core"), ".jl")
+# Results comparison tools
+include("compare_results.jl")
 
 # Configure settings
-include_from_dir(joinpath(@__DIR__,"configure_settings"), ".jl")
+include("configure_settings/configure_settings.jl")
 
 # Configure optimizer instance
-include_from_dir(joinpath(@__DIR__,"configure_solver"), ".jl")
+include("configure_solver/configure_gurobi.jl")
+include("configure_solver/configure_highs.jl")
+include("configure_solver/configure_cplex.jl")
+include("configure_solver/configure_clp.jl")
+include("configure_solver/configure_cbc.jl")
+include("configure_solver/configure_solver.jl")
 
-# Files which involve multiple sectors
-include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
+# Load input data - GenX
+include("GenX/load_inputs/load_generators_data.jl")
+include("GenX/load_inputs/load_generators_variability.jl")
+include("GenX/load_inputs/load_network_data.jl")
+include("GenX/load_inputs/load_reserves.jl")
+include("GenX/load_inputs/load_cap_reserve_margin.jl")
+include("GenX/load_inputs/load_energy_share_requirement.jl")
+include("GenX/load_inputs/load_co2_cap.jl")
+include("GenX/load_inputs/load_period_map.jl")
+include("GenX/load_inputs/load_minimum_capacity_requirement.jl")
+include("GenX/load_inputs/load_load_data.jl")
+include("GenX/load_inputs/load_fuels_data.jl")
+include("GenX/load_inputs/load_inputs.jl")
 
-# Files which involve multiple sectors
-include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
+# Load time domain reduction related scripts
+include("time_domain_reduction/time_domain_reduction.jl")
+
+#Load input data - HSC
+include("HSC/load_inputs/load_h2_gen.jl")
+include("HSC/load_inputs/load_h2_demand.jl")
+include("HSC/load_inputs/load_h2_generators_variability.jl")
+include("HSC/load_inputs/load_h2_pipeline_data.jl")
+include("HSC/load_inputs/load_h2_truck.jl")
+include("HSC/load_inputs/load_h2_inputs.jl")
+include("HSC/load_inputs/load_co2_cap_hsc.jl")
+include("HSC/load_inputs/load_h2_g2p.jl")
+include("HSC/load_inputs/load_h2_g2p_variability.jl")
+
+#Load input data - CSC
+include("CSC/load_inputs/load_co2_inputs.jl")
+include("CSC/load_inputs/load_co2_capture_DAC.jl")
+include("CSC/load_inputs/load_co2_capture_DAC_variability.jl")
+include("CSC/load_inputs/load_co2_storage.jl")
+include("CSC/load_inputs/load_co2_capture_compression.jl")
+include("CSC/load_inputs/load_co2_pipeline_data.jl")
+
+#Load input data - syn fuels
+include("SynFuels/load_inputs/load_syn_fuels_inputs.jl")
+include("SynFuels/load_inputs/load_syn_fuels_resources.jl")
+include("SynFuels/load_inputs/load_liquid_fuel_demand.jl")
+
+#Load input data - BESC
+include("BESC/load_inputs/load_bio_inputs.jl")
+include("BESC/load_inputs/load_bio_refinery.jl")
+include("BESC/load_inputs/load_bio_supply.jl")
+include("BESC/load_inputs/load_bio_ethanol_demand.jl")
+
+
+#Core GenX Features
+include("GenX/model/core/discharge/discharge.jl")
+include("GenX/model/core/discharge/investment_discharge.jl")
+include("GenX/model/core/non_served_energy.jl")
+include("GenX/model/core/ucommit.jl")
+include("GenX/model/core/reserves.jl")
+include("GenX/model/core/transmission.jl")
+include("GenX/model/core/emissions_power.jl")
+include("GenX/model/resources/curtailable_variable_renewable/curtailable_variable_renewable.jl")
+include("GenX/model/resources/flexible_demand/flexible_demand.jl")
+include("GenX/model/resources/hydro/hydro_res.jl")
+include("GenX/model/resources/hydro/hydro_inter_period_linkage.jl")
+include("GenX/model/resources/must_run/must_run.jl")
+include("GenX/model/resources/storage/storage.jl")
+include("GenX/model/resources/storage/investment_energy.jl")
+include("GenX/model/resources/storage/storage_all.jl")
+include("GenX/model/resources/storage/long_duration_storage.jl")
+include("GenX/model/resources/storage/investment_charge.jl")
+include("GenX/model/resources/storage/storage_asymmetric.jl")
+include("GenX/model/resources/storage/storage_symmetric.jl")
+
+include("GenX/model/resources/thermal/thermal.jl")
+include("GenX/model/resources/thermal/thermal_commit.jl")
+include("GenX/model/resources/thermal/thermal_no_commit.jl")
+
+include("GenX/model/policies/co2_cap_power.jl")
+include("GenX/model/policies/energy_share_requirement.jl")
+include("GenX/model/policies/cap_reserve_margin.jl")
+include("GenX/model/policies/minimum_capacity_requirement.jl")
+
+#Core HSC Modelling Features
+include("HSC/model/core/h2_investment.jl")
+include("HSC/model/core/h2_outputs.jl")
+include("HSC/model/core/h2_non_served.jl")
+
+include("HSC/model/flexible_demand/h2_flexible_demand.jl")
+include("HSC/model/core/emissions_hsc.jl")
+
+# H2 production
+include("HSC/model/generation/h2_production_commit.jl")
+include("HSC/model/generation/h2_production_no_commit.jl")
+include("HSC/model/generation/h2_production_all.jl")
+include("HSC/model/generation/h2_production.jl")
+
+# H2 pipelines
+include("HSC/model/transmission/h2_pipeline.jl")
+
+# H2 trucks
+include("HSC/model/truck/h2_truck_investment.jl")
+include("HSC/model/truck/h2_truck.jl")
+include("HSC/model/truck/h2_truck_all.jl")
+include("HSC/model/truck/h2_long_duration_truck.jl")
+
+# H2 storage
+include("HSC/model/storage/h2_storage_investment_energy.jl")
+include("HSC/model/storage/h2_storage_investment_charge.jl")
+include("HSC/model/storage/h2_storage.jl")
+include("HSC/model/storage/h2_storage_all.jl")
+include("HSC/model/storage/h2_long_duration_storage.jl")
+
+# H2 G2P
+include("HSC/model/g2p/h2_g2p_investment.jl")
+include("HSC/model/g2p/h2_g2p_discharge.jl")
+include("HSC/model/g2p/h2_g2p_all.jl")
+include("HSC/model/g2p/h2_g2p_commit.jl")
+include("HSC/model/g2p/h2_g2p_no_commit.jl")
+include("HSC/model/g2p/h2_g2p.jl")
+
+# Policies
+include("HSC/model/policies/co2_cap_hsc.jl")
+include("HSC/model/policies/green_h2_share_requirement.jl")
+
+
+#Core CSC Modelling Features
+include("CSC/model/core/DAC_investment.jl")
+include("CSC/model/core/DAC_var_cost.jl")
+include("CSC/model/core/emissions_csc.jl")
+
+# CO2 Capture
+include("CSC/model/capture/co2_capture.jl")
+include("CSC/model/capture/co2_capture_DAC.jl")
+
+# CO2 Storage
+include("CSC/model/storage/co2_storage_investment.jl")
+include("CSC/model/storage/co2_injection.jl")
+
+# CO2 Compression
+include("CSC/model/compression/co2_capture_compression_investment.jl")
+include("CSC/model/compression/co2_capture_compression.jl")
+
+# CO2 Pipeline
+include("CSC/model/transmission/co2_pipeline.jl")
+
+#Syn Fuels
+include("SynFuels/model/core/syn_fuel_investment.jl")
+include("SynFuels/model/core/liquid_fuel_emissions.jl")
+include("SynFuels/model/core/syn_fuel_outputs.jl")
+
+include("SynFuels/model/demand/liquid_fuel_demand.jl")
+include("SynFuels/model/resources/syn_fuel_resources.jl")
+
+#Core BESC Modelling Features
+include("BESC/model/core/biorefinery_investment.jl")
+include("BESC/model/core/biorefinery.jl")
+include("BESC/model/core/biorefinery_var_cost.jl")
+include("BESC/model/core/emissions_besc.jl")
+
+#Biomass Supplies
+include("BESC/model/supply/bio_herb_supply.jl")
+include("BESC/model/supply/bio_wood_supply.jl")
 
 # Load model generation and solving scripts
-include(joinpath(@__DIR__,"generate_model.jl"))
-include(joinpath(@__DIR__, "solve_model.jl"))
+include("co2_cap_power_hsc.jl")
+include("generate_model.jl")
+include("solve_model.jl")
+
+
+# Write GenX Outputs
+include("GenX/write_outputs/dftranspose.jl")
+include("GenX/write_outputs/write_capacity.jl")
+include("GenX/write_outputs/write_charge.jl")
+include("GenX/write_outputs/write_charging_cost.jl")
+include("GenX/write_outputs/write_costs.jl")
+include("GenX/write_outputs/write_curtailment.jl")
+include("GenX/write_outputs/write_emissions.jl")
+include("GenX/write_outputs/write_energy_revenue.jl")
+include("GenX/write_outputs/write_net_revenue.jl")
+include("GenX/write_outputs/write_nse.jl")
+include("GenX/write_outputs/write_power.jl")
+include("GenX/write_outputs/write_power_balance.jl")
+include("GenX/write_outputs/write_price.jl")
+include("GenX/write_outputs/write_reliability.jl")
+include("GenX/write_outputs/write_status.jl")
+include("GenX/write_outputs/write_storage.jl")
+include("GenX/write_outputs/write_storagedual.jl")
+include("GenX/write_outputs/write_subsidy_revenue.jl")
+include("GenX/write_outputs/write_time_weights.jl")
+include("GenX/write_outputs/choose_output_dir.jl")
+
+include("GenX/write_outputs/capacity_reserve_margin/write_capacity_value.jl")
+include("GenX/write_outputs/capacity_reserve_margin/write_reserve_margin_revenue.jl")
+include("GenX/write_outputs/capacity_reserve_margin/write_reserve_margin_w.jl")
+include("GenX/write_outputs/capacity_reserve_margin/write_reserve_margin.jl")
+
+include("GenX/write_outputs/energy_share_requirement/write_esr_prices.jl")
+include("GenX/write_outputs/energy_share_requirement/write_esr_revenue.jl")
+
+include("GenX/write_outputs/long_duration_storage/write_opwrap_lds_dstor.jl")
+include("GenX/write_outputs/long_duration_storage/write_opwrap_lds_stor_init.jl")
+
+include("GenX/write_outputs/reserves/write_reg.jl")
+include("GenX/write_outputs/reserves/write_rsv.jl")
+
+include("GenX/write_outputs/transmission/write_nw_expansion.jl")
+include("GenX/write_outputs/transmission/write_transmission_flows.jl")
+include("GenX/write_outputs/transmission/write_transmission_losses.jl")
+
+include("GenX/write_outputs/ucommit/write_commit.jl")
+include("GenX/write_outputs/ucommit/write_shutdown.jl")
+include("GenX/write_outputs/ucommit/write_start.jl")
+
+include("GenX/write_outputs/write_costs_system.jl")
+
+include("GenX/write_outputs/write_power_plant_emissions.jl")
+
+include("GenX/write_outputs/write_outputs.jl")
+
+# HSC Write Outputs
+include("HSC/write_outputs/write_h2_gen.jl")
+include("HSC/write_outputs/write_h2_capacity.jl")
+include("HSC/write_outputs/write_h2_nse.jl")
+include("HSC/write_outputs/write_h2_costs.jl")
+include("HSC/write_outputs/write_h2_balance.jl")
+include("HSC/write_outputs/write_h2_balance_zone.jl")
+include("HSC/write_outputs/write_h2_balance_dual.jl")
+include("HSC/write_outputs/write_h2_pipeline_flow.jl")
+include("HSC/write_outputs/write_h2_pipeline_expansion.jl")
+include("HSC/write_outputs/write_h2_pipeline_level.jl")
+include("HSC/write_outputs/write_h2_emissions.jl")
+include("HSC/write_outputs/write_h2_charge.jl")
+include("HSC/write_outputs/write_h2_storage.jl")
+include("HSC/write_outputs/write_h2_truck_capacity.jl")
+include("HSC/write_outputs/write_h2_truck_flow.jl")
+include("HSC/write_outputs/write_h2_transmission_flow.jl")
+include("HSC/write_outputs/write_HSC_outputs.jl")
+include("HSC/write_outputs/write_p_g2p.jl")
+include("HSC/write_outputs/write_h2_g2p.jl")
+include("HSC/write_outputs/write_g2p_capacity.jl")
+include("HSC/write_outputs/write_HSC_LCOH.jl")
+
+# CSC Write Outputs
+include("CSC/write_outputs/write_co2_capture_capacity.jl")
+include("CSC/write_outputs/write_CSC_outputs.jl")
+include("CSC/write_outputs/write_CSC_costs.jl")
+include("CSC/write_outputs/write_co2_storage_capacity.jl")
+include("CSC/write_outputs/write_co2_total_injection.jl")
+include("CSC/write_outputs/write_co2_pipeline_flow.jl")
+include("CSC/write_outputs/write_co2_pipeline_expansion.jl")
+include("CSC/write_outputs/write_co2_emission_balance_zone.jl")
+include("CSC/write_outputs/write_co2_storage_balance.jl")
+include("CSC/write_outputs/write_co2_storage_balance_zone.jl")
+include("CSC/write_outputs/write_co2_emission_balance_system.jl")
+include("CSC/write_outputs/write_co2_balance_dual.jl")
+
+#Write SynFuel Outputs
+include("SynFuels/write_outputs/write_synfuel_outputs.jl")
+include("SynFuels/write_outputs/write_liquid_fuel_demand_balance.jl")
+include("SynFuels/write_outputs/write_liquid_fuel_balance_dual.jl")
+include("SynFuels/write_outputs/write_synfuel_balance.jl")
+include("SynFuels/write_outputs/write_synfuel_capacity.jl")
+include("SynFuels/write_outputs/write_synfuel_costs.jl")
+include("SynFuels/write_outputs/write_synfuel_gen.jl")
+include("SynFuels/write_outputs/write_synfuel_emissions.jl")
+
+# BESC Write Outputs
+include("BESC/write_outputs/write_BESC_outputs.jl")
+include("BESC/write_outputs/write_BESC_costs.jl")
+include("BESC/write_outputs/write_bio_plant_capacity.jl")
+include("BESC/write_outputs/write_bio_zone_bioelectricity_produced.jl")
+include("BESC/write_outputs/write_bio_zone_biohydrogen_produced.jl")
+include("BESC/write_outputs/write_bio_zone_biodiesel_produced.jl")
+include("BESC/write_outputs/write_bio_zone_biojetfuel_produced.jl")
+include("BESC/write_outputs/write_bio_zone_biogasoline_produced.jl")
+include("BESC/write_outputs/write_bio_zone_bioethanol_produced.jl")
+include("BESC/write_outputs/write_bio_zone_herb_consumed.jl")
+include("BESC/write_outputs/write_bio_zone_wood_consumed.jl")
 
 end

@@ -26,8 +26,6 @@ function load_h2_pipeline_data(
     inputs_nw::Dict,
 )
 
-    Z = inputs_nw["Z"]
-
     # Network zones inputs and Network topology inputs
     pipeline_var = DataFrame(
         CSV.File(string(path, sep, "HSC_pipelines.csv"), header = true),
@@ -36,7 +34,7 @@ function load_h2_pipeline_data(
 
     # Number of H2 Pipelines = L
     inputs_nw["H2_P"] = size(collect(skipmissing(pipeline_var[!, :H2_Pipelines])), 1)
- 
+
     # Find first column of pipe map table
     start = findall(s -> s == "z1", names(pipeline_var))[1]
 
@@ -134,7 +132,7 @@ function load_h2_pipeline_data(
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
         )
 
-    print_and_log(" -- HSC_pipelines.csv Successfully Read!")
+    print_and_log("HSC_pipelines.csv Successfully Read!")
 
     return inputs_nw
 end

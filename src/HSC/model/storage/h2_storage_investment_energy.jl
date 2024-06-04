@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-    h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
+	h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
 This function defines the expressions and constraints keeping track of total available storage energy capacity as well as constraints on capacity retirements. 
 The function also adds investment and fixed OM costs related to energy capacity to the objective function.
@@ -24,7 +24,7 @@ The total energy capacity of storage resource is defined as the sum of the exist
 
 ```math
 \begin{equation*}
-    y_{s,z}^{\textrm{H,ENE,total}} = y_{s,z}^{\textrm{H,ENE,existing}} + y_{s,z}^{\textrm{H,ENE,new}} - y_{s,z}^{\textrm{H,ENE,retired}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	y_{s,z}^{\textrm{H,ENE,total}} = y_{s,z}^{\textrm{H,ENE,existing}} + y_{s,z}^{\textrm{H,ENE,new}} - y_{s,z}^{\textrm{H,ENE,retired}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
@@ -33,7 +33,7 @@ The total energy capacity of storage resource is defined as the sum of the exist
 In addition, this module adds investment and fixed OM costs related to energy capacity to the objective function:
 ```math
 \begin{equation*}
-    \sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{H,ENE,INV}} \times y_{s,z}^{\textrm{H,ENE,new}} + \textrm{c}_{s,z}^{\textrm{H,ENE,FOM}} \times y_{y,z}^{\textrm{H,ENE,total}})
+	\sum_{s \in \mathcal{S}} \sum_{z \in \mathcal{Z}} (c_{s,z}^{\textrm{H,ENE,INV}} \times y_{s,z}^{\textrm{H,ENE,new}} + \textrm{c}_{s,z}^{\textrm{H,ENE,FOM}} \times y_{y,z}^{\textrm{H,ENE,total}})
 \end{equation*}
 ```
 
@@ -42,20 +42,20 @@ In addition, this module adds investment and fixed OM costs related to energy ca
 One cannot retire more capacity than existing capacity.
 ```math
 \begin{equation*}
-    0 \leq y_{s,z}^{\textrm{H,ENE,retired}} \leq y_{s,z}^{\textrm{H,ENE,existing}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	0 \leq y_{s,z}^{\textrm{H,ENE,retired}} \leq y_{s,z}^{\textrm{H,ENE,existing}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation*}
 ```
 
 For storage resources where upper bound $\overline{R_{s,z}^{\textrm{H,ENE}}}$ and lower bound $\underline{R_{s,z}^{\textrm{H,ENE}}}$ is defined, then we impose constraints on minimum and maximum storage energy capacity.
 ```math
 \begin{equation*}
-    \underline{R_{s,z}^{\textrm{H,ENE}}} \leq y_{s,z}^{\textrm{H,ENE}} \leq \overline{R_{s,z}^{\textrm{H,ENE}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
+	\underline{R_{s,z}^{\textrm{H,ENE}}} \leq y_{s,z}^{\textrm{H,ENE}} \leq \overline{R_{s,z}^{\textrm{H,ENE}}} \quad \forall s \in \mathcal{S}, z \in \mathcal{Z}
 \end{equation*}
 ```
 """
 function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log(" -- H2 Storage Energy Investment Module")
+    print_and_log("H2 Storage Energy Investment Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

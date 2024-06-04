@@ -22,7 +22,7 @@ This function establishes constraints that can be flexibily applied to define al
 	"""
 function green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 
-	print_and_log(" -- Green H2 Share Requirement Policies Module")
+	print_and_log("Green H2 Share Requirement Policies Module")
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -55,8 +55,6 @@ function green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 		end
 
 	end
-
-
 
 	return EP
 end

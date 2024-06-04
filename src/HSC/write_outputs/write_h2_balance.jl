@@ -35,24 +35,14 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	dfH2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 16)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", #1
-	           "Flexible_Demand_Defer", #2
-			   "Flexible_Demand_Satisfy", # 3
-			   "Storage Discharging",#4
-			    "Storage Charging", #5
-               "Nonserved_Energy",#6
-			   "H2_Pipeline_Import/Export", # 7
-			   "H2_Truck_Import/Export",# 8
-			   "Truck Consumption", #9
-			   "H2G2P", # 10
-	           "Demand",#11 
-			   "Liquid_Generation",# 12 
-			   "Liquid_Demand", #13
-			   "Evaporation",# 14 
-			   "Biohydrogen",#15 
-			   "Synfuel Consumption"] # 16] 
-
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 13)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation",
+	           "Flexible_Demand_Defer", "Flexible_Demand_Satisfy",
+			   "Storage Discharging", "Storage Charging",
+               "Nonserved_Energy",
+			   "H2_Pipeline_Import/Export",
+			   "H2_Truck_Import/Export","Truck Consumption","H2G2P",
+	           "Demand", "Biohydrogen","Synfuel Consumption"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			if !isempty(inputs["H2_GEN_COMMIT"])
@@ -60,7 +50,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 			else
 				dfTemp1[t+rowoffset,1]= value.(EP[:eH2GenNoCommit][t,z])
 			end
-			
 	     	dfTemp1[t+rowoffset,2] = 0
             dfTemp1[t+rowoffset,3] = 0
 			dfTemp1[t+rowoffset,4] = 0
@@ -98,29 +87,21 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,10] = 0
 			end
 
-			dfTemp1[t+rowoffset,11] = -inputs["H2_D"][t,z]
+	     	dfTemp1[t+rowoffset,11] = -inputs["H2_D"][t,z]
 
-            if setup["ModelH2Liquid"] == 1
-                dfTemp1[t+rowoffset,12] = sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_LIQ].>0) .&  (dfH2Gen[!,:H2_LIQ].<3) .& (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
-				dfTemp1[t+rowoffset,13] = -inputs["H2_D_L"][t,z]
-				dfTemp1[t+rowoffset,14] = sum(value.(EP[:vH2Gen][dfH2Gen[(dfH2Gen[!,:H2_LIQ].>2) .&  (dfH2Gen[!,:Zone].==z),:][!,:R_ID],t]))
-            else
-                dfTemp1[t+rowoffset,12] = 0
-				dfTemp1[t+rowoffset,13] = 0
-				dfTemp1[t+rowoffset,14] = 0
+
+			dfTemp1[t+rowoffset,12] = 0
+			
+			if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
+				dfTemp1[t+rowoffset,12] = value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone][t,z]) - value.(EP[:eScaled_BioH2_consumption_per_time_per_zone][t,z])
 			end
 
-			if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
-				dfTemp1[t+rowoffset,15] = value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone][t,z]) - value.(EP[:eScaled_BioH2_consumption_per_time_per_zone][t,z])
-			else
-				dfTemp1[t+rowoffset,15] = 0
 			
-			end 
 
-			if setup["ModelLiquidFuels"] == 1
-				dfTemp1[t+rowoffset,16] = - value.(EP[:eSynFuelH2Cons][t,z])
+			if setup["ModelSynFuels"] == 1
+				dfTemp1[t+rowoffset,13] = - value.(EP[:eSynFuelH2Cons][t,z])
 			else
-				dfTemp1[t+rowoffset,16] = 0
+				dfTemp1[t+rowoffset,13] = 0
 			end
 
 	   	end
@@ -131,11 +112,9 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 		    dfH2Balance = hcat(dfH2Balance, dfTemp1)
 		end
 	end
-
 	for c in 2:size(dfH2Balance,2)
 		dfH2Balance[rowoffset,c]=sum(inputs["omega"].*dfH2Balance[(rowoffset+1):size(dfH2Balance,1),c])
 	end
-
 	dfH2Balance = DataFrame(dfH2Balance, :auto)
 	CSV.write(string(path,sep,"HSC_h2_balance.csv"), dfH2Balance, writeheader=false)
 end

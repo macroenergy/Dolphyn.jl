@@ -44,6 +44,80 @@ Model settings parameters are specified in a `GenX_Settings.yml` file which shou
 |MinCapReq | Minimum technology carve out requirement constraints.|
 || 1 = if one or more minimum technology capacity constraints are specified|
 || 0 = otherwise|
+|**Solution strategy and outputs**||
+|Solver | Solver name is case sensitive (CPLEX, Gurobi, clp). |
+|ParameterScale | Flag to turn on parameter scaling wherein load, capacity and power variables defined in GW rather than MW. This flag aides in improving the computational performance of the model. |
+||1 = Scaling is activated. |
+||0 = Scaling is not activated. |
+|WriteShadowPrices | Get dual of various model related constraints, including to estimate electricity prices, stored value of energy and the marginal CO2 prices.|
+|**Miscellaneous**|
+|PrintModel | Flag for printnig the model equations as .lp file.|
+||1= including the model equation as an output|
+||0 for the model equation not being included as an output|
+|MacOrWindows | Set to either Mac (also works for Linux) or Windows to ensure use of proper file directory separator \ or /.|
+
+Additionally, Solver related settings parameters are specified in the appropriate solver settings .yml file (e.g. `gurobi_settings.yml` or `cplex_settings.yml`), which should be located in the current working directory (or to specify an alternative location, edit the `solver_settings_path` variable in your Run.jl file). Note that GenX supplies default settings for most solver settings in the various solver-specific functions found in the /src/configure_solver/ directory. To overwrite default settings, you can specify the below Solver specific settings. Note that appropriate solver settings are specific to each solver.
+
+###### Table 1b: Summary of the Solver settings parameters
+---
+|**Settings Parameter** | **Description**|
+| :------------ | :-----------|
+|**Solver settings**||
+|Method | Algorithm used to solve continuous models or the root node of a MIP model. Generally, barrier method provides the fastest run times for real-world problem set.|
+|| CPLEX: CPX\_PARAM\_LPMETHOD - Default = 0; See [link](https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-algorithm-continuous-linear-problems) for more specifications.|
+|| Gurobi: Method - Default = -1; See [link](https://www.gurobi.com/documentation/8.1/refman/method.html) for more specifications.|
+|| clp: SolveType - Default = 5; See [link](https://www.coin-or.org/Doxygen/Clp/classClpSolve.html) for more specifications.|
+|BarConvTol | Convergence tolerance for barrier algorithm.|
+|| CPLEX: CPX\_PARAM\_BAREPCOMP - Default = 1e-8; See [link](https://www.ibm.com/docs/en/icos/12.8.0.0?topic=parameters-convergence-tolerance-lp-qp-problems) for more specifications.|
+|| Gurobi: BarConvTol - Default = 1e-8; See [link](https://www.gurobi.com/documentation/8.1/refman/barconvtol.html)link for more specifications.|
+|Feasib\_Tol | All constraints must be satisfied as per this tolerance. Note that this tolerance is absolute.|
+|| CPLEX: CPX\_PARAM\_EPRHS - Default = 1e-6; See [link](https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-feasibility-tolerance) for more specifications.|
+|| Gurobi: FeasibilityTol - Default = 1e-6; See [link](https://www.gurobi.com/documentation/9.1/refman/feasibilitytol.html) for more specifications.|
+|| clp: PrimalTolerance - Default = 1e-7; See [link](https://www.coin-or.org/Clp/userguide/clpuserguide.html) for more specifications.|
+|| clp: DualTolerance - Default = 1e-7; See [link](https://www.coin-or.org/Clp/userguide/clpuserguide.html) for more specifications.|
+|Optimal\_Tol | Reduced costs must all be smaller than Optimal\_Tol in the improving direction in order for a model to be declared optimal.|
+|| CPLEX: CPX\_PARAM\_EPOPT - Default = 1e-6; See [link](https://www.ibm.com/docs/en/icos/12.8.0.0?topic=parameters-optimality-tolerance) for more specifications.|
+|| Gurobi: OptimalityTol - Default = 1e-6; See [link](https://www.gurobi.com/documentation/8.1/refman/optimalitytol.html) for more specifications.|
+|Pre\_Solve | Controls the presolve level.|
+|| Gurobi: Presolve - Default = -1; See [link](https://www.gurobi.com/documentation/8.1/refman/presolve.html) for more specifications.|
+|| clp: PresolveType - Default = 5; See [link](https://www.coin-or.org/Doxygen/Clp/classClpSolve.html) for more specifications.|
+|Crossover | Determines the crossover strategy used to transform the interior solution produced by barrier algorithm into a basic solution.|
+|| CPLEX: CPX\_PARAM\_SOLUTIONTYPE - Default = 2; See [link](https://www.ibm.com/docs/en/icos/12.8.0.0?topic=parameters-optimality-tolerance) for more specifications.|
+|| Gurobi: Crossover - Default = 0; See [link](https://www.gurobi.com/documentation/9.1/refman/crossover.html#:~:text=Use%20value%200%20to%20disable,interior%20solution%20computed%20by%20barrier.) for more specifications.|
+|NumericFocus | Controls the degree to which the code attempts to detect and manage numerical issues.|
+|| CPLEX: CPX\_PARAM\_NUMERICALEMPHASIS - Default = 0; See [link](https://www.ibm.com/docs/en/icos/12.8.0.0?topic=parameters-numerical-precision-emphasis) for more specifications.|
+|| Gurobi: NumericFocus - Default = 0; See [link](https://www.gurobi.com/documentation/9.1/refman/numericfocus.html) for more specifications.|
+|TimeLimit | Time limit to terminate the solution algorithm, model could also terminate if it reaches MIPGap before this time.|
+|| CPLEX: CPX\_PARAM\_TILIM- Default = 1e+75; See [link](https://www.ibm.com/docs/en/icos/12.8.0.0?topic=parameters-optimizer-time-limit-in-seconds) for more specifications.|
+|| Gurobi: TimeLimit - Default = infinity; See [link](https://www.gurobi.com/documentation/9.1/refman/timelimit.html) for more specifications.|
+|| clp: MaximumSeconds - Default = -1; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|MIPGap | Optimality gap in case of mixed-integer program.|
+|| CPLEX: CPX\_PARAM\_EPGAP- Default = 1e-4; See [link](https://www.ibm.com/docs/en/icos/20.1.0?topic=parameters-relative-mip-gap-tolerance) for more specifications.|
+|| Gurobi: MIPGap - Default = 1e-4; See [link](https://www.gurobi.com/documentation/9.1/refman/mipgap2.html) for more specifications.|
+|DualObjectiveLimit | When using dual simplex (where the objective is monotonically changing), terminate when the objective exceeds this limit.|
+|| clp: DualObjectiveLimit - Default = 1e308; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|MaximumIterations | Terminate after performing this number of simplex iterations.|
+|| clp: MaximumIterations - Default = 2147483647; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|LogLevel | Set to 1, 2, 3, or 4 for increasing output. Set to 0 to disable output.|
+|| clp: logLevel - Default = 1; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|| cbc: logLevel - Default = 1; See [link](https://www.coin-or.org/Doxygen/Cbc/classCbcModel.html#a244a08213674ce52ddcf33ab4ff53380a185d42e67d2c4cb7b79914c0ed322b5f) for more specifications.|
+|InfeasibleReturn | Set to 1 to return as soon as the problem is found to be infeasible (by default, an infeasibility proof is computed as well).|
+|| clp: InfeasibleReturn - Default = 0; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|Scaling | Sets or unsets scaling; 0 -off, 1 equilibrium, 2 geometric, 3 auto, 4 dynamic(later).|
+|| clp: Scaling - Default = 3; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|Perturbation | Perturbs problem; Switch on perturbation (50), automatic (100), don't try perturbing (102).|
+|| clp: Perturbation - Default = 3; See [link](https://www.coin-or.org/Doxygen/Clp/classClpModel.html) for more specifications.|
+|maxSolutions | Terminate after this many feasible solutions have been found.|
+|| cbc: maxSolutions - Default = -1; See [link](https://www.coin-or.org/Doxygen/Cbc/classCbcModel.html#a244a08213674ce52ddcf33ab4ff53380a185d42e67d2c4cb7b79914c0ed322b5f) for more specifications.|
+|maxNodes | Terminate after this many branch-and-bound nodes have been evaluated|
+|| cbc: maxNodes - Default = -1; See [link](https://www.coin-or.org/Doxygen/Cbc/classCbcModel.html#a244a08213674ce52ddcf33ab4ff53380a185d42e67d2c4cb7b79914c0ed322b5f) for more specifications.|
+| allowableGap | Terminate after optimality gap is less than this value (on an absolute scale)|
+|| cbc: allowableGap - Default = -1; See [link](https://www.coin-or.org/Doxygen/Cbc/classCbcModel.html#a244a08213674ce52ddcf33ab4ff53380a185d42e67d2c4cb7b79914c0ed322b5f) for more specifications.|
+|ratioGap | Terminate after optimality gap is smaller than this relative fraction.|
+|| cbc: ratioGap - Default = Inf; See [link](https://www.coin-or.org/Doxygen/Cbc/classCbcModel.html#a244a08213674ce52ddcf33ab4ff53380a185d42e67d2c4cb7b79914c0ed322b5f) for more specifications.|
+|threads | Set the number of threads to use for parallel branch & bound.|
+|| cbc: threads - Default = 1; See [link](https://www.coin-or.org/Doxygen/Cbc/classCbcModel.html#a244a08213674ce52ddcf33ab4ff53380a185d42e67d2c4cb7b79914c0ed322b5f) for more specifications.|
+
 
 ## 2 Inputs
 
@@ -76,7 +150,7 @@ All input files are in CSV format. Running the GenX submodule requires a minimum
 
 • **Second row:** The second row specifies the CO$_2$ emissions intensity of each fuel in tons/MMBtu (million British thermal units). Note that by convention, tons correspond to metric tonnes and not short tons (although as long as the user is internally consistent in their application of units, either can be used).
 
-• **Remaining rows:** Rest of the rows in this input file specify the time-series for prices for each fuel in \$/MMBtu. A constant price can be specified by entering the same value for all hours.
+• **Remaining rows:** Rest of the rows in this input file specify the time-series for prices for each fuel in $/MMBtu. A constant price can be specified by entering the same value for all hours.
 
 * ** First column:** The first column in this file denotes, Time\_index, represents the index of time steps in a model instance.
 
@@ -120,7 +194,7 @@ This file includes parameters to characterize model temporal resolution to appro
 |**Column Name** | **Description**|
 | :------------ | :-----------|
 |**Mandatory Columns**|
-|Voll |Value of lost load in \$/MWh.|
+|Voll |Value of lost load in $/MWh.|
 |Demand\_Segment |Number of demand curtailment/lost load segments with different cost and capacity of curtailable demand for each segment. User-specified demand segments. Integer values starting with 1 in the first row. Additional segements added in subsequent rows.|
 |Cost\_of\_Demand\_Curtailment\_per\_MW |Cost of non-served energy/demand curtailment (for each segment), reported as a fraction of value of lost load. If *Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length equal to the length of Demand\_Segment.|
 |Max\_Demand\_Curtailment| Maximum time-dependent demand curtailable in each segment, reported as % of the demand in each zone and each period. *If Demand\_Segment = 1*, then this parameter is a scalar and equal to one. In general this parameter is a vector of length given by length of Demand\_segment.|
@@ -193,14 +267,14 @@ This file contains cost and performance parameters for various generators and ot
 |Min\_Cap\_MWh| -1 (default) – no limit on minimum energy capacity of the resource. If non-negative, represents minimum allowed energy capacity (in MWh) of the resource with `STOR = 1` or `STOR = 2`.|
 |Min\_Charge\_Cap\_MW |-1 (default) – no limit on minimum charge capacity of the resource. If non-negative, represents minimum allowed charge capacity (in MW) of the resource with `STOR = 2`.|
 |**Cost parameters**|
-|Inv\_Cost\_per\_MWyr | Annualized capacity investment cost of a technology (\$/MW/year). |
-|Inv\_Cost\_per\_MWhyr | Annualized investment cost of the energy capacity for a storage technology (\$/MW/year), applicable to either `STOR = 1` or `STOR = 2`. |
-|Inv\_Cost\_Charge\_per\_MWyr | Annualized capacity investment cost for the charging portion of a storage technology with `STOR = 2` (\$/MW/year). |
-|Fixed\_OM\_Cost\_per\_MWy | Fixed operations and maintenance cost of a technology (\$/MW/year). |
-|Fixed\_OM\_Cost\_per\_MWhyr | Fixed operations and maintenance cost of the energy component of a storage technology (\$/MWh/year). |
+|Inv\_Cost\_per\_MWyr | Annualized capacity investment cost of a technology ($/MW/year). |
+|Inv\_Cost\_per\_MWhyr | Annualized investment cost of the energy capacity for a storage technology ($/MW/year), applicable to either `STOR = 1` or `STOR = 2`. |
+|Inv\_Cost\_Charge\_per\_MWyr | Annualized capacity investment cost for the charging portion of a storage technology with `STOR = 2` ($/MW/year). |
+|Fixed\_OM\_Cost\_per\_MWy | Fixed operations and maintenance cost of a technology ($/MW/year). |
+|Fixed\_OM\_Cost\_per\_MWhyr | Fixed operations and maintenance cost of the energy component of a storage technology ($/MWh/year). |
 |Fixed\_OM\_Cost\_charge\_per\_MWyr | Fixed operations and maintenance cost of the charging component of a storage technology of type `STOR = 2`. |
-|Var\_OM\_Cost\_per\_MWh | Variable operations and maintenance cost of a technology (\$/MWh). |
-|Var\_OM\_Cost\_per\_MWhIn | Variable operations and maintenance cost of the charging aspect of a storage technology with `STOR = 2`, or variable operations and maintenance costs associated with flexible demand deferral with `FLEX = 1`. Otherwise 0 (\$/MWh). |
+|Var\_OM\_Cost\_per\_MWh | Variable operations and maintenance cost of a technology ($/MWh). |
+|Var\_OM\_Cost\_per\_MWhIn | Variable operations and maintenance cost of the charging aspect of a storage technology with `STOR = 2`, or variable operations and maintenance costs associated with flexible demand deferral with `FLEX = 1`. Otherwise 0 ($/MWh). |
 |**Technical performance parameters**|
 |Heat\_Rate\_MMBTU\_per\_MWh  |Heat rate of a generator or MMBtu of fuel consumed per MWh of electricity generated for export (net of on-site house loads). The heat rate is the inverse of the efficiency: a lower heat rate is better. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
 |Fuel  |Fuel needed for a generator. The names should match with the ones in the `Fuels_data.csv`. |
@@ -228,11 +302,11 @@ This file contains cost and performance parameters for various generators and ot
 |**UCommit >= 1** | The following settings apply only to thermal plants with unit commitment constraints (`THERM = 1`).|
 |Up\_Time| Minimum amount of time a resource has to stay in the committed state.|
 |Down\_Time |Minimum amount of time a resource has to remain in the shutdown state.|
-|Start\_Cost\_per\_MW |Cost per MW of nameplate capacity to start a generator (\$/MW per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
+|Start\_Cost\_per\_MW |Cost per MW of nameplate capacity to start a generator ($/MW per start). Multiplied by the number of generation units (each with a pre-specified nameplate capacity) that is turned on.|
 |Start\_Fuel\_MMBTU\_per\_MW |Startup fuel use per MW of nameplate capacity of each generator (MMBtu/MW per start).|
 |**Reserves = 1** | The following settings apply to thermal, dispatchable VRE, hydro and storage resources|
-|Reg\_Cost |Cost of providing regulation reserves (\$/MW per time step/hour).|
-|Rsv\_Cost |Cost of providing upwards spinning or contingency reserves (\$/MW per time step/hour).|
+|Reg\_Cost |Cost of providing regulation reserves ($/MW per time step/hour).|
+|Rsv\_Cost |Cost of providing upwards spinning or contingency reserves ($/MW per time step/hour).|
 |Reg\_Max |[0,1], Fraction of nameplate capacity that can committed to provided regulation reserves. .|
 |Rsv\_Max |[0,1], Fraction of nameplate capacity that can committed to provided upwards spinning or contingency reserves.|
 |**EnergyShareRequirement > 0**||
@@ -288,7 +362,7 @@ This file includes parameter inputs needed to model time-dependent procurement o
 |Reg\_Req\_Percent\_VRE |[0,1], Regulation requirement as a percent of time-dependent wind and solar generation (summed across all model zones).|
 |Rsv\_Req\_Percent\_Load [0,1], |Spinning up or contingency reserve requirement as a percent of time-dependent load (which is summed across all zones).|
 |Rsv\_Req\_Percent\_VRE |[0,1], Spinning up or contingency reserve requirement as a percent of time-dependent wind and solar generation (which is summed across all zones).|
-|Unmet\_Rsv\_Penalty\_Dollar\_per\_MW |Penalty for not meeting time-dependent spinning reserve requirement (\$/MW per time step).|
+|Unmet\_Rsv\_Penalty\_Dollar\_per\_MW |Penalty for not meeting time-dependent spinning reserve requirement ($/MW per time step).|
 |Dynamic\_Contingency |Flags to include capacity (generation or transmission) contingency to be added to the spinning reserve requirement.|
 |Dynamic\_Contingency |= 1: contingency set to be equal to largest installed thermal unit (only applied when `UCommit = 1`).|
 ||= 2: contingency set to be equal to largest committed thermal unit each time period (only applied when `UCommit = 1`).|
@@ -542,7 +616,7 @@ This file includes the capacity revenue earned by each generator listed in the i
 
 #### 3.2.6 ESR\_prices.csv
 
-This file includes the renewable/clean energy credit price of each modeled RPS/CES constraint. GenX will print this file only when RPS/CES is modeled and the shadow price can be obtained form the solver. The unit is \$/MWh.
+This file includes the renewable/clean energy credit price of each modeled RPS/CES constraint. GenX will print this file only when RPS/CES is modeled and the shadow price can be obtained form the solver. The unit is $/MWh.
 
 
 #### 3.2.7 ESR\_Revenue.csv

@@ -23,7 +23,7 @@ For storage technologies with asymmetric charge and discharge capacities (all $s
 
 ```math
 \begin{equation*}
-    0 \leq x_{s,z,t}^{\textrm{H,CHA}} \leq y_{s,z}^{\textrm{H,STO,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
+	0 \leq x_{s,z,t}^{\textrm{H,CHA}} \leq y_{s,z}^{\textrm{H,STO,CHA}} \quad \forall s \in \mathcal{S}^{asym}, z \in \mathcal{Z}, t \in \mathcal{T}
 \end{equation*}
 ```
 """
@@ -31,7 +31,7 @@ function h2_storage_asymmetric(EP::Model, inputs::Dict)
     # Set up additional variables, constraints, and expressions associated with storage resources with asymmetric charge & discharge capacity
     # STOR = 2 corresponds to storage with distinct power and energy capacity decisions and distinct charge and discharge power capacity decisions/ratings
 
-    println(" -- H2 Storage Resources with Asmymetric Charge/Discharge Capacity Module")
+    println("H2 Storage Resources with Asmymetric Charge/Discharge Capacity Module")
 
     T = inputs["T"]     # Number of time steps (hours)
 

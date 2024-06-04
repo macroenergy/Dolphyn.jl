@@ -15,7 +15,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_capture(EP::Model, inputs::Dict, setup::Dict)
+co2_capture(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
 This module models the CO2 captured by flue gas CCS units present in power, H2, and DAC plants and adds them to the total captured CO2 balance 
 """
@@ -42,7 +42,7 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	end
 
 	#CO2 captued by power sector CCS plants
-	@expression(EP, ePower_CO2_captured_per_plant_per_time[y=1:G,t=1:T], EP[:eCO2CaptureByPlant][y,t])
+	@expression(EP, ePower_CO2_captured_per_plant_per_time[y=1:G,t=1:T], dfGen[!,:CO2_captured_per_MWh][y]*EP[:vP][y,t]) #tonne/MWh = kton/GWh so no need scale
 	@expression(EP, ePower_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(ePower_CO2_captured_per_plant_per_time[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
 	@expression(EP, ePower_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(ePower_CO2_captured_per_plant_per_time[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
 	

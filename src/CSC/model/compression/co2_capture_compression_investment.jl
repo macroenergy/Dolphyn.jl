@@ -15,32 +15,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict)
+    co2_capture_compression_investment(EP::Model, inputs::Dict, UCommit::Int, Reserves::Int)
 
-This module defines the total fixed cost (Investment + Fixed O&M) of compressing the CO2 after capture by DAC
+This module defines the total fixed cost (Investment + Fixed O&M) of compressing the CO2 before after capture
 
-Sets up constraints common to all CO2 compression resources.
-
-This function defines the expressions and constraints keeping track of total available CO2 compression capacity $y_{k}^{\textrm{C,COMP}}$ as well as constraints on capacity.
-
-The expression defined in this file named after ```vCapacity\textunderscore{CO2}\textunderscore{Caputure}\textunderscore{Comp}\textunderscore{per}\textunderscore{type}``` covers all variables $y_{k}^{\textrm{C,DAC}}$.
-
-The total capacity of each CO2 compression resource is defined as the sum of newly invested capacity based on the assumption there are no existing CO2 compression resources. 
-
-**Cost expressions**
-
-This module additionally defines contributions to the objective function from investment costs of CO2 compression (fixed O\&M plus investment costs) from all resources $k \in \mathcal{K}$:
-
-```math
-\begin{equation*}
-	\textrm{C}^{\textrm{C,COMP,c}} = \sum_{k \in \mathcal{K}} \sum_{z \in \mathcal{Z}} y_{k, z}^{\textrm{C,COMP}}\times \textrm{c}_{k}^{\textrm{COMP,INV}} + \sum_{k \in \mathcal{K}} \sum_{z \in \mathcal{Z}} y_{g, z}^{\textrm{C,COMP,total}} \times \textrm{c}_{k}^{\textrm{COMP,FOM}}
-\end{equation*}
-```
 """
 function co2_capture_compression_investment(EP::Model, inputs::Dict, setup::Dict)
 	#Model the capacity and cost of compressing the CO2 after capture
 
-	println(" -- Carbon Capture Compression Cost module")
+	println("Carbon Capture Compression Cost module")
 
 	dfCO2CaptureComp = inputs["dfCO2CaptureComp"]
 	CO2_CAPTURE_COMP_ALL = inputs["CO2_CAPTURE_COMP_ALL"]

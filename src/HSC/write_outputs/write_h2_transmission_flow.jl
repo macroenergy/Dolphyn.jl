@@ -21,21 +21,23 @@ function write_h2_transmission_flow(path::AbstractString, sep::AbstractString, i
     
     Z = inputs["Z"]     # Number of zones
     T = inputs["T"]     # Number of time steps (hours)
-    
+	
     dfH2TransmissionFlow = DataFrame(Time_Index=1:T)
-    if setup["ModelH2Pipelines"] == 1
-        insertcols!(dfH2TransmissionFlow, [Symbol("H2PipeFlowToZone$z") => value.(EP[:ePipeZoneDemand][:, z]) for z in 1:Z]...)
-    else
-        insertcols!(dfH2TransmissionFlow, [Symbol("H2PipeFlowToZone$z") => zeros(T) for z in 1:Z]...)
+    for z in 1:Z
+        if setup["ModelH2Pipelines"] == 1
+            dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] = value.(EP[:ePipeZoneDemand])[:, z]
+        else
+            dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] .= 0
+        end
+
+        if setup["ModelH2Trucks"] == 1
+            dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")] = value.(EP[:eH2TruckFlow])[:, z]
+        else
+            dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")] .= 0
+        end
+
+        dfH2TransmissionFlow[!, Symbol("H2FlowToZone$z")] = dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] + dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")]
     end
 
-    if setup["ModelH2Trucks"] == 1
-        insertcols!(dfH2TransmissionFlow, [Symbol("H2TruckFlowToZone$z") => value.(EP[:eH2TruckFlow][:, z]) for z in 1:Z]...)
-    else
-        insertcols!(dfH2TransmissionFlow, [Symbol("H2TruckFlowToZone$z") => zeros(T) for z in 1:Z]...)
-    end
-
-    insertcols!(dfH2TransmissionFlow, [Symbol("H2FlowToZone$z") => dfH2TransmissionFlow[!, Symbol("H2PipeFlowToZone$z")] + dfH2TransmissionFlow[!, Symbol("H2TruckFlowToZone$z")] for z in 1:Z]...)
-
-    CSV.write(joinpath(path,  "HSC_h2_transmission_flow.csv"), dfH2TransmissionFlow, writeheader=true)
+	CSV.write(string(path,sep, "HSC_h2_transmission_flow.csv"), dfH2TransmissionFlow, writeheader=true)
 end

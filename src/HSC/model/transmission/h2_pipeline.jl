@@ -25,15 +25,22 @@ This module defines the hydrogen pipeline construction decision variable $y_{i,z
 
 This module defines the hydrogen pipeline flow decision variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen flow via pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
 
-This module defines the hydrogen pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$.
+This module defines the hydrogen pipeline storage level decision variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}} \forall i \in \mathcal{I}, z \rightarrow z^{\prime} \in \mathcal{B}, t \in \mathcal{T}$, representing hydrogen stored in pipeline of type $i$ through path $z \rightarrow z^{\prime}$ at time period $t$. This type of storage is known as "Line Packing".
 
 The variable defined in this file named after ```vH2NPipe``` covers variable $y_{i,z \rightarrow z^{\prime}}^{\textrm{H,PIP}}$.
 
-The variable defined in this file named after ```vH2PipeFlow_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP+}}$.
+Variable to track positive hydrogen flow through pipeline
+This variable tracks the positive (unidirectional) flow of hydrogen through each pipeline in each time period. It is indexed by pipeline type `i`, pipeline path `z -> z'`, and time period `t`. Along with the corresponding negative flow variable, it is used to calculate net pipeline flow. Tracks the positive hydrogen flow through the pipeline in the forward direction
+in the direction from zone z to zone z'# Variable to track positive hydrogen flow through pipeline
+Variable to track positive hydrogen flow through pipeline 
+_pos``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP+}}$.
 
 The variable defined in this file named after ```vH2PipeFlow_neg``` covers variable $x_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP-}}$.
 
 The variable defined in this file named after ```vH2PipeLevel``` covers variable $U_{i,z \rightarrow z^{\prime},t}^{\textrm{H,PIP}}$.
+
+The key to understanding how the pipeline flow works is through the expression '''eH2PipeFlow_net'''. This expression can be split up into 4 components that represent the inflow and outflow at each end of a single pipeline. For each zone that the pipeline connects, that side of the pipeline could either import hydrogen from the zone or export it into the zone. The unidirectional flow setting turns off the source side of the pipeline's ability to export hydrogen into the zone and the sink side of the pipeline's ability to import hydrogen from the zone.
+
 
 **Cost expressions**
 
@@ -70,7 +77,7 @@ The change of hydrogen pipeline storage inventory is modeled as follows:
 """
 function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log(" -- H2 Pipeline Module")
+    print_and_log("Hydrogen Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
@@ -82,11 +89,24 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     H2_P = inputs["H2_P"] # Number of Hydrogen Pipelines
     H2_Pipe_Map = inputs["H2_Pipe_Map"]
 
+    Source_H2_Pipe_Map = H2_Pipe_Map[H2_Pipe_Map.d .== 1, :]
+    Sink_H2_Pipe_Map = H2_Pipe_Map[H2_Pipe_Map.d .== -1, :]
+
     ### Variables ###
+    # Here the d index refers to the zones. +1 d refers to the source zone. -1 d refers to the destination zone.
+    # p refers to each unique pipeline
     @variable(EP, vH2NPipe[p = 1:H2_P] >= 0) # Number of Pipes
     @variable(EP, vH2PipeLevel[p = 1:H2_P, t = 1:T] >= 0) # Storage in the pipe
-    @variable(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow
-    @variable(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
+    # H2PipeFlow refers to the flow into a zone d = +/-1 (aka source(+) --> sink(-))
+    @variable(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow to zone
+    @variable(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow to zone
+
+    # Unidirectional pipeline flow constraints. hsc_pipeline inputs file must have 2 pipelines in between each zone for this to work properly (flipping the -1 and +1 directions)
+    # Constraints force the source zone to only export H2 through pipeline p while the destination zone can only import
+    if setup["H2PipeDirection"] == 1
+        @constraint(EP, vH2PipeFlow_pos[:, :, 1] .== 0)
+        @constraint(EP, vH2PipeFlow_neg[:, :, -1] .== 0)
+    end
 
 
     ### Expressions ###
@@ -99,6 +119,9 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
         eH2PipeFlow_net[p = 1:H2_P, t = 1:T, d = [-1, 1]],
         vH2PipeFlow_pos[p, t, d] - vH2PipeFlow_neg[p, t, d]
     )
+
+
+
 
     ## Objective Function Expressions ##
     # Capital cost of pipelines 
@@ -155,8 +178,8 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
             ePowerBalanceH2PipeCompression[t = 1:T, z = 1:Z],
             sum(
                 vH2PipeFlow_neg[
-                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+                    p, t, H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]   # H2_Pipe_Map[(H2_Pipe_Map[!, :Zone].==z).&(H2_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1] explanation: For each zone z and pipeline p, finds the direction of the flow of the pipeline d = +/-1
+                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no] # H2_Pipe_Map[H2_Pipe_Map[!, :Zone].==z, :][!, :pipe_no] / explanation: Finds all of the pipelines p that connect to the zone z
             ) / ModelScalingFactor
         )
     else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of H2 related power consumption

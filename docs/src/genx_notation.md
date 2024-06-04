@@ -9,7 +9,7 @@
 |$t \in \mathcal{T}^{interior}$|This set of time-coupling constraints wrap around to ensure the power output in the inner time step of each year (or each representative period)|
 |$z \in \mathcal{Z}$ | $z$ denotes a zone and $\mathcal{Z}$ is the set of zones in the network|
 |$z \rightarrow z^{\prime} \in \mathcal{B}$ | $z \rightarrow z^{\prime}$ denotes paths for different transport routes of electricity and $\mathcal{B}$ is the set of all possible routes |
-|$k \in \mathcal{K}$ | $k$ denotes a thermal generator like nuclear plant or coal-fire plant and $\mathcal{K}$ is the set of all thermal generators |
+|$k \in \mathcal{K}$ | $k$ denotes a thermal generator like nuclear plant or coal-fire plant and $\mathcal{K} is the set of all thermal generators $|
 |$r \in \mathcal{R}$ | $r$ denotes a variable renewable energy resource and $\mathcal{R}$ is the set of all renewable energy resources|
 |$s \in \mathcal{S}$ | $s$ denotes an energy storage system (ESS) and $\mathcal{S}$ is the set of all energy storage systems|
 |$s \in \mathcal{S}^{asym}$| $s$ denotes an asymmetric energy storage system (ESS) and $\mathcal{S}^{asym}$ is the set of all asymmetric energy storage systems|
@@ -48,7 +48,7 @@
 |$y_{s, z}^{\textrm{E,STO,DIS}}$| total available storage discharge capacity |
 |$y_{s, z}^{\textrm{E,STO,CHA}}$| total available storage charge capacity |
 |$y_{s, z}^{\textrm{E,STO,ENE}}$| total available storage energy capacity |
-|$\pi^{\textrm{TCAP}}_{l}$| Transmission reinforcement or construction cots for a transmission line [\$/MW-yr] |
+|$\pi^{\textrm{TCAP}}_{l}$| Transmission reinforcement or construction cots for a transmission line [$/MW-yr] |
 |$y_l^{\textrm{E,NET,new}}$|The additional transmission capacity required|
 |$y_{l}^{\textrm{E, NET, Existing}}$|The maximum power transfer capacity of a given line|
 |$n_{k,z,t}^{\textrm{E,THE}}$|the commitment state variable of generator cluster $k$ in zone $z$ at time $t$ ,$\forall k \in \mathcal{K}, z \in \mathcal{Z}, t \in \mathcal{T}$|
