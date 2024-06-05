@@ -15,11 +15,11 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-	write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_synfuel_balance_flex(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for reporting input and output balance of synthetic fuels resources across different zones with time.
 """
-function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+function write_synfuel_balance_flex(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	dfSynFuels= inputs["dfSynFuels"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
@@ -31,9 +31,9 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 	dfSFBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6 + NSFByProd)
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 15 + NSFByProd)
 		byprodHead = "ByProd_Out_" .* string.(collect(1:NSFByProd))
-	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","Power_In", "H2_In","Syn_Gasoline","Syn_Jetfuel","Syn_Diesel"], byprodHead)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","Power_In", "H2_In","Syn_Gasoline_Out","Syn_Jetfuel_Original","Syn_Diesel_Original","Syn_Gasoline_to_Jetfuel","Syn_Gasoline_to_Diesel","Syn_Jetfuel_to_Gasoline","Syn_Jetfuel_to_Diesel","Syn_Diesel_to_Gasoline","Syn_Diesel_to_Jetfuel","Syn_Gasoline_Final","Syn_Jetfuel_Final","Syn_Diesel_Final"], byprodHead)
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 	   	for t in 1:T
@@ -51,8 +51,21 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 			dfTemp1[t+rowoffset,5]= sum(value.(EP[:vSFProd_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
 			dfTemp1[t+rowoffset,6]= sum(value.(EP[:vSFProd_Diesel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
 
+			dfTemp1[t+rowoffset,7]= sum(value.(EP[:vSFGasoline_To_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,8]= sum(value.(EP[:vSFGasoline_To_Diesel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+
+			dfTemp1[t+rowoffset,9]= sum(value.(EP[:vSFJetfuel_To_Gasoline][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,10]= sum(value.(EP[:vSFJetfuel_To_Diesel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+
+			dfTemp1[t+rowoffset,11]= sum(value.(EP[:vSFDiesel_To_Gasoline][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,12]= sum(value.(EP[:vSFDiesel_To_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+
+			dfTemp1[t+rowoffset,13]= sum(value.(EP[:eSynFuelProd_Gasoline_Plant][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,14]= sum(value.(EP[:eSynFuelProd_Jetfuel_Plant][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,15]= sum(value.(EP[:eSynFuelProd_Diesel_Plant][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
+		
 			for b in 1:NSFByProd
-				dfTemp1[t+rowoffset, 6 + b] = sum(value.(EP[:vSFByProd][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],b,t]))
+				dfTemp1[t+rowoffset, 15 + b] = sum(value.(EP[:vSFByProd][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],b,t]))
 			end
 
 	   	end

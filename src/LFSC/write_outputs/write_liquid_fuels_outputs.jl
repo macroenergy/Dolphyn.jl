@@ -66,11 +66,15 @@ function write_liquid_fuels_outputs(EP::Model, genx_path::AbstractString, setup:
 
   end
 
-  
-
   if setup["ModelSyntheticFuels"] == 1
     write_synfuel_capacity(path, sep, inputs, setup, EP)
-    write_synfuel_balance(path, sep, inputs, setup, EP)
+    
+    if setup["ModelFlexSyntheticFuels"] == 1
+      write_synfuel_balance_flex(path, sep, inputs, setup, EP)
+    else
+      write_synfuel_balance(path, sep, inputs, setup, EP)
+    end
+
     #write_synfuel_gen(path, sep, inputs, setup, EP)
   end
 
