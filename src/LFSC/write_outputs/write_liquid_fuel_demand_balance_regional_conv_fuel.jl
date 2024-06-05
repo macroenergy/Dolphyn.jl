@@ -36,7 +36,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 		for t in 1:T
 
 			if setup["ModelSyntheticFuels"] == 1
-				dfTemp1_Diesel[t+rowoffset,1] = value.(EP[:eSynFuelProd_Diesel_Zone][t,z])
+				dfTemp1_Diesel[t+rowoffset,1] = value.(EP[:eSynFuelProd_Diesel][t,z])
 			else
 				dfTemp1_Diesel[t+rowoffset,1] = 0
 			end
@@ -60,7 +60,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 
 		#Calculate annual values
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1_Diesel[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Diesel_Zone][t,z]) for t in 1:T)
+			dfTemp1_Diesel[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Diesel][t,z]) for t in 1:T)
 		else
 			dfTemp1_Diesel[rowoffset,1] = 0 
 		end
@@ -95,7 +95,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 	for t in 1:T
 	
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1_Global_SB_Diesel[t+rowoffset,1] = sum(value.(EP[:eSynFuelProd_Diesel_Zone][t,z]) for z = 1:Z)
+			dfTemp1_Global_SB_Diesel[t+rowoffset,1] = sum(value.(EP[:eSynFuelProd_Diesel][t,z]) for z = 1:Z)
 		else
 			dfTemp1_Global_SB_Diesel[t+rowoffset,1] = 0
 		end
@@ -111,7 +111,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 
 	#Calculate annual values
 	if setup["ModelSyntheticFuels"] == 1
-		dfTemp1_Global_SB_Diesel[rowoffset,1] = sum(sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Diesel_Zone][t,z] for z in 1:Z)) for t in 1:T)
+		dfTemp1_Global_SB_Diesel[rowoffset,1] = sum(sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Diesel][t,z] for z in 1:Z)) for t in 1:T)
 	else
 		dfTemp1_Global_SB_Diesel[rowoffset,1] = 0 
 	end
@@ -187,7 +187,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 		for t in 1:T
 
 			if setup["ModelSyntheticFuels"] == 1
-				dfTemp1_Jetfuel[t+rowoffset,1] = value.(EP[:eSynFuelProd_Jetfuel_Zone][t,z])
+				dfTemp1_Jetfuel[t+rowoffset,1] = value.(EP[:eSynFuelProd_Jetfuel][t,z])
 			else
 				dfTemp1_Jetfuel[t+rowoffset,1] = 0
 			end
@@ -211,7 +211,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 
 		#Calculate annual values
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1_Jetfuel[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Jetfuel_Zone][t,z]) for t in 1:T)
+			dfTemp1_Jetfuel[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Jetfuel][t,z]) for t in 1:T)
 		else
 			dfTemp1_Jetfuel[rowoffset,1] = 0 
 		end
@@ -246,7 +246,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 	for t in 1:T
 	
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1_Global_SB_Jetfuel[t+rowoffset,1] = sum(value.(EP[:eSynFuelProd_Jetfuel_Zone][t,z]) for z = 1:Z)
+			dfTemp1_Global_SB_Jetfuel[t+rowoffset,1] = sum(value.(EP[:eSynFuelProd_Jetfuel][t,z]) for z = 1:Z)
 		else
 			dfTemp1_Global_SB_Jetfuel[t+rowoffset,1] = 0
 		end
@@ -262,7 +262,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 
 	#Calculate annual values
 	if setup["ModelSyntheticFuels"] == 1
-		dfTemp1_Global_SB_Jetfuel[rowoffset,1] = sum(sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Jetfuel_Zone][t,z] for z in 1:Z)) for t in 1:T)
+		dfTemp1_Global_SB_Jetfuel[rowoffset,1] = sum(sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Jetfuel][t,z] for z in 1:Z)) for t in 1:T)
 	else
 		dfTemp1_Global_SB_Jetfuel[rowoffset,1] = 0 
 	end
@@ -338,7 +338,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 		for t in 1:T
 
 			if setup["ModelSyntheticFuels"] == 1
-				dfTemp1_Gasoline[t+rowoffset,1] = value.(EP[:eSynFuelProd_Gasoline_Zone][t,z])
+				dfTemp1_Gasoline[t+rowoffset,1] = value.(EP[:eSynFuelProd_Gasoline][t,z])
 			else
 				dfTemp1_Gasoline[t+rowoffset,1] = 0
 			end
@@ -362,7 +362,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 
 		#Calculate annual values
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1_Gasoline[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Gasoline_Zone][t,z]) for t in 1:T)
+			dfTemp1_Gasoline[rowoffset,1] = sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Gasoline][t,z]) for t in 1:T)
 		else
 			dfTemp1_Gasoline[rowoffset,1] = 0 
 		end
@@ -397,7 +397,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 	for t in 1:T
 	
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1_Global_SB_Gasoline[t+rowoffset,1] = sum(value.(EP[:eSynFuelProd_Gasoline_Zone][t,z]) for z = 1:Z)
+			dfTemp1_Global_SB_Gasoline[t+rowoffset,1] = sum(value.(EP[:eSynFuelProd_Gasoline][t,z]) for z = 1:Z)
 		else
 			dfTemp1_Global_SB_Gasoline[t+rowoffset,1] = 0
 		end
@@ -413,7 +413,7 @@ function write_liquid_fuel_demand_balance_regional_conv_fuel(path::AbstractStrin
 
 	#Calculate annual values
 	if setup["ModelSyntheticFuels"] == 1
-		dfTemp1_Global_SB_Gasoline[rowoffset,1] = sum(sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Gasoline_Zone][t,z] for z in 1:Z)) for t in 1:T)
+		dfTemp1_Global_SB_Gasoline[rowoffset,1] = sum(sum(inputs["omega"][t] * value.(EP[:eSynFuelProd_Gasoline][t,z] for z in 1:Z)) for t in 1:T)
 	else
 		dfTemp1_Global_SB_Gasoline[rowoffset,1] = 0 
 	end
