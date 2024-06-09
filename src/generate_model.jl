@@ -273,6 +273,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             )
         end
 
+        if setup["ModelH2carrier"] == 1 # model hydrogen carriers
+            EP = h2_carrier(EP, inputs, setup)
+        end
+
         # Modeling Time matching requirement for electricity use for hydrogen production
 		if setup["TimeMatchingRequirement"] > 0
 			EP = time_matching_requirement(EP, inputs, setup)

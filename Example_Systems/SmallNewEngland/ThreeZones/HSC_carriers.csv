@@ -1,0 +1,3 @@
+carrier,HYD,process,lifetime (years),capex_d_p_MW_y,fom_d_p_MW_y,vom_d_MWh,carrier_loss_fraction,h2_consumption_fraction,elec_input_fraction_MWh_MWh,ng_input_MMBtu_p_MWh_H2,ramp_up_rate (fraction of nameplate capacity/hour),ramp_down_rate (fraction of nameplate capacity/hour),co_product use/production (tonne/ kWh H2),carrier_tonne_p_MWh_H2,make_up_carrier_cost_d_p_tonne,co-product_cost_revenue ($/tonne),rich_storage_capex_tonne_y,lean_storage_capex_tonne_y,max_cap_MW_H2
+LOHC,1,hyd,20,7704.1,2880.3,0,0.03,0,0.01,0,1,1,0,0.453,4000,1000,225,225,1000
+LOHC,2,dehyd,20,5778,2160.2,0,0.01,0,0.01,0.27,1,1,0,0.453,4000,1000,225,225,1000

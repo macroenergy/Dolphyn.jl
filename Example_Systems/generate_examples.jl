@@ -19,7 +19,7 @@ highs_cases = [
 ]
 
 gurobi_cases = [
-    joinpath(@__DIR__, "SmallNewEngland", "ThreeZones_Gurobi"),
+    joinpath(@__DIR__, "SmallNewEngland", "ThreeZones"),
 ]
 
 if use_TDR
@@ -36,15 +36,15 @@ if force_TDR_recluster
     println("Forcing TDR recluster")
 end
 
-for case in highs_cases
-    split_case = splitpath(case)
-    case_name = string(split_case[end-1], split_case[end])
+# for case in highs_cases
+#     split_case = splitpath(case)
+#     case_name = string(split_case[end-1], split_case[end])
 
-    println(" ------ ------ ------")
-    println("Generating model for $case_name ...")
-    generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-    println("Generated model for $case_name.")
-end
+#     println(" ------ ------ ------")
+#     println("Generating model for $case_name ...")
+#     generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+#     println("Generated model for $case_name.")
+# end
 
 if gurobi_installed
     using Gurobi
