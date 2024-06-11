@@ -18,8 +18,8 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
     load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
 Function for reading input parameters related to hydrogen generators.
-Liquifiers and evaporators are also considered here, and are identified via the H2_LIQ type column. 
-Liquid versus gas storage is identified via the H2_STOR type column. 
+Liquifiers and evaporators are also considered here, and are identified via the H2_LIQ type column.
+Liquid versus gas storage is identified via the H2_STOR type column.
 """
 function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs_gen::Dict)
 
@@ -37,7 +37,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
     # Name of H2 Generation resources
     inputs_gen["H2_RESOURCES_NAME"] = collect(skipmissing(h2_gen_in[!,:H2_Resource][1:inputs_gen["H2_RES_ALL"]]))
-    
+
     # Resource identifiers by zone (just zones in resource order + resource and zone concatenated)
     h2_zones = collect(skipmissing(h2_gen_in[!,:Zone][1:inputs_gen["H2_RES_ALL"]]))
     inputs_gen["H2_R_ZONES"] = h2_zones
@@ -47,7 +47,7 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["H2_FLEX"] = h2_gen_in[h2_gen_in.H2_FLEX.==1,:R_ID]
 
     # Set of H2 storage resources
-    # DEV NOTE: if we want to model other types of H2 storage (liquified or LOHC)  where discharging capacity is constrained  
+    # DEV NOTE: if we want to model other types of H2 storage (liquified or LOHC)  where discharging capacity is constrained
     # then we need to create another storage type to account for discharging capacity limits and costs
     # H2_STOR = 1 : Charging and energy capacity sized and modeled but discharging capacity not sized or modeled. Mimicks gas storage
     inputs_gen["H2_STOR_GAS"] = h2_gen_in[h2_gen_in.H2_STOR.==1,:R_ID]
@@ -140,21 +140,23 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
     # Set of all resources eligible for new capacity - includes both storage and generation
     # DEV NOTE: Should we allow investment in flexible demand capacity later on?
-    inputs_gen["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_tonne_p_hr.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID]) 
+    inputs_gen["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_tonne_p_hr.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID])
     # Set of all resources eligible for capacity retirements
     # DEV NOTE: Should we allow retirement of flexible demand capacity later on?
     inputs_gen["H2_GEN_RET_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_tonne_p_hr.>=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1,:R_ID])
 
     # Fixed cost per start-up ($ per MW per start) if unit commitment is modelled
     start_cost = convert(Array{Float64}, collect(skipmissing(inputs_gen["dfH2Gen"][!,:Start_Cost_per_tonne_p_hr])))
-    
+
     inputs_gen["C_H2_Start"] = inputs_gen["dfH2Gen"][!,:Cap_Size_tonne_p_hr].* start_cost
 
-    
+
     # Direct CO2 emissions per tonne of H2 produced for various technologies
     inputs_gen["dfH2Gen"][!,:CO2_per_tonne] = zeros(Float64, inputs_gen["H2_RES_ALL"])
 
-    
+    if setup["CapacityReserveMargin"] == 1 && !in(names(inputs_gen["dfH2Gen"]), "CapRes_1")
+        inputs_gen["dfH2Gen"][!,:CapRes_1] = zeros(Float64, inputs_gen["H2_RES_ALL"])
+    end
     #### TO DO LATER ON - CO2 constraints
 
     # for k in 1:inputs_gen["H2_RES_ALL"]
