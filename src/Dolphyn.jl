@@ -23,6 +23,8 @@ export load_settings
 export load_all_inputs
 export setup_logging
 export setup_TDR
+export run_model_scaling
+export scale_constraints
 export configure_solver
 export load_inputs
 export load_h2_inputs
@@ -39,6 +41,7 @@ export write_liquid_fuels_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
+export init_logger
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix

@@ -26,7 +26,7 @@ function print_and_log(message::AbstractString)
 
     if Log
         println(message)
-        @info("$(Dates.format(now(), "yyyy-mm-dd HH:MM:SS")) $message")
+        @info message
     else
         println(message)
     end

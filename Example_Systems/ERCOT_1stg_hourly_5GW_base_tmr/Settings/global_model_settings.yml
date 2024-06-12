@@ -7,3 +7,9 @@ WriteShadowPrices: 1 # Write shadow prices of LP or relaxed MILP; 0 = not active
 OperationWrapping: 0 # Sets temporal resolution of the model; 0 = single period to represent the full year, with first-last time step linked; 1 = multiple representative periods
 TimeDomainReductionFolder: "TDR_Results" # Directory name where results from time domain reduction will be saved. If results already exist here, these will be used without running time domain reduction script again.
 TimeDomainReduction: 1 # Time domain reduce (i.e. cluster) inputs based on Load_data.csv, Generators_variability.csv, and Fuels_data.csv; 0 = not active (use input data as provided); 1 = active (cluster input data, or use data that has already been clustered)
+LogFile: ""  # Filename for log file
+
+# Model scaling settings
+Model_Scaling: 1 # 0 for off and 1 for on
+Lower_Target: 1.0e-03
+Upper_Target: 1.0e+06
