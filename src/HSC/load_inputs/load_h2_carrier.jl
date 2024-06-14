@@ -72,9 +72,14 @@ function load_h2_carrier(setup::Dict, path::AbstractString, sep::AbstractString,
 
     # Convert each row to a tuple of source sink pairs eligible for carriers
     inputs_gen["carrier_candidate_routes_tuple"] = [(inputs_gen["carrier_candidate_routes"][i, 1], inputs_gen["carrier_candidate_routes"][i, 2]) for i in 1:size(inputs_gen["carrier_candidate_routes"], 1)]
+    # println("carrier_candidate_routes_tuple,", inputs_gen["carrier_candidate_routes_tuple"])
+
+    # println("routes from zone 4,", [r for r in inputs_gen["carrier_candidate_routes_tuple"] if r[1] == 4])
 
     # set of candidate source sinks for carriers
-    inputs_gen["carrier_source_sink"] = unique(inputs_gen["carrier_candidate_routes"])
+    inputs_gen["carrier_zones"] = unique(inputs_gen["carrier_candidate_routes"])
+    # println("carrier_zones,", inputs_gen["carrier_zones"])
+
  
     println(" -- HSC_carriers.csv Successfully Read!")
 

@@ -36,13 +36,13 @@ function write_h2_carrier_capacity(path::AbstractString, sep::AbstractString, in
  
    
     # set of candidate source sinks for carriers
-    carrier_source_sink = inputs["carrier_source_sink"]
+    carrier_zones = inputs["carrier_zones"]
 
     
      # Non-served energy/demand curtailment by segment in each time step
      dfNse = DataFrame()
      dfTemp = Dict()
-     for z in carrier_source_sink
+     for z in carrier_zones
          dfTemp = DataFrame(Carrier=zeros(size(carrier_type,1)), Zone=zeros(size(carrier_type,1)))
          dfTemp[!,:Carrier] = carrier_type
          dfTemp[!,:Zone] = fill(z,size(carrier_type,1))
@@ -70,12 +70,6 @@ function write_h2_carrier_capacity(path::AbstractString, sep::AbstractString, in
      rename!(dfNse,auxNew_Names)
 
 
-    # dfTransCap = DataFrame(
-    # Carrier = dfH2carrier[:, :carrier],
-    # Process = dfH2carrier[:, :process],
-    # Zone = 1:Z,
-    # CarProcH2Cap = convert(Array{Union{Missing,Float64}}, CarProcessCap)
-    # )
     
     CSV.write(joinpath(path, "HSC_carrier_capacity.csv"), dfNse)
 end

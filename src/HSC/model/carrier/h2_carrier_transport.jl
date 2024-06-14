@@ -49,39 +49,30 @@ function h2_carrier_transport(EP::Model, inputs::Dict, setup::Dict)
     carrier_candidate_routes_tuple = inputs["carrier_candidate_routes_tuple"]
 
     # set of candidate source sinks for carriers
-    carrier_source_sink = inputs["carrier_source_sink"]
+    carrier_zones = inputs["carrier_zones"]
 
     # Dictionary Mapping R_ID to carrier + process pairs
     R_ID =inputs["carrier_R_ID"]
 
 
-### Constraints ### 
-# Sum of all carrier exports from a zone z must equal carrier transport from that zone to all other connected zones
-# @constraint(EP,cExportBalance[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
-#     vCarProcFlowExport[c,p,z,t] =sum(vCarInterZoneFlow[c,p,z,z1,t] for z1 in [r for r in carrier_candidate_routes_tuple if r[1] == z])
-# )
-
-# # Sum of all carrier imports to a zone z must equal carrier transport from all other connected zones to that zone
-# @constraint(EP,cImportBalance[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
-#     vCarProcFlowImport[c,p,z,t] =sum(vCarInterZoneFlow[c,p,z1,z,t] for z1 in [r for r in carrier_candidate_routes_tuple if r[2] == z])
-# )
-
-# Sum of injections and withdrawals of each carrier type must be cCarVariableEquality
-## NOTE: This assumes no time delay in carrier transport
-@constraint(EP,cZonalRichCarrierBalance[c in carrier_type,  t=1:T],
-    sum(EP[:vCarProcFlowExport][c,p,z,t] for z in carrier_source_sink, p in CARRIER_HYD)== sum(EP[:vCarProcFlowImport][c,p,z,t] for z in carrier_source_sink, p in CARRIER_DEHYD) 
-)
-
-@constraint(EP,cZonalLeanCarrierBalance[c in carrier_type,  t=1:T],
-    sum(EP[:vCarProcFlowExport][c,p,z,t] for z in carrier_source_sink, p in CARRIER_DEHYD)== sum(EP[:vCarProcFlowImport][c,p,z,t] for z in carrier_source_sink, p in CARRIER_HYD) 
-)
-
-if setup["H2CarrierStorageFunction"] == 0 # If we do not allow H2 carrier to provide storage function at the same site
-    # Flow of carrier on a route only allowed if the source and sink have the appropriate processes designated by binary variable vCarTransportON
-    @constraint(EP,cCarFlowFeasibility[c in carrier_type, p in process_type, (z,z1) in carrier_candidate_routes_tuple,  t=1:T],
-        EP[:vCarInterZoneFlow][c,p,(z,z1),t] <=dfH2carrier[!,:max_cap_MW_H2][R_ID[(c,p)]] *EP[:vCarTransportON][c,p,(z,z1)]
+    ### Constraints ### 
+    # Sum of all carrier exports from a zone z must equal carrier transport from that zone to all other connected zones
+    @constraint(EP,cExportBalance[c in carrier_type, p in process_type, z in carrier_zones, t=1:T],
+        EP[:vCarProcFlowExport][c,p,z,t] ==sum(EP[:vCarInterZoneFlow][c,p,(z,z1),t] for z1 in [r[2] for r in carrier_candidate_routes_tuple if r[1] == z])
     )
-end
+
+    # Sum of all carrier imports to a zone z must equal carrier transport from all other connected zones having the opposing process
+    @constraint(EP,cImportBalance[c in carrier_type, p in process_type, p1 in process_type, z in carrier_zones, t=1:T; p!=p1],
+        EP[:vCarProcFlowImport][c,p,z,t] == sum(EP[:vCarInterZoneFlow][c,p1,(z1,z),t] for z1 in [r[1] for r in carrier_candidate_routes_tuple if r[2] == z])
+    )
+
+
+    if setup["H2CarrierStorageFunction"] == 0 # If we do not allow H2 carrier to provide storage function at the same site
+        # Flow of carrier on a route only allowed if the source and sink have the appropriate processes designated by binary variable vCarTransportON
+        @constraint(EP,cCarFlowFeasibility[c in carrier_type, p in process_type, (z,z1) in carrier_candidate_routes_tuple,  t=1:T],
+            EP[:vCarInterZoneFlow][c,p,(z,z1),t] <=dfH2carrier[!,:max_cap_MW_H2][R_ID[(c,p)]] *EP[:vCarTransportON][c,p,(z,z1)]
+        )
+    end
 
     return EP
 end # end H2Pipeline module

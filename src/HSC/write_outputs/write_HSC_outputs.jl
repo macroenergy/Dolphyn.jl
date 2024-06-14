@@ -93,6 +93,8 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
 
     if setup["ModelH2carrier"] == 1 # model hydrogen carriers
         write_h2_carrier_capacity(path, sep, inputs, setup, EP)
+        write_h2_carrier_operation_outputs(path, sep, inputs, setup, EP)
+
     end
 
 

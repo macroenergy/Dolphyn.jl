@@ -1,0 +1,3 @@
+MinCapReqConstraint,ConstraintDescription,Max_MW
+1,all_PV,22000
+2,all_onshore_wind,10000

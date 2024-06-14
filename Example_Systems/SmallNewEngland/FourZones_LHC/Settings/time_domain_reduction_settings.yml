@@ -15,7 +15,7 @@
   #   - TimestepsPerRepPeriod 
   #   Typically 168 timesteps (e.g., hours) per period, this designates 
   #   the length of each representative period.
-TimestepsPerRepPeriod: 168
+TimestepsPerRepPeriod: 24
 
   #   - ClusterMethod 
   #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
@@ -31,19 +31,19 @@ ScalingMethod: "S"
   #   The maximum number of periods - both clustered periods and extreme periods -
   #   that may be used to represent the input data. If IterativelyAddPeriods is on and the
   #   error threshold is never met, this will be the total number of periods.
-MaxPeriods: 3
+MaxPeriods: 50
 
   #   - MinPeriods
   #   The minimum number of periods used to represent the input data. If using
   #   UseExtremePeriods, this must be at least the number of extreme periods requests. If 
   #   IterativelyAddPeriods if off, this will be the total number of periods.
-MinPeriods: 1
+MinPeriods: 50
 
   #   - IterativelyAddPeriods
   #   Either 'yes' or 'no', this designates whether or not to add periods
   #   until the error threshold between input data and represented data is met or the maximum
   #   number of periods is reached.
-IterativelyAddPeriods: 1
+IterativelyAddPeriods: 0
 
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to
@@ -85,7 +85,7 @@ ClusterFuelPrices: 1
   #   outliers (by performance or load/resource extreme) as their own representative periods.
   #   This setting automatically includes the periods with maximum load, minimum solar cf and
   #   minimum wind cf as extreme periods.
-UseExtremePeriods: 0
+UseExtremePeriods: 1
 
 # STILL IN DEVELOPMENT - Currently just uses integral max load, integral min PV and wind.
 #   - ExtremePeriods

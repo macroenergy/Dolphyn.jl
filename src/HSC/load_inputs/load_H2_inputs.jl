@@ -95,9 +95,11 @@ function load_h2_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     end
 
   # Read input data about G2P Resources
-  if isfile(joinpath(path, "HSC_Carriers.csv"))
+  if isfile(joinpath(path, "HSC_carriers.csv")) && isfile(joinpath(path, "HSC_carrier_routes.csv")) 
     setup["ModelH2carrier"] = 1
     inputs = load_h2_carrier(setup, path, sep, inputs)
+  else
+    setup["ModelH2carrier"] = 0
 end
 
     print_and_log("HSC Input CSV Files Successfully Read In From $path$sep")

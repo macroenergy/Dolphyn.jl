@@ -25,4 +25,5 @@ function minimum_capacity_requirement!(EP::Model, inputs::Dict, setup::Dict)
 		
 		EP[:eObj] += eTotalCMinCapSlack
 	end
+	return EP
 end

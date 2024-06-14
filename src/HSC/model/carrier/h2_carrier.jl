@@ -32,9 +32,11 @@ function h2_carrier(EP::Model, inputs::Dict, setup::Dict)
 
     # Storage related constraints for H2 carriers
     EP = h2_carrier_storage(EP::Model, inputs::Dict, setup::Dict)
+    # EP = h2_carrier_storage_simple(EP::Model, inputs::Dict, setup::Dict)
 
-    # Storage related constraints for H2 carriers
+    # Transport related constraints for H2 carriers
     EP = h2_carrier_transport(EP::Model, inputs::Dict, setup::Dict)
+
     # # Expressions related to H2 carriers passed to other parts of the code
     EP = h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
    

@@ -45,7 +45,7 @@ function h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
  
    
     # set of candidate source sinks for carriers
-    carrier_source_sink = inputs["carrier_source_sink"]
+    carrier_zones = inputs["carrier_zones"]
 
     # Dictionary Mapping R_ID to carrier + process pairs
     R_ID =inputs["carrier_R_ID"]
@@ -53,32 +53,31 @@ function h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
 
     ### Expressions ####
     # cost of make up lean carrier
-    @expression(EP, eCMakeupCarrierCost[c in carrier_type, p in CARRIER_HYD, z in carrier_source_sink],
+    @expression(EP, eCMakeupCarrierCost[c in carrier_type, p in CARRIER_HYD, z in carrier_zones],
     sum(inputs["omega"][t]*dfH2carrier[!,:make_up_carrier_cost_d_p_tonne][R_ID[(c,p)]]*EP[:vMakeupCarrier][c,p,z,t] for t=1:T)
     )
 
     # Sum individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eCMakeupCarrierCostSum, sum(EP[:eCMakeupCarrierCost][c,p,z] for c in carrier_type, p in CARRIER_HYD, z in carrier_source_sink))
+    @expression(EP, eCMakeupCarrierCostSum, sum(EP[:eCMakeupCarrierCost][c,p,z] for c in carrier_type, p in CARRIER_HYD, z in carrier_zones))
 
     # # Add term to objective function expression
     EP[:eObj] += eCMakeupCarrierCostSum
 
     # Carrier H2 Supply: Generation via dehydrogenation - consumption via hydrogenation
     @expression(EP,eCarProcH2Supply[t=1:T,z=1:Z], # MWh
-        if z in carrier_source_sink
+        if z in carrier_zones
             # Positive term implies production of H2 and negative term implies consumption of H2
-            sum((1+dfH2carrier[!,:h2_consumption_fraction][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in CARRIER_DEHYD) -
-            sum((1+dfH2carrier[!,:h2_consumption_fraction][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in CARRIER_HYD)
+            sum((1-dfH2carrier[!,:h2_consumption_fraction][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in CARRIER_DEHYD) - sum((1+dfH2carrier[!,:h2_consumption_fraction][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in CARRIER_HYD)
         else 
             EP[:vZERO]
         end
     )
 
-    EP[:eH2Balance] +=eCarProcH2Supply/H2_LHV # To conver MWh to tonnes/hr of H2
+    EP[:eH2Balance] +=eCarProcH2Supply/H2_LHV # To conver MW H2 to tonnes/hr of H2
 
     # Carrier Electricity balance: scaled as a function of H2 produced in each process
     @expression(EP,eCarProcPowerDemand[t=1:T,z=1:Z], # MWh
-        if z in carrier_source_sink
+        if z in carrier_zones
             sum((1+dfH2carrier[!,:elec_input_fraction_MWh_MWh][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in process_type)
         else 
             EP[:vZERO]
@@ -89,7 +88,7 @@ function h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
 
     # Carrier NG balance: scaled as a function of H2 produced in each process
     @expression(EP,eCarProcNGDemand[t=1:T,z=1:Z], # MMBTu
-        if z in carrier_source_sink
+        if z in carrier_zones
             sum((1+dfH2carrier[!,:ng_input_MMBtu_p_MWh_H2][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in process_type)
         else 
             EP[:vZERO]
@@ -108,7 +107,7 @@ function h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eCarProcNGEmissions[z=1:Z,t=1:T,], 
     sum(EP[:eCarProcNGDemand][t,z]*inputs["fuel_CO2"][inputs["fuels"][z]]))
 
-    ## TO DO: Need to export NG related emissions to emissions_hsc.jl where it can be added to the H2emissions by plant
+    ### TO DO: Need to export NG related emissions to emissions_hsc.jl where it can be added to the H2emissions by plant
 
     return EP
 end # end H2Pipeline module

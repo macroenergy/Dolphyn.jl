@@ -82,7 +82,7 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
     carrier_candidate_routes_tuple =inputs["carrier_candidate_routes_tuple"]
 
     # set of candidate source sinks for carriers
-    carrier_source_sink = inputs["carrier_source_sink"]
+    carrier_zones = inputs["carrier_zones"]
 
     CARRIER_HYD = inputs["CARRIER_HYD"]
     CARRIER_DEHYD = inputs["CARRIER_DEHYD"]
@@ -92,11 +92,11 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
    
     ### Variables ###
     # Installed capacity of process p in terms of H2 throughput, for carrier c in zone z (MW_H2)
-    @variable(EP, vCarProcH2Cap[c in carrier_type, p in process_type, z in carrier_source_sink] >= 0) 
+    @variable(EP, vCarProcH2Cap[c in carrier_type, p in process_type, z in carrier_zones] >= 0) 
 
     if setup["H2CarrierStorageFunction"] == 0 # If we do not allow H2 carrier to provide storage function at the same site
     #1. Binary variable indicating selection of zone as source sink for carrier c and process p
-        @variable(EP, vCarProcBuild[c in carrier_type, p in process_type, z in carrier_source_sink], Bin) 
+        @variable(EP, vCarProcBuild[c in carrier_type, p in process_type, z in carrier_zones], Bin) 
 
 
     #2. Binary variable tracking feasible transport routes for each carrier
@@ -105,9 +105,9 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
     end
 
     #  Installed capacity of rich carrier storage associated with process in zone z (tonne) 
-    @variable(EP, vCarRichStorageCap[c in carrier_type, p in process_type, z in carrier_source_sink] >= 0) 
+    @variable(EP, vCarRichStorageCap[c in carrier_type, p in process_type, z in carrier_zones] >= 0) 
     #  Installed capacity of lean carrier storage associated with process in zone z (tonne) 
-    @variable(EP, vCarLeanStorageCap[c in carrier_type, p in process_type, z in carrier_source_sink] >= 0) 
+    @variable(EP, vCarLeanStorageCap[c in carrier_type, p in process_type, z in carrier_zones] >= 0) 
 
 
 
@@ -120,7 +120,7 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
     ###  TREAT EXISTING AND NEW CAPACITY SEPARATELY (i.e. dont count investment cost for existing capacity)
 
     @expression(EP, eCFixH2perCarrierProcess[c in carrier_type, p in process_type],
-        (dfH2carrier[!,:capex_d_p_MW_y][R_ID[(c,p)]] +  dfH2carrier[!,:fom_d_p_MW_y][R_ID[(c,p)]]) * sum(vCarProcH2Cap[c,p,z] for z in carrier_source_sink)
+        (dfH2carrier[!,:capex_d_p_MW_y][R_ID[(c,p)]] +  dfH2carrier[!,:fom_d_p_MW_y][R_ID[(c,p)]]) * sum(vCarProcH2Cap[c,p,z] for z in carrier_zones)
     )
 
 
@@ -132,8 +132,8 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
 
     # Fixed cost of rich carrier storage -  annuitized investment cost plus fixed O&M costs
     @expression(EP, eCFixH2perCarrierStorage[c in carrier_type, p in process_type],
-        dfH2carrier[!,:rich_storage_capex_tonne_y][R_ID[(c,p)]]*sum(vCarRichStorageCap[c,p,z] for z in carrier_source_sink) +
-        dfH2carrier[!,:lean_storage_capex_tonne_y][R_ID[(c,p)]]*sum(vCarLeanStorageCap[c,p,z] for z in carrier_source_sink) 
+        dfH2carrier[!,:rich_storage_capex_tonne_y][R_ID[(c,p)]]*sum(vCarRichStorageCap[c,p,z] for z in carrier_zones) +
+        dfH2carrier[!,:lean_storage_capex_tonne_y][R_ID[(c,p)]]*sum(vCarLeanStorageCap[c,p,z] for z in carrier_zones) 
 
     )
 
@@ -150,12 +150,12 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
     #####3 NOTE: There may be other constraints that one can add - NOT SURE IF THIS IS COMPREHENSIVE
     if setup["H2CarrierStorageFunction"] == 0 # If we do not allow H2 carrier to provide storage function at the same site
         # 1. cannot simultaneously invest in hydrogenation and dehydrogenation in the same zone
-        @constraint(EP, cCarrierProcessExclusivity[c in carrier_type, z in carrier_source_sink], 
+        @constraint(EP, cCarrierProcessExclusivity[c in carrier_type, z in carrier_zones], 
             sum(vCarProcBuild[c, p, z] for p in process_type) <= 1
         )
 
         # 2. cannot build carrier process at a given location if binary variable at that location is inactive
-        @constraint(EP, cCarrierProcessInstallFeasibility[c in carrier_type, p in process_type, z in carrier_source_sink], 
+        @constraint(EP, cCarrierProcessInstallFeasibility[c in carrier_type, p in process_type, z in carrier_zones], 
             vCarProcH2Cap[c, p, z] <= dfH2carrier[!,:max_cap_MW_H2][R_ID[(c, p)]]*vCarProcBuild[c,p,z]
         )
         
@@ -178,14 +178,13 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
         @constraint(EP, cCarrierTransportActive3[c in carrier_type, p in process_type, p1 in process_type, (z,z1) in carrier_candidate_routes_tuple; p!=p1], 
             vCarTransportON[c,p,(z,z1)]>= vCarProcBuild[c,p,z]+vCarProcBuild[c,p1,z1] - 1
         )
-
     end
 
-    # # Force investment in one location
-    # @constraint(EP,cForceInvestmentH2Cap[c in ["LOHC"], p in CARRIER_HYD, z=1],
+    # Force investment in one location
+    # @constraint(EP,cForceInvestmentH2Cap[c in ["LOHC"], p in CARRIER_HYD, z=4],
     #     EP[:vCarProcH2Cap][c,p,z]= 100.0
     # )
-    # fix(vCarProcH2Cap["LOHC","hyd",1], 100.0; force = true)
+    # fix(vCarProcH2Cap["LOHC","hyd",4], 100.0; force = true)
 
     return EP
 end # end H2Pipeline module

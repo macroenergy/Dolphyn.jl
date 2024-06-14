@@ -25,4 +25,5 @@ function maximum_capacity_requirement!(EP::Model, inputs::Dict, setup::Dict)
 		
 		EP[:eObj] += eTotalCMaxCapSlack
 	end
+	return EP
 end

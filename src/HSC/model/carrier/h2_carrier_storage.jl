@@ -40,30 +40,38 @@ function h2_carrier_storage(EP::Model, inputs::Dict, setup::Dict)
     process_type = inputs["carrier_process_names"]
 
     # set of candidate source sinks for carriers
-    carrier_source_sink = inputs["carrier_source_sink"]
+    carrier_zones = inputs["carrier_zones"]
+
+
+    #####  Variables #####
+
+    @variable(EP, vCarRichStorLevel[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
+
+    # Carrier storage inventory (tonnes)
+    @variable(EP, vCarLeanStorLevel[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
     #### Storage balance ####
     ### TEMPORRY APPROACH - NO LDES option
 
-    @expression(EP, eLeanCarStorChange[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
+    @expression(EP, eLeanCarStorChange[c in carrier_type, p in process_type, z in carrier_zones, t=1:T],
     if p in CARRIER_HYD
         -EP[:vCarLeanStorDischg][c,p,z, t] + EP[:vCarProcFlowImport][c,p,z,t]
     else # CARRIER_DEHYD
-        -EP[:vCarLeanStorDischg][c,p,z, t]  + EP[:vCarProcCarOutput][c,p,z,t]
+        -EP[:vCarLeanStorDischg][c,p,z, t]  + EP[:vCarProcOutput][c,p,z,t]
     end 
         
     )
 
     # Constraint enforcing flow exports = storage discharge for dehydrogenation related storage
-    @constraint(EP,cCarVariableEquality[c in carrier_type, p in CARRIER_DEHYD, z in carrier_source_sink, t=1:T],
+    @constraint(EP,cCarVariableEquality[c in carrier_type, p in CARRIER_DEHYD, z in carrier_zones, t=1:T],
     EP[:vCarLeanStorDischg][c,p,z,t] == EP[:vCarProcFlowExport][c,p,z,t]
     )     
 
-    @expression(EP, eRichCarStorChange[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
+    @expression(EP, eRichCarStorChange[c in carrier_type, p in process_type, z in carrier_zones, t=1:T],
     if p in CARRIER_HYD
-        -EP[:vCarProcFlowExport][c,p,z, t] + EP[:vCarProcCarOutput][c,p,z,t]
+        -EP[:vCarProcFlowExport][c,p,z, t] + EP[:vCarProcOutput][c,p,z,t]
     else # CARRIER_DEHYD
-        -EP[:vCarProcCarInput][c,p,z, t]  + EP[:vCarProcFlowImport][c,p,z,t]
+        -EP[:vCarProcInput][c,p,z, t]  + EP[:vCarProcFlowImport][c,p,z,t]
     end 
         
     )
@@ -72,24 +80,24 @@ function h2_carrier_storage(EP::Model, inputs::Dict, setup::Dict)
     @constraints(EP, begin
 
         # capacity constraints
-        [c in carrier_type, p in process_type, z in carrier_source_sink, t in 1:T], EP[:vCarRichStorageCap][c,p,z] >= EP[:vCarRichStorLevel][c,p,z,t]
-        [c in carrier_type, p in process_type, z in carrier_source_sink, t in 1:T], EP[:vCarLeanStorageCap][c,p,z] >= EP[:vCarLeanStorLevel][c,p,z,t]
+        [c in carrier_type, p in process_type, z in carrier_zones, t in 1:T], EP[:vCarRichStorageCap][c,p,z] >= EP[:vCarRichStorLevel][c,p,z,t]
+        [c in carrier_type, p in process_type, z in carrier_zones, t in 1:T], EP[:vCarLeanStorageCap][c,p,z] >= EP[:vCarLeanStorLevel][c,p,z,t]
       
         # energy stored for the next hour = Energy in storage from previous hour + net change in storage
-        cLeanCarSoCBalInterior[t in INTERIOR_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_source_sink,], EP[:vCarLeanStorLevel][c,p,z,t] ==
+        cLeanCarSoCBalInterior[t in INTERIOR_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_zones], EP[:vCarLeanStorLevel][c,p,z,t] ==
         EP[:vCarLeanStorLevel][c,p,z,t-1] +eLeanCarStorChange[c,p,z,t]
 
         # energy stored for the next hour = Energy in storage from previous hour (last hour of rep. period) + net change in storage
-        cLeanCarSoCBalStart[t in START_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_source_sink,], EP[:vCarLeanStorLevel][c,p,z,t] ==
+        cLeanCarSoCBalStart[t in START_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_zones], EP[:vCarLeanStorLevel][c,p,z,t] ==
         EP[:vCarLeanStorLevel][c,p,z,t+hours_per_subperiod-1] + eLeanCarStorChange[c,p,z,t]
 
         # energy stored for the next hour = Energy in storage from previous hour + net change in storage
-        cRichCarSoCBalInterior[t in INTERIOR_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_source_sink,], EP[:vCarRichStorLevel][c,p,z,t] ==
+        cRichCarSoCBalInterior[t in INTERIOR_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_zones], EP[:vCarRichStorLevel][c,p,z,t] ==
         EP[:vCarRichStorLevel][c,p,z,t-1] +eRichCarStorChange[c,p,z,t]
 
         # energy stored for the next hour = Energy in storage from previous hour(last hour of rep. period) + net change in storage
-        cRichCarSoCBalStart[t in START_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_source_sink,], EP[:vCarRichStorLevel][c,p,z,t] ==
-        EP[:vCarLeanStorLevel][c,p,z,t+hours_per_subperiod-1] +eRichCarStorChange[c,p,z,t]
+        cRichCarSoCBalStart[t in START_SUBPERIODS, c in carrier_type, p in process_type, z in carrier_zones], EP[:vCarRichStorLevel][c,p,z,t] ==
+        EP[:vCarRichStorLevel][c,p,z,t+hours_per_subperiod-1] +eRichCarStorChange[c,p,z,t]
     end)
 
     return EP

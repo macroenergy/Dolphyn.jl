@@ -48,7 +48,7 @@ function h2_carrier_operation(EP::Model, inputs::Dict, setup::Dict)
     carrier_candidate_routes_tuple = inputs["carrier_candidate_routes_tuple"]
 
     # set of candidate source sinks for carriers
-    carrier_source_sink = inputs["carrier_source_sink"]
+    carrier_zones = inputs["carrier_zones"]
 
     # Dictionary Mapping R_ID to carrier + process pairs
     R_ID =inputs["carrier_R_ID"]
@@ -57,79 +57,71 @@ function h2_carrier_operation(EP::Model, inputs::Dict, setup::Dict)
     ### Variables ###
     # H2 output from process p for carrier c from zone z (GW_H2) - used to size the processes
     # p = hyd - refer to output in liquid form, p = dehyd = output in gaseous form
-    @variable(EP, vCarProcH2output[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
+    @variable(EP, vCarProcH2output[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
     # Carrier input to process p;  p = hyd - refer to lean carrier , p = dehyd - refer to rich carrier input (tonnes/hr)
-    @variable(EP, vCarProcCarInput[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
+    @variable(EP, vCarProcInput[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
     # Carrier output from process p;  p = hyd - refer to rich carrier , p = dehyd - refer to lean carrier input (tonnes/hr)
-    @variable(EP, vCarProcCarOutput[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
+    @variable(EP, vCarProcOutput[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
 
     # Carrier imports from process p via storage for carrier c from zone z (tonnes/hr)
     # p = hyd - lean carrier, p = dehyd = rich carrier
-    @variable(EP, vCarProcFlowImport[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
+    @variable(EP, vCarProcFlowImport[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
     # Carrier exports from process p via storage for carrier c from zone z (tonnes/hr)
     # p = hyd - lean carrier, p = dehyd = rich carrier
-    @variable(EP, vCarProcFlowExport[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
+    @variable(EP, vCarProcFlowExport[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
     # Make-up carrier consumption - associated with hydrogenation Process only
-    @variable(EP, vMakeupCarrier[c in carrier_type, p in CARRIER_HYD, z in carrier_source_sink, t=1:T]>=0)
+    @variable(EP, vMakeupCarrier[c in carrier_type, p in process_type, z in carrier_zones, t=1:T]>=0)
 
     # Discharge of lean carrier from storage for process p for carrier c in zone z (tonnes/hr)
-    @variable(EP, vCarLeanStorDischg[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
+    @variable(EP, vCarLeanStorDischg[c in carrier_type, p in process_type, z in carrier_zones, t=1:T] >= 0) 
 
-    # Carrier storage inventory (tonnes)
-    @variable(EP, vCarLeanStorLevel[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
-
-    @variable(EP, vCarRichStorLevel[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T] >= 0) 
-
+    
     # Flow of carrier c from process p in zone z to zone z1
     @variable(EP, vCarInterZoneFlow[c in carrier_type, p in process_type, (z,z1) in carrier_candidate_routes_tuple, t=1:T] >= 0) 
 
         
     ### Constraints ###
-    # Process capacity limit
-    @constraint(EP,cProcessCapLimit[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
+    # Process capacity limit (MW)
+    @constraint(EP,cProcessCapLimit[c in carrier_type, p in process_type, z in carrier_zones, t=1:T],
         vCarProcH2output[c,p,z,t] <= EP[:vCarProcH2Cap][c,p,z]
     )
 
-    # Carrier material balance at the process level: Input = Output + losses
-    @constraint(EP,cCarProcessBalance[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
-    vCarProcCarInput[c,p,z,t] *(1- dfH2carrier[!,:carrier_loss_fraction][R_ID[(c, p)]] ) == vCarProcCarOutput[c,p,z,t]
+    # Carrier material balance at the process level: Input = Output + losses (tonnes)
+    @constraint(EP,cCarProcessBalance[c in carrier_type, p in process_type, z in carrier_zones, t=1:T],
+    vCarProcInput[c,p,z,t] *(1- dfH2carrier[!,:carrier_loss_fraction][R_ID[(c, p)]] ) == vCarProcOutput[c,p,z,t]
     )
 
     
     # Carrier process stoichiometry - relating relative amounts of H2 and carrier in rich carrier for each process
-    @expression(EP,eCarProcessStoichiometry[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
-        if p in CARRIER_HYD
-            vCarProcCarOutput[c,p,z, t] - dfH2carrier[!,:carrier_tonne_p_MWh_H2][R_ID[(c,p)]]*vCarProcH2output[c,p,z,t]
-        else # CARRIER_DEHYD
-            vCarProcCarInput[c,p,z, t]  - dfH2carrier[!,:carrier_tonne_p_MWh_H2][R_ID[(c,p)]]*vCarProcH2output[c,p,z,t]
-        end 
+    @constraint(EP,eCarProcessStoichiometryhyd[c in carrier_type, p in CARRIER_HYD, z in carrier_zones, t=1:T],
+       vCarProcOutput[c,p,z, t] - dfH2carrier[!,:carrier_tonne_p_MWh_H2][R_ID[(c,p)]]*vCarProcH2output[c,p,z,t] ==0
     )
 
-    @constraint(EP,cCarProcessStoichiometry[c in carrier_type, p in process_type, z in carrier_source_sink, t=1:T],
-        eCarProcessStoichiometry[c,p,z,t] ==0
+    @constraint(EP,eCarProcessStoichiometrydhyd[c in carrier_type, p in CARRIER_DEHYD, z in carrier_zones, t=1:T],
+        vCarProcInput[c,p,z, t]  - dfH2carrier[!,:carrier_tonne_p_MWh_H2][R_ID[(c,p)]]*vCarProcH2output[c,p,z,t] ==0
     )
+
 
     #### Hydrogenation #### 
 
     # Carrier make up supply - only for hydrogenation step: Input = discharge from lean storage + make up
-    @constraint(EP,cCarProcessMakeup[c in carrier_type, p in CARRIER_HYD, z in carrier_source_sink, t=1:T],
-    vCarProcCarInput[c,p,z,t] == vCarLeanStorDischg[c,p,z,t] + vMakeupCarrier[c,p,z,t]
+    @constraint(EP,cCarProcessMakeup[c in carrier_type, p in CARRIER_HYD, z in carrier_zones, t=1:T],
+    vCarProcInput[c,p,z,t] == vCarLeanStorDischg[c,p,z,t] + vMakeupCarrier[c,p,z,t]
     )
 
+    # for t=1:T
+    #     fix(vCarProcH2output["LOHC","dehyd",2,t], 100.0; force = true)
+    # end
 
-
-
-
-
-
-
-
-
+    # Carrier make up supply - only for hydrogenation step: 
+    @constraint(EP,cCarProcessMakeup2[c in carrier_type, p in CARRIER_DEHYD, z in carrier_zones, t=1:T],
+     vMakeupCarrier[c,p,z,t]==0
+    )
 
     return EP
 end # end H2Pipeline module

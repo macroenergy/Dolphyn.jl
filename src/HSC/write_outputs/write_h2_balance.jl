@@ -31,6 +31,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
 	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
 	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
+	H2_G2P = inputs["H2_G2P"] # Set of H2 G2P resources
 	## Hydrogen balance for each zone
 	dfH2Balance = Array{Any}
 	rowoffset=3
@@ -92,7 +93,7 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,9] = 0
 			end
 
-			if setup["ModelH2G2P"] == 1
+			if setup["ModelH2G2P"] == 1 && !isempty(H2_G2P)
 				dfTemp1[t+rowoffset,10] = - sum(value.(EP[:vH2G2P][dfH2G2P[(dfH2G2P[!,:Zone].==z),:][!,:R_ID],t]))
 			else
 				dfTemp1[t+rowoffset,10] = 0

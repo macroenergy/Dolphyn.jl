@@ -170,7 +170,7 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
     EP = generate_model(mysetup, myinputs, solver)
 
     ## Add model scaling run
-    with_logger(logger) do 
+    # with_logger(logger) do 
         if mysetup["Model_Scaling"] == 1
             println("Running model scaling: ")
             @info "Running model scaling: "
@@ -184,7 +184,7 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
             println("End of model scaling")
             @info "End of model scaling..."
         end
-    end
+    # end
     return EP, mysetup, myinputs
 end
 
