@@ -110,6 +110,9 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vCarLeanStorageCap[c in carrier_type, p in process_type, z in carrier_zones] >= 0) 
 
 
+    #Inter-zonal carrier transport capacity (tonnes)
+    @variable(EP, vCarInterZoneFlowCap[c in carrier_type, p in process_type, (z,z1) in carrier_candidate_routes_tuple] >= 0) 
+
 
     ## Objective Function Expressions ##
 
@@ -132,8 +135,8 @@ function h2_carrier_investment(EP::Model, inputs::Dict, setup::Dict)
 
     # Fixed cost of rich carrier storage -  annuitized investment cost plus fixed O&M costs
     @expression(EP, eCFixH2perCarrierStorage[c in carrier_type, p in process_type],
-        dfH2carrier[!,:rich_storage_capex_tonne_y][R_ID[(c,p)]]*sum(vCarRichStorageCap[c,p,z] for z in carrier_zones) +
-        dfH2carrier[!,:lean_storage_capex_tonne_y][R_ID[(c,p)]]*sum(vCarLeanStorageCap[c,p,z] for z in carrier_zones) 
+        (dfH2carrier[!,:rich_storage_capex_d_p_tonne_y][R_ID[(c,p)]]+dfH2carrier[!,:rich_storage_fom_d_p_tonne_y][R_ID[(c,p)]])*sum(vCarRichStorageCap[c,p,z] for z in carrier_zones) +
+        (dfH2carrier[!,:lean_storage_capex_d_p_tonne_y][R_ID[(c,p)]]+dfH2carrier[!,:lean_storage_fom_d_p_tonne_y][R_ID[(c,p)]])*sum(vCarLeanStorageCap[c,p,z] for z in carrier_zones) 
 
     )
 

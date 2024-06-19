@@ -24,10 +24,6 @@ function write_h2_carrier_capacity(path::AbstractString, sep::AbstractString, in
     Z = inputs["Z"]  # Model demand zones - assumed to be same for H2 and electricity
 
 
-    CARRIER_HYD = inputs["CARRIER_HYD"]
-    CARRIER_DEHYD = inputs["CARRIER_DEHYD"]
-
-
     carrier_type = inputs["carrier_names"]
     process_type = inputs["carrier_process_names"]
 

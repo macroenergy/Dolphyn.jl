@@ -87,7 +87,7 @@ function h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
     EP[:ePowerBalance] -=eCarProcPowerDemand  # in MW
 
     # Carrier NG balance: scaled as a function of H2 produced in each process
-    @expression(EP,eCarProcNGDemand[t=1:T,z=1:Z], # MMBTu
+    @expression(EP,eCarProcFuelDemand[t=1:T,z=1:Z], # MMBTu
         if z in carrier_zones
             sum((1+dfH2carrier[!,:ng_input_MMBtu_p_MWh_H2][R_ID[(c,p)]] )*EP[:vCarProcH2output][c,p,z,t] for c in carrier_type, p in process_type)
         else 
@@ -98,16 +98,17 @@ function h2_carrier_expressions(EP::Model, inputs::Dict, setup::Dict)
 
     # NG related costs
     # Sum individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eCarProcNGCost, sum(EP[:eCarProcNGDemand][t,z]*inputs["omega"][t]*inputs["fuel_costs"][inputs["fuels"][z]][t]  for t=1:T, z=1:Z))
+    # TO DO: NEED TO SPECIFY FUEL TYPE for each zone
+    @expression(EP, eCarProcNGCost, sum(EP[:eCarProcFuelDemand][t,z]*inputs["omega"][t]*inputs["fuel_costs"][inputs["fuels"][z]][t]  for t=1:T, z=1:Z))
 
      # Add term to objective function expression
     EP[:eObj] += eCarProcNGCost
 
     # NG related emissions
-    @expression(EP, eCarProcNGEmissions[z=1:Z,t=1:T,], 
-    sum(EP[:eCarProcNGDemand][t,z]*inputs["fuel_CO2"][inputs["fuels"][z]]))
+    @expression(EP, eCarProcEmissions[z=1:Z,t=1:T], 
+    sum(EP[:eCarProcFuelDemand][t,z]*inputs["fuel_CO2"][inputs["fuels"][z]]))
 
-    ### TO DO: Need to export NG related emissions to emissions_hsc.jl where it can be added to the H2emissions by plant
+
 
     return EP
 end # end H2Pipeline module

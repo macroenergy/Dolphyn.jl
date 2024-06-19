@@ -34,11 +34,6 @@ function write_h2_carrier_operation_outputs(path::AbstractString, sep::AbstractS
     # set of candidate source sinks for carriers
     carrier_zones = inputs["carrier_zones"]
 
-
-    #vCarProcOutput
-    #vCarProcH2output
-    #vCarProcInput
-   
     variables_to_export = [:vCarProcInput, :vCarProcH2output, :vCarProcOutput,:vMakeupCarrier,
     :vCarLeanStorDischg, :vCarProcFlowImport, :vCarProcFlowExport, :eLeanCarStorChange, :eRichCarStorChange]
    

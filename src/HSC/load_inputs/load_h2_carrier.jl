@@ -44,9 +44,10 @@ function load_h2_carrier(setup::Dict, path::AbstractString, sep::AbstractString,
     inputs_gen["carrier_process_names"] = unique(h2_carrier_in[:, :process])
 
     # Hydrogenation processes
-    inputs_gen["CARRIER_HYD"] = h2_carrier_in[h2_carrier_in.HYD.==1,:process] 
-    # Dehydrogenation processe for each carrier type
-    inputs_gen["CARRIER_DEHYD"] = h2_carrier_in[h2_carrier_in.HYD.==2,:process]
+    # inputs_gen["CARRIER_HYD"] = h2_carrier_in[h2_carrier_in.HYD.==1,:process] 
+    inputs_gen["CARRIER_HYD"]=  filter(s -> startswith(s, "hyd"), inputs_gen["carrier_process_names"])
+    # Dehydrogenation process label for each carrier type
+    inputs_gen["CARRIER_DEHYD"] = filter(s -> startswith(s, "dehyd"), inputs_gen["carrier_process_names"])
 
     # Defining a dictionary to map carrier type and process type to R_ID for extracting parameters
     R_ID = Dict{Tuple{String, String}, Int64}()
@@ -72,9 +73,9 @@ function load_h2_carrier(setup::Dict, path::AbstractString, sep::AbstractString,
 
     # Convert each row to a tuple of source sink pairs eligible for carriers
     inputs_gen["carrier_candidate_routes_tuple"] = [(inputs_gen["carrier_candidate_routes"][i, 1], inputs_gen["carrier_candidate_routes"][i, 2]) for i in 1:size(inputs_gen["carrier_candidate_routes"], 1)]
-    # println("carrier_candidate_routes_tuple,", inputs_gen["carrier_candidate_routes_tuple"])
 
-    # println("routes from zone 4,", [r for r in inputs_gen["carrier_candidate_routes_tuple"] if r[1] == 4])
+    # store distance and travel time for each carrier
+    
 
     # set of candidate source sinks for carriers
     inputs_gen["carrier_zones"] = unique(inputs_gen["carrier_candidate_routes"])

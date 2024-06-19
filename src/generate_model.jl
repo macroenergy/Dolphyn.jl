@@ -236,9 +236,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
             EP = h2_production(EP, inputs, setup)
         end
 
-        # Direct emissions of various hydrogen sector resources
-        EP = emissions_hsc(EP, inputs,setup)
-
         # Model H2 non-served
         EP = h2_non_served(EP, inputs,setup)
 
@@ -276,6 +273,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         if setup["ModelH2carrier"] == 1 # model hydrogen carriers
             EP = h2_carrier(EP, inputs, setup)
         end
+
+        # Direct emissions of various hydrogen sector resources
+        EP = emissions_hsc(EP, inputs,setup)
 
         # Modeling Time matching requirement for electricity use for hydrogen production
 		if setup["TimeMatchingRequirement"] > 0

@@ -85,7 +85,12 @@ function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
     @expression(
         EP,
         eH2EmissionsByZone[z = 1:Z, t = 1:T],
-        sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
+        if setup["ModelH2carrier"] ==0 # When no H2 carrier - only count plant Emissions
+            sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID])
+        else # count both plant and carrier related process emissions
+            sum(eH2EmissionsByPlant[y, t] for y in dfH2Gen[(dfH2Gen[!, :Zone].==z), :R_ID]) +EP[:eCarProcEmissions][z,t]
+        end
+
     )
 
     # If CO2 price is implemented in HSC balance or Power Balance and SystemCO2 constraint is active (independent or joint), then need to add cost penalty due to CO2 prices

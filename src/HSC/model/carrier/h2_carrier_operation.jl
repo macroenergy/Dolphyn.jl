@@ -114,9 +114,9 @@ function h2_carrier_operation(EP::Model, inputs::Dict, setup::Dict)
     vCarProcInput[c,p,z,t] == vCarLeanStorDischg[c,p,z,t] + vMakeupCarrier[c,p,z,t]
     )
 
-    # for t=1:T
-    #     fix(vCarProcH2output["LOHC","dehyd",2,t], 100.0; force = true)
-    # end
+    for t=1:T
+        fix(vCarProcH2output["LOHC","dehyd",1,t], 100.0; force = true)
+    end
 
     # Carrier make up supply - only for hydrogenation step: 
     @constraint(EP,cCarProcessMakeup2[c in carrier_type, p in CARRIER_DEHYD, z in carrier_zones, t=1:T],
