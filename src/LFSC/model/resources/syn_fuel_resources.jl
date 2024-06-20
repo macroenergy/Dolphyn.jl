@@ -41,6 +41,8 @@ The variables defined in this file named after ```vSFProd_Gasoline``` cover vari
 """
 function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
+	println(" -- Synthetic Fuels Resources")
+
 	#Rename H2Gen dataframe
 	dfSynFuels = inputs["dfSynFuels"]
     dfSynFuelsByProdExcess = inputs["dfSynFuelsByProdExcess"]
@@ -105,25 +107,25 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	##################################################################################################################
 
 	#H2 Balance expressions
-	@expression(EP, eSynFuelH2Cons[t=1:T, z=1:Z],
+	@expression(EP, eSyn_Fuel_H2_Cons[t=1:T, z=1:Z],
 		sum(EP[:vSFH2in][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
-	EP[:eH2Balance] -= eSynFuelH2Cons
+	EP[:eH2Balance] -= eSyn_Fuel_H2_Cons
 
     #CO2 Balance Expression
-    @expression(EP, eSynFuelCO2Cons_Per_Time_Per_Zone[t=1:T, z=1:Z],
+    @expression(EP, eSyn_Fuel_CO2_Cons_Per_Time_Per_Zone[t=1:T, z=1:Z],
 		sum(EP[:vSFCO2in][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
-	@expression(EP, eSynFuelCO2Cons_Per_Zone_Per_Time[z=1:Z, t=1:T],
+	@expression(EP, eSyn_Fuel_CO2_Cons_Per_Zone_Per_Time[z=1:Z, t=1:T],
 		sum(EP[:vSFCO2in][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID])))
 
-	EP[:eCaptured_CO2_Balance] -= eSynFuelCO2Cons_Per_Time_Per_Zone
+	EP[:eCaptured_CO2_Balance] -= eSyn_Fuel_CO2_Cons_Per_Time_Per_Zone
 
 	#Power Balance Expression
-	@expression(EP, ePowerBalanceSynFuelRes[t=1:T, z=1:Z],
+	@expression(EP, eSyn_Fuel_Power_Cons[t=1:T, z=1:Z],
 		sum(EP[:vSFPin][k,t] for k in intersect(1:SYN_FUELS_RES_ALL, dfSynFuels[dfSynFuels[!,:Zone].==z,:][!,:R_ID]))) 
 
-	EP[:ePowerBalance] += -ePowerBalanceSynFuelRes
+	EP[:ePowerBalance] += -eSyn_Fuel_Power_Cons
 
 	###Constraints###
 	

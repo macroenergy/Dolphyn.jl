@@ -38,13 +38,13 @@ function write_ng_demand_balance(path::AbstractString, sep::AbstractString, inpu
 			dfTemp1_NG[t+rowoffset,1] = 0
 			dfTemp1_NG[t+rowoffset,2] = 0
 
-			#if setup["ModelSyntheticNG"] == 1
-			#	dfTemp1_NG[t+rowoffset,1] = value.(EP[:eSyn_NG_Prod][t,z])
-			#end
+			if setup["ModelSyntheticNG"] == 1
+				dfTemp1_NG[t+rowoffset,1] = value.(EP[:eSyn_NG_Prod][t,z])
+			end
 
-			#if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
-			#	dfTemp1_NG[t+rowoffset,2] = value.(EP[:eBio_NG_produced_MMBtu_per_time_per_zone][t,z])
-			#end
+			if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
+				dfTemp1_NG[t+rowoffset,2] = value.(EP[:eBio_NG_produced_MMBtu_per_time_per_zone][t,z])
+			end
 
 			dfTemp1_NG[t+rowoffset,3] = value.(EP[:vConv_NG_Demand][t,z])
 

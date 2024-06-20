@@ -20,54 +20,55 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for writing the cost for the different sectors of the natural gas supply chain (Synthetic NG resources CAPEX and OPEX, conventional NG).
 """
 function write_ng_costs(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+
+	
 	## Cost results
-	#if setup["ModelSyntheticNG"] == 1
-	#	dfNG= inputs["dfNG"]
-	#end
-
 	Z = inputs["Z"]     # Number of zones
-	T = inputs["T"]     # Number of time steps (hours)
 
-	dfNGCost = DataFrame(Costs = ["cNGTotal", "cSNGFix", "cSNGVar","cConvNGCost"])
+	if setup["ModelSyntheticNG"] == 1
+        dfSyn_NG = inputs["dfSyn_NG"]
+    end
 
-	cSNGVar = 0
-	cSNGFix = 0
+	dfNGCost = DataFrame(Costs = ["cNGTotal", "cSyn_NGFix", "cSyn_NGVar","cConvNGCost"])
 
-	#if setup["ModelSyntheticNG"] == 1
-	#	cSNGVar = value(EP[:eTotalCSNGProdVarOut])*ModelScalingFactor^2
-	#	cSNGFix = value(EP[:eFixed_Cost_Syn_NG_total])*ModelScalingFactor^2
-	#end
+	cSyn_NGVar = 0
+	cSyn_NGFix = 0
+
+	if setup["ModelSyntheticNG"] == 1
+		cSyn_NGVar = value(EP[:eTotalCSyn_NGProdVarOut])
+		cSyn_NGFix = value(EP[:eFixed_Cost_Syn_NG_total])
+	end
 
 	cConvNGCost = value(EP[:eTotalConv_NG_VarOut])
 	 
-    cNGTotal = cSNGVar + cSNGFix + cConvNGCost
+    cNGTotal = cSyn_NGVar + cSyn_NGFix + cConvNGCost
 
-    dfNGCost[!,Symbol("Total")] = [cNGTotal, cSNGFix, cSNGVar, cConvNGCost]
+    dfNGCost[!,Symbol("Total")] = [cNGTotal, cSyn_NGFix, cSyn_NGVar, cConvNGCost]
 
 	for z in 1:Z
 		tempCTotal = 0
-		tempC_SNG_Fix = 0
-		tempC_SNG_Var = 0
+		tempC_Syn_NG_Fix = 0
+		tempC_Syn_NG_Var = 0
 
 		tempCNGConvFuel = sum(value.(EP[:eTotalConv_NG_VarOut_Z])[z,:])
 
-		#if setup["ModelSyntheticNG"] == 1
-		#	for y in dfNG[dfNG[!,:Zone].==z,:][!,:R_ID]
-		#		tempC_SNG_Fix = tempC_SNG_Fix +
-		#			value.(EP[:eFixed_Cost_Syn_NG_per_type])[y]
+		if setup["ModelSyntheticNG"] == 1
+			for y in dfSyn_NG[dfSyn_NG[!,:Zone].==z,:][!,:R_ID]
+				tempC_Syn_NG_Fix = tempC_Syn_NG_Fix +
+					value.(EP[:eFixed_Cost_Syn_NG_per_type])[y]
 
-		#		tempC_SNG_Var = tempC_SNG_Var +
-		#			sum(value.(EP[:eCSNGProdVar_out])[y,:])
+				tempC_Syn_NG_Var = tempC_Syn_NG_Var +
+					sum(value.(EP[:eCSyn_NGProdVar_out])[y,:])
 
-		#		tempCTotal = tempCTotal +
-		#				value.(EP[:eFixed_Cost_Syn_NG_per_type])[y] +
-		#				sum(value.(EP[:eCSNGProdVar_out])[y,:])
-		#	end
-		#end
+				tempCTotal = tempCTotal +
+						value.(EP[:eFixed_Cost_Syn_NG_per_type])[y] +
+						sum(value.(EP[:eCSyn_NGProdVar_out])[y,:])
+			end
+		end
 
 		tempCTotal = tempCTotal +  tempCNGConvFuel
 
-		dfNGCost[!,Symbol("Zone$z")] = [tempCTotal, tempC_SNG_Fix, tempC_SNG_Var, tempCNGConvFuel]
+		dfNGCost[!,Symbol("Zone$z")] = [tempCTotal, tempC_Syn_NG_Fix, tempC_Syn_NG_Var, tempCNGConvFuel]
 	end
 	CSV.write(string(path,sep,"NG_costs.csv"), dfNGCost)
 end

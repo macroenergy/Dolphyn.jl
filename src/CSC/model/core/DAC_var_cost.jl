@@ -57,12 +57,8 @@ function DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
 	#####################################################################################################################################
 	##Expressions
-	if setup["ParameterScale"] ==1
-		# NOTE: When Setup[ParameterScale] =1, fuel costs are scaled in fuels_data.csv, so no if condition needed to scale fuel cost of DAC
-		@expression(EP,eVar_OM_DAC_per_type_per_time[k=1:DAC_RES_ALL, t = 1:T], inputs["omega"][t] * (dfDAC[!,:Var_OM_Cost_per_tonne][k]/ModelScalingFactor^2 + dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * inputs["fuel_costs"][dfDAC[!,:Fuel][k]][t]) * EP[:vDAC_CO2_Captured][k,t] )
-	else
-		@expression(EP,eVar_OM_DAC_per_type_per_time[k=1:DAC_RES_ALL, t = 1:T], inputs["omega"][t] * (dfDAC[!,:Var_OM_Cost_per_tonne][k] + dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * inputs["fuel_costs"][dfDAC[!,:Fuel][k]][t]) * EP[:vDAC_CO2_Captured][k,t] )
-	end
+	@expression(EP,eVar_OM_DAC_per_type_per_time[k=1:DAC_RES_ALL, t = 1:T], inputs["omega"][t] * (dfDAC[!,:Var_OM_Cost_per_tonne][k] + dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * inputs["fuel_costs"][dfDAC[!,:Fuel][k]][t]) * EP[:vDAC_CO2_Captured][k,t] )
+
 
 	#Total variable cost per resource type
 	@expression(EP, eVar_OM_DAC_per_time[t=1:T], sum(EP[:eVar_OM_DAC_per_type_per_time][k,t] for k in 1:DAC_RES_ALL))

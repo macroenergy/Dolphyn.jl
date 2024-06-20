@@ -100,53 +100,16 @@ function ng_pipeline(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eNGNPipeNew[p = 1:NG_P], vNGNPipe[p] - inputs["pNG_Pipe_No_Curr"][p])
 
     # Calculate net flow at each pipe-zone interfrace
-    @expression(
-        EP,
-        eNGPipeFlow_net[p = 1:NG_P, t = 1:T, d = [-1, 1]],
-        vNGPipeFlow_pos[p, t, d] - vNGPipeFlow_neg[p, t, d]
-    )
+    @expression(EP,eNGPipeFlow_net[p = 1:NG_P, t = 1:T, d = [-1, 1]],vNGPipeFlow_pos[p, t, d] - vNGPipeFlow_neg[p, t, d])
 
     ## Objective Function Expressions ##
     # Capital cost of pipelines 
-    # DEV NOTE: To add fixed cost of existing + new pipelines
-    #  ParameterScale = 1 --> objective function is in million $
-    #  ParameterScale = 0 --> objective function is in $
-    if setup["ParameterScale"] == 1
-        @expression(
-            EP,
-            eCNGPipe,
-            sum(
-                eNGNPipeNew[p] * inputs["pCAPEX_NG_Pipe"][p] / (ModelScalingFactor)^2 for
-                p = 1:NG_P
-            )
-        )
-    else
-        @expression(
-            EP,
-            eCNGPipe,
-            sum(eNGNPipeNew[p] * inputs["pCAPEX_NG_Pipe"][p] for p = 1:NG_P)
-        )
-    end
+    @expression(EP,eCNGPipe,sum(eNGNPipeNew[p] * inputs["pCAPEX_NG_Pipe"][p] for p = 1:NG_P))
 
     EP[:eObj] += eCNGPipe
 
     # Capital cost of booster compressors located along each pipeline - more booster compressors needed for longer pipelines than shorter pipelines
-    # YS Formula doesn't make sense to me
-    #  ParameterScale = 1 --> objective function is in million $
-    #  ParameterScale = 0 --> objective function is in $
-    if setup["ParameterScale"] == 1
-        @expression(
-            EP,
-            eCNGCompPipe,
-            sum(eNGNPipeNew[p] * inputs["pCAPEX_Comp_NG_Pipe"][p] for p = 1:NG_P) / ModelScalingFactor^2
-        )
-    else
-        @expression(
-            EP,
-            eCNGCompPipe,
-            sum(eNGNPipeNew[p] * inputs["pCAPEX_Comp_NG_Pipe"][p] for p = 1:NG_P)
-        )
-    end
+    @expression(EP,eCNGCompPipe,sum(eNGNPipeNew[p] * inputs["pCAPEX_Comp_NG_Pipe"][p] for p = 1:NG_P))
 
     EP[:eObj] += eCNGCompPipe
 
@@ -155,27 +118,15 @@ function ng_pipeline(EP::Model, inputs::Dict, setup::Dict)
     ## Balance Expressions ##
     # NG Power Consumption balance
 
-    if setup["ParameterScale"] == 1 # IF ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
-        @expression(
-            EP,
-            ePowerBalanceNGPipeCompression[t = 1:T, z = 1:Z],
-            sum(
-                vNGPipeFlow_neg[
-                    p, t, NG_Pipe_Map[(NG_Pipe_Map[!, :Zone].==z).&(NG_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in NG_Pipe_Map[NG_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
-            ) / ModelScalingFactor
+    @expression(
+        EP,
+        ePowerBalanceNGPipeCompression[t = 1:T, z = 1:Z],
+        sum(
+            vNGPipeFlow_neg[
+                p, t, NG_Pipe_Map[(NG_Pipe_Map[!, :Zone].==z).&(NG_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
+            ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in NG_Pipe_Map[NG_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
         )
-    else # IF ParameterScale = 0, power system operation/capacity modeled in MW so no scaling of NG related power consumption
-        @expression(
-            EP,
-            ePowerBalanceNGPipeCompression[t = 1:T, z = 1:Z],
-            sum(
-                vNGPipeFlow_neg[
-                    p, t, NG_Pipe_Map[(NG_Pipe_Map[!, :Zone].==z).&(NG_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-                ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in NG_Pipe_Map[NG_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
-            )
-        )
-    end
+    )
 
     EP[:ePowerBalance] += -ePowerBalanceNGPipeCompression
     EP[:eNGNetpowerConsumptionByAll] += ePowerBalanceNGPipeCompression

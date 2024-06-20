@@ -16,12 +16,6 @@ Modules = [Dolphyn]
 Pages = ["BESC/load_inputs/load_bio_supply.jl"]
 ```
 
-## Load Bioethanol Demand Inputs
-```@autodocs
-Modules = [Dolphyn]
-Pages = ["BESC/load_inputs/load_bio_ethanol_demand.jl"]
-```
-
 ## Load CO2 Pipelines
 ```@autodocs
 Modules = [Dolphyn]

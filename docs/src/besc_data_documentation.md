@@ -27,9 +27,6 @@ Model settings parameters are specified in a `besc_Settings.yml` file which shou
 |Bio\_Gasoline\_On | Flag for activating or deactivating modeling of bio gasoline.|
 ||0 = not modeling bio gasoline.|
 ||1 = modeling bio gasoline.|
-|Bio\_Ethanol\_On | Flag for activating or deactivating modeling of bio ethanol.|
-||0 = not modeling bio ethanol.|
-||1 = modeling bio ethanol.|
 
 
 ## 2 Inputs
@@ -45,7 +42,6 @@ All input files are in CSV format. Running the GenX submodule requires a minimum
 |BESC\_Biorefinery.csv |Specify cost and performance data for biorefinery resources.|
 |BESC\_Herb\_Supply.csv |Specify quantity, cost and emissions of herbaceous biomass supply.|
 |BESC\_Wood\_Supply.csv |Specify quantity, cost and emissions of woody biomass supply.|
-|Bio\_Fuels\_Ethanol\_Demand.csv |Specify time-series of load profiles for each model zone, emission factor for bio ethanol.|
 
 ### 2.1 Mandatory input data
 #### 2.1.1 BESC\_Biorefinery.csv
@@ -64,7 +60,6 @@ This file contains cost and performance parameters for various biorefinery resou
 |BioGasoline\_Production | 0 = not a bio gasoline resource, 1 = bio gasoline resource. |
 |BioJetfuel\_Production | 0 = not a bio jetfuel resource, 1 = bio jetfuel resource. |
 |BioDiesel\_Production | 0 = not a bio diesel resource, 1 = bio diesel resource. |
-|BioEthanol\_Production | 0 = not a bio ethanol resource, 1 = bio ethanol resource. |
 |**Capacity requirements**|
 |Max\_capacity\_tonne\_per\_hr |-1 (default) – no limit on maximum operating capacity of the biorefinery resource. If non-negative, represents maximum allowed biomass consumption capacity (in tonne/hr) of the resource.|
 |Min\_capacity\_tonne\_per\_hr| -1 (default) – no limit on minimum operating capacity of the biorefinery resource. If non-negative, represents minimum allowed biomass consumption capacity (in tonne/hr) of the resource.|
@@ -79,7 +74,6 @@ This file contains cost and performance parameters for various biorefinery resou
 |BioGasoline\_yield\_MMBtu\_per\_tonne  |MMBtu of gasoline output per tonne of biomass input by biorefinery resource. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
 |BioJetfuel\_yield\_MMBtu\_per\_tonne  |MMBtu of jetfuel output per tonne of biomass input by biorefinery resource. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
 |BioDiesel\_yield\_MMBtu\_per\_tonne  |MMBtu of diesel output per tonne of biomass input by biorefinery resource. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
-|BioEthanol\_yield\_MMBtu\_per\_tonne  |MMBtu of ethanol output per tonne of biomass input by biorefinery resource. Should be consistent with fuel prices in terms of reporting on higher heating value (HHV) or lower heating value (LHV) basis. |
 |Power\_consumption\_MWh\_per\_tonne | MWh of electricity required per tonne of biomass input by biorefinery resource.|
 |H2\_consumption\_tonne\_per\_tonne | Tonne of H2 required per tonne of biomass input by biorefinery resource.|
 |etaFuel\_MMBtu\_per\_tonne | MMBtu of fuel required per tonne of biomass input by biorefinery resource.|
@@ -112,10 +106,6 @@ This file contains the quantity, cost and emissions parameters for woody biomass
 |Cost\_per\_tonne\_per\_hr | Cost of utilizing biomass supply per tonne per hour (\$/tonne/hr). |
 |Max\_tonne\_per\_hr | Maximum biomass supply per tonne per hour (\tonne/hr). |
 
-#### 2.1.4 Bio\_Fuels\_Ethanol\_Demand.csv
-
-This file includes parameters to characterize model the bio ethanol demand for each time step for each zone and the emission factor for bio ethanol. Note that DOLPHYN is designed to model hourly time steps. With some care and effort, finer (e.g. 15 minute) or courser (e.g. 2 hour) time steps can be modeled so long as all time-related parameters are scaled appropriately (e.g. time period weights, heat rates, ramp rates and minimum up and down times for generators, variable costs, etc).
-
 ## 3 Outputs
 
 The table below summarizes the output variables reported as part of the various CSV files produced after each model run. The reported units are also provided. When the model is run with time domain reduction, if a result file includes time-dependent values (e.g. for each model time step), the value will not include the hour weight in it. An annual sum ("AnnualSum") column/row will be provided whenever it is possible (e.g., `BESC_zone_biohydrogen_produced.csv`), and this value takes the time-weights into account. 
@@ -136,13 +126,11 @@ Reports optimal values of investment variables for biorefinery resource.
 | Capacity\_Biodiesel\_MMBtu\_per\_h |Maximum hourly bio diesel production based on built capacity of biorefinery resource |MMBtu / Hr |
 | Capacity\_Biojetfuel\_MMBtu\_per\_h |Maximum hourly bio jetfuel production based on built capacity of biorefinery resource |MMBtu / Hr |
 | Capacity\_Biogasoline\_MMBtu\_per\_h |Maximum hourly bio gasoline production based on built capacity of biorefinery resource |MMBtu / Hr |
-| Capacity\_Bioethanol\_MMBtu\_per\_h |Maximum hourly bio ethanol production based on built capacity of biorefinery resource |MMBtu / Hr |
 | Annual\_Electricity\_Production |Actual annual bio electricity production |MWh |
 | Annual\_H2\_Production |Actual annual bio hydrogen jetfuel production |Tonnes H2 |
 | Annual\_Biodiesel\_Production |Actual annual bio diesel production |MMBtu |
 | Annual\_Biojetfuel\_Production |Actual annual bio jetfuel production |MMBtu |
 | Annual\_Biogasoline\_Production |Actual annual bio gasoline production |MMBtu |
-| Annual\_Bioethanol\_Production |Actual annual bio ethanol production |MMBtu |
 | Max\_Annual\_Biomass\_Consumption |Maximum annual biomass input based on built capacity |Tonnes Biomass |
 | Annual\_Biomass\_Consumption |Actual biomass CO2 input |Tonnes Biomass |
 | Capacity\_Factor |Capacity factor by dividing actual annual biomass input by maximum annual possible biomass input based on built capacity | |
@@ -172,14 +160,10 @@ Reports production of bio jetfuel for each zone and time step.
 
 Reports production of bio gasoline for each zone and time step.
 
-#### 3.1.8 BESC\_zone\_bioethanol\_produced.csv
-
-Reports production of bio ethanol for each zone and time step.
-
-#### 3.1.9 BESC\_zone\_supply\_herb\_consumed.csv
+#### 3.1.8 BESC\_zone\_supply\_herb\_consumed.csv
 
 Reports consumption of herbaceous biomass for each zone and time step.
 
-#### 3.1.10 BESC\_zone\_supply\_wood\_consumed.csv
+#### 3.1.9 BESC\_zone\_supply\_wood\_consumed.csv
 
 Reports consumption of woody biomass for each zone and time step.

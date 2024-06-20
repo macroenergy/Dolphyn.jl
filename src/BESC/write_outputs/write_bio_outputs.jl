@@ -77,9 +77,9 @@ function write_bio_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     if setup["Bio_Gasoline_On"] == 1
       write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
     end
-
-    if setup["Bio_Ethanol_On"] == 1
-      write_bio_zone_bioethanol_produced(path, sep, inputs, setup, EP)
+    
+    if setup["Bio_NG_On"] == 1
+      write_bio_zone_bio_NG_produced(path, sep, inputs, setup, EP)
     end
     
   ## Print confirmation

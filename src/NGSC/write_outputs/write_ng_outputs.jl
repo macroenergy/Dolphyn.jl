@@ -58,10 +58,15 @@ function write_ng_outputs(EP::Model, genx_path::AbstractString, setup::Dict, inp
   write_ng_emissions(path,sep,inputs, setup, EP)
   write_ng_costs(path, sep, inputs, setup, EP)
 
-  if setup["ModelH2Pipelines"] == 1
+  if setup["ModelNGPipelines"] == 1
     write_ng_pipeline_flow(path, sep, inputs, setup, EP)
     write_ng_pipeline_expansion(path, sep, inputs, setup, EP)
     write_ng_pipeline_level(path, sep, inputs, setup, EP)
+  end
+
+  if setup["ModelSyntheticNG"] == 1
+    write_syn_ng_balance(path, sep, inputs, setup, EP)
+    write_syn_ng_capacity(path, sep, inputs, setup, EP)
   end
 
   ## Print confirmation

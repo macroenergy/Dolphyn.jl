@@ -115,21 +115,6 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
     #Scale each constraint
     if setup["ModelSyntheticFuels"] == 1
 
-        #CO2 captured per type of resource "k" #No need to scale ratio
-        @expression(EP,eSyn_Fuels_CO2_Captured_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
-        dfSynFuels[!,:co2_captured_p_co2_in][k] * EP[:vSFCO2in][k,t])
-
-        #Total CO2 capture per zone per time
-        @expression(EP, eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time[z=1:Z, t=1:T], 
-            sum(eSyn_Fuels_CO2_Captured_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
-
-        @expression(EP, eSyn_Fuels_CO2_Capture_Per_Time_Per_Zone[t=1:T, z=1:Z], 
-            sum(eSyn_Fuels_CO2_Captured_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
-
-        #ADD TO CO2 BALANCE
-        EP[:eCaptured_CO2_Balance] += EP[:eSyn_Fuels_CO2_Capture_Per_Time_Per_Zone]
-
-
         ######CO2 emitted as a result of syn fuel consumption
         #CO2 emitted as a result of syn diesel consumption
         @expression(EP,eSyn_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
@@ -144,25 +129,60 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
         Syn_gasoline_co2_per_mmbtu * EP[:eSynFuelProd_Gasoline][t,z])
 
 
-        #CO2 vent emissions per type of resource
-        @expression(EP,eSyn_Fuels_CO2_Emissions_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
-        EP[:vSFCO2in][k,t] - EP[:eSynFuelProd_Diesel_Plant][k,t]*Syn_diesel_co2_per_mmbtu - EP[:eSynFuelProd_Jetfuel_Plant][k,t]*Syn_jetfuel_co2_per_mmbtu - EP[:eSynFuelProd_Gasoline_Plant][k,t]*Syn_gasoline_co2_per_mmbtu)
-
-        #CO2 emitted by fuel usage per zone
-        @expression(EP, eSynfuels_Production_CO2_Emissions_By_Zone[z=1:Z, t=1:T], sum(eSyn_Fuels_CO2_Emissions_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
-
-
-
+        ##########################################################################
         ######## By product emissions
         #CO2 emitted as a result of byproduct fuel consumption
         @expression(EP,eByProdConsCO2Emissions[k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd, t = 1:T], 
         EP[:vSFByProd][k,b,t] * dfSynFuelsByProdEmissions[:,b][k])
+
+        #CO2 emitted as a result of byproduct fuel consumption per plant
+        @expression(EP,eByProdConsCO2EmissionsByPlant[k in 1:SYN_FUELS_RES_ALL, t = 1:T], 
+        sum(EP[:eByProdConsCO2Emissions][k,b,t] for b in 1:NSFByProd))
 
         #CO2 emitted as a result of byproduct fuel consumption by zone, by-product, and time
         @expression(EP,eByProdConsCO2EmissionsByZoneB[b in 1:NSFByProd, z = 1:Z, t = 1:T], sum(EP[:eByProdConsCO2Emissions][k,b,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
 
         #CO2 emitted as a result of byproduct fuel consumption by zone and time
         @expression(EP,eByProdConsCO2EmissionsByZone[z = 1:Z, t = 1:T], sum(EP[:eByProdConsCO2EmissionsByZoneB][b,z,t] for b in 1:NSFByProd)) 
+
+        
+        ##########################################################################
+        #Plant CO2 emissions per type of resource (Input CO2 - Synfuel emissions - Byproduct emission (if any)) --- Before CCS
+        @expression(EP,eSyn_Fuels_CO2_Produced_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
+        EP[:vSFCO2in][k,t] 
+        - EP[:eSynFuelProd_Diesel_Plant][k,t]*Syn_diesel_co2_per_mmbtu - EP[:eSynFuelProd_Jetfuel_Plant][k,t]*Syn_jetfuel_co2_per_mmbtu - EP[:eSynFuelProd_Gasoline_Plant][k,t]*Syn_gasoline_co2_per_mmbtu 
+        - EP[:eByProdConsCO2EmissionsByPlant][k,t])
+
+        ##########################################################################
+        #Plant CO2 captured per type of resource defined by CCS rate (Add to captured CO2 balance)
+        @expression(EP,eSyn_Fuels_CO2_Captured_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
+        dfSynFuels[!,:CCS_Rate][k] * EP[:eSyn_Fuels_CO2_Produced_By_Res][k,t])
+
+        #Total CO2 capture per zone per time
+        @expression(EP, eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time[z=1:Z, t=1:T], 
+        sum(eSyn_Fuels_CO2_Captured_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
+
+        @expression(EP, eSyn_Fuels_CO2_Capture_Per_Time_Per_Zone[t=1:T, z=1:Z], 
+        sum(eSyn_Fuels_CO2_Captured_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
+
+        #ADD TO CO2 BALANCE
+        EP[:eCaptured_CO2_Balance] += EP[:eSyn_Fuels_CO2_Capture_Per_Time_Per_Zone]
+
+        ##########################################################################
+        #Plant CO2 emitted per type of resource --- After CCS (Add to CO2 cap policy)
+        @expression(EP,eSyn_Fuels_CO2_Emissions_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 
+        (1 - dfSynFuels[!,:CCS_Rate][k]) * EP[:eSyn_Fuels_CO2_Produced_By_Res][k,t])
+
+        @expression(EP, eSynfuels_Production_CO2_Emissions_By_Zone[z=1:Z, t=1:T], sum(eSyn_Fuels_CO2_Emissions_By_Res[k,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
+
+
+        
+
+
+
+
+        
+        
     end
 
     return EP

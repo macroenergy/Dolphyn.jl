@@ -53,22 +53,7 @@ function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
     Z = inputs["Z"]     # Number of zones
 	T = inputs["T"]     # Number of time steps (hours)
 
-   
-
     if setup["Liquid_Fuels_Regional_Demand"] == 1
-        Conv_gasoline_regional_price_df = inputs["Conv_Gasoline_Regional_Price"]
-        Conv_jetfuel_regional_price_df = inputs["Conv_Jetfuel_Regional_Price"]
-        Conv_diesel_regional_price_df = inputs["Conv_Diesel_Regional_Price"]
-
-        if setup["ParameterScale"] ==1
-            Conv_gasoline_regional_price = Conv_gasoline_regional_price_df[!,:Price] / ModelScalingFactor^2 #Change price from $ to $M
-            Conv_jetfuel_regional_price = Conv_jetfuel_regional_price_df[!,:Price] / ModelScalingFactor^2 #Change price from $ to $M
-            Conv_diesel_regional_price = Conv_diesel_regional_price_df[!,:Price] / ModelScalingFactor^2 #Change price from $ to $M
-        else
-            Conv_gasoline_regional_price = Conv_gasoline_regional_price_df[!,:Price]
-            Conv_jetfuel_regional_price = Conv_jetfuel_regional_price_df[!,:Price]
-            Conv_diesel_regional_price = Conv_diesel_regional_price_df[!,:Price]
-        end
 
         if setup["Liquid_Fuels_Hourly_Demand"] == 1
 
@@ -85,9 +70,9 @@ function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             ### Expressions ###
             #Cost of Conventional Fuel
             #Sum up conventional Fuel Costs
-            @expression(EP, eTotalCLFGasolineVarOut_Z[z = 1:Z], sum((inputs["omega"][t] * Conv_gasoline_regional_price[z] * vConvLFGasolineDemand[t,z]) for t in 1:T))
-            @expression(EP, eTotalCLFJetfuelVarOut_Z[z = 1:Z], sum((inputs["omega"][t] * Conv_jetfuel_regional_price[z] * vConvLFJetfuelDemand[t,z]) for t in 1:T))
-            @expression(EP, eTotalCLFDieselVarOut_Z[z = 1:Z], sum((inputs["omega"][t] * Conv_diesel_regional_price[z] * vConvLFDieselDemand[t,z]) for t in 1:T))
+            @expression(EP, eTotalCLFGasolineVarOut_Z[z = 1:Z], sum((inputs["omega"][t] * inputs["Gasoline_Price_Regional"][t,z] * vConvLFGasolineDemand[t,z]) for t in 1:T))
+            @expression(EP, eTotalCLFJetfuelVarOut_Z[z = 1:Z], sum((inputs["omega"][t] * inputs["Jetfuel_Price_Regional"][t,z] * vConvLFJetfuelDemand[t,z]) for t in 1:T))
+            @expression(EP, eTotalCLFDieselVarOut_Z[z = 1:Z], sum((inputs["omega"][t] * inputs["Diesel_Price_Regional"][t,z] * vConvLFDieselDemand[t,z]) for t in 1:T))
 
             @expression(EP, eTotalCLFGasolineVarOut, sum(EP[:eTotalCLFGasolineVarOut_Z][z] for z in 1:Z))
             @expression(EP, eTotalCLFJetfuelVarOut, sum(EP[:eTotalCLFJetfuelVarOut_Z][z] for z in 1:Z))
@@ -112,11 +97,11 @@ function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             
             ### Expressions ###
             #Cost of Conventional Fuel
-            #Sum up conventional Fuel Costs
+            #Sum up conventional Fuel Costs (Take input price of first hour if not modeling price variation)
 
-            @expression(EP, eTotalCLFGasolineVarOut_Z[z = 1:Z], Conv_gasoline_regional_price[z] * vConvLFGasolineDemand[z])
-            @expression(EP, eTotalCLFJetfuelVarOut_Z[z = 1:Z], Conv_jetfuel_regional_price[z] * vConvLFJetfuelDemand[z])
-            @expression(EP, eTotalCLFDieselVarOut_Z[z = 1:Z], Conv_diesel_regional_price[z] * vConvLFDieselDemand[z])
+            @expression(EP, eTotalCLFGasolineVarOut_Z[z = 1:Z], inputs["Gasoline_Price_Regional"][1,z] * vConvLFGasolineDemand[z])
+            @expression(EP, eTotalCLFJetfuelVarOut_Z[z = 1:Z], inputs["Jetfuel_Price_Regional"][1,z] * vConvLFJetfuelDemand[z])
+            @expression(EP, eTotalCLFDieselVarOut_Z[z = 1:Z], inputs["Diesel_Price_Regional"][1,z] * vConvLFDieselDemand[z])
 
             @expression(EP, eTotalCLFGasolineVarOut, sum(EP[:eTotalCLFGasolineVarOut_Z][z] for z in 1:Z))
             @expression(EP, eTotalCLFJetfuelVarOut, sum(EP[:eTotalCLFJetfuelVarOut_Z][z] for z in 1:Z))
@@ -131,17 +116,6 @@ function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
     elseif setup["Liquid_Fuels_Regional_Demand"] == 0
         
-        if setup["ParameterScale"] ==1
-            Global_conventional_gasoline_price_per_mmbtu = inputs["Global_conventional_gasoline_price_per_mmbtu"] / ModelScalingFactor^2 #Change price from $ to $M
-            Global_conventional_jetfuel_price_per_mmbtu = inputs["Global_conventional_jetfuel_price_per_mmbtu"] / ModelScalingFactor^2 #Change price from $ to $M
-            Global_conventional_diesel_price_per_mmbtu = inputs["Global_conventional_diesel_price_per_mmbtu"] / ModelScalingFactor^2 #Change price from $ to $M
-        else
-            Global_conventional_gasoline_price_per_mmbtu = inputs["Global_conventional_gasoline_price_per_mmbtu"]
-            Global_conventional_jetfuel_price_per_mmbtu = inputs["Global_conventional_jetfuel_price_per_mmbtu"]
-            Global_conventional_diesel_price_per_mmbtu = inputs["Global_conventional_diesel_price_per_mmbtu"]
-        end
-
-
         if setup["Liquid_Fuels_Hourly_Demand"] == 1
 
             #If do conventional as global hourly variable [t]
@@ -157,9 +131,9 @@ function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
             ### Expressions ###
             #Cost of Conventional Fuel
             #Sum up conventional Fuel Costs
-            @expression(EP, eTotalCLFGasolineVarOut, sum((inputs["omega"][t] * Global_conventional_gasoline_price_per_mmbtu * vConvLFGasolineDemand[t]) for t in 1:T))
-            @expression(EP, eTotalCLFJetfuelVarOut, sum((inputs["omega"][t] * Global_conventional_jetfuel_price_per_mmbtu * vConvLFJetfuelDemand[t]) for t in 1:T))
-            @expression(EP, eTotalCLFDieselVarOut, sum((inputs["omega"][t] * Global_conventional_diesel_price_per_mmbtu * vConvLFDieselDemand[t]) for t in 1:T))
+            @expression(EP, eTotalCLFGasolineVarOut, sum((inputs["omega"][t] * inputs["Gasoline_Price_Global"][t] * vConvLFGasolineDemand[t]) for t in 1:T))
+            @expression(EP, eTotalCLFJetfuelVarOut, sum((inputs["omega"][t] * inputs["Jetfuel_Price_Global"][t] * vConvLFJetfuelDemand[t]) for t in 1:T))
+            @expression(EP, eTotalCLFDieselVarOut, sum((inputs["omega"][t] * inputs["Diesel_Price_Global"][t] * vConvLFDieselDemand[t]) for t in 1:T))
 
             #Add to objective function
             EP[:eObj] += eTotalCLFGasolineVarOut
@@ -180,10 +154,10 @@ function conventional_fuel_demand(EP::Model, inputs::Dict, setup::Dict)
 
             ### Expressions ###
             #Cost of Conventional Fuel
-            #Sum up conventional Fuel Costs
-            @expression(EP, eTotalCLFGasolineVarOut, Global_conventional_gasoline_price_per_mmbtu * vConvLFGasolineDemand)
-            @expression(EP, eTotalCLFJetfuelVarOut, Global_conventional_jetfuel_price_per_mmbtu * vConvLFJetfuelDemand)
-            @expression(EP, eTotalCLFDieselVarOut, Global_conventional_diesel_price_per_mmbtu * vConvLFDieselDemand)
+            #Sum up conventional Fuel Costs (Take input price of first hour if not modeling price variation)
+            @expression(EP, eTotalCLFGasolineVarOut, inputs["Gasoline_Price_Global"][1] * vConvLFGasolineDemand)
+            @expression(EP, eTotalCLFJetfuelVarOut, inputs["Jetfuel_Price_Global"][1] * vConvLFJetfuelDemand)
+            @expression(EP, eTotalCLFDieselVarOut, inputs["Diesel_Price_Global"][1] * vConvLFDieselDemand)
 
             #Add to objective function
             EP[:eObj] += eTotalCLFGasolineVarOut

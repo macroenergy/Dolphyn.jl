@@ -95,7 +95,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	Demand = - sum(sum(inputs["omega"].* (inputs["H2_D"][:,z]) for z in 1:Z))
 
 	if setup["ModelLFSC"] == 1 && setup["ModelSyntheticFuels"] == 1
-		Synfuel_Consumption = sum(sum(inputs["omega"].* value.(EP[:eSynFuelH2Cons])[:,z] for z in 1:Z))
+		Synfuel_Consumption = sum(sum(inputs["omega"].* value.(EP[:eSyn_Fuel_H2_Cons])[:,z] for z in 1:Z))
 	else
 		Synfuel_Consumption = 0 
 	end
@@ -165,7 +165,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		tempDemand = tempDemand - sum(inputs["omega"].* (inputs["H2_D"][:,z]))
 
 		if setup["ModelLFSC"] == 1 && setup["ModelSyntheticFuels"] == 1
-			tempSynfuel_Consumption = tempSynfuel_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelH2Cons])[:,z]))
+			tempSynfuel_Consumption = tempSynfuel_Consumption - sum(inputs["omega"].* (value.(EP[:eSyn_Fuel_H2_Cons])[:,z]))
 		end
 
 		tempCTotal = tempGreen_H2_Generation + tempBlue_H2_Generation + tempGrey_H2_Generation + tempBio_H2 + tempNonserved_Energy + tempH2_Pipeline_Import_Export + tempH2_Truck_Import_Export + tempTruck_Consumption + tempH2G2P + tempDemand + tempSynfuel_Consumption

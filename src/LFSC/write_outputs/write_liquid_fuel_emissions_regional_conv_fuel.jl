@@ -44,7 +44,7 @@ function write_liquid_fuel_emissions_regional_conv_fuel(path::AbstractString, se
 
 		for t in 1:T
 			if setup["ModelSyntheticFuels"] == 1
-				dfTemp1[t+rowoffset,1] = value.(EP[:eSynFuelCO2Cons_Per_Time_Per_Zone][t,z])
+				dfTemp1[t+rowoffset,1] = value.(EP[:eSyn_Fuel_CO2_Cons_Per_Time_Per_Zone][t,z])
 				dfTemp1[t+rowoffset,2] = value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t])
 				dfTemp1[t+rowoffset,3] = value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t])
 				dfTemp1[t+rowoffset,4] = value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t])
@@ -112,7 +112,7 @@ function write_liquid_fuel_emissions_regional_conv_fuel(path::AbstractString, se
 
 		#Calculate annual values
 		if setup["ModelSyntheticFuels"] == 1
-			dfTemp1[rowoffset,1]= sum(inputs["omega"][t] * value.(EP[:eSynFuelCO2Cons_Per_Time_Per_Zone][t,z]) for t in 1:T)
+			dfTemp1[rowoffset,1]= sum(inputs["omega"][t] * value.(EP[:eSyn_Fuel_CO2_Cons_Per_Time_Per_Zone][t,z]) for t in 1:T)
 			dfTemp1[rowoffset,2]= sum(inputs["omega"][t] * value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
 			dfTemp1[rowoffset,3]= sum(inputs["omega"][t] * value.(EP[:eSyn_Fuels_CO2_Capture_Per_Zone_Per_Time][z,t]) for t in 1:T)
 			dfTemp1[rowoffset,4]= sum(inputs["omega"][t] * value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)

@@ -38,42 +38,49 @@ function ng_emissions(EP::Model, inputs::Dict, setup::Dict)
     ######################################################################
     ##CO2 emitted as a result of synthetic ng production and consumption
 
-    #if setup["ModelSyntheticNG"] == 1
-    #    dfSNG = inputs["dfSNG"]
-    #    SYN_NG_RES_ALL = inputs["SYN_NG_RES_ALL"]
-    #end
+    if setup["ModelSyntheticNG"] == 1
 
-    #Syn_ng_co2_per_mmbtu = inputs["Syn_ng_co2_per_mmbtu"]
+        dfSyn_NG = inputs["dfSyn_NG"]
+        SYN_NG_RES_ALL = inputs["SYN_NG_RES_ALL"]
 
-    #if setup["ModelSyntheticNG"] == 1
-
-        #CO2 emitted per type of resource "k"
-        #@expression(EP,eSyn_NG_CO2_Emissions_By_Res[k=1:SYN_NG_RES_ALL,t=1:T], 
-        #dfSNG[!,:co2_out_p_co2_in][k] * EP[:vSNGCO2in][k,t])
-
-        #CO2 captured per type of resource "k"
-        #@expression(EP,eSyn_NG_CO2_Captured_By_Res[k=1:SYN_NG_RES_ALL,t=1:T], 
-        #dfSNG[!,:co2_captured_p_co2_in][k] * EP[:vSNGCO2in][k,t])
-
-        #Total CO2 capture per zone per time
-        #@expression(EP, eSyn_NG_CO2_Capture_Per_Zone_Per_Time[z=1:Z, t=1:T], 
-        #sum(eSyn_NG_CO2_Captured_By_Res[k,t] for k in dfSNG[(dfSNG[!,:Zone].==z),:R_ID]))
-
-        #@expression(EP, eSyn_NG_CO2_Capture_Per_Time_Per_Zone[t=1:T, z=1:Z], 
-        #sum(eSyn_NG_CO2_Captured_By_Res[k,t] for k in dfSNG[(dfSNG[!,:Zone].==z),:R_ID]))
-
-        #ADD TO CO2 BALANCE
-        #EP[:eCaptured_CO2_Balance] += EP[:eSyn_NG_CO2_Capture_Per_Time_Per_Zone]
-
-        #CO2 emitted by syn ng production per zone
-        #@expression(EP, eSyn_NG_Production_CO2_Emissions_By_Zone[z=1:Z, t=1:T], 
-        #sum(eSyn_NG_CO2_Emissions_By_Res[k,t] for k in dfSNG[(dfSNG[!,:Zone].==z),:R_ID]))
+        Syn_ng_co2_per_mmbtu = inputs["Syn_ng_co2_per_mmbtu"]
 
         #CO2 emitted as a result of syn ng consumption
-        #@expression(EP,eSyn_NG_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-        #Syn_ng_co2_per_mmbtu * EP[:eSynFuelProd_NG][t,z])
+        @expression(EP,eSyn_NG_CO2_Emissions_By_Plant[k=1:SYN_NG_RES_ALL,t=1:T], 
+        Syn_ng_co2_per_mmbtu * EP[:eSyn_NG_Prod_Plant][k,t])
 
-    #end
+        @expression(EP,eSyn_NG_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+        sum(eSyn_NG_CO2_Emissions_By_Plant[k,t] for k in dfSyn_NG[(dfSyn_NG[!,:Zone].==z),:R_ID]))
+
+        ##########################################################################
+        #Plant CO2 emissions per type of resource (Input CO2 - Syn NG emissions) --- Before CCS
+        @expression(EP,eSyn_NG_CO2_Production_By_Plant[k=1:SYN_NG_RES_ALL,t=1:T], 
+        EP[:vSyn_NG_CO2in][k,t] - EP[:eSyn_NG_CO2_Emissions_By_Plant][k,t])
+
+        ##########################################################################
+        #Plant CO2 captured per type of resource defined by CCS rate (Add to captured CO2 balance)
+        @expression(EP,eSyn_NG_CO2_Captured_By_Res[k=1:SYN_NG_RES_ALL,t=1:T], 
+        dfSyn_NG[!,:CCS_Rate][k] * EP[:eSyn_NG_CO2_Production_By_Plant][k,t])
+
+        #Total CO2 capture per zone per time
+        @expression(EP, eSyn_NG_CO2_Capture_Per_Zone_Per_Time[z=1:Z, t=1:T], 
+        sum(eSyn_NG_CO2_Captured_By_Res[k,t] for k in dfSyn_NG[(dfSyn_NG[!,:Zone].==z),:R_ID]))
+
+        @expression(EP, eSyn_NG_CO2_Capture_Per_Time_Per_Zone[t=1:T, z=1:Z], 
+        sum(eSyn_NG_CO2_Captured_By_Res[k,t] for k in dfSyn_NG[(dfSyn_NG[!,:Zone].==z),:R_ID]))
+
+        #ADD TO CO2 BALANCE
+        EP[:eCaptured_CO2_Balance] += EP[:eSyn_NG_CO2_Capture_Per_Time_Per_Zone]
+
+        ##########################################################################
+        #Plant CO2 emitted per type of resource --- After CCS (Add to CO2 cap policy)
+        @expression(EP,eSyn_NG_CO2_Emissions_By_Res[k=1:SYN_NG_RES_ALL,t=1:T], 
+        (1 - dfSyn_NG[!,:CCS_Rate][k]) * EP[:eSyn_NG_CO2_Production_By_Plant][k,t])
+
+        @expression(EP, eSyn_NG_Production_CO2_Emissions_By_Zone[z=1:Z, t=1:T], 
+        sum(eSyn_NG_CO2_Emissions_By_Res[k,t] for k in dfSyn_NG[(dfSyn_NG[!,:Zone].==z),:R_ID]))
+
+    end
 
     return EP
 end

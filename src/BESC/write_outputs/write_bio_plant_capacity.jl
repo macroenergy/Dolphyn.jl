@@ -29,16 +29,10 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 	capbiodiesel = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 	capbiojetfuel = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 	capbiogasoline = zeros(size(inputs["BIO_RESOURCES_NAME"]))
-	capbioethanol = zeros(size(inputs["BIO_RESOURCES_NAME"]))
+	capbio_NG = zeros(size(inputs["BIO_RESOURCES_NAME"]))
 
 	for i in 1:inputs["BIO_RES_ALL"]
 		capbioenergy[i] = value(EP[:vCapacity_BIO_per_type][i])
-		#capbioelectricity[i] = 0
-		#capbioH2[i] = 0
-		#capbiodiesel[i] = 0
-		#capbiojetfuel[i] = 0
-		#capbiogasoline[i] = 0
-		#capbioethanol[i] = 0
 	end
 
 	for i in inputs["BIO_ELEC"]
@@ -61,8 +55,9 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 		capbiogasoline[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioGasoline_yield_MMBtu_per_tonne][i]
 	end
 
-	for i in inputs["BIO_ETHANOL"]
-		capbioethanol[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:BioEthanol_yield_MMBtu_per_tonne][i]
+
+	for i in inputs["BIO_NG"]
+		capbio_NG[i] = value(EP[:vCapacity_BIO_per_type][i]) * dfbioenergy[!,:Bio_NG_yield_MMBtu_per_tonne][i]
 	end
 
 	AnnualElectricity = zeros(size(1:inputs["BIO_RES_ALL"]))
@@ -70,7 +65,7 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 	AnnualBioDiesel = zeros(size(1:inputs["BIO_RES_ALL"]))
 	AnnualBioJetfuel = zeros(size(1:inputs["BIO_RES_ALL"]))
 	AnnualBioGasoline = zeros(size(1:inputs["BIO_RES_ALL"]))
-	AnnualBioEthanol = zeros(size(1:inputs["BIO_RES_ALL"]))
+	AnnualBioNG = zeros(size(1:inputs["BIO_RES_ALL"]))
 	MaxBiomassConsumption = zeros(size(1:inputs["BIO_RES_ALL"]))
 	AnnualBiomassConsumption = zeros(size(1:inputs["BIO_RES_ALL"]))
 	CapFactor = zeros(size(1:inputs["BIO_RES_ALL"]))
@@ -82,7 +77,7 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 		AnnualBioDiesel[i] = sum(inputs["omega"].* (value.(EP[:eBiodiesel_produced_per_plant_per_time])[i,:]))
 		AnnualBioJetfuel[i] = sum(inputs["omega"].* (value.(EP[:eBiojetfuel_produced_per_plant_per_time])[i,:]))
 		AnnualBioGasoline[i] = sum(inputs["omega"].* (value.(EP[:eBiogasoline_produced_per_plant_per_time])[i,:]))
-		AnnualBioEthanol[i] = sum(inputs["omega"].* (value.(EP[:eBioethanol_produced_per_plant_per_time])[i,:]))
+		AnnualBioNG[i] = sum(inputs["omega"].* (value.(EP[:eBio_NG_produced_per_plant_per_time])[i,:]))
 		MaxBiomassConsumption[i] = value.(EP[:vCapacity_BIO_per_type])[i] * 8760
 		AnnualBiomassConsumption[i] = sum(inputs["omega"].* (value.(EP[:vBiomass_consumed_per_plant_per_time])[i,:]))
 		AnnualCO2Emission[i] = sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_emissions_per_plant_per_time])[i,:] - value.(EP[:eBiomass_CO2_captured_per_plant_per_time])[i,:]))
@@ -105,37 +100,18 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 		Capacity_Biodiesel_MMBtu_per_h = capbiodiesel[:],
 		Capacity_Biojetfuel_MMBtu_per_h = capbiojetfuel[:],
 		Capacity_Biogasoline_MMBtu_per_h = capbiogasoline[:],
-		Capacity_Bioethanol_MMBtu_per_h = capbioethanol[:],
+		Capacity_Bio_NG_MMBtu_per_h = capbio_NG[:],
 		Annual_Electricity_Production = AnnualElectricity[:],
 		Annual_H2_Production = AnnualH2[:],
 		Annual_Biodiesel_Production = AnnualBioDiesel[:],
 		Annual_Biojetfuel_Production = AnnualBioJetfuel[:],
 		Annual_Biogasoline_Production = AnnualBioGasoline[:],
-		Annual_Bioethanol_Production = AnnualBioEthanol[:],
+		Annual_Bio_NG_Production = AnnualBioNG[:],
 		Max_Annual_Biomass_Consumption = MaxBiomassConsumption[:],
 		Annual_Biomass_Consumption = AnnualBiomassConsumption[:],
 		CapacityFactor = CapFactor[:],
 		Annual_CO2_Emission = AnnualCO2Emission[:]
 	)
-
-	if setup["ParameterScale"] ==1
-		dfCap.Capacity_tonne_biomass_per_h = dfCap.Capacity_tonne_biomass_per_h * ModelScalingFactor
-		dfCap.Capacity_Bioelectricity_MWh_per_h = dfCap.Capacity_Bioelectricity_MWh_per_h * ModelScalingFactor
-		dfCap.Capacity_BioH2_tonne_per_h = dfCap.Capacity_BioH2_tonne_per_h * ModelScalingFactor
-		dfCap.Capacity_Biodiesel_MMBtu_per_h = dfCap.Capacity_Biodiesel_MMBtu_per_h * ModelScalingFactor
-		dfCap.Capacity_Biojetfuel_MMBtu_per_h = dfCap.Capacity_Biojetfuel_MMBtu_per_h * ModelScalingFactor
-		dfCap.Capacity_Biogasoline_MMBtu_per_h = dfCap.Capacity_Biogasoline_MMBtu_per_h * ModelScalingFactor
-		dfCap.Capacity_Bioethanol_MMBtu_per_h = dfCap.Capacity_Bioethanol_MMBtu_per_h * ModelScalingFactor
-		dfCap.Annual_Electricity_Production = dfCap.Annual_Electricity_Production * ModelScalingFactor
-		dfCap.Annual_H2_Production = dfCap.Annual_H2_Production * ModelScalingFactor
-		dfCap.Annual_Biodiesel_Production = dfCap.Annual_Biodiesel_Production * ModelScalingFactor
-		dfCap.Annual_Biojetfuel_Production = dfCap.Annual_Biojetfuel_Production * ModelScalingFactor
-		dfCap.Annual_Biogasoline_Production = dfCap.Annual_Biogasoline_Production * ModelScalingFactor
-		dfCap.Annual_Bioethanol_Production = dfCap.Annual_Bioethanol_Production * ModelScalingFactor
-		dfCap.Max_Annual_Biomass_Consumption = dfCap.Max_Annual_Biomass_Consumption * ModelScalingFactor
-		dfCap.Annual_Biomass_Consumption = dfCap.Annual_Biomass_Consumption * ModelScalingFactor
-		dfCap.Annual_CO2_Emission = dfCap.Annual_CO2_Emission * ModelScalingFactor
-	end
 
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
@@ -145,13 +121,13 @@ function write_bio_plant_capacity(path::AbstractString, sep::AbstractString, inp
 			Capacity_Biodiesel_MMBtu_per_h = sum(dfCap[!,:Capacity_Biodiesel_MMBtu_per_h]),
 			Capacity_Biojetfuel_MMBtu_per_h = sum(dfCap[!,:Capacity_Biojetfuel_MMBtu_per_h]),
 			Capacity_Biogasoline_MMBtu_per_h = sum(dfCap[!,:Capacity_Biogasoline_MMBtu_per_h]),
-			Capacity_Bioethanol_MMBtu_per_h = sum(dfCap[!,:Capacity_Bioethanol_MMBtu_per_h]),
+			Capacity_Bio_NG_MMBtu_per_h = sum(dfCap[!,:Capacity_Bio_NG_MMBtu_per_h]),
 			Annual_Electricity_Production = sum(dfCap[!,:Annual_Electricity_Production]),
 			Annual_H2_Production = sum(dfCap[!,:Annual_H2_Production]),
 			Annual_Biodiesel_Production = sum(dfCap[!,:Annual_Biodiesel_Production]),
 			Annual_Biojetfuel_Production = sum(dfCap[!,:Annual_Biojetfuel_Production]),
 			Annual_Biogasoline_Production = sum(dfCap[!,:Annual_Biogasoline_Production]),
-			Annual_Bioethanol_Production = sum(dfCap[!,:Annual_Bioethanol_Production]),
+			Annual_Bio_NG_Production = sum(dfCap[!,:Annual_Bio_NG_Production]),
 			Max_Annual_Biomass_Consumption = sum(dfCap[!,:Max_Annual_Biomass_Consumption]), 
 			Annual_Biomass_Consumption = sum(dfCap[!,:Annual_Biomass_Consumption]),
 			CapacityFactor = "-",

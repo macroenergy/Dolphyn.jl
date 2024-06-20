@@ -57,6 +57,10 @@ function load_ng_inputs(inputs::Dict,setup::Dict,path::AbstractString)
     else
         inputs["NG_P"] = 0
     end
+
+    if setup["ModelSyntheticNG"] == 1    
+        inputs = load_syn_ng_resources(setup, path, sep, inputs)
+    end
     
     print_and_log("NGSC Input CSV Files Successfully Read In From $path$sep")
 

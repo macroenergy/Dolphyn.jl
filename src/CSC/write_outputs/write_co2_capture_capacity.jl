@@ -55,12 +55,6 @@ function write_co2_capture_capacity(path::AbstractString, sep::AbstractString, i
 		CapacityFactor = CapFactor[:]
 	)
 
-	if setup["ParameterScale"] ==1
-		dfCap.Capacity = dfCap.Capacity * ModelScalingFactor
-		dfCap.Max_Annual_Capture = dfCap.Max_Annual_Capture * ModelScalingFactor
-		dfCap.Annual_Capture = dfCap.Annual_Capture * ModelScalingFactor
-	end
-
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
 			Capacity = sum(dfCap[!,:Capacity]),

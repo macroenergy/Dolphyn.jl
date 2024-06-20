@@ -42,7 +42,7 @@ function load_bio_refinery(setup::Dict, path::AbstractString, sep::AbstractStrin
 
 	inputs_bioenergy["BIO_JETFUEL"] = bioenergy[bioenergy.BioJetfuel_Production.== 1 ,:R_ID]
 
-	inputs_bioenergy["BIO_ETHANOL"] = bioenergy[bioenergy.BioEthanol_Production.== 1 ,:R_ID]
+	inputs_bioenergy["BIO_NG"] = bioenergy[bioenergy.Bio_NG_Production.== 1 ,:R_ID]
 
 	# Name of CO2 capture resources
 	inputs_bioenergy["BIO_RESOURCES_NAME"] = collect(skipmissing(bioenergy[!,:Biorefinery][1:inputs_bioenergy["BIO_RES_ALL"]]))

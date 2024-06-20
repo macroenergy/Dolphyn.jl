@@ -55,17 +55,10 @@ function DAC_investment(EP::Model, inputs::Dict, setup::Dict)
 	#General variables for non-piecewise and piecewise cost functions
 	@variable(EP,vCapacity_DAC_per_type[i in 1:DAC_RES_ALL])
 
-	if setup["ParameterScale"] == 1
-		DAC_Capacity_Min_Limit = dfDAC[!,:Min_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
-		DAC_Capacity_Max_Limit = dfDAC[!,:Max_capacity_tonne_per_hr]/ModelScalingFactor # kt/h
-		DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-		DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-	else
-		DAC_Capacity_Min_Limit = dfDAC[!,:Min_capacity_tonne_per_hr] # t/h
-		DAC_Capacity_Max_Limit = dfDAC[!,:Max_capacity_tonne_per_hr] # t/h
-		DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]
-		DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
-	end
+	DAC_Capacity_Min_Limit = dfDAC[!,:Min_capacity_tonne_per_hr] # t/h
+	DAC_Capacity_Max_Limit = dfDAC[!,:Max_capacity_tonne_per_hr] # t/h
+	DAC_Inv_Cost_per_tonne_per_hr_yr = dfDAC[!,:Inv_Cost_per_tonne_per_hr_yr]
+	DAC_Fixed_OM_Cost_per_tonne_per_hr_yr = dfDAC[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
 
 	#Investment cost = CAPEX
 	@expression(EP, eCAPEX_DAC_per_type[i in 1:DAC_RES_ALL], EP[:vCapacity_DAC_per_type][i] * DAC_Inv_Cost_per_tonne_per_hr_yr[i])

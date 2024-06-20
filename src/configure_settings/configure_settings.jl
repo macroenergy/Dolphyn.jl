@@ -164,7 +164,6 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     set_default_if_absent!(settings, "Bio_Diesel_On", 0)
     set_default_if_absent!(settings, "Bio_Jetfuel_On", 0)
     set_default_if_absent!(settings, "Bio_Gasoline_On", 0)
-    set_default_if_absent!(settings, "Bio_Ethanol_On", 0)
 
     #Parameter Scaling for BESC is untested
     if settings["ModelBESC"] == 1

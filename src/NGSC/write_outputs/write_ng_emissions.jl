@@ -30,7 +30,7 @@ function write_ng_emissions(path::AbstractString, sep::AbstractString, inputs::D
 	rowoffset=3
 	for z in 1:Z
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2_In","SNG_Prod_Emissions", "SNG_Prod_Captured", "Syn_NG_Emissions", "Bio_NG_Emissions", "Conventional_NG_Emissions"])
+	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2 In","Syn NG Plant Emissions", "Syn NG Plant Captured", "Syn NG Emissions", "Bio NG Emissions", "Conventional NG Emissions"])
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 		for t in 1:T
@@ -41,16 +41,16 @@ function write_ng_emissions(path::AbstractString, sep::AbstractString, inputs::D
 			dfTemp1[t+rowoffset,4] = 0
 			dfTemp1[t+rowoffset,5] = 0
 
-			#if setup["ModelSyntheticNG"] == 1
-			#	dfTemp1[t+rowoffset,1] = value.(EP[:eSyn_NG_CO2_Cons_Per_Time_Per_Zone][t,z])
-			#	dfTemp1[t+rowoffset,2] = value.(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t])
-			#	dfTemp1[t+rowoffset,3] = value.(EP[:eSyn_NG_CO2_Capture_Per_Zone_Per_Time][z,t])
-			#	dfTemp1[t+rowoffset,4] = value.(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t])
-			#end
+			if setup["ModelSyntheticNG"] == 1
+				dfTemp1[t+rowoffset,1] = value.(EP[:eSyn_NG_CO2_Cons_Per_Time_Per_Zone][t,z])
+				dfTemp1[t+rowoffset,2] = value.(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t])
+				dfTemp1[t+rowoffset,3] = value.(EP[:eSyn_NG_CO2_Capture_Per_Zone_Per_Time][z,t])
+				dfTemp1[t+rowoffset,4] = value.(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t])
+			end
 
-			#if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
-			#	dfTemp1[t+rowoffset,5] = value.(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t])
-			#end
+			if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
+				dfTemp1[t+rowoffset,5] = value.(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t])
+			end
 
 			dfTemp1[t+rowoffset,6] = value.(EP[:eConv_NG_CO2_Emissions][z,t])
 

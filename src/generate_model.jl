@@ -311,8 +311,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		if setup["ModelCO2Storage"] == 1
 			#model CO2 injection
 			EP = co2_injection(EP, inputs, setup)
-
-            #EP = co2_storage_investment(EP, inputs, setup)
 		end
 
 		if setup["ModelCO2Pipelines"] == 1
@@ -322,16 +320,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
 		# Direct emissions of various carbon capture sector resources
 		EP = emissions_csc(EP, inputs,setup)
-
-
-		# Fixed costs of external carbon capture compression
-
-		#EP = co2_capture_compression_investment(EP, inputs, setup)
-
-		#if !isempty(inputs["CO2_CAPTURE_COMP"])
-			#model CO2 capture
-		#	EP = co2_capture_compression(EP, inputs, setup)
-		#end
 
 		#EP[:eAdditionalDemandByZone] += EP[:eCSCNetpowerConsumptionByAll]
 
@@ -382,7 +370,36 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		EP = conventional_fuel_demand(EP, inputs, setup)
 		EP = liquid_fuel_emissions(EP, inputs, setup)
     
-        #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynFuelRes]
+        #EP[:eAdditionalDemandByZone] += EP[:eSyn_Fuel_Power_Cons]
+    end
+
+    ###### START OF NATURAL GAS INFRASTRUCTURE MODEL ######
+    if setup["ModelNGSC"] == 1
+
+        # Initialize Syn + bio NG Balance [z,t]
+        @expression(EP, eSB_NG_Balance[t=1:T, z=1:Z], 0)
+
+        println("Generating Natural Gas Supply Chain model")
+
+        # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, eNGNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
+
+        EP = conventional_ng_demand(EP, inputs, setup)
+
+        if setup["ModelNGPipelines"] == 1
+            # model natural gas transmission via pipelines
+            EP = ng_pipeline(EP, inputs, setup)
+        end
+        
+        if setup["ModelSyntheticNG"] == 1
+            EP = syn_ng_outputs(EP, inputs, setup)
+            EP = syn_ng_investment(EP, inputs, setup)
+            EP = syn_ng_resources(EP, inputs, setup)
+        end
+
+        EP = ng_emissions(EP, inputs, setup)
+        
+        #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynNGRes]
     end
 
 
@@ -415,43 +432,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Direct emissions
 		EP = emissions_besc(EP, inputs,setup)
 
-        if setup["ModelLFSC"] == 1 && setup["Bio_Ethanol_On"] == 1
-            @expression(EP, eEthanolBalance[t=1:T, z=1:Z], 0)
-        end
-
         #EP[:eAdditionalDemandByZone] += EP[:eBioNetpowerConsumptionByAll]
-    end
-
-
-    ###### START OF LIQUID FUELS INFRASTRUCTURE MODEL ######
-    if setup["ModelNGSC"] == 1
-
-        println("Generating Natural Gas Supply Chain model")
-        #@expression(EP, eNGenerationByZone[z=1:Z, t=1:T], 0)
-        #@expression(EP, eNTransmissionByZone[t=1:T, z=1:Z], 0)
-        #@expression(EP, eNDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
-        # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
-        @expression(EP, eNGNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
-
-        EP = conventional_ng_demand(EP, inputs, setup)
-		EP = ng_emissions(EP, inputs, setup)
-
-        if setup["ModelNGPipelines"] == 1
-            # model natural gas transmission via pipelines
-            EP = ng_pipeline(EP, inputs, setup)
-        end
-
-        ### To be completed
-        # Initialize Syn and bio NG Balance [z,t]
-        #@expression(EP, eSB_NG_Balance[t=1:T, z=1:Z], 0)
-        
-        #if setup["ModelSyntheticNG"] == 1
-        #    EP = syn_NG_outputs(EP, inputs, setup)
-        #    EP = syn_NG_investment(EP, inputs, setup)
-        #    EP = syn_NG_resources(EP, inputs, setup)
-        #end
-        
-        #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynNGRes]
     end
 
     ################  Policies #####################3
@@ -560,44 +541,19 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     end
 
+    #########################################################################################
+    ###Natural Gas Balance constraints
 
+    if setup["ModelNGSC"] == 1
+        @constraint(EP, cNG_Balance_T_Z[t=1:T,z=1:Z], EP[:eNGBalance][t,z] == inputs["NG_D"][t,z])
 
-    if setup["ModelBESC"] == 1
-        ###Herb and Wood Biomass Balanace constraints
-        @constraint(EP, cHerbBiomassBalance[t=1:T, z=1:Z], EP[:eHerb_Biomass_Supply][t,z] == 0)
-        @constraint(EP, cWoodBiomassBalance[t=1:T, z=1:Z], EP[:eWood_Biomass_Supply][t,z] == 0)
-
-        if setup["ModelLFSC"] == 1 && setup["Bio_Ethanol_On"] == 1
-
-            if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
-
-                #Demand constraint for hourly regional liquid fuel demand[t,z]
-                @constraint(EP, cEthanolBalance_T_Z[t=1:T,z=1:Z], EP[:eEthanolBalance][t,z] >= inputs["Bio_Fuels_Ethanol_D"][t,z])
-
-            elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-
-                #Demand constraint for annual regional liquid fuel demand[z]
-                @constraint(EP, cEthanolBalance_Z[z=1:Z], sum(inputs["omega"][t] * EP[:eEthanolBalance][t,z] for t = 1:T) >= sum(inputs["omega"][t] * inputs["Bio_Fuels_Ethanol_D"][t,z] for t = 1:T))
-
-            elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
-
-                #Demand constraint for hourly global liquid fuel demand[t]
-                @constraint(EP, cEthanolBalance_T[t=1:T], sum(EP[:eEthanolBalance][t,z] for z = 1:Z) >= sum(inputs["Bio_Fuels_Ethanol_D"][t,z] for z = 1:Z))
-
-            elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-
-                #Demand constraint for annual global liquid fuel demand
-                @constraint(EP, cEthanolBalance, sum(sum(inputs["omega"][t] * EP[:eEthanolBalance][t,z] for z = 1:Z) for t = 1:T) >= sum(sum(inputs["omega"][t] * inputs["Bio_Fuels_Ethanol_D"][t,z] for z = 1:Z) for t = 1:T))
-
-            end
+         # Conventional Fuels Share Policy
+         if setup["Conventional_NG_Share_Requirement"] == 1
+            EP = conventional_ng_share(EP, inputs, setup)
         end
     end
 
-    if setup["ModelNGSC"] == 1
-        ###Natural Gas Balance constraints
-        @constraint(EP, cNG_Balance_T_Z[t=1:T,z=1:Z], EP[:eNGBalance][t,z] == inputs["NG_D"][t,z])
-    end
-
+    #########################################################################################
 
     ## Record pre-solver time
     presolver_time = time() - presolver_start_time

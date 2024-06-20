@@ -146,7 +146,6 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
             + sum(inputs["omega"][t] * EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             + sum(inputs["omega"][t] * EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             + sum(inputs["omega"][t] * EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            + sum(inputs["omega"][t] * EP[:eBio_Ethanol_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             - sum(inputs["omega"][t] * EP[:eBiomass_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
             )
 
@@ -161,13 +160,20 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
             eEmissionsConstraintLHS += eEmissionsConstraintLHSCNG
 
             #To be completed when synthetic NG modeled
-            #if setup["ModelSyntheticNG"] == 1
-                #@expression(EP, eEmissionsConstraintLHSSNG[cap=1:inputs["NCO2Cap"]],
-                #sum(inputs["omega"][t] * EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-                #+ sum(inputs["omega"][t] * EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+            if setup["ModelSyntheticNG"] == 1
+                @expression(EP, eEmissionsConstraintLHSSyn_NG[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                + sum(inputs["omega"][t] * EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
 
-                #eEmissionsConstraintLHS += eEmissionsConstraintLHSSNG
-            #end
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSSyn_NG
+            end
+
+            if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
+                @expression(EP, eEmissionsConstraintLHSBio_NG[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eBio_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBio_NG
+            end
             
         end
 

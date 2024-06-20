@@ -46,10 +46,7 @@ function load_liquid_fuels_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	end
 	
 	inputs = load_liquid_fuels_demand(setup, path, sep, inputs)
-	
-	if setup["Liquid_Fuels_Regional_Demand"] == 1
-		inputs = load_conventional_fuel_prices(setup, path, sep, inputs)
-	end
+	inputs = load_conventional_fuel_prices(setup, path, sep, inputs)
 
 	println("LFSC Input CSV Files Successfully Read In From $path$sep")
 

@@ -68,7 +68,6 @@ function write_CSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
 
   if setup["ModelCO2Storage"] == 1
     write_co2_total_injection(path, sep, inputs, setup, EP)
-    #write_co2_storage_capacity(path, sep, inputs, setup, EP)
   end
 
   if setup["ModelCO2Pipelines"] ==1 

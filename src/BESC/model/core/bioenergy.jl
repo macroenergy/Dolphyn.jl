@@ -75,7 +75,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	BIO_ELEC = inputs["BIO_ELEC"]
 	BIO_DIESEL = inputs["BIO_DIESEL"]
 	BIO_GASOLINE = inputs["BIO_GASOLINE"]
-	BIO_ETHANOL = inputs["BIO_ETHANOL"]
+	BIO_NG = inputs["BIO_NG"]
 
 	#####################################################################################################################################
 	######################################### Power/H2 consumption and Plant Operational Constraints ####################################
@@ -138,11 +138,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	#Format for output
 	@expression(EP, eBioH2_consumption_per_zone_per_time[z=1:Z,t=1:T], sum(EP[:vH2_BIO][i,t] for i in dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID]))
 
-	if setup["ParameterScale"] ==1
-		@expression(EP,eScaled_BioH2_consumption_per_time_per_zone[t in 1:T,z in 1:Z], eBioH2_consumption_per_time_per_zone[t,z]*ModelScalingFactor) #HSC modules are not scaled, so we need convert to tonnes
-	else
-		@expression(EP,eScaled_BioH2_consumption_per_time_per_zone[t in 1:T,z in 1:Z], eBioH2_consumption_per_time_per_zone[t,z])
-	end
+	@expression(EP,eScaled_BioH2_consumption_per_time_per_zone[t in 1:T,z in 1:Z], eBioH2_consumption_per_time_per_zone[t,z])
 
 	#Add to power balance to take power away from generated
 	EP[:eH2Balance] += -EP[:eScaled_BioH2_consumption_per_time_per_zone]
@@ -152,9 +148,6 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	#####################################################################################################################################
 	
 	#Power Balance
-	# If ParameterScale = 1, power system operation/capacity modeled in GW, no need to scale as MW/ton = GW/kton 
-	# If ParameterScale = 0, power system operation/capacity modeled in MW
-
 	if setup["Bio_Electricity_On"] == 1
 		#Bioelectricity demand
 		@expression(EP,eBioelectricity_produced_MWh_per_plant_per_time[i in BIO_ELEC, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioElectricity_yield_MWh_per_tonne][i])
@@ -173,11 +166,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		@expression(EP,eBioH2_produced_tonne_per_plant_per_time[i in BIO_H2, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioH2_yield_tonne_per_tonne][i])
 		@expression(EP,eBioH2_produced_tonne_per_time_per_zone[t in 1:T,z in 1:Z], sum(EP[:eBioH2_produced_tonne_per_plant_per_time][i,t] for i in intersect(BIO_H2, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 		
-		if setup["ParameterScale"] ==1
-			@expression(EP,eScaled_BioH2_produced_tonne_per_time_per_zone[t in 1:T,z in 1:Z], eBioH2_produced_tonne_per_time_per_zone[t,z]*ModelScalingFactor)
-		else
-			@expression(EP,eScaled_BioH2_produced_tonne_per_time_per_zone[t in 1:T,z in 1:Z], eBioH2_produced_tonne_per_time_per_zone[t,z])
-		end
+		@expression(EP,eScaled_BioH2_produced_tonne_per_time_per_zone[t in 1:T,z in 1:Z], eBioH2_produced_tonne_per_time_per_zone[t,z])
 
 		EP[:eH2Balance] += EP[:eScaled_BioH2_produced_tonne_per_time_per_zone]
 	end
@@ -194,15 +183,10 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		#Emissions from biogasoline utilization
 		Bio_gasoline_co2_per_mmbtu = inputs["Bio_gasoline_co2_per_mmbtu"]
 	
-		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of bio gasoline consumption
-			@expression(EP,eBio_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
-		else
-			#CO2 emitted as a result of bio gasoline consumption
-			@expression(EP,eBio_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
-		end
+		#CO2 emitted as a result of bio gasoline consumption
+		@expression(EP,eBio_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+		Bio_gasoline_co2_per_mmbtu * EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
+
 	else
 		@expression(EP,eBio_Gasoline_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
@@ -219,15 +203,10 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		#Emissions from biojetfuel utilization
 		Bio_jetfuel_co2_per_mmbtu = inputs["Bio_jetfuel_co2_per_mmbtu"]
 	
-		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of bio jetfuel consumption
-			@expression(EP,eBio_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
-		else
-			#CO2 emitted as a result of bio jetfuel consumption
-			@expression(EP,eBio_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z])
-		end
+		#CO2 emitted as a result of bio jetfuel consumption
+		@expression(EP,eBio_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+		Bio_jetfuel_co2_per_mmbtu * EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z])
+
 	else
 		@expression(EP,eBio_Jetfuel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
@@ -244,42 +223,33 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		#Emissions from biodiesel utilization
 		Bio_diesel_co2_per_mmbtu = inputs["Bio_diesel_co2_per_mmbtu"]
 	
-		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of bio diesel consumption
-			@expression(EP,eBio_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
-		else
-			#CO2 emitted as a result of bio diesel consumption
-			@expression(EP,eBio_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
-		end
+		#CO2 emitted as a result of bio diesel consumption
+		@expression(EP,eBio_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+		Bio_diesel_co2_per_mmbtu * EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
+
 	else
 		@expression(EP,eBio_Diesel_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
 	
 	#####################################################################################################################################
+
+	if setup["Bio_NG_On"] == 1
+		#Bio NG demand
+		@expression(EP,eBio_NG_produced_MMBtu_per_plant_per_time[i in BIO_NG, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Bio_NG_yield_MMBtu_per_tonne][i])
+		@expression(EP,eBio_NG_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBio_NG_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_NG, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
 	
-	if setup["Bio_Ethanol_On"] == 1
-		#Bioethanol demand
-		@expression(EP,eBioethanol_produced_MMBtu_per_plant_per_time[i in BIO_ETHANOL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioEthanol_yield_MMBtu_per_tonne][i])
-		@expression(EP,eBioethanol_produced_MMBtu_per_time_per_zone[t in 1:T, z in 1:Z], sum(EP[:eBioethanol_produced_MMBtu_per_plant_per_time][i,t] for i in intersect(BIO_ETHANOL, dfbioenergy[dfbioenergy[!,:Zone].==z,:][!,:R_ID])))
+		EP[:eSB_NG_Balance] += EP[:eBio_NG_produced_MMBtu_per_time_per_zone] #Add to syn + bio gas balance: For conv NG share policy
+		EP[:eNGBalance] += EP[:eBio_NG_produced_MMBtu_per_time_per_zone]
 	
-		EP[:eEthanolBalance] += EP[:eBioethanol_produced_MMBtu_per_time_per_zone]
+		#Emissions from bio NG utilization
+		Bio_ng_co2_per_mmbtu = inputs["Bio_ng_co2_per_mmbtu"]
 	
-		#Emissions from bioethanol utilization
-		Bio_ethanol_co2_per_mmbtu = inputs["Bio_ethanol_co2_per_mmbtu"]
+		#CO2 emitted as a result of bio NG consumption
+		@expression(EP,eBio_NG_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
+		Bio_ng_co2_per_mmbtu * EP[:eBio_NG_produced_MMBtu_per_time_per_zone][t,z])
 	
-		if setup["ParameterScale"] ==1
-			#CO2 emitted as a result of bio ethanol consumption
-			@expression(EP,eBio_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z]/ModelScalingFactor)
-		else
-			#CO2 emitted as a result of bio ethanol consumption
-			@expression(EP,eBio_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 
-			Bio_ethanol_co2_per_mmbtu * EP[:eBioethanol_produced_MMBtu_per_time_per_zone][t,z])
-		end
 	else
-		@expression(EP,eBio_Ethanol_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
+		@expression(EP,eBio_NG_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 0)
 	end
 	
 	#####################################################################################################################################
@@ -290,7 +260,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP,eBiodiesel_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioDiesel_yield_MMBtu_per_tonne][i])
 	@expression(EP,eBiojetfuel_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioJetfuel_yield_MMBtu_per_tonne][i])
 	@expression(EP,eBiogasoline_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioGasoline_yield_MMBtu_per_tonne][i])
-	@expression(EP,eBioethanol_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioEthanol_yield_MMBtu_per_tonne][i])
+	@expression(EP,eBio_NG_produced_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Bio_NG_yield_MMBtu_per_tonne][i])
 	
     return EP
 

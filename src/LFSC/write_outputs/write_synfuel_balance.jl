@@ -38,14 +38,14 @@ function write_synfuel_balance(path::AbstractString, sep::AbstractString, inputs
 
 	   	for t in 1:T
 			if setup["ParameterScale"] ==1
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_Per_Time_Per_Zone][t,z])*ModelScalingFactor #Convert kton CO2 to tonne CO2
-				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelRes][t,z])*ModelScalingFactor #Convert GW to MW
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSyn_Fuel_CO2_Cons_Per_Time_Per_Zone][t,z])*ModelScalingFactor #Convert kton CO2 to tonne CO2
+				dfTemp1[t+rowoffset,2]=value.(EP[:eSyn_Fuel_Power_Cons][t,z])*ModelScalingFactor #Convert GW to MW
 			else
-				dfTemp1[t+rowoffset,1]=value.(EP[:eSynFuelCO2Cons_Per_Time_Per_Zone][t,z])
-				dfTemp1[t+rowoffset,2]=value.(EP[:ePowerBalanceSynFuelRes][t,z])
+				dfTemp1[t+rowoffset,1]=value.(EP[:eSyn_Fuel_CO2_Cons_Per_Time_Per_Zone][t,z])
+				dfTemp1[t+rowoffset,2]=value.(EP[:eSyn_Fuel_Power_Cons][t,z])
 			end
 
-			dfTemp1[t+rowoffset,3]=value.(EP[:eSynFuelH2Cons][t,z])
+			dfTemp1[t+rowoffset,3]=value.(EP[:eSyn_Fuel_H2_Cons][t,z])
 			
 			dfTemp1[t+rowoffset,4]= sum(value.(EP[:vSFProd_Gasoline][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))
 			dfTemp1[t+rowoffset,5]= sum(value.(EP[:vSFProd_Jetfuel][dfSynFuels[(dfSynFuels[!,:Zone].==z),:][!,:R_ID],t]))

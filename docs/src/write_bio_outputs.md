@@ -56,9 +56,3 @@ Pages = ["BESC/write_outputs/write_bio_zone_biojetfuel_produced.jl"]
 Modules = [Dolphyn]
 Pages = ["BESC/write_outputs/write_bio_zone_biogasoline_produced.jl"]
 ```
-
-## Write Bio-Ethanol Production
-```@autodocs
-Modules = [Dolphyn]
-Pages = ["BESC/write_outputs/write_bio_zone_bioethanol_produced.jl"]
-```
