@@ -37,7 +37,7 @@ MaxPeriods: 3
   #   The minimum number of periods used to represent the input data. If using
   #   UseExtremePeriods, this must be at least the number of extreme periods requests. If
   #   IterativelyAddPeriods if off, this will be the total number of periods.
-MinPeriods: 1
+MinPeriods: 3
 
   #   - IterativelyAddPeriods
   #   Either 'yes' or 'no', this designates whether or not to add periods

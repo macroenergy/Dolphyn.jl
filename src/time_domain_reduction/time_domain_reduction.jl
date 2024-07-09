@@ -1,19 +1,3 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
 ##############################################
 #
 #   Time Domain Reduction
@@ -65,43 +49,12 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################
 
-# Store the paths of the current working directory, GenX, and Settings YAML file
-if isfile("PreCluster.jl")
-    genx_path = cd(pwd, "../..") # pwd() grandparent <-- TDR called from PreCluster.jl
-else
-    genx_path = pwd()         # <-- TDR called from Run_test.jl
-end
-settings_path = joinpath(genx_path, "GenX_settings.yml")
-
-# Load GenX modules
-push!(LOAD_PATH, genx_path)
-push!(LOAD_PATH, pwd())
-
 using YAML
 using DataFrames
 using StatsBase
 using Clustering
 using Distances
 using CSV
-
-
-@doc raw"""
-    rmse_score(y_true, y_pred)
-
-Calculates Root Mean Square Error.
-
-```math
-RMSE = \sqrt{\frac{1}{n}\Sigma_{i=1}^{n}{\Big(\frac{d_i -f_i}{\sigma_i}\Big)^2}}
-```
-
-"""
-function rmse_score(y_true, y_pred)
-    errors = y_pred - y_true
-    errors² = errors .^ 2
-    mse = mean(errors²)
-    rmse = sqrt(mse)
-    return rmse
-end
 
 @doc raw"""
     parse_data(myinputs)
@@ -143,7 +96,7 @@ function parse_data(myinputs, mysetup)
     col_to_zone_map = Dict("Load_MW_z"*string(l) => l for l in 1:size(load_profiles)[1])
 
     # CAPACITY FACTORS - Generators_variability.csv
-    for r in 1:length(RESOURCES)
+    for r in eachindex(RESOURCES)
                
         if occursin("PV", RESOURCES[r]) || occursin("pv", RESOURCES[r]) || occursin("Pv", RESOURCES[r]) || occursin("Solar", RESOURCES[r]) || occursin("SOLAR", RESOURCES[r]) || occursin("solar", RESOURCES[r])
             push!(solar_col_names, RESOURCES[r])
@@ -162,7 +115,7 @@ function parse_data(myinputs, mysetup)
     fuel_col_names = string.(myinputs["fuels"])
     fuel_profiles = []
     AllFuelsConst = true
-    for f in 1:length(fuel_col_names)
+    for f in eachindex(fuel_col_names)
         push!(fuel_profiles, myinputs["fuel_costs"][fuel_col_names[f]])
         if AllFuelsConst && (minimum(myinputs["fuel_costs"][fuel_col_names[f]]) != maximum(myinputs["fuel_costs"][fuel_col_names[f]]))
             AllFuelsConst = false
@@ -190,7 +143,7 @@ function parse_data(myinputs, mysetup)
         end
 
         # CAPACITY FACTORS - HSC_Generators_variability.csv
-        for r in 1:length(H2_RESOURCES)
+        for r in eachindex(H2_RESOURCES)
             push!(h2_var_col_names, H2_RESOURCES[r])
             push!(h2_var_profiles, myinputs["pH2_Max"][r,:])
             h2_col_to_zone_map[H2_RESOURCES[r]] = H2_ZONES[r]
@@ -205,7 +158,7 @@ function parse_data(myinputs, mysetup)
             H2_G2P= myinputs["H2_G2P_RESOURCE_ZONES"]    
             H2_G2P_ZONES = myinputs["H2_G2P_ZONES"]
 
-            for r in 1:length(H2_G2P)
+            for r in eachindex(H2_G2P)
                 push!(h2_g2p_var_col_names, H2_G2P[r])
                 push!(h2_g2p_var_profiles, myinputs["pH2_g2p_Max"][r,:])
 
@@ -241,7 +194,7 @@ function check_condition(Threshold, R, OldColNames, ScalingMethod, TimestepsPerR
     elseif ScalingMethod == "S"
         return maximum(R.costs)/(length(OldColNames)*TimestepsPerRepPeriod*4) < Threshold
     else
-        println(" -- INVALID Scaling Method ", ScalingMethod, " / Choose N for Normalization or S for Standardization. Proceeding with N.")
+        println(" -- INVALID Scaling Method $ScalingMethod \n Choose N for Normalization or S for Standardization. Proceeding with N.")
     end
     return maximum(R.costs)/(length(OldColNames)*TimestepsPerRepPeriod) < Threshold
 end
@@ -279,8 +232,8 @@ function cluster(ClusterMethod, ClusteringInputDF, NClusters, nIters, v=false)
             if R_i.totalcost < R.totalcost
                 R = R_i
             end
-            if v && (i % (nIters/10) == 0)
-                println(string(i) * " : " * string(round(R_i.totalcost, digits=3)) * " " * string(round(R.totalcost, digits=3)) )
+            if (i % (nIters/10) == 0)
+                @debug " -- Iteration: $i : $(round(R_i.totalcost, digits=3)) $(round(R.totalcost, digits=3))"
             end
         end
 
@@ -303,8 +256,8 @@ function cluster(ClusterMethod, ClusteringInputDF, NClusters, nIters, v=false)
             if R_i.totalcost < R.totalcost
                 R = R_i
             end
-            if v && (i % (nIters/10) == 0)
-                println(string(i) * " : " * string(round(R_i.totalcost, digits=3)) * " " * string(round(R.totalcost, digits=3)) )
+            if (i % (nIters/10) == 0)
+                @debug " -- Iteration: $i : $(round(R_i.totalcost, digits=3)) $(round(R.totalcost, digits=3))"
             end
         end
 
@@ -312,7 +265,7 @@ function cluster(ClusterMethod, ClusteringInputDF, NClusters, nIters, v=false)
         W = R.counts # get the cluster sizes - W for Weights
         M = R.medoids # get the cluster centers - M for Medoids
     else
-        println(" -- INVALID ClusterMethod. Select kmeans or kmedoids. Running kmeans instead.")
+        @warn " -- INVALID ClusterMethod. Select kmeans or kmedoids. Running kmeans instead."
         return cluster("kmeans", ClusteringInputDF, NClusters, nIters)
     end
     return [R, A, W, M, DistMatrix]
@@ -328,17 +281,17 @@ function RemoveConstCols(all_profiles, all_col_names, v=false)
     ConstData = []
     ConstIdx = []
     ConstCols = []
-    for c in 1:length(all_col_names)
+    for c in eachindex(all_col_names)
         Const = minimum(all_profiles[c]) == maximum(all_profiles[c])
         if Const
-            if v println(" -- Removing constant col: ", all_col_names[c]) end
+            @debug " -- Removing constant col: $(all_col_names[c])"
             push!(ConstData, all_profiles[c])
             push!(ConstCols, all_col_names[c])
             push!(ConstIdx, c)
         end
     end
-    all_profiles = [all_profiles[i] for i in 1:length(all_profiles) if i ∉ ConstIdx]
-    all_col_names = [all_col_names[i] for i in 1:length(all_col_names) if i ∉ ConstIdx]
+    all_profiles = [all_profiles[i] for i in eachindex(all_profiles) if i ∉ ConstIdx]
+    all_col_names = [all_col_names[i] for i in eachindex(all_col_names) if i ∉ ConstIdx]
     return all_profiles, all_col_names, ConstData, ConstCols, ConstIdx
 end
 
@@ -356,7 +309,7 @@ system to be included among the extreme periods. They would select
 """
 function get_extreme_period(DF, GDF, profKey, typeKey, statKey,
     ConstCols, load_col_names, solar_col_names, wind_col_names, v=false)
-    if v println(profKey," ", typeKey," ", statKey) end
+    @debug " -- Getting extreme period for $profKey, $typeKey, $statKey"
     if typeKey == "Integral"
         if profKey == "Load"
             (stat, group_idx) = get_integral_extreme(GDF, statKey, load_col_names, ConstCols)
@@ -365,7 +318,7 @@ function get_extreme_period(DF, GDF, profKey, typeKey, statKey,
         elseif profKey == "Wind"
             (stat, group_idx) = get_integral_extreme(GDF, statKey, wind_col_names, ConstCols)
         else
-            println(" -- Error: Profile Key ", profKey, " is invalid. Choose `Load', `PV' or `Wind'.")
+            println(" -- Error: Profile Key $profKey is invalid. Choose `Load', `PV' or `Wind'.")
         end
     elseif typeKey == "Absolute"
         if profKey == "Load"
@@ -375,10 +328,10 @@ function get_extreme_period(DF, GDF, profKey, typeKey, statKey,
         elseif profKey == "Wind"
             (stat, group_idx) = get_absolute_extreme(DF, statKey, wind_col_names, ConstCols)
         else
-            println(" -- Error: Profile Key ", profKey, " is invalid. Choose `Load', `PV' or `Wind'.")
+            println(" -- Error: Profile Key $profKey is invalid. Choose `Load', `PV' or `Wind'.")
         end
    else
-       println(" -- Error: Type Key ", typeKey, " is invalid. Choose `Absolute' or `Integral'.")
+       println(" -- Error: Type Key $typeKey is invalid. Choose `Absolute' or `Integral'.")
        stat = 0
        group_idx = 0
    end
@@ -399,7 +352,7 @@ function get_integral_extreme(GDF, statKey, col_names, ConstCols)
     elseif statKey == "Min"
         (stat, stat_idx) = findmin( sum([GDF[!, Symbol(c)] for c in setdiff(col_names, ConstCols) ]) )
     else
-        println(" -- Error: Statistic Key ", statKey, " is invalid. Choose `Max' or `Min'.")
+        println(" -- Error: Statistic Key $statKey is invalid. Choose `Max' or `Min'.")
     end
     return (stat, stat_idx)
 end
@@ -418,7 +371,7 @@ function get_absolute_extreme(DF, statKey, col_names, ConstCols)
         (stat, stat_idx) = findmin( sum([DF[!, Symbol(c)] for c in setdiff(col_names, ConstCols) ]) )
         group_idx = DF.Group[stat_idx]
     else
-        println(" -- Error: Statistic Key ", statKey, " is invalid. Choose `Max' or `Min'.")
+        println(" -- Error: Statistic Key $statKey is invalid. Choose `Max' or `Min'.")
     end
     return (stat, group_idx)
 end
@@ -435,12 +388,10 @@ w_j \leftarrow H \cdot \frac{w_j}{\sum_i w_i} \: \: \: \forall w_j \in W
 
 """
 function scale_weights(W, H, v=false)
-    if v println(" -- Weights before scaling: ", W) end
+    @debug " -- Weights before scaling: $W"
     W = [ float(w)/sum(W) * H for w in W] # Scale to number of hours in input data
-    if v
-        println(" -- Weights after scaling: ", W)
-        println(" -- Sum of Updated Cluster Weights: ", sum(W))
-    end
+    @debug " -- Weights after scaling: $W"
+    @debug " -- Sum of Updated Cluster Weights: $(sum(W))"
     return W
 end
 
@@ -490,7 +441,7 @@ function get_load_multipliers(ClusterOutputData, InputData, M, W, LoadCols, Time
             weighted_cluster_zone_sums[loadcol] += (W[m]/(TimestepsPerRepPeriod))*cluster_zone_sums[m][loadcol]
         end
         load_mults[loadcol] = zone_sums[loadcol]/weighted_cluster_zone_sums[loadcol]
-        if v println(loadcol, ": ", weighted_cluster_zone_sums[loadcol], " vs. ", zone_sums[loadcol], " => ", load_mults[loadcol]) end
+        @debug "$loadcol: $(weighted_cluster_zone_sums[loadcol]) vs. $(zone_sums[loadcol]) => $(load_mults[loadcol])"
     end
 
     # Zone-wise validation that scaled clustered load equals original load (Don't actually scale load in this function)
@@ -501,13 +452,13 @@ function get_load_multipliers(ClusterOutputData, InputData, M, W, LoadCols, Time
                 if (NewColNames[i] in LoadCols)
                     # Uncomment this line if we decide to scale load here instead of later. (Also remove "load_mults[NewColNames[i]]*" term from new_zone_sums computation)
                     #ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i] *= load_mults[NewColNames[i]]
-                    println(" --    Scaling ", M[m], " (", NewColNames[i], ") : ", cluster_zone_sums[m][NewColNames[i]], " => ", load_mults[NewColNames[i]]*sum(ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i]))
+                    println(" -- Scaling $(M[m]) ($(NewColNames[i])): $(cluster_zone_sums[m][NewColNames[i]]) => $(load_mults[NewColNames[i]] * sum(ClusterOutputData[!,m][TimestepsPerRepPeriod * (i-1)+1 : TimestepsPerRepPeriod * i]))")
                     new_zone_sums[NewColNames[i]] += (W[m]/(TimestepsPerRepPeriod))*load_mults[NewColNames[i]]*sum(ClusterOutputData[!,m][TimestepsPerRepPeriod*(i-1)+1 : TimestepsPerRepPeriod*i])
                 end
             end
         end
         for loadcol in LoadCols
-            println(loadcol, ": ", new_zone_sums[loadcol], " =?= ", zone_sums[loadcol])
+            println(" -- $loadcol: $(new_zone_sums[loadcol]) =?= $(zone_sums[loadcol])")
         end
     end
 
@@ -561,7 +512,7 @@ In Load_data.csv, include the following:
 """
 function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
-    if v println(now()) end
+    @debug " -- Starting Time Domain Reduction: $(now())"
 
     ##### Step 0: Load in settings and data
 
@@ -600,7 +551,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     mysetup_local = copy(mysetup)
     # If ParameterScale =1 then make it zero, since clustered inputs will be scaled prior to generating model
     mysetup_local["ParameterScale"]=0  # Performing cluster and report outputs in user-provided units
-    if v println(" -- Loading inputs") end
+    @debug " -- Loading inputs from $inpath"
 
     myinputs=Dict()
     myinputs = load_inputs(mysetup_local,inpath)
@@ -608,8 +559,6 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if mysetup["ModelH2"] == 1
       myinputs = load_h2_inputs(myinputs, mysetup_local, inpath)
     end
-
-    if v println() end
 
     #Copy Original Parameter Scale Variable
     parameter_scale_org = mysetup["ParameterScale"]
@@ -632,12 +581,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if (ClusterFuelPrices != 1) || (AllFuelsConst) IncludeFuel = false end
 
     # Put it together!
-    InputData = DataFrame( Dict( all_col_names[c]=>all_profiles[c] for c in 1:length(all_col_names) ) )
-    if v
-        println(" -- Load (MW) and Capacity Factor Profiles: ")
-        println(describe(InputData))
-        println()
-    end
+    InputData = DataFrame( Dict( all_col_names[c]=>all_profiles[c] for c in eachindex(all_col_names) ) )
+
+    @debug " -- Load (MW) and Capacity Factor Profiles: \n $(describe(InputData))"
+
     OldColNames = names(InputData)
     NewColNames = [Symbol.(OldColNames); :GrpWeight]
     Nhours = nrow(InputData) # Timesteps
@@ -648,17 +595,17 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     # Normalize/standardize data based on user-provided method
     if ScalingMethod == "N"
-        normProfiles = [ StatsBase.transform(fit(UnitRangeTransform, InputData[:,c]; dims=1, unit=true), InputData[:,c]) for c in 1:length(OldColNames)  ]
+        normProfiles = [ StatsBase.transform(fit(UnitRangeTransform, InputData[:,c]; dims=1, unit=true), InputData[:,c]) for c in eachindex(OldColNames)  ]
     elseif ScalingMethod == "S"
-        normProfiles = [ StatsBase.transform(fit(ZScoreTransform, InputData[:,c]; dims=1, center=true, scale=true), InputData[:,c]) for c in 1:length(OldColNames)  ]
+        normProfiles = [ StatsBase.transform(fit(ZScoreTransform, InputData[:,c]; dims=1, center=true, scale=true), InputData[:,c]) for c in eachindex(OldColNames)  ]
     else
         println(" -- ERROR InvalidScalingMethod: Use N for Normalization or S for Standardization.")
         println(" -- CONTINUING using 0->1 normalization...")
-        normProfiles = [ StatsBase.transform(fit(UnitRangeTransform, InputData[:,c]; dims=1, unit=true), InputData[:,c]) for c in 1:length(OldColNames)  ]
+        normProfiles = [ StatsBase.transform(fit(UnitRangeTransform, InputData[:,c]; dims=1, unit=true), InputData[:,c]) for c in eachindex(OldColNames)  ]
     end
 
     # Compile newly normalized/standardized profiles
-    AnnualTSeriesNormalized = DataFrame(Dict(  OldColNames[c] => normProfiles[c] for c in 1:length(OldColNames) ))
+    AnnualTSeriesNormalized = DataFrame(Dict(  OldColNames[c] => normProfiles[c] for c in eachindex(OldColNames) ))
 
     # Optional pre-scaling of load in order to give it more preference in clutering algorithm
     if LoadWeight != 1   # If we want to value load more/less than capacity factors. Assume nonnegative. LW=1 means no scaling.
@@ -667,18 +614,13 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         end
     end
 
-    if v
-        println(" -- Load (MW) and Capacity Factor Profiles NORMALIZED! ")
-        println(describe(AnnualTSeriesNormalized))
-        println()
-    end
-
+    @debug " -- Load (MW) and Capacity Factor Profiles NORMALIZED: \n $(describe(AnnualTSeriesNormalized))"
 
     ##### STEP 2: Identify extreme periods in the model, Reshape data for clustering
 
     # Total number of subperiods available in the dataset, where each subperiod length = TimestepsPerRepPeriod
     NumDataPoints = Nhours÷TimestepsPerRepPeriod # 364 weeks in 7 years
-    if v println(" -- Total Subperiods in the data set: ", NumDataPoints) end
+    @debug " -- Total Subperiods in the data set: $NumDataPoints"
     InputData[:, :Group] .= (1:Nhours) .÷ (TimestepsPerRepPeriod+0.0001) .+ 1    # Group col identifies the subperiod ID of each hour (e.g., all hours in week 2 have Group=2 if using TimestepsPerRepPeriod=168)
 
     # Group by period (e.g., week)
@@ -699,39 +641,37 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
                               LoadExtremePeriod = true
                           end
                           if geoKey == "System"
-                              if v print(geoKey, " ") end
                               (stat, group_idx) = get_extreme_period(InputData, cgdf, profKey, typeKey, statKey, ConstCols, load_col_names, solar_col_names, wind_col_names, v)
                               push!(ExtremeWksList, floor(Int, group_idx))
-                              if v println(group_idx, " : ", stat) end
+                              @debug " -- Extreme Period: $geoKey $(group_idx) : $(stat)"
                           elseif geoKey == "Zone"
                               for z in sort(unique(myinputs["R_ZONES"]))
-                                  z_cols = [k for (k,v) in col_to_zone_map if v==z]
-                                  if profKey == "Load" z_cols_type = intersect(z_cols, load_col_names)
-                                  elseif profKey == "PV" z_cols_type = intersect(z_cols, solar_col_names)
-                                  elseif profKey == "Wind" z_cols_type = intersect(z_cols, wind_col_names)
-                                  else z_cols_type = []
-                                  end
-                                  z_cols_type = setdiff(z_cols_type, ConstCols)
-                                  if length(z_cols_type) > 0
-                                      if v print(geoKey, " ") end
-                                      (stat, group_idx) = get_extreme_period(select(InputData, [:Group; Symbol.(z_cols_type)]), select(cgdf, [:Group; Symbol.(z_cols_type)]), profKey, typeKey, statKey, ConstCols, z_cols_type, z_cols_type, z_cols_type, v)
-                                      push!(ExtremeWksList, floor(Int, group_idx))
-                                      if v println(group_idx, " : ", stat, "(", z, ")") end
+                                    z_cols = [k for (k,v) in col_to_zone_map if v==z]
+                                    if profKey == "Load" z_cols_type = intersect(z_cols, load_col_names)
+                                    elseif profKey == "PV" z_cols_type = intersect(z_cols, solar_col_names)
+                                    elseif profKey == "Wind" z_cols_type = intersect(z_cols, wind_col_names)
+                                    else z_cols_type = []
+                                    end
+                                    z_cols_type = setdiff(z_cols_type, ConstCols)
+                                    if length(z_cols_type) > 0
+                                        (stat, group_idx) = get_extreme_period(select(InputData, [:Group; Symbol.(z_cols_type)]), select(cgdf, [:Group; Symbol.(z_cols_type)]), profKey, typeKey, statKey, ConstCols, z_cols_type, z_cols_type, z_cols_type, v)
+                                        push!(ExtremeWksList, floor(Int, group_idx))
+                                        @debug " -- Extreme Period: $geoKey $(group_idx) : $(stat)($z)"
                                   else
-                                      if v println(" -- Zone ", z, " has no time series profiles of type ", profKey) end
+                                        @debug " -- Zone $z has no time series profiles of type $profKey"
                                   end
                               end
                           else
-                              println(" -- Error: Geography Key ", geoKey, " is invalid. Select `System' or `Zone'.")
+                              println(" -- Error: Geography Key $geoKey is invalid. Select `System' or `Zone'.")
                           end
                       end
                   end
               end
           end
       end
-      if v println(ExtremeWksList) end
+      @debug " -- Extreme Weeks: $(ExtremeWksList)"
       sort!(unique!(ExtremeWksList))
-      if v println(" -- Reduced to ", ExtremeWksList) end
+      @debug " -- Reduced to: $(ExtremeWksList)"
     end
 
     ### DATA MODIFICATION - Shifting InputData and Normalized InputData
@@ -747,10 +687,10 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     # Remove extreme periods from normalized data before clustering
     NClusters = MinPeriods
     if UseExtremePeriods == 1
-        if v println(" -- Pre-removal: ", names(ModifiedDataNormalized)) end
-        if v println(" -- Extreme Periods: ", string.(ExtremeWksList)) end
+        @debug " -- Pre-removal: $(names(ModifiedDataNormalized))"
+        @debug " -- Extreme Periods: $(string.(ExtremeWksList))"
         ClusteringInputDF = select(ModifiedDataNormalized, Not(string.(ExtremeWksList)))
-        if v println(" -- Post-removal: ", names(ClusteringInputDF)) end
+        @debug " -- Post-removal: $(names(ClusteringInputDF))"
         NClusters -= length(ExtremeWksList)
     else
         ClusteringInputDF = ModifiedDataNormalized
@@ -768,29 +708,29 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     if (Iterate == 1)
         while (!check_condition(Threshold, last(cluster_results)[1], OldColNames, ScalingMethod, TimestepsPerRepPeriod)) & ((length(ExtremeWksList)+NClusters) < MaxPeriods)
             if IterateMethod == "cluster"
-                if v println(" -- Adding a new Cluster! ") end
+                @debug " -- Adding a new Cluster!"
                 NClusters += 1
                 push!(cluster_results, cluster(ClusterMethod, ClusteringInputDF, NClusters, nReps, v))
             elseif (IterateMethod == "extreme") & (UseExtremePeriods == 1)
-                if v println(" -- Adding a new Extreme Period! ") end
+                @debug " -- Adding a new Extreme Period!"
                 worst_period_idx = get_worst_period_idx(last(cluster_results)[1])
                 removed_period = string(names(ClusteringInputDF)[worst_period_idx])
                 select!(ClusteringInputDF, Not(worst_period_idx))
                 push!(ExtremeWksList, parse(Int, removed_period))
-                if v println(worst_period_idx, " (", removed_period, ") ", ExtremeWksList) end
+                @debug " -- Worst Period: $(worst_period_idx) ($(removed_period)) $(ExtremeWksList)"
                 push!(cluster_results, cluster(ClusterMethod, ClusteringInputDF, NClusters, nReps, v))
             elseif IterateMethod == "extreme"
-                println(" -- INVALID IterateMethod ", IterateMethod, " because UseExtremePeriods is off. Set to 1 if you wish to add extreme periods.")
+                println(" -- INVALID IterateMethod $IterateMethod because UseExtremePeriods is off. Set to 1 if you wish to add extreme periods.")
                 break
             else
-                println(" -- INVALID IterateMethod ", IterateMethod, ". Choose 'cluster' or 'extreme'.")
+                println(" -- INVALID IterateMethod $IterateMethod. Choose 'cluster' or 'extreme'.")
                 break
             end
         end
-        if v && (length(ExtremeWksList)+NClusters == MaxPeriods)
-            println(" -- Stopped iterating by hitting the maximum number of periods.")
-        elseif v
-            println(" -- Stopped by meeting the accuracy threshold.")
+        if (length(ExtremeWksList)+NClusters == MaxPeriods)
+            @debug " -- Stopped iterating by hitting the maximum number of periods."
+        else
+            @debug " -- Stopped by meeting the accuracy threshold."
         end
     end
 
@@ -800,18 +740,13 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     W = last(cluster_results)[3]  # Weights
     M = last(cluster_results)[4]  # Centers or Medoids
     DistMatrix = last(cluster_results)[5]  # Pairwise distances
-    if v
-        println(" -- Total Groups Assigned to Each Cluster: ", W)
-        println(" -- Sum Cluster Weights: ", sum(W))
-        println(" -- Representative Periods: ", M)
-    end
+    @debug " -- Total Groups Assigned to Each Cluster: $W \n -- Sum Cluster Weights: $(sum(W)) \n -- Representative Periods: $M"
 
     # K-means/medoids returns indices from DistMatrix as its medoids.
     #   This does not account for missing extreme weeks.
     #   This is corrected retroactively here.
     M = [parse(Int64, string(names(ClusteringInputDF)[i])) for i in M]
-    if v println(" -- Fixed M: ", M) end
-
+    @debug " -- Fixed M: $M"
 
     ##### Step 4: Aggregation
     # Add the subperiods corresponding to the extreme periods back into the data.
@@ -821,9 +756,9 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     # Add extreme periods into the clustering result with # of occurences = 1 for each
     ExtremeWksList = sort(ExtremeWksList)
     if UseExtremePeriods == 1
-        if v println(" -- Extreme Periods: ", ExtremeWksList) end
+        @debug " -- Extreme Periods: $(ExtremeWksList)"
         M = [M; ExtremeWksList]
-        for w in 1:length(ExtremeWksList)
+        for w in eachindex(ExtremeWksList)
             insert!(A, ExtremeWksList[w], NClusters+w)
             push!(W, 1)
         end
@@ -844,7 +779,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     W = df_sort[!, :Weights]
     N = df_sort[!, :NumPeriods]
     M = df_sort[!, :Rep_Period]
-    AssignMap = Dict( i => findall(x->x==old_M[i], M)[1] for i in 1:length(M))
+    AssignMap = Dict( i => findall(x->x==old_M[i], M)[1] for i in eachindex(M))
     A = [AssignMap[a] for a in A]
 
     # Make PeriodMap, maps each period to its representative period
@@ -853,18 +788,18 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
                             Rep_Period_Index = [a for a in A])
 
     # Get Symbol-version of column names by type for later analysis
-    LoadCols = [Symbol("Load_MW_z"*string(i)) for i in 1:length(load_col_names) ]
-    VarCols = [Symbol(var_col_names[i]) for i in 1:length(var_col_names) ]
-    FuelCols = [Symbol(fuel_col_names[i]) for i in 1:length(fuel_col_names) ]
-    ConstCol_Syms = [Symbol(ConstCols[i]) for i in 1:length(ConstCols) ]
+    LoadCols = [Symbol("Load_MW_z"*string(i)) for i in eachindex(load_col_names) ]
+    VarCols = [Symbol(var_col_names[i]) for i in eachindex(var_col_names) ]
+    FuelCols = [Symbol(fuel_col_names[i]) for i in eachindex(fuel_col_names) ]
+    ConstCol_Syms = [Symbol(ConstCols[i]) for i in eachindex(ConstCols) ]
 
     LoadColsNoConst = setdiff(LoadCols, ConstCol_Syms)
 
     if mysetup["ModelH2"] == 1
-        H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_col_names) ]
-        H2LoadLiqCols = [Symbol("Load_liqH2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_liq_col_names) ]
-        H2VarCols = [Symbol(h2_var_col_names[i]) for i in 1:length(h2_var_col_names) ]
-        H2G2PVarCols = [Symbol(h2_g2p_var_col_names[i]) for i in 1:length(h2_g2p_var_col_names) ]
+        H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in eachindex(h2_load_col_names) ]
+        H2LoadLiqCols = [Symbol("Load_liqH2_tonne_per_hr_z"*string(i)) for i in eachindex(h2_load_liq_col_names) ]
+        H2VarCols = [Symbol(h2_var_col_names[i]) for i in eachindex(h2_var_col_names) ]
+        H2G2PVarCols = [Symbol(h2_g2p_var_col_names[i]) for i in eachindex(h2_g2p_var_col_names) ]
     end
 
     # Cluster Ouput: The original data at the medoids/centers
@@ -935,7 +870,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         end
                 
         # Add Constant Columns back in
-        for c in 1:length(ConstCols)
+        for c in eachindex(ConstCols)
             rpDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
             if Symbol(ConstCols[c]) in VarCols
                 gvDF[!,Symbol(ConstCols[c])] .= ConstData[c][1]
@@ -1024,7 +959,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
 
     InputDataTest = InputData[(InputData.Group .<= NumDataPoints*1.0), :]
     ClusterDataTest = vcat([rpDFs[a] for a in A]...) # To compare fairly, load is not scaled here
-    RMSE = Dict( c => rmse_score(InputDataTest[:, c], ClusterDataTest[:, c])  for c in OldColNames)
+    RMSE = Dict( c => rmsd(InputDataTest[:, c], ClusterDataTest[:, c])  for c in OldColNames)
 
 
     ##### Step 6: Print to File
@@ -1058,18 +993,18 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     end
     load_in = load_in[1:size(LPOutputData,1),:]
 
-    if v println(" -- Writing load file...") end
+    @debug " -- Writing load file..."
     CSV.write(string(inpath,sep,Load_Outfile), load_in)
 
     ### Generators_variability_clustered.csv
 
     # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
-    GVColMap = Dict(myinputs["RESOURCE_ZONES"][i] => myinputs["RESOURCES"][i] for i in 1:length(myinputs["RESOURCES"]))
+    GVColMap = Dict(myinputs["RESOURCE_ZONES"][i] => myinputs["RESOURCES"][i] for i in eachindex(myinputs["RESOURCES"]))
     GVColMap["Time_Index"] = "Time_Index"
     GVOutputData = GVOutputData[!, Symbol.(myinputs["RESOURCE_ZONES"])]
     insertcols!(GVOutputData, 1, :Time_Index => 1:size(GVOutputData,1))
     NewGVColNames = [GVColMap[string(c)] for c in names(GVOutputData)]
-    if v println(" -- Writing resource file...") end
+    @debug " -- Writing resource file..."
     CSV.write(string(inpath,sep,GVar_Outfile), GVOutputData, header=NewGVColNames)
 
     ### Fuels_data_clustered.csv
@@ -1080,11 +1015,11 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     NewFuelOutput = vcat(SepFirstRow, FPOutputData)
     rename!(NewFuelOutput, FuelCols)
     insertcols!(NewFuelOutput, 1, :Time_Index => 0:size(NewFuelOutput,1)-1)
-    if v println(" -- Writing fuel profiles...") end
+    @debug " -- Writing fuel profiles..."
     CSV.write(string(inpath,sep,Fuel_Outfile), NewFuelOutput)
 
     ### Period_map.csv
-    if v println(" -- Writing period map...") end
+    @debug " -- Writing period map..."
     CSV.write(string(inpath,sep,PMap_Outfile), PeriodMap)
 
     ### Write Hydrogen Outputs
@@ -1109,7 +1044,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         
         h2_load_in = h2_load_in[1:size(HLPOutputData,1),:]
 
-        if v println(" -- Writing load file...") end
+        @debug " -- Writing load file..."
         CSV.write(string(inpath,sep,H2Load_Outfile), h2_load_in)
 
 
@@ -1134,40 +1069,37 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
             
             h2_load_in = h2_load_in[1:size(HLLPOutputData,1),:]
 
-            if v println(" -- Writing liquid load file...") end
+            @debug " -- Writing liquid load file..."
             CSV.write(string(inpath,sep,H2Load_Liq_Outfile), h2_load_in)
         end
 
 
         #Write HSC Resource Variability 
         # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
-        HRVColMap = Dict(myinputs["H2_RESOURCE_ZONES"][i] => myinputs["H2_RESOURCES_NAME"][i] for i in 1:length(myinputs["H2_RESOURCES_NAME"]))
+        HRVColMap = Dict(myinputs["H2_RESOURCE_ZONES"][i] => myinputs["H2_RESOURCES_NAME"][i] for i in eachindex(myinputs["H2_RESOURCES_NAME"]))
         HRVColMap["Time_Index"] = "Time_Index"
         HRVOutputData = HRVOutputData[!, Symbol.(myinputs["H2_RESOURCE_ZONES"])]
         insertcols!(HRVOutputData, 1, :Time_Index => 1:size(HRVOutputData,1))
         NewHRVColNames = [HRVColMap[string(c)] for c in names(HRVOutputData)]
-        if v println(" -- Writing resource file...") end
-        # println(NewHRVColNames)
+        @debug " -- Writing resource file..."
         CSV.write(string(inpath,sep,H2RVar_Outfile), HRVOutputData, header=NewHRVColNames)
 
         if mysetup["ModelH2G2P"] == 1
             #Write HSC Resource Variability 
             # Reset column ordering, add time index, and solve duplicate column name trouble with CSV.write's header kwarg
             # Dharik - string conversion needed to change from inlinestring to string type
-            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => String(myinputs["H2_G2P_NAME"][i]) for i in 1:length(myinputs["H2_G2P_NAME"]))
-            #println(HG2PVColMap)
+            HG2PVColMap = Dict(myinputs["H2_G2P_RESOURCE_ZONES"][i] => String(myinputs["H2_G2P_NAME"][i]) for i in eachindex(myinputs["H2_G2P_NAME"]))
             HG2PVColMap["Time_Index"] = "Time_Index"
             HG2POutputData = HG2POutputData[!, Symbol.(myinputs["H2_G2P_RESOURCE_ZONES"])]
             insertcols!(HG2POutputData, 1, :Time_Index => 1:size(HG2POutputData,1))
             NewHG2PVColNames = [HG2PVColMap[string(c)] for c in names(HG2POutputData)]
-            #println(NewHG2PVColNames)
-            if v println(" -- Writing resource file...") end
+            @debug " -- Writing resource file..."
             CSV.write(string(inpath,sep,H2G2PVar_Outfile), HG2POutputData, header=NewHG2PVColNames)
         end
     end
 
     ### time_domain_reduction_settings.yml
-    if v println(" -- Writing .yml settings...") end
+    @debug " -- Writing .yml settings..."
     YAML.write_file(string(inpath,sep,YAML_Outfile), myTDRsetup)
 
     return FinalOutputData, W, RMSE, myTDRsetup, col_to_zone_map
