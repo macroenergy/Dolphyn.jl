@@ -146,7 +146,7 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
 		#Hydrogen Consumption
 		@constraints(EP, begin
-		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_h2_p_tonne_co2][k]
 		end)
 
 		# By-product produced constraint

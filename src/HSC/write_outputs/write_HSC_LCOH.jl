@@ -44,6 +44,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 
 	Blue_H2_LCOH_Zone = zeros(size(1:Z))
 
+	haskey(inputs, "NCO2Cap") ? num_co2_caps = inputs["NCO2Cap"] : num_co2_caps = 0
+
 	for z in 1:Z
 		tempBlue_H2_Generation = 0
 		tempBlue_H2_Fixed_Cost = 0
@@ -57,16 +59,15 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		for y in intersect(BLUE_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempBlue_H2_Generation = tempBlue_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
 			tempBlue_H2_Fixed_Cost = tempBlue_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-			tempBlue_H2_Var_Cost = tempBlue_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_tonne][y].* (value.(EP[:vH2Gen])[y,:])))
-			tempBlue_H2_Fuel_Cost = tempBlue_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,:]))
+			tempBlue_H2_Var_Cost = tempBlue_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_MWh][y].* (value.(EP[:vH2Gen])[y,:])))
+			tempBlue_H2_Fuel_Cost = tempBlue_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_MWh][y].* (value.(EP[:vH2Gen])[y,:]))
 			tempBlue_H2_Electricity_Cost = tempBlue_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
 			tempBlue_H2_CO2_Emission = tempBlue_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
-		tempCO2Price = zeros(inputs["NCO2Cap"])
-
-		if has_duals(EP) == 1
-			for cap in 1:inputs["NCO2Cap"]
+		if has_duals(EP) == 1 && num_co2_caps > 0
+			tempCO2Price = zeros(num_co2_caps)
+			for cap in 1:num_co2_caps
 				for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
 					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
@@ -257,16 +258,15 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		for y in intersect(GREY_H2, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])
 			tempGrey_H2_Generation = tempGrey_H2_Generation + sum(inputs["omega"].* (value.(EP[:vH2Gen])[y,:]))
 			tempGrey_H2_Fixed_Cost = tempGrey_H2_Fixed_Cost + value.(EP[:eH2GenCFix])[y]
-			tempGrey_H2_Var_Cost = tempGrey_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_tonne][y].* (value.(EP[:vH2Gen])[y,:])))
-			tempGrey_H2_Fuel_Cost = tempGrey_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_tonne][y].* (value.(EP[:vH2Gen])[y,:]))
+			tempGrey_H2_Var_Cost = tempGrey_H2_Var_Cost + sum(inputs["omega"].* (dfH2Gen[!,:Var_OM_Cost_p_MWh][y].* (value.(EP[:vH2Gen])[y,:])))
+			tempGrey_H2_Fuel_Cost = tempGrey_H2_Fuel_Cost + sum(inputs["omega"].* inputs["fuel_costs"][dfH2Gen[!,:Fuel][y]].* dfH2Gen[!,:etaFuel_MMBtu_p_MWh][y].* (value.(EP[:vH2Gen])[y,:]))
 			tempGrey_H2_Electricity_Cost = tempGrey_H2_Electricity_Cost + sum(value.(EP[:vP2G])[y,:].* dual.(EP[:cPowerBalance])[:,z])
 			tempGrey_H2_CO2_Emission = tempGrey_H2_CO2_Emission + sum(inputs["omega"].* (value.(EP[:eH2EmissionsByPlant])[y,:]))
 		end
 
-		tempCO2Price = zeros(inputs["NCO2Cap"])
-
-		if has_duals(EP) == 1
-			for cap in 1:inputs["NCO2Cap"]
+		if has_duals(EP) == 1 && num_co2_caps > 0
+			tempCO2Price = zeros(num_co2_caps)
+			for cap in 1:num_co2_caps
 				for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
 					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000

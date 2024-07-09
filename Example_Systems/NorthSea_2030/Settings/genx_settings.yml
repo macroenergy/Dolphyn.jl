@@ -11,3 +11,4 @@ MaxCapReq: 0  # Activate maximum technology carveout constraints; 0 = not active
 ParameterScale: 1 # Turn on parameter scaling wherein load, capacity and power variables are defined in GW rather than MW. 0 = not active; 1 = active systemwide
 UCommit: 0 # Unit committment of thermal power plants; 0 = not active; 1 = active using integer clestering; 2 = active using linearized clustering
 MultiStage: 0 # Multi-stage modeling; 0 if single-stage; 1 if multi-stage.
+OperationWrapping: 0 # Operation wrapping; 0 if no wrapping; 1 if wrapping.

@@ -31,6 +31,8 @@ println("Loading packages")
 push!(LOAD_PATH, src_path)
 
 using DOLPHYN
+using Gurobi
+
 using YAML
 
 genx_settings = joinpath(settings_path, "genx_settings.yml") #Settings YAML file path for GenX
@@ -61,7 +63,7 @@ end
 
 # ### Configure solver
 println("Configuring Solver")
-OPTIMIZER = configure_solver(mysetup["Solver"], settings_path)
+OPTIMIZER = configure_solver(mysetup["Solver"], settings_path, Gurobi.Optimizer)
 
 # #### Running a case
 

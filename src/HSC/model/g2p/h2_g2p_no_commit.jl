@@ -101,7 +101,7 @@ function h2_g2p_no_commit(EP::Model, inputs::Dict,setup::Dict)
     # Power and natural gas consumption associated with H2 generation in each time step
     @constraints(EP, begin
         #Power Balance
-        [k in H2_G2P_NO_COMMIT, t = 1:T], EP[:vPG2P][k,t] == EP[:vH2G2P][k,t] * dfH2G2P[!,:etaG2P_MWh_p_tonne][k]
+        [k in H2_G2P_NO_COMMIT, t = 1:T], EP[:vPG2P][k,t] == EP[:vH2G2P][k,t] * dfH2G2P[!,:etaG2P][k]
     end)
 
     @constraints(EP, begin

@@ -31,7 +31,6 @@ global_logger = setup_logging(mysetup)
 
 ### Load DOLPHYN
 println("Loading packages")
-# push!(LOAD_PATH, src_path)
 
 # Setup time domain reduction and cluster inputs if necessary
 setup_TDR(inputs_path, settings_path, mysetup)
@@ -73,4 +72,4 @@ if mysetup["ModelH2"] == 1
     write_HSC_outputs(EP, outpath_GenX, mysetup, myinputs)
 end
 
-compare_results(outpath_GenX, joinpath(inputs_path, "Results_Example"))
+

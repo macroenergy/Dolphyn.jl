@@ -57,6 +57,8 @@ println("Loading packages")
 push!(LOAD_PATH, src_path)
 
 using Dolphyn
+using Gurobi
+
 
 outpath = joinpath(inpath, "Results")
 
