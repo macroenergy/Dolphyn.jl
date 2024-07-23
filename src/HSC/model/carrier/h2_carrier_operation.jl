@@ -115,7 +115,7 @@ function h2_carrier_operation(EP::Model, inputs::Dict, setup::Dict)
     )
 
     for t=1:T
-        fix(vCarProcH2output["LOHC","dehyd",1,t], 100.0; force = true)
+        fix(vCarProcH2output["Ammonia","dehyd",1,t], 0.5*12.9*H2_LHV; force = true) # Fix to 50% of MA demand
     end
 
     # Carrier make up supply - only for hydrogenation step: 
