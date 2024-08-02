@@ -20,10 +20,15 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 	dfH2Gen = inputs["dfH2Gen"]
+	H2_GEN = inputs["H2_GEN"]
+	dfGen = inputs["dfGen"]
 	H2_ELECTROLYZER = inputs["H2_ELECTROLYZER"]
 	BLUE_H2 = inputs["BLUE_H2"]
 	GREY_H2 = inputs["GREY_H2"]
 	H2_STOR_ALL = inputs["H2_STOR_ALL"]
+
+	# Identify number of time matching requirements
+	nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))
 	
 
 	if setup["ModelH2G2P"] == 1
@@ -33,14 +38,43 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+	hours_per_subperiod = Int(inputs["hours_per_subperiod"])
+	Rep_Periods = Int(T/hours_per_subperiod)
 	
-	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total"])
+	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total", "H2TMR_Excess_Sales_Ratio"])
 
 	#Try this form of summing otherwise just create z dimensions and sum later
 	
 	Green_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in H2_ELECTROLYZER))
-	Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2))
-	Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2))
+	#Hardcoded TMR to 1!!!
+	#Old, works for deterministic
+	#H2TMR_Excess_Sales_Ratio =  ( ( value.(EP[:eExcessAnnualElectricitySupplyTMR])[1]) / sum(sum((inputs["H2_D"][:,z] for z in Z)) ) )
+	H2TMR_Excess_Sales_Ratio = []
+	for p in 1:Rep_Periods
+		#print(value.(EP[:eExcessAnnualElectricitySupplyTMRwRepPeriods])[1, p]) / ( sum(sum((inputs["H2_D"][:,z] z in 1:Z)) / Rep_Periods) )
+		#push!(H2TMR_Excess_Sales_Ratio, ( ( value.(EP[:eExcessAnnualElectricitySupplyTMRwRepPeriods])[1, p]) / ( sum(sum((inputs["H2_D"][:,z] for z in 1:Z)) / Rep_Periods) ) ) )
+		push!(H2TMR_Excess_Sales_Ratio, ( ( value.(EP[:eExcessAnnualElectricitySupplyTMRwRepPeriods])[1, p]) / 
+		sum(sum(value.(EP[:vH2Gen])[k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_1")]),:R_ID])) for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))))	#	eExcessAnnualElectricitySupplyTMRwRepPeriods[TMR, p] <= (setup["H2TMR_Excess_Sales_Allowance"] * sum(sum((inputs["H2_D"][:,1]) ) )  / Rep_Periods) 
+	end
+
+	#PPA_Battery_Excess_Sales_Ratio = []
+	#for p in 1:Rep_Periods
+	#	push!(PPA_Battery_Excess_Sales_Ratio, ( ( value.(EP[:eExcessAnnualBatterySalesTMRwRepPeriods])[1, p]) /
+	#	sum(sum(dfGen[!,Symbol("H2_TMR_1")][y] * value.(EP[:vP])[y,t] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_1")]),:R_ID], inputs["STOR_ALL"]) ) for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))) )
+	#end
+
+	##EDITED TO ACCOUNT FOR CASES WITHOUT BLUE OR GREY H2
+	if !isempty(BLUE_H2)
+		Blue_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in BLUE_H2), init = 0)
+	else 
+		Blue_H2_Generation = 0
+	end
+
+	if !isempty(GREY_H2)
+		Grey_H2_Generation = sum(sum(inputs["omega"].* value.(EP[:vH2Gen])[y,:] for y in GREY_H2), init = 0)
+	else	
+		Grey_H2_Generation = 0
+	end
 
 	if setup["ModelBIO"] == 1 && setup["BIO_H2_On"] == 1
 		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z) - sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z])) for z in 1:Z)
@@ -90,7 +124,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	cTotal = Green_H2_Generation + Blue_H2_Generation + Grey_H2_Generation + Bio_H2 + Nonserved_Energy + H2_Pipeline_Import_Export + H2_Truck_Import_Export + Truck_Consumption + H2G2P + Demand + Synfuel_Consumption
 
 	# Define total column, i.e. column 2
-	dfCost[!,Symbol("Total")] = [Green_H2_Generation, Blue_H2_Generation, Grey_H2_Generation, Bio_H2, Storage_Discharging, Storage_Charging, Nonserved_Energy, H2_Pipeline_Import_Export, H2_Truck_Import_Export, Truck_Consumption, H2G2P, Demand, Synfuel_Consumption, cTotal]
+	dfCost[!,Symbol("Total")] = [Green_H2_Generation, Blue_H2_Generation, Grey_H2_Generation, Bio_H2, Storage_Discharging, Storage_Charging, Nonserved_Energy, H2_Pipeline_Import_Export, H2_Truck_Import_Export, Truck_Consumption, H2G2P, Demand, Synfuel_Consumption, cTotal, H2TMR_Excess_Sales_Ratio]
 
 	################################################################################################################################
 	# Computing zonal cost breakdown by cost category
@@ -157,7 +191,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		tempCTotal = tempGreen_H2_Generation + tempBlue_H2_Generation + tempGrey_H2_Generation + tempBio_H2 + tempNonserved_Energy + tempH2_Pipeline_Import_Export + tempH2_Truck_Import_Export + tempTruck_Consumption + tempH2G2P + tempDemand + tempSynfuel_Consumption
 
 
-		dfCost[!,Symbol("Zone$z")] = [tempGreen_H2_Generation, tempBlue_H2_Generation, tempGrey_H2_Generation, tempBio_H2, tempStorage_Discharging, tempStorage_Charging, tempNonserved_Energy, tempH2_Pipeline_Import_Export, tempH2_Truck_Import_Export, tempTruck_Consumption, tempH2G2P, tempDemand, tempSynfuel_Consumption, tempCTotal]
+		dfCost[!,Symbol("Zone$z")] = [tempGreen_H2_Generation, tempBlue_H2_Generation, tempGrey_H2_Generation, tempBio_H2, tempStorage_Discharging, tempStorage_Charging, tempNonserved_Energy, tempH2_Pipeline_Import_Export, tempH2_Truck_Import_Export, tempTruck_Consumption, tempH2G2P, tempDemand, tempSynfuel_Consumption, tempCTotal, H2TMR_Excess_Sales_Ratio]
 	end
 
 	CSV.write(string(path,sep,"HSC_balance_zone.csv"), dfCost)
