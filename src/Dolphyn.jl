@@ -142,6 +142,10 @@ genx_to_exclude = [
     joinpath(genxsubmod_path,"model","policies","co2_cap.jl"),
     joinpath(genxsubmod_path,"model","policies","cap_reserve_margin.jl"),
     joinpath(genxsubmod_path,"model","resources","thermal","thermal_commit.jl"),
+    joinpath(genxsubmod_path,"model","core","discharge","discharge.jl"), # Added to compute ESR contributions at each time step
+    joinpath(genxsubmod_path,"model","core","transmission.jl"), # Added to compute ESR contributions at each time step
+    joinpath(genxsubmod_path,"model","resources","storage","storage.jl"), # Added to compute ESR contributions at each time step
+    joinpath(genxsubmod_path,"model","policies","energy_share_requirement.jl"), # Added to compute ESR contributions at each time step
     # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
 include_from_dir(genxsubmod_path, ".jl", genx_to_exclude)

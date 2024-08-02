@@ -83,8 +83,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	dfH2Gen = inputs["dfH2Gen"]
 
 	hours_per_subperiod = Int(inputs["hours_per_subperiod"])
-	#Rep_Periods = inputs["Rep_Periods"]
-	Rep_Periods = Int(T/hours_per_subperiod)
+	Rep_Periods = inputs["REP_PERIOD"] # number of representative periods
 
 	# Identify number of time matching requirements
 	nH2_TMR = count(s -> startswith(String(s), "H2_TMR_"), names(dfGen))
@@ -92,108 +91,85 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	# Identify number of ESRR requirements
 	nESR = count(s -> startswith(String(s), "ESR_"), names(dfGen))
 
+	# Expressions  Supply of contracted electricity minus demand at each time step
+
+	# Hourly electricity consumption to be matched
+	@expression(EP,eTMRDemand[TMR=1:nH2_TMR, t=1:T],
+		sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
+	)
+
+	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
+		sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
+		- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
+		-eTMRDemand[TMR,T])
+
 	### Variable ###
 	# if input files are present, add CO2 cap slack variables
 	if haskey(setup, "H2TMR_slack_cost")
 		H2_TMR_cost = Int(setup["H2TMR_slack_cost"])
 		println("##################################")
-		println("H2_TMR_slack cost is $H2_TMR_cost")
-		println("Rep Periods: ", Rep_Periods)
-		println("##################################")
-		@variable(EP, vH2_TMR_slack[t = 1:T]>=0)
+		println("H2_TMR_slack cost is $H2_TMR_cost") # Penalty associated with not matching consumption with contracted supply $/MWh
+		@variable(EP, vH2_TMR_slack[TMR=1:nH2_TMR, t = 1:T]>=0) # MWh of ummatched demand in each time step 
 
-		@expression(EP, eH2_TMR_slack[t = 1:T], 
-		H2_TMR_cost * EP[:vH2_TMR_slack][t])
+		# Expression to calculate cost of violating TMR constraint
+		@expression(EP, eH2_TMR_slack[TMR=1:nH2_TMR, t = 1:T], 
+			H2_TMR_cost * EP[:vH2_TMR_slack][TMR,t])
+
+		# Annual cost of violating TMR slack
 		@expression(EP, eCTotal_H2_TMR_slack, 
-		sum(EP[:eH2_TMR_slack][t] for t = 1:T))
+			sum(EP[:eH2_TMR_slack][t]*inputs["omega"][t] for TMR=1:nH2_TMR, t = 1:T))
+
+		# Add penalty cost to objective function
+		EP[:eObj] += eCTotal_H2_TMR_slack 
+
+		#IF slack is active add it to the expression being used to define the constraint
+		EP[:eExcessElectricitySupplyTMR] = +vH2_TMR_slack
 		
-		EP[:eObj] += eCTotal_H2_TMR_slack / Rep_Periods
-
-		# Hourly excess electricity supply from contracted electricity resources for H2 production
-		@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
-		sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
-		- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-		-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
-		+ EP[:vH2_TMR_slack][t])
-
-		#println(intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_1")]),:R_ID], inputs["STOR_ALL"]))
-		#println(intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_1")]),:R_ID]))
-		#println(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_1")]),:R_ID])
-		#println(inputs["STOR_ALL"])
-		#println(setdiff(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_1")]),:R_ID], inputs["STOR_ALL"]))
-	
-	else 
-		@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
-		sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
-		- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-		-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID])))
 	end
 
-#	if haskey(setup, "Battery_excess_sales_limit")
-#		@expression(EP,eExcessBatterySalesTMR[TMR=1:nH2_TMR, t=1:T],
-#		sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]) )
-#		#sum(EP[:vP][y,t] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-#		-(  sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
-#			- sum(EP[:vP][y,t] for y in setdiff(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"])) 
-#			)
-#		)
-#
-#		@expression(EP, eExcessAnnualBatterySalesTMRwRepPeriods[TMR=1:nH2_TMR, p=1:Rep_Periods], 
-#		sum(eExcessBatterySalesTMR[TMR, t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod)))
-#
-#	end
-
-
-	# Export expression regarding excess electricity generation from contracted VRE resources over the entire year that can be used for meeting RPS requirements
-
-	# Hourly excess electricity supply from contracted electricity resources for H2 production
-	#@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
-	#sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
-	#- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-	#-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
-	#+ EP[:vH2_TMR_slack][t]
-	#)
-
 	
-	# Annual excess electricity supply from contracted electricity resources for H2 production
-	@expression(EP, eExcessAnnualElectricitySupplyTMR[TMR=1:nH2_TMR], sum(eExcessElectricitySupplyTMR[TMR,t]*inputs["omega"][t] for t = 1:T))
+	# Sum of Annual excess electricity supply from contracted electricity resources for H2 production for time periods
+	# - omega scales data to one year when modeling multiple years of operations
+	@expression(EP, eExcessAnnualElectricitySupplyTMR[TMR=1:nH2_TMR], 
+		sum(eExcessElectricitySupplyTMR[TMR,t]*inputs["omega"][t] for t = 1:T)
+	)
 
 
-	# Annual excess electricity supply from contracted electricity resources for H2 production with representative periods
-	#ASSUMES H2 DEMAND IS THE SAME IN EVERY SUBPERIOD!!!!
-
-	@expression(EP, eExcessAnnualElectricitySupplyTMRwRepPeriods[TMR=1:nH2_TMR, p=1:Rep_Periods], 
-    	sum(eExcessElectricitySupplyTMR[TMR, t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod)))
+	# Sub-period-level excess electricity supply
+	@expression(EP, eExcessPeriodElectricitySupplyTMR[TMR=1:nH2_TMR, p=1:Rep_Periods], 
+    	sum(eExcessElectricitySupplyTMR[TMR, t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
+	)
 	
-	# Annual excess electricity supply from contracted electricity resources for H2 production by period
-	#@expression(EP, eExcessAnnualElectricitySupplyTMRwRepPeriods[TMR=1:nH2_TMR, p = 1:Rep_Periods], sum(eExcessElectricitySupplyTMRwRepPeriods[TMR,p,t]*inputs["omega"][t] for t = 1:hours_per_subperiod) for p in 1:Rep_Periods)
-
-	print(sum((inputs["H2_D"][:,1]) ))
 
 	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
 	if setup["TimeMatchingRequirement"] == 1 # hourly with excess sales allowed
 		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t]>=0 )	
 		if haskey(setup, "H2TMR_Excess_Sales_Allowance")
-			##HARDCODED TO BE ZONE 1, the first one works for stochastic, but doesn't enforce by subperiod for stochastic
-			#@constraint(EP, cH2TMR_Excess_Allowance[TMR=1:nH2_TMR], eExcessAnnualElectricitySupplyTMR[TMR] <= (setup["H2TMR_Excess_Sales_Allowance"] * sum((inputs["H2_D"][:,1]) )	) )
-			@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR, p=1:Rep_Periods], eExcessAnnualElectricitySupplyTMRwRepPeriods[TMR, p] <= (setup["H2TMR_Excess_Sales_Allowance"] * sum(sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_1")]),:R_ID])) for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))))
+			if (hours_per_subperiod == 8760) && Rep_Periods >1 # modeling multiple years of operations
+			# Limit excess electricity sales in each sub_period
+				@constraint(EP, cExcessTMRSalesAnnual[TMR=1:nH2_TMR, p=1:Rep_Periods], 
+				eExcessPeriodElectricitySupplyTMR[TMR, p] 				
+					<= setup["H2TMR_Excess_Sales_Allowance"] * sum(eTMRDemand[TMR,t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
+				)
+			else # modeling a single year of operations either for 8760 hours or via representative periods
+				@constraint(EP, cExcessTMRSalesAnnual[TMR=1:nH2_TMR], 
+				eExcessAnnualElectricitySupplyTMR[TMR] 				
+					<= setup["H2TMR_Excess_Sales_Allowance"] * sum(eTMRDemand[TMR,t]*inputs["omega"][t] for t = 1:T)
+				)	
+
+			end
 		end
 
-#		if haskey(setup, "Battery_excess_sales_limit")
-#			@constraint(EP, cH2TMR_Annual_Battery_Excess_Allowance[TMR=1:nH2_TMR, p=1:Rep_Periods], eExcessAnnualBatterySalesTMRwRepPeriods[TMR, p] 
-#			<= setup["Battery_excess_sales_limit"] * sum(sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]) ) 
-#			for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod)) )
-#		end
-		
 
 	elseif setup["TimeMatchingRequirement"] == 2 # hourly without excess sales 
 		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t] ==0 )			
 	elseif setup["TimeMatchingRequirement"] == 3 # annual matching 
+		if (hours_per_subperiod == 8760) && Rep_Periods >1 # modeling multiple years of operations
+			@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR, p=1:Rep_Periods], eExcessPeriodElectricitySupplyTMR[TMR, p] ==0 )	
+		else # modeling a single year of operations either for 8760 hours or via representative periods
 		# Annual excess electricity supply from contracted electricity resources for H2 production
-		@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR], eExcessAnnualElectricitySupplyTMR[TMR] ==0 )	
-	elseif setup["TimeMatchingRequirement"] == 4 # annual matching by period
-		# Annual excess electricity supply from contracted electricity resources for H2 production
-		@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR, p=1:Rep_Periods], eExcessAnnualElectricitySupplyTMRwRepPeriods[TMR, p] ==0 )	
+			@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR], eExcessAnnualElectricitySupplyTMR[TMR] ==0 )	
+		end
 	end
 
 	#Add excess TMR Sales to ESR

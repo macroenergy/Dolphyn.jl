@@ -99,7 +99,7 @@ function configure_gurobi(solver_settings_path::String, solver::DataType)
         MyBarHomogeneous = solver_settings["BarHomogeneous"]
     end
     ########################################################################
-
+ 
     OPTIMIZER = optimizer_with_attributes(
         solver,
         "OptimalityTol" => MyOptimalityTol,

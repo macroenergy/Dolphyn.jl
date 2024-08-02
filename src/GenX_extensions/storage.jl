@@ -99,7 +99,7 @@ The above reserve related constraints are established by ```storage_all_reserves
 """
 function storage!(EP::Model, inputs::Dict, setup::Dict)
 
-	println(" -- Storage Resources Module")
+	println("Storage Resources Module")
 	dfGen = inputs["dfGen"]
 	T = inputs["T"]
 	STOR_ALL = inputs["STOR_ALL"]
@@ -135,11 +135,16 @@ function storage!(EP::Model, inputs::Dict, setup::Dict)
 	# ESR Lossses
 	if EnergyShareRequirement >= 1
 		if IncludeLossesInESR == 1
-			@expression(EP, eESRStor[ESR=1:inputs["nESR"]], sum(inputs["dfESR"][z,ESR]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
+			@expression(EP, eESRStorT[ESR=1:inputs["nESR"],t=1:T], 
+				sum(inputs["dfESR"][z,ESR]*sum(EP[:vCHARGE][y,t] - EP[:vP][y,t] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)) for z=findall(x->x>0,inputs["dfESR"][:,ESR]))
+			)
+
+			@expression(EP, eESRStor[ESR=1:inputs["nESR"]],
+				sum(eESRStorT[ESR,t]*inputs["omega"][t] for t=1:T)
+			)
 			EP[:eESR] -= eESRStor
 		end
 	end
-
 
 	# Capacity Reserves Margin policy
 	if CapacityReserveMargin > 0
