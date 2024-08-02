@@ -22,24 +22,26 @@ function energy_share_requirement!(EP::Model, inputs::Dict, setup::Dict)
 
 
 	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
-	if (hours_per_subperiod == 8760) && Rep_Periods >1 # modeling multiple years of operations
-		# Sub-period ESR constraint LHS
-		@expression(EP, eESRPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
-			sum( EP[:eESRDischargeT][ESR,t] -EP[:eESRTransT][ESR,t] -EP[:eESRStorT][ESR,t] 
-			for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
-		)
+	# Sub-period ESR constraint LHS
+		if setup["MultipleYears"]==1
+			@expression(EP, eESRPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
+				sum( EP[:eESRT][ESR, t]
+				for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
+			)
 
-		@constraint(EP, cESRSharePerPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
-			eESRPeriod[ESR,p] >= 0
-		)
-	else # modeling single year of operations either on an hourly basis or a representative periods - see eESR definition
-		@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], EP[:eESR][ESR] >= 0)
-	end
+			@constraint(EP, cESRSharePerPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
+				eESRPeriod[ESR,p] >= 0
+			)
+		else
+		 # modeling single year of operations either on an hourly basis or a representative periods - see eESR definition
+			@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], EP[:eESR][ESR] >= 0)
+		end
 
 
 	
 	# if input files are present, add energy share requirement slack variables
-	if haskey(inputs, "dfESR_slack")
+	# HARD CODED TO APPLY ONLY FOR SINGLE YEAR CALCLATIONS FOR NOW
+	if haskey(inputs, "dfESR_slack") && setup["MultipleYears"]==0 
 		@variable(EP, vESR_slack[ESR=1:inputs["nESR"]]>=0)
 		EP[:eESR] += vESR_slack
 

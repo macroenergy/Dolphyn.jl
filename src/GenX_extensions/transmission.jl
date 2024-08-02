@@ -329,13 +329,16 @@ function transmission!(EP::Model, inputs::Dict, setup::Dict)
 
 	# ESR Lossses
     if EnergyShareRequirement >= 1 && IncludeLossesInESR ==1
-		@expression(EP, eESRTranT[ESR=1:inputs["nESR"], t=1:T],
-                    sum(inputs["dfESR"][z,ESR]*EP[:eLosses_By_Zone][z,t]  for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
-
-        @expression(EP, eESRTran[ESR=1:inputs["nESR"]],
-					sum(eESRTranT[ESR,t]*inputs["omega"][t] for t=1:T)
-		)
-        EP[:eESR] -= eESRTran
+		
+		if setup["MultipleYears"]==1
+			@expression(EP, eESRTranT[ESR=1:inputs["nESR"],t=1:T],
+			sum(inputs["dfESR"][z,ESR]*inputs["omega"][t]*EP[:eLosses_By_Zone][z,t] for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
+			EP[:eESRT] -=eESRTransT
+		else
+			@expression(EP, eESRTran[ESR=1:inputs["nESR"]],
+			sum(inputs["dfESR"][z,ESR]*sum(inputs["omega"][t]*EP[:eLosses_By_Zone][z,t] for t in 1:T) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
+			EP[:eESR] -= eESRTran
+		end
 	end
 
 end

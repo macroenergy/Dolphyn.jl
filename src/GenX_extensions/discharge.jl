@@ -40,13 +40,18 @@ function discharge!(EP::Model, inputs::Dict, setup::Dict)
 	# ESR Policy
 	if setup["EnergyShareRequirement"] >= 1
 
-		@expression(EP, eESRDischargeT[ESR=1:inputs["nESR"], t=1:T], dfGen[y,Symbol("ESR_$ESR")]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID] -
-		- sum(inputs["dfESR"][z,ESR]*inputs["pD"][t,z] for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
+		if setup["MultipleYears"] ==1
+			@expression(EP, eESRDischargeT[ESR=1:inputs["nESR"],t=1:T], sum(inputs["omega"][t]*dfGen[y,Symbol("ESR_$ESR")]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID])
+			- sum(inputs["dfESR"][z,ESR]*inputs["omega"][t]*inputs["pD"][t,z] for z=findall(x->x>0,inputs["dfESR"][:,ESR]))
+			)
 
+			EP[:eESRT] +=eESRDischargeT
+		else
+			@expression(EP, eESRDischarge[ESR=1:inputs["nESR"]], sum(inputs["omega"][t]*dfGen[y,Symbol("ESR_$ESR")]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("ESR_$ESR")]),:R_ID], t=1:T)
+			- sum(inputs["dfESR"][z,ESR]*inputs["omega"][t]*inputs["pD"][t,z] for t=1:T, z=findall(x->x>0,inputs["dfESR"][:,ESR])))
 
-		@expression(EP, eESRDischarge[ESR=1:inputs["nESR"]],eESRDischargeT[ESR,t] *inputs["omega"][t] for t=1:T)
-
-		EP[:eESR] += eESRDischarge
+			EP[:eESR] += eESRDischarge
+		end
 	end
 
 end

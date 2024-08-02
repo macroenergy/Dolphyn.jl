@@ -101,7 +101,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
 		sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
 		- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-		-eTMRDemand[TMR,T])
+		-eTMRDemand[TMR,t])
 
 	### Variable ###
 	# if input files are present, add CO2 cap slack variables
@@ -137,7 +137,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 	# Sub-period-level excess electricity supply
 	@expression(EP, eExcessPeriodElectricitySupplyTMR[TMR=1:nH2_TMR, p=1:Rep_Periods], 
-    	sum(eExcessElectricitySupplyTMR[TMR, t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
+    	sum(eExcessElectricitySupplyTMR[TMR, t]*inputs["omega"][t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
 	)
 	
 
@@ -145,11 +145,11 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	if setup["TimeMatchingRequirement"] == 1 # hourly with excess sales allowed
 		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t]>=0 )	
 		if haskey(setup, "H2TMR_Excess_Sales_Allowance")
-			if (hours_per_subperiod == 8760) && Rep_Periods >1 # modeling multiple years of operations
+			if setup["MultipleYears"]==1 # modeling multiple years of operations
 			# Limit excess electricity sales in each sub_period
 				@constraint(EP, cExcessTMRSalesAnnual[TMR=1:nH2_TMR, p=1:Rep_Periods], 
 				eExcessPeriodElectricitySupplyTMR[TMR, p] 				
-					<= setup["H2TMR_Excess_Sales_Allowance"] * sum(eTMRDemand[TMR,t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
+					<= setup["H2TMR_Excess_Sales_Allowance"] * sum(eTMRDemand[TMR,t]*inputs["omega"][t] for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
 				)
 			else # modeling a single year of operations either for 8760 hours or via representative periods
 				@constraint(EP, cExcessTMRSalesAnnual[TMR=1:nH2_TMR], 
@@ -164,7 +164,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	elseif setup["TimeMatchingRequirement"] == 2 # hourly without excess sales 
 		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t] ==0 )			
 	elseif setup["TimeMatchingRequirement"] == 3 # annual matching 
-		if (hours_per_subperiod == 8760) && Rep_Periods >1 # modeling multiple years of operations
+		if setup["MultipleYears"]==1 # modeling multiple years of operations
 			@constraint(EP, cH2TMR_Annual[TMR=1:nH2_TMR, p=1:Rep_Periods], eExcessPeriodElectricitySupplyTMR[TMR, p] ==0 )	
 		else # modeling a single year of operations either for 8760 hours or via representative periods
 		# Annual excess electricity supply from contracted electricity resources for H2 production
@@ -211,8 +211,13 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 
 		if nrow(esr_tmr_df) != 0
 			#Summing excess energy across all TMR resources in the same ESR group, creating an excess annual electricity supply variable from TMR resources for each ESR. 
-			@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum(eExcessElectricitySupplyTMR[TMR] for TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
-			EP[:eESR] += eExcessAnnualElectricitySupplyESR
+			if setup["MultipleYears"]==0
+				@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR], sum(eExcessElectricitySupplyTMR[TMR,t]*inputs["omega"][t] for t=1:T, TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
+				EP[:eESR] += eExcessAnnualElectricitySupplyESR
+			else
+				@expression(EP, eExcessAnnualElectricitySupplyESR[ESR=1:nESR,t=1:T], sum(eExcessPeriodElectricitySupplyTMR[TMR,t] for TMR in esr_tmr_df[(esr_tmr_df[!,:ESR].==ESR), :TMR]))
+				EP[:eESRT] += eExcessAnnualElectricitySupplyESR
+			end
 		end
 
 	end 

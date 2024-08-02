@@ -91,6 +91,15 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
+    
+	hours_per_subperiod = Int(inputs["hours_per_subperiod"])
+	Rep_Periods = inputs["REP_PERIOD"] # number of representative periods
+
+    if (hours_per_subperiod == 8760) && Rep_Periods >1 # modeling multiple years of operations
+        setup["MultipleYears"]=1
+    else
+        setup["MultipleYears"]=0 # Single year modeled over 8760 hours or via representative weeks
+    end
 
     ## Start pre-solve timer
     presolver_start_time = time()
@@ -134,7 +143,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     
     # Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
-		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
+    # Initialize expressions for ESR at period and annual level depending on single or multiple years Period-level ESR used if modeling multiple years of operation;
+        if setup["MultipleYears"]==1
+            @expression(EP, eESRT[ESR=1:inputs["nESR"],t=1:T], 0)
+        else
+            @expression(EP, eESR[ESR=1:inputs["nESR"]], 0)     
+        end
 	end
 
     # Initialize Capacity Reserve Margin Expression

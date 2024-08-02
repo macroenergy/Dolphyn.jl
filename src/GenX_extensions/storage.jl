@@ -135,14 +135,16 @@ function storage!(EP::Model, inputs::Dict, setup::Dict)
 	# ESR Lossses
 	if EnergyShareRequirement >= 1
 		if IncludeLossesInESR == 1
-			@expression(EP, eESRStorT[ESR=1:inputs["nESR"],t=1:T], 
-				sum(inputs["dfESR"][z,ESR]*sum(EP[:vCHARGE][y,t] - EP[:vP][y,t] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)) for z=findall(x->x>0,inputs["dfESR"][:,ESR]))
-			)
+			if setup["MultipleYears"]==1
+				@expression(EP, eESRStorT[ESR=1:inputs["nESR"],t=1:T], 
+					sum(inputs["dfESR"][z,ESR]*sum((EP[:vCHARGE][y,t] - EP[:vP][y,t])*inputs["omega"][t] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)) for z=findall(x->x>0,inputs["dfESR"][:,ESR]))
+				)
+				EP[:eESRT] -=eESRStorT
 
-			@expression(EP, eESRStor[ESR=1:inputs["nESR"]],
-				sum(eESRStorT[ESR,t]*inputs["omega"][t] for t=1:T)
-			)
-			EP[:eESR] -= eESRStor
+			else
+				@expression(EP, eESRStor[ESR=1:inputs["nESR"]], sum(inputs["dfESR"][z,ESR]*sum(EP[:eELOSS][y] for y in intersect(dfGen[dfGen.Zone.==z,:R_ID],STOR_ALL)) for z=findall(x->x>0,inputs["dfESR"][:,ESR])))
+				EP[:eESR] -= eESRStor
+			end
 		end
 	end
 
