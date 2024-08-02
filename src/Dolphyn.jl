@@ -138,6 +138,7 @@ genx_to_exclude = [
     joinpath(genxsubmod_path,"write_outputs","write_storage.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_storagedual.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_subsidy_revenue.jl"),
+    joinpath(genxsubmod_path,"write_outputs","energy_share_requirement","write_esr_prices.jl"), # Added to compute ESR contributions at each time step
     joinpath(genxsubmod_path,"model","core","emissions.jl"),
     joinpath(genxsubmod_path,"model","policies","co2_cap.jl"),
     joinpath(genxsubmod_path,"model","policies","cap_reserve_margin.jl"),
