@@ -26,7 +26,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 
     data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
     
-    if setup["TimeDomainReduction"] == 1 && isfile(joinpath(data_directory,"HSC_load_data.csv")) # Use Time Domain Reduced data for GenX
+    if setup["TimeDomainReduction"] == 1 && isfile(joinpath(data_directory,"HSC_load_data.csv")) # Use Time Domain Reduced data for DOLPHYN
         H2_load_in = DataFrame(CSV.File(string(joinpath(data_directory,"HSC_load_data.csv")), header=true), copycols=true)
     else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
         H2_load_in = DataFrame(CSV.File(joinpath(path, "HSC_load_data.csv"), header=true), copycols=true)
@@ -46,12 +46,14 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     H2_SEG = inputs_load["H2_SEG"]  # Number of demand segments
     inputs_load["pC_H2_D_Curtail"] = zeros(H2_SEG)
     inputs_load["pMax_H2_D_Curtail"] = zeros(H2_SEG)
+
     for s in 1:H2_SEG
         # Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
         inputs_load["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_per_Tonne]))[s]*inputs_load["H2_Voll"][1]
+       # print_and_log("H2_NSE cost is: ", inputs_load["pC_H2_D_Curtail"])
         # Maximum hourly demand curtailable as % of the max demand (for each segment)
         inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
-
+       # print_and_log("pMax_H2_D_Curtail is: ", inputs_load["pMax_H2_D_Curtail"][s])
     end
     
     print_and_log(" -- HSC_load_data.csv Successfully Read!")

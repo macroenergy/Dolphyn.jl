@@ -62,7 +62,36 @@ function write_h2_tmr_prices(path::AbstractString, sep::AbstractString, inputs::
 	CSV.write(string(path,sep,"TMR_prices.csv"), dfPrice)
 
 	end
+
+
+#write out the H2_TMR_slack variable
+#	if setup["TimeMatchingRequirement"] >= 1
+#		dfH2_TMR_slack = DataFrame(TMR = 1:nH2_TMR) 
+#		dfH2_TMR_slack = hcat(dfH2_TMR_slack, (EP[:vH2_TMR_slack]./inputs["omega"]))
+
+#	CSV.write(string(path,sep,"H2_TMR_slack.csv"), dfH2_TMR_slack)
+
+#	end
+
+
+#	dfH2_TMR_slack = DataFrame()
+#	if setup["ParameterScale"] == 1
+#		dfCO2Price.CO2_Price .*= ModelScalingFactor # Convert Million$/kton to $/ton
+#	end
+
+#	if haskey(setup, "H2TMR_slack_cost")
+#		dfH2_TMR_slack = hcat(dfH2_TMR_slack, convert(Array{Float64}, value.(EP[:vH2_TMR_slack])))
+#		#if setup["ParameterScale"] == 1
+		#	dfCO2Price.CO2_Mass_Slack .*= ModelScalingFactor # Convert ktons to tons
+		#	dfCO2Price.CO2_Penalty .*= ModelScalingFactor^2 # Convert Million$ to $
+		#end
+#		CSV.write(joinpath(path, "H2_TMR_slack.csv"), dfH2_TMR_slack)
+#	end
+
 	
-	return dfPrice
+
+	
+
+#	return dfPrice, dfH2_TMR_slack
 
 end

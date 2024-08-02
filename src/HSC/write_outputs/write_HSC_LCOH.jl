@@ -81,7 +81,8 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCO2Price_z = 0
 		end
 
-		tempBlue_H2_CO2_MAC = abs(tempCO2Price_z) * tempBlue_H2_CO2_Emission
+		##Set this to 0, this is really bad practice
+		tempBlue_H2_CO2_MAC = 0 * tempBlue_H2_CO2_Emission
 
 		tempBlue_H2_CTotal = tempBlue_H2_Fixed_Cost + tempBlue_H2_Electricity_Cost + tempBlue_H2_Var_Cost + tempBlue_H2_Fuel_Cost + tempBlue_H2_CO2_MAC
 		tempBlue_H2_LCOH = tempBlue_H2_CTotal/tempBlue_H2_Generation
@@ -280,7 +281,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 			tempCO2Price_z = 0
 		end
 
-		tempGrey_H2_CO2_MAC = abs(tempCO2Price_z) * tempGrey_H2_CO2_Emission
+		tempGrey_H2_CO2_MAC = 0 * tempGrey_H2_CO2_Emission
 
 		tempGrey_H2_CTotal = tempGrey_H2_Fixed_Cost + tempGrey_H2_Electricity_Cost + tempGrey_H2_Var_Cost + tempGrey_H2_Fuel_Cost + tempGrey_H2_CO2_MAC
 		tempGrey_H2_LCOH = tempGrey_H2_CTotal/tempGrey_H2_Generation
