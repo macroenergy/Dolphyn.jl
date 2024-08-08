@@ -77,10 +77,11 @@ end
 function setup_logging(mysetup::Dict{String, Any})
     # Start logging
     global Log = mysetup["Log"]
+
     if Log
-        logger = FileLogger(mysetup["LogFile"])
-        return global_logger(logger)
+        return init_logger(mysetup) 
     end
+
     return nothing
 end
 
@@ -140,14 +141,13 @@ function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict
     if mysetup["ModelLiquidFuels"] == 1
         write_liquid_fuels_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
-
     return adjusted_outpath
 
 end
 
 function generate_model(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     mysetup = load_settings(settings_path)
-    global_logger = setup_logging(mysetup)
+    logger = setup_logging(mysetup)
 
     # Check if TDR is forced on or off
     # If both are set to on, force_TDR_on will take precedence
@@ -168,6 +168,23 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
     solver = configure_solver(settings_path, optimizer)
     myinputs = load_all_inputs(mysetup, inputs_path)
     EP = generate_model(mysetup, myinputs, solver)
+
+    ## Add model scaling run
+    with_logger(logger) do 
+        if mysetup["Model_Scaling"] == 1
+            println("Running model scaling: ")
+            @info "Running model scaling: "
+            EP = run_model_scaling(EP, mysetup)
+            println("Optimize model: EP")
+            @info "Optimize model: EP"
+            optimize!(EP)
+            obj_val = objective_value(EP)
+            println("Objective value: ", obj_val)
+            @info "Objective value: $obj_val"
+            println("End of model scaling")
+            @info "End of model scaling..."
+        end
+    end
     return EP, mysetup, myinputs
 end
 
@@ -178,17 +195,36 @@ function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=
 end
 
 function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
-    EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
-    EP, solve_time = solve_model(EP, mysetup)
-    myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
-    adjusted_outpath = write_all_outputs(EP, mysetup, myinputs, inputs_path)
+        EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
+
+        EP, solve_time = solve_model(EP, mysetup)
+        myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
+        adjusted_outpath = write_all_outputs(EP, mysetup, myinputs, inputs_path)
+
     return EP, myinputs, mysetup, adjusted_outpath
 end
 
-function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=Gurobi.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
     settings_path = joinpath(local_dir, "Settings")
     inputs_path = local_dir
     EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
     return EP, myinputs, mysetup, adjusted_outpath
 end
 
+function init_logger(mysetup::Dict{String, Any})
+   function fmt(io, args)
+       println(io, args._module, " | ", Dates.format(now(), "yyyy-mm-dd HH:MM:SS"), " | " , "[", args.level, "] ", args.message)
+   end
+   # Open the file for writing
+   file = open(mysetup["LogFile"], "w")
+
+   # Wrap the FormatLogger in a MinLevelLogger to filter messages by severity
+   format_logger = FormatLogger(fmt, file)
+   min_level_logger = MinLevelLogger(format_logger, Logging.Info)
+
+   logger = TeeLogger(
+        global_logger(),
+        min_level_logger,
+   )
+  return logger
+end
