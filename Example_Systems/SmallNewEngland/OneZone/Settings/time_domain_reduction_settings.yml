@@ -15,7 +15,7 @@
   #   - TimestepsPerRepPeriod 
   #   Typically 168 timesteps (e.g., hours) per period, this designates 
   #   the length of each representative period.
-TimestepsPerRepPeriod: 168
+TimestepsPerRepPeriod: 24
 
   #   - ClusterMethod 
   #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
@@ -31,19 +31,19 @@ ScalingMethod: "S"
   #   The maximum number of periods - both clustered periods and extreme periods -
   #   that may be used to represent the input data. If IterativelyAddPeriods is on and the
   #   error threshold is never met, this will be the total number of periods.
-MaxPeriods: 3
+MaxPeriods: 10
 
   #   - MinPeriods
   #   The minimum number of periods used to represent the input data. If using
   #   UseExtremePeriods, this must be at least the number of extreme periods requests. If 
   #   IterativelyAddPeriods if off, this will be the total number of periods.
-MinPeriods: 1
+MinPeriods: 10
 
   #   - IterativelyAddPeriods
   #   Either 'yes' or 'no', this designates whether or not to add periods
   #   until the error threshold between input data and represented data is met or the maximum
   #   number of periods is reached.
-IterativelyAddPeriods: 1
+IterativelyAddPeriods: 0
 
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to
@@ -78,7 +78,7 @@ WeightTotal: 8760
   #   Fuels_data_clustered.csv with reshaped fuel prices based on the number and size of the
   #   representative weeks, assuming a constant time series of fuel prices with length equal to the
   #   number of timesteps in the raw input data.
-ClusterFuelPrices: 1
+ClusterFuelPrices: 0
 
   #   - UseExtremePeriods 
   #   Either 'yes' or 'no', this designates whether or not to include
@@ -119,7 +119,7 @@ ExtremePeriods:
             Min: 0
          Integral:   
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
@@ -134,7 +134,7 @@ ExtremePeriods:
             Min: 0  
          Integral:
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
