@@ -77,9 +77,7 @@ function write_net_revenue(path::AbstractString, inputs::Dict, setup::Dict, EP::
 
 	# Add RPS/CES revenue to the dataframe
 	dfNetRevenue.ESRRevenue = zeros(nrow(dfNetRevenue))
- 	if setup["EnergyShareRequirement"] > 0 && has_duals(EP) == 1 && setup["MultipleYears"]==0 
-		# The unit is confirmed to be $
-		# SKIPPING REVENUE CALCULATION FOR MULTIPLE YEARS OF OPERATION
+ 	if setup["EnergyShareRequirement"] > 0 && has_duals(EP) == 1 # The unit is confirmed to be $
  		dfNetRevenue.ESRRevenue = dfESRRev[!,:AnnualSum]
  	end
 
