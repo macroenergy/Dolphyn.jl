@@ -31,6 +31,8 @@ else
     println("Gurobi is not installed. Will use HiGHS for all cases")
 end
 
+summary = []
+
 if use_TDR
     println("Time Domain Reduction is enabled")
     force_TDR_on = true
@@ -50,9 +52,15 @@ for case in highs_cases
     case_name = string(split_case[end-1], split_case[end])
 
     println(" ------ ------ ------")
-    println("Generating model for $case_name ...")
-    run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-    println("Generated model for $case_name.")
+    println("Generating and running model for $case_name ...")
+    try
+        run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+        push!(summary, "🟢 $(case_name)")
+        println("Ran model for $case.")
+    catch Exception
+        println("Failed to run model for $case")
+        push!(summary, "🔴 $(case_name)")
+    end
 end
 
 if gurobi_installed
@@ -63,11 +71,24 @@ if gurobi_installed
         case_name = string(split_case[end-1], split_case[end])
 
         println(" ------ ------ ------")
-        println("Generating model for $case_name ...")
-        run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-        println("Generated model for $case.")
+        println("Generating and running model for $case_name ...")
+        try
+            run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+            push!(summary, "🟢 $(case_name)")
+            println("Ran model for $case.")
+        catch Exception
+            println("Failed to run model for $case")
+            push!(summary, "🔴 $(case)")
+        end
     end
 else 
     println(" ------ ------ ------")
     println("Gurobi is not installed. Skipping those cases")
 end
+
+println(" ------ ------ ------")
+println("Summary of which cases were run successfully:")
+for s in summary
+    println(s)
+end
+println(" ------ ------ ------")
