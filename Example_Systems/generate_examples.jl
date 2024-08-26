@@ -70,7 +70,7 @@ if gurobi_installed
             println("Generated model for $case.")
         catch Exception
             println("Failed to generate model for $case")
-            push!(summary, "🔴 $(case)")
+            push!(summary, "🔴 $(case_name)")
         end
     end
 else 

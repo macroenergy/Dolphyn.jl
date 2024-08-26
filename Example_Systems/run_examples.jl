@@ -78,7 +78,7 @@ if gurobi_installed
             println("Ran model for $case.")
         catch Exception
             println("Failed to run model for $case")
-            push!(summary, "🔴 $(case)")
+            push!(summary, "🔴 $(case_name)")
         end
     end
 else 
