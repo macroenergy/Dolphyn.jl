@@ -122,14 +122,14 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eTotalH2TruckEnergy[z = 1:Z, j in H2_TRUCK_TYPES],
         if (j in intersect(NEW_CAP_TRUCK, RET_CAP_TRUCK))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_MWh_z$z")][j] + EP[:vH2TruckEnergy][z, j] -
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_MW_z$z")][j] + EP[:vH2TruckEnergy][z, j] -
             EP[:vH2RetTruckEnergy][z, j]
         elseif (j in setdiff(NEW_CAP_TRUCK, RET_CAP_TRUCK))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_MWh_z$z")][j] + EP[:vH2TruckEnergy][z, j]
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_MW_z$z")][j] + EP[:vH2TruckEnergy][z, j]
         elseif (j in setdiff(RET_CAP_TRUCK, NEW_CAP_TRUCK))
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_MWh_z$z")][j] - EP[:vH2RetTruckEnergy][z, j]
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_MW_z$z")][j] - EP[:vH2RetTruckEnergy][z, j]
         else
-            dfH2Truck[!, Symbol("Existing_Energy_Cap_MWh_z$z")][j]
+            dfH2Truck[!, Symbol("Existing_Energy_Cap_MW_z$z")][j]
         end
     )
 
@@ -205,7 +205,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
   	## Constraints on truck compression energy
 		
 	# Cannot retire more energy capacity than existing energy capacity
-	@constraint(EP, cMaxRetH2TruckEnergy[z = 1:Z, j in RET_CAP_TRUCK], vH2RetTruckEnergy[z,j] <= dfH2Truck[!, Symbol("Existing_Energy_Cap_MWh_z$z")][j])
+	@constraint(EP, cMaxRetH2TruckEnergy[z = 1:Z, j in RET_CAP_TRUCK], vH2RetTruckEnergy[z,j] <= dfH2Truck[!, Symbol("Existing_Energy_Cap_MW_z$z")][j])
 
 	## Constraints on new built truck compression energy capacity
 	# Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
