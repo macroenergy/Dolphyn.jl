@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
     load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
 
-Function for reading input parameters related to liquid hydrogen load (demand) of each zone. The columns should be labeled as "Load_liqH2_tonne_per_hr_zX" where X is the zone number.
+Function for reading input parameters related to liquid hydrogen load (demand) of each zone. The columns should be labeled as "Load_liqH2_MW_zX" where X is the zone number.
 """
 function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     
@@ -32,7 +32,7 @@ function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_load["H2_SEG_L"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
     # Demand in tonnes per hour for each zone
-    start = findall(s -> s == "Load_liqH2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
+    start = findall(s -> s == "Load_liqH2_MW_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
     
     # Max value of non-served energy in $/(tonne)
     inputs_load["H2_Voll_L"] = collect(skipmissing(H2_load_in[!,:Voll]))
