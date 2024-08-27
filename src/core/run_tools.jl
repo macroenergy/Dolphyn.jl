@@ -200,3 +200,20 @@ function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.
     return EP, myinputs, mysetup, adjusted_outpath
 end
 
+function get_case_name(case::AbstractString, root_dirname::AbstractString="Example_Systems")
+    split_case = splitpath(case)
+    # If one of the entries is "Example_Systems", then use the last two entries
+    if root_dirname in split_case
+        start = findfirst(x -> x == root_dirname, split_case)
+        case_name = joinpath(split_case[start+1:end]...)
+    else
+        case_name = split_case[end]
+    end
+    return case_name
+end
+
+function obj_value(EP::Model, mysetup::Dict{String, Any})
+    scale_factor = mysetup["ParameterScale"] == 1 ? ModelScalingFactor : 1 
+    obj_value = value(EP[:eObj]) * scale_factor
+    return obj_value
+end

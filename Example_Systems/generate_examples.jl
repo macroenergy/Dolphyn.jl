@@ -39,8 +39,7 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    split_case = splitpath(case)
-    case_name = string(split_case[end-1], split_case[end])
+    case_name = get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
     println("Generating model for $case_name ...")
@@ -59,8 +58,7 @@ if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        split_case = splitpath(case)
-        case_name = string(split_case[end-1], split_case[end])
+        case_name = get_case_name(case, "Example_Systems")
 
         println(" ------ ------ ------")
         println("Generating model for $case_name ...")
