@@ -48,14 +48,15 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    split_case = splitpath(case)
-    case_name = string(split_case[end-1], split_case[end])
+    case_name = get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
     println("Generating and running model for $case_name ...")
     try
-        run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-        push!(summary, "🟢 $(case_name)")
+        (EP,_,mysetup,_) = run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+        scale_factor = mysetup["ParameterScale"] == 1 ? Dolphyn.ModelScalingFactor : 1 
+        obj_value = value(EP[:eObj]) * scale_factor
+        push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
         println("Ran model for $case.")
     catch Exception
         println("Failed to run model for $case")
@@ -67,16 +68,18 @@ if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        split_case = splitpath(case)
-        case_name = string(split_case[end-1], split_case[end])
+        case_name = get_case_name(case, "Example_Systems")
 
         println(" ------ ------ ------")
         println("Generating and running model for $case_name ...")
         try
-            run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-            push!(summary, "🟢 $(case_name)")
+            (EP,_,mysetup,_) = run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+            scale_factor = mysetup["ParameterScale"] == 1 ? Dolphyn.ModelScalingFactor : 1 
+            obj_value = Dolphyn.obj_value(EP, mysetup)
+            push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
             println("Ran model for $case.")
         catch Exception
+            println(Exception)
             println("Failed to run model for $case")
             push!(summary, "🔴 $(case_name)")
         end
@@ -86,6 +89,12 @@ else
     println("Gurobi is not installed. Skipping those cases")
 end
 
+# In the summary array, split each on "|" and find the longest first element
+# Then, right-pad all the first elements to that length with spaces
+# Then recombine with the later elements and print
+max_length = maximum([length(split(s,"|")[1]) for s in summary])
+summary = [split(s,"|") for s in summary]
+summary = ["$(s[1])$(repeat(" ", max_length - length(s[1]))) | $(s[2])" for s in summary]
 println(" ------ ------ ------")
 println("Summary of which cases were run successfully:")
 for s in summary
