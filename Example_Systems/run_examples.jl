@@ -48,14 +48,13 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    case_name = get_case_name(case, "Example_Systems")
+    case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
     println("Generating and running model for $case_name ...")
     try
         (EP,_,mysetup,_) = run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-        scale_factor = mysetup["ParameterScale"] == 1 ? Dolphyn.ModelScalingFactor : 1 
-        obj_value = value(EP[:eObj]) * scale_factor
+        obj_value = Dolphyn.obj_value(EP, mysetup)
         push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
         println("Ran model for $case.")
     catch Exception
@@ -68,13 +67,12 @@ if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        case_name = get_case_name(case, "Example_Systems")
+        case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
         println(" ------ ------ ------")
         println("Generating and running model for $case_name ...")
         try
             (EP,_,mysetup,_) = run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-            scale_factor = mysetup["ParameterScale"] == 1 ? Dolphyn.ModelScalingFactor : 1 
             obj_value = Dolphyn.obj_value(EP, mysetup)
             push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
             println("Ran model for $case.")
@@ -94,7 +92,7 @@ end
 # Then recombine with the later elements and print
 max_length = maximum([length(split(s,"|")[1]) for s in summary])
 summary = [split(s,"|") for s in summary]
-summary = ["$(s[1])$(repeat(" ", max_length - length(s[1]))) | $(s[2])" for s in summary]
+summary = [length(s) > 1 ? "$(s[1])$(repeat(" ", max_length - length(s[1]))) | $(s[2])" : "$(s[1])" for s in summary]
 println(" ------ ------ ------")
 println("Summary of which cases were run successfully:")
 for s in summary
