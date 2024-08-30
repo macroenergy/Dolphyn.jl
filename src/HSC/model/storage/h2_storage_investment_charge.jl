@@ -80,14 +80,14 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
         EP,
         eTotalH2CapCharge[y in H2_STOR_ALL],
         if (y in intersect(NEW_CAP_H2_STOR_CHARGE, RET_CAP_H2_STOR_CHARGE))
-            dfH2Gen[!, :Existing_Charge_Cap_MWh][y] + EP[:vH2CAPCHARGE][y] -
+            dfH2Gen[!, :Existing_Charge_Cap_MW][y] + EP[:vH2CAPCHARGE][y] -
             EP[:vH2RETCAPCHARGE][y]
         elseif (y in setdiff(NEW_CAP_H2_STOR_CHARGE, RET_CAP_H2_STOR_CHARGE))
-            dfH2Gen[!, :Existing_Charge_Cap_MWh][y] + EP[:vH2CAPCHARGE][y]
+            dfH2Gen[!, :Existing_Charge_Cap_MW][y] + EP[:vH2CAPCHARGE][y]
         elseif (y in setdiff(RET_CAP_H2_STOR_CHARGE, NEW_CAP_H2_STOR_CHARGE))
-            dfH2Gen[!, :Existing_Charge_Cap_MWh][y] - EP[:vH2RETCAPCHARGE][y]
+            dfH2Gen[!, :Existing_Charge_Cap_MW][y] - EP[:vH2RETCAPCHARGE][y]
         else
-            dfH2Gen[!, :Existing_Charge_Cap_MWh][y]
+            dfH2Gen[!, :Existing_Charge_Cap_MW][y]
         end
     )
 
@@ -104,13 +104,13 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
             eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_STOR_CHARGE # Resources eligible for new charge capacity
                 1 / ModelScalingFactor^2 * (
-                    dfH2Gen[!, :Inv_Cost_Charge_p_MWh_yr][y] * vH2CAPCHARGE[y] +
-                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] *
+                    dfH2Gen[!, :Inv_Cost_Charge_p_MW_yr][y] * vH2CAPCHARGE[y] +
+                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MW_yr][y] *
                     eTotalH2CapCharge[y]
                 )
             else
                 1 / ModelScalingFactor^2 * (
-                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] *
+                    dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MW_yr][y] *
                     eTotalH2CapCharge[y]
                 )
             end
@@ -120,10 +120,10 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
             EP,
             eCFixH2Charge[y in H2_STOR_ALL],
             if y in NEW_CAP_H2_STOR_CHARGE # Resources eligible for new charge capacity
-                dfH2Gen[!, :Inv_Cost_Charge_p_MWh_yr][y] * vH2CAPCHARGE[y] +
-                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] * eTotalH2CapCharge[y]
+                dfH2Gen[!, :Inv_Cost_Charge_p_MW_yr][y] * vH2CAPCHARGE[y] +
+                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MW_yr][y] * eTotalH2CapCharge[y]
             else
-                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MWh_yr][y] * eTotalH2CapCharge[y]
+                dfH2Gen[!, :Fixed_OM_Cost_Charge_p_MW_yr][y] * eTotalH2CapCharge[y]
             end
         )
     end
@@ -141,31 +141,31 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         cMaxRetH2Charge[y in RET_CAP_H2_STOR_CHARGE],
-        vH2RETCAPCHARGE[y] <= dfH2Gen[!, :Existing_Cap_Charge_tonne_p_hr][y]
+        vH2RETCAPCHARGE[y] <= dfH2Gen[!, :Existing_Charge_Cap_MW][y]
     )
 
     # Constraints on new built capacity
 
     # Constraint on maximum charge capacity (if applicable) [set input to -1 if no constraint on maximum charge capacity]
-    # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MWh and lead to infeasabilty
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is >= Max_Charge_Cap_MW and lead to infeasabilty
     @constraint(
         EP,
         cMaxCapH2Charge[y in intersect(
-            dfH2Gen[!, :Max_Charge_Cap_MWh] .> 0,
+            dfH2Gen[!, :Max_Charge_Cap_MW] .> 0,
             H2_STOR_ALL,
         )],
-        eTotalH2CapCharge[y] <= dfH2Gen[!, :Max_Charge_Cap_MWh][y]
+        eTotalH2CapCharge[y] <= dfH2Gen[!, :Max_Charge_Cap_MW][y]
     )
 
     # Constraint on minimum charge capacity (if applicable) [set input to -1 if no constraint on minimum charge capacity]
-    # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MWh and lead to infeasabilty
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Charge_Cap_MW is <= Min_Charge_Cap_MW and lead to infeasabilty
     @constraint(
         EP,
         cMinCapH2Charge[y in intersect(
-            dfH2Gen[!, :Min_Charge_Cap_MWh] .> 0,
+            dfH2Gen[!, :Min_Charge_Cap_MW] .> 0,
             H2_STOR_ALL,
         )],
-        eTotalH2CapCharge[y] >= dfH2Gen[!, :Min_Charge_Cap_MWh][y]
+        eTotalH2CapCharge[y] >= dfH2Gen[!, :Min_Charge_Cap_MW][y]
     )
 
     return EP

@@ -77,8 +77,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     else
         blue_h2_declared = Int64[]
     end
-    if issubset(["etaFuel_MMBtu_p_tonne","CCS_Rate","H2_GEN_TYPE"], h2_gen_in_names)
-        blue_h2_infered = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_tonne.>0) .& (h2_gen_in.CCS_Rate.>0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    if issubset(["etaFuel_MMBtu_p_MWh","CCS_Rate","H2_GEN_TYPE"], h2_gen_in_names)
+        blue_h2_infered = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_MWh.>0) .& (h2_gen_in.CCS_Rate.>0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
     else
         blue_h2_infered = Int64[]
     end
@@ -90,8 +90,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     else
         grey_h2_declared = Int64[]
     end
-    if issubset(["etaFuel_MMBtu_p_tonne","CCS_Rate","H2_GEN_TYPE"], h2_gen_in_names)
-        grey_h2_infered = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_tonne.>0) .& (h2_gen_in.CCS_Rate.==0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
+    if issubset(["etaFuel_MMBtu_p_MWh","CCS_Rate","H2_GEN_TYPE"], h2_gen_in_names)
+        grey_h2_infered = h2_gen_in[(h2_gen_in.etaFuel_MMBtu_p_MWh.>0) .& (h2_gen_in.CCS_Rate.==0) .&  (h2_gen_in.H2_GEN_TYPE.>0),:R_ID]
     else
         grey_h2_infered = Int64[]
     end
@@ -108,9 +108,9 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["RET_CAP_H2_ENERGY"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Energy_Cap_MWh.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
 
     # Set of asymmetric charge/discharge storage resources eligible for new charge capacity, which for H2 storage refers to compression power requirements
-    inputs_gen["NEW_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Charge_Cap_MWh.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
+    inputs_gen["NEW_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1,:R_ID], h2_gen_in[h2_gen_in.Max_Charge_Cap_MW.!=0,:R_ID], inputs_gen["H2_STOR_ALL"])
     # Set of asymmetric charge/discharge storage resources eligible for charge capacity retirements
-    inputs_gen["RET_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Charge_Cap_MWh.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
+    inputs_gen["RET_CAP_H2_STOR_CHARGE"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Charge_Cap_MW.>0,:R_ID], inputs_gen["H2_STOR_ALL"])
 
     # Set of H2 generation resources
     # Set of h2 resources eligible for unit committment - either continuous or discrete capacity -set by setup["H2GenCommit"]
@@ -141,19 +141,19 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
 
     # Set of all resources eligible for new capacity - includes both storage and generation
     # DEV NOTE: Should we allow investment in flexible demand capacity later on?
-    inputs_gen["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_MWh.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID]) 
+    inputs_gen["H2_GEN_NEW_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.==1 ,:R_ID], h2_gen_in[h2_gen_in.Max_Cap_MW.!=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!= 1,:R_ID]) 
     # Set of all resources eligible for capacity retirements
     # DEV NOTE: Should we allow retirement of flexible demand capacity later on?
-    inputs_gen["H2_GEN_RET_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_MWh.>=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1,:R_ID])
+    inputs_gen["H2_GEN_RET_CAP"] = intersect(h2_gen_in[h2_gen_in.New_Build.!=-1,:R_ID], h2_gen_in[h2_gen_in.Existing_Cap_MW.>=0,:R_ID], h2_gen_in[h2_gen_in.H2_FLEX.!=1,:R_ID])
 
     # Fixed cost per start-up ($ per MW per start) if unit commitment is modelled
-    start_cost = convert(Array{Float64}, collect(skipmissing(inputs_gen["dfH2Gen"][!,:Start_Cost_per_MW_p_hr])))
+    start_cost = convert(Array{Float64}, collect(skipmissing(inputs_gen["dfH2Gen"][!,:Start_Cost_p_MW])))
     
-    inputs_gen["C_H2_Start"] = inputs_gen["dfH2Gen"][!,:Cap_Size_MWh].* start_cost
+    inputs_gen["C_H2_Start"] = inputs_gen["dfH2Gen"][!,:Cap_Size_MW] .* start_cost
 
     
     # Direct CO2 emissions per tonne of H2 produced for various technologies
-    inputs_gen["dfH2Gen"][!,:CO2_per_tonne] = zeros(Float64, inputs_gen["H2_RES_ALL"])
+    inputs_gen["dfH2Gen"][!,:CO2_per_MWh] = zeros(Float64, inputs_gen["H2_RES_ALL"])
 
     
     #### TO DO LATER ON - CO2 constraints

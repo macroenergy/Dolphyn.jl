@@ -169,9 +169,9 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
     # Term to represent electricity consumption associated with H2 storage charging and discharging
     @expression(EP, ePowerBalanceH2Stor[t=1:T, z=1:Z],
     if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GW rather than MW 
-        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
+        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_MWh][y]/ModelScalingFactor for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
     else
-        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge][y] for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
+        sum(EP[:vH2_CHARGE_STOR][y,t]*dfH2Gen[!,:H2Stor_Charge_MWh_p_MWh][y] for y in intersect(dfH2Gen[dfH2Gen.Zone.==z,:R_ID],H2_STOR_ALL); init=0.0)
     end
     )
 
@@ -218,7 +218,7 @@ function h2_storage_all(EP::Model, inputs::Dict, setup::Dict)
         [y in H2_STOR_ALL, t in 1:T], EP[:eH2TotalCapEnergy][y]*dfH2Gen[!,:H2Stor_min_level][y] <= EP[:vH2S][y,t]
 
         # Constraint on maximum discharging rate imposed if storage discharging capital cost >0
-        # [y in intersect(H2_STOR_ALL,dfH2Gen[!,:Inv_Cost_p_MWh_yr].>0), t in 1:T], EP[:vH2Gen][y,t] <= EP[:eH2TotalCapEnergy][y]
+        # [y in intersect(H2_STOR_ALL,dfH2Gen[!,:Inv_Cost_p_MW_yr].>0), t in 1:T], EP[:vH2Gen][y,t] <= EP[:eH2TotalCapEnergy][y]
         # [y in H2_STOR_ALL, t in 1:T], EP[:vH2Gen][y,t] <= EP[:eH2GenTotalCap][y] * inputs["pH2_Max"][y,t]
         
         # energy stored for the next hour
