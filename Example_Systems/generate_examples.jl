@@ -39,7 +39,7 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    case_name = get_case_name(case, "Example_Systems")
+    case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
     println("Generating model for $case_name ...")
@@ -58,7 +58,7 @@ if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        case_name = get_case_name(case, "Example_Systems")
+        case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
         println(" ------ ------ ------")
         println("Generating model for $case_name ...")
