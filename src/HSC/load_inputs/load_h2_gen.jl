@@ -152,19 +152,8 @@ function load_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inp
     inputs_gen["C_H2_Start"] = inputs_gen["dfH2Gen"][!,:Cap_Size_MW] .* start_cost
 
     
-    # Direct CO2 emissions per tonne of H2 produced for various technologies
+    # Direct CO2 emissions per MWh of H2 produced for various technologies
     inputs_gen["dfH2Gen"][!,:CO2_per_MWh] = zeros(Float64, inputs_gen["H2_RES_ALL"])
-
-    
-    #### TO DO LATER ON - CO2 constraints
-
-    # for k in 1:inputs_gen["H2_RES_ALL"]
-    #     # NOTE: When Setup[ParameterScale] =1, fuel costs and emissions are scaled in fuels_data.csv, so no if condition needed to scale C_Fuel_per_MWh
-    #     # IF ParameterScale = 1, then CO2 emissions intensity Units ktonne/tonne
-    #     # If ParameterScale = 0 , then CO2 emission intensity units is tonne/tonne
-    #     inputs_gen["dfH2Gen"][!,:CO2_per_tonne][g] =inputs_gen["fuel_CO2"][dfH2Gen[!,:Fuel][k]][t] * dfH2Gen[!,:etaFuel_MMBtu_p_MWh][k]))
-
-    # end
 
     println(" -- HSC_generation.csv Successfully Read!")
 

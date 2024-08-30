@@ -53,7 +53,7 @@ function h2_g2p_all(EP::Model, inputs::Dict, setup::Dict)
     ####Variables####
     #Define variables needed across both commit and no commit sets
 
-    #H2 required by G2P resource k to make hydrogen (Tonne/Hr)
+    #H2 required by G2P resource k to make hydrogen (MWh/hr)
     @variable(EP, vH2G2P[k in H2_G2P, t = 1:T] >= 0 )
 
     ### Constratints ###

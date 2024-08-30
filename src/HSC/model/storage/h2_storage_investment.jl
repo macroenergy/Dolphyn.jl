@@ -89,7 +89,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vH2RETCAPENERGY[y in RET_CAP_H2_ENERGY] >= 0)
 
     ### Expressions ###
-    # Total available charging capacity in tonnes/hour
+    # Total available charging capacity in MWh/hour
     @expression(EP, eTotalH2CapCharge[y in H2_STOR_ALL],
         if (y in intersect(NEW_CAP_H2_CHARGE, RET_CAP_H2_CHARGE))
             dfH2Gen[!,:Existing_Charge_Cap_MW][y] + EP[:vH2CAPCHARGE][y] - EP[:vH2RETCAPCHARGE][y]
@@ -103,7 +103,7 @@ function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
     )
 
 
-    # Total available energy capacity in tonnes
+    # Total available energy capacity in MWh
     @expression(EP, eTotalH2CapEnergy[y in H2_STOR_ALL],
     if (y in intersect(NEW_CAP_H2_ENERGY, RET_CAP_H2_ENERGY))
         dfH2Gen[!,:Existing_Energy_Cap_MWh][y] + EP[:vH2CAPENERGY][y] - EP[:vH2RETCAPENERGY][y]
