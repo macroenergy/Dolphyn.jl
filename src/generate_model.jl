@@ -268,7 +268,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         else
             # Quick fix to ensure that the H2_G2P variable is defined even if the function is not run
             # FIX ME: This needs to be handled better in co2_cap_hsc and co2_cap_power_hsc
-            @expression(EP, eH2DemandByZoneG2P[z=1:Z, t=1:T], # the unit is tonne/hour
+            @expression(EP, eH2DemandByZoneG2P[z=1:Z, t=1:T], # the unit is MWh/hour
                 0.0
             )
         end
