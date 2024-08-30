@@ -86,14 +86,14 @@ function load_h2_pipeline_data(
     #Maxiumum Pipe Flow per Pipe
     inputs_nw["pH2_Pipe_Max_Flow"] = convert(
         Array{Float64},
-        collect(skipmissing(pipeline_var[!, :Max_Flow_MW_p_Hr_Per_Pipe])),
+        collect(skipmissing(pipeline_var[!, :Max_Flow_MW_p_pipe])),
     )
 
     #Maximum Pipeline storage capacity in tonnes per pipe
     inputs_nw["pH2_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2PipeCap_MW_per_mile])),
+            collect(skipmissing(pipeline_var[!, :H2PipeCap_MWh_p_mile])),
         ) .* inputs_nw["pPipe_length_miles"]
 
     #Minimum Pipeline storage capacity in tonnes per pipe
@@ -119,19 +119,19 @@ function load_h2_pipeline_data(
             ) .+
             inputs_nw["no_booster_comp_stations"] .* convert(
                 Array{Float64},
-                collect(skipmissing(pipeline_var[!, :BoosterCompCapex_p_MWh_yr])),
+                collect(skipmissing(pipeline_var[!, :BoosterCompCapex_p_MW_yr])),
             )
         )
 
     #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
-    inputs_nw["pComp_MWh_per_tonne_Pipe"] =
+    inputs_nw["pComp_MWh_per_MWh_Pipe"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :H2PipeCompEnergy]))
+            collect(skipmissing(pipeline_var[!, :H2PipeCompEnergy_MWh_p_MWh])),
         ) .+ 
         inputs_nw["no_booster_comp_stations"] .* convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :BoosterCompEnergy])),
+            collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_p_MWh])),
         )
 
     print_and_log(" -- HSC_pipelines.csv Successfully Read!")

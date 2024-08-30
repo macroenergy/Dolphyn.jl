@@ -136,7 +136,7 @@ function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
 
     ## Constraints on new built energy capacity
     # Constraint on maximum energy capacity (if applicable) [set input to -1 if no constraint on maximum energy capacity]
-    # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is >= Max_Cap_MWh and lead to infeasabilty
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is >= Max_Cap_MW and lead to infeasabilty
     @constraint(
         EP,
         cMaxCapH2Energy[y in intersect(
@@ -147,7 +147,7 @@ function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
     )
 
     # Constraint on minimum energy capacity (if applicable) [set input to -1 if no constraint on minimum energy apacity]
-    # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MWh is <= Min_Cap_MWh and lead to infeasabilty
+    # DEV NOTE: This constraint may be violated in some cases where Existing_Cap_MW is <= Min_Cap_MW and lead to infeasabilty
     @constraint(
         EP,
         cMinCapH2Energy[y in intersect(

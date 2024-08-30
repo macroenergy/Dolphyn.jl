@@ -120,7 +120,7 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
 		#Hydrogen Consumption (change tonne H2/tonne CO2 to tonne H2/ktonne CO2 since H2 is not scaled in HSC)
 		@constraints(EP, begin
-		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k] * ModelScalingFactor
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_h2_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
 		# By-product produced constraint (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
@@ -146,7 +146,7 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
 		#Hydrogen Consumption
 		@constraints(EP, begin
-		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_h2_p_tonne_co2][k]
 		end)
 
 		# By-product produced constraint

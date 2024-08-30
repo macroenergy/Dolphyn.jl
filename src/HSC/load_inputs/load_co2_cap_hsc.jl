@@ -60,8 +60,8 @@ function load_co2_cap_hsc(setup::Dict, path::AbstractString, sep::AbstractString
 
     elseif (setup["H2CO2Cap"] == 2 || setup["H2CO2Cap"] == 3)
         #  CO2 emissions rate applied per ton (ton refers to "Metric tonne")
-        first_col = findall(s -> s == "CO_2_Max_tons_ton_1", names(inputs_co2_hsc["dfH2CO2Cap"]))[1]
-        last_col = findall(s -> s == "CO_2_Max_tons_ton_$cap", names(inputs_co2_hsc["dfH2CO2Cap"]))[1]
+        first_col = findall(s -> s == "CO_2_Max_tons_p_MWh_1", names(inputs_co2_hsc["dfH2CO2Cap"]))[1]
+        last_col = findall(s -> s == "CO_2_Max_tons_p_MWh_$cap", names(inputs_co2_hsc["dfH2CO2Cap"]))[1]
         if setup["ParameterScale"] == 1
             inputs_co2_hsc["dfH2MaxCO2Rate"] = Matrix{Float64}(inputs_co2_hsc["dfH2CO2Cap"][:, first_col:last_col]) / ModelScalingFactor
             # when scaled, the constraint unit is kton, thus the emission rate should be in kton/ton

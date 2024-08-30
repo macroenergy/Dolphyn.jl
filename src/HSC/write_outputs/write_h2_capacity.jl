@@ -24,11 +24,13 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 	dfH2Gen = inputs["dfH2Gen"]
 	H = inputs["H2_RES_ALL"]
 
+	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"]::Vector{Int}
+
 	capdischarge = zeros(size(inputs["H2_RESOURCES_NAME"]))
-    new_cap_and_commit = intersect(inputs["H2_GEN_NEW_CAP"], inputs["H2_GEN_COMMIT"])
-    new_cap_not_commit = setdiff(inputs["H2_GEN_NEW_CAP"], inputs["H2_GEN_COMMIT"])
+    new_cap_and_commit = intersect(inputs["H2_GEN_NEW_CAP"], H2_GEN_COMMIT)
+    new_cap_not_commit = setdiff(inputs["H2_GEN_NEW_CAP"], H2_GEN_COMMIT)
     if !isempty(new_cap_and_commit)
-        capdischarge[new_cap_and_commit] .= value.(EP[:vH2GenNewCap][new_cap_and_commit]).data .* dfH2Gen[new_cap_and_commit,:Cap_Size_MWh]
+        capdischarge[new_cap_and_commit] .= value.(EP[:vH2GenNewCap][new_cap_and_commit]).data .* dfH2Gen[new_cap_and_commit,:Cap_Size_MW]
     end
     
 	if !isempty(new_cap_not_commit)
@@ -39,7 +41,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
     ret_cap_and_commit = intersect(inputs["H2_GEN_RET_CAP"], H2_GEN_COMMIT)
     ret_cap_not_commit = setdiff(inputs["H2_GEN_RET_CAP"], H2_GEN_COMMIT)
     if !isempty(ret_cap_and_commit)
-        retcapdischarge[ret_cap_and_commit] .= value.(EP[:vH2GenRetCap][ret_cap_and_commit]).data .* dfH2Gen[ret_cap_and_commit,:Cap_Size_MWh]
+        retcapdischarge[ret_cap_and_commit] .= value.(EP[:vH2GenRetCap][ret_cap_and_commit]).data .* dfH2Gen[ret_cap_and_commit,:Cap_Size_MW]
     end
     if !isempty(ret_cap_not_commit)
         retcapdischarge[ret_cap_not_commit] .= value.(EP[:vH2GenRetCap][ret_cap_not_commit]).data
@@ -91,7 +93,7 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
 
     dfCap = DataFrame(
         Resource = inputs["H2_RESOURCES_NAME"], Zone = dfH2Gen[!,:Zone],
-        StartCap = dfH2Gen[!,:Existing_Cap_MWh],
+        StartCap = dfH2Gen[!,:Existing_Cap_MW],
         RetCap = retcapdischarge[:],
         NewCap = capdischarge[:],
         EndCap = value.(EP[:eH2GenTotalCap]),
@@ -99,10 +101,14 @@ function write_h2_capacity(path::AbstractString, sep::AbstractString, inputs::Di
         RetEnergyCap = retcapenergy[:],
         NewEnergyCap = capenergy[:],
         EndEnergyCap = dfH2Gen[!,:Existing_Energy_Cap_MWh]+capenergy[:]-retcapenergy[:],
-        StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh],
+        StartChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MW],
         RetChargeCap = retcapcharge[:],
         NewChargeCap = capcharge[:],
-        EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MWh]+capcharge[:]-retcapcharge[:]
+        EndChargeCap = dfH2Gen[!,:Existing_Charge_Cap_MW]+capcharge[:]-retcapcharge[:],
+		MaxAnnualGeneration = MaxGen[:],
+		AnnualGeneration = AnnualGen[:],
+		CapacityFactor = CapFactor[:],
+		AnnualEmissions = AnnualCO2Emissions[:],
     )
 
 	total = DataFrame(

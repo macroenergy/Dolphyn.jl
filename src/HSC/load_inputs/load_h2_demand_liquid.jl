@@ -46,7 +46,7 @@ function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_load["pMax_H2_D_Curtail_L"] = zeros(H2_SEG)
     for s in 1:H2_SEG
         # Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
-        inputs_load["pC_H2_D_Curtail_L"][s] = collect(skipmissing(H2_load_in[!,:Cost_of_Demand_Curtailment_p_MWh]))[s]*inputs_load["Voll"][1]
+        inputs_load["pC_H2_D_Curtail_L"][s] = collect(skipmissing(H2_load_in[!,:Segment_Cost_of_Demand_Curtailment_Fraction]))[s]*inputs_load["Voll"][1]
         # Maximum hourly demand curtailable as % of the max demand (for each segment)
         inputs_load["pMax_H2_D_Curtail_L"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
     end
