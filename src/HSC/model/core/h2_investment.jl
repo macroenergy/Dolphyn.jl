@@ -93,10 +93,10 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     H2_STOR_ALL = inputs["H2_STOR_ALL"]
     H = inputs["H2_RES_ALL"]
 
-    # Capacity of New H2 Gen units (tonnes/hr)
+    # Capacity of New H2 Gen units (MWh/hr)
     # For generation with unit commitment, this variable refers to the number of units, not capacity. 
     @variable(EP, vH2GenNewCap[k in H2_GEN_NEW_CAP] >= 0)
-    # Capacity of Retired H2 Gen units bui(tonnes/hr)
+    # Capacity of Retired H2 Gen units (MWh/hr)
     # For generation with unit commitment, this variable refers to the number of units, not capacity. 
     @variable(EP, vH2GenRetCap[k in H2_GEN_RET_CAP] >= 0)
 

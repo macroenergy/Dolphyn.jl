@@ -70,7 +70,7 @@ function h2_storage_investment_energy(EP::Model, inputs::Dict, setup::Dict)
     # Retired energy capacity of resource "y" from existing capacity
     @variable(EP, vH2RETCAPENERGY[y in RET_CAP_H2_ENERGY] >= 0)
 
-    # Total available energy capacity in tonnes
+    # Total available energy capacity in MWh
     @expression(
         EP,
         eH2TotalCapEnergy[y in H2_STOR_ALL],

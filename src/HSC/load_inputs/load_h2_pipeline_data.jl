@@ -89,14 +89,14 @@ function load_h2_pipeline_data(
         collect(skipmissing(pipeline_var[!, :Max_Flow_MW_p_pipe])),
     )
 
-    #Maximum Pipeline storage capacity in tonnes per pipe
+    #Maximum Pipeline storage capacity in MWh per pipe
     inputs_nw["pH2_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :H2PipeCap_MWh_p_mile])),
         ) .* inputs_nw["pPipe_length_miles"]
 
-    #Minimum Pipeline storage capacity in tonnes per pipe
+    #Minimum Pipeline storage capacity in MWh per pipe
     inputs_nw["pH2_Pipe_Min_Cap"] =
         convert(
             Array{Float64},
@@ -110,7 +110,7 @@ function load_h2_pipeline_data(
             collect(skipmissing(pipeline_var[!, :H2Pipe_Inv_Cost_per_mile_yr])),
         ) .* inputs_nw["pPipe_length_miles"]
 
-    #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
+    #Capital cost associated with booster compressors per pipe= capex per MWh/hour flow rate x pipe max flow rate (MWh/hour) x number of booster compressor stations per pipe route
     inputs_nw["pCAPEX_Comp_H2_Pipe"] =
         inputs_nw["pH2_Pipe_Max_Flow"] .* (
             convert(
@@ -123,7 +123,7 @@ function load_h2_pipeline_data(
             )
         )
 
-    #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
+    #Compression energy requirement Per Pipe  = MWh electricity per MWh of gas flow rate x number of compressor stations enroute a pipeline route
     inputs_nw["pComp_MWh_per_MWh_Pipe"] =
         convert(
             Array{Float64},

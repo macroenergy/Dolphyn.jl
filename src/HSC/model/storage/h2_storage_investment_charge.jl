@@ -75,7 +75,7 @@ function h2_storage_investment_charge(EP::Model, inputs::Dict, setup::Dict)
     @variable(EP, vH2RETCAPCHARGE[y in RET_CAP_H2_STOR_CHARGE] >= 0)
 
     ### Expressions ###
-    # Total available charging capacity in tonnes/hour
+    # Total available charging capacity in MWh/hour
     @expression(
         EP,
         eTotalH2CapCharge[y in H2_STOR_ALL],
