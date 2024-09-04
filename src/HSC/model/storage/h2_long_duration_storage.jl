@@ -119,6 +119,12 @@ function h2_long_duration_storage(EP::Model, inputs::Dict)
     # Build up inventory can be positive or negative
     @variable(EP, vdH2SOC[y in H2_STOR_LONG_DURATION, w=1:REP_PERIOD])
 
+    # Maximum positive storage inventory change within subperiod
+	@variable(EP, vdH2SOC_maxPos[y in H2_STOR_LONG_DURATION, w=1:REP_PERIOD] >= 0)
+
+	# Maximum negative storage inventory change within subperiod
+	@variable(EP, vdH2SOC_maxNeg[y in H2_STOR_LONG_DURATION, w=1:REP_PERIOD] <= 0)    
+
     ### Constraints ###
 
     # Links last time step with first time step, ensuring position in hour 1 is within eligible change from final hour position
@@ -145,6 +151,25 @@ function h2_long_duration_storage(EP::Model, inputs::Dict)
     # Initial storage = Final storage - change in storage inventory across representative period
     @constraint(EP, cH2SoCBalLongDurationStorageSub[y in H2_STOR_LONG_DURATION, r in REP_PERIODS_INDEX],
                     vH2SOCw[y,r] == EP[:vH2S][y,hours_per_subperiod*dfPeriodMap[!,:Rep_Period_Index][r]] - vdH2SOC[y,dfPeriodMap[!,:Rep_Period_Index][r]])
+
+    # Extract maximum storage level variation (positive) within subperiod
+	@constraint(EP, cH2MaxSoCVarPos[y in H2_STOR_LONG_DURATION, w=1:REP_PERIOD, t=2:hours_per_subperiod],
+                    vdH2SOC_maxPos[y,w] >= EP[:vH2S][y,hours_per_subperiod*(w-1)+t] - EP[:vH2S][y,hours_per_subperiod*(w-1)+1])
+
+    # Extract maximum storage level variation (negative) within subperiod
+    @constraint(EP, cH2MaxSoCVarNeg[y in H2_STOR_LONG_DURATION, w=1:REP_PERIOD, t=2:hours_per_subperiod],
+                    vdH2SOC_maxNeg[y,w] <= EP[:vH2S][y,hours_per_subperiod*(w-1)+t] - EP[:vH2S][y,hours_per_subperiod*(w-1)+1])
+        
+    # Max storage content within each modeled period cannot exceed installed energy capacity (initial storage content according to cH2SoCBalLongDurationStorageStart)
+    @constraint(EP, cH2SoCLongDurationStorageMaxInt[y in H2_STOR_LONG_DURATION, r in MODELED_PERIODS_INDEX],
+                    (1-dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y])*vH2SOCw[y,r]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,hours_per_subperiod*(dfPeriodMap[r,:Rep_Period_Index]-1)+1])
+                    +(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,hours_per_subperiod*(dfPeriodMap[r,:Rep_Period_Index]-1)+1])
+                    +vdH2SOC_maxPos[y,dfPeriodMap[r,:Rep_Period_Index]] <= EP[:eH2TotalCapEnergy][y])
+
+    # Min storage content within each modeled period cannot be negative (initial storage content according to cH2SoCBalLongDurationStorageStart)
+    @constraint(EP, cH2SoCLongDurationStorageMinInt[y in H2_STOR_LONG_DURATION, r in MODELED_PERIODS_INDEX],
+                    (1-dfH2Gen[!,:H2Stor_self_discharge_rate_p_hour][y])*vH2SOCw[y,r]-(1/dfH2Gen[!,:H2Stor_eff_discharge][y]*EP[:vH2Gen][y,hours_per_subperiod*(dfPeriodMap[r,:Rep_Period_Index]-1)+1])
+                    +(dfH2Gen[!,:H2Stor_eff_charge][y]*EP[:vH2_CHARGE_STOR][y,hours_per_subperiod*(dfPeriodMap[r,:Rep_Period_Index]-1)+1])+vdH2SOC_maxNeg[y,dfPeriodMap[r,:Rep_Period_Index]] >= 0)
 
     return EP
 end
