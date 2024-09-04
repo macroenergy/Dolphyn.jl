@@ -65,6 +65,10 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     write_h2_emissions(path, sep, inputs, setup, EP)
     write_h2_charge(path, sep, inputs, setup, EP)
     write_h2_storage(path, sep, inputs, setup, EP)
+    if !isempty(inputs["H2_STOR_LONG_DURATION"])
+        write_h2_opwrap_lds_dstor(path, sep, inputs, setup, EP)
+        write_h2_opwrap_lds_stor_init(path, sep, inputs, setup, EP)
+    end
 
     if has_duals(EP) == 1
         write_h2_elec_costs(path, sep, inputs, setup, EP)
