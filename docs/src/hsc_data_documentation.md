@@ -307,7 +307,7 @@ This file contains cost and performance parameters for various hydrogen to power
 ||New\_Build = 1: eligible for capacity expansion and retirement. | |
 ||New\_Build = 0: not eligible for capacity expansion, eligible for retirement.| |
 ||New\_Build = -1: not eligible for capacity expansion or retirement.| |
-|TruckCap\_MW\_per\_unit | Size of a single truck unit. | MWh / unit |
+|TruckCap\_MWh\_per\_unit | Size of a single truck unit. | MWh / unit |
 |**Existing technology capacity**| | |
 |Existing\_Number |The existing capacity of a type of hydrogen truck. |Trucks |
 |Existing\_Energy\_Cap\_MW\_z* | The existing capacity of truck loading station compression. |MWh / hour |
