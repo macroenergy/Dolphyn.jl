@@ -9,7 +9,6 @@ function write_liquid_fuel_balance_dual(path::AbstractString, sep::AbstractStrin
 	Z = inputs["Z"]     # Number of zones
 
 	omega = inputs["omega"] # Time step weights
-	setup["ParameterScale"]==1 ? SCALING = ModelScalingFactor : SCALING = 1.0
 
 	# # Dual of storage level (state of charge) balance of each resource in each time step
 	dfDieselBalanceDual = DataFrame(Zone = 1:Z)

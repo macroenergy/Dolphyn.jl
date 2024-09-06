@@ -60,21 +60,11 @@ function bioenergy_investment(EP::Model, inputs::Dict, setup::Dict)
 	@variable(EP,vCapacity_BIO_per_type[i in 1:BIO_RES_ALL])
 	@variable(EP,vCAPEX_BIO_per_type[i in 1:BIO_RES_ALL])
 
-	if setup["ParameterScale"] == 1
-		BIO_Capacity_Min_Limit = dfbioenergy[!,:Min_capacity_tonne_per_hr]/ModelScalingFactor
-		BIO_Capacity_Max_Limit = dfbioenergy[!,:Max_capacity_tonne_per_hr]/ModelScalingFactor
-	else
-		BIO_Capacity_Min_Limit = dfbioenergy[!,:Min_capacity_tonne_per_hr]
-		BIO_Capacity_Max_Limit = dfbioenergy[!,:Max_capacity_tonne_per_hr]
-	end
-		
-	if setup["ParameterScale"] == 1
-		BIO_Inv_Cost_per_tonne_per_hr_yr = dfbioenergy[!,:Inv_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-		BIO_Fixed_OM_Cost_per_tonne_per_hr_yr = dfbioenergy[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]/ModelScalingFactor # $M/kton
-	else
-		BIO_Inv_Cost_per_tonne_per_hr_yr = dfbioenergy[!,:Inv_Cost_per_tonne_per_hr_yr]
-		BIO_Fixed_OM_Cost_per_tonne_per_hr_yr = dfbioenergy[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
-	end
+	BIO_Capacity_Min_Limit = dfbioenergy[!,:Min_capacity_tonne_per_hr]
+	BIO_Capacity_Max_Limit = dfbioenergy[!,:Max_capacity_tonne_per_hr]
+	
+	BIO_Inv_Cost_per_tonne_per_hr_yr = dfbioenergy[!,:Inv_Cost_per_tonne_per_hr_yr]
+	BIO_Fixed_OM_Cost_per_tonne_per_hr_yr = dfbioenergy[!,:Fixed_OM_Cost_per_tonne_per_hr_yr]
 
 	#Min and max capacity constraints
 	@constraint(EP,cMinCapacity_per_unit_BIO[i in 1:BIO_RES_ALL], EP[:vCapacity_BIO_per_type][i] >= BIO_Capacity_Min_Limit[i])

@@ -35,9 +35,7 @@ function load_ng_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
 	# Demand in Tonnes per hour
 	inputs["NG_D"] =Matrix(NGSC_NG_Demand_in[1:inputs["T"],start_ng:start_ng-1+inputs["Z"]]) #form a matrix with columns as the different zonal load NG demand values and rows as the hours
     
-	inputs["Conventional_ng_co2_per_mmbtu"] = NGSC_NG_Demand_in[!, "Conventional_ng_co2_per_mmbtu"][1]
-    inputs["Syn_ng_co2_per_mmbtu"] = NGSC_NG_Demand_in[!, "Syn_ng_co2_per_mmbtu"][1]
-	inputs["Bio_ng_co2_per_mmbtu"] = NGSC_NG_Demand_in[!, "Bio_ng_co2_per_mmbtu"][1]
+	inputs["ng_co2_per_mmbtu"] = NGSC_NG_Demand_in[!, "ng_co2_per_mmbtu"][1]
 
 	println(" -- NGSC_Demand.csv Successfully Read!")
 

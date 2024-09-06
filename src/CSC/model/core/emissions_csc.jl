@@ -39,7 +39,7 @@ function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
-    #CO2 emitted by fuel usage per type of resource "k"
+    #CO2 emitted by fuel usage per type of resource "k", when NGSC not modeled
     @expression(EP,eDAC_Fuel_CO2_Production_per_plant_per_time[k=1:DAC_RES_ALL,t=1:T], 
     inputs["fuel_CO2"][dfDAC[!,:Fuel][k]] * dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (1-dfDAC[!, :Fuel_CCS_Rate][k]))
 

@@ -1,0 +1,10 @@
+Syn_NG_Resource,Zone,mmbtu_syn_ng_p_tonne_co2,tonnes_h2_p_tonne_co2,mwh_p_tonne_co2,Inv_Cost_p_tonne_co2_p_hr_yr,Fixed_OM_cost_p_tonne_co2_hr_yr,Var_OM_cost_p_tonne_co2,CCS_Rate,MinCapacity_tonne_p_hr,MaxCapacity_tonne_p_hr
+CA_Syn_NG_Plant,1,18,0.001,0,1,0,0,0,0,-1
+NW_Syn_NG_Plant,2,18,0.001,0,1,0,0,0,0,-1
+SW_Syn_NG_Plant,3,18,0.001,0,1,0,0,0,0,-1
+TX_Syn_NG_Plant,4,18,0.001,0,1,0,0,0,0,-1
+NCEN_Syn_NG_Plant,5,18,0.001,0,1,0,0,0,0,-1
+CEN_Syn_NG_Plant,6,18,0.001,0,1,0,0,0,0,-1
+SE_Syn_NG_Plant,7,18,0.001,0,1,0,0,0,0,-1
+MIDAT_Syn_NG_Plant,8,18,0.001,0,1,0,0,0,0,-1
+NE_Syn_NG_Plant,9,18,0.001,0,1,0,0,0,0,-1

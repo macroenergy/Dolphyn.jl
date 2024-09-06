@@ -26,17 +26,11 @@ function write_BESC_costs(path::AbstractString, sep::AbstractString, inputs::Dic
 	T = inputs["T"]     # Number of time steps (hours)
 	
 	dfCost = DataFrame(Costs = ["cTotal", "cBiorefineryFix", "cBiorefineryVar", "cHerb", "cWood"])
-	if setup["ParameterScale"] == 1
-		cBiorefineryVar = value(EP[:eVar_Cost_BIO]) * ModelScalingFactor^2
-		cBiorefineryFix = value(EP[:eFixed_Cost_BIO_total]) * ModelScalingFactor^2
-		cHerb =  value(EP[:eHerb_biomass_supply_cost]) * ModelScalingFactor^2
-		cWood = value(EP[:eWood_biomass_supply_cost]) * ModelScalingFactor^2
-	else
-		cBiorefineryVar = value(EP[:eVar_Cost_BIO])
-		cBiorefineryFix = value(EP[:eFixed_Cost_BIO_total])
-		cHerb = value(EP[:eHerb_biomass_supply_cost])
-		cWood = value(EP[:eWood_biomass_supply_cost])
-	end
+
+	cBiorefineryVar = value(EP[:eVar_Cost_BIO])
+	cBiorefineryFix = value(EP[:eFixed_Cost_BIO_total])
+	cHerb = value(EP[:eHerb_biomass_supply_cost])
+	cWood = value(EP[:eWood_biomass_supply_cost])
 
 	# Define total costs
 	cTotal = cBiorefineryFix + cBiorefineryVar + cHerb + cWood
@@ -63,15 +57,6 @@ function write_BESC_costs(path::AbstractString, sep::AbstractString, inputs::Dic
 		tempCBIOHerb = tempCBIOHerb + value.(EP[:eHerb_biomass_supply_cost_per_zone][z])
 		tempCBIOWood = tempCBIOWood + value.(EP[:eWood_biomass_supply_cost_per_zone][z])
 		tempCTotal = tempCTotal + value.(EP[:eHerb_biomass_supply_cost_per_zone][z]) + value.(EP[:eWood_biomass_supply_cost_per_zone][z])
-
-
-		if setup["ParameterScale"] == 1
-			tempCTotal = tempCTotal * (ModelScalingFactor^2)
-			tempCBIOFix = tempCBIOFix * (ModelScalingFactor^2)
-			tempCBIOVar = tempCBIOVar * (ModelScalingFactor^2)
-			tempCBIOHerb = tempCBIOHerb * (ModelScalingFactor^2)
-			tempCBIOWood = tempCBIOWood * (ModelScalingFactor^2)
-		end
 
 		dfCost[!,Symbol("Zone$z")] = [tempCTotal, tempCBIOFix, tempCBIOVar, tempCBIOHerb, tempCBIOWood]
 	end

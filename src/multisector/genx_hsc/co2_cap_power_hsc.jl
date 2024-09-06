@@ -174,7 +174,28 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
                 eEmissionsConstraintLHS += eEmissionsConstraintLHSBio_NG
             end
-            
+
+            #Deduct CO2 captured by CCS technologies across sectors
+            @expression(EP, eEmissionsConstraintLHSCNGCCSPower[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+            eEmissionsConstraintLHS -= eEmissionsConstraintLHSCNGCCSPower
+
+
+            if setup["ModelH2"] == 1
+                @expression(EP, eEmissionsConstraintLHSCNGCCSH2[cap=1:inputs["NCO2Cap"]],
+                    sum(inputs["omega"][t] * EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+                eEmissionsConstraintLHS -= eEmissionsConstraintLHSCNGCCSH2
+            end
+
+            if setup["ModelCSC"] == 1
+                @expression(EP, eEmissionsConstraintLHSCNGCCSDAC[cap=1:inputs["NCO2Cap"]],
+                    sum(inputs["omega"][t] * EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
+
+                eEmissionsConstraintLHS -= eEmissionsConstraintLHSCNGCCSDAC
+            end
+                
         end
 
         ############################################################################################

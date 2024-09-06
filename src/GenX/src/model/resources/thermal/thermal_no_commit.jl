@@ -62,8 +62,6 @@ function thermal_no_commit!(EP::Model, inputs::Dict, setup::Dict)
 
 	EP[:ePowerBalance] += ePowerBalanceThermNoCommit
 
-	### Constraints ###
-
 	### Maximum ramp up and down between consecutive hours (Constraints #1-2)
 	@constraints(EP, begin
 

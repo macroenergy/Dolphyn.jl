@@ -159,8 +159,6 @@ function thermal_commit!(EP::Model, inputs::Dict, setup::Dict)
 
 	EP[:ePowerBalance] += ePowerBalanceThermCommit
 
-	### Constraints ###
-
 	### Capacitated limits on unit commitment decision variables (Constraints #1-3)
 	@constraints(EP, begin
 		[y in THERM_COMMIT, t=1:T], EP[:vCOMMIT][y,t] <= EP[:eTotalCap][y]/dfGen[y,:Cap_Size]

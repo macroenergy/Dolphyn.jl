@@ -59,15 +59,9 @@ function bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)
 	#Wood Biomass purchased from supply = k (tonnes/hr) in time t
 	@variable(EP, vWood_biomass_purchased[k=1:WOOD_SUPPLY_RES_ALL, t = 1:T] >= 0 )
 
-	if setup["ParameterScale"] ==1
-		Wood_biomass_supply_max = dfWood[!,:Max_tonne_per_hr]/ModelScalingFactor #Convert to ktonne
-		Wood_biomass_cost_per_tonne = dfWood[!,:Cost_per_tonne]/ModelScalingFactor #Convert to $M/ktonne
-		Wood_biomass_emission_per_tonne = dfWood[!,:Emissions_tonne_per_tonne] #Convert to ktonne/ktonne = tonne/tonne
-	else
-		Wood_biomass_supply_max = dfWood[!,:Max_tonne_per_hr]
-		Wood_biomass_cost_per_tonne = dfWood[!,:Cost_per_tonne]
-		Wood_biomass_emission_per_tonne = dfWood[!,:Emissions_tonne_per_tonne]
-	end
+	Wood_biomass_supply_max = dfWood[!,:Max_tonne_per_hr]
+	Wood_biomass_cost_per_tonne = dfWood[!,:Cost_per_tonne]
+	Wood_biomass_emission_per_tonne = dfWood[!,:Emissions_tonne_per_tonne]
 
 	#Wood Biomass Balance Expressions
 	@expression(EP, eWood_biomass_purchased_per_time_per_zone[t=1:T, z=1:Z],

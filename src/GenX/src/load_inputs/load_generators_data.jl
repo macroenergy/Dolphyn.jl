@@ -180,6 +180,10 @@ function load_generators_data!(setup::Dict, path::AbstractString, inputs_gen::Di
 	heat_rate = convert(Array{Float64}, gen_in[!,:Heat_Rate_MMBTU_per_MWh])
 	# Fuel used by each resource
 	fuel_type = gen_in[!,:Fuel]
+
+	#Identify NG power resources
+    #inputs_gen["NG_POWER"] = gen_in[(gen_in.NG_MMBtu_per_MWh.>0).& (gen_in.THERM.>0),:R_ID]
+
 	# Maximum fuel cost in $ per MWh and CO2 emissions in tons per MWh
 	inputs_gen["C_Fuel_per_MWh"] = zeros(Float64, G, inputs_gen["T"])
 	gen_in[!,:CO2_per_MWh] = zeros(Float64, G)

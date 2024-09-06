@@ -124,7 +124,7 @@ function ng_pipeline(EP::Model, inputs::Dict, setup::Dict)
         sum(
             vNGPipeFlow_neg[
                 p, t, NG_Pipe_Map[(NG_Pipe_Map[!, :Zone].==z).&(NG_Pipe_Map[!, :pipe_no].==p), :,][!,:d][1]
-            ] * inputs["pComp_MWh_per_tonne_Pipe"][p] for p in NG_Pipe_Map[NG_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
+            ] * inputs["pComp_MWh_per_MMBtu_Pipe"][p] for p in NG_Pipe_Map[NG_Pipe_Map[!, :Zone].==z, :][!, :pipe_no]
         )
     )
 

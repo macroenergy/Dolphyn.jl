@@ -1,0 +1,4 @@
+Biomass_Supply,Zone,Emissions_tonne_per_tonne,Cost_per_tonne,Max_tonne_per_hr
+SE_Wood_40,1,0.02,40,8000
+SE_Wood_60,1,0.02,60,8000
+SE_Wood_80,1,0.02,80,8000

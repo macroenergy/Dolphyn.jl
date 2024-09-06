@@ -59,11 +59,7 @@ function bioenergy_var_cost(EP::Model, inputs::Dict, setup::Dict)
 
 	#####################################################################################################################################
 	#Variable cost per plant per time
-	if setup["ParameterScale"] ==1
-		@expression(EP, eVar_Cost_BIO_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Var_OM_per_tonne][i]/ModelScalingFactor)
-	else
-		@expression(EP, eVar_Cost_BIO_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Var_OM_per_tonne][i])
-	end
+	@expression(EP, eVar_Cost_BIO_per_plant_per_time[i in 1:BIO_RES_ALL, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Var_OM_per_tonne][i])
 
 	#Variable cost per plant
 	@expression(EP, eVar_Cost_BIO_per_plant[i in 1:BIO_RES_ALL], sum(EP[:eVar_Cost_BIO_per_plant_per_time][i,t] for t in 1:T))
@@ -72,23 +68,6 @@ function bioenergy_var_cost(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eVar_Cost_BIO, sum(EP[:eVar_Cost_BIO_per_plant][i] for i in 1:BIO_RES_ALL))
 
 	EP[:eObj] += EP[:eVar_Cost_BIO]
-
-	#####################################################################################################################################
-	#For Bio-H2 to use in LCOH calculations
-	#Variable cost per Bio H2 plant per time
-	#if setup["Bio_H2_On"] == 1
-	#	if setup["ParameterScale"] ==1
-	#		@expression(EP, eVar_Cost_BIO_H2_per_plant_per_time[i in BIO_H2, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Var_OM_per_tonne][i]/ModelScalingFactor)
-	#	else
-	#		@expression(EP, eVar_Cost_BIO_H2_per_plant_per_time[i in BIO_H2, t in 1:T], inputs["omega"][t] * EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:Var_OM_per_tonne][i])
-	#	end
-		
-		#Variable cost per Bio H2 plant
-	#	@expression(EP, eVar_Cost_BIO_H2_per_plant[i in BIO_H2], sum(EP[:eVar_Cost_BIO_H2_per_plant_per_time][i,t] for t in 1:T))
-
-		#Total variable cost for Bio H2
-	#	@expression(EP, eVar_Cost_BIO_H2, sum(EP[:eVar_Cost_BIO_H2_per_plant][i] for i in BIO_H2))
-	#end
 	
 	return EP
 

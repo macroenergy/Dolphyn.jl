@@ -121,6 +121,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
     end
 
+    if setup["ModelBESC"] == 1
+        # Initialize Herb and Wood Biomass Supply Balance 
+        @expression(EP, eHerb_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eWood_Biomass_Supply[t=1:T, z=1:Z], 0)
+    end
+
     if setup["ModelNGSC"] == 1
         # Initialize NG Balance Expression
 	    @expression(EP, eNGBalance[t=1:T, z=1:Z], 0)
@@ -157,6 +163,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ##### Power System related modules ############
     println("Generating Electricity System model")
+
+    if setup["ModelNGSC"] == 1
+        @expression(EP, eElectricityNetNGConsumptionByAll[t=1:T,z=1:Z], 0)   
+    end 
 
     # Infrastructure
     discharge!(EP, inputs, setup)
@@ -228,7 +238,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
         @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
         # Net Power consumption by HSC supply chain by z and timestep - used in emissions constraints
-        @expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
+        @expression(EP, eH2NetpowerConsumptionByAll[t=1:T,z=1:Z], 0)   
+        
+        if setup["ModelNGSC"] == 1
+            @expression(EP, eH2NetNGConsumptionByAll[t=1:T,z=1:Z], 0)    
+        end
 
         # Infrastructure
         EP = h2_outputs(EP, inputs, setup)
@@ -296,6 +310,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
         println("Generating Carbon Supply Chain model")
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+
+        if setup["ModelNGSC"] == 1
+            @expression(EP, eCSCNetNGConsumptionByAll[t=1:T,z=1:Z], 0)    
+        end
 
 		# Variable costs and carbon captured per DAC resource "k" and time "t"
 		EP = DAC_var_cost(EP, inputs, setup)
@@ -376,10 +395,10 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     ###### START OF NATURAL GAS INFRASTRUCTURE MODEL ######
     if setup["ModelNGSC"] == 1
 
+        println("Generating Natural Gas Supply Chain model")
+
         # Initialize Syn + bio NG Balance [z,t]
         @expression(EP, eSB_NG_Balance[t=1:T, z=1:Z], 0)
-
-        println("Generating Natural Gas Supply Chain model")
 
         # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
         @expression(EP, eNGNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)    
@@ -408,12 +427,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
         println("Generating Bioenergy Supply Chain model")
 
-        # Initialize Herb and Wood Biomass Supply Balance 
-        @expression(EP, eHerb_Biomass_Supply[t=1:T, z=1:Z], 0)
-        @expression(EP, eWood_Biomass_Supply[t=1:T, z=1:Z], 0)
-
 		# Net Power consumption
 		@expression(EP, eBioNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Supply costs
+		EP = bio_herb_supply(EP, inputs, setup)
+		EP = bio_wood_supply(EP, inputs, setup)
 
 		# Variable costs
 		EP = bioenergy_var_cost(EP, inputs, setup)
@@ -421,13 +440,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		# Fixed costs
 		EP = bioenergy_investment(EP, inputs, setup)
 	
-		# Supply costs
-		EP = bio_herb_supply(EP, inputs, setup)
-		EP = bio_wood_supply(EP, inputs, setup)
-
-		if !isempty(inputs["BIO_RES_ALL"])
-			EP = bioenergy(EP, inputs, setup)
-		end
+        # Bioenergy resources
+        EP = bioenergy(EP, inputs, setup)
 
 		# Direct emissions
 		EP = emissions_besc(EP, inputs,setup)
@@ -497,6 +511,14 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     if setup["ModelCSC"] == 1
 		###Captured CO2 Balanace constraints
 		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
+	end
+
+    #########################################################################################
+
+    if setup["ModelBESC"] == 1
+		###Biomass Balanace constraints
+		@constraint(EP, cHerbBiomassBalance[t=1:T, z=1:Z], EP[:eHerb_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cWoodBiomassBalance[t=1:T, z=1:Z], EP[:eWood_Biomass_Supply][t,z] == 0)
 	end
 
     #########################################################################################

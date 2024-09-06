@@ -26,11 +26,7 @@ function write_synfuel_capacity(path::AbstractString, sep::AbstractString, input
 	
 	capsynfuelplant = zeros(size(inputs["SYN_FUELS_RESOURCES_NAME"]))
 	for i in 1:inputs["SYN_FUELS_RES_ALL"]
-		if setup["ParameterScale"] ==1
-			capsynfuelplant[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i])*ModelScalingFactor
-		else
-			capsynfuelplant[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i])
-		end
+		capsynfuelplant[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i])
 	end
 
 	capsyndiesel = zeros(size(inputs["SYN_FUELS_RESOURCES_NAME"]))
@@ -78,18 +74,6 @@ function write_synfuel_capacity(path::AbstractString, sep::AbstractString, input
 		Annual_CO2_Consumption = AnnualCO2Consumption[:],
 		CapacityFactor = CapFactor[:]
 	)
-
-	if setup["ParameterScale"] ==1
-		dfCap.Capacity_tonne_CO2_per_h = dfCap.Capacity_tonne_CO2_per_h * ModelScalingFactor
-		dfCap.Capacity_Diesel_MMBtu_per_h = dfCap.Capacity_Diesel_MMBtu_per_h * ModelScalingFactor
-		dfCap.Capacity_Synjetfuel_MMBtu_per_h = dfCap.Capacity_Synjetfuel_MMBtu_per_h * ModelScalingFactor
-		dfCap.Capacity_Syngasoline_MMBtu_per_h = dfCap.Capacity_Syngasoline_MMBtu_per_h * ModelScalingFactor
-		dfCap.Annual_Syngasoline_Production = dfCap.Annual_Syngasoline_Production * ModelScalingFactor
-		dfCap.Annual_Synjetfuel_Production = dfCap.Annual_Synjetfuel_Production * ModelScalingFactor
-		dfCap.Annual_Syndiesel_Production = dfCap.Annual_Syndiesel_Production * ModelScalingFactor
-		dfCap.Max_Annual_CO2_Consumption = dfCap.Max_Annual_CO2_Consumption * ModelScalingFactor
-		dfCap.Annual_CO2_Consumption = dfCap.Annual_CO2_Consumption * ModelScalingFactor
-	end
 
 
 	total = DataFrame(

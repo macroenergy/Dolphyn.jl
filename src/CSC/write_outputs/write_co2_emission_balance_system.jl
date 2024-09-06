@@ -28,8 +28,8 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
 	dfCO2Balance = Array{Any}
 	rowoffset=2
 
-    dfTemp1 = Array{Any}(nothing, T+rowoffset, 15)
-    dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "HSC Emissions", "CSC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "Biomass Capture", "Conventional NG", "Syn NG Plant Emissions", "Syn NG", "Bio NG", "Conventional Liquid Fuels", "Synfuel Plant Emissions" ,"Synfuels", "Biofuels", "Total"]
+    dfTemp1 = Array{Any}(nothing, T+rowoffset, 18)
+    dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "HSC Emissions", "CSC Emissions",  "Biorefinery Emissions", "Bioresource Emissions", "Biomass Capture", "Conventional NG", "Syn NG Plant Emissions", "Syn NG", "Bio NG", "Conventional Liquid Fuels", "Synfuel Plant Emissions" ,"Synfuels", "Biofuels", "NG Reduction from Power CCS", "NG Reduction from H2 CCS", "NG Reduction from DAC CCS", "Total"]
     for t in 1:T
         dfTemp1[t+rowoffset,1] = value(sum(EP[:eEmissionsByZone][z,t] for z in 1:Z))
         
@@ -106,11 +106,29 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
                 dfTemp1[t+rowoffset,14] = value(sum(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t] for z in 1:Z)) + value(sum(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t] for z in 1:Z))
             end
         end
+
+
+        dfTemp1[t+rowoffset,15] = 0
+        dfTemp1[t+rowoffset,16] = 0
+        dfTemp1[t+rowoffset,17] = 0
+
+        if setup["ModelNGSC"] == 1
+            dfTemp1[t+rowoffset,15] = -value(sum(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t] for z in 1:Z))
+
+            if setup["ModelH2"] == 1
+                dfTemp1[t+rowoffset,16] = -value(sum(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t] for z in 1:Z))
+            end
+
+            if setup["ModelCSC"] == 1
+                dfTemp1[t+rowoffset,17] = -value(sum(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t] for z in 1:Z))
+            end
+        end
+
         
         if setup["ModelLFSC"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
-            dfTemp1[t+rowoffset,15] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10] + dfTemp1[t+rowoffset,12] + dfTemp1[t+rowoffset,13] + dfTemp1[t+rowoffset,14]
+            dfTemp1[t+rowoffset,18] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10] + dfTemp1[t+rowoffset,12] + dfTemp1[t+rowoffset,13] + dfTemp1[t+rowoffset,14] + dfTemp1[t+rowoffset,15] + dfTemp1[t+rowoffset,16] + dfTemp1[t+rowoffset,17]
         else
-            dfTemp1[t+rowoffset,15] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10] + dfTemp1[t+rowoffset,11] + dfTemp1[t+rowoffset,12] + dfTemp1[t+rowoffset,13] + dfTemp1[t+rowoffset,14]
+            dfTemp1[t+rowoffset,18] =  dfTemp1[t+rowoffset,1] + dfTemp1[t+rowoffset,2] + dfTemp1[t+rowoffset,3] + dfTemp1[t+rowoffset,4] + dfTemp1[t+rowoffset,5] + dfTemp1[t+rowoffset,6] + dfTemp1[t+rowoffset,7] + dfTemp1[t+rowoffset,8] + dfTemp1[t+rowoffset,9] + dfTemp1[t+rowoffset,10] + dfTemp1[t+rowoffset,11] + dfTemp1[t+rowoffset,12] + dfTemp1[t+rowoffset,13] + dfTemp1[t+rowoffset,14] + dfTemp1[t+rowoffset,15] + dfTemp1[t+rowoffset,16] + dfTemp1[t+rowoffset,17]
         end
 
     end
@@ -195,8 +213,24 @@ function write_co2_emission_balance_system(path::AbstractString, inputs::Dict, s
         end
     end
 
+    dfTemp1[rowoffset,15] = 0
+    dfTemp1[rowoffset,16] = 0
+    dfTemp1[rowoffset,17] = 0
+
+    if setup["ModelNGSC"] == 1
+        dfTemp1[rowoffset,15] = -sum(sum(inputs["omega"].* (value.(EP[:ePower_NG_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+
+        if setup["ModelH2"] == 1
+            dfTemp1[rowoffset,16] = -sum(sum(inputs["omega"].* (value.(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+        end
+
+        if setup["ModelCSC"] == 1
+            dfTemp1[rowoffset,17] = -sum(sum(inputs["omega"].* (value.(EP[:eDAC_NG_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+        end
+    end
+
     
-    dfTemp1[rowoffset,15] =  dfTemp1[rowoffset,1] + dfTemp1[rowoffset,2] + dfTemp1[rowoffset,3] + dfTemp1[rowoffset,4] + dfTemp1[rowoffset,5] + dfTemp1[rowoffset,6] + dfTemp1[rowoffset,7] + dfTemp1[rowoffset,8] + dfTemp1[rowoffset,9] + dfTemp1[rowoffset,10] + dfTemp1[rowoffset,11] + dfTemp1[rowoffset,12] + dfTemp1[rowoffset,13] + dfTemp1[rowoffset,14]
+    dfTemp1[rowoffset,18] =  dfTemp1[rowoffset,1] + dfTemp1[rowoffset,2] + dfTemp1[rowoffset,3] + dfTemp1[rowoffset,4] + dfTemp1[rowoffset,5] + dfTemp1[rowoffset,6] + dfTemp1[rowoffset,7] + dfTemp1[rowoffset,8] + dfTemp1[rowoffset,9] + dfTemp1[rowoffset,10] + dfTemp1[rowoffset,11] + dfTemp1[rowoffset,12] + dfTemp1[rowoffset,13] + dfTemp1[rowoffset,14] + dfTemp1[rowoffset,15] + dfTemp1[rowoffset,16] + dfTemp1[rowoffset,17]
     
 
     dfCO2Balance =  hcat(vcat(["", "AnnualSum"], ["t$t" for t in 1:T]), dfTemp1)

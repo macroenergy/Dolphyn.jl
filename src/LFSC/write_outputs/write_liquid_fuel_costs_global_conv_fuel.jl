@@ -33,28 +33,15 @@ function write_liquid_fuel_costs_global_conv_fuel(path::AbstractString, sep::Abs
 	cSFFix = 0
 	cSFByProdRev = 0
 
-	if setup["ParameterScale"]==1 # Convert costs in millions to $
-		if setup["ModelSyntheticFuels"] == 1
-			cSFVar = value(EP[:eTotalCSFProdVarOut])*ModelScalingFactor^2
-			cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])*ModelScalingFactor^2
-			cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])*ModelScalingFactor^2
-		end
-
-		cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])*ModelScalingFactor^2
-		cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])*ModelScalingFactor^2
-		cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])*ModelScalingFactor^2
-
-	else
-		if setup["ModelSyntheticFuels"] == 1
-			cSFVar = value(EP[:eTotalCSFProdVarOut])
-			cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])
-			cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])
-		end
-
-		cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])
-		cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])
-		cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])
+	if setup["ModelSyntheticFuels"] == 1
+		cSFVar = value(EP[:eTotalCSFProdVarOut])
+		cSFFix = value(EP[:eFixed_Cost_Syn_Fuel_total])
+		cSFByProdRev = - value(EP[:eTotalCSFByProdRevenueOut])
 	end
+
+	cSFConvDieselFuelCost = value(EP[:eTotalCLFDieselVarOut])
+	cSFConvJetfuelFuelCost = value(EP[:eTotalCLFJetfuelVarOut])
+	cSFConvGasolineFuelCost = value(EP[:eTotalCLFGasolineVarOut])
 
 	if setup["CO2Cap"]==4 
         ErrorException("Carbon Price for SynFuels Not implemented")
@@ -96,22 +83,11 @@ function write_liquid_fuel_costs_global_conv_fuel(path::AbstractString, sep::Abs
 			end
 		end
 
-		if setup["ParameterScale"] == 1 # Convert costs in millions to $
-			tempC_SF_Fix = tempC_SF_Fix * (ModelScalingFactor^2)
-			tempC_SF_Var = tempC_SF_Var * (ModelScalingFactor^2)
-			tempC_SF_ByProd = tempC_SF_ByProd * (ModelScalingFactor^2)
-			tempCDieselConvFuel = "-"
-			tempCJetfuelConvFuel = "-"
-			tempCGasolineConvFuel = "-"
-			tempCTotal = tempCTotal * (ModelScalingFactor^2)
-		end
-
 		if setup["CO2Cap"]==4 
 			ErrorException("Carbon Price for SynFuels Not implemented")
 		end
 
 		# Add emisions penalty related costs if the constraints are active
-		# Emissions penalty is already scaled previously depending on value of ParameterScale and hence not scaled here
 		#if((setup["CO2Cap"]==4 && setup["SystemCO2Constraint"]==2)||(setup["H2CO2Cap"]==4 && setup["SystemCO2Constraint"]==1))
 		#	tempC_SF_Var  = tempC_SF_Var + value.(EP[:eCH2EmissionsPenaltybyZone])[z]
 		#	tempCTotal = tempCTotal +value.(EP[:eCH2EmissionsPenaltybyZone])[z]

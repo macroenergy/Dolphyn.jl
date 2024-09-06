@@ -28,8 +28,8 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	dfCO2StorBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 11)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Plant Capture", "Synfuel Plant Consumption", "Syn NG Plant Capture", "Syn NG Plant Consumption", "CO2 Pipeline Import",
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 14)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Plant Capture", "Synfuel Plant Consumption", "Syn NG Plant Capture", "Syn NG Plant Consumption", "NG Power CCS", "NG H2 CCS", "NG DAC CCS", "CO2 Pipeline Import",
 	           "CO2 Storage"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -62,22 +62,38 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 
 			dfTemp1[t+rowoffset,8] = 0
 			dfTemp1[t+rowoffset,9] = 0
+			dfTemp1[t+rowoffset,10] = 0
+			dfTemp1[t+rowoffset,11] = 0
+			dfTemp1[t+rowoffset,12] = 0
 
-			if setup["ModelNGSC"] == 1 && setup["ModelSyntheticNG"] == 1
-				dfTemp1[t+rowoffset,8] = value(EP[:eSyn_NG_CO2_Capture_Per_Zone_Per_Time][z,t])
-				dfTemp1[t+rowoffset,9] = - value(EP[:eSyn_NG_CO2_Cons_Per_Zone_Per_Time][z,t])
+			if setup["ModelNGSC"] == 1 
+				if setup["ModelSyntheticNG"] == 1
+					dfTemp1[t+rowoffset,8] = value(EP[:eSyn_NG_CO2_Capture_Per_Zone_Per_Time][z,t])
+					dfTemp1[t+rowoffset,9] = - value(EP[:eSyn_NG_CO2_Cons_Per_Zone_Per_Time][z,t])
+				end
+
+				dfTemp1[t+rowoffset,10] = value(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t])
+				
+				if setup["ModelH2"] == 1
+					dfTemp1[t+rowoffset,11] = value(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["ModelCSC"] == 1
+					dfTemp1[t+rowoffset,12] = value(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t])
+				end
+
 			end
 
-			dfTemp1[t+rowoffset,10] = 0
+			dfTemp1[t+rowoffset,13] = 0
 
 			if setup["ModelCO2Pipelines"] == 1
-				dfTemp1[t+rowoffset,10] = value(EP[:ePipeZoneCO2Demand][t,z])
+				dfTemp1[t+rowoffset,13] = value(EP[:ePipeZoneCO2Demand][t,z])
 			end
 
-			dfTemp1[t+rowoffset,11] = 0
+			dfTemp1[t+rowoffset,14] = 0
 
 			if setup["ModelCO2Storage"] == 1
-				dfTemp1[t+rowoffset,11] = - value(EP[:eCO2_Injected_per_zone][z,t])
+				dfTemp1[t+rowoffset,14] = - value(EP[:eCO2_Injected_per_zone][z,t])
 			end
 
 	   	end

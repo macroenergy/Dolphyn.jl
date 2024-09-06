@@ -800,35 +800,58 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     W = last(cluster_results)[3]  # Weights
     M = last(cluster_results)[4]  # Centers or Medoids
     DistMatrix = last(cluster_results)[5]  # Pairwise distances
-    if v
-        println(" -- Total Groups Assigned to Each Cluster: ", W)
-        println(" -- Sum Cluster Weights: ", sum(W))
-        println(" -- Representative Periods: ", M)
+    if v # Diagnostic checks
+        println("Total Groups Assigned to Each Cluster: ", W)
+        println("Sum Cluster Weights: ", sum(W))
+        println("Representative Periods: ", M)
     end
+
+    ##### Step 4: Aggregation
+    # Set clustering outputs in correct numeric order.
+    # Add the subperiods corresponding to the extreme periods back into the data.
+    # Rescale weights to total user-specified number of hours (e.g., 8760 for one year).
+    # If DemandExtremePeriod=false (because we don't want to change peak demand day), rescale demand to ensure total demand is equal.
 
     # K-means/medoids returns indices from DistMatrix as its medoids.
     #   This does not account for missing extreme weeks.
     #   This is corrected retroactively here.
+    
+    # Orginal M is produced in alphabetical order - 10th column is not the 10th data point in chronological order
+    # Hence need to identify the right data point number based on column name
     M = [parse(Int64, string(names(ClusteringInputDF)[i])) for i in M]
-    if v println(" -- Fixed M: ", M) end
+    # if v 
+        println(" -- Fixed M: ", M) 
+    # end
+    
 
-
-    ##### Step 4: Aggregation
-    # Add the subperiods corresponding to the extreme periods back into the data.
-    # Rescale weights to total user-specified number of hours (e.g., 8760 for one year).
-    # If LoadExtremePeriod=false (because we don't want to change peak load day), rescale load to ensure total demand is equal
-
+    # ClusterInputDF Ordering of All Periods (i.e., alphabetical as opposed to indices)
+    A_Dict = Dict()   # States index of representative period within M for each period a in A
+    M_Dict = Dict()   # States representative period m for each period a in A
+    for i in 1:length(A)
+        A_Dict[parse(Int64, string(names(ClusteringInputDF)[i]))] = A[i]
+        M_Dict[parse(Int64, string(names(ClusteringInputDF)[i]))] = M[A[i]]
+    end
+      
     # Add extreme periods into the clustering result with # of occurences = 1 for each
     ExtremeWksList = sort(ExtremeWksList)
     if UseExtremePeriods == 1
-        if v println(" -- Extreme Periods: ", ExtremeWksList) end
+        if v
+            println("Extreme Periods: ", ExtremeWksList)
+        end
         M = [M; ExtremeWksList]
-        for w in 1:length(ExtremeWksList)
-            insert!(A, ExtremeWksList[w], NClusters+w)
+        A_idx = NClusters + 1
+        for w in ExtremeWksList
+            A_Dict[w] = A_idx
+            M_Dict[w] = w
             push!(W, 1)
+            A_idx += 1
         end
         NClusters += length(ExtremeWksList) #NClusers from this point forward is the ending number of periods
-    end
+    end 
+
+    ########################################
+    # Recreate A in numeric order (as opposed to ClusterInputDF order)
+    A = [A_Dict[i] for i in 1:(length(A) + length(ExtremeWksList))]
 
     N = W  # Keep cluster version of weights stored as N, number of periods represented by RP
 
@@ -844,13 +867,17 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     W = df_sort[!, :Weights]
     N = df_sort[!, :NumPeriods]
     M = df_sort[!, :Rep_Period]
+    # Sorting the representative periods to be in chronological order
     AssignMap = Dict( i => findall(x->x==old_M[i], M)[1] for i in 1:length(M))
     A = [AssignMap[a] for a in A]
 
+  
     # Make PeriodMap, maps each period to its representative period
     PeriodMap = DataFrame(Period_Index = 1:length(A),
                             Rep_Period = [M[a] for a in A],
                             Rep_Period_Index = [a for a in A])
+
+    ######################################
 
     # Get Symbol-version of column names by type for later analysis
     LoadCols = [Symbol("Load_MW_z"*string(i)) for i in 1:length(load_col_names) ]

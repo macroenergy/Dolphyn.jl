@@ -29,8 +29,8 @@ function write_ng_emissions(path::AbstractString, sep::AbstractString, inputs::D
 
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 6)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2 In","Syn NG Plant Emissions", "Syn NG Plant Captured", "Syn NG Emissions", "Bio NG Emissions", "Conventional NG Emissions"])
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = vcat(["CO2 In","Syn NG Plant Emissions", "Syn NG Plant Captured", "Syn NG Emissions", "Bio NG Emissions", "Conventional NG Emissions", "Reduction from Power CCS", "Reduction from H2 CCS", "Reduction from DAC CCS"])
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 		for t in 1:T
@@ -53,6 +53,19 @@ function write_ng_emissions(path::AbstractString, sep::AbstractString, inputs::D
 			end
 
 			dfTemp1[t+rowoffset,6] = value.(EP[:eConv_NG_CO2_Emissions][z,t])
+			dfTemp1[t+rowoffset,7] = -value.(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t])
+
+			dfTemp1[t+rowoffset,8] = 0
+
+			if setup["ModelH2"] == 1
+				dfTemp1[t+rowoffset,8] = -value.(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t])
+			end
+			
+			dfTemp1[t+rowoffset,9] = 0
+			
+			if setup["ModelCSC"] == 1
+				dfTemp1[t+rowoffset,9] = -value.(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t])
+			end
 
 		end
 

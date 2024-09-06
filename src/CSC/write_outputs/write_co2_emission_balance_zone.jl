@@ -28,8 +28,8 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 	dfCO2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 23)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions", "DAC Capture", "CO2 Pipeline Loss", "Biorefinery Emissions", "Bioresource Emissions",  "Biomass Capture", "Conventional Gasoline","Conventional Jetfuel","Conventional Diesel","Synfuel Production Emissions","Synfuel Byproducts Emissions","Syn Gasoline","Syn Jetfuel","Syn Diesel","Bio Gasoline","Bio Jetfuel","Bio Diesel", "Conventional NG", "Syn NG Production Emissions", "Syn NG", "Bio NG"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 26)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions", "DAC Capture", "CO2 Pipeline Loss", "Biorefinery Emissions", "Bioresource Emissions",  "Biomass Capture", "Conventional Gasoline","Conventional Jetfuel","Conventional Diesel","Synfuel Production Emissions","Synfuel Byproducts Emissions","Syn Gasoline","Syn Jetfuel","Syn Diesel","Bio Gasoline","Bio Jetfuel","Bio Diesel", "Conventional NG", "Syn NG Production Emissions", "Syn NG", "Bio NG", "NG Reduction from Power CCS", "NG Reduction from H2 CCS", "NG Reduction from DAC CCS"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			dfTemp1[t+rowoffset,1] = value(EP[:eEmissionsByZone][z,t])
@@ -103,6 +103,9 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 			dfTemp1[t+rowoffset,21] = 0
 			dfTemp1[t+rowoffset,22] = 0
 			dfTemp1[t+rowoffset,23] = 0
+			dfTemp1[t+rowoffset,24] = 0
+			dfTemp1[t+rowoffset,25] = 0
+			dfTemp1[t+rowoffset,26] = 0
 
 			if setup["ModelNGSC"] == 1
 				dfTemp1[t+rowoffset,20] = value(EP[:eConv_NG_CO2_Emissions][z,t])
@@ -116,6 +119,15 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 					dfTemp1[t+rowoffset,23] = value(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t])
 				end
 
+				dfTemp1[t+rowoffset,24] = -value(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t])
+
+				if setup["ModelH2"] == 1
+					dfTemp1[t+rowoffset,25] = -value(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["ModelCSC"] == 1
+					dfTemp1[t+rowoffset,26] = -value(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t])
+				end
 			end
 
 	   	end
@@ -192,6 +204,9 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 		dfTemp1[rowoffset,21] = 0
 		dfTemp1[rowoffset,22] = 0
 		dfTemp1[rowoffset,23] = 0
+		dfTemp1[rowoffset,24] = 0
+		dfTemp1[rowoffset,25] = 0
+		dfTemp1[rowoffset,26] = 0
 
 		if setup["ModelNGSC"] == 1
 			dfTemp1[rowoffset,20] = sum(inputs["omega"][t] * value.(EP[:eConv_NG_CO2_Emissions][z,t]) for t in 1:T)
@@ -203,6 +218,16 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 
 			if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
 				dfTemp1[rowoffset,23] = sum(inputs["omega"][t] * value.(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+			end
+
+			dfTemp1[rowoffset,24] = -sum(inputs["omega"][t] * value.(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
+
+			if setup["ModelH2"] == 1
+				dfTemp1[rowoffset,25] = -sum(inputs["omega"][t] * value.(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
+			end
+
+			if setup["ModelCSC"] == 1
+				dfTemp1[rowoffset,26] = -sum(inputs["omega"][t] * value.(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
 			end
 
 		end

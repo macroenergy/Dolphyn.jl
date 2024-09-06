@@ -59,15 +59,9 @@ function bio_herb_supply(EP::Model, inputs::Dict, setup::Dict)
 	#Herb Biomass purchased from supply = k (tonnes/hr) in time t
 	@variable(EP, vHerb_biomass_purchased[k=1:HERB_SUPPLY_RES_ALL, t = 1:T] >= 0 )
 
-	if setup["ParameterScale"] ==1
-		Herb_biomass_supply_max = dfHerb[!,:Max_tonne_per_hr]/ModelScalingFactor #Convert to ktonne
-		Herb_biomass_cost_per_tonne = dfHerb[!,:Cost_per_tonne]/ModelScalingFactor #Convert to $M/ktonne
-		Herb_biomass_emission_per_tonne = dfHerb[!,:Emissions_tonne_per_tonne] #Convert to ktonne/ktonne = tonne/tonne
-	else
-		Herb_biomass_supply_max = dfHerb[!,:Max_tonne_per_hr]
-		Herb_biomass_cost_per_tonne = dfHerb[!,:Cost_per_tonne]
-		Herb_biomass_emission_per_tonne = dfHerb[!,:Emissions_tonne_per_tonne]
-	end
+	Herb_biomass_supply_max = dfHerb[!,:Max_tonne_per_hr]
+	Herb_biomass_cost_per_tonne = dfHerb[!,:Cost_per_tonne]
+	Herb_biomass_emission_per_tonne = dfHerb[!,:Emissions_tonne_per_tonne]
 
 	#Herb Biomass Balance Expressions
 	@expression(EP, eHerb_biomass_purchased_per_time_per_zone[t=1:T, z=1:Z],

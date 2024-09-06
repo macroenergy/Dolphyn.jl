@@ -159,8 +159,6 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 
 	#####################################################################################################################################
 
-	#HSC modules are not scaled, so we need convert to tonnes for ParameterScale = 1
-
 	if setup["Bio_H2_On"] == 1
 		#Biohydrogen demand
 		@expression(EP,eBioH2_produced_tonne_per_plant_per_time[i in BIO_H2, t in 1:T], EP[:vBiomass_consumed_per_plant_per_time][i,t] * dfbioenergy[!,:BioH2_yield_tonne_per_tonne][i])
@@ -242,7 +240,7 @@ function bioenergy(EP::Model, inputs::Dict, setup::Dict)
 		EP[:eNGBalance] += EP[:eBio_NG_produced_MMBtu_per_time_per_zone]
 	
 		#Emissions from bio NG utilization
-		Bio_ng_co2_per_mmbtu = inputs["Bio_ng_co2_per_mmbtu"]
+		Bio_ng_co2_per_mmbtu = inputs["ng_co2_per_mmbtu"]
 	
 		#CO2 emitted as a result of bio NG consumption
 		@expression(EP,eBio_NG_CO2_Emissions_By_Zone[z = 1:Z,t=1:T], 

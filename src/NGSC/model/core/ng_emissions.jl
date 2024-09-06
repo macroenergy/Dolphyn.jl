@@ -25,7 +25,7 @@ function ng_emissions(EP::Model, inputs::Dict, setup::Dict)
 
 	println(" -- CO2 Emissions Module for Natural Gas")
 
-    Conventional_ng_co2_per_mmbtu = inputs["Conventional_ng_co2_per_mmbtu"]
+    Conventional_ng_co2_per_mmbtu = inputs["ng_co2_per_mmbtu"]
 
     T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -43,7 +43,7 @@ function ng_emissions(EP::Model, inputs::Dict, setup::Dict)
         dfSyn_NG = inputs["dfSyn_NG"]
         SYN_NG_RES_ALL = inputs["SYN_NG_RES_ALL"]
 
-        Syn_ng_co2_per_mmbtu = inputs["Syn_ng_co2_per_mmbtu"]
+        Syn_ng_co2_per_mmbtu = inputs["ng_co2_per_mmbtu"]
 
         #CO2 emitted as a result of syn ng consumption
         @expression(EP,eSyn_NG_CO2_Emissions_By_Plant[k=1:SYN_NG_RES_ALL,t=1:T], 

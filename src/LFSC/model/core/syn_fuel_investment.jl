@@ -52,26 +52,14 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
     dfSynFuels = inputs["dfSynFuels"]
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
 
-	##Load cost parameters
-	#  ParameterScale = 1 --> objective function is in million $ . 
-	# In powedfSynFuelr system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
-	#  ParameterScale = 0 --> objective function is in $
-
 	#General variables
 	@variable(EP,vCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL]>=0) #Capacity of units in co2 input mtonnes/hr 
 
-	if setup["ParameterScale"] == 1
-		MinCapacity_tonne_p_hr = dfSynFuels[!,:MinCapacity_tonne_p_hr]/ModelScalingFactor # kt/h
-		MaxCapacity_tonne_p_hr = dfSynFuels[!,:MaxCapacity_tonne_p_hr]/ModelScalingFactor # kt/h
-		Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuels[!,:Inv_Cost_p_tonne_co2_p_hr_yr]/ModelScalingFactor # $M/kton
-		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr]/ModelScalingFactor # $M/kton
-	else
-		#Load capacity parameters
-		MinCapacity_tonne_p_hr = dfSynFuels[!,:MinCapacity_tonne_p_hr] # t/h
-		MaxCapacity_tonne_p_hr = dfSynFuels[!,:MaxCapacity_tonne_p_hr] # t/h/h
-		Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuels[!,:Inv_Cost_p_tonne_co2_p_hr_yr] # $/tonne
-		Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr] # $/tonne
-	end
+	#Load capacity parameters
+	MinCapacity_tonne_p_hr = dfSynFuels[!,:MinCapacity_tonne_p_hr] # t/h
+	MaxCapacity_tonne_p_hr = dfSynFuels[!,:MaxCapacity_tonne_p_hr] # t/h/h
+	Inv_Cost_p_tonne_co2_p_hr_yr = dfSynFuels[!,:Inv_Cost_p_tonne_co2_p_hr_yr] # $/tonne
+	Fixed_OM_cost_p_tonne_co2_hr_yr = dfSynFuels[!,:Fixed_OM_cost_p_tonne_co2_hr_yr] # $/tonne
 
 	#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
 	#Investment cost = CAPEX

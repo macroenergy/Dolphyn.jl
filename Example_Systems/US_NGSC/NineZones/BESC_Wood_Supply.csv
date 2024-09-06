@@ -1,0 +1,10 @@
+Biomass_Supply,Zone,Emissions_tonne_per_tonne,Cost_per_tonne,Max_tonne_per_hr
+CA_Wood,1,0,123.08,313.87
+NW_Wood,2,0,144.13,1516.88
+SW_Wood,3,0,135.44,318.62
+TX_Wood,4,0,117.46,1157.54
+NCEN_Wood,5,0,123.31,1840.92
+CEN_Wood,6,0,122.25,2740.94
+SE_Wood,7,0,128.79,5043.43
+MIDAT_Wood,8,0,104.63,2195.06
+NE_Wood,9,0,102.41,634.46

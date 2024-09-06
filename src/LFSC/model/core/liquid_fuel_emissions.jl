@@ -44,9 +44,6 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	
-    # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
-    # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes
-
     ##########################################################
     ##CO2 emitted as a result of conventional fuel consumption
 

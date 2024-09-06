@@ -38,34 +38,31 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	EP = co2_capture_DAC(EP::Model, inputs::Dict,setup::Dict)
 
 	#CO2 captued by power sector CCS plants
-	@expression(EP, ePower_CO2_captured_per_plant_per_time[y=1:G,t=1:T], EP[:eCO2CaptureByPlant][y,t])
-	@expression(EP, ePower_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(ePower_CO2_captured_per_plant_per_time[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
-	@expression(EP, ePower_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(ePower_CO2_captured_per_plant_per_time[y,t] for y in dfGen[(dfGen[!,:Zone].==z),:R_ID]))
-	
-	#ADD TO CO2 BALANCE
 	EP[:eCaptured_CO2_Balance] += EP[:ePower_CO2_captured_per_time_per_zone]
+
+	if setup["ModelNGSC"] == 1
+		#If NGSC is modeled, NG is not in fuels input, so have to account for CO2 captured from CCS of NG utilization in plant separately
+		EP[:eCaptured_CO2_Balance] += EP[:ePower_NG_CO2_captured_per_time_per_zone]
+	end
 
 	#################################################################################################################################################################
 
 	if setup["ModelH2"] == 1
-		@expression(EP, eHydrogen_CO2_captured_per_plant_per_time[y=1:H,t=1:T], EP[:eCO2CaptureByH2Plant][y,t])
-		@expression(EP, eHydrogen_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(eHydrogen_CO2_captured_per_plant_per_time[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
-		@expression(EP, eHydrogen_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eHydrogen_CO2_captured_per_plant_per_time[y,t] for y in dfH2Gen[(dfH2Gen[!,:Zone].==z),:R_ID]))
 
-		#ADD TO CO2 BALANCE
+		#CO2 captued by H2 CCS plants
 		EP[:eCaptured_CO2_Balance] += EP[:eHydrogen_CO2_captured_per_time_per_zone]
+
+		if setup["ModelNGSC"] == 1
+			#If NGSC is modeled, not using fuel from the fuels input, so have to account for CO2 captured from CCS of NG utilization in plant separately
+			EP[:eCaptured_CO2_Balance] += EP[:eHydrogen_NG_CO2_captured_per_time_per_zone]
+		end
 	end
 	#################################################################################################################################################################
 	#CO2 captued by DAC CCS plants
 
     #CCS CO2 captured by fuel usage per type of resource "k"
-    if setup["ParameterScale"] ==1
-        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
-            inputs["fuel_CO2"][dfDAC[!,:Fuel][k]] * dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfDAC[!, :Fuel_CCS_Rate][k]) * ModelScalingFactor) #As fuel CO2 is already scaled to kton/MMBtu we need to scale vDAC_CO2_Captured
-    else
-        @expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
-        inputs["fuel_CO2"][dfDAC[!,:Fuel][k]] * dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfDAC[!, :Fuel_CCS_Rate][k]))
-    end
+	@expression(EP,eCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
+	inputs["fuel_CO2"][dfDAC[!,:Fuel][k]] * dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfDAC[!, :Fuel_CCS_Rate][k]))
 
 	@expression(EP, eDAC_Fuel_CO2_captured_per_plant_per_time[y=1:D,t=1:T], EP[:eCO2CaptureByDACFuelPlant][y,t])
 	@expression(EP, eDAC_Fuel_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_Fuel_CO2_captured_per_plant_per_time[y,t] for y in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
@@ -73,6 +70,19 @@ function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 	
 	#ADD TO CO2 BALANCE
 	EP[:eCaptured_CO2_Balance] += EP[:eDAC_Fuel_CO2_captured_per_time_per_zone]
+
+	if setup["ModelNGSC"] == 1
+		 #CCS CO2 captured by fuel usage per type of resource "k"
+		@expression(EP,eNGCO2CaptureByDACFuelPlant[k=1:D,t=1:T], 
+		inputs["ng_co2_per_mmbtu"] * dfDAC[!,:etaNG_MMBtu_per_tonne][k] * EP[:vDAC_CO2_Captured][k,t] *  (dfDAC[!, :Fuel_CCS_Rate][k]))
+
+		@expression(EP, eDAC_NG_CO2_captured_per_plant_per_time[y=1:D,t=1:T], EP[:eNGCO2CaptureByDACFuelPlant][y,t])
+		@expression(EP, eDAC_NG_CO2_captured_per_zone_per_time[z=1:Z, t=1:T], sum(eDAC_NG_CO2_captured_per_plant_per_time[y,t] for y in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
+		@expression(EP, eDAC_NG_CO2_captured_per_time_per_zone[t=1:T, z=1:Z], sum(eDAC_NG_CO2_captured_per_plant_per_time[y,t] for y in dfDAC[(dfDAC[!,:Zone].==z),:R_ID]))
+
+		#ADD TO CO2 BALANCE
+		EP[:eCaptured_CO2_Balance] += EP[:eDAC_NG_CO2_captured_per_time_per_zone]
+	end
 
 	return EP
 end

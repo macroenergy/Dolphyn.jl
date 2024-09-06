@@ -55,6 +55,9 @@ function DAC_var_cost(EP::Model, inputs::Dict, setup::Dict)
 	#Power produced by carbon capture resource k (MW)
 	@variable(EP, vPower_Produced_DAC[k=1:DAC_RES_ALL, t = 1:T] >= 0 )
 
+	#NG required by carbon capture resource k (MW)
+	@variable(EP, vNG_DAC[k=1:DAC_RES_ALL, t = 1:T] >= 0 )
+
 	#####################################################################################################################################
 	##Expressions
 	@expression(EP,eVar_OM_DAC_per_type_per_time[k=1:DAC_RES_ALL, t = 1:T], inputs["omega"][t] * (dfDAC[!,:Var_OM_Cost_per_tonne][k] + dfDAC[!,:etaFuel_MMBtu_per_tonne][k] * inputs["fuel_costs"][dfDAC[!,:Fuel][k]][t]) * EP[:vDAC_CO2_Captured][k,t] )

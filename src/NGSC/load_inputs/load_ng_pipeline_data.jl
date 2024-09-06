@@ -86,17 +86,17 @@ function load_ng_pipeline_data(
     #Maxiumum Pipe Flow per Pipe
     inputs_nw["pNG_Pipe_Max_Flow"] = convert(
         Array{Float64},
-        collect(skipmissing(pipeline_var[!, :Max_Flow_Tonne_p_Hr_Per_Pipe])),
+        collect(skipmissing(pipeline_var[!, :Max_Flow_MMBtu_p_Hr_Per_Pipe])),
     )
 
-    #Maximum Pipeline storage capacity in tonnes per pipe
+    #Maximum Pipeline storage capacity in MMBtu per pipe
     inputs_nw["pNG_Pipe_Max_Cap"] =
         convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :NGPipeCap_tonne_per_mile])),
+            collect(skipmissing(pipeline_var[!, :NGPipeCap_MMBtu_per_mile])),
         ) .* inputs_nw["pPipe_length_miles"]
 
-    #Minimum Pipeline storage capacity in tonnes per pipe
+    #Minimum Pipeline storage capacity in MMBtu per pipe
     inputs_nw["pNG_Pipe_Min_Cap"] =
         convert(
             Array{Float64},
@@ -110,7 +110,7 @@ function load_ng_pipeline_data(
             collect(skipmissing(pipeline_var[!, :NGPipe_Inv_Cost_per_mile_yr])),
         ) .* inputs_nw["pPipe_length_miles"]
 
-    #Capital cost associated with booster compressors per pipe= capex per tonne/hour flow rate x pipe max flow rate (tonne/hour) x number of booster compressor stations per pipe route
+    #Capital cost associated with booster compressors per pipe= capex per MMBtu/hour flow rate x pipe max flow rate (MMBtu/hour) x number of booster compressor stations per pipe route
     inputs_nw["pCAPEX_Comp_NG_Pipe"] =
         inputs_nw["pNG_Pipe_Max_Flow"] .* (
             convert(
@@ -119,19 +119,19 @@ function load_ng_pipeline_data(
             ) .+
             inputs_nw["no_booster_comp_stations"] .* convert(
                 Array{Float64},
-                collect(skipmissing(pipeline_var[!, :BoosterCompCapex_per_tonne_p_hr_yr])),
+                collect(skipmissing(pipeline_var[!, :BoosterCompCapex_per_MMBtu_p_hr_yr])),
             )
         )
 
-    #Compression energy requirement Per Pipe  = MWh electricity per tonne of gas flow rate x number of compressor stations enroute a pipeline route
-    inputs_nw["pComp_MWh_per_tonne_Pipe"] =
+    #Compression energy requirement Per Pipe  = MWh electricity per MMBtu of gas flow rate x number of compressor stations enroute a pipeline route
+    inputs_nw["pComp_MWh_per_MMBtu_Pipe"] =
         convert(
             Array{Float64},
             collect(skipmissing(pipeline_var[!, :NGPipeCompEnergy]))
         ) .+ 
         inputs_nw["no_booster_comp_stations"] .* convert(
             Array{Float64},
-            collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
+            collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_MMBtu])),
         )
 
     print_and_log(" -- NGSC_Pipelines.csv Successfully Read!")

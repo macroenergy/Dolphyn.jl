@@ -236,7 +236,6 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
     EP[:ePowerBalance] += -ePowerBalanceH2GenCommit
 
-
     ##For CO2 Polcy constraint right hand side development - power consumption by zone and each time step
     EP[:eH2NetpowerConsumptionByAll] += ePowerBalanceH2GenCommit
 
