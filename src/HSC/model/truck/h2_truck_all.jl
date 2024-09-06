@@ -235,13 +235,13 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GWh rather than MWh
             sum(
                 vH2Ncharged[z, j, t] *
-                dfH2Truck[!, :TruckCap_MW_per_unit][j] *
+                dfH2Truck[!, :TruckCap_MWh_per_unit][j] *
                 dfH2Truck[!, :H2TruckCompressionEnergy][j] for j in H2_TRUCK_TYPES
             ) / ModelScalingFactor
         else
             sum(
                 vH2Ncharged[z, j, t] *
-                dfH2Truck[!, :TruckCap_MW_per_unit][j] *
+                dfH2Truck[!, :TruckCap_MWh_per_unit][j] *
                 dfH2Truck[!, :H2TruckCompressionEnergy][j] for j in H2_TRUCK_TYPES
             )
         end
@@ -561,7 +561,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         [z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
-        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_MW_per_unit][j] <=
+        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_MWh_per_unit][j] <=
         EP[:eTotalH2TruckEnergy][z, j]
     )
 
@@ -571,9 +571,9 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         cH2TruckFlow[z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
         vH2TruckFlow[z, j, t] ==
         vH2Ndischarged[z, j, t] *
-        dfH2Truck[!, :TruckCap_MW_per_unit][j] *
+        dfH2Truck[!, :TruckCap_MWh_per_unit][j] *
         (1 - dfH2Truck[!, :H2TLoss_per_mile][j]) -
-        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_MW_per_unit][j]
+        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_MWh_per_unit][j]
     )
 
     ### End Constraints ###

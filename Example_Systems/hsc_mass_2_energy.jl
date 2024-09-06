@@ -72,7 +72,7 @@ for case in cases
 
     hsc_trucks_changes = Dict(
         "Existing_Energy_Cap_tonne_z" => ("Existing_Energy_Cap_MW_z", HHV_H2),
-        "TruckCap_tonne_per_unit" => ("TruckCap_MW_per_unit", HHV_H2),
+        "TruckCap_tonne_per_unit" => ("TruckCap_MWh_per_unit", HHV_H2),
         "Inv_Cost_Energy_p_tonne_y" => ("Inv_Cost_Energy_p_MW_y", 1/HHV_H2),
         "Fixed_OM_Cost_Energy_p_tonne_y" => ("Fixed_OM_Cost_Energy_p_MW_y", 1/HHV_H2),
         "Max_Energy_Cap_tonne" => ("Max_Energy_Cap_MW", HHV_H2),
