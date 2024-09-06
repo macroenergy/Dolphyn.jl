@@ -160,4 +160,7 @@ In your command terminal (not the Julia REPL), navigate to your DOLPHYN folder t
 
 ## DOLPHYN Team
 
-The model was originally [developed](https://pubs.rsc.org/en/content/articlehtml/2021/ee/d1ee00627d) by [Guannan He](https://www.guannanhe.com/) while at the MIT Energy Initiative, and is now maintained by a team contributors at [MITEI](https://energy.mit.edu/) led by [Dharik Mallapragada](http://mallapragada.mit.edu/) and Ruaridh Macdonald as well as Guannan He's research group at Peking University. Key contributors include Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang.
+The original version of the model was [developed](https://pubs.rsc.org/en/content/articlehtml/2021/ee/d1ee00627d) by [Guannan He](https://www.guannanhe.com/) while at the MIT Energy Initiative, and is now maintained by a team contributors at New York University (NYU), led by [Dharik Mallapragada](https://engineering.nyu.edu/faculty/dharik-mallapragada), [Massachusetts Institute of Technology](https://energy.mit.edu/), led by Ruaridh Macdonald, as well as Guannan He's research group at Peking University. Key contributors include Dharik S. Mallapragada, Ruaridh Macdonald, Guannan He, Mary Bennett, Shantanu Chakraborty, Anna Cybulsky, Michael Giovanniello, Jun Wen Law, Youssef Shaker, Nicole Shi and Yuheng Zhang.
+
+## Citing DOLPHYN
+G. He, D. S. Mallapragada, R. Macdonald, J. W. Law, Y. Shaker, Y. Zhang, A. Cybulsky, S. Chakraborty, M. Giovanniello. DOLPHYN: decision optimization for low-carbon power and hydrogen networks. n.d. https://github.com/macroenergy/Dolphyn.jl
