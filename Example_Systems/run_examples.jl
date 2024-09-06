@@ -31,6 +31,8 @@ else
     println("Gurobi is not installed. Will use HiGHS for all cases")
 end
 
+summary = []
+
 if use_TDR
     println("Time Domain Reduction is enabled")
     force_TDR_on = true
@@ -46,28 +48,54 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    split_case = splitpath(case)
-    case_name = string(split_case[end-1], split_case[end])
+    case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
-    println("Generating model for $case_name ...")
-    run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-    println("Generated model for $case_name.")
+    println("Generating and running model for $case_name ...")
+    try
+        (EP,_,mysetup,_) = run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+        obj_value = Dolphyn.obj_value(EP, mysetup)
+        push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
+        println("Ran model for $case.")
+    catch Exception
+        println("Failed to run model for $case")
+        push!(summary, "🔴 $(case_name)")
+    end
 end
 
 if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        split_case = splitpath(case)
-        case_name = string(split_case[end-1], split_case[end])
+        case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
         println(" ------ ------ ------")
-        println("Generating model for $case_name ...")
-        run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-        println("Generated model for $case.")
+        println("Generating and running model for $case_name ...")
+        try
+            (EP,_,mysetup,_) = run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+            obj_value = Dolphyn.obj_value(EP, mysetup)
+            push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
+            println("Ran model for $case.")
+        catch Exception
+            println(Exception)
+            println("Failed to run model for $case")
+            push!(summary, "🔴 $(case_name)")
+        end
     end
 else 
     println(" ------ ------ ------")
     println("Gurobi is not installed. Skipping those cases")
 end
+
+# In the summary array, split each on "|" and find the longest first element
+# Then, right-pad all the first elements to that length with spaces
+# Then recombine with the later elements and print
+max_length = maximum([length(split(s,"|")[1]) for s in summary])
+summary = [split(s,"|") for s in summary]
+summary = [length(s) > 1 ? "$(s[1])$(repeat(" ", max_length - length(s[1]))) | $(s[2])" : "$(s[1])" for s in summary]
+println(" ------ ------ ------")
+println("Summary of which cases were run successfully:")
+for s in summary
+    println(s)
+end
+println(" ------ ------ ------")

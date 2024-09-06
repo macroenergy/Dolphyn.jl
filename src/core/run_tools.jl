@@ -112,8 +112,16 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
     TDR_filepaths = joinpath.(TDR_path, TDR_files)
 
     if mysetup["TimeDomainReduction"] == 1
+        if mysetup["Force_TDR_recluster"] == 1
+            # Delete the TDR folder to force a recluster
+            # This seems more robust than using an OR statement below and calling cluster_inputs
+            println(" -- Deleting TDR folder to force recluster")
+            if isdir(TDR_path)
+                rm(TDR_path; recursive=true)
+            end
+        end
         # If any of the TDR files are missing, cluster the data
-        if any(!isfile, TDR_filepaths) || mysetup["Force_TDR_recluster"] == 1
+        if any(!isfile, TDR_filepaths)
             print_and_log("Clustering Time Series Data...")
             cluster_inputs(inputs_path, settings_path, mysetup)
         else
@@ -192,3 +200,20 @@ function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.
     return EP, myinputs, mysetup, adjusted_outpath
 end
 
+function get_case_name(case::AbstractString, root_dirname::AbstractString="Example_Systems")
+    split_case = splitpath(case)
+    # If one of the entries is "Example_Systems", then use the last two entries
+    if root_dirname in split_case
+        start = findfirst(x -> x == root_dirname, split_case)
+        case_name = joinpath(split_case[start+1:end]...)
+    else
+        case_name = split_case[end]
+    end
+    return case_name
+end
+
+function obj_value(EP::Model, mysetup::Dict{String, Any})
+    scale_factor = mysetup["ParameterScale"] == 1 ? ModelScalingFactor : 1 
+    obj_value = value(EP[:eObj]) * scale_factor
+    return obj_value
+end

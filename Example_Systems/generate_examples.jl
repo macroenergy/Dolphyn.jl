@@ -22,6 +22,8 @@ gurobi_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "ThreeZones_Gurobi"),
 ]
 
+summary = []
+
 if use_TDR
     println("Time Domain Reduction is enabled")
     force_TDR_on = true
@@ -37,28 +39,46 @@ if force_TDR_recluster
 end
 
 for case in highs_cases
-    split_case = splitpath(case)
-    case_name = string(split_case[end-1], split_case[end])
+    case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
     println("Generating model for $case_name ...")
-    generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-    println("Generated model for $case_name.")
+    try
+        generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+        push!(summary, "🟢 $(case_name)")
+        println("Generated model for $case.")
+    catch Exception
+        println("Failed to generate model for $case")
+        push!(summary, "🔴 $(case_name)")
+    end
+    
 end
 
 if gurobi_installed
     using Gurobi
     
     for case in gurobi_cases
-        split_case = splitpath(case)
-        case_name = string(split_case[end-1], split_case[end])
+        case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
         println(" ------ ------ ------")
         println("Generating model for $case_name ...")
-        generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-        println("Generated model for $case.")
+        try
+            generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+            push!(summary, "🟢 $(case_name)")
+            println("Generated model for $case.")
+        catch Exception
+            println("Failed to generate model for $case")
+            push!(summary, "🔴 $(case_name)")
+        end
     end
 else 
     println(" ------ ------ ------")
     println("Gurobi is not installed. Skipping those cases")
 end
+
+println(" ------ ------ ------")
+println("Summary of which cases were generated successfully:")
+for s in summary
+    println(s)
+end
+println(" ------ ------ ------")
