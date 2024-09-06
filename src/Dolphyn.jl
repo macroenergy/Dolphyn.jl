@@ -68,8 +68,6 @@ using HiGHS
 # To translate $/MWh to $M/GWh, multiply by ModelScalingFactor
 const ModelScalingFactor = 1e+3
 
-const H2_LHV = 33.33 / 38.39 # Lower heating value of hydrogen, as a fraction of the higher heating value
-
 # Logging flag
 Log = true
 
