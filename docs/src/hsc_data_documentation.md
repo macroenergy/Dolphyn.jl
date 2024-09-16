@@ -310,15 +310,15 @@ This file contains cost and performance parameters for various hydrogen to power
 |TruckCap\_MWh\_per\_unit | Size of a single truck unit. | MWh / unit |
 |**Existing technology capacity**| | |
 |Existing\_Number |The existing capacity of a type of hydrogen truck. |Trucks |
-|Existing\_Energy\_Cap\_MW\_z* | The existing capacity of truck loading station compression. |MWh / hour |
+|Existing\_ChargePower\_MW\_z* | The existing capacity of truck loading station compression. |MWh / hour |
 |**Capacity/Energy requirements**| | |
-|Max\_Energy\_Cap\_MW | -1 (default) – no limit on maximum compression capacity of the resource. If non-negative, represents maximum allowed compression capacity of the resource. |MWh / hour |
-|Min\_Energy\_Cap\_MW | 0 (default) – minimum compression capacity of the resource. If non-negative, represents minimum allowed compression capacity of the resource. |MWh / hour |
+|Max\_ChargePower\_MW | -1 (default) – no limit on maximum compression capacity of the resource. If non-negative, represents maximum allowed compression capacity of the resource. |MWh / hour |
+|Min\_ChargePower\_MW | 0 (default) – minimum compression capacity of the resource. If non-negative, represents minimum allowed compression capacity of the resource. |MWh / hour |
 |H2TruckCompressionEnergy | Compression energy requirements for hydrogen. |MWh-elec / MWh-H2 |
 |**Cost parameters**| | |
 |Inv\_Cost\_p\_unit\_p\_yr | Annualized capacity investment cost of a type of truck. |\$ / truck / year |
-|Inv\_Cost\_Energy\_p\_MW\_yr | Annualized capacity investment cost of compression stations for trucks. |\$ / (MWh / hour) / year |
-|Fixed\_OM\_Cost\_Energy\_p\_MW\_yr | Fixed operations and maintenance cost of compression stations for trucks. |\$ / (MWh / hour) / year |
+|Inv\_Cost\_ChargePower\_p\_M\\_yr | Annualized capacity investment cost of compression stations for trucks. |\$ / (MWh / hour) / year |
+|Fixed\_OM\_Cost\_ChargePower\_p\_MW\_yr | Fixed operations and maintenance cost of compression stations for trucks. |\$ / (MWh / hour) / year |
 |H2TruckCompressionUnitOpex | Variable cost for compression station |MWh-elec / MWh-H2 |
 |H2TruckUnitOpex\_per\_mile\_full | Variable cost for full truck operation. |\$ / truck / mile |
 |H2TruckUnitOpex\_per\_mile\_empty | Variable cost for empty truck operation. |\$ / truck / mile |

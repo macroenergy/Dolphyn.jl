@@ -171,7 +171,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	#  ParameterScale = 1 --> objective function is in million $ . In power system case we only scale by 1000 because variables are also scaled. But here we dont scale variables.
 	#  ParameterScale = 0 --> objective function is in $
 	if setup["ParameterScale"]==1
-		@expression(EP, eCFixH2TruckNumberPower[z = 1:Z, j in H2_TRUCK_TYPES],
+		@expression(EP, eCFixH2TruckChargePower[z = 1:Z, j in H2_TRUCK_TYPES],
 		if j in NEW_CAP_TRUCK # Resources eligible for new capacity
 			1/ModelScalingFactor^2*(dfH2Truck[!,:Inv_Cost_ChargePower_p_MW_yr][j]*vH2TruckChargePower[z, j] + dfH2Truck[!,:Fixed_OM_Cost_ChargePower_p_MW_yr][j]*eTotalH2TruckChargePower[z, j])
 		else
@@ -189,10 +189,10 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 	end
 
     # Sum individual zone and individual resource contributions to fixed costs to get total fixed costs
-    @expression(EP, eTotalCFixH2TruckNumberPower, sum(EP[:eCFixH2TruckNumberPower][z, j] for z = 1:Z, j in H2_TRUCK_TYPES))
+    @expression(EP, eTotalCFixH2TruckChargePower, sum(EP[:eCFixH2TruckChargePower][z, j] for z = 1:Z, j in H2_TRUCK_TYPES))
 
     # Add term to objective function expression
-    EP[:eObj] += eTotalCFixH2TruckNumberPower
+    EP[:eObj] += eTotalCFixH2TruckChargePower
 
 
 	### Constratints ###
