@@ -58,7 +58,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	end
 
     if setup["ModelH2Trucks"] == 1
-		cH2Fix_Truck = value.(EP[:eTotalCFixH2TruckNumberPower]) + value.(EP[:eTotalCFixH2TruckNumber])
+		cH2Fix_Truck = value.(EP[:eTotalCFixH2TruckChargePower]) + value.(EP[:eTotalCFixH2TruckNumber])
 		cTruckVar = value.(EP[:OPEX_Truck]) + value.(EP[:OPEX_Truck_Compression])
 	else
 		cH2Fix_Truck = 0
