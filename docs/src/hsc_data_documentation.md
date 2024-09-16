@@ -458,14 +458,14 @@ This file reports truck capacity and related compression capacity. The columns a
 | NewTruck | Newly invested truck capacity of each truck type; this is a decision variable |MWh|
 | RetTruck | Retired truck capacity of each truck type; this is a decision variable |MWh |
 | EndTruck | Total truck capacity of each truck type |MWh |
-|StartTruckEnergyZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |MWh / hour |
-|NewTruckEnergyZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|MWh / hour|
-|RetTruckEnergyZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable |MWh / hour |
-|EndTruckEnergyZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index} |MWh / hour |
-|StartTruckEnergy| Total initial truck compression capacity of each truck type; this is an input |MWh / hour |
-|NewTruckEnergy| Total newly invested truck compression capacity of each truck type; this is a decision variable |MWh / hour |
-|RetTruckEnergy| Total retired truck compression capacity of each truck type; this is a decision variable |MWh / hour |
-|EndTruckEnergy| Total truck compression capacity of each truck type |MWh / hour |
+|StartTruckChargePowerZone{zone index}| Initial truck compression capacity of each truck type in zone {zone index}; this is an input |MWh / hour |
+|NewTruckChargePowerZone{zone index}| Newly invested truck compression capacity of each truck type in zone {zone index}; this is a decision variable|MWh / hour|
+|RetTruckChargePowerZone{zone index}| Retired truck compression capacity of each truck type in zone {zone index}; this is a decision variable |MWh / hour |
+|EndTruckChargePowerZone{zone index}| Total truck compreession capacity of each truck type in zone {zone index} |MWh / hour |
+|StartTruckChargePower| Total initial truck compression capacity of each truck type; this is an input |MWh / hour |
+|NewTruckChargePower| Total newly invested truck compression capacity of each truck type; this is a decision variable |MWh / hour |
+|RetTruckChargePower| Total retired truck compression capacity of each truck type; this is a decision variable |MWh / hour |
+|EndTruckChargePower| Total truck compression capacity of each truck type |MWh / hour |
 
 ##### 3.2.7.2 H2TruckTransit Folder
 
