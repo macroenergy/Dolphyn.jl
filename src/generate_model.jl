@@ -388,6 +388,9 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		
 	end
 
+    if setup["ModelBIO"] == 1
+        @warn "Biomass model is currently under development -- Please check your results carefully"
+    end
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
