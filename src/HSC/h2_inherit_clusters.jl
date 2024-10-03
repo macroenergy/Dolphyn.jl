@@ -30,7 +30,7 @@ function h2_inherit_clusters(path, setup)
     HSC_load_data[!,:Time_Index] = 1:length(rep_timesteps);
     HSC_load_data[1,:Voll] = HSC_load_data_all[1,:Voll];
     HSC_load_data[1,:Demand_Segment] = HSC_load_data_all[1,:Demand_Segment];
-    HSC_load_data[1,:Cost_of_Demand_Curtailment_per_Tonne] = HSC_load_data_all[1,:Cost_of_Demand_Curtailment_per_Tonne];
+    HSC_load_data[1,:Segment_Cost_of_Demand_Curtailment_Fraction] = HSC_load_data_all[1,:Segment_Cost_of_Demand_Curtailment_Fraction];
     HSC_load_data[1,:Max_Demand_Curtailment] = HSC_load_data_all[1,:Max_Demand_Curtailment];
 
     HSC_load_data[!,:Rep_Periods] = df_load[!,:Rep_Periods];

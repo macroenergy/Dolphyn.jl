@@ -135,7 +135,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
 
     ### Variables ###
 
-    # Truck flow volume [tonne] through type 'j' at time 't' on zone 'z'
+    # Truck flow volume [MWh] through type 'j' at time 't' on zone 'z'
     @variable(EP, vH2TruckFlow[z = 1:Z, j in H2_TRUCK_TYPES, t = 1:T])
 
     # Number of available full truck type 'j' in transit at time 't' on zone 'z'
@@ -235,13 +235,13 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         if setup["ParameterScale"] == 1 # If ParameterScale = 1, power system operation/capacity modeled in GWh rather than MWh
             sum(
                 vH2Ncharged[z, j, t] *
-                dfH2Truck[!, :TruckCap_tonne_per_unit][j] *
+                dfH2Truck[!, :TruckCap_MWh_per_unit][j] *
                 dfH2Truck[!, :H2TruckCompressionEnergy][j] for j in H2_TRUCK_TYPES
             ) / ModelScalingFactor
         else
             sum(
                 vH2Ncharged[z, j, t] *
-                dfH2Truck[!, :TruckCap_tonne_per_unit][j] *
+                dfH2Truck[!, :TruckCap_MWh_per_unit][j] *
                 dfH2Truck[!, :H2TruckCompressionEnergy][j] for j in H2_TRUCK_TYPES
             )
         end
@@ -298,7 +298,7 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         eH2TruckTravelConsumption[t = 1:T, z = 1:Z],
         sum(
             (vH2Narrive_full[zz, z, j, t] + vH2Narrive_empty[zz, z, j, t]) *
-            dfH2Truck[!, :H2_tonne_per_mile][j] *
+            dfH2Truck[!, :H2_MWh_per_mile][j] *
             inputs["RouteLength"][zz, z] for
             zz = 1:Z, j in H2_TRUCK_TYPES if zz != z
         )
@@ -561,8 +561,8 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
     @constraint(
         EP,
         [z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
-        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_tonne_per_unit][j] <=
-        EP[:eTotalH2TruckEnergy][z, j]
+        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_MWh_per_unit][j] <=
+        EP[:eTotalH2TruckChargePower][z, j]
     )
 
     # H2 truck flow balance
@@ -571,9 +571,9 @@ function h2_truck_all(EP::Model, inputs::Dict, setup::Dict)
         cH2TruckFlow[z in 1:Z, j in H2_TRUCK_TYPES, t in 1:T],
         vH2TruckFlow[z, j, t] ==
         vH2Ndischarged[z, j, t] *
-        dfH2Truck[!, :TruckCap_tonne_per_unit][j] *
+        dfH2Truck[!, :TruckCap_MWh_per_unit][j] *
         (1 - dfH2Truck[!, :H2TLoss_per_mile][j]) -
-        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_tonne_per_unit][j]
+        vH2Ncharged[z, j, t] * dfH2Truck[!, :TruckCap_MWh_per_unit][j]
     )
 
     ### End Constraints ###

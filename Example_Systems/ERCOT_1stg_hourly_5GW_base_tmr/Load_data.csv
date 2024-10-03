@@ -1,4 +1,4 @@
-,Unnamed: 0.1.1.1.1.1,Voll,Demand_Segment,Cost_of_Demand_Curtailment_per_MW,Max_Demand_Curtailment,Rep_Periods,Timesteps_per_Rep_Period,Sub_Weights,Time_Index,Load_MW_z1
+Column1,Unnamed: 0.1.1.1.1.1,Voll,Demand_Segment,Cost_of_Demand_Curtailment_per_MW,Max_Demand_Curtailment,Rep_Periods,Timesteps_per_Rep_Period,Sub_Weights,Time_Index,Load_MW_z1
 0,0,50000.0,1.0,1.0,1.0,1.0,8760.0,1.0,1,37573
 1,1,,,,,,,,2,37753
 2,2,,,,,,,,3,37795

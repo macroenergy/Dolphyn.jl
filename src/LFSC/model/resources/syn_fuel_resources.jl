@@ -54,14 +54,14 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	####Variables####
 	#Define variables needed across both commit and no commit sets
     
-    #Amount of Syn Fuel Produced in MMBTU
+    #Amount of Syn Fuel Produced, in MMBTU
 	@variable(EP, vSFProd_Diesel[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
 	@variable(EP, vSFProd_Jetfuel[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
 	@variable(EP, vSFProd_Gasoline[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
 
-    #Hydrogen Required by SynFuel Resource
+    #Hydrogen Required by SynFuel Resource, in MWh
     @variable(EP, vSFH2in[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
-    #Power Required by SynFuel Resource
+    #Power Required by SynFuel Resource, in MWh
     @variable(EP, vSFPin[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
 
 	###Expressions###
@@ -118,9 +118,9 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Gasoline][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
-		#Hydrogen Consumption (change tonne H2/tonne CO2 to tonne H2/ktonne CO2 since H2 is not scaled in HSC)
+		#Hydrogen Consumption (change MWh H2 / tonne CO2 to MWh H2/ktonne CO2 since H2 is not scaled in HSC)
 		@constraints(EP, begin
-		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k] * ModelScalingFactor
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_h2_p_tonne_co2][k] * ModelScalingFactor
 		end)
 
 		# By-product produced constraint (change mmbtu/tonne CO2 to mmbtu/ktonne CO2)
@@ -144,9 +144,9 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 			[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFProd_Gasoline][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][k]
 		end)
 
-		#Hydrogen Consumption
+		#Hydrogen Consumption, in MWh
 		@constraints(EP, begin
-		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:tonnes_h2_p_tonne_co2][k]
+		[k in 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFH2in][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_h2_p_tonne_co2][k]
 		end)
 
 		# By-product produced constraint

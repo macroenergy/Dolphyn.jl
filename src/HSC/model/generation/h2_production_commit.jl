@@ -259,14 +259,14 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     ###Constraints###
     @constraints(EP, begin
         #Power Balance
-        [k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G_MWh_p_tonne][k]
+        [k in H2_GEN_COMMIT, t = 1:T], EP[:vP2G][k,t] == EP[:vH2Gen][k,t] * dfH2Gen[!,:etaP2G][k]
     end)
 
     ### Capacitated limits on unit commitment decision variables (Constraints #1-3)
     @constraints(EP, begin
-        [k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenCOMMIT][k,t] <= EP[:eH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size_tonne_p_hr][k]
-        [k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenStart][k,t] <= EP[:eH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size_tonne_p_hr][k]
-        [k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenShut][k,t] <= EP[:eH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size_tonne_p_hr][k]
+        [k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenCOMMIT][k,t] <= EP[:eH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size_MW][k]
+        [k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenStart][k,t] <= EP[:eH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size_MW][k]
+        [k in H2_GEN_COMMIT, t=1:T], EP[:vH2GenShut][k,t] <= EP[:eH2GenTotalCap][k]/dfH2Gen[!,:Cap_Size_MW][k]
     end)
 
     # Commitment state constraint linking startup and shutdown decisions (Constraint #4)
@@ -284,34 +284,34 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
     # Links last time step with first time step, ensuring position in hour 1 is within eligible ramp of final hour position
     # rampup constraints
     @constraint(EP,[k in H2_GEN_COMMIT, t in START_SUBPERIODS],
-    EP[:vH2Gen][k,t]-EP[:vH2Gen][k,(t+hours_per_subperiod-1)] <= dfH2Gen[!,:Ramp_Up_Percentage][k] * dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
-    + min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenStart][k,t]
-    - dfH2Gen[!,:H2Gen_min_output][k] * dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenShut][k,t])
+    EP[:vH2Gen][k,t]-EP[:vH2Gen][k,(t+hours_per_subperiod-1)] <= dfH2Gen[!,:Ramp_Up_Percentage][k] * dfH2Gen[!,:Cap_Size_MW][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+    + min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenStart][k,t]
+    - dfH2Gen[!,:H2Gen_min_output][k] * dfH2Gen[!,:Cap_Size_MW][k] * EP[:vH2GenShut][k,t])
 
     # rampdown constraints
     @constraint(EP,[k in H2_GEN_COMMIT, t in START_SUBPERIODS],
-    EP[:vH2Gen][k,(t+hours_per_subperiod-1)]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
-    - dfH2Gen[!,:H2Gen_min_output][k]*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenStart][k,t]
-    + min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenShut][k,t])
+    EP[:vH2Gen][k,(t+hours_per_subperiod-1)]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size_MW][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+    - dfH2Gen[!,:H2Gen_min_output][k]*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenStart][k,t]
+    + min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenShut][k,t])
 
     ## For Interior Hours
     # rampup constraints
     @constraint(EP,[k in H2_GEN_COMMIT, t in INTERIOR_SUBPERIODS],
-        EP[:vH2Gen][k,t]-EP[:vH2Gen][k,t-1] <= dfH2Gen[!,:Ramp_Up_Percentage][k]*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
-            + min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenStart][k,t]
-            -dfH2Gen[!,:H2Gen_min_output][k]*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenShut][k,t])
+        EP[:vH2Gen][k,t]-EP[:vH2Gen][k,t-1] <= dfH2Gen[!,:Ramp_Up_Percentage][k]*dfH2Gen[!,:Cap_Size_MW][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+            + min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Up_Percentage][k]))*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenStart][k,t]
+            -dfH2Gen[!,:H2Gen_min_output][k]*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenShut][k,t])
 
     # rampdown constraints
     @constraint(EP,[k in H2_GEN_COMMIT, t in INTERIOR_SUBPERIODS],
-    EP[:vH2Gen][k,t-1]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
-    -dfH2Gen[!,:H2Gen_min_output][k]*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenStart][k,t]
-    +min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size_tonne_p_hr][k]*EP[:vH2GenShut][k,t])
+    EP[:vH2Gen][k,t-1]-EP[:vH2Gen][k,t] <= dfH2Gen[!,:Ramp_Down_Percentage][k]*dfH2Gen[!,:Cap_Size_MW][k]*(EP[:vH2GenCOMMIT][k,t]-EP[:vH2GenStart][k,t])
+    -dfH2Gen[!,:H2Gen_min_output][k]*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenStart][k,t]
+    +min(inputs["pH2_Max"][k,t],max(dfH2Gen[!,:H2Gen_min_output][k],dfH2Gen[!,:Ramp_Down_Percentage][k]))*dfH2Gen[!,:Cap_Size_MW][k]*EP[:vH2GenShut][k,t])
 
     @constraints(EP, begin
     # Minimum stable generated per technology "k" at hour "t" > = Min stable output level
-    [k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= dfH2Gen[!,:Cap_Size_tonne_p_hr][k] *dfH2Gen[!,:H2Gen_min_output][k]* EP[:vH2GenCOMMIT][k,t]
+    [k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] >= dfH2Gen[!,:Cap_Size_MW][k] *dfH2Gen[!,:H2Gen_min_output][k]* EP[:vH2GenCOMMIT][k,t]
     # Maximum power generated per technology "k" at hour "t" < Max power
-    [k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenCOMMIT][k,t] * inputs["pH2_Max"][k,t]
+    [k in H2_GEN_COMMIT, t=1:T], EP[:vH2Gen][k,t] <= dfH2Gen[!,:Cap_Size_MW][k] * EP[:vH2GenCOMMIT][k,t] * inputs["pH2_Max"][k,t]
     end)
 
 
@@ -349,15 +349,15 @@ function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
         # TODO: Replace LHS of constraints in this block with eNumPlantsOffline[y,t]
         @constraints(EP, begin
             # cDownTimeInterior: Constraint looks back over last n hours, where n = inputs["pDMS_Time"][y]
-            [t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-dfH2Gen[!,:Down_Time][y]):t)
+            [t in setdiff(INTERIOR_SUBPERIODS,Down_Time_HOURS)], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_MW][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-dfH2Gen[!,:Down_Time][y]):t)
 
             # cDownTimeWrap: If n is greater than the number of subperiods left in the period, constraint wraps around to first hour of time series
-            # cDownTimeWrap constraint equivalant to: EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenShut][y,e] for e=(hours_per_subperiod_max-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
-            [t in Down_Time_HOURS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenShut][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
+            # cDownTimeWrap constraint equivalant to: EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_MW][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenShut][y,e] for e=(hours_per_subperiod_max-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):hours_per_subperiod_max)
+            [t in Down_Time_HOURS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_MW][y]-EP[:vH2GenCOMMIT][y,t] >= sum(EP[:vH2GenShut][y,e] for e=(t-((t%hours_per_subperiod)-1):t))+sum(EP[:vH2GenShut][y,e] for e=((t+hours_per_subperiod-(t%hours_per_subperiod))-(dfH2Gen[!,:Down_Time][y]-(t%hours_per_subperiod))):(t+hours_per_subperiod-(t%hours_per_subperiod)))
 
             # cDownTimeStart:
             # NOTE: Expression t+hours_per_subperiod-(t%hours_per_subperiod) is equivalant to "hours_per_subperiod_max"
-            [t in START_SUBPERIODS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_tonne_p_hr][y]-EP[:vH2GenCOMMIT][y,t]  >= EP[:vH2GenShut][y,t]+sum(EP[:vH2GenShut][y,e] for e=((t+hours_per_subperiod-1)-(dfH2Gen[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1))
+            [t in START_SUBPERIODS], EP[:eH2GenTotalCap][y]/dfH2Gen[!,:Cap_Size_MW][y]-EP[:vH2GenCOMMIT][y,t]  >= EP[:vH2GenShut][y,t]+sum(EP[:vH2GenShut][y,e] for e=((t+hours_per_subperiod-1)-(dfH2Gen[!,:Down_Time][y]-1)):(t+hours_per_subperiod-1))
         end)
     end
 

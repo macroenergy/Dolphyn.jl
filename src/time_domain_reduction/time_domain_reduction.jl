@@ -176,17 +176,17 @@ function parse_data(myinputs, mysetup)
 
         # Parsing HSC_load_data.csv
         h2_load_profiles = [ myinputs["H2_D"][:,l] for l in 1:size(myinputs["H2_D"],2) ]
-        h2_load_col_names = ["Load_H2_tonne_per_hr_z"*string(l) for l in 1:size(h2_load_profiles)[1]]
+        h2_load_col_names = ["Load_H2_MW_z"*string(l) for l in 1:size(h2_load_profiles)[1]]
         h2_load_zones = [l for l in 1:size(h2_load_profiles)[1]]
-        h2_col_to_zone_map = Dict("Load_H2_tonne_per_hr_z"*string(l) => l for l in 1:size(h2_load_profiles)[1])
+        h2_col_to_zone_map = Dict("Load_H2_MW_z"*string(l) => l for l in 1:size(h2_load_profiles)[1])
 
 
         if mysetup["ModelH2Liquid"] ==1
         # Parsing HSC_load_data_liquid.csv
             h2_load_liq_profiles = [ myinputs["H2_D_L"][:,l] for l in 1:size(myinputs["H2_D_L"],2) ]
-            h2_load_liq_col_names = ["Load_liqH2_tonne_per_hr_z"*string(l) for l in 1:size(h2_load_liq_profiles)[1]]
+            h2_load_liq_col_names = ["Load_liqH2_MW_z"*string(l) for l in 1:size(h2_load_liq_profiles)[1]]
             h2_load_liq_zones = [l for l in 1:size(h2_load_liq_profiles)[1]]
-            #h2_col_to_zone_liq_map = Dict("Load_H2_tonne_per_hr_z"*string(l) => l for l in 1:size(h2_load_liq_profiles)[1])
+            #h2_col_to_zone_liq_map = Dict("Load_H2_MW_z"*string(l) => l for l in 1:size(h2_load_liq_profiles)[1])
         end
 
         # CAPACITY FACTORS - HSC_Generators_variability.csv
@@ -888,8 +888,8 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     LoadColsNoConst = setdiff(LoadCols, ConstCol_Syms)
 
     if mysetup["ModelH2"] == 1
-        H2LoadCols = [Symbol("Load_H2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_col_names) ]
-        H2LoadLiqCols = [Symbol("Load_liqH2_tonne_per_hr_z"*string(i)) for i in 1:length(h2_load_liq_col_names) ]
+        H2LoadCols = [Symbol("Load_H2_MW_z"*string(i)) for i in 1:length(h2_load_col_names) ]
+        H2LoadLiqCols = [Symbol("Load_liqH2_MW_z"*string(i)) for i in 1:length(h2_load_liq_col_names) ]
         H2VarCols = [Symbol(h2_var_col_names[i]) for i in 1:length(h2_var_col_names) ]
         H2G2PVarCols = [Symbol(h2_g2p_var_col_names[i]) for i in 1:length(h2_g2p_var_col_names) ]
     end

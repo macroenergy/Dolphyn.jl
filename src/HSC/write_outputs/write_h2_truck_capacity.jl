@@ -52,28 +52,28 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
     )
 
     for z in 1:Z
-        dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] = dfH2Truck[!, Symbol("Existing_Energy_Cap_tonne_z$z")]
+        dfH2TruckCap[!, Symbol("StartTruckChargePowerZone$z")] = dfH2Truck[!, Symbol("Existing_ChargePower_Cap_MW_z$z")]
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
         truck_new_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["NEW_CAP_TRUCK"])
-        tempEnergy[truck_new_cap] = value.(EP[:vH2TruckEnergy][z,truck_new_cap]).data
-        dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")] = tempEnergy
+        tempEnergy[truck_new_cap] = value.(EP[:vH2TruckChargePower][z,truck_new_cap]).data
+        dfH2TruckCap[!,Symbol("NewTruckChargePowerZone$z")] = tempEnergy
 
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
         truck_ret_cap = intersect(inputs["H2_TRUCK_TYPES"], inputs["RET_CAP_TRUCK"])
-        tempEnergy[truck_ret_cap] = value.(EP[:vH2RetTruckEnergy][z,truck_ret_cap]).data
-        dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")] = tempEnergy
+        tempEnergy[truck_ret_cap] = value.(EP[:vH2RetTruckChargePower][z,truck_ret_cap]).data
+        dfH2TruckCap[!,Symbol("RetTruckChargePowerZone$z")] = tempEnergy
 
         tempEnergy = zeros(size(H2_TRUCK_TYPES))
         for j in H2_TRUCK_TYPES
-            tempEnergy[j] = value(EP[:eTotalH2TruckEnergy][z,j])
+            tempEnergy[j] = value(EP[:eTotalH2TruckChargePower][z,j])
         end
-        dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")] = tempEnergy
+        dfH2TruckCap[!,Symbol("EndTruckChargePowerZone$z")] = tempEnergy
     end
 
-    dfH2TruckCap[!,:StartTruckEnergy] = sum(dfH2TruckCap[!, Symbol("StartTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:NewTruckEnergy] = sum(dfH2TruckCap[!, Symbol("NewTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:RetTruckEnergy] = sum(dfH2TruckCap[!, Symbol("RetTruckEnergyZone$z")] for z in 1:Z)
-    dfH2TruckCap[!,:EndTruckEnergy] = sum(dfH2TruckCap[!, Symbol("EndTruckEnergyZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:StartTruckChargePower] = sum(dfH2TruckCap[!, Symbol("StartTruckChargePowerZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:NewTruckChargePower] = sum(dfH2TruckCap[!, Symbol("NewTruckChargePowerZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:RetTruckChargePower] = sum(dfH2TruckCap[!, Symbol("RetTruckChargePowerZone$z")] for z in 1:Z)
+    dfH2TruckCap[!,:EndTruckChargePower] = sum(dfH2TruckCap[!, Symbol("EndTruckChargePowerZone$z")] for z in 1:Z)
 
     dfH2TruckTotal = DataFrame(
         TruckType = "Total",
@@ -81,17 +81,17 @@ function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inpu
         NewTruck = sum(dfH2TruckCap[!,:NewTruck]),
         RetTruck = sum(dfH2TruckCap[!,:RetTruck]),
         EndTruck = sum(dfH2TruckCap[!,:EndTruck]),
-        StartTruckEnergy = sum(dfH2TruckCap[!,:StartTruckEnergy]),
-        NewTruckEnergy = sum(dfH2TruckCap[!,:NewTruckEnergy]),
-        RetTruckEnergy = sum(dfH2TruckCap[!,:RetTruckEnergy]),
-        EndTruckEnergy = sum(dfH2TruckCap[!,:EndTruckEnergy])
+        StartTruckChargePower = sum(dfH2TruckCap[!,:StartTruckChargePower]),
+        NewTruckChargePower = sum(dfH2TruckCap[!,:NewTruckChargePower]),
+        RetTruckChargePower = sum(dfH2TruckCap[!,:RetTruckChargePower]),
+        EndTruckChargePower = sum(dfH2TruckCap[!,:EndTruckChargePower])
     )
 
     for z in 1:Z
-        dfH2TruckTotal[!,Symbol("StartTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("NewTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("RetTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckEnergyZone$z")])]
-        dfH2TruckTotal[!,Symbol("EndTruckEnergyZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckEnergyZone$z")])]
+        dfH2TruckTotal[!,Symbol("StartTruckChargePowerZone$z")] = [sum(dfH2TruckCap[!,Symbol("StartTruckChargePowerZone$z")])]
+        dfH2TruckTotal[!,Symbol("NewTruckChargePowerZone$z")] = [sum(dfH2TruckCap[!,Symbol("NewTruckChargePowerZone$z")])]
+        dfH2TruckTotal[!,Symbol("RetTruckChargePowerZone$z")] = [sum(dfH2TruckCap[!,Symbol("RetTruckChargePowerZone$z")])]
+        dfH2TruckTotal[!,Symbol("EndTruckChargePowerZone$z")] = [sum(dfH2TruckCap[!,Symbol("EndTruckChargePowerZone$z")])]
     end
 
     dfH2TruckCap = vcat(dfH2TruckCap, dfH2TruckTotal)

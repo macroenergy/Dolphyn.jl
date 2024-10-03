@@ -33,7 +33,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
 
-    if setup["SystemCO2Constraint"] ==1 # Independent constraints for Power and HSC
+    if setup["SystemCO2Constraint"] == 1 # Independent constraints for Power and HSC
         if setup["CO2Cap"] != 0
             # CO2 constraint for power system imposed separately
             co2_cap!(EP, inputs, setup)
@@ -72,26 +72,21 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
 
         elseif setup["CO2Cap"] == 2
-            if setup["ParameterScale"] ==1
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) 
+            @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
+                sum(
+                    inputs["dfMaxCO2Rate"][z,cap] * sum(
+                        inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T
+                    ) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
                 )
-            else
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) )
-            end 
+                +
+                sum(
+                    inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] * EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
+                ) 
+            )
         elseif setup["CO2Cap"] == 3
-            if setup["ParameterScale"] ==1
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])))
-            else
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
-                )
-            end 
-     
+            @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+            )
         end
 
         if setup["ModelH2"] == 1

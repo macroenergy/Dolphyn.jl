@@ -95,7 +95,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
 	sum(dfGen[!,Symbol("H2_TMR_$TMR")][y]*EP[:vP][y,t] for y=dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID]) 
 	- sum(dfGen[!,Symbol("H2_TMR_$TMR")][s]*EP[:vCHARGE][s,t] for s in intersect(dfGen[findall(x->x>0,dfGen[!,Symbol("H2_TMR_$TMR")]),:R_ID], inputs["STOR_ALL"]))
-	-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
+	-sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
 	)
 
 	# Annual excess electricity supply from contracted electricity resources for H2 production

@@ -17,7 +17,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 @doc raw"""
 	green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)
 
-This function establishes constraints that can be flexibily applied to define alternative forms of policies that require generation of a quantity of tonne-h2 from green h2 in the entire system across the entire year
+This function establishes constraints that can be flexibily applied to define alternative forms of policies that require generation of a quantity of MWh-h2 from green h2 in the entire system across the entire year
 
 	"""
 function green_h2_share_requirement(EP::Model, inputs::Dict, setup::Dict)

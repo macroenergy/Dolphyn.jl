@@ -93,10 +93,10 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     H2_STOR_ALL = inputs["H2_STOR_ALL"]
     H = inputs["H2_RES_ALL"]
 
-    # Capacity of New H2 Gen units (tonnes/hr)
+    # Capacity of New H2 Gen units (MWh/hr)
     # For generation with unit commitment, this variable refers to the number of units, not capacity. 
     @variable(EP, vH2GenNewCap[k in H2_GEN_NEW_CAP] >= 0)
-    # Capacity of Retired H2 Gen units bui(tonnes/hr)
+    # Capacity of Retired H2 Gen units (MWh/hr)
     # For generation with unit commitment, this variable refers to the number of units, not capacity. 
     @variable(EP, vH2GenRetCap[k in H2_GEN_RET_CAP] >= 0)
 
@@ -108,30 +108,30 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
         eH2GenTotalCap[k in 1:H],
         if k in intersect(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for new capacity and retirements
             if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
+                dfH2Gen[!, :Existing_Cap_MW][k] +
+                dfH2Gen[!, :Cap_Size_MW][k] *
                 (EP[:vH2GenNewCap][k] - EP[:vH2GenRetCap][k])
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k] -
+                dfH2Gen[!, :Existing_Cap_MW][k] + EP[:vH2GenNewCap][k] -
                 EP[:vH2GenRetCap][k]
             end
         elseif k in setdiff(H2_GEN_NEW_CAP, H2_GEN_RET_CAP) # Resources eligible for only new capacity
             if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] +
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenNewCap][k]
+                dfH2Gen[!, :Existing_Cap_MW][k] +
+                dfH2Gen[!, :Cap_Size_MW][k] * EP[:vH2GenNewCap][k]
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] + EP[:vH2GenNewCap][k]
+                dfH2Gen[!, :Existing_Cap_MW][k] + EP[:vH2GenNewCap][k]
             end
         elseif k in setdiff(H2_GEN_RET_CAP, H2_GEN_NEW_CAP) # Resources eligible for only capacity retirements
             if k in H2_COMMIT
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] -
-                dfH2Gen[!, :Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k]
+                dfH2Gen[!, :Existing_Cap_MW][k] -
+                dfH2Gen[!, :Cap_Size_MW][k] * EP[:vH2GenRetCap][k]
             else
-                dfH2Gen[!, :Existing_Cap_tonne_p_hr][k] - EP[:vH2GenRetCap][k]
+                dfH2Gen[!, :Existing_Cap_MW][k] - EP[:vH2GenRetCap][k]
             end
         else
             # Resources not eligible for new capacity or retirements
-            dfH2Gen[!, :Existing_Cap_tonne_p_hr][k]
+            dfH2Gen[!, :Existing_Cap_MW][k]
         end
     )
 
@@ -149,19 +149,19 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
                 if k in H2_COMMIT
                     1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                        dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
+                        dfH2Gen[!, :Inv_Cost_p_MW_yr][k] *
+                        dfH2Gen[!, :Cap_Size_MW][k] *
                         EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                        dfH2Gen[!, :Fixed_OM_Cost_p_MW_yr][k] * eH2GenTotalCap[k]
                     )
                 else
                     1 / ModelScalingFactor^2 * (
-                        dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                        dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                        dfH2Gen[!, :Inv_Cost_p_MW_yr][k] * EP[:vH2GenNewCap][k] +
+                        dfH2Gen[!, :Fixed_OM_Cost_p_MW_yr][k] * eH2GenTotalCap[k]
                     )
                 end
             else
-                (dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]) /
+                (dfH2Gen[!, :Fixed_OM_Cost_p_MW_yr][k] * eH2GenTotalCap[k]) /
                 ModelScalingFactor^2
             end
         )
@@ -173,16 +173,16 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
             eH2GenCFix[k in 1:H],
             if k in H2_GEN_NEW_CAP # Resources eligible for new capacity
                 if k in H2_COMMIT
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] *
-                    dfH2Gen[!, :Cap_Size_tonne_p_hr][k] *
+                    dfH2Gen[!, :Inv_Cost_p_MW_yr][k] *
+                    dfH2Gen[!, :Cap_Size_MW][k] *
                     EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                    dfH2Gen[!, :Fixed_OM_Cost_p_MW_yr][k] * eH2GenTotalCap[k]
                 else
-                    dfH2Gen[!, :Inv_Cost_p_tonne_p_hr_yr][k] * EP[:vH2GenNewCap][k] +
-                    dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                    dfH2Gen[!, :Inv_Cost_p_MW_yr][k] * EP[:vH2GenNewCap][k] +
+                    dfH2Gen[!, :Fixed_OM_Cost_p_MW_yr][k] * eH2GenTotalCap[k]
                 end
             else
-                dfH2Gen[!, :Fixed_OM_Cost_p_tonne_p_hr_yr][k] * eH2GenTotalCap[k]
+                dfH2Gen[!, :Fixed_OM_Cost_p_MW_yr][k] * eH2GenTotalCap[k]
             end
         )
     end
@@ -191,9 +191,11 @@ function h2_investment(EP::Model, inputs::Dict, setup::Dict)
     @expression(EP, eTotalH2GenCFix, sum(EP[:eH2GenCFix][k] for k in H2_GEN))
 
     # Adding conditional for when liquefaction is considered
+    # FIXME - These costs aren't being printed anywhere. I've temporarily added them to eTotalH2GenCFix
     if setup["ModelH2Liquid"] ==1
         @expression(EP, eTotalH2LiqCFix, sum(EP[:eH2GenCFix][k] for k in union(H2_LIQ, H2_EVAP)))
-        EP[:eObj] += eTotalH2LiqCFix
+        eTotalH2GenCFix += eTotalH2LiqCFix
+        # EP[:eObj] += eTotalH2LiqCFix
     end
 
     # Add term to objective function expression
