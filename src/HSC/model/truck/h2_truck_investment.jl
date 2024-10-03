@@ -179,7 +179,7 @@ function h2_truck_investment(EP::Model, inputs::Dict, setup::Dict)
 		end
 		)
 	else
-		@expression(EP, eCFixH2TruckNumberPower[z = 1:Z, j in H2_TRUCK_TYPES],
+		@expression(EP, eCFixH2TruckChargePower[z = 1:Z, j in H2_TRUCK_TYPES],
 		if j in NEW_CAP_TRUCK # Resources eligible for new capacity
 			dfH2Truck[!,:Inv_Cost_ChargePower_p_MW_yr][j]*vH2TruckChargePower[z, j] + dfH2Truck[!,:Fixed_OM_Cost_ChargePower_p_MW_yr][j]*eTotalH2TruckChargePower[z, j]
 		else
