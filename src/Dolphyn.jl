@@ -39,6 +39,8 @@ export write_liquid_fuels_outputs
 export cluster_inputs
 export mga
 export h2_inherit_clusters
+export scale_constraints!
+export format_summary
 
 using JuMP # used for mathematical programming
 using DataFrames #This package allows put together data into a matrix
