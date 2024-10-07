@@ -51,7 +51,7 @@ for case in highs_cases
     try
         time_taken = @elapsed (EP, mysetup, myinputs) = generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster);
         if scale_models
-            action_count = scale_constraints!(EP; count_actions=true)
+            action_count = scale_constraints!(EP)
             println("Scaled $action_count constraints")
         end
         push!(summary, "🟢 $(case_name) | Time = $(round(time_taken,digits=2)) sec")
@@ -75,7 +75,7 @@ if gurobi_installed
         try
             time_taken = @elapsed (EP, mysetup, myinputs) = generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster);
             if scale_models
-                action_count = scale_constraints!(EP; count_actions=true)
+                action_count = scale_constraints!(EP)
                 println("Scaled $action_count constraints")
             end
             push!(summary, "🟢 $(case_name) | Time = $(round(time_taken,digits=2)) sec")
