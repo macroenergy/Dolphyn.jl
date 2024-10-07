@@ -45,10 +45,7 @@ function make_constraint(EP::Model, var_coeff_pairs::AbstractDict{VariableRef, F
     end
     new_con = @constraint(EP, expr in rhs; base_name=con_name)
     if rhs_multiplier != 1.0
-        # println("Old RHS: $(normalized_rhs(new_con))")
-        # println("Multiplying by $(rhs_multiplier)")
         set_normalized_rhs(new_con, normalized_rhs(new_con) * rhs_multiplier)
-        # println("New RHS: $(normalized_rhs(new_con))")
     end
     name, indices = parse_name(con_name)
     if indices === nothing
@@ -90,8 +87,6 @@ function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coe
     else
         rhs_multiplier = 1.0
     end
-
-    # rhs_multiplier = 1.0
 
     for (var, coeff) in var_coeff_pairs
         abs_coeff = abs(coeff) * rhs_multiplier
@@ -162,11 +157,6 @@ function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, F
         end
         set_normalized_rhs(con_ref, normalized_rhs(con_ref) / max_ratio)
         action_count += 1
-        # temp = abs.(append!(constraint_object(con_ref).func.terms.vals, normalized_rhs(con_ref)))
-        # temp = temp[temp .> 0] # Ignore constraints which equal zero
-        # if minimum(temp) < coeff_lb || maximum(temp) > coeff_ub+1
-        #     println("Large ratio had max of $(max_ratio * coeff_ub) and min of $(coeff_lb / min_ratio)\n -- min / max: $(min_ratio / max_ratio)\n -- Led to new lb: $(minimum(temp)) and ub: $(maximum(temp))")
-        # end
     # Else-if some coefficients are too small, and none too large
     # and multiplying by min_ratio will not make any coefficients greater than coeff_ub
     elseif min_ratio > 1 && max_ratio < 1 && max_ratio * min_ratio < 1
@@ -175,11 +165,6 @@ function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, F
         end
         set_normalized_rhs(con_ref, normalized_rhs(con_ref) * min_ratio)
         action_count += 1
-        # temp = abs.(append!(constraint_object(con_ref).func.terms.vals, normalized_rhs(con_ref)))
-        # temp = temp[temp .> 0] # Ignore constraints which equal zero
-        # if minimum(temp) < coeff_lb || maximum(temp) > coeff_ub+1
-        #     println("Small ratio led to new lb: $(minimum(temp)) and ub: $(maximum(temp))")
-        # end
     # Else we'll recreate the constraint with proxy variables to scale the coefficients one-by-one
     else
         scale_and_remake_constraint(con_ref, coeff_lb, coeff_ub, min_coeff, rhs_ub, Dict{VariableRef, VariableRef}())
