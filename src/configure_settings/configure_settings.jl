@@ -165,5 +165,15 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
         error("Only one of SpecifySynDieselPercentFlag, SpecifySynJetfuelPercentFlag, and SpecifySynGasolinePercentFlag can be on")
     end
 
+    ############################################################
+    ### Model scaling settings ###
+    scaling_settings = Dict{String, Any}()
+    for scaling_setting in [String(x) for x in fieldnames(ScalingSettings)]
+        if haskey(settings, scaling_setting)
+            scaling_settings[scaling_setting] = settings[scaling_setting]
+        end
+    end
+    settings["ScalingSettings"] = ScalingSettings(; scaling_settings...)
+
 return settings
 end
