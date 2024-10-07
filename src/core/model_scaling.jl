@@ -70,23 +70,32 @@ function replace_constraint!(con_ref::ConstraintRef, var_coeff_pairs=nothing, rh
     return nothing
 end
 
-function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coeff_ub::Real, min_coeff::Real, rhs_ub::Real, proxy_var_map::Dict{VariableRef, VariableRef})
+function calc_rhs_multiplier(con_ref::ConstraintRef, rhs_lb::Real, rhs_ub::Real, coeff_lb::Real, coeff_ub::Real)
+    rhs = normalized_rhs(con_ref)
+    abs_rhs = abs(rhs)
+
+    if rhs_lb < abs_rhs < rhs_ub
+        return 1.0
+    end
+
+    coeff_and_rhs = abs.(append!(constraint_object(con_ref).func.terms.vals, rhs))
+    coeff_and_rhs = coeff_and_rhs[coeff_and_rhs .> 0] # Ignore coefficients which equal zero
+    
+    if abs_rhs > rhs_ub
+        return maximum([1.0 / abs_rhs, coeff_lb / coeff_ub / minimum(coeff_and_rhs)])
+    end
+    if abs_rhs < rhs_lb
+        return minimum([1.0 / abs_rhs, coeff_ub / coeff_lb / maximum(coeff_and_rhs)])
+    end
+end
+
+function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coeff_ub::Real, min_coeff::Real, rhs_lb::Real, rhs_ub::Real, proxy_var_map::Dict{VariableRef, VariableRef})
     var_coeff_pairs = constraint_object(con_ref).func.terms
     new_var_coeff_pairs = OrderedDict{VariableRef, Float64}()
     
     # First we want to check if we need to scale the RHS constant
     # We'd like to do this without making it impossible to scale some coefficients with proxy variables
-    rhs = normalized_rhs(con_ref)
-    if abs(rhs) > rhs_ub
-        coefficients = abs.(append!(constraint_object(con_ref).func.terms.vals, rhs))
-        coefficients = coefficients[coefficients .> 0] # Ignore coefficients which equal zero
-
-        # We're only looking at large RHS, so we can just scale it down
-        # That means we want to avoid any coefficients becoming less than coeff_lb / coeff_ub
-        rhs_multiplier = maximum([1.0 / rhs, 1.0 / rhs_ub, coeff_lb / coeff_ub / minimum(coefficients)])
-    else
-        rhs_multiplier = 1.0
-    end
+    rhs_multiplier = calc_rhs_multiplier(con_ref, rhs_lb, rhs_ub, coeff_lb, coeff_ub)
 
     for (var, coeff) in var_coeff_pairs
         abs_coeff = abs(coeff) * rhs_multiplier
@@ -128,9 +137,10 @@ function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coe
     replace_constraint!(con_ref, new_var_coeff_pairs, rhs_multiplier)
 end
     
-function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, Float64}=(1e-3, 1e6), min_coeff::Float64=1e-9, rhs_ub::Float64=1e6)
+function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, Float64}=(1e-3, 1e6), min_coeff::Float64=1e-9, rhs_range::Tuple{Float64, Float64}=(1e-3, 1e6))
     action_count = 0
     coeff_lb, coeff_ub = coeff_range
+    rhs_lb, rhs_ub = rhs_range
     con_obj = constraint_object(con_ref)
     coefficients = abs.(append!(con_obj.func.terms.vals, normalized_rhs(con_ref)))
     coefficients = coefficients[coefficients .> 0] # Ignore coefficients which equal zero
@@ -167,7 +177,7 @@ function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, F
         action_count += 1
     # Else we'll recreate the constraint with proxy variables to scale the coefficients one-by-one
     else
-        scale_and_remake_constraint(con_ref, coeff_lb, coeff_ub, min_coeff, rhs_ub, Dict{VariableRef, VariableRef}())
+        scale_and_remake_constraint(con_ref, coeff_lb, coeff_ub, min_coeff, rhs_lb, rhs_ub, Dict{VariableRef, VariableRef}())
         action_count += 1
     end
     return action_count
