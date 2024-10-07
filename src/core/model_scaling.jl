@@ -73,14 +73,11 @@ end
 function calc_rhs_multiplier(con_ref::ConstraintRef, rhs_lb::Real, rhs_ub::Real, coeff_lb::Real, coeff_ub::Real)
     rhs = normalized_rhs(con_ref)
     abs_rhs = abs(rhs)
-
     if rhs_lb < abs_rhs < rhs_ub
         return 1.0
     end
-
     coeff_and_rhs = abs.(append!(constraint_object(con_ref).func.terms.vals, rhs))
     coeff_and_rhs = coeff_and_rhs[coeff_and_rhs .> 0] # Ignore coefficients which equal zero
-    
     if abs_rhs > rhs_ub
         return maximum([1.0 / abs_rhs, coeff_lb / coeff_ub / minimum(coeff_and_rhs)])
     end
@@ -89,7 +86,56 @@ function calc_rhs_multiplier(con_ref::ConstraintRef, rhs_lb::Real, rhs_ub::Real,
     end
 end
 
-function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coeff_ub::Real, min_coeff::Real, rhs_lb::Real, rhs_ub::Real, proxy_var_map::Dict{VariableRef, VariableRef})
+function make_proxy_var(var::VariableRef, multiplier::Real)
+    model = var.model
+    proxy_var = @variable(model)
+    if has_lower_bound(var)
+        set_lower_bound(proxy_var, lower_bound(var) * multiplier)
+    end
+    if has_upper_bound(var)
+        set_upper_bound(proxy_var, upper_bound(var) * multiplier)
+    end
+    @constraint(model, var == proxy_var * multiplier)
+    return proxy_var
+end
+
+function update_var_coeff_pair(var::VariableRef, coeff::Real, coeff_lb::Real, coeff_ub::Real, min_coeff::Real=1e-9, allow_recursion::Bool=true)
+    multiplier = calc_coeff_multiplier(abs(coeff), coeff_lb, coeff_ub)
+    new_coeff = coeff * multiplier
+    abs_new_coeff = abs(new_coeff)
+    if abs_new_coeff < min_coeff
+        return (var, 0.0)
+    end
+    # Tidy up near-unity coefficients, in case that allows a speedup
+    if new_coeff ≈ 1.0
+        new_coeff = 1.0
+        multiplier = new_coeff / coeff
+    elseif new_coeff ≈ -1.0
+        new_coeff = -1.0
+        multiplier = new_coeff / coeff
+    end
+    if coeff_lb <= abs_new_coeff <= coeff_ub
+        proxy_var = make_proxy_var(var, multiplier)
+        return (proxy_var, new_coeff)
+    end
+    if allow_recursion
+        return update_var_coeff_pair(var, new_coeff, coeff_lb, coeff_ub, min_coeff, false)
+    else
+        proxy_var = make_proxy_var(var, multiplier)
+        return (proxy_var, new_coeff)
+    end
+end
+
+function calc_coeff_multiplier(abs_coeff::Real, coeff_lb::Real, coeff_ub::Real)
+    if abs_coeff < coeff_lb
+        return minimum([coeff_ub, 1.0 / abs_coeff]) # We could shift the target value (i.e. 1.0 here)
+    end
+    if abs_coeff > coeff_ub
+        return maximum([coeff_lb, 1.0 / abs_coeff])
+    end
+end
+
+function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coeff_ub::Real, min_coeff::Real, rhs_lb::Real, rhs_ub::Real, proxy_var_map::Dict{VariableRef, VariableRef}, allow_recursion::Bool=true)
     var_coeff_pairs = constraint_object(con_ref).func.terms
     new_var_coeff_pairs = OrderedDict{VariableRef, Float64}()
     
@@ -98,46 +144,17 @@ function scale_and_remake_constraint(con_ref::ConstraintRef, coeff_lb::Real, coe
     rhs_multiplier = calc_rhs_multiplier(con_ref, rhs_lb, rhs_ub, coeff_lb, coeff_ub)
 
     for (var, coeff) in var_coeff_pairs
-        abs_coeff = abs(coeff) * rhs_multiplier
-        if coeff == 0.0 || (coeff_lb <= abs_coeff <= coeff_ub)
+        if coeff == 0.0 || (coeff_lb <= (abs(coeff) * rhs_multiplier) <= coeff_ub)
             new_var_coeff_pairs[var] = coeff * rhs_multiplier
             continue
-        elseif abs_coeff < coeff_lb
-            multiplier = minimum([coeff_ub, 1.0 / abs_coeff]) # We could shift the target value (i.e. 1.0 here)
-        elseif abs_coeff > coeff_ub
-            multiplier = maximum([coeff_lb, 1.0 / abs_coeff])
         end
-
-        new_coeff = coeff * rhs_multiplier * multiplier
-        if abs(new_coeff) < min_coeff
-            new_var_coeff_pairs[var] = 0.0
-        else
-            if new_coeff ≈ 1.0
-                new_coeff = 1.0
-                multiplier = new_coeff / coeff / rhs_multiplier
-            elseif new_coeff ≈ -1.0
-                new_coeff = -1.0
-                multiplier = new_coeff / coeff / rhs_multiplier
-            end
-            model = var.model
-            proxy_var = @variable(model)
-            if has_lower_bound(var)
-                set_lower_bound(proxy_var, lower_bound(var) * multiplier )
-            end
-            if has_upper_bound(var)
-                set_upper_bound(proxy_var, upper_bound(var) * multiplier)
-            end
-
-            # println("Changing $(coeff) to $(new_coeff), multiplier was $(multiplier)")
-
-            new_var_coeff_pairs[proxy_var] = new_coeff
-            @constraint(model, var == proxy_var * multiplier)
-        end
+        (updated_var, updated_coeff) = update_var_coeff_pair(var, coeff * rhs_multiplier, coeff_lb, coeff_ub, min_coeff, allow_recursion)
+        new_var_coeff_pairs[updated_var] = updated_coeff
     end
     replace_constraint!(con_ref, new_var_coeff_pairs, rhs_multiplier)
 end
     
-function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, Float64}=(1e-3, 1e6), min_coeff::Float64=1e-9, rhs_range::Tuple{Float64, Float64}=(1e-3, 1e6))
+function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, Float64}=(1e-3, 1e6), min_coeff::Float64=1e-9, rhs_range::Tuple{Float64, Float64}=(1e-3, 1e6), allow_recursion::Bool=true)
     action_count = 0
     coeff_lb, coeff_ub = coeff_range
     rhs_lb, rhs_ub = rhs_range
@@ -177,7 +194,7 @@ function scale_constraint!(con_ref::ConstraintRef, coeff_range::Tuple{Float64, F
         action_count += 1
     # Else we'll recreate the constraint with proxy variables to scale the coefficients one-by-one
     else
-        scale_and_remake_constraint(con_ref, coeff_lb, coeff_ub, min_coeff, rhs_lb, rhs_ub, Dict{VariableRef, VariableRef}())
+        scale_and_remake_constraint(con_ref, coeff_lb, coeff_ub, min_coeff, rhs_lb, rhs_ub, Dict{VariableRef, VariableRef}(), allow_recursion)
         action_count += 1
     end
     return action_count
