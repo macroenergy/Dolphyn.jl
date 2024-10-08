@@ -168,13 +168,7 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     ############################################################
     ### Model scaling settings ###
     set_default_if_absent!(settings, "AdvancedScaling", 1)
-    scaling_settings = Dict{String, Any}()
-    for scaling_setting in [String(x) for x in fieldnames(ScalingSettings)]
-        if haskey(settings, scaling_setting)
-            scaling_settings[scaling_setting] = settings[scaling_setting]
-        end
-    end
-    settings["ScalingSettings"] = ScalingSettings(; scaling_settings...)
+    settings["ScalingSettings"] = get_scaling_settings(settings)
 
 return settings
 end
