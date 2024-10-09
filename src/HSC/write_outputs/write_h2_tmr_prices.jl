@@ -33,8 +33,7 @@ function write_h2_tmr_prices(path::AbstractString, sep::AbstractString, inputs::
 
 	if (setup["TimeMatchingRequirement"] == 1 || setup["TimeMatchingRequirement"] == 2)
 
-			## Extract dual variables of constraints
-	# Electricity price: Dual variable of hourly power balance constraint = hourly price
+		## Extract dual variables of constraints
 		dfPrice = DataFrame(TMR = 1:nH2_TMR) # The unit is $/MWh
 
 	# Dividing dual variable for each hour with corresponding hourly price
