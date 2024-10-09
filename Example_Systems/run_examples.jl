@@ -7,6 +7,7 @@ force_highs = false
 gurobi_installed = Dolphyn.check_if_solver_installed("Gurobi")
 use_TDR = true
 force_TDR_recluster = true
+scale_model = true
 
 highs_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "OneZone"),
@@ -53,11 +54,12 @@ for case in highs_cases
     println(" ------ ------ ------")
     println("Generating and running model for $case_name ...")
     try
-        (EP,_,mysetup,_) = run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+        time_taken = @elapsed (EP,_,mysetup,_) = run_case(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster, scale_model=scale_model)
         obj_value = Dolphyn.obj_value(EP, mysetup)
-        push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
+        push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0)) | Time = $(round(time_taken,digits=2)) sec")
         println("Ran model for $case.")
-    catch Exception
+    catch err
+        println(err)
         println("Failed to run model for $case")
         push!(summary, "🔴 $(case_name)")
     end
@@ -72,12 +74,12 @@ if gurobi_installed
         println(" ------ ------ ------")
         println("Generating and running model for $case_name ...")
         try
-            (EP,_,mysetup,_) = run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
+            time_taken = @elapsed (EP,_,mysetup,_) = run_case(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster, scale_model=scale_model)
             obj_value = Dolphyn.obj_value(EP, mysetup)
-            push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0))")
+            push!(summary, "🟢 $(case_name) | Obj = $(round(obj_value,digits=0)) | Time = $(round(time_taken,digits=2)) sec")
             println("Ran model for $case.")
-        catch Exception
-            println(Exception)
+        catch err
+            println(err)
             println("Failed to run model for $case")
             push!(summary, "🔴 $(case_name)")
         end
@@ -87,12 +89,8 @@ else
     println("Gurobi is not installed. Skipping those cases")
 end
 
-# In the summary array, split each on "|" and find the longest first element
-# Then, right-pad all the first elements to that length with spaces
-# Then recombine with the later elements and print
-max_length = maximum([length(split(s,"|")[1]) for s in summary])
-summary = [split(s,"|") for s in summary]
-summary = [length(s) > 1 ? "$(s[1])$(repeat(" ", max_length - length(s[1]))) | $(s[2])" : "$(s[1])" for s in summary]
+summary = Dolphyn.format_summary(summary)
+
 println(" ------ ------ ------")
 println("Summary of which cases were run successfully:")
 for s in summary

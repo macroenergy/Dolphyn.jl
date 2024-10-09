@@ -185,18 +185,26 @@ function generate_model(local_dir::AbstractString=@__DIR__; optimizer::DataType=
     return generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
 end
 
-function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false, scale_model::Bool=false)
     EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
+    if scale_model
+        mysetup["AdvancedScaling"] = 1
+    else
+        mysetup["AdvancedScaling"] = 0
+    end
+    if mysetup["AdvancedScaling"] == 1
+        scale_constraints!(EP, mysetup["ScalingSettings"])
+    end
     EP, solve_time = solve_model(EP, mysetup)
     myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
     adjusted_outpath = write_all_outputs(EP, mysetup, myinputs, inputs_path)
     return EP, myinputs, mysetup, adjusted_outpath
 end
 
-function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
+function run_case(local_dir::AbstractString=@__DIR__; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false, scale_model::Bool=false)
     settings_path = joinpath(local_dir, "Settings")
     inputs_path = local_dir
-    EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
+    EP, myinputs, mysetup, adjusted_outpath = run_case(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster, scale_model=scale_model)
     return EP, myinputs, mysetup, adjusted_outpath
 end
 

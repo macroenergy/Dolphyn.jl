@@ -165,5 +165,10 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
         error("Only one of SpecifySynDieselPercentFlag, SpecifySynJetfuelPercentFlag, and SpecifySynGasolinePercentFlag can be on")
     end
 
+    ############################################################
+    ### Model scaling settings ###
+    set_default_if_absent!(settings, "AdvancedScaling", 1)
+    settings["ScalingSettings"] = get_scaling_settings(settings)
+
 return settings
 end

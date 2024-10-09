@@ -7,6 +7,7 @@ force_highs = false
 gurobi_installed = Dolphyn.check_if_solver_installed("Gurobi")
 use_TDR = true
 force_TDR_recluster = true
+scale_models = true
 
 highs_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "OneZone"),
@@ -38,16 +39,29 @@ if force_TDR_recluster
     println("Forcing TDR recluster")
 end
 
+if scale_models
+    println("Automatically scaling models to improve numerical stability")
+end
+
 for case in highs_cases
     case_name = Dolphyn.get_case_name(case, "Example_Systems")
 
     println(" ------ ------ ------")
     println("Generating model for $case_name ...")
     try
-        generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-        push!(summary, "🟢 $(case_name)")
+        time_taken = @elapsed (EP, mysetup, myinputs) = generate_model(case; force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster);
+        if scale_models
+            action_count = scale_constraints!(EP)
+            if isnothing(action_count)
+                println("Scaled $action_count constraints")
+            else
+                println("Scaled constraints")
+            end
+        end
+        push!(summary, "🟢 $(case_name) | Time = $(round(time_taken,digits=2)) sec")
         println("Generated model for $case.")
-    catch Exception
+    catch err
+        println(err)
         println("Failed to generate model for $case")
         push!(summary, "🔴 $(case_name)")
     end
@@ -63,10 +77,19 @@ if gurobi_installed
         println(" ------ ------ ------")
         println("Generating model for $case_name ...")
         try
-            generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster)
-            push!(summary, "🟢 $(case_name)")
+            time_taken = @elapsed (EP, mysetup, myinputs) = generate_model(case; optimizer=Gurobi.Optimizer, force_TDR_on=force_TDR_on, force_TDR_off=force_TDR_off, force_TDR_recluster=force_TDR_recluster);
+            if scale_models
+                action_count = scale_constraints!(EP)
+                if isnothing(action_count)
+                    println("Scaled $action_count constraints")
+                else
+                    println("Scaled constraints")
+                end
+            end
+            push!(summary, "🟢 $(case_name) | Time = $(round(time_taken,digits=2)) sec")
             println("Generated model for $case.")
-        catch Exception
+        catch err
+            println(err)
             println("Failed to generate model for $case")
             push!(summary, "🔴 $(case_name)")
         end
@@ -75,6 +98,8 @@ else
     println(" ------ ------ ------")
     println("Gurobi is not installed. Skipping those cases")
 end
+
+summary = format_summary(summary)
 
 println(" ------ ------ ------")
 println("Summary of which cases were generated successfully:")
