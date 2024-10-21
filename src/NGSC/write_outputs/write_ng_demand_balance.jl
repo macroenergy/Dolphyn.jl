@@ -30,8 +30,8 @@ function write_ng_demand_balance(path::AbstractString, sep::AbstractString, inpu
 	rowoffset=3
 
 	for z in 1:Z
-		dfTemp1_NG = Array{Any}(nothing, T+rowoffset, 8)
-		dfTemp1_NG[1,1:size(dfTemp1_NG,2)] = ["Syn_NG", "Bio_NG", "Conventional_NG", "NG_Pipeline", "NG_Demand", "Power", "H2", "CSC"]
+		dfTemp1_NG = Array{Any}(nothing, T+rowoffset, 9)
+		dfTemp1_NG[1,1:size(dfTemp1_NG,2)] = ["Syn_NG", "Bio_NG", "Conventional_NG", "NG_Pipeline", "NG_Demand", "Power", "H2", "CSC", "BESC"]
 		dfTemp1_NG[2,1:size(dfTemp1_NG,2)] = repeat([z],size(dfTemp1_NG,2))
 		for t in 1:T
 
@@ -43,7 +43,7 @@ function write_ng_demand_balance(path::AbstractString, sep::AbstractString, inpu
 			end
 
 			if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
-				dfTemp1_NG[t+rowoffset,2] = value.(EP[:eBio_NG_produced_MMBtu_per_time_per_zone][t,z])
+				dfTemp1_NG[t+rowoffset,2] = value.(EP[:eBioNG_produced_MMBtu_per_time_per_zone][t,z])
 			end
 
 			dfTemp1_NG[t+rowoffset,3] = value.(EP[:vConv_NG_Demand][t,z])
@@ -68,6 +68,10 @@ function write_ng_demand_balance(path::AbstractString, sep::AbstractString, inpu
 
 			if setup["ModelCSC"] == 1
 				dfTemp1_NG[t+rowoffset,8] = -value.(EP[:eCSCNetNGConsumptionByAll][t,z])
+			end
+
+			if setup["ModelBESC"] == 1
+				dfTemp1_NG[t+rowoffset,9] = -value.(EP[:eBESCNetNGConsumptionByAll][t,z])
 			end
 		end
 

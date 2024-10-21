@@ -40,7 +40,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 				dfTemp1_Diesel[t+rowoffset,1] = 0
 			end
 
-			if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 				dfTemp1_Diesel[t+rowoffset,2]= value.(EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z])
 			else
 				dfTemp1_Diesel[t+rowoffset,2]= 0
@@ -54,7 +54,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 			dfTemp1_Diesel[rowoffset,1] = 0 
 		end
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1_Diesel[rowoffset,2] = sum(inputs["omega"][t] * value.(EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]) for t in 1:T)
 		else
 			dfTemp1_Diesel[rowoffset,2] = 0
@@ -83,7 +83,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 		end
 
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1_Global_SB_Diesel[t+rowoffset,2] = sum(value.(EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]) for z = 1:Z)
 		else
 			dfTemp1_Global_SB_Diesel[t+rowoffset,2] = 0
@@ -97,7 +97,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 		dfTemp1_Global_SB_Diesel[rowoffset,1] = 0 
 	end
 
-	if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
+	if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 		dfTemp1_Global_SB_Diesel[rowoffset,2] = sum(sum(inputs["omega"][t] * value.(EP[:eBiodiesel_produced_MMBtu_per_time_per_zone][t,z]) for z in 1:Z) for t in 1:T)
 	else
 		dfTemp1_Global_SB_Diesel[rowoffset,2] = 0
@@ -170,7 +170,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 				dfTemp1_Jetfuel[t+rowoffset,1] = 0
 			end
 
-			if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 				dfTemp1_Jetfuel[t+rowoffset,2]= value.(EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z])
 			else
 				dfTemp1_Jetfuel[t+rowoffset,2]= 0
@@ -185,7 +185,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 			dfTemp1_Jetfuel[rowoffset,1] = 0 
 		end
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1_Jetfuel[rowoffset,2] = sum(inputs["omega"][t] * value.(EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z]) for t in 1:T)
 		else
 			dfTemp1_Jetfuel[rowoffset,2] = 0
@@ -214,7 +214,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 		end
 
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1_Global_SB_Jetfuel[t+rowoffset,2] = sum(value.(EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z]) for z = 1:Z)
 		else
 			dfTemp1_Global_SB_Jetfuel[t+rowoffset,2] = 0
@@ -228,7 +228,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 		dfTemp1_Global_SB_Jetfuel[rowoffset,1] = 0 
 	end
 
-	if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
+	if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 		dfTemp1_Global_SB_Jetfuel[rowoffset,2] = sum(sum(inputs["omega"][t] * value.(EP[:eBiojetfuel_produced_MMBtu_per_time_per_zone][t,z]) for z in 1:Z) for t in 1:T)
 	else
 		dfTemp1_Global_SB_Jetfuel[rowoffset,2] = 0
@@ -300,7 +300,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 				dfTemp1_Gasoline[t+rowoffset,1] = 0
 			end
 
-			if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 				dfTemp1_Gasoline[t+rowoffset,2]= value.(EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z])
 			else
 				dfTemp1_Gasoline[t+rowoffset,2]= 0
@@ -315,7 +315,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 			dfTemp1_Gasoline[rowoffset,1] = 0 
 		end
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1_Gasoline[rowoffset,2] = sum(inputs["omega"][t] * value.(EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]) for t in 1:T)
 		else
 			dfTemp1_Gasoline[rowoffset,2] = 0
@@ -344,7 +344,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 		end
 
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1_Global_SB_Gasoline[t+rowoffset,2] = sum(value.(EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]) for z = 1:Z)
 		else
 			dfTemp1_Global_SB_Gasoline[t+rowoffset,2] = 0
@@ -358,7 +358,7 @@ function write_liquid_fuel_demand_balance_global_conv_fuel(path::AbstractString,
 		dfTemp1_Global_SB_Gasoline[rowoffset,1] = 0 
 	end
 
-	if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
+	if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 		dfTemp1_Global_SB_Gasoline[rowoffset,2] = sum(sum(inputs["omega"][t] * value.(EP[:eBiogasoline_produced_MMBtu_per_time_per_zone][t,z]) for z in 1:Z) for t in 1:T)
 	else
 		dfTemp1_Global_SB_Gasoline[rowoffset,2] = 0

@@ -123,8 +123,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     if setup["ModelBESC"] == 1
         # Initialize Herb and Wood Biomass Supply Balance 
-        @expression(EP, eHerb_Biomass_Supply[t=1:T, z=1:Z], 0)
-        @expression(EP, eWood_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eEnergy_Crops_Herb_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eEnergy_Crops_Wood_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eAgri_Res_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eAgri_Process_Waste_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eForest_Biomass_Supply[t=1:T, z=1:Z], 0)
     end
 
     if setup["ModelNGSC"] == 1
@@ -427,24 +430,90 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
         println("Generating Bioenergy Supply Chain model")
 
+        if setup["ModelNGSC"] == 1
+            @expression(EP, eBESCNetNGConsumptionByAll[t=1:T,z=1:Z], 0)    
+        end
+
 		# Net Power consumption
 		@expression(EP, eBioNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
 		# Supply costs
-		EP = bio_herb_supply(EP, inputs, setup)
-		EP = bio_wood_supply(EP, inputs, setup)
+        if setup["Energy_Crops_Herb_Supply"] == 1
+		    EP = bio_herb_supply(EP, inputs, setup)
+        end
 
-		# Variable costs
-		EP = bioenergy_var_cost(EP, inputs, setup)
+        if setup["Energy_Crops_Wood_Supply"] == 1
+		    EP = bio_wood_supply(EP, inputs, setup)
+        end
 
-		# Fixed costs
-		EP = bioenergy_investment(EP, inputs, setup)
-	
-        # Bioenergy resources
-        EP = bioenergy(EP, inputs, setup)
+        if setup["Agri_Res_Supply"] == 1
+            EP = bio_agri_res_supply(EP, inputs, setup)
+        end
+        
+        if setup["Agri_Process_Waste_Supply"] == 1
+            EP = bio_agri_process_waste_supply(EP, inputs, setup)
+        end
 
-		# Direct emissions
-		EP = emissions_besc(EP, inputs,setup)
+        if setup["Agri_Forest_Supply"] == 1
+            EP = bio_forest_supply(EP, inputs, setup)
+        end
+
+
+        if setup["Bio_ELEC_On"] == 1
+            # Variable costs
+            EP = bio_electricity_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_electricity_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_electricity(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_electricity_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_H2_On"] == 1
+            # Variable costs
+            EP = bio_hydrogen_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_hydrogen_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_hydrogen(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_hydrogen_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_LF_On"] == 1
+            # Variable costs
+            EP = bio_liquid_fuels_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_liquid_fuels_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_liquid_fuels(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_liquid_fuels_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_NG_On"] == 1
+            # Variable costs
+            EP = bio_natural_gas_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_natural_gas_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_natural_gas(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_natural_gas_emissions(EP, inputs,setup)
+        end
 
         #EP[:eAdditionalDemandByZone] += EP[:eBioNetpowerConsumptionByAll]
     end
@@ -517,8 +586,11 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     if setup["ModelBESC"] == 1
 		###Biomass Balanace constraints
-		@constraint(EP, cHerbBiomassBalance[t=1:T, z=1:Z], EP[:eHerb_Biomass_Supply][t,z] == 0)
-        @constraint(EP, cWoodBiomassBalance[t=1:T, z=1:Z], EP[:eWood_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cHerbBiomassBalance[t=1:T, z=1:Z], EP[:eEnergy_Crops_Herb_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cWoodBiomassBalance[t=1:T, z=1:Z], EP[:eEnergy_Crops_Wood_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cAgriResBiomassBalance[t=1:T, z=1:Z], EP[:eAgri_Res_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cAgriProcessWasteBiomassBalance[t=1:T, z=1:Z], EP[:eAgri_Process_Waste_Biomass_Supply][t,z] == 0)
+        @constraint(EP, cForestBiomassBalance[t=1:T, z=1:Z], EP[:eForest_Biomass_Supply][t,z] == 0)
 	end
 
     #########################################################################################

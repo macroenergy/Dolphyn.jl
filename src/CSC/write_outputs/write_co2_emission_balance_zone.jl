@@ -28,8 +28,8 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 	dfCO2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 26)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions", "DAC Capture", "CO2 Pipeline Loss", "Biorefinery Emissions", "Bioresource Emissions",  "Biomass Capture", "Conventional Gasoline","Conventional Jetfuel","Conventional Diesel","Synfuel Production Emissions","Synfuel Byproducts Emissions","Syn Gasoline","Syn Jetfuel","Syn Diesel","Bio Gasoline","Bio Jetfuel","Bio Diesel", "Conventional NG", "Syn NG Production Emissions", "Syn NG", "Bio NG", "NG Reduction from Power CCS", "NG Reduction from H2 CCS", "NG Reduction from DAC CCS"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 32)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Power Emissions", "H2 Emissions", "DAC Emissions", "DAC Capture", "CO2 Pipeline Loss",  "Bio Elec Plant Emissions", "Biomass CO2 for Bio Elec", "Bio H2 Plant Emissions", "Biomass CO2 for Bio H2", "Bio LF Plant Emissions", "Biomass CO2 for Bio LF",  "Bio NG Plant Emissions",  "Biomass CO2 for Bio NG", "Bioresource Emissions", "Conventional Gasoline","Conventional Jetfuel","Conventional Diesel","Synfuel Production Emissions","Synfuel Byproducts Emissions","Syn Gasoline","Syn Jetfuel","Syn Diesel","Bio Gasoline","Bio Jetfuel","Bio Diesel", "Conventional NG", "Syn NG Production Emissions", "Syn NG", "Bio NG", "NG Reduction from Power CCS", "NG Reduction from H2 CCS", "NG Reduction from DAC CCS"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 			dfTemp1[t+rowoffset,1] = value(EP[:eEmissionsByZone][z,t])
@@ -53,80 +53,123 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 			dfTemp1[t+rowoffset,6] = 0
 			dfTemp1[t+rowoffset,7] = 0
 			dfTemp1[t+rowoffset,8] = 0
-
-			if setup["ModelBESC"] == 1
-				dfTemp1[t+rowoffset,6] = value(EP[:eBiorefinery_CO2_emissions_per_zone_per_time][z,t])
-				dfTemp1[t+rowoffset,7] = value(EP[:eHerb_biomass_emission_per_zone_per_time][z,t]) + value(EP[:eWood_biomass_emission_per_zone_per_time][z,t])
-				dfTemp1[t+rowoffset,8] = - value(EP[:eBiomass_CO2_captured_per_zone_per_time][z,t])
-			end
-
-
 			dfTemp1[t+rowoffset,9] = 0
 			dfTemp1[t+rowoffset,10] = 0
 			dfTemp1[t+rowoffset,11] = 0
 			dfTemp1[t+rowoffset,12] = 0
 			dfTemp1[t+rowoffset,13] = 0
 			dfTemp1[t+rowoffset,14] = 0
+
+			if setup["ModelBESC"] == 1
+
+				if setup["Bio_ELEC_On"] == 1
+					dfTemp1[t+rowoffset,6] = value(EP[:eBio_ELEC_CO2_emissions_per_zone_per_time][z,t])
+					dfTemp1[t+rowoffset,7] = - value(EP[:eBiomass_CO2_per_zone_per_time_ELEC][z,t])
+				end
+				
+				if setup["ModelH2"] == 1 && setup["Bio_H2_On"] == 1
+					dfTemp1[t+rowoffset,8] = value(EP[:eBio_H2_CO2_emissions_per_zone_per_time][z,t])
+					dfTemp1[t+rowoffset,9] = - value(EP[:eBiomass_CO2_per_zone_per_time_H2][z,t])
+				end
+
+				if setup["ModelLFSC"] == 1 && setup["Bio_LF_On"] == 1
+					dfTemp1[t+rowoffset,10] = value(EP[:eBio_LF_Plant_CO2_emissions_per_zone_per_time][z,t])
+					dfTemp1[t+rowoffset,11] = - value(EP[:eBiomass_CO2_per_zone_per_time_LF][z,t])
+				end
+
+				if setup["ModelNGSC"] == 1 && setup["Bio_NG_On"] == 1
+					dfTemp1[t+rowoffset,12] = value(EP[:eBio_NG_Plant_CO2_emissions_per_zone_per_time][z,t])
+					dfTemp1[t+rowoffset,13] = - value(EP[:eBiomass_CO2_per_zone_per_time_NG][z,t])
+				end
+
+				if setup["Energy_Crops_Herb_Supply"] == 1
+					dfTemp1[t+rowoffset,14] += value(EP[:eHerb_biomass_emission_per_zone_per_time][z,t])
+				end
+	
+				if setup["Energy_Crops_Wood_Supply"] == 1
+					dfTemp1[t+rowoffset,14] += value(EP[:eWood_biomass_emission_per_zone_per_time][z,t])
+				end
+	
+				if setup["Agri_Res_Supply"] == 1
+					dfTemp1[t+rowoffset,14] += value(EP[:eAgri_Res_biomass_emission_per_zone_per_time][z,t])
+				end
+	
+				if setup["Agri_Process_Waste_Supply"] == 1
+					dfTemp1[t+rowoffset,14] += value(EP[:eAgri_Process_Waste_biomass_emission_per_zone_per_time][z,t])
+				end
+	
+				if setup["Agri_Forest_Supply"] == 1
+					dfTemp1[t+rowoffset,14] += value(EP[:eForest_biomass_emission_per_zone_per_time][z,t])
+				end
+			end
+
+
 			dfTemp1[t+rowoffset,15] = 0
 			dfTemp1[t+rowoffset,16] = 0
 			dfTemp1[t+rowoffset,17] = 0
 			dfTemp1[t+rowoffset,18] = 0
 			dfTemp1[t+rowoffset,19] = 0
-
-			if setup["ModelLFSC"] == 1
-				if setup["Liquid_Fuels_Hourly_Demand"] == 1
-					dfTemp1[t+rowoffset,9] = value(EP[:eConv_Gasoline_CO2_Emissions][z,t])
-					dfTemp1[t+rowoffset,10] = value(EP[:eConv_Jetfuel_CO2_Emissions][z,t])
-					dfTemp1[t+rowoffset,11] = value(EP[:eConv_Diesel_CO2_Emissions][z,t])
-				else
-					dfTemp1[t+rowoffset,9] = "-"
-					dfTemp1[t+rowoffset,10] = "-"
-					dfTemp1[t+rowoffset,11] = "-"
-				end
-
-				if setup["ModelSyntheticFuels"] == 1
-					dfTemp1[t+rowoffset,12] = value(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,13] = value(EP[:eByProdConsCO2EmissionsByZone][z,t])
-					dfTemp1[t+rowoffset,14] = value(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,15] = value(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,16] = value(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t])
-				end
-
-				if setup["ModelBESC"] == 1
-					dfTemp1[t+rowoffset,17] = value(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,18] = value(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,19] = value(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t])
-				end
-			end
-
 			dfTemp1[t+rowoffset,20] = 0
 			dfTemp1[t+rowoffset,21] = 0
 			dfTemp1[t+rowoffset,22] = 0
 			dfTemp1[t+rowoffset,23] = 0
 			dfTemp1[t+rowoffset,24] = 0
 			dfTemp1[t+rowoffset,25] = 0
+
+			if setup["ModelLFSC"] == 1
+				if setup["Liquid_Fuels_Hourly_Demand"] == 1
+					dfTemp1[t+rowoffset,15] = value(EP[:eConv_Gasoline_CO2_Emissions][z,t])
+					dfTemp1[t+rowoffset,16] = value(EP[:eConv_Jetfuel_CO2_Emissions][z,t])
+					dfTemp1[t+rowoffset,17] = value(EP[:eConv_Diesel_CO2_Emissions][z,t])
+				else
+					dfTemp1[t+rowoffset,15] = "-"
+					dfTemp1[t+rowoffset,16] = "-"
+					dfTemp1[t+rowoffset,17] = "-"
+				end
+
+				if setup["ModelSyntheticFuels"] == 1
+					dfTemp1[t+rowoffset,18] = value(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,19] = value(EP[:eByProdConsCO2EmissionsByZone][z,t])
+					dfTemp1[t+rowoffset,20] = value(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,21] = value(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,22] = value(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t])
+				end
+
+				if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
+					dfTemp1[t+rowoffset,23] = value(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,24] = value(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,25] = value(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t])
+				end
+			end
+
 			dfTemp1[t+rowoffset,26] = 0
+			dfTemp1[t+rowoffset,27] = 0
+			dfTemp1[t+rowoffset,28] = 0
+			dfTemp1[t+rowoffset,29] = 0
+			dfTemp1[t+rowoffset,30] = 0
+			dfTemp1[t+rowoffset,31] = 0
+			dfTemp1[t+rowoffset,32] = 0
 
 			if setup["ModelNGSC"] == 1
-				dfTemp1[t+rowoffset,20] = value(EP[:eConv_NG_CO2_Emissions][z,t])
+				dfTemp1[t+rowoffset,26] = value(EP[:eConv_NG_CO2_Emissions][z,t])
 
 				if setup["ModelSyntheticNG"] == 1
-					dfTemp1[t+rowoffset,21] = value(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t])
-					dfTemp1[t+rowoffset,22] = value(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,27] = value(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,28] = value(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t])
 				end
 
 				if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
-					dfTemp1[t+rowoffset,23] = value(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t])
+					dfTemp1[t+rowoffset,29] = value(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t])
 				end
 
-				dfTemp1[t+rowoffset,24] = -value(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t])
+				dfTemp1[t+rowoffset,30] = -value(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t])
 
 				if setup["ModelH2"] == 1
-					dfTemp1[t+rowoffset,25] = -value(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t])
+					dfTemp1[t+rowoffset,31] = -value(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t])
 				end
 
 				if setup["ModelCSC"] == 1
-					dfTemp1[t+rowoffset,26] = -value(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t])
+					dfTemp1[t+rowoffset,32] = -value(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t])
 				end
 			end
 
@@ -155,79 +198,123 @@ function write_co2_emission_balance_zone(path::AbstractString, sep::AbstractStri
 		dfTemp1[rowoffset,6] = 0
 		dfTemp1[rowoffset,7] = 0
 		dfTemp1[rowoffset,8] = 0
-	
-		if setup["ModelBESC"] == 1
-			dfTemp1[rowoffset,6] = sum(inputs["omega"][t] * value.(EP[:eBiorefinery_CO2_emissions_per_zone_per_time][z,t]) for t in 1:T)
-			dfTemp1[rowoffset,7] = sum(inputs["omega"][t] * (value.(EP[:eHerb_biomass_emission_per_zone_per_time][z,t]) + value.(EP[:eWood_biomass_emission_per_zone_per_time][z,t])) for t in 1:T)
-			dfTemp1[rowoffset,8] = - sum(inputs["omega"][t] * value.(EP[:eBiomass_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
-		end
-
 		dfTemp1[rowoffset,9] = 0
 		dfTemp1[rowoffset,10] = 0
 		dfTemp1[rowoffset,11] = 0
 		dfTemp1[rowoffset,12] = 0
 		dfTemp1[rowoffset,13] = 0
 		dfTemp1[rowoffset,14] = 0
+
+		if setup["ModelBESC"] == 1
+
+			if setup["Bio_ELEC_On"] == 1
+				dfTemp1[rowoffset,6] = sum(inputs["omega"][t] * value.(EP[:eBio_ELEC_CO2_emissions_per_zone_per_time][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,7] = - sum(inputs["omega"][t] * value.(EP[:eBiomass_CO2_per_zone_per_time_ELEC][z,t]) for t in 1:T)
+			end
+			
+			if setup["ModelH2"] == 1 && setup["Bio_H2_On"] == 1
+				dfTemp1[rowoffset,8] = sum(inputs["omega"][t] * value.(EP[:eBio_H2_CO2_emissions_per_zone_per_time][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,9] = - sum(inputs["omega"][t] * value.(EP[:eBiomass_CO2_per_zone_per_time_H2][z,t]) for t in 1:T)
+			end
+
+			if setup["ModelLFSC"] == 1 && setup["Bio_LF_On"] == 1
+				dfTemp1[rowoffset,10] = sum(inputs["omega"][t] * value.(EP[:eBio_LF_Plant_CO2_emissions_per_zone_per_time][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,11] = - sum(inputs["omega"][t] * value.(EP[:eBiomass_CO2_per_zone_per_time_LF][z,t]) for t in 1:T)
+			end
+
+			if setup["ModelNGSC"] == 1 && setup["Bio_NG_On"] == 1
+				dfTemp1[rowoffset,12] = sum(inputs["omega"][t] * value.(EP[:eBio_NG_Plant_CO2_emissions_per_zone_per_time][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,13] = - sum(inputs["omega"][t] * value.(EP[:eBiomass_CO2_per_zone_per_time_NG][z,t]) for t in 1:T)
+			end
+
+			if setup["Energy_Crops_Herb_Supply"] == 1
+				dfTemp1[rowoffset,14] += sum(inputs["omega"][t] * (value.(EP[:eHerb_biomass_emission_per_zone_per_time][z,t])) for t in 1:T)
+			end
+
+			if setup["Energy_Crops_Wood_Supply"] == 1
+				dfTemp1[rowoffset,14] += sum(inputs["omega"][t] * (value.(EP[:eWood_biomass_emission_per_zone_per_time][z,t])) for t in 1:T)
+			end
+
+			if setup["Agri_Res_Supply"] == 1
+				dfTemp1[rowoffset,14] += sum(inputs["omega"][t] * (value.(EP[:eAgri_Res_biomass_emission_per_zone_per_time][z,t])) for t in 1:T)
+			end
+
+			if setup["Agri_Process_Waste_Supply"] == 1
+				dfTemp1[rowoffset,14] += sum(inputs["omega"][t] * (value.(EP[:eAgri_Process_Waste_biomass_emission_per_zone_per_time][z,t])) for t in 1:T)
+			end
+
+			if setup["Agri_Forest_Supply"] == 1
+				dfTemp1[rowoffset,14] += sum(inputs["omega"][t] * (value.(EP[:eForest_biomass_emission_per_zone_per_time][z,t])) for t in 1:T)
+			end
+		end
+	
+
 		dfTemp1[rowoffset,15] = 0
 		dfTemp1[rowoffset,16] = 0
 		dfTemp1[rowoffset,17] = 0
 		dfTemp1[rowoffset,18] = 0
 		dfTemp1[rowoffset,19] = 0
-
-		if setup["ModelLFSC"] == 1
-			if setup["Liquid_Fuels_Hourly_Demand"] == 1
-				dfTemp1[rowoffset,9] = sum(inputs["omega"][t] * value.(EP[:eConv_Gasoline_CO2_Emissions][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,10] = sum(inputs["omega"][t] * value.(EP[:eConv_Jetfuel_CO2_Emissions][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,11] = sum(inputs["omega"][t] * value.(EP[:eConv_Diesel_CO2_Emissions][z,t]) for t in 1:T)
-			else
-				dfTemp1[rowoffset,9] = value.(EP[:eConv_Gasoline_CO2_Emissions][z])
-				dfTemp1[rowoffset,10] = value.(EP[:eConv_Jetfuel_CO2_Emissions][z])
-				dfTemp1[rowoffset,11] = value.(EP[:eConv_Diesel_CO2_Emissions][z])
-			end
-
-			if setup["ModelSyntheticFuels"] == 1
-				dfTemp1[rowoffset,12] = sum(inputs["omega"][t] * value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,13] = sum(inputs["omega"][t] * value.(EP[:eByProdConsCO2EmissionsByZone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,14] = sum(inputs["omega"][t] * value.(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,15] = sum(inputs["omega"][t] * value.(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,16] = sum(inputs["omega"][t] * value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-			end
-
-			if setup["ModelBESC"] == 1
-				dfTemp1[rowoffset,17] = sum(inputs["omega"][t] * value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,18] = sum(inputs["omega"][t] * value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,19] = sum(inputs["omega"][t] * value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-			end
-		end
-
 		dfTemp1[rowoffset,20] = 0
 		dfTemp1[rowoffset,21] = 0
 		dfTemp1[rowoffset,22] = 0
 		dfTemp1[rowoffset,23] = 0
 		dfTemp1[rowoffset,24] = 0
 		dfTemp1[rowoffset,25] = 0
+
+		if setup["ModelLFSC"] == 1
+			if setup["Liquid_Fuels_Hourly_Demand"] == 1
+				dfTemp1[rowoffset,15] = sum(inputs["omega"][t] * value.(EP[:eConv_Gasoline_CO2_Emissions][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,16] = sum(inputs["omega"][t] * value.(EP[:eConv_Jetfuel_CO2_Emissions][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,17] = sum(inputs["omega"][t] * value.(EP[:eConv_Diesel_CO2_Emissions][z,t]) for t in 1:T)
+			else
+				dfTemp1[rowoffset,15] = value.(EP[:eConv_Gasoline_CO2_Emissions][z])
+				dfTemp1[rowoffset,16] = value.(EP[:eConv_Jetfuel_CO2_Emissions][z])
+				dfTemp1[rowoffset,17] = value.(EP[:eConv_Diesel_CO2_Emissions][z])
+			end
+
+			if setup["ModelSyntheticFuels"] == 1
+				dfTemp1[rowoffset,18] = sum(inputs["omega"][t] * value.(EP[:eSynfuels_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,19] = sum(inputs["omega"][t] * value.(EP[:eByProdConsCO2EmissionsByZone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,20] = sum(inputs["omega"][t] * value.(EP[:eSyn_Gasoline_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,21] = sum(inputs["omega"][t] * value.(EP[:eSyn_Jetfuel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,22] = sum(inputs["omega"][t] * value.(EP[:eSyn_Diesel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+			end
+
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
+				dfTemp1[rowoffset,23] = sum(inputs["omega"][t] * value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,24] = sum(inputs["omega"][t] * value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,25] = sum(inputs["omega"][t] * value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+			end
+		end
+
 		dfTemp1[rowoffset,26] = 0
+		dfTemp1[rowoffset,27] = 0
+		dfTemp1[rowoffset,28] = 0
+		dfTemp1[rowoffset,29] = 0
+		dfTemp1[rowoffset,30] = 0
+		dfTemp1[rowoffset,31] = 0
+		dfTemp1[rowoffset,32] = 0
 
 		if setup["ModelNGSC"] == 1
-			dfTemp1[rowoffset,20] = sum(inputs["omega"][t] * value.(EP[:eConv_NG_CO2_Emissions][z,t]) for t in 1:T)
+			dfTemp1[rowoffset,26] = sum(inputs["omega"][t] * value.(EP[:eConv_NG_CO2_Emissions][z,t]) for t in 1:T)
 			
 			if setup["ModelSyntheticNG"] == 1
-				dfTemp1[rowoffset,21] = sum(inputs["omega"][t] * value.(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
-				dfTemp1[rowoffset,22] = sum(inputs["omega"][t] * value.(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,27] = sum(inputs["omega"][t] * value.(EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,28] = sum(inputs["omega"][t] * value.(EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
 			end
 
 			if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
-				dfTemp1[rowoffset,23] = sum(inputs["omega"][t] * value.(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,29] = sum(inputs["omega"][t] * value.(EP[:eBio_NG_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
 			end
 
-			dfTemp1[rowoffset,24] = -sum(inputs["omega"][t] * value.(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
+			dfTemp1[rowoffset,30] = -sum(inputs["omega"][t] * value.(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
 
 			if setup["ModelH2"] == 1
-				dfTemp1[rowoffset,25] = -sum(inputs["omega"][t] * value.(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,31] = -sum(inputs["omega"][t] * value.(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
 			end
 
 			if setup["ModelCSC"] == 1
-				dfTemp1[rowoffset,26] = -sum(inputs["omega"][t] * value.(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
+				dfTemp1[rowoffset,32] = -sum(inputs["omega"][t] * value.(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t]) for t in 1:T)
 			end
 
 		end

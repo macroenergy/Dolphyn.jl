@@ -22,7 +22,7 @@ Function for reporting total CO2 storage balance across different zones.
 function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	Z = inputs["Z"]     # Number of zones
 
-	dfCost = DataFrame(Costs = ["Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture", "Synfuel Plant Capture", "Synfuel Plant Consumption", "Syn NG Plant Capture", "Syn NG Plant Consumption", "NG Power CCS", "NG H2 CCS", "NG DAC CCS", "CO2 Pipeline Import", "CO2 Storage", "Total"])
+	dfCost = DataFrame(Costs = ["Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Bio Elec Capture", "Bio H2 Capture", "Bio LF Capture", "Bio NG Capture", "Synfuel Plant Capture", "Synfuel Plant Consumption", "Syn NG Plant Capture", "Syn NG Plant Consumption", "NG Power CCS", "NG H2 CCS", "NG DAC CCS", "CO2 Pipeline Import", "CO2 Storage", "Total"])
 
 	Power_CCS = sum(sum(inputs["omega"].* (value.(EP[:ePower_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
@@ -35,10 +35,29 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 	DAC_Capture =  sum(sum(inputs["omega"].* (value.(EP[:eDAC_CO2_Captured_per_zone_per_time])[z,:])) for z in 1:Z)
 	DAC_Fuel_CCS = sum(sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 
-	Biorefinery_Capture = 0
+	Bio_ELEC_Capture = 0
+	Bio_H2_Capture = 0
+	Bio_LF_Capture = 0
+	Bio_NG_Capture = 0
 
 	if setup["ModelBESC"] == 1
-		Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+
+		if setup["Bio_ELEC_On"] == 1
+			Bio_ELEC_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBio_ELEC_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+		end
+
+		if setup["Bio_H2_On"] == 1
+			Bio_H2_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBio_H2_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+		end
+
+		if setup["Bio_LF_On"] == 1
+			Bio_LF_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBio_LF_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+		end
+
+		if setup["Bio_NG_On"] == 1
+			Bio_NG_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBio_NG_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+		end
+
 	end
 
 	Synfuel_Production_Capture = 0
@@ -85,10 +104,10 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 	end
 
 	# Define total CO2 storage balance
-	cTotal = Power_CCS + H2_CCS + DAC_Capture + DAC_Fuel_CCS + Biorefinery_Capture + Synfuel_Production_Capture + Synfuel_Production_Consumption + Syn_NG_Production_Capture + Syn_NG_Production_Consumption + NG_Power_CCS + NG_H2_CCS + NG_DAC_CCS + CO2_Pipeline_Import + CO2_Storage
+	cTotal = Power_CCS + H2_CCS + DAC_Capture + DAC_Fuel_CCS + Bio_ELEC_Capture + Bio_H2_Capture + Bio_LF_Capture + Bio_NG_Capture + Synfuel_Production_Capture + Synfuel_Production_Consumption + Syn_NG_Production_Capture + Syn_NG_Production_Consumption + NG_Power_CCS + NG_H2_CCS + NG_DAC_CCS + CO2_Pipeline_Import + CO2_Storage
 
 	# Define total column, i.e. column 2
-	dfCost[!,Symbol("Total")] = [Power_CCS, H2_CCS, DAC_Capture, DAC_Fuel_CCS, Biorefinery_Capture, Synfuel_Production_Capture, Synfuel_Production_Consumption, Syn_NG_Production_Capture, Syn_NG_Production_Consumption, NG_Power_CCS, NG_H2_CCS, NG_DAC_CCS, CO2_Pipeline_Import, CO2_Storage, cTotal]
+	dfCost[!,Symbol("Total")] = [Power_CCS, H2_CCS, DAC_Capture, DAC_Fuel_CCS, Bio_ELEC_Capture, Bio_H2_Capture, Bio_LF_Capture, Bio_NG_Capture, Synfuel_Production_Capture, Synfuel_Production_Consumption, Syn_NG_Production_Capture, Syn_NG_Production_Consumption, NG_Power_CCS, NG_H2_CCS, NG_DAC_CCS, CO2_Pipeline_Import, CO2_Storage, cTotal]
 
 	################################################################################################################################
 	# Computing zonal cost breakdown by cost category
@@ -97,7 +116,10 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 		tempH2_CCS = 0
 		tempDAC_Capture = 0
 		tempDAC_Fuel_CCS = 0
-		tempBiorefinery_Capture = 0
+		tempBio_ELEC_Capture = 0
+		tempBio_H2_Capture = 0
+		tempBio_LF_Capture = 0
+		tempBio_NG_Capture = 0
 		tempSynfuel_Production_Capture = 0
 		tempSynfuel_Production_Consumption = 0
 		tempSyn_NG_Production_Capture = 0
@@ -118,7 +140,21 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 		tempDAC_Fuel_CCS = tempDAC_Fuel_CCS + sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:]))
 
 		if setup["ModelBESC"] == 1
-			tempBiorefinery_Capture = tempBiorefinery_Capture + sum(inputs["omega"].* (value.(EP[:eBiorefinery_CO2_captured_per_zone_per_time])[z,:]))
+			if setup["Bio_ELEC_On"] == 1
+				tempBio_ELEC_Capture = tempBio_ELEC_Capture + sum(inputs["omega"].* (value.(EP[:eBio_ELEC_CO2_captured_per_zone_per_time])[z,:]))
+			end
+
+			if setup["Bio_H2_On"] == 1
+				tempBio_H2_Capture = tempBio_H2_Capture + sum(inputs["omega"].* (value.(EP[:eBio_H2_CO2_captured_per_zone_per_time])[z,:]))
+			end
+
+			if setup["Bio_LF_On"] == 1
+				tempBio_LF_Capture = tempBio_LF_Capture + sum(inputs["omega"].* (value.(EP[:eBio_LF_CO2_captured_per_zone_per_time])[z,:]))
+			end
+
+			if setup["Bio_NG_On"] == 1
+				tempBio_NG_Capture = tempBio_NG_Capture + sum(inputs["omega"].* (value.(EP[:eBio_NG_CO2_captured_per_zone_per_time])[z,:]))
+			end
 		end
 
 		if setup["ModelLFSC"] == 1 && setup["ModelSyntheticFuels"] == 1
@@ -151,9 +187,9 @@ function write_co2_storage_balance_zone(path::AbstractString, sep::AbstractStrin
 			tempCO2_Storage = tempCO2_Storage - sum(inputs["omega"].* (value.(EP[:eCO2_Injected_per_zone])[z,:]))
 		end
 
-		tempCTotal = tempPower_CCS + tempH2_CCS + tempDAC_Capture + tempDAC_Fuel_CCS + tempBiorefinery_Capture + tempSynfuel_Production_Capture + tempSynfuel_Production_Consumption + tempSyn_NG_Production_Capture + tempSyn_NG_Production_Consumption + tempNG_Power_CCS + tempNG_H2_CCS + tempNG_DAC_CCS + tempCO2_Pipeline_Import + tempCO2_Storage
+		tempCTotal = tempPower_CCS + tempH2_CCS + tempDAC_Capture + tempDAC_Fuel_CCS + tempBio_ELEC_Capture + tempBio_H2_Capture + tempBio_LF_Capture + tempBio_NG_Capture + tempSynfuel_Production_Capture + tempSynfuel_Production_Consumption + tempSyn_NG_Production_Capture + tempSyn_NG_Production_Consumption + tempNG_Power_CCS + tempNG_H2_CCS + tempNG_DAC_CCS + tempCO2_Pipeline_Import + tempCO2_Storage
 
-		dfCost[!,Symbol("Zone$z")] = [tempPower_CCS, tempH2_CCS, tempDAC_Capture, tempDAC_Fuel_CCS, tempBiorefinery_Capture, tempSynfuel_Production_Capture, tempSynfuel_Production_Consumption, tempSyn_NG_Production_Capture,  tempSyn_NG_Production_Consumption,  tempNG_Power_CCS, tempNG_H2_CCS, tempNG_DAC_CCS, tempCO2_Pipeline_Import, tempCO2_Storage, tempCTotal]
+		dfCost[!,Symbol("Zone$z")] = [tempPower_CCS, tempH2_CCS, tempDAC_Capture, tempDAC_Fuel_CCS, tempBio_ELEC_Capture, tempBio_H2_Capture, tempBio_LF_Capture, tempBio_NG_Capture, tempSynfuel_Production_Capture, tempSynfuel_Production_Consumption, tempSyn_NG_Production_Capture,  tempSyn_NG_Production_Consumption,  tempNG_Power_CCS, tempNG_H2_CCS, tempNG_DAC_CCS, tempCO2_Pipeline_Import, tempCO2_Storage, tempCTotal]
 	end
 
 	CSV.write(string(path,sep,"CSC_storage_balance_zone.csv"), dfCost)

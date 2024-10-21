@@ -71,9 +71,6 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 				for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
 					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
-					if setup["ParameterScale"] ==1
-						tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
-					end
 				end
 			end
 			tempCO2Price_z = sum(tempCO2Price)
@@ -118,7 +115,7 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 		DAC_Fuel_CCS = sum(sum(inputs["omega"].* (value.(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
 	
 		if setup["ModelBESC"] == 1
-			Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBiomass_CO2_captured_per_zone_per_time])[z,:])) for z in 1:Z)
+			Biorefinery_Capture = sum(sum(inputs["omega"].* (value.(EP[:eBiomass_CO2_per_zone_per_time_LF])[z,:])) for z in 1:Z)
 		else
 			Biorefinery_Capture = 0
 		end
@@ -275,9 +272,6 @@ function write_HSC_LCOH(path::AbstractString, sep::AbstractString, inputs::Dict,
 				for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
 					tempCO2Price[cap] = dual.(EP[:cCO2Emissions_systemwide])[cap]
 					# when scaled, The objective function is in unit of Million US$/kton, thus k$/ton, to get $/ton, multiply 1000
-					if setup["ParameterScale"] ==1
-						tempCO2Price[cap] = tempCO2Price[cap]* ModelScalingFactor
-					end
 				end
 			end
 			tempCO2Price_z = sum(tempCO2Price)

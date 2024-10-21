@@ -58,9 +58,9 @@ function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 
     ## Variables ##
     #CO2 Required by SynFuel Resource in MTonnes
-	@variable(EP, vSFCO2in[k in 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
+	@variable(EP, vSFCO2in[k = 1:SYN_FUELS_RES_ALL, t = 1:T] >= 0 )
     #Amount of By-productProduced in MMBTU
-	@variable(EP, vSFByProd[k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd, t = 1:T] >= 0 )
+	@variable(EP, vSFByProd[k = 1:SYN_FUELS_RES_ALL, b = 1:NSFByProd, t = 1:T] >= 0 )
     
 	### Expressions ###
 

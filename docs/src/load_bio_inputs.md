@@ -7,7 +7,7 @@ Pages = ["BESC/load_inputs/load_bio_inputs.jl"]
 ## Load Biorefinery Inputs
 ```@autodocs
 Modules = [Dolphyn]
-Pages = ["BESC/load_inputs/load_bio_refinery.jl"]
+Pages = ["BESC/load_inputs/load_bio_liquid_fuels.jl"]
 ```
 
 ## Load Biomass Supply Inputs

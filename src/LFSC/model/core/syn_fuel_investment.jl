@@ -53,7 +53,7 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 	SYN_FUELS_RES_ALL = inputs["SYN_FUELS_RES_ALL"]
 
 	#General variables
-	@variable(EP,vCapacity_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL]>=0) #Capacity of units in co2 input mtonnes/hr 
+	@variable(EP,vCapacity_Syn_Fuel_per_type[i = 1:SYN_FUELS_RES_ALL]>=0) #Capacity of units in co2 input mtonnes/hr 
 
 	#Load capacity parameters
 	MinCapacity_tonne_p_hr = dfSynFuels[!,:MinCapacity_tonne_p_hr] # t/h
@@ -63,23 +63,23 @@ function syn_fuel_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	#Linear CAPEX using refcapex similar to fixed O&M cost calculation method
 	#Investment cost = CAPEX
-	@expression(EP, eCAPEX_Syn_Fuel_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
+	@expression(EP, eCAPEX_Syn_Fuel_per_type[i = 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Inv_Cost_p_tonne_co2_p_hr_yr[i] )
 	#Fixed OM cost #Check again to match capacity
-	@expression(EP, eFixed_OM_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i])
+	@expression(EP, eFixed_OM_Syn_Fuels_per_type[i = 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i] * Fixed_OM_cost_p_tonne_co2_hr_yr[i])
 
 	#####################################################################################################################################
 	#Min and max capacity constraints
-	@constraint(EP,cMinSFCapacity_per_unit[i in 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  >= MinCapacity_tonne_p_hr[i])
+	@constraint(EP,cMinSFCapacity_per_unit[i = 1:SYN_FUELS_RES_ALL], EP[:vCapacity_Syn_Fuel_per_type][i]  >= MinCapacity_tonne_p_hr[i])
 
 	#Constraint on maximum capacity (if applicable) [set input to -1 if no constraint on maximum capacity]
-	@constraint(EP, cMaxSFCapacity_per_unit[i in intersect(dfSynFuels[dfSynFuels.MaxCapacity_tonne_p_hr.>0, :R_ID], 1:SYN_FUELS_RES_ALL)], EP[:vCapacity_Syn_Fuel_per_type][i] <= MaxCapacity_tonne_p_hr[i])
+	@constraint(EP, cMaxSFCapacity_per_unit[i = intersect(dfSynFuels[dfSynFuels.MaxCapacity_tonne_p_hr.>0, :R_ID], 1:SYN_FUELS_RES_ALL)], EP[:vCapacity_Syn_Fuel_per_type][i] <= MaxCapacity_tonne_p_hr[i])
 
 	#####################################################################################################################################
 	##Expressions
 	#Cost per type of technology
 	
 	#Total fixed cost = CAPEX + Fixed OM
-	@expression(EP, eFixed_Cost_Syn_Fuels_per_type[i in 1:SYN_FUELS_RES_ALL], EP[:eFixed_OM_Syn_Fuels_per_type][i] + EP[:eCAPEX_Syn_Fuel_per_type][i])
+	@expression(EP, eFixed_Cost_Syn_Fuels_per_type[i = 1:SYN_FUELS_RES_ALL], EP[:eFixed_OM_Syn_Fuels_per_type][i] + EP[:eCAPEX_Syn_Fuel_per_type][i])
 
 	#Total cost
 	#Expression for total CAPEX for all resoruce types (For output and to add to objective function)

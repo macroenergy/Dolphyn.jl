@@ -20,21 +20,45 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting the bioelectricity produced across different zones with time.
 """
 function write_bio_zone_bioelectricity_produced(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfbioenergy = inputs["dfbioenergy"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 
-	## Carbon balance for each zone
+	## Bio electricity balance for each zone
 	dfZoneBioelectricityBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
-	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 1)
-	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Bioelectricity Produced"]
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 4)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Bioelectricity Produced", "Bio H2 Power Credit", "Bio LF Power Credit", "Bio NG Power Credit"]
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 	   	for t in 1:T
-			dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBioelectricity_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
+			
+			dfTemp1[t+rowoffset,1] = 0
+			dfTemp1[t+rowoffset,2] = 0
+			dfTemp1[t+rowoffset,3] = 0
+			dfTemp1[t+rowoffset,4] = 0
+
+			if setup["Bio_ELEC_On"] == 1
+				dfBioELEC = inputs["dfBioELEC"]
+				dfTemp1[t+rowoffset,1] = sum(value.(EP[:eBioELEC_produced_MWh_per_plant_per_time][dfBioELEC[(dfBioELEC[!,:Zone].==z),:][!,:R_ID],t]))
+			end
+
+			if setup["Bio_H2_On"] == 1
+				dfBioH2 = inputs["dfBioH2"]
+				dfTemp1[t+rowoffset,2] = sum(value.(EP[:eBioH2_Power_credit_produced_MWh_per_plant_per_time][dfBioH2[(dfBioH2[!,:Zone].==z),:][!,:R_ID],t]))
+			end
+
+			if setup["Bio_LF_On"] == 1
+				dfBioLF = inputs["dfBioLF"]
+				dfTemp1[t+rowoffset,3] = sum(value.(EP[:eBioLF_Power_credit_produced_MWh_per_plant_per_time][dfBioLF[(dfBioLF[!,:Zone].==z),:][!,:R_ID],t]))
+			end
+
+			if setup["Bio_NG_On"] == 1
+				dfBioNG = inputs["dfBioNG"]
+				dfTemp1[t+rowoffset,4] = sum(value.(EP[:eBioNG_Power_credit_produced_MWh_per_plant_per_time][dfBioNG[(dfBioNG[!,:Zone].==z),:][!,:R_ID],t]))
+			end
+
 	   	end
 
 		if z==1

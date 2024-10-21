@@ -57,7 +57,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	end
 	
 	if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
-		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z) - sum(sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z])) for z in 1:Z)
+		Bio_H2 = sum(sum(inputs["omega"].* (value.(EP[:eBioH2_produced_tonne_per_time_per_zone])[:,z])) for z in 1:Z)
 	else
 		Bio_H2 = 0
 	end
@@ -137,7 +137,7 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 
 
 		if setup["ModelBESC"] == 1 && setup["Bio_H2_On"] == 1
-			tempBio_H2 = tempBio_H2 + sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_produced_tonne_per_time_per_zone])[:,z])) - sum(inputs["omega"].* (value.(EP[:eScaled_BioH2_consumption_per_time_per_zone])[:,z]))
+			tempBio_H2 = tempBio_H2 + sum(inputs["omega"].* (value.(EP[:eBioH2_produced_tonne_per_time_per_zone])[:,z]))
 		end
 
 		for y in intersect(H2_STOR_ALL, dfH2Gen[dfH2Gen[!,:Zone].==z,:R_ID])

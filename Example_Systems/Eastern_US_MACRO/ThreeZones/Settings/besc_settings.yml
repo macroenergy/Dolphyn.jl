@@ -1,9 +1,0 @@
-#Only turn on when ModelCO2 = 1
-ModelBESC: 0 #Flag to turn or off Bioenergy Supply Chain modelling capabilities - 0 = no BESC, 1 = BESC modeled
-
-Bio_H2_On: 1
-Bio_Electricity_On: 1
-Bio_Diesel_On: 0
-Bio_Jetfuel_On: 0
-Bio_Gasoline_On: 0
-Bio_NG_On: 0

@@ -129,15 +129,15 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
         ##########################################################################
         ######## By product emissions
         #CO2 emitted as a result of byproduct fuel consumption
-        @expression(EP,eByProdConsCO2Emissions[k in 1:SYN_FUELS_RES_ALL, b in 1:NSFByProd, t = 1:T], 
+        @expression(EP,eByProdConsCO2Emissions[k = 1:SYN_FUELS_RES_ALL, b = 1:NSFByProd, t = 1:T], 
         EP[:vSFByProd][k,b,t] * dfSynFuelsByProdEmissions[:,b][k])
 
         #CO2 emitted as a result of byproduct fuel consumption per plant
-        @expression(EP,eByProdConsCO2EmissionsByPlant[k in 1:SYN_FUELS_RES_ALL, t = 1:T], 
+        @expression(EP,eByProdConsCO2EmissionsByPlant[k = 1:SYN_FUELS_RES_ALL, t = 1:T], 
         sum(EP[:eByProdConsCO2Emissions][k,b,t] for b in 1:NSFByProd))
 
         #CO2 emitted as a result of byproduct fuel consumption by zone, by-product, and time
-        @expression(EP,eByProdConsCO2EmissionsByZoneB[b in 1:NSFByProd, z = 1:Z, t = 1:T], sum(EP[:eByProdConsCO2Emissions][k,b,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
+        @expression(EP,eByProdConsCO2EmissionsByZoneB[b = 1:NSFByProd, z = 1:Z, t = 1:T], sum(EP[:eByProdConsCO2Emissions][k,b,t] for k in dfSynFuels[(dfSynFuels[!,:Zone].==z),:R_ID]))
 
         #CO2 emitted as a result of byproduct fuel consumption by zone and time
         @expression(EP,eByProdConsCO2EmissionsByZone[z = 1:Z, t = 1:T], sum(EP[:eByProdConsCO2EmissionsByZoneB][b,z,t] for b in 1:NSFByProd)) 

@@ -139,17 +139,87 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
         #Using an additive approach where terms are added to LHS of emissions constraint
         if setup["ModelBESC"] == 1
-            @expression(EP, eEmissionsConstraintLHSBESC[cap=1:inputs["NCO2Cap"]],
-            sum(inputs["omega"][t] * EP[:eBiorefinery_CO2_emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            + sum(inputs["omega"][t] * EP[:eHerb_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            + sum(inputs["omega"][t] * EP[:eWood_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            + sum(inputs["omega"][t] * EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            + sum(inputs["omega"][t] * EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            + sum(inputs["omega"][t] * EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            - sum(inputs["omega"][t] * EP[:eBiomass_CO2_captured_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
-            )
 
-            eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC
+            if setup["Energy_Crops_Herb_Supply"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_Herb[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eHerb_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_Herb
+            end
+
+            if setup["Energy_Crops_Wood_Supply"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_Wood[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eWood_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_Wood
+            end
+
+            if setup["Agri_Res_Supply"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_Agri_Res[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eAgri_Res_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_Agri_Res
+            end
+
+            if setup["Agri_Process_Waste_Supply"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_Agri_Process_Waste[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eAgri_Process_Waste_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_Agri_Process_Waste
+            end
+
+            if setup["Agri_Forest_Supply"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_Forest[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eForest_biomass_emission_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_Forest
+            end
+
+            if setup["Bio_ELEC_On"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_ELEC[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eBio_ELEC_CO2_emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                - sum(inputs["omega"][t] * EP[:eBiomass_CO2_per_zone_per_time_ELEC][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_ELEC
+            end
+
+            if setup["ModelH2"] == 1 && setup["Bio_H2_On"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_H2[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eBio_H2_CO2_emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                - sum(inputs["omega"][t] * EP[:eBiomass_CO2_per_zone_per_time_H2][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_H2
+            end
+
+            if setup["ModelLFSC"] == 1 && setup["Bio_LF_On"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_LF[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eBio_LF_Plant_CO2_emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                + sum(inputs["omega"][t] * EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                + sum(inputs["omega"][t] * EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                + sum(inputs["omega"][t] * EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                - sum(inputs["omega"][t] * EP[:eBiomass_CO2_per_zone_per_time_LF][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_LF
+            end
+
+            if setup["ModelNGSC"] == 1 && setup["Bio_NG_On"] == 1
+                @expression(EP, eEmissionsConstraintLHSBESC_NG[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["omega"][t] * EP[:eBio_NG_Plant_CO2_emissions_per_zone_per_time][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                + sum(inputs["omega"][t] * EP[:eBio_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                - sum(inputs["omega"][t] * EP[:eBiomass_CO2_per_zone_per_time_NG][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
+                )
+
+                eEmissionsConstraintLHS += eEmissionsConstraintLHSBESC_NG
+            end
+
         end 
 
 
@@ -159,20 +229,12 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
             eEmissionsConstraintLHS += eEmissionsConstraintLHSCNG
 
-            #To be completed when synthetic NG modeled
             if setup["ModelSyntheticNG"] == 1
                 @expression(EP, eEmissionsConstraintLHSSyn_NG[cap=1:inputs["NCO2Cap"]],
                 sum(inputs["omega"][t] * EP[:eSyn_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T)
                 + sum(inputs["omega"][t] * EP[:eSyn_NG_Production_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
 
                 eEmissionsConstraintLHS += eEmissionsConstraintLHSSyn_NG
-            end
-
-            if setup["ModelBESC"] == 1 && setup["Bio_NG_On"] == 1
-                @expression(EP, eEmissionsConstraintLHSBio_NG[cap=1:inputs["NCO2Cap"]],
-                sum(inputs["omega"][t] * EP[:eBio_NG_CO2_Emissions_By_Zone][z,t] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]), t=1:T))
-
-                eEmissionsConstraintLHS += eEmissionsConstraintLHSBio_NG
             end
 
             #Deduct CO2 captured by CCS technologies across sectors
@@ -207,53 +269,28 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
 
 
         elseif setup["CO2Cap"] == 2
-            if setup["ParameterScale"] ==1
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) 
-                )
-            else
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) )
-            end 
+            @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["dfMaxCO2Rate"][z,cap] * sum(inputs["omega"][t] * (inputs["pD"][t,z] - sum(EP[:vNSE][s,t,z] for s in 1:SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) +
+                sum(inputs["dfMaxCO2Rate"][z,cap] * setup["StorageLosses"] *  EP[:eELOSSByZone][z] for z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])) )
         elseif setup["CO2Cap"] == 3
-            if setup["ParameterScale"] ==1
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap])))
-            else
-                @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
-                    sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
-                )
-            end 
-        
+            @expression(EP, eEmissionsConstraintRHS[cap=1:inputs["NCO2Cap"]],
+                sum(inputs["dfMaxCO2Rate"][z,cap] * inputs["omega"][t] * EP[:eGenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+            )
         end
 
         if setup["ModelH2"] == 1
 
             ## Mass-based: Emissions constraint in absolute emissions limit (tons)
             if setup["CO2Cap"] == 2
-                if setup["ParameterScale"] ==1
-                    @expression(EP, eEmissionsConstraintRHSH2[cap=1:inputs["NCO2Cap"]],
-                            sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV/ModelScalingFactor * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
-                    )
-                else
-                    @expression(EP, eEmissionsConstraintRHSH2[cap=1:inputs["NCO2Cap"]],
-                        sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
-                    )
-                end 
+                @expression(EP, eEmissionsConstraintRHSH2[cap=1:inputs["NCO2Cap"]],
+                    sum(inputs["dfMaxCO2Rate"][z,cap] * H2_LHV * sum(inputs["omega"][t] * (inputs["H2_D"][t,z] + EP[:eH2DemandByZoneG2P][z,t] - sum(EP[:vH2NSE][s,t,z] for s in 1:H2_SEG)) for t=1:T) for z = findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
+                )
 
                 eEmissionsConstraintRHS += eEmissionsConstraintRHSH2
             elseif setup["CO2Cap"] == 3
-                if setup["ParameterScale"] ==1
-                    @expression(EP, eEmissionsConstraintRHSH2[cap=1:inputs["NCO2Cap"]],
-                        sum(inputs["dfMaxCO2Rate"][z,cap] *H2_LHV/ModelScalingFactor *inputs["omega"][t] * EP[:eH2GenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
-                    )
-                else
                     @expression(EP, eEmissionsConstraintRHSH2[cap=1:inputs["NCO2Cap"]],
                         sum(inputs["dfMaxCO2Rate"][z,cap] *H2_LHV *inputs["omega"][t] * EP[:eH2GenerationByZone][z,t] for t=1:T, z=findall(x->x==1, inputs["dfCO2CapZones"][:,cap]))
                     )
-                end 
 
                 eEmissionsConstraintRHS += eEmissionsConstraintRHSH2
             end

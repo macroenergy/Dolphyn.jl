@@ -67,19 +67,19 @@ function bio_wood_supply(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eWood_biomass_purchased_per_time_per_zone[t=1:T, z=1:Z],
 	sum(EP[:vWood_biomass_purchased][k,t] for k in intersect(BESC_WOOD_SUPPLY, dfWood[dfWood[!,:Zone].==z,:][!,:R_ID])))
 
-	EP[:eWood_Biomass_Supply] += EP[:eWood_biomass_purchased_per_time_per_zone]
+	EP[:eEnergy_Crops_Wood_Biomass_Supply] += EP[:eWood_biomass_purchased_per_time_per_zone]
 
 	#Wood Biomass VOM
-	@expression(EP,eWood_biomass_supply_cost_per_type_per_time[k=1:WOOD_SUPPLY_RES_ALL, t = 1:T], inputs["omega"][t] * EP[:vWood_biomass_purchased][k,t] * Wood_biomass_cost_per_tonne[k])
+	@expression(EP,eEnergy_Crops_Wood_Biomass_Supply_cost_per_type_per_time[k=1:WOOD_SUPPLY_RES_ALL, t = 1:T], inputs["omega"][t] * EP[:vWood_biomass_purchased][k,t] * Wood_biomass_cost_per_tonne[k])
 
-	@expression(EP, eWood_biomass_supply_cost_per_zone_per_time[z=1:Z,t=1:T],
-	sum(EP[:eWood_biomass_supply_cost_per_type_per_time][k,t] for k in intersect(BESC_WOOD_SUPPLY, dfWood[dfWood[!,:Zone].==z,:][!,:R_ID])))
+	@expression(EP, eEnergy_Crops_Wood_Biomass_Supply_cost_per_zone_per_time[z=1:Z,t=1:T],
+	sum(EP[:eEnergy_Crops_Wood_Biomass_Supply_cost_per_type_per_time][k,t] for k in intersect(BESC_WOOD_SUPPLY, dfWood[dfWood[!,:Zone].==z,:][!,:R_ID])))
 
-	@expression(EP, eWood_biomass_supply_cost_per_zone[z=1:Z], sum(EP[:eWood_biomass_supply_cost_per_zone_per_time][z,t] for t in 1:T))
+	@expression(EP, eEnergy_Crops_Wood_Biomass_Supply_cost_per_zone[z=1:Z], sum(EP[:eEnergy_Crops_Wood_Biomass_Supply_cost_per_zone_per_time][z,t] for t in 1:T))
 
-	@expression(EP, eWood_biomass_supply_cost, sum(EP[:eWood_biomass_supply_cost_per_zone][z] for z in 1:Z))
+	@expression(EP, eEnergy_Crops_Wood_Biomass_Supply_cost, sum(EP[:eEnergy_Crops_Wood_Biomass_Supply_cost_per_zone][z] for z in 1:Z))
 
-	EP[:eObj] += EP[:eWood_biomass_supply_cost]
+	EP[:eObj] += EP[:eEnergy_Crops_Wood_Biomass_Supply_cost]
 
 
 	#Emission

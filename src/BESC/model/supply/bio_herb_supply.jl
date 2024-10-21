@@ -67,19 +67,19 @@ function bio_herb_supply(EP::Model, inputs::Dict, setup::Dict)
 	@expression(EP, eHerb_biomass_purchased_per_time_per_zone[t=1:T, z=1:Z],
 	sum(EP[:vHerb_biomass_purchased][k,t] for k in intersect(BESC_HERB_SUPPLY, dfHerb[dfHerb[!,:Zone].==z,:][!,:R_ID])))
 
-	EP[:eHerb_Biomass_Supply] += EP[:eHerb_biomass_purchased_per_time_per_zone]
+	EP[:eEnergy_Crops_Herb_Biomass_Supply] += EP[:eHerb_biomass_purchased_per_time_per_zone]
 
 	#Herb Biomass VOM
-	@expression(EP,eHerb_biomass_supply_cost_per_type_per_time[k=1:HERB_SUPPLY_RES_ALL, t = 1:T], inputs["omega"][t] * EP[:vHerb_biomass_purchased][k,t] * Herb_biomass_cost_per_tonne[k])
+	@expression(EP,eEnergy_Crops_Herb_Biomass_Supply_cost_per_type_per_time[k=1:HERB_SUPPLY_RES_ALL, t = 1:T], inputs["omega"][t] * EP[:vHerb_biomass_purchased][k,t] * Herb_biomass_cost_per_tonne[k])
 
-	@expression(EP, eHerb_biomass_supply_cost_per_zone_per_time[z=1:Z,t=1:T],
-	sum(EP[:eHerb_biomass_supply_cost_per_type_per_time][k,t] for k in intersect(BESC_HERB_SUPPLY, dfHerb[dfHerb[!,:Zone].==z,:][!,:R_ID])))
+	@expression(EP, eEnergy_Crops_Herb_Biomass_Supply_cost_per_zone_per_time[z=1:Z,t=1:T],
+	sum(EP[:eEnergy_Crops_Herb_Biomass_Supply_cost_per_type_per_time][k,t] for k in intersect(BESC_HERB_SUPPLY, dfHerb[dfHerb[!,:Zone].==z,:][!,:R_ID])))
 
-	@expression(EP, eHerb_biomass_supply_cost_per_zone[z=1:Z], sum(EP[:eHerb_biomass_supply_cost_per_zone_per_time][z,t] for t in 1:T))
+	@expression(EP, eEnergy_Crops_Herb_Biomass_Supply_cost_per_zone[z=1:Z], sum(EP[:eEnergy_Crops_Herb_Biomass_Supply_cost_per_zone_per_time][z,t] for t in 1:T))
 
-	@expression(EP, eHerb_biomass_supply_cost, sum(EP[:eHerb_biomass_supply_cost_per_zone][z] for z in 1:Z))
+	@expression(EP, eEnergy_Crops_Herb_Biomass_Supply_cost, sum(EP[:eEnergy_Crops_Herb_Biomass_Supply_cost_per_zone][z] for z in 1:Z))
 
-	EP[:eObj] += EP[:eHerb_biomass_supply_cost]
+	EP[:eObj] += EP[:eEnergy_Crops_Herb_Biomass_Supply_cost]
 
 
 	#Emission

@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting the biohydrogen produced across different zones with time.
 """
 function write_bio_zone_biohydrogen_produced(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfbioenergy = inputs["dfbioenergy"]
+	dfBioH2 = inputs["dfBioH2"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -34,7 +34,7 @@ function write_bio_zone_biohydrogen_produced(path::AbstractString, sep::Abstract
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 	   	for t in 1:T
-			dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiohydrogen_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBioH2_produced_tonne_per_plant_per_time][dfBioH2[(dfBioH2[!,:Zone].==z),:][!,:R_ID],t]))
 	   	end
 
 		if z==1

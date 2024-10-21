@@ -53,7 +53,7 @@ function write_liquid_fuel_emissions_global_conv_fuel(path::AbstractString, sep:
 				dfTemp1[t+rowoffset,4] = 0
 			end
 
-			if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 				dfTemp1[t+rowoffset,5] = value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t])
 			else
 				dfTemp1[t+rowoffset,5] = 0
@@ -65,7 +65,7 @@ function write_liquid_fuel_emissions_global_conv_fuel(path::AbstractString, sep:
 				dfTemp1[t+rowoffset,6] = 0
 			end
 
-			if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 				dfTemp1[t+rowoffset,7] = value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t])
 			else
 				dfTemp1[t+rowoffset,7] = 0
@@ -77,7 +77,7 @@ function write_liquid_fuel_emissions_global_conv_fuel(path::AbstractString, sep:
 				dfTemp1[t+rowoffset,8] = 0
 			end
 
-			if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
+			if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 				dfTemp1[t+rowoffset,9] = value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t])
 			else
 				dfTemp1[t+rowoffset,9] = 0
@@ -104,7 +104,7 @@ function write_liquid_fuel_emissions_global_conv_fuel(path::AbstractString, sep:
 			dfTemp1[rowoffset,4] = 0
 		end
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Diesel_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1[rowoffset,5] = sum(inputs["omega"][t] * value.(EP[:eBio_Diesel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
 		else
 			dfTemp1[rowoffset,5] =0
@@ -116,7 +116,7 @@ function write_liquid_fuel_emissions_global_conv_fuel(path::AbstractString, sep:
 			dfTemp1[rowoffset,6] = 0
 		end
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Jetfuel_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1[rowoffset,7] = sum(inputs["omega"][t] * value.(EP[:eBio_Jetfuel_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
 		else
 			dfTemp1[rowoffset,7] = 0
@@ -128,7 +128,7 @@ function write_liquid_fuel_emissions_global_conv_fuel(path::AbstractString, sep:
 			dfTemp1[rowoffset,8] = 0
 		end
 
-		if setup["ModelBESC"] == 1 && setup["Bio_Gasoline_On"] == 1
+		if setup["ModelBESC"] == 1 && setup["Bio_LF_On"] == 1
 			dfTemp1[rowoffset,9] = sum(inputs["omega"][t] * value.(EP[:eBio_Gasoline_CO2_Emissions_By_Zone][z,t]) for t in 1:T)
 		else
 			dfTemp1[rowoffset,9] = 0

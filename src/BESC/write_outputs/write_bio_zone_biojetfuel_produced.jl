@@ -20,7 +20,7 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 Function for reporting the biojetfuel produced across different zones with time.
 """
 function write_bio_zone_biojetfuel_produced(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-	dfbioenergy = inputs["dfbioenergy"]
+	dfBioLF = inputs["dfBioLF"]
 	
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
@@ -34,7 +34,7 @@ function write_bio_zone_biojetfuel_produced(path::AbstractString, sep::AbstractS
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 
 	   	for t in 1:T
-			dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiojetfuel_produced_per_plant_per_time][dfbioenergy[(dfbioenergy[!,:Zone].==z),:][!,:R_ID],t]))
+			dfTemp1[t+rowoffset,1]= sum(value.(EP[:eBiojetfuel_produced_MMBtu_per_plant_per_time][dfBioLF[(dfBioLF[!,:Zone].==z),:][!,:R_ID],t]))
 	   	end
 
 		if z==1

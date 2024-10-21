@@ -21,17 +21,9 @@ This module models the CO2 captured by flue gas CCS units present in power, H2, 
 """
 function co2_capture(EP::Model, inputs::Dict, setup::Dict)
 
-	dfGen = inputs["dfGen"] #To account for the CO2 captured by power sector
-
-	if setup["ModelH2"] == 1
-		dfH2Gen = inputs["dfH2Gen"]
-		H = inputs["H2_RES_ALL"]
-	end
-
 	dfDAC = inputs["dfDAC"]  # Input CO2 capture data
 
 	D = inputs["DAC_RES_ALL"]
-	G = inputs["G"]  # Number of resources (generators, storage, DR, and DERs)
 	Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2, H2 and electricity
 	T = inputs["T"]	 # Model operating time steps
 

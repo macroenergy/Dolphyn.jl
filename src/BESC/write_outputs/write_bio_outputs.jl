@@ -54,32 +54,57 @@ function write_bio_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
   end
 
     write_BESC_costs(path, sep, inputs, setup, EP)
-    write_bio_plant_capacity(path, sep, inputs, setup, EP)
-    write_bio_herb_supply(path, sep, inputs, setup, EP)
-    write_bio_wood_supply(path, sep, inputs, setup, EP)
 
-    if setup["Bio_Electricity_On"] == 1
-      write_bio_zone_bioelectricity_produced(path, sep, inputs, setup, EP)
+    if setup["Energy_Crops_Herb_Supply"] == 1
+      write_bio_herb_supply(path, sep, inputs, setup, EP)
+    end
+
+    if setup["Energy_Crops_Wood_Supply"] == 1
+      write_bio_wood_supply(path, sep, inputs, setup, EP)
+    end
+
+    if setup["Agri_Res_Supply"] == 1
+      write_bio_agri_res_supply(path, sep, inputs, setup, EP)
+    end
+
+    if setup["Agri_Process_Waste_Supply"] == 1
+      write_bio_agri_process_waste_supply(path, sep, inputs, setup, EP)
+    end
+
+    if setup["Agri_Forest_Supply"] == 1
+      write_bio_forest_supply(path, sep, inputs, setup, EP)
+    end
+
+
+    write_bio_zone_bioelectricity_produced(path, sep, inputs, setup, EP)
+    
+    if setup["Bio_ELEC_On"] == 1
+      write_bio_electricity_plant_capacity(path, sep, inputs, setup, EP)
     end
 
     if setup["Bio_H2_On"] == 1
       write_bio_zone_biohydrogen_produced(path, sep, inputs, setup, EP)
+      write_bio_hydrogen_plant_capacity(path, sep, inputs, setup, EP)
     end
 
-    if setup["Bio_Diesel_On"] == 1
-      write_bio_zone_biodiesel_produced(path, sep, inputs, setup, EP)
-    end
-    
-    if setup["Bio_Jetfuel_On"] == 1
-      write_bio_zone_biojetfuel_produced(path, sep, inputs, setup, EP)
-    end
+    if setup["Bio_LF_On"] == 1
+      if setup["ModelFlexBioLiquidFuels"] == 1
+        write_bio_liquid_fuels_balance_flex(path, sep, inputs, setup, EP)
+      else
+        write_bio_liquid_fuels_balance(path, sep, inputs, setup, EP)
+      end
 
-    if setup["Bio_Gasoline_On"] == 1
-      write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
+      #write_bio_zone_biodiesel_produced(path, sep, inputs, setup, EP)
+      #write_bio_zone_biojetfuel_produced(path, sep, inputs, setup, EP)
+      #write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
+
+      write_bio_liquid_fuels_plant_capacity(path, sep, inputs, setup, EP)
+
     end
     
     if setup["Bio_NG_On"] == 1
-      write_bio_zone_bio_NG_produced(path, sep, inputs, setup, EP)
+      write_bio_zone_bionaturalgas_produced(path, sep, inputs, setup, EP)
+      write_bio_natural_gas_plant_capacity(path, sep, inputs, setup, EP)
     end
     
   ## Print confirmation

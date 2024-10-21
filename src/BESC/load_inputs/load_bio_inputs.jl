@@ -43,9 +43,25 @@ function load_bio_inputs(inputs::Dict,setup::Dict,path::AbstractString)
 	## Read input files
 	println("Reading Bioenergy Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
-    inputs = load_bio_refinery(setup, path, sep, inputs)
-    inputs = load_bio_supply(setup, path, sep, inputs)
 
+	inputs = load_bio_supply(setup, path, sep, inputs)
+
+	if setup["Bio_ELEC_On"] == 1
+    	inputs = load_bio_electricity(setup, path, sep, inputs)
+	end
+
+	if setup["Bio_H2_On"] == 1
+    	inputs = load_bio_hydrogen(setup, path, sep, inputs)
+	end
+
+	if setup["Bio_LF_On"] == 1
+    	inputs = load_bio_liquid_fuels(setup, path, sep, inputs)
+	end
+
+	if setup["Bio_NG_On"] == 1
+    	inputs = load_bio_natural_gas(setup, path, sep, inputs)
+	end
+    
 	println("BESC Input CSV Files Successfully Read In From $path$sep")
 
 	return inputs
