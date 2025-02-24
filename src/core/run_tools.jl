@@ -52,7 +52,7 @@ end
 function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString)
     myinputs = Dict{String, Any}() # myinputs dictionary will store read-in data and computed parameters
 
-    # To do: make this conditional on modelling the electricity sector
+    # TODO: make this conditional on modelling the electricity sector
     myinputs = load_inputs(mysetup, inputs_path)
 
     # ### Load H2 inputs if modeling the hydrogen supply chain
@@ -68,6 +68,16 @@ function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString
     ### Load LF inputs if modeling the synthetic fuels supply chain
     if mysetup["ModelLiquidFuels"] == 1
         myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    if mysetup["ElectricityImportExport"] == 1
+        myinputs = load_elec_import_limits(mysetup, inputs_path, myinputs)
+        myinputs = load_elec_import_prices(mysetup, inputs_path, myinputs)
+    end
+
+    if mysetup["H2ImportExport"] == 1
+        myinputs = load_h2_import_limits(mysetup, inputs_path, myinputs)
+        myinputs = load_h2_import_prices(mysetup, inputs_path, myinputs)
     end
 
     return myinputs
@@ -132,24 +142,48 @@ end
 
 function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict{String, Any}, inputs_path::AbstractString)
     outpath = joinpath(inputs_path, "Results")
-    adjusted_outpath = write_outputs(EP, outpath, mysetup, myinputs)
+
+    if mysetup["ModelGenX"] == 1
+        outpath = write_outputs(EP, outpath, mysetup, myinputs)
+    else
+        if mysetup["OverwriteResults"] == 1
+            # Overwrite existing results if dir exists
+            # This is the default behaviour when there is no flag, to avoid breaking existing code
+            if !(isdir(outpath))
+                mkpath(outpath)
+            end
+        else
+            # Find closest unused ouput directory name and create it
+            outpath = choose_output_dir(outpath)
+            mkpath(outpath)
+        end
+    end
+
+    if mysetup["ElectricityImportExport"] == 1
+        write_elec_imports(outpath, "", myinputs, mysetup, EP)
+        write_elec_import_costs(outpath, "", myinputs, mysetup, EP)
+    end
+
+    if mysetup["H2ImportExport"] == 1
+        myinputs = write_h2_imports(EP, outpath, mysetup, myinputs)
+    end
 
     # Write hydrogen supply chain outputs
     if mysetup["ModelH2"] == 1
-        write_HSC_outputs(EP, adjusted_outpath, mysetup, myinputs)
+        write_HSC_outputs(EP, outpath, mysetup, myinputs)
     end
 
     # Write carbon supply chain outputs
     if mysetup["ModelCSC"] == 1
-        write_CSC_outputs(EP, adjusted_outpath, mysetup, myinputs)
+        write_CSC_outputs(EP, outpath, mysetup, myinputs)
     end
 
     # Write synthetic fuels supply chain outputs
     if mysetup["ModelLiquidFuels"] == 1
-        write_liquid_fuels_outputs(EP, adjusted_outpath, mysetup, myinputs)
+        write_liquid_fuels_outputs(EP, outpath, mysetup, myinputs)
     end
-
-    return adjusted_outpath
+    
+    return outpath
 
 end
 

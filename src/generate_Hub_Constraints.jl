@@ -22,6 +22,11 @@ function generate_Hub_Constraints!(EP::Model, setup::Dict, inputs::Dict)
   EP[:eElec_Hub] += EP[:vElec_HSC2Hub]
   EP[:eElec_Hub] += EP[:vElec_LFSC2Hub]
   EP[:eElec_Hub] += EP[:vElec_CSC2Hub]
+
+  if haskey(EP, :vElecImports)
+    EP[:eElec_Hub] += EP[:vElecImports]
+  end
+  
   @constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:eElec_Hub][t, z] == 0)   ##+EP[:ePowerBalance_CSC][t, z]+ EP[:ePowerBalance_LFSC][t, z] 
   #@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:eElec_Hub][t,z] +EP[:ePowerBalance][t, z] +EP[:ePowerBalance_HSC][t, z]== inputs["pD"][t, z])
 

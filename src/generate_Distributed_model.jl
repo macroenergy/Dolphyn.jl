@@ -42,7 +42,9 @@ function generate_distributed_model(setup::Dict, inputs::Dict, OPTIMIZER::MOI.Op
      @variable(EP, vZERO == 0)
 
      # Initialize Objective Function Expression
-     @expression(EP, eObj, 0)
+     eObj = AffExpr(0.0)
+     EP[:eObj] = eObj
+     
      # Note: CO2 balance related expressions, to be handled
      # Power supply by z and timestep - used in emissions constraints
      @expression(EP, eGenerationByZone[z=1:Z, t=1:T], 0)  #Note: to be split
@@ -59,8 +61,7 @@ function generate_distributed_model(setup::Dict, inputs::Dict, OPTIMIZER::MOI.Op
 
      generate_Hub!(EP, setup, inputs)
 
-
-     if setup["Model_GenX"] == 1
+     if setup["ModelGenX"] == 1
           generate_GenX!(EP, setup, inputs)
           #@constraint(EP, cPowerBalance[t=1:T, z=1:Z], EP[:ePowerBalance][t,z] == inputs["pD"][t,z] )
           if setup["SystemCO2Constraint"] == 1 && setup["CO2Cap"] != 0

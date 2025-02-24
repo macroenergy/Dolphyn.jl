@@ -164,6 +164,11 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     if (settings["SpecifySynDieselPercentFlag"] + settings["SpecifySynJetfuelPercentFlag"] + settings["SpecifySynGasolinePercentFlag"] ) > 1
         error("Only one of SpecifySynDieselPercentFlag, SpecifySynJetfuelPercentFlag, and SpecifySynGasolinePercentFlag can be on")
     end
+    
+    ############################################################
+    ###Import / Export Model Settings Options#####
+    set_default_if_absent!(settings, "ElectricityImportExport", 0)
+    set_default_if_absent!(settings, "H2ImportExport", 0)
 
 return settings
 end

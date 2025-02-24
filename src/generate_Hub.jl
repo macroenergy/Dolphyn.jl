@@ -39,6 +39,15 @@ function generate_Hub!(EP::Model, setup::Dict, inputs::Dict)
      # @variable(EP, vElec_slack[t=1:T, z=1:Z], start = 0)
      # @variable(EP, vH2_slack[t=1:T, z=1:Z], start = 0)
 
+     ### Import and export of external commodities ###
+
+     if setup["ElectricityImportExport"] == 1
+          elec_imports!(EP, inputs, setup)
+     end
+     
+     if setup["H2ImportExport"] == 1
+          h2_imports!(EP, inputs, setup)
+     end
 
      ### Creating variables for CO2 emisisons ###
 

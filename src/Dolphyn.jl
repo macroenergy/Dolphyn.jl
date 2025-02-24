@@ -162,6 +162,9 @@ include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
 # Load all .jl files from the core directory
 include_from_dir(joinpath(@__DIR__,"core"), ".jl")
 
+# Load all .jl files from the external import / export directory
+include_from_dir(joinpath(@__DIR__,"external_commodities"), ".jl")
+
 # Configure settings
 include_from_dir(joinpath(@__DIR__,"configure_settings"), ".jl")
 

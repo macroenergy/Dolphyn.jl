@@ -32,7 +32,7 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
     T = inputs["T"]     # Number of time steps (hours)
    
     ### GenX  -> Hub exports
-    if setup["Model_GenX"] == 1
+    if setup["ModelGenX"] == 1
         @expression(EP, eEmissionsConstraintLHS[cap=1:inputs["NCO2Cap"]],
             sum(inputs["omega"][t] * EP[:eEmissionsByZone][z, t] for z = findall(x -> x == 1, inputs["dfCO2CapZones"][:, cap]), t = 1:T)
         )
