@@ -4,7 +4,6 @@ ModelBESC: 1 #Flag to turn or off Bioenergy Supply Chain modelling capabilities 
 #Biomass Supply
 Energy_Crops_Herb_Supply: 1
 Energy_Crops_Wood_Supply: 1
-Agri_Res_Supply: 1
 
 #Bioenergy Process
 Bio_H2_On: 1
