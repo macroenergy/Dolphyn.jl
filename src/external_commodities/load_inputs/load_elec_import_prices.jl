@@ -20,10 +20,10 @@ function load_elec_import_prices(setup::Dict, path::AbstractString, inputs::Dict
 
     elec_prices = Matrix{Float64}(elec_prices_in[:, 2:end])
 
-    # If the model is scaled, then prices become $ / GWhe, not MWhe
+    # If the model is scaled, then prices become M$ / GWhe, not $ / MWhe
     scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
     if scale_factor != 1.0
-        elec_prices .*= scale_factor
+        elec_prices ./= scale_factor
     end
 
     inputs["elec_imports_prices"] = elec_prices

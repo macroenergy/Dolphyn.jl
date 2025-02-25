@@ -7,17 +7,15 @@ function elec_imports!(EP::Model, inputs::Dict, setup::Dict)
 
     # Hourly electricity imports in each zone
     @variable(EP, vElecImports[t=1:T,z=1:Z] >= 0) 
-
+    
     if !(inputs["elec_imports_limits"] === nothing)
         # Limit the hourly imports based on the exogenous capacity limits, if they exist
         @constraint(EP, cElecImportsLimits[t=1:T,z=1:Z], vElecImports[t,z] <= inputs["elec_imports_limits"][t,z])
     end
 
-    # Add to the power balance
-    # add_similar_to_expression!(EP[:ePowerBalance], vElecImports)
-
     # Cost of imports
-    @expression(EP, eElecImportsCost[z=1:Z,t=1:T], vElecImports[t,z] * inputs["elec_imports_prices"][t,z])
+    # If setup["ParameterScale"] == 1, then imports are in M$/GWh, otherwise they are in $/MWh
+    @expression(EP, eElecImportsCost[z=1:Z,t=1:T], inputs["omega"][t] * vElecImports[t,z] * inputs["elec_imports_prices"][t,z])
 
     # Total import Cost
     @expression(EP, eElecImportsCostTot, sum_expression(eElecImportsCost))

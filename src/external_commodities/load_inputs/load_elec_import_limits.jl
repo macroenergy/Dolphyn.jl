@@ -26,9 +26,8 @@ function load_elec_import_limits(setup::Dict, path::AbstractString, inputs::Dict
     # so we can drop the first column
     elec_volume_limits = Matrix{Float64}(elec_volume_limits_in[:, 2:end])
 
-    # If the model is scaled, then prices become GWhe, not MWhe
+    # If the model is scaled, then limits become GWhe, not MWhe
     scale_factor = setup["ParameterScale"] == 1 ? ModelScalingFactor : 1
-    
     if scale_factor != 1.0
         elec_volume_limits ./= scale_factor
     end
