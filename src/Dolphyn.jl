@@ -1,18 +1,4 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
+
 
 module Dolphyn
 
@@ -28,6 +14,7 @@ export load_inputs
 export load_h2_inputs
 export load_co2_inputs
 export load_liquid_fuels_inputs
+export generate_distributed_model
 export generate_model
 export solve_model
 export run_case
@@ -97,11 +84,11 @@ function include_from_dir(dir::String, file_type::String=".jl", exclusions::Vect
         end
     end
     if length(files_to_exclude) > 0
-        println(" --- The following files are not being included from $dir: --- ")
+        @debug(" --- The following files are not being included from $dir: --- ")
         for file in files_to_exclude
-            println("Excluding $file")
+            @debug("Excluding $file")
         end
-        println(" --- End of excluded files --- ")
+        @debug(" --- End of excluded files --- ")
     end
     # Filter out all the files we want to exclude
     filter!(x -> !(x in files_to_exclude), files)
@@ -149,6 +136,9 @@ include_from_dir(tdr_path, ".jl", [joinpath(tdr_path,"PreCluster.jl")])
 # Extensions to GenX
 include_from_dir(joinpath(@__DIR__,"GenX_extensions"), ".jl")
 
+# Load all .jl files from the Hub directory
+include_from_dir(joinpath(@__DIR__,"Hub"), ".jl")
+
 # Load all .jl files from the HSC directory
 include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
 
@@ -157,6 +147,9 @@ include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
 
 # Load all .jl files from the core directory
 include_from_dir(joinpath(@__DIR__,"core"), ".jl")
+
+# Load all .jl files from the external import / export directory
+include_from_dir(joinpath(@__DIR__,"external_commodities"), ".jl")
 
 # Configure settings
 include_from_dir(joinpath(@__DIR__,"configure_settings"), ".jl")
@@ -171,7 +164,14 @@ include_from_dir(joinpath(@__DIR__,"multisector"), ".jl")
 include_from_dir(joinpath(@__DIR__,"CSC"), ".jl")
 
 # Load model generation and solving scripts
-include(joinpath(@__DIR__,"generate_model.jl"))
+ 
+include(joinpath(@__DIR__,"generate_distributed_model.jl"))
+include(joinpath(@__DIR__,"generate_GenX.jl"))
+include(joinpath(@__DIR__,"generate_HSC.jl"))
+include(joinpath(@__DIR__,"generate_CSC.jl"))
+include(joinpath(@__DIR__,"generate_LFSC.jl"))
+include(joinpath(@__DIR__,"generate_Hub.jl"))
+include(joinpath(@__DIR__,"generate_Hub_Constraints.jl"))
 include(joinpath(@__DIR__, "solve_model.jl"))
 
 end

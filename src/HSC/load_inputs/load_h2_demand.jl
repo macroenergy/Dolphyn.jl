@@ -1,28 +1,11 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
+
 
 @doc raw"""
-    load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
+    load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
 
 Function for reading input parameters related to hydrogen load (demand) of each zone.
 """
-function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
-
-    #Zones = inputs_load["Zones"]
-    #Z = inputs_load["Z"]
+function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
 
     data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
     
@@ -33,30 +16,69 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
     end
 
     # Number of demand curtailment/lost load segments
-    inputs_load["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
+    inputs["H2_SEG"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
+
+    # Set T and Z if GenX hasn't run
+    if !haskey(inputs, "T")
+        inputs["T"] = size(H2_load_in, 1)
+    end
+    if !haskey(inputs, "Z")
+        inputs["Z"] = count(s -> occursin("Load_H2_MW_z", s), names(H2_load_in))
+    end
+
+    T = inputs["T"]
+    Z = inputs["Z"]
 
     # Demand in MWh per hour for each zone
-    start = findall(s -> s == "Load_H2_MW_z1", names(H2_load_in))[1]    
+    start = findall(s -> s == "Load_H2_MW_z1", names(H2_load_in))[1]
     # Max value of non-served energy in $/MWh
-    inputs_load["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
+    inputs["H2_Voll"] = collect(skipmissing(H2_load_in[!,:Voll]))
     # Demand in MWh per hour      
-    inputs_load["H2_D"] =Matrix(H2_load_in[1:inputs_load["T"],start:start-1+inputs_load["Z"]])    
+    inputs["H2_D"] =Matrix(H2_load_in[1:T,start:start-1+Z])    
 
     # Cost of non-served energy/demand curtailment (for each segment)
-    H2_SEG = inputs_load["H2_SEG"]  # Number of demand segments
-    inputs_load["pC_H2_D_Curtail"] = zeros(H2_SEG)
-    inputs_load["pMax_H2_D_Curtail"] = zeros(H2_SEG)
+    H2_SEG = inputs["H2_SEG"]  # Number of demand segments
+    inputs["pC_H2_D_Curtail"] = zeros(H2_SEG)
+    inputs["pMax_H2_D_Curtail"] = zeros(H2_SEG)
     for s in 1:H2_SEG
         # Cost of each segment reported as a fraction of value of non-served energy - scaled implicitly
-        inputs_load["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Segment_Cost_of_Demand_Curtailment_Fraction]))[s]*inputs_load["H2_Voll"][1]
+        inputs["pC_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Segment_Cost_of_Demand_Curtailment_Fraction]))[s]*inputs["H2_Voll"][1]
         # Maximum hourly demand curtailable as % of the max demand (for each segment)
-        inputs_load["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
+        inputs["pMax_H2_D_Curtail"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
+
+    end
+
+    if !haskey(inputs, "omega")
+        as_vector(col::Symbol) = collect(skipmissing(H2_load_in[!, col]))
+
+        inputs["omega"] = zeros(Float64, T) # weights associated with operational sub-period in the model - sum of weight = 8760
+        # Weights for each period - assumed same weights for each sub-period within a period
+        inputs["Weights"] = as_vector(:Sub_Weights) # Weights each period
+
+        # Total number of periods and subperiods
+        inputs["REP_PERIOD"] = convert(Int16, as_vector(:Rep_Periods)[1])
+        inputs["H"] = convert(Int64, as_vector(:Timesteps_per_Rep_Period)[1])
+
+        # Creating sub-period weights from weekly weights
+        for w in 1:inputs["REP_PERIOD"]
+            for h in 1:inputs["H"]
+                t = inputs["H"]*(w-1)+h
+                inputs["omega"][t] = inputs["Weights"][w]/inputs["H"]
+            end
+        end
+
+        # Create time set steps indicies
+        inputs["hours_per_subperiod"] = div.(T,inputs["REP_PERIOD"]) # total number of hours per subperiod
+        hours_per_subperiod = inputs["hours_per_subperiod"] # set value for internal use
+
+        inputs["START_SUBPERIODS"] = 1:hours_per_subperiod:T 	# set of indexes for all time periods that start a subperiod (e.g. sample day/week)
+        inputs["INTERIOR_SUBPERIODS"] = setdiff(1:T, inputs["START_SUBPERIODS"]) # set of indexes for all time periods that do not start a subperiod
 
     end
     
     print_and_log(" -- HSC_load_data.csv Successfully Read!")
 
-    return inputs_load
+    return inputs
 
 end
 

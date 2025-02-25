@@ -1,18 +1,4 @@
-"""
-DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
-Copyright (C) 2022,  Massachusetts Institute of Technology
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-A complete copy of the GNU General Public License v2 (GPLv2) is available
-in LICENSE.txt.  Users uncompressing this from an archive may not have
-received this license file.  If not, see <http://www.gnu.org/licenses/>.
-"""
+
 
 @doc raw"""
     h2_production(EP::Model, inputs::Dict, setup::Dict)
@@ -26,11 +12,12 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
     print_and_log(" -- H2 Production Module")
     
     if !isempty(inputs["H2_GEN"])
-    # expressions, variables and constraints common to all types of hydrogen generation technologies
-        EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict)
+        # expressions, variables and constraints common to all types of hydrogen generation technologies
+        EP = h2_production_all_investmentConstraints(EP::Model, inputs::Dict, setup::Dict)
+        EP = h2_production_all(EP::Model, inputs::Dict, setup::Dict) #constraints for operations
     end
 
-    if setup["ModelH2Liquid"] ==1
+    if setup["ModelH2Liquid"] == 1
         H2_GEN_COMMIT = union(inputs["H2_GEN_COMMIT"], inputs["H2_LIQ_COMMIT"], inputs["H2_EVAP_COMMIT"])
         H2_GEN_NO_COMMIT = union(inputs["H2_GEN_NO_COMMIT"], inputs["H2_LIQ_NO_COMMIT"], inputs["H2_EVAP_NO_COMMIT"])
     else
@@ -46,7 +33,7 @@ function h2_production(EP::Model, inputs::Dict, setup::Dict)
     end
 
     if !isempty(H2_GEN_NO_COMMIT)
-        EP = h2_production_no_commit(EP::Model, inputs::Dict,setup::Dict)
+        EP = h2_production_no_commit(EP::Model, inputs::Dict, setup::Dict)
     end
 
     ## For CO2 Policy constraint right hand side development - H2 Generation by zone and each time step
