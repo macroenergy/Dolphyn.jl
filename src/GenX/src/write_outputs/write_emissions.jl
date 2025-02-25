@@ -20,6 +20,7 @@ function write_emissions(path::AbstractString, inputs::Dict, setup::Dict, EP::Mo
 			# Dual variable of CO2 constraint = shadow price of CO2
 			tempCO2Price = zeros(Z,inputs["NCO2Cap"])
 			if has_duals(EP) == 1
+				@info "Number of caps: $(inputs["NCO2Cap"])"
 				for cap in 1:inputs["NCO2Cap"]
 					for z in findall(x->x==1, inputs["dfCO2CapZones"][:,cap])
 						tempCO2Price[z,cap] = (-1) * dual.(EP[:cCO2Emissions_systemwide])[cap]

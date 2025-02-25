@@ -6,8 +6,6 @@
 Function for reporting time-dependent CO$_2$ emissions by zone in hydrogen supply chain.
 """
 function write_h2_emissions(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
-    dfH2Gen = inputs["dfH2Gen"]
-    G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
 

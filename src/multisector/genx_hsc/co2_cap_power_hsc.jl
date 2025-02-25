@@ -130,11 +130,6 @@ function co2_cap_power_hsc(EP::Model, inputs::Dict, setup::Dict)
         EP[:eCO2emission_Hub] += eEmissionsConstraintLHSLF
     end
 
-    ### Hub constraints
-    @constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
-        EP[:eCO2emission_Hub][cap] <= EP[:eCO2cap_Hub][cap]
-    )
-
     return EP
 
 end

@@ -14,7 +14,6 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
-	H2_SEG = inputs["H2_SEG"] # Number of load curtailment segments
 	H2_FLEX = inputs["H2_FLEX"] # Set of demand flexibility resources
 	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of H2 storage resources
 	## Hydrogen balance for each zone

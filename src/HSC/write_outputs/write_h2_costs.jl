@@ -9,12 +9,7 @@ function write_h2_costs(path::AbstractString, sep::AbstractString, inputs::Dict,
 	## Cost results
 	dfH2Gen = inputs["dfH2Gen"]
 
-	H = inputs["H2_RES_ALL"]
-	H2_STOR_ALL = inputs["H2_STOR_ALL"] # Set of all h2 storage resources
-
-	SEG = inputs["SEG"]  # Number of lines
 	Z = inputs["Z"]     # Number of zones
-	T = inputs["T"]     # Number of time steps (hours)
 	H2_GEN_COMMIT = inputs["H2_GEN_COMMIT"] # H2 production technologies with unit commitment
 
 	if setup["ModelH2G2P"] == 1

@@ -53,14 +53,28 @@ function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString
     myinputs = Dict{String, Any}() # myinputs dictionary will store read-in data and computed parameters
 
     # TODO: make this conditional on modelling the electricity sector
-    myinputs = load_inputs(mysetup, inputs_path)
+    if mysetup["ModelGenX"] == 1
+        myinputs = load_inputs(mysetup, inputs_path)
+    end
+    if !haskey(myinputs, "L")
+        # GenX inputs not loaded
+        if isfile(joinpath(inputs_path, "Network.csv"))
+            # But a network file exists - so we'll model the network
+            network_var = load_network_data!(mysetup, inputs_path, myinputs)
+        else
+            # No network file - so we'll assume no network
+            myinputs["L"] = 0
+            myinputs["EXPANSION_LINES"] = Int[]
+            myinputs["NO_EXPANSION_LINES"] = Int[]
+        end
+    end
 
-    # ### Load H2 inputs if modeling the hydrogen supply chain
+    ### Load H2 inputs if modeling the hydrogen supply chain
     if mysetup["ModelH2"] == 1
         myinputs = load_h2_inputs(myinputs, mysetup, inputs_path)
     end
 
-    # ### Load CO2 inputs if modeling the carbon supply chain
+    ### Load CO2 inputs if modeling the carbon supply chain
     if mysetup["ModelCSC"] == 1
         myinputs = load_co2_inputs(myinputs, mysetup, inputs_path)
     end
@@ -157,6 +171,21 @@ function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict
             outpath = choose_output_dir(outpath)
             mkpath(outpath)
         end
+
+        write_status(outpath, myinputs, mysetup, EP)
+
+        if myinputs["L"] > 0
+            elapsed_time_flows = @elapsed write_transmission_flows(outpath, myinputs, mysetup, EP)
+            println(" -- Time elapsed for writing transmission flows is $(elapsed_time_flows)")
+            elapsed_time_losses = @elapsed write_transmission_losses(outpath, myinputs, mysetup, EP)
+            println(" -- Time elapsed for writing transmission losses is $(elapsed_time_losses)")
+            if mysetup["NetworkExpansion"] == 1
+                elapsed_time_expansion = @elapsed write_nw_expansion(outpath, myinputs, mysetup, EP)
+                println(" -- Time elapsed for writing network expansion is $(elapsed_time_expansion)")
+            end
+        end
+
+
     end
 
     if mysetup["ElectricityImportExport"] == 1

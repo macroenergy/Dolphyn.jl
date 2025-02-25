@@ -7,10 +7,6 @@ Functions for reporting capacities of hydrogen trucks (starting capacities or, e
 """
 function write_h2_truck_capacity(path::AbstractString, sep::AbstractString, inputs::Dict,setup::Dict, EP::Model)
     H2_TRUCK_TYPES = inputs["H2_TRUCK_TYPES"]
-    NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"]
-    RET_CAP_TRUCK = inputs["RET_CAP_TRUCK"]
-   # NEW_CAP_TRUCK = inputs["NEW_CAP_TRUCK"]
-   # RET_CAP_TRUCK = inputs["RET_CAP_TRUCK"]
 
     dfH2Truck = inputs["dfH2Truck"]
     Z = inputs["Z"]

@@ -14,7 +14,6 @@ function generate_Hub_Constraints!(EP::Model, setup::Dict, inputs::Dict)
     transmission_operation!(EP, inputs, setup)
   end
 
-
   # ### Note, the dierctions of the all the energy flow in/out Hub need to be double checked.
   # ## Electricity balance between zones and domains
   EP[:eElec_Hub] += EP[:vElec_GenX2Hub]
@@ -36,6 +35,13 @@ function generate_Hub_Constraints!(EP::Model, setup::Dict, inputs::Dict)
   EP[:eH2_Hub] += EP[:vH2_LFSC2Hub]
   @constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2_Hub][t, z] == 0)  ##+ EP[:eH2Balance_LFSC][t,z] 
   #@constraint(EP, cH2Balance[t=1:T, z=1:Z], EP[:eH2Balance][t, z]== inputs["H2_D"][t, z])
+
+  if setup["SystemCO2Constraint"] == 2
+    ### Hub constraints
+    @constraint(EP, cCO2Emissions_systemwide[cap=1:inputs["NCO2Cap"]],
+      EP[:eCO2emission_Hub][cap] <= EP[:eCO2cap_Hub][cap]
+    )
+  end
 
   return EP
 end
