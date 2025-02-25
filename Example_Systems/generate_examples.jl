@@ -20,6 +20,7 @@ highs_cases = [
 
 gurobi_cases = [
     joinpath(@__DIR__, "SmallNewEngland", "ThreeZones_Gurobi"),
+    joinpath(@__DIR__, "SmallNewEngland", "ThreeZones_Gurobi_imports"),
 ]
 
 summary = []

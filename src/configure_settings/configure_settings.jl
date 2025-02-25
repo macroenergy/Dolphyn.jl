@@ -110,6 +110,9 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
     #GreenH2ShareRequirement: 0 # Modeling whether or not resources there is a share of green H2 required. 
     set_default_if_absent!(settings, "GreenH2ShareRequirement", 0) 
 
+    set_default_if_absent!(settings, "ModelH2Pipelines", 0)
+    set_default_if_absent!(settings, "H2PipeDirection", 1)
+
 
     ############################################################
     ###CSC Model Settings Options#####
