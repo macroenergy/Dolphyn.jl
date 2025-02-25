@@ -1,5 +1,3 @@
-
-
 @doc raw"""
     h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
@@ -69,19 +67,28 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
     H2_Pipe_Map = inputs["H2_Pipe_Map"]
 
     ### Variables ###
-    
     @variable(EP, vH2PipeLevel[p = 1:H2_P, t = 1:T] >= 0) # Storage in the pipe
     @variable(EP, vH2PipeFlow_pos[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # positive pipeflow
     @variable(EP, vH2PipeFlow_neg[p = 1:H2_P, t = 1:T, d = [1, -1]] >= 0) # negative pipeflow
 
+    # Unidirectional pipeline flow constraints. hsc_pipeline inputs file must have 2 pipelines in between each zone for this to work properly (flipping the -1 and +1 directions)
+    # Constraints force the source zone to only export H2 through pipeline p while the destination zone can only import
+    if setup["H2PipeDirection"] == 1
+        @constraint(EP, vH2PipeFlow_pos[:, :, 1] .== 0)
+        @constraint(EP, vH2PipeFlow_neg[:, :, -1] .== 0)
+    end
 
-       # Calculate net flow at each pipe-zone interfrace
+    ### Expressions ###
+    # Calculate net flow at each pipe-zone interfrace
     @expression(
         EP,
         eH2PipeFlow_net[p = 1:H2_P, t = 1:T, d = [-1, 1]],
         vH2PipeFlow_pos[p, t, d] - vH2PipeFlow_neg[p, t, d]
     )
 
+    ## Objective Function Expressions ##
+
+    ## End Objective Function Expressions ##
 
     ## Balance Expressions ##
     # H2 Power Consumption balance
@@ -131,7 +138,26 @@ function h2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
     ### Constraints ###
 
-    
+    # Constraints
+    if setup["H2PipeInteger"] == 1
+        for p = 1:H2_P
+            set_integer.(vH2NPipe[p])
+        end
+    end
+
+    # Modeling expansion of the pipleline network
+    if setup["H2NetworkExpansion"] == 1
+        # If network expansion allowed Total no. of Pipes >= Existing no. of Pipe 
+        @constraints(EP, begin
+            [p in 1:H2_P], EP[:eH2NPipeNew][p] >= 0
+        end)
+    else
+        # If network expansion is not alllowed Total no. of Pipes == Existing no. of Pipe 
+        @constraints(EP, begin
+            [p in 1:H2_P], EP[:eH2NPipeNew][p] == 0
+        end)
+    end
+
     # Constraint maximum pipe flow
     @constraints(
         EP,
