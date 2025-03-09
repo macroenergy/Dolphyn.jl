@@ -17,37 +17,48 @@ function energy_share_requirement!(EP::Model, inputs::Dict, setup::Dict)
 
 	hours_per_subperiod = Int(inputs["hours_per_subperiod"])
 	Rep_Periods = inputs["REP_PERIOD"] # number of representative periods
+	Period_Weights = inputs["Weights"] # weights associated with operational sub-period in the model
 
+	if setup["MultipleYears"]==0
+			# if input files are present, add energy share requirement slack variables
+		if haskey(inputs, "dfESR_slack") 
+			@variable(EP, vESR_slack[ESR=1:inputs["nESR"]]>=0)
+			EP[:eESR] += vESR_slack
 
+			@expression(EP, eCESRSlack[ESR=1:inputs["nESR"]], inputs["dfESR_slack"][ESR,:PriceCap] * EP[:vESR_slack][ESR])
+			@expression(EP, eCTotalESRSlack, sum(EP[:eCESRSlack][ESR] for ESR = 1:inputs["nESR"]))
 
+			EP[:eObj] += eCTotalESRSlack
 
-	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
-	# Sub-period ESR constraint LHS
-		if setup["MultipleYears"]==1
-			@expression(EP, eESRPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
-				sum( EP[:eESRT][ESR, t]
-				for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
-			)
-
-			@constraint(EP, cESRSharePerPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
-				eESRPeriod[ESR,p] >= 0
-			)
-		else
-		 # modeling single year of operations either on an hourly basis or a representative periods - see eESR definition
-			@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], EP[:eESR][ESR] >= 0)
 		end
+		# modeling single year of operations either on an hourly basis or a representative periods - see eESR definition
+		@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], EP[:eESR][ESR] >= 0)
 
+	else # setup["MultipleYears"]==1
+		@expression(EP, eESRPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
+			sum( EP[:eESRT][ESR, t]
+			for t in ((p-1) * hours_per_subperiod + 1):(p * hours_per_subperiod))
+		)
 
+		if haskey(inputs, "dfESR_slack") 
+			@variable(EP, vESR_slack[ESR=1:inputs["nESR"], p=1:Rep_Periods] >= 0)
+			@expression(EP,ESRslackPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
+				vESR_slack[ESR,p]*convert(Float64, Period_Weights[p])
+			)
+			EP[:eESRPeriod] += ESRslackPeriod
+
+			@expression(EP, eCESRSlack[ESR=1:inputs["nESR"], p=1:Rep_Periods], inputs["dfESR_slack"][ESR,:PriceCap] * EP[:vESR_slack][ESR,p])
+			@expression(EP, eCTotalESRSlackPerESR[ESR=1:inputs["nESR"]], sum(EP[:eCESRSlack][ESR,p]*Period_Weights[p] for p = 1:Rep_Periods))
+			@expression(EP, eCTotalESRSlack, sum(EP[:eCTotalESRSlackPerESR][ESR] for ESR = 1:inputs["nESR"]))
+
+			EP[:eObj] += eCTotalESRSlack
+
+		end
+		# Sub-period ESR constraint LHS for the case of modeling multiple years
+		@constraint(EP, cESRSharePerPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
+			EP[:eESRPeriod][ESR,p] >= 0
+		)
 	
-	# if input files are present, add energy share requirement slack variables
-	# HARD CODED TO APPLY ONLY FOR SINGLE YEAR CALCLATIONS FOR NOW
-	if haskey(inputs, "dfESR_slack") && setup["MultipleYears"]==0 
-		@variable(EP, vESR_slack[ESR=1:inputs["nESR"]]>=0)
-		EP[:eESR] += vESR_slack
-
-		@expression(EP, eCESRSlack[ESR=1:inputs["nESR"]], inputs["dfESR_slack"][ESR,:PriceCap] * EP[:vESR_slack][ESR])
-		@expression(EP, eCTotalESRSlack, sum(EP[:eCESRSlack][ESR] for ESR = 1:inputs["nESR"]))
-
-		EP[:eObj] += eCTotalESRSlack
 	end
+
 end

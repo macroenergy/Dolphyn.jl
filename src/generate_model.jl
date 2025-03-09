@@ -98,7 +98,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     if Rep_Periods >1 && ( (hours_per_subperiod == 8760) || div(sum(Rep_Period_Weights),Rep_Periods)== 8760)
         # modeling multiple years of operations if RepPeriod > 1 and one of two conditions is true:
-        # hours_per_subperiod = 8760 (modeling each year at hourly resolution)
+        # hours_per_subperiod = 8760 (modeling each year at hourly resolution) but the weight of each rep period could be separately specified for to capture different probabilities
         # OR
         # average weight for each rep period is 8760 (in this case number of time steps need for each rep period can be less than 8760)
         setup["MultipleYears"]=1

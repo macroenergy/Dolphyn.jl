@@ -16,7 +16,7 @@ function write_esr_prices(path::AbstractString, inputs::Dict, setup::Dict, EP::M
 			dfESR[!,:ESR_Price] = dfESR[!,:ESR_Price] * ModelScalingFactor # Converting MillionUS$/GWh to US$/MWh
 		end
 
-		if haskey(inputs, "dfESR_slack") # SKIP FOR THE CASE OF MULTIPLE YEARS OF OPERATION
+		if haskey(inputs, "dfESR_slack") 
 			dfESR[!,:ESR_AnnualSlack] = convert(Array{Float64}, value.(EP[:vESR_slack]))
 			dfESR[!,:ESR_AnnualPenalty] = convert(Array{Float64}, value.(EP[:eCESRSlack]))
 			if setup["ParameterScale"] == 1
@@ -26,25 +26,33 @@ function write_esr_prices(path::AbstractString, inputs::Dict, setup::Dict, EP::M
 		end
 		CSV.write(joinpath(path, "ESR_prices_and_penalties.csv"), dfESR)
 
-	else
-		dfESR = DataFrame(ESR = 1:nESR) 
-
-		# Dividing dual variable for each hour with corresponding hourly weight to retrieve marginal cost of generation
-		if setup["ParameterScale"] == 1
-			dfESR = hcat(dfESR, DataFrame(dual.(EP[:cESRSharePerPeriod])./ModelScalingFactor, :auto))
+	else # setup["MultipleYears"]==1
+		if haskey(inputs, "dfESR_slack") 
+			dfESR = DataFrame(:ESR => Int[], :Rep_Periods => String[] ,:ESR_Price => Float64[], :ESR_AnnualSlack => Float64[], :ESR_AnnualPenalty => Float64[])
+			i=1
+			while i <= nESR
+				df1 = DataFrame(ESR = i, 
+				Rep_Periods=1:Rep_Periods, 
+				ESR_Price = convert(Array{Float64}, dual.(EP[:cESRSharePerPeriod])[i,:]),
+				ESR_AnnualSlack = convert(Array{Float64}, value.(EP[:vESR_slack])[i,:]),
+				ESR_AnnualPenalty = convert(Array{Float64}, value.(EP[:eCESRSlack])[i,:])
+				)	
+				dfESR =vcat(dfESR, df1)
+				i += 1
+			end
 		else
-			dfESR = hcat(dfESR, DataFrame(dual.(EP[:cESRSharePerPeriod]), :auto))
+			dfESR = DataFrame(:ESR => Int[], :Rep_Periods => String[] ,:ESR_Price => Float64[])
+			i=1
+			while i <= nESR
+				df1 = DataFrame(ESR = i, 
+				Rep_Periods=1:Rep_Periods, 
+				ESR_Price = convert(Array{Float64}, dual.(EP[:cESRSharePerPeriod])[i,:])
+				)	
+				dfESR =vcat(dfESR, df1)
+				i += 1
+			end
 		end
-
-		auxNew_Names=[Symbol("Representative_Periods");[Symbol("p$t") for t in 1:Rep_Periods]]
-		#[Symbol("p$t") for t in 1:Rep_Periods]
-		rename!(dfESR,auxNew_Names)
-		# dfESR = DataFrame(ESR_Price = vec(convert(Array{Float64}, dual.(EP[:cESRSharePerPeriod]))))
-
-		# dfESR = DataFrame(ESR_Price = convert(Array{Float64}, dual.(EP[:cESRSharePerPeriod])))
-	
-
-		CSV.write(joinpath(path, "ESR_prices_and_penalties.csv"), dftranspose(dfESR, false), writeheader=false)
+		CSV.write(joinpath(path, "ESR_prices_and_penalties.csv"), dfESR)
 
 	end
 	return dfESR
