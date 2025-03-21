@@ -96,16 +96,6 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	Rep_Periods = inputs["REP_PERIOD"] # number of representative periods
     Rep_Period_Weights = inputs["Weights"]  # Weights of representative period - vector
 
-    if Rep_Periods >1 && ( (hours_per_subperiod == 8760) || div(sum(Rep_Period_Weights),Rep_Periods)== 8760)
-        # modeling multiple years of operations if RepPeriod > 1 and one of two conditions is true:
-        # hours_per_subperiod = 8760 (modeling each year at hourly resolution) but the weight of each rep period could be separately specified for to capture different probabilities
-        # OR
-        # average weight for each rep period is 8760 (in this case number of time steps need for each rep period can be less than 8760)
-        setup["MultipleYears"]=1
-    else
-        setup["MultipleYears"]=0 # Single year modeled over 8760 hours or via representative weeks
-    end
-
     ## Start pre-solve timer
     presolver_start_time = time()
 
