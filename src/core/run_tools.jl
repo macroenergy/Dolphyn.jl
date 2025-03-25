@@ -239,6 +239,10 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
     solver = configure_solver(settings_path, optimizer)
     myinputs = load_all_inputs(mysetup, inputs_path)
     EP = generate_distributed_model(mysetup, myinputs, solver)
+    if mysetup["AutoScaleConstraints"] == 1
+        println("Scaling Constraints")
+        scale_constraints!(EP, mysetup["AutoScalingSettings"])
+    end
     return EP, mysetup, myinputs
 end
 

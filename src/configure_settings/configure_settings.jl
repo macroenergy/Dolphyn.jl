@@ -46,6 +46,12 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
 
     ## Force re-clustering of time series data; 0 = not active; 1 = active
     set_default_if_absent!(settings, "Force_TDR_recluster", 0)
+
+    ## Automatically scale constraint coefficients and RHS
+    set_default_if_absent!(settings, "AutoScaleConstraints", 0)
+
+    ## Get scaling setting for constraint and RHS scaling
+    settings["AutoScalingSettings"] = get_scaling_settings(settings)
     
     ###########################################
     ### GenX-specific settings 

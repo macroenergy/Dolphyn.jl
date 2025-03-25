@@ -40,6 +40,7 @@ using Combinatorics
 using Revise
 using Glob
 using LoggingExtras
+using MacroEnergyScaling
 
 using Random
 using RecursiveArrayTools
