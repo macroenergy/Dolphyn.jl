@@ -17,7 +17,8 @@ function energy_share_requirement!(EP::Model, inputs::Dict, setup::Dict)
 
 	hours_per_subperiod = Int(inputs["hours_per_subperiod"])
 	Rep_Periods = inputs["REP_PERIOD"] # number of representative periods
-	Period_Weights = inputs["Weights"] # weights associated with operational sub-period in the model
+	normalized_period_weights = inputs["Weights"]  ./ sum(inputs["Weights"]) # normalize period weights to sum to 1
+
 
 	if setup["MultipleYears"]==0
 			# if input files are present, add energy share requirement slack variables
@@ -43,12 +44,12 @@ function energy_share_requirement!(EP::Model, inputs::Dict, setup::Dict)
 		if haskey(inputs, "dfESR_slack") 
 			@variable(EP, vESR_slack[ESR=1:inputs["nESR"], p=1:Rep_Periods] >= 0)
 			@expression(EP,ESRslackPeriod[ESR=1:inputs["nESR"], p=1:Rep_Periods], 
-				vESR_slack[ESR,p]*convert(Float64, Period_Weights[p])
+				vESR_slack[ESR,p]
 			)
 			EP[:eESRPeriod] += ESRslackPeriod
 
 			@expression(EP, eCESRSlack[ESR=1:inputs["nESR"], p=1:Rep_Periods], inputs["dfESR_slack"][ESR,:PriceCap] * EP[:vESR_slack][ESR,p])
-			@expression(EP, eCTotalESRSlackPerESR[ESR=1:inputs["nESR"]], sum(EP[:eCESRSlack][ESR,p]*Period_Weights[p] for p = 1:Rep_Periods))
+			@expression(EP, eCTotalESRSlackPerESR[ESR=1:inputs["nESR"]], sum(EP[:eCESRSlack][ESR,p]*normalized_period_weights[p] for p = 1:Rep_Periods))
 			@expression(EP, eCTotalESRSlack, sum(EP[:eCTotalESRSlackPerESR][ESR] for ESR = 1:inputs["nESR"]))
 
 			EP[:eObj] += eCTotalESRSlack
