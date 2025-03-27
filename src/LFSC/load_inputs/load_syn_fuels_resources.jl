@@ -79,7 +79,7 @@ function load_syn_fuels_resources(setup::Dict, path::AbstractString, sep::Abstra
 	inputs["Syn_Fuel_R_Zones"] = syn_fuel_zones
 	inputs["Syn_fuel_Resource_ZONES"] = inputs["SYN_FUELS_RESOURCES_NAME"] .* "_z" .* string.(syn_fuel_zones)
 
-	println("Syn_Fuels_resources.csv Successfully Read!")
+	println(" -- Syn_Fuels_resources.csv Successfully Read!")
 
     return inputs
 

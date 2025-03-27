@@ -13,7 +13,7 @@ The final term in the summation above adds roundtrip storage losses to the total
 """
 function energy_share_requirement!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Energy Share Requirement Policies Module")
+	println(" -- Energy Share Requirement Policies Module")
 
 	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
 	@constraint(EP, cESRShare[ESR=1:inputs["nESR"]], EP[:eESR][ESR] >= 0)

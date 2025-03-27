@@ -80,6 +80,10 @@ function configure_solver(solver_name::String, solver_settings_path::String, sol
     return optimizer
 end
 
+function configure_solver(solver_settings_path::AbstractString, solver::DataType=HiGHS.Optimizer)
+    return configure_solver(find_optimizer_packagename(solver), solver_settings_path, solver)
+end
+
 function check_solver_and_configure(solver_details::Dict, solver::DataType)
     optimizer_name = solver_details["name"]
     if check_if_solver_loaded(optimizer_name)

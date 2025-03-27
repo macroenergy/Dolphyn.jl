@@ -69,7 +69,7 @@ The change of CO2 pipeline storage inventory is modeled as follows:
 """
 function co2_pipeline(EP::Model, inputs::Dict, setup::Dict)
 
-	println("CO2 Pipeline Module")
+	println(" -- CO2 Pipeline Module")
 
     T = inputs["T"] # Model operating time steps
     Z = inputs["Z"]  # Model demand zones - assumed to be same for CO2 and electricity

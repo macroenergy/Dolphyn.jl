@@ -39,7 +39,7 @@ function load_co2_capture_compression(setup::Dict, path::AbstractString, sep::Ab
 	# Set of CO2 resources not eligible for unit committment
 	inputs_co2_capture_comp["CO2_CAPTURE_COMP"] = co2_capture_comp[!,:R_ID]
 
-	println("CSC_capture_compression.csv Successfully Read!")
+	println(" -- CSC_capture_compression.csv Successfully Read!")
 
     return inputs_co2_capture_comp
 

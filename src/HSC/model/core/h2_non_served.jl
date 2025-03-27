@@ -63,7 +63,7 @@ Additionally, total demand curtailed in each time step cannot exceed total hydro
 """
 function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("Hydrogen Non-served Energy Module")
+    print_and_log(" -- H2 Non-served Energy Module")
 
     T = inputs["T"]     # Number of time steps
     Z = inputs["Z"]     # Number of zones
@@ -110,10 +110,10 @@ function h2_non_served(EP::Model, inputs::Dict, setup::Dict)
     # Add total cost contribution of non-served energy/curtailed demand to the objective function
     EP[:eObj] += eTotalH2CNSE
 
-    ## Power Balance Expressions ##
+    ## Expression to be added to H2 Balance##
     @expression(EP, eH2BalanceNse[t = 1:T, z = 1:Z], sum(vH2NSE[s, t, z] for s = 1:H2_SEG))
 
-    # Add non-served energy/curtailed demand contribution to power balance expression
+    # Add non-served energy/curtailed demand contribution to H2 balance expression
     EP[:eH2Balance] += eH2BalanceNse
 
     ### Constratints ###

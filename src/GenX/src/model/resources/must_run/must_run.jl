@@ -14,7 +14,7 @@ For must-run resources ($y\in \mathcal{MR}$) output in each time period $t$ must
 """
 function must_run!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Must-Run Resources Module")
+	println(" -- Must-Run Resources Module")
 
 	dfGen = inputs["dfGen"]
 

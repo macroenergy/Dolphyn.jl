@@ -11,7 +11,7 @@ This module additionally defines contributions to the objective function from va
 """
 function discharge!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Discharge Module")
+	println(" -- Discharge Module")
 
 	dfGen = inputs["dfGen"]
 

@@ -43,7 +43,7 @@ For resources where upper bound $\overline{y_{g}^{\textrm{H,GEN}}}$ and lower bo
 """
 function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("H2 Production Core Module")
+    print_and_log(" -- H2 Production Core Module")
     
     dfH2Gen = inputs["dfH2Gen"]
 
@@ -72,7 +72,7 @@ function h2_production_all(EP::Model, inputs::Dict, setup::Dict)
 
     ## Constraints on retirements and capacity additions
     # Cannot retire more capacity than existing capacity
-    @constraint(EP, cH2GenMaxRetNoCommit[k in setdiff(H2_GEN_RET_CAP, H2_GEN_NO_COMMIT)], EP[:vH2GenRetCap][k] <= dfH2Gen[!,:Existing_Cap_tonne_p_hr][k])
+    @constraint(EP, cH2GenMaxRetNoCommit[k in intersect(H2_GEN_RET_CAP, H2_GEN_NO_COMMIT)], EP[:vH2GenRetCap][k] <= dfH2Gen[!,:Existing_Cap_tonne_p_hr][k])
     @constraint(EP, cH2GenMaxRetCommit[k in intersect(H2_GEN_RET_CAP, H2_GEN_COMMIT)], dfH2Gen[!,:Cap_Size_tonne_p_hr][k] * EP[:vH2GenRetCap][k] <= dfH2Gen[!,:Existing_Cap_tonne_p_hr][k])
 
     ## Constraints on new built capacity

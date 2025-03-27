@@ -15,5 +15,5 @@ function load_maximum_capacity_requirement!(path::AbstractString, inputs::Dict, 
     if "PriceCap" in names(df)
         inputs["MaxCapPriceCap"] = df[!, :PriceCap] / scale_factor
     end
-    println(filename * " Successfully Read!")
+    println(" -- " * filename * " Successfully Read!")
 end

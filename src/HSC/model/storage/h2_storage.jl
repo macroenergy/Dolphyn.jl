@@ -23,7 +23,7 @@ A wide range of energy storage devices (all $s \in \mathcal{S}$) can be modeled 
 """
 function h2_storage(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("Hydrogen Storage Module")
+    print_and_log(" -- H2 Storage Module")
 
     if !isempty(inputs["H2_STOR_ALL"])
         # investment variables expressions and related constraints for H2 storage tehcnologies
@@ -39,7 +39,7 @@ function h2_storage(EP::Model, inputs::Dict, setup::Dict)
         # DEV NOTE: add if conditions here for other types of storage technologies
 
         # Include LongDurationStorage only when modeling representative periods and long-duration storage
-        if setup["OperationWrapping"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"])
+        if setup["TimeDomainReduction"] == 1 && !isempty(inputs["H2_STOR_LONG_DURATION"])
             EP = h2_long_duration_storage(EP, inputs)
         end
     end

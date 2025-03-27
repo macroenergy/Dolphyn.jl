@@ -34,7 +34,7 @@ Additionally, total demand curtailed in each time step cannot exceed total deman
 """
 function non_served_energy!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Non-served Energy Module")
+	println(" -- Non-served Energy Module")
 
 	T = inputs["T"]     # Number of time steps
 	Z = inputs["Z"]     # Number of zones

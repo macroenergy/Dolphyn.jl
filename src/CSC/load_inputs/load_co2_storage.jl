@@ -39,7 +39,7 @@ function load_co2_storage(setup::Dict, path::AbstractString, sep::AbstractString
 	# Set of CO2 resources not eligible for unit committment
 	inputs_co2_storage["CO2_STORAGE"] = co2_storage[!,:R_ID]
 
-	println("CSC_storage.csv Successfully Read!")
+	println(" -- CSC_storage.csv Successfully Read!")
 
     return inputs_co2_storage
 

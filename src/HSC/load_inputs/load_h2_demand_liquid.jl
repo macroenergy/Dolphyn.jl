@@ -22,7 +22,7 @@ Function for reading input parameters related to liquid hydrogen load (demand) o
 function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractString, inputs_load::Dict)
     
     data_directory = joinpath(path, setup["TimeDomainReductionFolder"])
-    if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"Load_data.csv")) && isfile(joinpath(data_directory,"Generators_variability.csv")) && isfile(joinpath(data_directory,"Fuels_data.csv")) && isfile(joinpath(data_directory,"HSC_load_data_liquid.csv")) && isfile(joinpath(data_directory,"HSC_generators_variability.csv")) # Use Time Domain Reduced data for GenX
+    if setup["TimeDomainReduction"] == 1  && isfile(joinpath(data_directory,"HSC_load_data_liquid.csv")) # Use Time Domain Reduced data for GenX
         H2_load_in = DataFrame(CSV.File(joinpath(data_directory,"HSC_load_data_liquid.csv"), header=true), copycols=true)
     else # Run without Time Domain Reduction OR Getting original input data for Time Domain Reduction
         H2_load_in = DataFrame(CSV.File(joinpath(path, "HSC_load_data_liquid.csv"), header=true), copycols=true)
@@ -32,7 +32,6 @@ function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractS
     inputs_load["H2_SEG_L"]=size(collect(skipmissing(H2_load_in[!,:Demand_Segment])),1)
 
     # Demand in tonnes per hour for each zone
-    #print_and_log(names(load_in))
     start = findall(s -> s == "Load_liqH2_tonne_per_hr_z1", names(H2_load_in))[1] #gets the starting column number of all the columns, with header "Load_H2_z1"
     
     # Max value of non-served energy in $/(tonne)
@@ -52,7 +51,7 @@ function load_h2_demand_liquid(setup::Dict, path::AbstractString, sep::AbstractS
         inputs_load["pMax_H2_D_Curtail_L"][s] = collect(skipmissing(H2_load_in[!,:Max_Demand_Curtailment]))[s]
     end
     
-    print_and_log("HSC_load_data_liquid.csv Successfully Read!")
+    print_and_log(" -- HSC_load_data_liquid.csv Successfully Read!")
 
     return inputs_load
 

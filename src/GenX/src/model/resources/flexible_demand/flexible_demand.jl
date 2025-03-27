@@ -37,7 +37,7 @@ If $t$ is first time step of the year (or the first time step of the representat
 function flexible_demand!(EP::Model, inputs::Dict, setup::Dict)
 ## Flexible demand resources available during all hours and can be either delayed or advanced (virtual storage-shiftable demand) - DR ==1
 
-println("Flexible Demand Resources Module")
+println(" -- Flexible Demand Resources Module")
 
 dfGen = inputs["dfGen"]
 

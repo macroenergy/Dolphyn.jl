@@ -56,7 +56,7 @@ function load_h2_demand(setup::Dict, path::AbstractString, sep::AbstractString, 
        # print_and_log("pMax_H2_D_Curtail is: ", inputs_load["pMax_H2_D_Curtail"][s])
     end
     
-    print_and_log("HSC_load_data.csv Successfully Read!")
+    print_and_log(" -- HSC_load_data.csv Successfully Read!")
 
     return inputs_load
 

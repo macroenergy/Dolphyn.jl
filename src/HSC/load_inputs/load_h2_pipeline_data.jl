@@ -134,7 +134,7 @@ function load_h2_pipeline_data(
             collect(skipmissing(pipeline_var[!, :BoosterCompEnergy_MWh_per_tonne])),
         )
 
-    print_and_log("HSC_pipelines.csv Successfully Read!")
+    print_and_log(" -- HSC_pipelines.csv Successfully Read!")
 
     return inputs_nw
 end

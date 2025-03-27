@@ -58,7 +58,7 @@ In addition, this function adds investment and fixed OM related costs related to
 """
 function h2_storage_investment(EP::Model, inputs::Dict, setup::Dict)
 
-    println("H2 storage Investment Module")
+    println(" -- H2 storage Investment Module")
 
     dfH2Gen = inputs["dfH2Gen"]
 

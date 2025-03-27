@@ -14,7 +14,7 @@ function load_inputs(setup::Dict,path::AbstractString)
 	## Read input files
 	println("Reading Input CSV Files")
 	## Declare Dict (dictionary) object used to store parameters
-	inputs = Dict()
+	inputs = Dict{String,Any}()
 	# Read input data about power network topology, operating and expansion attributes
 	if isfile(joinpath(path,"Network.csv"))
 		network_var = load_network_data!(setup, path, inputs)

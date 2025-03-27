@@ -106,7 +106,13 @@ function write_HSC_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
 
 
     ## Print confirmation
-    print_and_log("Wrote outputs HSC outputs to $path$sep")
+    print_and_log("Wrote HSC outputs to $path$sep")
+
+    #moved this line up
+    if setup["TimeMatchingRequirement"] >0
+        write_h2_tmr_prices(path, sep, inputs, setup, EP)
+        write_tmr_balance(path, sep, inputs, setup, EP)      
+    end
 
     #moved this line up
     if setup["TimeMatchingRequirement"] >0

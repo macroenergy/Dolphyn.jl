@@ -31,7 +31,7 @@ In addition, there is a constraint that specify that amount of CO2 that undergoe
 """
 function emissions_csc(EP::Model, inputs::Dict, setup::Dict)
 
-	println("CO2 Emissions Module for CO2 Policy modularization")
+	println(" -- CO2 Emissions Module for CO2 Policy modularization")
 
 	dfDAC = inputs["dfDAC"]
     DAC_RES_ALL = inputs["DAC_RES_ALL"]

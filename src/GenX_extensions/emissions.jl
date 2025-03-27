@@ -5,13 +5,18 @@ This function creates expression to add the CO2 emissions by plants in each zone
 """
 function emissions!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Emissions Module (for CO2 Policy modularization")
+	println(" -- Emissions Module for CO2 Policy modularization")
 
 	dfGen = inputs["dfGen"]
 
 	G = inputs["G"]     # Number of resources (generators, storage, DR, and DERs)
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
+
+	# HOTFIX - If CCS_Rate is not in the dfGen, then add it and set it to 0
+	if "CCS_Rate" ∉ names(dfGen)
+		dfGen[!,:CCS_Rate] .= 0
+	end
 
 	@expression(EP, eEmissionsByPlant[y=1:G,t=1:T],
 

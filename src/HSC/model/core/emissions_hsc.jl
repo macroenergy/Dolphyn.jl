@@ -29,13 +29,18 @@ This function creates expression to add the CO2 emissions for hydrogen supply ch
 """
 function emissions_hsc(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("H2 Emissions Module for CO2 Policy modularization")
+    print_and_log(" -- H2 Emissions Module for CO2 Policy modularization")
 
     dfH2Gen = inputs["dfH2Gen"]
 
     H = inputs["H2_RES_ALL"]     # Number of resources (generators, storage, flexible demand)
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones
+
+    # HOTFIX - If CCS_Rate is not in the dfGen, then add it and set it to 0
+	if "CCS_Rate" ∉ names(dfH2Gen)
+		dfH2Gen[!,:CCS_Rate] .= 0
+	end
 
     # If setup["ParameterScale] = 1, emissions expression and constraints are written in ktonnes
     # If setup["ParameterScale] = 0, emissions expression and constraints are written in tonnes

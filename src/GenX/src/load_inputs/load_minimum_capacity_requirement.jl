@@ -18,5 +18,5 @@ function load_minimum_capacity_requirement!(path::AbstractString, inputs::Dict, 
             inputs["MinCapPriceCap"] /= ModelScalingFactor # Convert to million $/GW
         end
     end
-    println(filename * " Successfully Read!")
+    println(" -- " * filename * " Successfully Read!")
 end

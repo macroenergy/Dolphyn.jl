@@ -45,7 +45,7 @@ This module also defines contributions to the objective function from revenues o
 """
 function syn_fuel_outputs(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Syn Fuel module")
+	println(" -- Syn Fuel module")
 
     dfSynFuels = inputs["dfSynFuels"]
 	dfSynFuelsByProdPrice = inputs["dfSynFuelsByProdPrice"]

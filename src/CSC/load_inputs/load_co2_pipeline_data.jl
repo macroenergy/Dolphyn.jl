@@ -96,7 +96,7 @@ function load_co2_pipeline_data(setup::Dict, path::AbstractString, sep::Abstract
     inputs_co2_nw["pComp_MWh_per_tonne_CO2_Pipe"] = convert(Array{Float64}, collect(skipmissing(co2_pipeline_var[!,:BoosterCompEnergy_MWh_per_tonne]))).* inputs_co2_nw["CO2_no_booster_comp_stations"] 
 
 
-    println("CO2_pipelines.csv Successfully Read!")
+    println(" -- CO2_pipelines.csv Successfully Read!")
 
     return inputs_co2_nw
 end

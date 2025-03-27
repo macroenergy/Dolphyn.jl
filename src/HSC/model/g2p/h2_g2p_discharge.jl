@@ -33,7 +33,7 @@ This module additionally defines contributions to the objective function from va
 """
 function h2_g2p_discharge(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("H2 g2p demand module")
+    print_and_log(" -- H2 g2p demand module")
 
     dfH2G2P = inputs["dfH2G2P"]
 

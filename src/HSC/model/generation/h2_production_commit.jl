@@ -144,7 +144,7 @@ It is recommended that users of DOLPHYN must use longer subperiods than the long
 """
 function h2_production_commit(EP::Model, inputs::Dict, setup::Dict)
 
-    print_and_log("H2 Production (Unit Commitment) Module")
+    print_and_log(" -- H2 Production (Unit Commitment) Module")
     
     # Rename H2Gen dataframe
     dfH2Gen = inputs["dfH2Gen"]

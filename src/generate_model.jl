@@ -91,6 +91,20 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     T = inputs["T"]     # Number of time steps (hours)
     Z = inputs["Z"]     # Number of zones - assumed to be same for power and hydrogen system
+    
+	hours_per_subperiod = Int(inputs["hours_per_subperiod"])
+	Rep_Periods = inputs["REP_PERIOD"] # number of representative periods
+    Rep_Period_Weights = inputs["Weights"]  # Weights of representative period - vector
+
+    if Rep_Periods >1 && ( (hours_per_subperiod == 8760) || div(sum(Rep_Period_Weights),Rep_Periods)== 8760)
+        # modeling multiple years of operations if RepPeriod > 1 and one of two conditions is true:
+        # hours_per_subperiod = 8760 (modeling each year at hourly resolution) but the weight of each rep period could be separately specified for to capture different probabilities
+        # OR
+        # average weight for each rep period is 8760 (in this case number of time steps need for each rep period can be less than 8760)
+        setup["MultipleYears"]=1
+    else
+        setup["MultipleYears"]=0 # Single year modeled over 8760 hours or via representative weeks
+    end
 
     ## Start pre-solve timer
     presolver_start_time = time()
@@ -134,7 +148,12 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     
     # Energy Share Requirement
 	if setup["EnergyShareRequirement"] >= 1
-		@expression(EP, eESR[ESR=1:inputs["nESR"]], 0)
+    # Initialize expressions for ESR at period and annual level depending on single or multiple years Period-level ESR used if modeling multiple years of operation;
+        if setup["MultipleYears"]==1
+            @expression(EP, eESRT[ESR=1:inputs["nESR"],t=1:T], 0)
+        else
+            @expression(EP, eESR[ESR=1:inputs["nESR"]], 0)     
+        end
 	end
 
     # Initialize Capacity Reserve Margin Expression
@@ -151,6 +170,8 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     ##### Power System related modules ############
+    println("Generating Electricity System model")
+
     # Infrastructure
     discharge!(EP, inputs, setup)
 
@@ -196,7 +217,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
     end
 
     # Model constraints, variables, expression related to reservoir hydropower resources with long duration storage
-    if setup["OperationWrapping"] == 1 && !isempty(inputs["STOR_HYDRO_LONG_DURATION"])
+    if setup["TimeDomainReduction"] == 1 && !isempty(inputs["STOR_HYDRO_LONG_DURATION"])
         hydro_inter_period_linkage!(EP, inputs)
     end
 
@@ -216,6 +237,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 
     ###### START OF H2 INFRASTRUCTURE MODEL --- SHOULD BE A SEPARATE FILE?? ###############
     if setup["ModelH2"] == 1
+        println("Generating Hydrogen Supply Chain model")
         @expression(EP, eHGenerationByZone[z=1:Z, t=1:T], 0)
         @expression(EP, eHTransmissionByZone[t=1:T, z=1:Z], 0)
         @expression(EP, eHDemandByZone[t=1:T, z=1:Z], inputs["H2_D"][t, z])
@@ -284,7 +306,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     if setup["ModelCSC"] == 1
-
+        println("Generating Carbon Supply Chain model")
 		# Net Power consumption by CSC supply chain by z and timestep - used in emissions constraints
 		@expression(EP, eCSCNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
 
@@ -328,7 +350,7 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	end
 
     if setup["ModelLiquidFuels"] == 1
-
+        println("Generating Liquid Fuels model")
 		# Initialize Liquid Fuel Balance
 		@expression(EP, eLFDieselBalance[t=1:T, z=1:Z], 0)
 		@expression(EP, eLFJetfuelBalance[t=1:T, z=1:Z], 0)

@@ -20,5 +20,5 @@ function load_energy_share_requirement!(setup::Dict, path::AbstractString, input
     inputs["dfESR"] = mat
     inputs["nESR"] = size(mat, 2)
 
-    println(filename * " Successfully Read!")
+    println(" -- " * filename * " Successfully Read!")
 end

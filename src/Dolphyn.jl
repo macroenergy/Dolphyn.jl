@@ -20,6 +20,7 @@ export compare_results
 export print_and_log
 export configure_settings
 export load_settings
+export load_all_inputs
 export setup_logging
 export setup_TDR
 export configure_solver
@@ -29,6 +30,8 @@ export load_co2_inputs
 export load_liquid_fuels_inputs
 export generate_model
 export solve_model
+export run_case
+export write_all_outputs
 export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
@@ -135,10 +138,15 @@ genx_to_exclude = [
     joinpath(genxsubmod_path,"write_outputs","write_storage.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_storagedual.jl"),
     joinpath(genxsubmod_path,"write_outputs","write_subsidy_revenue.jl"),
+    joinpath(genxsubmod_path,"write_outputs","energy_share_requirement","write_esr_prices.jl"), # Added to compute ESR contributions at each time step
     joinpath(genxsubmod_path,"model","core","emissions.jl"),
     joinpath(genxsubmod_path,"model","policies","co2_cap.jl"),
     joinpath(genxsubmod_path,"model","policies","cap_reserve_margin.jl"),
     joinpath(genxsubmod_path,"model","resources","thermal","thermal_commit.jl"),
+    joinpath(genxsubmod_path,"model","core","discharge","discharge.jl"), # Added to compute ESR contributions at each time step
+    joinpath(genxsubmod_path,"model","core","transmission.jl"), # Added to compute ESR contributions at each time step
+    joinpath(genxsubmod_path,"model","resources","storage","storage.jl"), # Added to compute ESR contributions at each time step
+    joinpath(genxsubmod_path,"model","policies","energy_share_requirement.jl"), # Added to compute ESR contributions at each time step
     # joinpath(genxsubmod_path,"configure_settings") # DOLPHYN and GenX are using different approaches, so we need both
 ]
 include_from_dir(genxsubmod_path, ".jl", genx_to_exclude)

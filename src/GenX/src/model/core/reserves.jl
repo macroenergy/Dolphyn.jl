@@ -69,7 +69,7 @@ where $M_y$ is a `big M' constant equal to the largest possible capacity that ca
 """
 function reserves_contingency!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Reserves Contingency Module")
+	println(" -- Reserves Contingency Module")
 
 	dfGen = inputs["dfGen"]
 
@@ -99,15 +99,15 @@ function reserves_contingency!(EP::Model, inputs::Dict, setup::Dict)
 	### Expressions ###
 	if UCommit == 1 && pDynamic_Contingency == 1
 		# Largest contingency defined as largest installed generator
-		println("Dynamic Contingency Type 1: Modeling the largest contingency as the largest installed generator")
+		println(" -- Dynamic Contingency Type 1: Modeling the largest contingency as the largest installed generator")
 		@expression(EP, eContingencyReq[t=1:T], vLARGEST_CONTINGENCY)
 	elseif UCommit == 1 && pDynamic_Contingency == 2
 		# Largest contingency defined for each hour as largest committed generator
-		println("Dynamic Contingency Type 2: Modeling the largest contingency as the largest largest committed generator")
+		println(" -- Dynamic Contingency Type 2: Modeling the largest contingency as the largest largest committed generator")
 		@expression(EP, eContingencyReq[t=1:T], vLARGEST_CONTINGENCY[t])
 	else
 		# Largest contingency defined fixed as user-specifed static contingency in MW
-		println("Static Contingency: Modeling the largest contingency as user-specifed static contingency")
+		println(" -- Static Contingency: Modeling the largest contingency as user-specifed static contingency")
 		@expression(EP, eContingencyReq[t=1:T], inputs["pStatic_Contingency"])
 	end
 
@@ -190,7 +190,7 @@ function reserves_core!(EP::Model, inputs::Dict, setup::Dict)
 	# DEV NOTE: After simplifying reserve changes are integrated/confirmed, should we revise such that reserves can be modeled without UC constraints on?
 	# Is there a use case for economic dispatch constraints with reserves?
 
-	println("Reserves Core Module")
+	println(" -- Reserves Core Module")
 
 	dfGen = inputs["dfGen"]
 	UCommit = setup["UCommit"]

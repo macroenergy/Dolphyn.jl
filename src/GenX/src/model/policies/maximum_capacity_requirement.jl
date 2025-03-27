@@ -10,7 +10,7 @@ Note that $\epsilon_{y,z,p}^{MaxCapReq}$ is the eligiblity of a generator of tec
 """
 function maximum_capacity_requirement!(EP::Model, inputs::Dict, setup::Dict)
 
-	println("Maximum Capacity Requirement Module")
+	println(" -- Maximum Capacity Requirement Module")
 	NumberOfMaxCapReqs = inputs["NumberOfMaxCapReqs"]
 
 	@constraint(EP, cZoneMaxCapReq[maxcap = 1:NumberOfMaxCapReqs], EP[:eMaxCapRes][maxcap] <= inputs["MaxCapReq"][maxcap])
