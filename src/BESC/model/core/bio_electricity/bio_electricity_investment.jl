@@ -63,7 +63,7 @@ function bio_electricity_investment(EP::Model, inputs::Dict, setup::Dict)
 
 	#Min and max capacity constraints
 	@constraint(EP,cMinCapacity_per_unit_BIO_ELEC[i = 1:BIO_ELEC_RES_ALL], EP[:vCapacity_BIO_ELEC_per_type][i] >= BIO_ELEC_Capacity_Min_Limit[i])
-	@constraint(EP,cMaxCapacity_per_unit_BIO_ELEC[i = 1:BIO_ELEC_RES_ALL], EP[:vCapacity_BIO_ELEC_per_type][i] <= BIO_ELEC_Capacity_Max_Limit[i])
+	@constraint(EP,cMaxCapacity_per_unit_BIO_ELEC[i = intersect(dfBioELEC[dfBioELEC.Max_capacity_tonne_per_hr.>0, :R_ID], 1:BIO_ELEC_RES_ALL)], EP[:vCapacity_BIO_ELEC_per_type][i] <= BIO_ELEC_Capacity_Max_Limit[i])
 
 	#Investment cost = CAPEX
 	@expression(EP, eCAPEX_BIO_ELEC_per_type[i = 1:BIO_ELEC_RES_ALL], EP[:vCapacity_BIO_ELEC_per_type][i] * BIO_ELEC_Inv_Cost_per_tonne_per_hr_yr[i])
