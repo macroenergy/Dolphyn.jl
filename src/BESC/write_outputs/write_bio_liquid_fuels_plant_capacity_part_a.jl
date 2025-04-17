@@ -15,31 +15,39 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 @doc raw"""
-write_bio_liquid_fuels_plant_capacity_part_a(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
+	write_bio_LF_plant_capacity(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 
 Function for writing the diferent capacities for biorefinery resources.
 """
 function write_bio_liquid_fuels_plant_capacity_part_a(path::AbstractString, sep::AbstractString, inputs::Dict, setup::Dict, EP::Model)
 	# Capacity_tonne_biomass_per_h decisions
 	dfBioLF = inputs["dfBioLF"]
+
+	capbioenergy_LF = zeros(size(1:inputs["BIO_LF_RES_ALL"]))
 	AnnualBiomassConsumption = zeros(size(1:inputs["BIO_LF_RES_ALL"]))
 
-
 	for i in 1:inputs["BIO_LF_RES_ALL"]
+		
 		if value(EP[:vCapacity_BIO_LF_per_type][i]) > 0.01
-			AnnualBiomassConsumption[i] = sum(inputs["omega"].* (value.(EP[:vBiomass_consumed_per_plant_per_time_LF])[i,:]))	
+			capbioenergy_LF[i] = value(EP[:vCapacity_BIO_LF_per_type][i])
+			AnnualBiomassConsumption[i] = sum(inputs["omega"].* (value.(EP[:vBiomass_consumed_per_plant_per_time_LF])[i,:]))
 		else
+			capbioenergy_LF[i] = 0
 			AnnualBiomassConsumption[i] = 0
 		end
+
+		
 	end
 
 	dfCap = DataFrame(
 		Resource = inputs["BIO_LF_RESOURCES_NAME"], Zone = dfBioLF[!,:Zone],
+		Capacity_tonne_biomass_per_h = capbioenergy_LF[:],
 		Annual_Biomass_Consumption = AnnualBiomassConsumption[:]
 	)
 
 	total = DataFrame(
 			Resource = "Total", Zone = "n/a",
+			Capacity_tonne_biomass_per_h = sum(dfCap[!,:Capacity_tonne_biomass_per_h]),
 			Annual_Biomass_Consumption = sum(dfCap[!,:Annual_Biomass_Consumption])
 		)
 

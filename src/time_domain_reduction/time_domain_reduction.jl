@@ -100,6 +100,18 @@ function rmse_score(y_true, y_pred)
     errors² = errors .^ 2
     mse = mean(errors²)
     rmse = sqrt(mse)
+
+        # Normalize y_pred and y_true by their respective ranges
+        normalized_y_pred = y_pred ./ maximum(y_true)
+        normalized_y_true = y_true ./ maximum(y_true)
+    
+        # Calculate RMSE on normalized values
+        errors_normalized = normalized_y_pred - normalized_y_true
+        errors_normalized_squared = errors_normalized .^ 2
+        mse_normalized = mean(errors_normalized_squared)
+        rmse_normalized = sqrt(mse_normalized)
+        println("Normalized RMSE:", rmse_normalized)
+        
     return rmse
 end
 
@@ -1053,6 +1065,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     ClusterDataTest = vcat([rpDFs[a] for a in A]...) # To compare fairly, load is not scaled here
     RMSE = Dict( c => rmse_score(InputDataTest[:, c], ClusterDataTest[:, c])  for c in OldColNames)
 
+    #println(OldColNames)
 
     ##### Step 6: Print to File
 

@@ -98,8 +98,6 @@ function write_bio_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
     end
 
     if setup["Bio_LF_On"] == 1
-
-      #write_bio_liquid_fuels_plant_capacity_part_a(path, sep, inputs, setup, EP)
       
       if setup["ModelFlexBioLiquidFuels"] == 1
         write_bio_liquid_fuels_balance_flex(path, sep, inputs, setup, EP)
@@ -110,7 +108,8 @@ function write_bio_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
       #write_bio_zone_biodiesel_produced(path, sep, inputs, setup, EP)
       #write_bio_zone_biojetfuel_produced(path, sep, inputs, setup, EP)
       #write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
-      write_bio_liquid_fuels_plant_capacity(path, sep, inputs, setup, EP)
+      #write_bio_liquid_fuels_plant_capacity(path, sep, inputs, setup, EP)
+      write_bio_liquid_fuels_plant_capacity_part_a(path, sep, inputs, setup, EP)
 
     end
   
