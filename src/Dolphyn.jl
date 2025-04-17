@@ -58,6 +58,9 @@ using Revise
 using Glob
 using LoggingExtras
 
+using Flux
+using Zygote
+
 using Random
 using RecursiveArrayTools
 using Statistics
