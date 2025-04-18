@@ -467,7 +467,7 @@ end
 
 
 @doc raw"""
-    cluster_inputs(inpath, settings_path, v=false, norm_plot=false, silh_plot=false, res_plots=false, indiv_plots=false, pair_plots=false)
+    run_time_domain_reduction(inpath, settings_path, v=false, norm_plot=false, silh_plot=false, res_plots=false, indiv_plots=false, pair_plots=false)
 
 Use kmeans or kmedoids to cluster raw load profiles and resource capacity factor profiles
 into representative periods. Use Extreme Periods to capture noteworthy periods or
@@ -515,7 +515,7 @@ In Load_data.csv, include the following:
      the first stage and will apply the periods of each other model stage to this set
      of representative periods by closest Eucliden distance.
 """
-function cluster_inputs(inpath, settings_path, mysetup, stage_id=-99, v=false)
+function run_time_domain_reduction(inpath, settings_path, mysetup, stage_id=-99, v=false)
     if v println(now()) end
 
     ##### Step 0: Load in settings and data

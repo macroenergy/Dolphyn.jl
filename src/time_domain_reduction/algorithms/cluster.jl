@@ -1,13 +1,7 @@
 @doc raw"""
     cluster(ClusterMethod, ClusteringInputDF, NClusters, nIters)
 
-Get representative periods using cluster centers from kmeans or kmedoids.
-
-K-Means:
-https://juliastats.org/Clustering.jl/dev/kmeans.html
-
-K-Medoids:
- https://juliastats.org/Clustering.jl/stable/kmedoids.html
+Get representative periods using cluster centers from various algorithms
 """
 function cluster(ClusterMethod, ClusteringInputDF, NClusters, nIters, v=false)
     function get_batches(data, batch_size)

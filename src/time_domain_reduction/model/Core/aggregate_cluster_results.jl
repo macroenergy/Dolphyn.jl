@@ -1,6 +1,5 @@
 @doc raw"""
     aggregate_cluster_results(
-        myTDRsetup::Dict,
         A::Vector{Int},
         W::Vector{<:Real},
         M::Vector{Int},
@@ -14,13 +13,14 @@
         NClusters::Int,
         ExtremeWksList::Vector{Int},
         Ncols::Int,
+        NumDataPoints::Int,
         mysetup::Dict,
+        myTDRsetup::Dict,
         v::Bool = false
     )
 """
 
 function aggregate_cluster_results(
-            myTDRsetup::Dict,
             A::Vector{Int},
             W::Vector{<:Real},
             M::Vector{Int},
@@ -34,7 +34,9 @@ function aggregate_cluster_results(
             NClusters::Int,
             ExtremeWksList::Vector{Int},
             Ncols::Int,
+            NumDataPoints::Int,
             mysetup::Dict,
+            myTDRsetup::Dict,
             v::Bool = false
         )
 
@@ -46,6 +48,7 @@ function aggregate_cluster_results(
     h2_var_col_names     = ColumnNames["h2_var_col_names"]
     h2_g2p_var_col_names = ColumnNames["h2_g2p_var_col_names"]
     h2_load_liq_col_names = ColumnNames["h2_load_liq_col_names"]
+    OldColNames          = ColumnNames["OldColNames"]
     NewColNames          = ColumnNames["NewColNames"]
 
     # Load flags 
@@ -301,8 +304,11 @@ function aggregate_cluster_results(
 
     end
 
+    InputDataTest = InputData[(InputData.Group .<= NumDataPoints*1.0), :]
+    ClusterDataTest = vcat([rpDFs[a] for a in A]...) # To compare fairly, load is not scaled here
+    RMSE = Dict( c => rmse_score(InputDataTest[:, c], ClusterDataTest[:, c])  for c in OldColNames)
+
     OutputData = Dict(
-        "FinalOutputData"   => FinalOutputData,
         "GVOutputData"      => GVOutputData,
         "LPOutputData"      => LPOutputData,
         "FPOutputData"      => FPOutputData,
@@ -312,6 +318,6 @@ function aggregate_cluster_results(
         "HG2POutputData"    => (mysetup["ModelH2G2P"] == 1 ? HG2POutputData : nothing)
     )
 
-    return OutputData, PeriodMap, W, M, A, rpDFs
+    return FinalOutputData, OutputData, PeriodMap, W, M, A, RMSE
 
 end

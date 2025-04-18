@@ -1,17 +1,26 @@
 @doc raw"""
-    write_cluster_outputs(inpath, settings_path, v=false, norm_plot=false, silh_plot=false, res_plots=false, indiv_plots=false, pair_plots=false)
-
-"""
-
-function write_cluster_outputs(
-        inpath::String,
-        mysetup::Dict,
-        myinputs::Dict,
-        myTDRsetup::Dict,
+    function write_cluster_outputs(
         W::Vector{<:Real},
         OutputData::Dict,
         PeriodMap::DataFrame,
         ColumnNames::Dict,
+        inpath::String,
+        myinputs::Dict,
+        mysetup::Dict,
+        myTDRsetup::Dict,
+        v::Bool = false
+    )
+"""
+
+function write_cluster_outputs(
+        W::Vector{<:Real},
+        OutputData::Dict,
+        PeriodMap::DataFrame,
+        ColumnNames::Dict,
+        inpath::String,
+        myinputs::Dict,
+        mysetup::Dict,
+        myTDRsetup::Dict,
         v::Bool = false
     )
 

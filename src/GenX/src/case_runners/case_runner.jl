@@ -42,7 +42,7 @@ function run_genx_case_simple!(case::AbstractString, mysetup::Dict)
         prevent_doubled_timedomainreduction(case)
         if !time_domain_reduced_files_exist(TDRpath)
             println("Clustering Time Series Data (Grouped)...")
-            cluster_inputs(inputs_path, settings_path, mysetup)
+            run_time_domain_reduction(inputs_path, settings_path, mysetup)
         else
             println("Time Series Data Already Clustered.")
         end
@@ -102,11 +102,11 @@ function run_genx_case_multistage!(case::AbstractString, mysetup::Dict)
             if (mysetup["MultiStage"] == 1) && (TDRSettingsDict["MultiStageConcatenate"] == 0)
                 println("Clustering Time Series Data (Individually)...")
                 for stage_id in 1:mysetup["MultiStageSettingsDict"]["NumStages"]
-                    cluster_inputs(case, settings_path, mysetup, stage_id)
+                    run_time_domain_reduction(case, settings_path, mysetup, stage_id)
                 end
             else
                 println("Clustering Time Series Data (Grouped)...")
-                cluster_inputs(case, settings_path, mysetup)
+                run_time_domain_reduction(case, settings_path, mysetup)
             end
         else
             println("Time Series Data Already Clustered.")

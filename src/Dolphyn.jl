@@ -40,7 +40,7 @@ export write_CSC_outputs
 export write_liquid_fuels_outputs
 export write_bio_outputs
 export write_ng_outputs
-export cluster_inputs
+export run_time_domain_reduction
 export mga
 export h2_inherit_clusters
 

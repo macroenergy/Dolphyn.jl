@@ -147,7 +147,7 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
     if mysetup["TimeDomainReduction"] == 1
         if mysetup["Force_TDR_recluster"] == 1
             # Delete the TDR folder to force a recluster
-            # This seems more robust than using an OR statement below and calling cluster_inputs
+            # This seems more robust than using an OR statement below and calling run_time_domain_reduction
             println(" -- Deleting TDR folder to force recluster")
             if isdir(TDR_path)
                 rm(TDR_path; recursive=true)
@@ -156,7 +156,7 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
         # If any of the TDR files are missing, cluster the data
         if any(!isfile, TDR_filepaths)
             print_and_log("Clustering Time Series Data...")
-            cluster_inputs(inputs_path, settings_path, mysetup)
+            run_time_domain_reduction(inputs_path, settings_path, mysetup)
         else
             print_and_log("Time Series Data Already Clustered.")
         end

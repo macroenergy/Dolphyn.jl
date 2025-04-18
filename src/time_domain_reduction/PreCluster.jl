@@ -69,7 +69,7 @@ elseif mysetup["TimeDomainReduction"] == 0
     println("Trying to pre-cluster the inputs, but the TimeDomainReduction setting is set to 0. Set to 1 and try again.")
     println(settings_path)
 else
-    Rep_Period, Weights, RMSE, TDRsetup, col_to_zone_map = cluster_inputs(inpath, settings_path, mysetup, v)
+    Rep_Period, Weights, RMSE, TDRsetup, col_to_zone_map = run_time_domain_reduction(inpath, settings_path, mysetup, v)
     if v
         for res in RMSE
             println(res)

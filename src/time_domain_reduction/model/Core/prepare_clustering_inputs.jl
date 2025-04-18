@@ -1,8 +1,8 @@
 @doc raw"""
-    prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::Dict, myTDRsetup::Dict, v::Bool=false)
+    prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup::Dict, v::Bool=false)
 """
 
-function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::Dict, myTDRsetup::Dict, v::Bool=false)
+function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup::Dict, v::Bool=false)
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
     TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
