@@ -44,9 +44,7 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     A, W, M = run_clustering(myTDRsetup, ClusteringInputDF, NClusters, ColumnNames, ExtremeWksList, v)
 
     ##### Step 5: Post-processing of cluster results
-    FinalOutputData, GVOutputData, LPOutputData, FPOutputData, PeriodMap, 
-    W, M, A, HLPOutputData, HRVOutputData, rpDFs, HLLPOutputData, 
-    HG2POutputData = aggregate_cluster_results(
+    OutputData, PeriodMap, W, M, A, rpDFs = aggregate_cluster_results(
                         myTDRsetup,
                         A, W, M,
                         ClusteringInputDF,
@@ -70,25 +68,19 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
         myinputs,
         myTDRsetup,
         W,
-        LPOutputData,
-        GVOutputData,
-        FPOutputData,
+        OutputData,
         PeriodMap,
-        HLPOutputData,
-        HLLPOutputData,
-        HRVOutputData,
-        HG2POutputData,
         ColumnNames,
         v
     )
 
+    FinalOutputData = OutputData["FinalOutputData"]
     OldColNames = ColumnNames["OldColNames"]
     
     ##### Step 7: Evaluation of results
     InputDataTest = InputData[(InputData.Group .<= NumDataPoints*1.0), :]
     ClusterDataTest = vcat([rpDFs[a] for a in A]...) # To compare fairly, load is not scaled here
     RMSE = Dict( c => rmse_score(InputDataTest[:, c], ClusterDataTest[:, c])  for c in OldColNames)
-
 
     return FinalOutputData, W, RMSE, myTDRsetup, col_to_zone_map
 end

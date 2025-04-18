@@ -60,7 +60,7 @@ function aggregate_cluster_results(
     WeightTotal = myTDRsetup["WeightTotal"]
 
     ####################################################################################
-    
+
     # Set clustering outputs in correct numeric order.
     # Add the subperiods corresponding to the extreme periods back into the data.
     # Rescale weights to total user-specified number of hours (e.g., 8760 for one year).
@@ -301,10 +301,17 @@ function aggregate_cluster_results(
 
     end
 
-    return FinalOutputData, GVOutputData, LPOutputData, FPOutputData,
-            PeriodMap, W, M, A,
-            (mysetup["ModelH2"] == 1 ? HLPOutputData : nothing), (mysetup["ModelH2"] == 1 ? HRVOutputData : nothing), rpDFs,
-            (mysetup["ModelH2Liquid"] == 1 ? HLLPOutputData : nothing),
-            (mysetup["ModelH2G2P"] == 1 ? HG2POutputData : nothing)
+    OutputData = Dict(
+        "FinalOutputData"   => FinalOutputData,
+        "GVOutputData"      => GVOutputData,
+        "LPOutputData"      => LPOutputData,
+        "FPOutputData"      => FPOutputData,
+        "HLPOutputData"     => (mysetup["ModelH2"] == 1 ? HLPOutputData : nothing),
+        "HRVOutputData"     => (mysetup["ModelH2"] == 1 ? HRVOutputData : nothing),
+        "HLLPOutputData"    => (mysetup["ModelH2Liquid"] == 1 ? HLLPOutputData : nothing),
+        "HG2POutputData"    => (mysetup["ModelH2G2P"] == 1 ? HG2POutputData : nothing)
+    )
+
+    return OutputData, PeriodMap, W, M, A, rpDFs
 
 end

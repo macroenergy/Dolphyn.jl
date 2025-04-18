@@ -4,22 +4,16 @@
 """
 
 function write_cluster_outputs(
-            inpath::String,
-            mysetup::Dict,
-            myinputs::Dict,
-            myTDRsetup::Dict,
-            W::Vector{<:Real},
-            LPOutputData::DataFrame,
-            GVOutputData::DataFrame,
-            FPOutputData::DataFrame,
-            PeriodMap::DataFrame,
-            HLPOutputData::Union{DataFrame, Nothing},
-            HLLPOutputData::Union{DataFrame, Nothing},
-            HRVOutputData::Union{DataFrame, Nothing},
-            HG2POutputData::Union{DataFrame, Nothing},
-            ColumnNames::Dict,
-            v::Bool = false
-        )
+        inpath::String,
+        mysetup::Dict,
+        myinputs::Dict,
+        myTDRsetup::Dict,
+        W::Vector{<:Real},
+        OutputData::Dict,
+        PeriodMap::DataFrame,
+        ColumnNames::Dict,
+        v::Bool = false
+    )
 
     if Sys.isunix()
         sep = "/"
@@ -33,9 +27,19 @@ function write_cluster_outputs(
     FuelCols = ColumnNames["fuel_col_names"]
     H2LoadCols = ColumnNames["h2_load_col_names"]
     H2LoadLiqCols = ColumnNames["h2_load_liq_col_names"]
-        
+
+    LPOutputData     = OutputData["LPOutputData"]
+    GVOutputData     = OutputData["GVOutputData"]
+    FPOutputData     = OutputData["FPOutputData"]
+    HLPOutputData    = OutputData["HLPOutputData"]
+    HRVOutputData    = OutputData["HRVOutputData"]
+    HLLPOutputData   = OutputData["HLLPOutputData"]
+    HG2POutputData   = OutputData["HG2POutputData"]
+            
     TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
     TimeDomainReductionFolder = mysetup["TimeDomainReductionFolder"]
+
+    ####################################################################################
 
     # Set output filenames for later
     Load_Outfile = joinpath(TimeDomainReductionFolder, "Load_data.csv")
