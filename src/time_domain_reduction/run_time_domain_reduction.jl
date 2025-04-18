@@ -1,22 +1,3 @@
-using YAML
-using DataFrames
-using StatsBase
-using Clustering
-using Distances
-using CSV
-
-using Random
-using LinearAlgebra
-using Flux
-using Flux: glorot_uniform, leakyrelu, Dense, Conv, flatten, params, update!, gradient
-import Zygote
-import Flux.Optimise: update!
-Zygote.@nograd fill!
-Zygote.@nograd Flux.create_bias
-
-using Distances: Euclidean, pairwise
-
-
 @doc raw"""
     run_time_domain_reduction(inpath, settings_path, mysetup, v=false)
 
