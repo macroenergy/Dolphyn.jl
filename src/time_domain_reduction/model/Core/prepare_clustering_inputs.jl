@@ -163,10 +163,26 @@ function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::D
     end
 
     ConstCols = string.(ConstCols)
-    NewColNames = string.(Symbol.(NewColNames))
 
-    return InputData, OldColNames, NewColNames, Ncols, IncludeFuel, ConstData, 
-    ConstCols, load_col_names, h2_load_col_names, h2_load_liq_col_names, var_col_names,
-    h2_var_col_names, h2_g2p_var_col_names, fuel_col_names, col_to_zone_map, AllHRVarConst, 
-    AllHG2PVarConst, ExtremeWksList, ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, LoadExtremePeriod
+    ColumnNames = Dict(
+        "OldColNames" => OldColNames,
+        "NewColNames" => NewColNames,
+        "load_col_names" => load_col_names,
+        "h2_load_col_names" => h2_load_col_names,
+        "h2_load_liq_col_names" => h2_load_liq_col_names,
+        "var_col_names" => var_col_names,
+        "h2_var_col_names" => h2_var_col_names,
+        "h2_g2p_var_col_names" => h2_g2p_var_col_names,
+        "fuel_col_names" => fuel_col_names
+    )
+
+    Flags = Dict(
+        "AllHRVarConst" => AllHRVarConst,
+        "AllHG2PVarConst" => AllHG2PVarConst,
+        "LoadExtremePeriod" => LoadExtremePeriod,
+        "IncludeFuel" => IncludeFuel
+    )
+
+    return InputData, Ncols, ConstData, 
+    ConstCols, col_to_zone_map, ExtremeWksList, ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, ColumnNames, Flags
 end

@@ -1,8 +1,8 @@
 @doc raw"""
-run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, OldColNames::Vector{<:AbstractString}, ExtremeWksList::Vector{Int}, v::Bool=false)
+run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, ColumnNames::Dict, ExtremeWksList::Vector{Int}, v::Bool=false)
 """
 
-function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, OldColNames::Vector{<:AbstractString}, ExtremeWksList::Vector{Int}, v::Bool=false)
+function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, ColumnNames::Dict, ExtremeWksList::Vector{Int}, v::Bool=false)
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
     TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
@@ -14,6 +14,9 @@ function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NCluster
     IterateMethod = myTDRsetup["IterateMethod"]
     Threshold = myTDRsetup["Threshold"]
     nReps = myTDRsetup["nReps"]
+
+    # Accept OldColNames from ColumnNames dictionary
+    OldColNames = ColumnNames["OldColNames"]
 
     ####################################################################################
 

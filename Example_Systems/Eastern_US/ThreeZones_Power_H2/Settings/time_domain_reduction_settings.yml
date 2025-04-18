@@ -20,7 +20,7 @@ TimestepsPerRepPeriod: 168
   #   - ClusterMethod 
   #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
   #   periods and determine each point's representative period.
-ClusterMethod: 'sequential'
+ClusterMethod: 'kmeans'
 
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])

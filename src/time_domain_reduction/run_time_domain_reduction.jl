@@ -35,28 +35,55 @@ function cluster_inputs(inpath, settings_path, mysetup, v=false)
     parsed_data = parse_data(myinputs, mysetup)
 
     ##### Step 3: Prepare inputs for clustering: Normalize profiles, identify extreme periods, reshape for clustering
-    InputData, OldColNames, NewColNames, Ncols, IncludeFuel, ConstData, 
-    ConstCols, load_col_names, h2_load_col_names, h2_load_liq_col_names, var_col_names,
-    h2_var_col_names, h2_g2p_var_col_names, fuel_col_names, col_to_zone_map, AllHRVarConst, 
-    AllHG2PVarConst, ExtremeWksList, ModifiedData, ClusteringInputDF, NClusters, 
-    NumDataPoints, LoadExtremePeriod = prepare_clustering_inputs(parsed_data, myinputs, mysetup, myTDRsetup, v)
+    InputData, Ncols, ConstData, 
+    ConstCols, col_to_zone_map, ExtremeWksList, 
+    ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, 
+    ColumnNames, Flags = prepare_clustering_inputs(parsed_data, myinputs, mysetup, myTDRsetup, v)
     
     ##### Step 4: Clustering and iterative add periods of input dataframe to obtain A: Assignments, W: Weights, M: Medoids
-    A, W, M = run_clustering(myTDRsetup, ClusteringInputDF, NClusters, OldColNames, ExtremeWksList, v)
+    A, W, M = run_clustering(myTDRsetup, ClusteringInputDF, NClusters, ColumnNames, ExtremeWksList, v)
 
     ##### Step 5: Post-processing of cluster results
     FinalOutputData, GVOutputData, LPOutputData, FPOutputData, PeriodMap, 
     W, M, A, HLPOutputData, HRVOutputData, rpDFs, HLLPOutputData, 
-    HG2POutputData = aggregate_cluster_results(myTDRsetup, A, W, M, ClusteringInputDF, ModifiedData, InputData,
-                                ConstCols, ConstData, load_col_names, var_col_names, fuel_col_names,
-                                h2_load_col_names, h2_var_col_names, h2_g2p_var_col_names, h2_load_liq_col_names,
-                              AllHRVarConst, AllHG2PVarConst, NClusters, ExtremeWksList, LoadExtremePeriod,
-                              NewColNames, Ncols, IncludeFuel, mysetup, v)
+    HG2POutputData = aggregate_cluster_results(
+                        myTDRsetup,
+                        A, W, M,
+                        ClusteringInputDF,
+                        ModifiedData,
+                        InputData,
+                        ConstCols,
+                        ConstData,
+                        ColumnNames,
+                        Flags,
+                        NClusters,
+                        ExtremeWksList,
+                        Ncols,
+                        mysetup,
+                        v
+                    )
     
     ##### Step 6: Write cluster results
-    write_cluster_outputs(inpath, mysetup, myinputs, myTDRsetup, W, Symbol.(load_col_names), LPOutputData, GVOutputData, 
-    FPOutputData, Symbol.(fuel_col_names), PeriodMap, Symbol.(h2_load_col_names), Symbol.(h2_load_liq_col_names), HLPOutputData, HLLPOutputData, HRVOutputData, HG2POutputData, v)
+    write_cluster_outputs(
+        inpath,
+        mysetup,
+        myinputs,
+        myTDRsetup,
+        W,
+        LPOutputData,
+        GVOutputData,
+        FPOutputData,
+        PeriodMap,
+        HLPOutputData,
+        HLLPOutputData,
+        HRVOutputData,
+        HG2POutputData,
+        ColumnNames,
+        v
+    )
 
+    OldColNames = ColumnNames["OldColNames"]
+    
     ##### Step 7: Evaluation of results
     InputDataTest = InputData[(InputData.Group .<= NumDataPoints*1.0), :]
     ClusterDataTest = vcat([rpDFs[a] for a in A]...) # To compare fairly, load is not scaled here

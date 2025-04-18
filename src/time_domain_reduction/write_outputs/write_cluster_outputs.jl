@@ -4,25 +4,22 @@
 """
 
 function write_cluster_outputs(
-                inpath::String,
-                mysetup::Dict,
-                myinputs::Dict,
-                myTDRsetup::Dict,
-                W::Vector{<:Real},
-                LoadCols::Vector{Symbol},
-                LPOutputData::DataFrame,
-                GVOutputData::DataFrame,
-                FPOutputData::DataFrame,
-                FuelCols::Vector{Symbol},
-                PeriodMap::DataFrame,
-                H2LoadCols::Vector{Symbol},
-                H2LoadLiqCols::Vector{Symbol},
-                HLPOutputData::Union{DataFrame, Nothing},
-                HLLPOutputData::Union{DataFrame, Nothing},
-                HRVOutputData::Union{DataFrame, Nothing},
-                HG2POutputData::Union{DataFrame, Nothing},
-                v::Bool = false
-            )
+            inpath::String,
+            mysetup::Dict,
+            myinputs::Dict,
+            myTDRsetup::Dict,
+            W::Vector{<:Real},
+            LPOutputData::DataFrame,
+            GVOutputData::DataFrame,
+            FPOutputData::DataFrame,
+            PeriodMap::DataFrame,
+            HLPOutputData::Union{DataFrame, Nothing},
+            HLLPOutputData::Union{DataFrame, Nothing},
+            HRVOutputData::Union{DataFrame, Nothing},
+            HG2POutputData::Union{DataFrame, Nothing},
+            ColumnNames::Dict,
+            v::Bool = false
+        )
 
     if Sys.isunix()
         sep = "/"
@@ -31,7 +28,12 @@ function write_cluster_outputs(
     else
         sep = "/"
     end
-    
+
+    LoadCols = ColumnNames["load_col_names"]
+    FuelCols = ColumnNames["fuel_col_names"]
+    H2LoadCols = ColumnNames["h2_load_col_names"]
+    H2LoadLiqCols = ColumnNames["h2_load_liq_col_names"]
+        
     TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
     TimeDomainReductionFolder = mysetup["TimeDomainReductionFolder"]
 

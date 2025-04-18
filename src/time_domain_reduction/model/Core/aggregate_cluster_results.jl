@@ -9,21 +9,11 @@
         InputData::DataFrame,
         ConstCols::Vector{<:AbstractString},
         ConstData::Vector,
-        load_col_names::Vector{<:AbstractString},
-        var_col_names::Vector{<:AbstractString},
-        fuel_col_names::Vector{<:AbstractString},
-        h2_load_col_names::Vector{<:AbstractString},
-        h2_var_col_names::Vector{<:AbstractString},
-        h2_g2p_var_col_names::Vector{<:AbstractString},
-        h2_load_liq_col_names::Vector{<:AbstractString},
-        AllHRVarConst::Bool,
-        AllHG2PVarConst::Bool,
+        ColumnNames::Dict,
+        Flags::Dict,
         NClusters::Int,
         ExtremeWksList::Vector{Int},
-        LoadExtremePeriod::Bool,
-        NewColNames::Vector{<:AbstractString},
         Ncols::Int,
-        IncludeFuel::Bool,
         mysetup::Dict,
         v::Bool = false
     )
@@ -39,30 +29,38 @@ function aggregate_cluster_results(
             InputData::DataFrame,
             ConstCols::Vector{<:AbstractString},
             ConstData::Vector,
-            load_col_names::Vector{<:AbstractString},
-            var_col_names::Vector{<:AbstractString},
-            fuel_col_names::Vector{<:AbstractString},
-            h2_load_col_names::Vector{<:AbstractString},
-            h2_var_col_names::Vector{<:AbstractString},
-            h2_g2p_var_col_names::Vector{<:AbstractString},
-            h2_load_liq_col_names::Vector{<:AbstractString},
-            AllHRVarConst::Bool,
-            AllHG2PVarConst::Bool,
+            ColumnNames::Dict,
+            Flags::Dict,
             NClusters::Int,
             ExtremeWksList::Vector{Int},
-            LoadExtremePeriod::Bool,
-            NewColNames::Vector{<:AbstractString},
             Ncols::Int,
-            IncludeFuel::Bool,
             mysetup::Dict,
             v::Bool = false
         )
+
+    # Load column names from ColumnNames dictionary
+    load_col_names       = ColumnNames["load_col_names"]
+    var_col_names        = ColumnNames["var_col_names"]
+    fuel_col_names       = ColumnNames["fuel_col_names"]
+    h2_load_col_names    = ColumnNames["h2_load_col_names"]
+    h2_var_col_names     = ColumnNames["h2_var_col_names"]
+    h2_g2p_var_col_names = ColumnNames["h2_g2p_var_col_names"]
+    h2_load_liq_col_names = ColumnNames["h2_load_liq_col_names"]
+    NewColNames          = ColumnNames["NewColNames"]
+
+    # Load flags 
+    AllHRVarConst     = Flags["AllHRVarConst"]
+    AllHG2PVarConst   = Flags["AllHG2PVarConst"]
+    LoadExtremePeriod = Flags["LoadExtremePeriod"]
+    IncludeFuel       = Flags["IncludeFuel"]
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
     TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
     UseExtremePeriods = myTDRsetup["UseExtremePeriods"]
     WeightTotal = myTDRsetup["WeightTotal"]
 
+    ####################################################################################
+    
     # Set clustering outputs in correct numeric order.
     # Add the subperiods corresponding to the extreme periods back into the data.
     # Rescale weights to total user-specified number of hours (e.g., 8760 for one year).
