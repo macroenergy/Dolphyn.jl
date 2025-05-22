@@ -146,6 +146,7 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 
 	#Flexible fuels allocation fraction defined by user in settings
 	if setup["ModelFlexSyntheticFuels"] == 1
+		#Gasoline
 		@constraints(EP, begin 
 			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFGasoline_To_Jetfuel][k,t] <= setup["Max_Gasoline_To_Jetfuel_Frac"] * EP[:vSFProd_Gasoline][k,t]
 		end)
@@ -154,7 +155,11 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 		[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFGasoline_To_Diesel][k,t] <= setup["Max_Gasoline_To_Diesel_Frac"] * EP[:vSFProd_Gasoline][k,t]
 		end)
 
+		@constraints(EP, begin 
+			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:eSynFuelProd_Gasoline_Plant][k,t] >= 0
+		end)
 
+		#Jetfuel
 		@constraints(EP, begin 
 			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFJetfuel_To_Gasoline][k,t] <= setup["Max_Jetfuel_To_Gasoline_Frac"] * EP[:vSFProd_Jetfuel][k,t]
 		end)
@@ -164,12 +169,22 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 		end)
 
 		@constraints(EP, begin 
+			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:eSynFuelProd_Jetfuel_Plant][k,t] >= 0
+		end)
+
+		#Diesel
+		@constraints(EP, begin 
 			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFDiesel_To_Gasoline][k,t] <= setup["Max_Diesel_To_Gasoline_Frac"] * EP[:vSFProd_Diesel][k,t]
 		end)
 
 		@constraints(EP, begin 
 			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFDiesel_To_Jetfuel][k,t] <= setup["Max_Diesel_To_Jetfuel_Frac"] * EP[:vSFProd_Diesel][k,t]
 		end)
+
+		@constraints(EP, begin 
+			[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:eSynFuelProd_Diesel_Plant][k,t] >= 0
+		end)
+
 	end
 
 	#Hydrogen Consumption

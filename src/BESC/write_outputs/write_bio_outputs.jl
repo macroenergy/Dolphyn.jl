@@ -108,8 +108,8 @@ function write_bio_outputs(EP::Model, genx_path::AbstractString, setup::Dict, in
       #write_bio_zone_biodiesel_produced(path, sep, inputs, setup, EP)
       #write_bio_zone_biojetfuel_produced(path, sep, inputs, setup, EP)
       #write_bio_zone_biogasoline_produced(path, sep, inputs, setup, EP)
-      #write_bio_liquid_fuels_plant_capacity(path, sep, inputs, setup, EP)
-      write_bio_liquid_fuels_plant_capacity_part_a(path, sep, inputs, setup, EP)
+      write_bio_liquid_fuels_plant_capacity(path, sep, inputs, setup, EP)
+      #write_bio_liquid_fuels_plant_capacity_part_a(path, sep, inputs, setup, EP)
 
     end
   

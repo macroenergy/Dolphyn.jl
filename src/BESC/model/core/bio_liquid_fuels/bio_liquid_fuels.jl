@@ -208,6 +208,10 @@ function bio_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:vBioGasoline_To_Diesel][i,t] <= setup["Max_Bio_Gasoline_To_Diesel_Frac"] * EP[:eBiogasoline_original_produced_MMBtu_per_plant_per_time][i,t]
 		end)
 
+		@constraints(EP, begin 
+			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:eBiogasoline_produced_MMBtu_per_plant_per_time][i,t] >= 0
+		end)
+
 		#Jetfuel
 		@constraints(EP, begin 
 			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:vBioJetfuel_To_Gasoline][i,t] <= setup["Max_Bio_Jetfuel_To_Gasoline_Frac"] * EP[:eBiojetfuel_original_produced_MMBtu_per_plant_per_time][i,t]
@@ -217,6 +221,10 @@ function bio_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:vBioJetfuel_To_Diesel][i,t] <= setup["Max_Bio_Jetfuel_To_Diesel_Frac"] * EP[:eBiojetfuel_original_produced_MMBtu_per_plant_per_time][i,t]
 		end)
 
+		@constraints(EP, begin 
+			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:eBiojetfuel_produced_MMBtu_per_plant_per_time][i,t] >= 0
+		end)
+
 		#Diesel
 		@constraints(EP, begin 
 			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:vBioDiesel_To_Gasoline][i,t] <= setup["Max_Bio_Diesel_To_Gasoline_Frac"] * EP[:eBiodiesel_original_produced_MMBtu_per_plant_per_time][i,t]
@@ -224,6 +232,10 @@ function bio_liquid_fuels(EP::Model, inputs::Dict, setup::Dict)
 
 		@constraints(EP, begin 
 			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:vBioDiesel_To_Jetfuel][i,t] <= setup["Max_Bio_Diesel_To_Jetfuel_Frac"] * EP[:eBiodiesel_original_produced_MMBtu_per_plant_per_time][i,t]
+		end)
+
+		@constraints(EP, begin 
+			[i = 1:BIO_LF_RES_ALL, t in 1:T], EP[:eBiodiesel_produced_MMBtu_per_plant_per_time][i,t] >= 0
 		end)
 
 	else
