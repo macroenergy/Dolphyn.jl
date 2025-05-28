@@ -68,6 +68,8 @@ using Statistics
 # HiGHS is the default solver, but there is an option to employ other optimizers
 using HiGHS
 
+using MacroEnergyTimeReduction
+
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)
 # To translate MW to GW, divide by ModelScalingFactor

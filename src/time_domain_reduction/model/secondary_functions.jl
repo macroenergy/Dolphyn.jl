@@ -8,13 +8,7 @@ RMSE = \sqrt{\frac{1}{n}\Sigma_{i=1}^{n}{\Big(\frac{d_i -f_i}{\sigma_i}\Big)^2}}
 ```
 
 """
-#function rmse_score(y_true, y_pred)
-    #errors = y_pred - y_true
-    #errors² = errors .^ 2
-    #mse = mean(errors²)
-    #rmse = sqrt(mse)
-    #return rmse
-#end
+
 function rmse_score(y_true, y_pred)
     errors = y_pred .- y_true
     rmse = sqrt(mean(errors .^ 2))
@@ -24,7 +18,7 @@ function rmse_score(y_true, y_pred)
     normalized_y_true = y_true ./ maximum(y_true)
     rmse_normalized = sqrt(mean((normalized_y_pred .- normalized_y_true) .^ 2))
 
-    println("Normalized RMSE: ", rmse_normalized)
+    #println("Normalized RMSE: ", rmse_normalized)
     return rmse
 end
 

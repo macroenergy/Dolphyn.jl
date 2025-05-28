@@ -76,9 +76,8 @@ function aggregate_cluster_results(
     # Orginal M is produced in alphabetical order - 10th column is not the 10th data point in chronological order
     # Hence need to identify the right data point number based on column name
     M = [parse(Int64, string(names(ClusteringInputDF)[i])) for i in M]
-    # if v 
-        println(" -- Fixed M: ", M) 
-    # end
+    
+    if v println(" -- Fixed M: ", M) end
     
 
     # ClusterInputDF Ordering of All Periods (i.e., alphabetical as opposed to indices)
