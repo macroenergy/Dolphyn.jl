@@ -59,6 +59,60 @@ end
 # print_and_log("Generating the Optimization Model")
 EP = generate_model(mysetup, myinputs, OPTIMIZER)
 
+function scale_constraints!(EP::Model, max_coeff::Float64=1e6, min_coeff::Float64=1e-3)
+    con_list = all_constraints(EP; include_variable_in_set_constraints=false)
+    scale_constraints!(con_list, max_coeff, min_coeff)
+end
+function scale_constraints!(constraint_list::Vector{ConstraintRef}, max_coeff::Float64=1e6, min_coeff::Float64=1e-3)
+    action_count = 0
+    for con_ref in constraint_list
+        con_obj = constraint_object(con_ref)
+        coefficients = abs.(append!(con_obj.func.terms.vals, normalized_rhs(con_ref)))
+        # coefficients[coefficients .< min_coeff / 100] .= 0 # Set any coefficients less than min_coeff / 100 to zero
+        coefficients = coefficients[coefficients .> 0] # Ignore constraints which equal zero
+        if length(coefficients) == 0
+            continue
+        end
+        max_ratio = maximum(coefficients) / max_coeff
+        min_ratio = min_coeff / minimum(coefficients)
+        if con_ref ==constraint_by_name(EP,"cESRSharePerPeriod[1,1]")
+        println("max_ratio: ", max_ratio)
+        println("min_ratio: ", min_ratio)
+        println("max_coeff: ", max_coeff)
+        println("min_coeff: ", min_coeff)
+        println("max to min ratio", min_ratio / max_ratio)
+        end
+        if max_ratio > 1 && min_ratio < 1
+            if min_ratio / max_ratio < 1
+                for (key, val) in con_obj.func.terms
+                    set_normalized_coefficient(con_ref, key, val / max_ratio)
+                end
+                set_normalized_rhs(con_ref, normalized_rhs(con_ref) / max_ratio)
+                if con_ref ==constraint_by_name(EP,"cESRSharePerPeriod[1,1]")
+                    println(normalized_rhs(con_ref) )
+                end
+                action_count += 1
+            end
+        elseif min_ratio > 1 && max_ratio < 1
+            if max_ratio * min_ratio < 1
+                for (key, val) in con_obj.func.terms
+                    set_normalized_coefficient(con_ref, key, val * min_ratio)
+                end
+                set_normalized_rhs(con_ref, normalized_rhs(con_ref) * min_ratio)
+                action_count += 1
+            end
+        end
+        # if con_ref ==constraint_by_name(EP,"cESRSharePerPeriod[1,1]")
+        #     println(con_ref)
+        # end
+    end
+    return action_count
+end
+scale_constraints!(EP)
+
+
+
+
 ### Solve model
 print_and_log("Solving Model")
 EP, solve_time = solve_model(EP, mysetup)

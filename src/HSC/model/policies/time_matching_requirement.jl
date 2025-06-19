@@ -91,11 +91,16 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	# Identify number of ESRR requirements
 	nESR = count(s -> startswith(String(s), "ESR_"), names(dfGen))
 
+	if !haskey(setup, "TMRComplianceFraction") # check if TMR compliance fraction is specified
+		println("TMRComplianceFraction not specified in setup, using default value of 1")
+        setup["TMRComplianceFraction"] = 1 # Default value for TMR compliance fraction
+    end
+
 	# Expressions  Supply of contracted electricity minus demand at each time step
 
 	# Hourly electricity consumption to be matched
 	@expression(EP,eTMRDemand[TMR=1:nH2_TMR, t=1:T],
-		sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
+		sum(EP[:vH2Gen][k,t]*dfH2Gen[!,:etaP2G_MWh_p_tonne][k]* setup["TMRComplianceFraction"] for k in intersect(H2_GEN, dfH2Gen[findall(x->x>0,dfH2Gen[!,Symbol("H2_TMR_$TMR")]),:R_ID]))
 	)
 
 	@expression(EP,eExcessElectricitySupplyTMR[TMR=1:nH2_TMR, t=1:T],
@@ -141,7 +146,7 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 	)
 	
 
-	## Energy Share Requirements (minimum energy share from qualifying renewable resources) constraint
+	## Time matching requirement constraints
 	if setup["TimeMatchingRequirement"] == 1 # hourly with excess sales allowed
 		@constraint(EP, cH2TMR[TMR=1:nH2_TMR, t=1:T], eExcessElectricitySupplyTMR[TMR, t]>=0 )	
 		if haskey(setup, "H2TMR_Excess_Sales_Allowance")
