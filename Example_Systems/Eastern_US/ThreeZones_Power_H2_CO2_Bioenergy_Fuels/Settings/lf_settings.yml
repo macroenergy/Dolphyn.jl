@@ -24,13 +24,13 @@ Conv_Diesel_to_Gasoline_Ratio_Min: 0.3492 #Min ratio
 Conv_Diesel_to_Gasoline_Ratio_Max: 0.5147 #Max ratio
 
 ## Flexible allocation of liquid fuels (Fraction of Fuel A to Fuel B)
-ModelFlexSyntheticFuels: 0
+ModelFlexSyntheticFuels: 1
 
-Max_Gasoline_To_Jetfuel_Frac: 0.25
-Max_Gasoline_To_Diesel_Frac: 0.0000001
+Max_Gasoline_To_Jetfuel_Frac: 1
+Max_Gasoline_To_Diesel_Frac: 1
 
-Max_Jetfuel_To_Gasoline_Frac: 0.25
-Max_Jetfuel_To_Diesel_Frac: 0.25
+Max_Jetfuel_To_Gasoline_Frac: 1
+Max_Jetfuel_To_Diesel_Frac: 1
 
-Max_Diesel_To_Gasoline_Frac: 0.0000001
-Max_Diesel_To_Jetfuel_Frac: 0.25
+Max_Diesel_To_Gasoline_Frac: 1
+Max_Diesel_To_Jetfuel_Frac: 1

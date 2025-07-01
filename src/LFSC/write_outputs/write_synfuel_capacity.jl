@@ -44,9 +44,9 @@ function write_synfuel_capacity(path::AbstractString, sep::AbstractString, input
 			capsyndiesel[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i]) * dfSynFuels[!,:mmbtu_sf_diesel_p_tonne_co2][i]
 			capsynjetfuel[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i]) * dfSynFuels[!,:mmbtu_sf_jetfuel_p_tonne_co2][i]
 			capsyngasoline[i] = value(EP[:vCapacity_Syn_Fuel_per_type][i]) * dfSynFuels[!,:mmbtu_sf_gasoline_p_tonne_co2][i]
-			AnnualSynGasoline[i] = sum(inputs["omega"].* (value.(EP[:vSFProd_Gasoline])[i,:]))
-			AnnualSynJetfuel[i] = sum(inputs["omega"].* (value.(EP[:vSFProd_Jetfuel])[i,:]))
-			AnnualSynDiesel[i] = sum(inputs["omega"].* (value.(EP[:vSFProd_Diesel])[i,:]))
+			AnnualSynGasoline[i] = sum(inputs["omega"].* (value.(EP[:eSynFuelProd_Gasoline_Plant])[i,:]))
+			AnnualSynJetfuel[i] = sum(inputs["omega"].* (value.(EP[:eSynFuelProd_Jetfuel_Plant])[i,:]))
+			AnnualSynDiesel[i] = sum(inputs["omega"].* (value.(EP[:eSynFuelProd_Diesel_Plant])[i,:]))
 			MaxCO2Consumption[i] = value.(EP[:vCapacity_Syn_Fuel_per_type])[i] * 8760
 			AnnualCO2Consumption[i] = sum(inputs["omega"].* (value.(EP[:vSFCO2in])[i,:]))
 			CapFactor[i] = AnnualCO2Consumption[i]/MaxCO2Consumption[i]
