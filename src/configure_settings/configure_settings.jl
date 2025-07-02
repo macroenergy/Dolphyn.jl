@@ -60,6 +60,9 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
 
     ## Force re-clustering of time series data; 0 = not active; 1 = active
     set_default_if_absent!(settings, "Force_TDR_recluster", 0)
+
+    ## Cluster weekly energy system results in TDR; 0 = not active; 1 = active
+    set_default_if_absent!(settings, "ClusterSubPeriodResults", 0)
     
     ###########################################
     ### GenX-specific settings 

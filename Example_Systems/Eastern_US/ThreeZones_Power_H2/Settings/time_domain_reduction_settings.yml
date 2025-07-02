@@ -20,7 +20,7 @@ TimestepsPerRepPeriod: 168
   #   - ClusterMethod 
   #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
   #   periods and determine each point's representative period.
-ClusterMethod: 'simultaneous'
+ClusterMethod: 'kmeans'
 
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])
@@ -31,19 +31,23 @@ ScalingMethod: "S"
   #   The maximum number of periods - both clustered periods and extreme periods -
   #   that may be used to represent the input data. If IterativelyAddPeriods is on and the
   #   error threshold is never met, this will be the total number of periods.
-MaxPeriods: 11
+MaxPeriods: 5
 
   #   - MinPeriods
   #   The minimum number of periods used to represent the input data. If using
   #   UseExtremePeriods, this must be at least the number of extreme periods requests. If 
   #   IterativelyAddPeriods if off, this will be the total number of periods.
-MinPeriods: 11
+MinPeriods: 5
 
   #   - IterativelyAddPeriods
   #   Either 'yes' or 'no', this designates whether or not to add periods
   #   until the error threshold between input data and represented data is met or the maximum
   #   number of periods is reached.
 IterativelyAddPeriods: 1
+
+ #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
+ #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
+ClusterSubPeriodResults: 1
 
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to

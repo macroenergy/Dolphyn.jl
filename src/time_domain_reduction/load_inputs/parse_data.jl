@@ -53,7 +53,7 @@ function parse_data(myinputs, mysetup)
     end
 
     
-
+    #Fuel costs
     fuel_col_names = string.(myinputs["fuels"])
     fuel_profiles = []
     AllFuelsConst = true
