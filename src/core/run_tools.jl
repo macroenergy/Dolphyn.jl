@@ -115,7 +115,7 @@ function setup_logging(mysetup::Dict{String, Any})
     return nothing
 end
 
-function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, mysetup::Dict{String,Any}, TDR_files::Union{Nothing, Vector{String}}=nothing)
+function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, mysetup::Dict{String,Any}, optimizer::DataType=HiGHS.Optimizer, TDR_files::Union{Nothing, Vector{String}}=nothing)
 
     if isnothing(TDR_files)
         TDR_files = String[]
@@ -162,6 +162,14 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
         end
         # If any of the TDR files are missing, cluster the data
         if any(!isfile, TDR_filepaths)
+
+            if mysetup["ClusterSubPeriodResults"] == 1
+                println(" -- Running subperiod cases for TDR...")
+                myinputs_sub = load_all_inputs(mysetup, inputs_path)
+                run_subperiod_cases(mysetup, myinputs_sub, settings_path, optimizer, inputs_path)
+                println(" -- Subperiod cases completed.")
+            end
+
             print_and_log("Clustering Time Series Data...")
             run_time_domain_reduction(inputs_path, settings_path, mysetup)
         else
@@ -220,7 +228,7 @@ function generate_model(inputs_path::AbstractString, settings_path::AbstractStri
     end
 
     if mysetup["TimeDomainReduction"] == 1
-        setup_TDR(inputs_path, settings_path, mysetup)
+        setup_TDR(inputs_path, settings_path, mysetup, optimizer)
     end
     
     solver = configure_solver(settings_path, optimizer)
@@ -237,42 +245,7 @@ end
 
 function run_case(inputs_path::AbstractString, settings_path::AbstractString; optimizer::DataType=HiGHS.Optimizer, force_TDR_off::Bool=false, force_TDR_on::Bool=false, force_TDR_recluster::Bool=false)
 
-    mysetup = load_settings(settings_path)
-    global_logger = setup_logging(mysetup)
-
-    # Check if iterative TDR method is available
-    if !haskey(mysetup, "ClusterSubPeriodResults")
-        mysetup["ClusterSubPeriodResults"] = 0
-    end
-
-    # Check if TDR is forced on or off
-    # If both are set to on, force_TDR_on will take precedence
-    if force_TDR_on
-        mysetup["TimeDomainReduction"] = 1
-    elseif force_TDR_off
-        mysetup["TimeDomainReduction"] = 0
-    end
-
-    if force_TDR_recluster
-        mysetup["Force_TDR_recluster"] = 1
-    end
-    
-    
-    if mysetup["TimeDomainReduction"] == 1
-        if mysetup["ClusterSubPeriodResults"] == 1
-            println(" -- Running subperiod cases...")
-            myinputs_subperiod = load_all_inputs(mysetup, inputs_path)
-            run_subperiod_cases(mysetup, myinputs_subperiod, settings_path, optimizer, inputs_path)
-            println(" -- Performing clustering after subperiod cases...")
-        else
-            println(" -- Performing clustering...")
-        end
-        setup_TDR(inputs_path, settings_path, mysetup)
-    end
-
-    solver = configure_solver(settings_path, optimizer)
-    myinputs = load_all_inputs(mysetup, inputs_path)
-    EP = generate_model(mysetup, myinputs, solver)
+    EP, mysetup, myinputs = generate_model(inputs_path, settings_path; optimizer=optimizer, force_TDR_off=force_TDR_off, force_TDR_on=force_TDR_on, force_TDR_recluster=force_TDR_recluster)
     EP, solve_time = solve_model(EP, mysetup)
     myinputs["solve_time"] = solve_time # Store the model solve time in myinputs
     adjusted_outpath = write_all_outputs(EP, mysetup, myinputs, inputs_path)
