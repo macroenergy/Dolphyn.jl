@@ -47,6 +47,11 @@ function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup
         println(describe(InputData))
         println()
     end
+
+    desc_df = describe(InputData)
+    println(" -- Full Describe Output -- ")
+    show(desc_df; allcols=true, allrows=true, truncate=0)
+
     OldColNames = names(InputData)
     NewColNames = [Symbol.(OldColNames); :GrpWeight]
     Nhours = nrow(InputData) # Timesteps

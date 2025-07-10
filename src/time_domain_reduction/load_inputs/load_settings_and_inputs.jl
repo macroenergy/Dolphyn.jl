@@ -20,6 +20,10 @@ function load_settings_and_inputs(inpath::String, settings_path::String, mysetup
       myinputs = load_h2_inputs(myinputs, mysetup_local, inpath)
     end
 
+    if mysetup["ClusterSubPeriodResults"] == 1
+      myinputs = load_subperiod_results(myinputs, mysetup_local, inpath)
+    end
+
     if v println() end
 
     #Copy Original Parameter Scale Variable

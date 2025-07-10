@@ -20,7 +20,7 @@ TimestepsPerRepPeriod: 168
   #   - ClusterMethod 
   #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
   #   periods and determine each point's representative period.
-ClusterMethod: 'kmeans'
+ClusterMethod: 'sequential'
 
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])
@@ -31,19 +31,27 @@ ScalingMethod: "S"
   #   The maximum number of periods - both clustered periods and extreme periods -
   #   that may be used to represent the input data. If IterativelyAddPeriods is on and the
   #   error threshold is never met, this will be the total number of periods.
-MaxPeriods: 3
+MaxPeriods: 11
 
   #   - MinPeriods
   #   The minimum number of periods used to represent the input data. If using
   #   UseExtremePeriods, this must be at least the number of extreme periods requests. If 
   #   IterativelyAddPeriods if off, this will be the total number of periods.
-MinPeriods: 3
+MinPeriods: 11
 
   #   - IterativelyAddPeriods
   #   Either 'yes' or 'no', this designates whether or not to add periods
   #   until the error threshold between input data and represented data is met or the maximum
   #   number of periods is reached.
 IterativelyAddPeriods: 1
+
+ #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
+ #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
+ClusterSubPeriodResults: 0
+
+#Mode of CO2 cap for each subperiod: 0 - No CO2 Cap, 1 - Split equally CO2 Cap of each subperiod = Annual CO2 Cap/Number of Subperiods, 4 - Assumed CO2 price (User to input below)
+ClusterSubPeriodCO2Cap: 1
+ClusterSubPeriodAssumedCO2Price: 300
 
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to
@@ -85,7 +93,7 @@ ClusterFuelPrices: 1
   #   outliers (by performance or load/resource extreme) as their own representative periods.
   #   This setting automatically includes the periods with maximum load, minimum solar cf and
   #   minimum wind cf as extreme periods.
-UseExtremePeriods: 0
+UseExtremePeriods: 1
 
 # STILL IN DEVELOPMENT - Currently just uses integral max load, integral min PV and wind.
 #   - ExtremePeriods
@@ -119,14 +127,14 @@ ExtremePeriods:
             Min: 0
          Integral:   
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
             Min: 0
          Integral:
             Max: 0
-            Min: 0
+            Min: 1
    Wind:
       Zone:
          Absolute:
@@ -134,11 +142,11 @@ ExtremePeriods:
             Min: 0  
          Integral:
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
             Min: 0 
          Integral:
             Max: 0
-            Min: 0
+            Min: 1

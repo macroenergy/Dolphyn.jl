@@ -152,6 +152,10 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 
 		elapsed_time_net_rev = @elapsed write_net_revenue(path, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
 	  println(" -- Time elapsed for writing net revenue is $(elapsed_time_net_rev)")
+
+	  elapsed_time_co2_emi = @elapsed write_co2_emission_balance_system(path, inputs, setup, EP)
+	  println(" -- Time elapsed for writing CO2 emission balance is $(elapsed_time_co2_emi)")
+
 	end
 	## Print confirmation
 	println("Wrote outputs to $path")

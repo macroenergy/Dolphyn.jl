@@ -49,6 +49,10 @@ IterativelyAddPeriods: 1
  #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
 ClusterSubPeriodResults: 1
 
+#Mode of CO2 cap for each subperiod: 0 - No CO2 Cap, 1 - Split equally CO2 Cap of each subperiod = Annual CO2 Cap/Number of Subperiods, 4 - Assumed CO2 price (User to input below)
+ClusterSubPeriodCO2Cap: 1
+ClusterSubPeriodAssumedCO2Price: 300
+
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to
   #   the kmeans/kmedoids method or to set aside the worst-fitting periods as a new extreme periods.

@@ -1,0 +1,47 @@
+"""
+DOLPHYN: Decision Optimization for Low-carbon Power and Hydrogen Networks
+Copyright (C) 2022,  Massachusetts Institute of Technology
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+A complete copy of the GNU General Public License v2 (GPLv2) is available
+in LICENSE.txt.  Users uncompressing this from an archive may not have
+received this license file.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+@doc raw"""
+load_subperiod_power_gen(setup::Dict, path::AbstractString, inputs::Dict)
+
+Function for reading input parameters related to hourly generation results from subperiod for all power generators (plus storage).
+"""
+function load_subperiod_power_gen(setup::Dict, path::AbstractString, inputs::Dict)
+
+    # Hourly capacity factors
+    filename = "ClusterSubPeriod_Power.csv"
+    power_df = DataFrame(CSV.File(joinpath(path, filename), header=true), copycols=true)
+
+    all_resources = inputs["RESOURCES"]
+
+    # Ensure the file contains all expected resource columns
+    existing_columns = names(power_df)
+    missing_resources = setdiff(all_resources, string.(existing_columns[2:end]))  # skip Time_Index
+    for r in missing_resources
+        @info "Assuming zero generation for missing resource $r in ClusterSubPeriod_Power.csv."
+        power_df[!, Symbol(r)] = 0.0
+    end
+
+    # Reorder columns: [:Time_Index, <resource symbols in correct order>]
+    select!(power_df, [:t; Symbol.(all_resources)])
+
+    # Load generation data into pP_Max (or whatever structure you need)
+    inputs["Subperiod_PowerGen"] = transpose(Matrix{Float64}(power_df[:, 2:end]))
+
+    println(" -- " * filename * " Successfully Read!")
+
+    return inputs
+end

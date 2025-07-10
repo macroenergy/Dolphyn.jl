@@ -164,10 +164,17 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
         if any(!isfile, TDR_filepaths)
 
             if mysetup["ClusterSubPeriodResults"] == 1
-                println(" -- Running subperiod cases for TDR...")
-                myinputs_sub = load_all_inputs(mysetup, inputs_path)
-                run_subperiod_cases(mysetup, myinputs_sub, settings_path, optimizer, inputs_path)
-                println(" -- Subperiod cases completed.")
+                h2_file = joinpath(inputs_path, "ClusterSubPeriod_H2Gen.csv")
+                power_file = joinpath(inputs_path, "ClusterSubPeriod_Power.csv")
+
+                if isfile(h2_file) && isfile(power_file)
+                    println(" -- Subperiod results already exist, skipping subperiod cases.")
+                else
+                    println(" -- Running subperiod cases for TDR...")
+                    myinputs_sub = load_all_inputs(mysetup, inputs_path)
+                    run_subperiod_cases(mysetup, myinputs_sub, settings_path, optimizer, inputs_path)
+                    println(" -- Subperiod cases completed.")
+                end
             end
 
             print_and_log("Clustering Time Series Data...")
@@ -178,8 +185,8 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
     end
 end
 
-function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict{String, Any}, inputs_path::AbstractString)
-    outpath = joinpath(inputs_path, "Results")
+function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict{String, Any}, inputs_path::AbstractString; output_folder::String = "Results")
+    outpath = joinpath(inputs_path, output_folder)
     adjusted_outpath = write_outputs(EP, outpath, mysetup, myinputs)
 
     # Write hydrogen supply chain outputs
@@ -269,15 +276,12 @@ function run_subperiod_cases(mysetup::Dict, myinputs::Dict, settings_path::Abstr
         end
         load_df = CSV.read(filepath, DataFrame)
 
-        # Extract demand columns — adjust if your headers differ
-        load_cols = names(load_df, r"Load_MW_z")  # or specify exact columns if needed
+        load_cols = names(load_df, r"Load_MW_z")
         pD_full = Matrix(load_df[:, load_cols])
 
         return pD_full
     end
 
-    # Get full model horizon
-    # Load the full-year load data
     pD_full_year = load_full_year_load(inputs_path)
     T_full = size(pD_full_year, 1)
 
@@ -288,43 +292,58 @@ function run_subperiod_cases(mysetup::Dict, myinputs::Dict, settings_path::Abstr
 
     println(" -- Running ", num_subperiods, " subperiod cases of ", hours_per_subperiod, " timesteps each.")
 
+    G = myinputs["G"]
+    RESOURCES = myinputs["RESOURCES"]
+    power_matrix = zeros(Float64, T_full, G)
+
+    if mysetup["ModelH2"] == 1
+        H = myinputs["H2_RES_ALL"]
+        H2_RESOURCES_NAME = myinputs["H2_RESOURCES_NAME"]
+        h2_matrix = zeros(Float64, T_full, H)
+    end
+
     for subp = 1:num_subperiods
         println(" -- Subperiod $subp / $num_subperiods")
 
-        # Define indices for this subperiod
         t_start = (subp - 1) * hours_per_subperiod + 1
         t_end = min(subp * hours_per_subperiod, T_full)
         t_indices = t_start:t_end
 
-        # Slice inputs
         sub_inputs = deepcopy(myinputs)
-
         sub_inputs["pD"] = myinputs["pD"][t_indices, :]
         sub_inputs["pP_Max"] = myinputs["pP_Max"][:, t_indices]
-
         sub_inputs["fuel_costs"] = Dict(f => myinputs["fuel_costs"][f][t_indices] for f in keys(myinputs["fuel_costs"]))
         sub_inputs["C_Fuel_per_MWh"] = myinputs["C_Fuel_per_MWh"][:, t_indices]
 
         if mysetup["ModelH2"] == 1
             sub_inputs["H2_D"] = myinputs["H2_D"][t_indices, :]
             sub_inputs["pH2_Max"] = myinputs["pH2_Max"][:, t_indices]
-
-            if mysetup["ModelH2Liquid"] ==1
+            if mysetup["ModelH2Liquid"] == 1
                 sub_inputs["H2_D_L"] = myinputs["H2_D_L"][t_indices, :]
             end
-
-            if mysetup["ModelH2G2P"] ==1
+            if mysetup["ModelH2G2P"] == 1
                 sub_inputs["pH2_g2p_Max"] = myinputs["pH2_g2p_Max"][:, t_indices]
             end
-
         end
-        
-        sub_inputs["T"] = length(t_indices)
-        println(" -- Time index ", t_indices,)
 
+        sub_inputs["T"] = length(t_indices)
         sub_inputs["REP_PERIOD"] = 1
-        sub_inputs["Weights"] = [sub_inputs["T"]]  # weight = actual hours covered
-        sub_inputs["omega"] = ones(Float64, sub_inputs["T"])  # or normalized to sum to sub_inputs["T"]
+        sub_inputs["Weights"] = [sub_inputs["T"]]
+
+        ## If we treat each subperiod individually, we need to divide the CO2 cap equally, but cost are annualized so this does not make sense
+        #sub_inputs["omega"] = ones(Float64, sub_inputs["T"])
+
+        #if mysetup["ClusterSubPeriodCO2Cap"] == 1
+        #    subperiod_hours = length(t_indices)
+        #    sub_inputs["dfMaxCO2"] = myinputs["dfMaxCO2"] * (subperiod_hours / T_full)
+        #    println(" -- Subperiod $subp CO2 cap scaled to ", sub_inputs["dfMaxCO2"])
+        #end
+
+        ## If we treat each subperiod as representing a full year, make more sense in price perspective because all our cost assumptions are annualized
+        subperiod_hours = length(t_indices)
+        weight_per_hour = T_full / subperiod_hours
+        sub_inputs["omega"] = fill(weight_per_hour, subperiod_hours)
+
         sub_inputs["hours_per_subperiod"] = sub_inputs["T"]
         sub_inputs["START_SUBPERIODS"] = [1]
         sub_inputs["INTERIOR_SUBPERIODS"] = 2:sub_inputs["T"]
@@ -333,26 +352,40 @@ function run_subperiod_cases(mysetup::Dict, myinputs::Dict, settings_path::Abstr
         sub_setup = deepcopy(mysetup)
         sub_setup["TimeDomainReduction"] = 0
 
-        # Build and solve model
         solver = configure_solver(settings_path, optimizer)
         EP = generate_model(sub_setup, sub_inputs, solver)
         EP, solve_time = solve_model(EP, sub_setup)
-        sub_inputs["solve_time"] = solve_time # Store the model solve time in myinputs
-        adjusted_outpath = write_all_outputs(EP, sub_setup, sub_inputs, inputs_path)
+        sub_inputs["solve_time"] = solve_time
+        adjusted_outpath = write_all_outputs(EP, sub_setup, sub_inputs, inputs_path; output_folder = "SubPeriod_Results")
 
-    end
-end
+        # Store power
+        power = value.(EP[:vP])
+        power_matrix[t_indices, :] = power'
 
-function get_case_name(case::AbstractString, root_dirname::AbstractString="Example_Systems")
-    split_case = splitpath(case)
-    # If one of the entries is "Example_Systems", then use the last two entries
-    if root_dirname in split_case
-        start = findfirst(x -> x == root_dirname, split_case)
-        case_name = joinpath(split_case[start+1:end]...)
-    else
-        case_name = split_case[end]
+        # Store H2 gen
+        if mysetup["ModelH2"] == 1
+            h2gen = value.(EP[:vH2Gen])
+            h2_matrix[t_indices, :] = h2gen'
+        end
     end
-    return case_name
+
+    # Write power matrix
+    dfPower = DataFrame(t = 1:T_full)
+    for (i, r) in enumerate(RESOURCES)
+        dfPower[!, Symbol(r)] = power_matrix[:, i]
+    end
+    CSV.write(joinpath(inputs_path, "ClusterSubPeriod_Power.csv"), dfPower)
+    println(" -- ClusterSubPeriod_Power.csv written.")
+
+    # Write H2 matrix
+    if mysetup["ModelH2"] == 1
+        dfH2 = DataFrame(t = 1:T_full)
+        for (i, r) in enumerate(H2_RESOURCES_NAME)
+            dfH2[!, Symbol(r)] = h2_matrix[:, i]
+        end
+        CSV.write(joinpath(inputs_path, "ClusterSubPeriod_H2Gen.csv"), dfH2)
+        println(" -- ClusterSubPeriod_H2Gen.csv written.")
+    end
 end
 
 function obj_value(EP::Model, mysetup::Dict{String, Any})
