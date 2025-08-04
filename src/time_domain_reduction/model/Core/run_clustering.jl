@@ -23,7 +23,8 @@ function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NCluster
     cluster_results = []
 
     # Cluster once regardless of iteration decisions
-    push!(cluster_results, cluster(ClusterMethod, ClusteringInputDF, NClusters, nReps, v))
+    
+    push!(cluster_results, cluster(myTDRsetup, ClusterMethod, ClusteringInputDF, NClusters, nReps, v))
 
     # Iteratively add worst periods as extreme periods OR increment number of clusters k
     #    until threshold is met or maximum periods are added (If chosen in inputs)

@@ -22,10 +22,20 @@ TimestepsPerRepPeriod: 168
   #   periods and determine each point's representative period.
 ClusterMethod: 'sequential'
 
+#For autoencoder based method only
+AutoEncoder:
+  input_dim: 1
+  n_filters: 32
+  kernel_size: 12
+  stride: 6
+  latent_dim: 64
+  padding: 1
+  epochs: 500
+
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])
   #   or standardize (mean 0, variance 1) the input data.
-ScalingMethod: "S"
+ScalingMethod: "N"
 
   #   - MaxPeriods 
   #   The maximum number of periods - both clustered periods and extreme periods -
@@ -49,8 +59,7 @@ IterativelyAddPeriods: 1
  #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
 ClusterSubPeriodResults: 0
 
-#Mode of CO2 cap for each subperiod: 0 - No CO2 Cap, 1 - Split equally CO2 Cap of each subperiod = Annual CO2 Cap/Number of Subperiods, 4 - Assumed CO2 price (User to input below)
-ClusterSubPeriodCO2Cap: 1
+#Assumed CO2 price for iterative CO2 emission cap method WORK IN PROGRESS
 ClusterSubPeriodAssumedCO2Price: 300
 
   #   - IterateMethod

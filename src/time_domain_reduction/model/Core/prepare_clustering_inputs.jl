@@ -167,6 +167,9 @@ function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup
         ClusteringInputDF = ModifiedDataNormalized
     end
 
+    println("Shape of ModifiedDataNormalized: ", size(ModifiedDataNormalized))  
+    println("Shape of ClusteringInputDF: ", size(ClusteringInputDF))  
+
     ConstCols = string.(ConstCols)
 
     ColumnNames = Dict(

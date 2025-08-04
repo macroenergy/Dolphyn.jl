@@ -49,8 +49,7 @@ IterativelyAddPeriods: 1
  #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
 ClusterSubPeriodResults: 1
 
-#Mode of CO2 cap for each subperiod: 0 - No CO2 Cap, 1 - Split equally CO2 Cap of each subperiod = Annual CO2 Cap/Number of Subperiods, 4 - Assumed CO2 price (User to input below)
-ClusterSubPeriodCO2Cap: 1
+#Assumed CO2 price for iterative CO2 emission cap method WORK IN PROGRESS
 ClusterSubPeriodAssumedCO2Price: 300
 
   #   - IterateMethod

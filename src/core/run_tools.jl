@@ -330,16 +330,6 @@ function run_subperiod_cases(mysetup::Dict, myinputs::Dict, settings_path::Abstr
         sub_inputs["REP_PERIOD"] = 1
         sub_inputs["Weights"] = [sub_inputs["T"]]
 
-        ## If we treat each subperiod individually, we need to divide the CO2 cap equally, but cost are annualized so this does not make sense
-        #sub_inputs["omega"] = ones(Float64, sub_inputs["T"])
-
-        #if mysetup["ClusterSubPeriodCO2Cap"] == 1
-        #    subperiod_hours = length(t_indices)
-        #    sub_inputs["dfMaxCO2"] = myinputs["dfMaxCO2"] * (subperiod_hours / T_full)
-        #    println(" -- Subperiod $subp CO2 cap scaled to ", sub_inputs["dfMaxCO2"])
-        #end
-
-        ## If we treat each subperiod as representing a full year, make more sense in price perspective because all our cost assumptions are annualized
         subperiod_hours = length(t_indices)
         weight_per_hour = T_full / subperiod_hours
         sub_inputs["omega"] = fill(weight_per_hour, subperiod_hours)
