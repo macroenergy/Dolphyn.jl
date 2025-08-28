@@ -128,8 +128,10 @@ function time_matching_requirement(EP::Model, inputs::Dict, setup::Dict)
 		EP[:eObj] += eCTotal_H2_TMR_slack 
 
 		#IF slack is active add it to the expression being used to define the constraint
-		EP[:eExcessElectricitySupplyTMR] = +vH2_TMR_slack
-		
+		for TMR in 1:nH2_TMR, t in 1:T
+    		EP[:eExcessElectricitySupplyTMR][TMR,t]= EP[:eExcessElectricitySupplyTMR][TMR,t] +vH2_TMR_slack[TMR,t]
+		end
+
 	end
 
 	
