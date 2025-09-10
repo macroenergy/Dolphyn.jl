@@ -150,6 +150,9 @@ function liquid_fuel_emissions(EP::Model, inputs::Dict, setup::Dict)
         - EP[:eSynFuelProd_Diesel_Plant][k,t]*Syn_diesel_co2_per_mmbtu - EP[:eSynFuelProd_Jetfuel_Plant][k,t]*Syn_jetfuel_co2_per_mmbtu - EP[:eSynFuelProd_Gasoline_Plant][k,t]*Syn_gasoline_co2_per_mmbtu 
         - EP[:eByProdConsCO2EmissionsByPlant][k,t])
 
+        #Plant CO2 emissions has to be greater or equal to zero, to prevent negative values in flexible synthetic fuels process with very high carbon conversion rates (e.g. recycled CO2 feed)
+        @constraint(EP,cNon_Negative_Syn_Fuels_CO2_Produced_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], EP[:eSyn_Fuels_CO2_Produced_By_Res][k,t] >= 0)
+
         ##########################################################################
         #Plant CO2 captured per type of resource defined by CCS rate (Add to captured CO2 balance)
         @expression(EP,eSyn_Fuels_CO2_Captured_By_Res[k=1:SYN_FUELS_RES_ALL,t=1:T], 

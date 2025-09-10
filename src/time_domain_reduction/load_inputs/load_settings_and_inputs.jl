@@ -4,9 +4,6 @@
 
 function load_settings_and_inputs(inpath::String, settings_path::String, mysetup::Dict, v::Bool=false)
 
-    # Read time domain reduction settings file time_domain_reduction_settings.yml
-    myTDRsetup = YAML.load(open(joinpath(settings_path,"time_domain_reduction_settings.yml")))
-
     # Define a local version of the setup so that you can modify the mysetup["ParameterScale"] value to be zero in case it is 1
     mysetup_local = copy(mysetup)
     # If ParameterScale =1 then make it zero, since clustered inputs will be scaled prior to generating model
@@ -33,5 +30,5 @@ function load_settings_and_inputs(inpath::String, settings_path::String, mysetup
     #Overwrites paramater scale
     mysetup["ParameterScale"] = parameter_scale_org 
 
-    return myTDRsetup, mysetup, myinputs
+    return mysetup, myinputs
 end

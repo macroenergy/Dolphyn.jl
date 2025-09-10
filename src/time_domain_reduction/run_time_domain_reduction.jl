@@ -10,7 +10,7 @@
 function run_time_domain_reduction(inpath, settings_path, mysetup, v=false)
 
     ##### Step 1: Load YAML settings and inputs
-    myTDRsetup, mysetup, myinputs = load_settings_and_inputs(inpath, settings_path, mysetup, v)   
+    mysetup, myinputs = load_settings_and_inputs(inpath, settings_path, mysetup, v)   
 
     ##### Step 2: Parse data from inputs
     parsed_data = parse_data(myinputs, mysetup)
@@ -18,20 +18,21 @@ function run_time_domain_reduction(inpath, settings_path, mysetup, v=false)
     ##### Step 3: Prepare inputs for clustering: Normalize profiles, identify extreme periods, reshape for clustering
     InputData, Ncols, ConstData, ConstCols, col_to_zone_map, ExtremeWksList, 
     ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, 
-    ColumnNames, Flags = prepare_clustering_inputs(parsed_data, myinputs, myTDRsetup, v)
+    ColumnNames, Flags = prepare_clustering_inputs(parsed_data, myinputs, mysetup, v)
     
     ##### Step 4: Clustering and iterative add periods of input dataframe to obtain A: Assignments, W: Weights, M: Medoids
-    A, W, M = run_clustering(myTDRsetup, ClusteringInputDF, NClusters, ColumnNames, ExtremeWksList, v)
+    A, W, M, autoencoder_training_time, clustering_time = run_clustering(inpath, mysetup, ClusteringInputDF, NClusters, ColumnNames, ExtremeWksList, v)
 
+    
     ##### Step 5: Post-processing of cluster results
     FinalOutputData, OutputData, PeriodMap, W, M, A, RMSE = aggregate_cluster_results(A, W, M,
                                                             ClusteringInputDF, ModifiedData, InputData,
                                                             ConstCols, ConstData, ColumnNames, Flags,
                                                             NClusters, ExtremeWksList, Ncols, NumDataPoints, 
-                                                            mysetup, myTDRsetup, v)
+                                                            mysetup, v)
     
     ##### Step 6: Write cluster results
-    write_cluster_outputs(W, OutputData, PeriodMap, ColumnNames, inpath, myinputs, mysetup, myTDRsetup, v)
+    write_cluster_outputs(W, OutputData, PeriodMap, ColumnNames, inpath, myinputs, mysetup, v)
 
-    return FinalOutputData, W, RMSE, myTDRsetup, col_to_zone_map
+    return FinalOutputData, W, RMSE, col_to_zone_map, autoencoder_training_time, clustering_time
 end

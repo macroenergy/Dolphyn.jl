@@ -27,14 +27,6 @@ function load_subperiod_power_gen(setup::Dict, path::AbstractString, inputs::Dic
 
     all_resources = inputs["RESOURCES"]
 
-    # Ensure the file contains all expected resource columns
-    existing_columns = names(power_df)
-    missing_resources = setdiff(all_resources, string.(existing_columns[2:end]))  # skip Time_Index
-    for r in missing_resources
-        @info "Assuming zero generation for missing resource $r in ClusterSubPeriod_Power.csv."
-        power_df[!, Symbol(r)] = 0.0
-    end
-
     # Reorder columns: [:Time_Index, <resource symbols in correct order>]
     select!(power_df, [:t; Symbol.(all_resources)])
 

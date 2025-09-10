@@ -1,19 +1,19 @@
 @doc raw"""
-run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, ColumnNames::Dict, ExtremeWksList::Vector{Int}, v::Bool=false)
+run_clustering(mysetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, ColumnNames::Dict, ExtremeWksList::Vector{Int}, v::Bool=false)
 """
 
-function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, ColumnNames::Dict, ExtremeWksList::Vector{Int}, v::Bool=false)
+function run_clustering(inpath::String, mysetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, ColumnNames::Dict, ExtremeWksList::Vector{Int}, v::Bool=false)
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
-    TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
-    ClusterMethod = myTDRsetup["ClusterMethod"]
-    ScalingMethod = myTDRsetup["ScalingMethod"]
-    MaxPeriods = myTDRsetup["MaxPeriods"]
-    UseExtremePeriods = myTDRsetup["UseExtremePeriods"]
-    Iterate = myTDRsetup["IterativelyAddPeriods"]
-    IterateMethod = myTDRsetup["IterateMethod"]
-    Threshold = myTDRsetup["Threshold"]
-    nReps = myTDRsetup["nReps"]
+    TimestepsPerRepPeriod = mysetup["TimestepsPerRepPeriod"]
+    ClusterMethod = mysetup["ClusterMethod"]
+    ScalingMethod = mysetup["ScalingMethod"]
+    MaxPeriods = mysetup["MaxPeriods"]
+    UseExtremePeriods = mysetup["UseExtremePeriods"]
+    Iterate = mysetup["IterativelyAddPeriods"]
+    IterateMethod = mysetup["IterateMethod"]
+    Threshold = mysetup["Threshold"]
+    nReps = mysetup["nReps"]
 
     # Accept OldColNames from ColumnNames dictionary
     OldColNames = ColumnNames["OldColNames"]
@@ -24,7 +24,7 @@ function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NCluster
 
     # Cluster once regardless of iteration decisions
     
-    push!(cluster_results, cluster(myTDRsetup, ClusterMethod, ClusteringInputDF, NClusters, nReps, v))
+    push!(cluster_results, cluster(inpath, mysetup, ClusterMethod, ClusteringInputDF, NClusters, nReps, v))
 
     # Iteratively add worst periods as extreme periods OR increment number of clusters k
     #    until threshold is met or maximum periods are added (If chosen in inputs)
@@ -72,5 +72,8 @@ function run_clustering(myTDRsetup::Dict, ClusteringInputDF::DataFrame, NCluster
     A = Int.(A)
     M = Int.(M)
 
-    return A, W, M
+    autoencoder_training_time = last(cluster_results)[6]
+    clustering_time = last(cluster_results)[7]
+
+    return A, W, M, autoencoder_training_time, clustering_time
 end

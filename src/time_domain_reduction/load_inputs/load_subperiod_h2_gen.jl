@@ -21,13 +21,13 @@ Function for reading input parameters related to hourly generation results from 
 """
 function load_subperiod_h2_gen(setup::Dict, path::AbstractString, sep::AbstractString, inputs::Dict)
 
-    results_gen = DataFrame(CSV.File(joinpath(path, "ClusterSubPeriod_H2Gen.csv"), header=true), copycols=true)
+    h2_gen_df = DataFrame(CSV.File(joinpath(path, "ClusterSubPeriod_H2Gen.csv"), header=true), copycols=true)
 
     # Reorder DataFrame to R_ID order (order provided in ClusterSubPeriod_H2Gen.csv)
-    select!(results_gen, [:t; Symbol.(inputs["H2_RESOURCES_NAME"]) ])
+    select!(h2_gen_df, [:t; Symbol.(inputs["H2_RESOURCES_NAME"]) ])
 
     # Maximum power output and variability of each energy resource
-    inputs["Subperiod_H2Gen"] = transpose(Matrix{Float64}(results_gen[1:inputs["T"],2:(inputs["H2_RES_ALL"]+1)]))
+    inputs["Subperiod_H2Gen"] = transpose(Matrix{Float64}(h2_gen_df[1:inputs["T"],2:(inputs["H2_RES_ALL"]+1)]))
 
     print_and_log(" -- ClusterSubPeriod_H2Gen.csv Successfully Read!")
     

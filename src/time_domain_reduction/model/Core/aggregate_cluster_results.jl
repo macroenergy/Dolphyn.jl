@@ -15,7 +15,6 @@
         Ncols::Int,
         NumDataPoints::Int,
         mysetup::Dict,
-        myTDRsetup::Dict,
         v::Bool = false
     )
 """
@@ -36,7 +35,6 @@ function aggregate_cluster_results(
             Ncols::Int,
             NumDataPoints::Int,
             mysetup::Dict,
-            myTDRsetup::Dict,
             v::Bool = false
         )
 
@@ -58,9 +56,9 @@ function aggregate_cluster_results(
     IncludeFuel       = Flags["IncludeFuel"]
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
-    TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
-    UseExtremePeriods = myTDRsetup["UseExtremePeriods"]
-    WeightTotal = myTDRsetup["WeightTotal"]
+    TimestepsPerRepPeriod = mysetup["TimestepsPerRepPeriod"]
+    UseExtremePeriods = mysetup["UseExtremePeriods"]
+    WeightTotal = mysetup["WeightTotal"]
 
     ####################################################################################
 

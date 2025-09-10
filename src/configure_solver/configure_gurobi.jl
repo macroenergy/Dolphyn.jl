@@ -98,6 +98,16 @@ function configure_gurobi(solver_settings_path::String, solver::DataType)
     if (haskey(solver_settings, "BarHomogeneous"))
         MyBarHomogeneous = solver_settings["BarHomogeneous"]
     end
+
+    MyThreads = 0 # Numerical precision emphasis. See https://www.gurobi.com/documentation/8.1/refman/numericfocus.html
+    if (haskey(solver_settings, "Threads"))
+        MyThreads = solver_settings["Threads"]
+    end
+
+    MyOutputFlag = 1 # Numerical precision emphasis. See https://www.gurobi.com/documentation/8.1/refman/numericfocus.html
+    if (haskey(solver_settings, "OutputFlag"))
+        MyOutputFlag = solver_settings["OutputFlag"]
+    end
     ########################################################################
 
     OPTIMIZER = optimizer_with_attributes(
@@ -115,6 +125,8 @@ function configure_gurobi(solver_settings_path::String, solver::DataType)
         "Crossover" => MyCrossover,
         "LogFile" => MyGurobiLogFile,
         "BarHomogeneous" => MyBarHomogeneous,
+        "Threads" => MyThreads,
+        "OutputFlag" => MyOutputFlag,
     )
 
     return OPTIMIZER

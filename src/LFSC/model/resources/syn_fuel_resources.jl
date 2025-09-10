@@ -203,9 +203,12 @@ function syn_fuel_resources(EP::Model, inputs::Dict, setup::Dict)
 	[k = 1:SYN_FUELS_RES_ALL, t = 1:T], EP[:vSFPin][k,t] == EP[:vSFCO2in][k,t] * dfSynFuels[!,:mwh_p_tonne_co2][k]
 	end)
 
+	#Include constraint of min synfuel plant operation
+	@constraint(EP,cMin_SF_output_per_plant_per_time[i in 1:SYN_FUELS_RES_ALL, t in 1:T], EP[:vSFCO2in][i,t] >= EP[:vCapacity_Syn_Fuel_per_type][i] * dfSynFuels[!,:sf_min_output][i])
 
-    # Production must be smaller than available capacity
-	@constraints(EP, begin [k = 1:SYN_FUELS_RES_ALL, t=1:T], EP[:vSFCO2in][k,t] <= EP[:vCapacity_Syn_Fuel_per_type][k] end)
+	#Include constraint of max synfuel plant operation
+	@constraint(EP,cMax_SF_output_per_plant_per_time[i in 1:SYN_FUELS_RES_ALL, t in 1:T], EP[:vSFCO2in][i,t] <= EP[:vCapacity_Syn_Fuel_per_type][i] * dfSynFuels[!,:sf_max_output][i])
+
 
 	return EP
 end

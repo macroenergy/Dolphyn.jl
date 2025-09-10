@@ -116,10 +116,13 @@ function syn_ng_resources(EP::Model, inputs::Dict, setup::Dict)
 	[k in 1:SYN_NG_RES_ALL, t = 1:T], EP[:vSyn_NG_Power_in][k,t] == EP[:vSyn_NG_CO2in][k,t] * dfSyn_NG[!,:mwh_p_tonne_co2][k]
 	end)
 
-    # Production must be smaller than available capacity
-	@constraints(EP, begin 
-	[k in 1:SYN_NG_RES_ALL, t=1:T], EP[:vSyn_NG_CO2in][k,t] <= EP[:vCapacity_Syn_NG_per_type][k] 
-	end)
+
+	#Include constraint of min synfuel plant operation
+	@constraint(EP,cMin_SNG_output_per_plant_per_time[i in 1:SYN_NG_RES_ALL, t in 1:T], EP[:vSyn_NG_CO2in][i,t] >= EP[:vCapacity_Syn_NG_per_type][i] * dfSyn_NG[!,:sng_min_output][i])
+
+	#Include constraint of max synfuel plant operation
+	@constraint(EP,cMax_SNG_output_per_plant_per_time[i in 1:SYN_NG_RES_ALL, t in 1:T], EP[:vSyn_NG_CO2in][i,t] <= EP[:vCapacity_Syn_NG_per_type][i] * dfSyn_NG[!,:sng_max_output][i])
+
 
 	return EP
 end

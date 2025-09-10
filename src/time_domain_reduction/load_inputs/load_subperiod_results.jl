@@ -39,10 +39,22 @@ function load_subperiod_results(inputs::Dict,setup::Dict,path::AbstractString)
 
     print_and_log("Reading Subperiod Results CSV Files")
 
+    STOR_ALL = inputs["STOR_ALL"]
+    
     inputs = load_subperiod_power_gen(setup, path, inputs)
 
+    if !isempty(STOR_ALL)
+        inputs = load_subperiod_power_charge(setup, path, inputs)
+    end
+
     if setup["ModelH2"] == 1
+        H2_STOR_ALL = inputs["H2_STOR_ALL"]
+    
         inputs = load_subperiod_h2_gen(setup, path, sep, inputs)
+
+        if !isempty(H2_STOR_ALL)
+            inputs = load_subperiod_h2_charge(setup, path, sep, inputs)
+        end
     end
 
     print_and_log("Subperiod Results CSV Files Successfully Read In From $path$sep")

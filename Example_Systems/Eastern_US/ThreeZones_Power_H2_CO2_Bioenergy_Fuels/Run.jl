@@ -17,4 +17,6 @@ received this license file.  If not, see <http://www.gnu.org/licenses/>.
 using Dolphyn
 using Gurobi
 
-EP, myinputs, mysetup, adjusted_outpath = run_case(@__DIR__; optimizer=Gurobi.Optimizer)
+#EP, myinputs, mysetup, adjusted_outpath = run_case(@__DIR__; optimizer=Gurobi.Optimizer)
+
+run_case(@__DIR__; optimizer=Gurobi.Optimizer)

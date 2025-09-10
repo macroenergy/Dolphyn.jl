@@ -1,17 +1,17 @@
 @doc raw"""
-    prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup::Dict, v::Bool=false)
+    prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::Dict, v::Bool=false)
 """
 
-function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup::Dict, v::Bool=false)
+function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::Dict, v::Bool=false)
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
-    TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
-    ScalingMethod = myTDRsetup["ScalingMethod"]
-    MinPeriods = myTDRsetup["MinPeriods"]
-    UseExtremePeriods = myTDRsetup["UseExtremePeriods"]
-    ExtPeriodSelections = myTDRsetup["ExtremePeriods"]
-    LoadWeight = myTDRsetup["LoadWeight"]
-    ClusterFuelPrices = myTDRsetup["ClusterFuelPrices"]
+    TimestepsPerRepPeriod = mysetup["TimestepsPerRepPeriod"]
+    ScalingMethod = mysetup["ScalingMethod"]
+    MinPeriods = mysetup["MinPeriods"]
+    UseExtremePeriods = mysetup["UseExtremePeriods"]
+    ExtPeriodSelections = mysetup["ExtremePeriods"]
+    LoadWeight = mysetup["LoadWeight"]
+    ClusterFuelPrices = mysetup["ClusterFuelPrices"]
     
     ####################################################################################
 
@@ -190,6 +190,12 @@ function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, myTDRsetup
         "LoadExtremePeriod" => LoadExtremePeriod,
         "IncludeFuel" => IncludeFuel
     )
+
+    # For debugging purposes
+    #output_path = "ClusteringInputDF_$(MinPeriods)_Weeks.csv"
+    #CSV.write(output_path, ClusteringInputDF)
+    #println("Input dataframe successfully saved to: ", output_path)
+
 
     return InputData, Ncols, ConstData, 
     ConstCols, col_to_zone_map, ExtremeWksList, ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, ColumnNames, Flags

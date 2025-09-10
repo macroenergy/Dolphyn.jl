@@ -7,7 +7,6 @@
         inpath::String,
         myinputs::Dict,
         mysetup::Dict,
-        myTDRsetup::Dict,
         v::Bool = false
     )
 """
@@ -20,7 +19,6 @@ function write_cluster_outputs(
         inpath::String,
         myinputs::Dict,
         mysetup::Dict,
-        myTDRsetup::Dict,
         v::Bool = false
     )
 
@@ -45,7 +43,7 @@ function write_cluster_outputs(
     HLLPOutputData   = OutputData["HLLPOutputData"]
     HG2POutputData   = OutputData["HG2POutputData"]
             
-    TimestepsPerRepPeriod = myTDRsetup["TimestepsPerRepPeriod"]
+    TimestepsPerRepPeriod = mysetup["TimestepsPerRepPeriod"]
     TimeDomainReductionFolder = mysetup["TimeDomainReductionFolder"]
 
     ####################################################################################
@@ -192,5 +190,5 @@ function write_cluster_outputs(
 
     ### time_domain_reduction_settings.yml
     if v println(" -- Writing .yml settings...") end
-    YAML.write_file(string(inpath,sep,YAML_Outfile), myTDRsetup)
+    YAML.write_file(string(inpath,sep,YAML_Outfile), mysetup)
 end

@@ -20,30 +20,53 @@ TimestepsPerRepPeriod: 168
   #   - ClusterMethod 
   #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
   #   periods and determine each point's representative period.
-ClusterMethod: 'kmeans'
+ClusterMethod: 'autoencoder'
+
+#For autoencoder based method only
+AutoEncoder:
+  n_filters: 32
+  kernel_size: 12
+  stride: 6
+  latent_dim: 64
+  epochs: 5000
+
+  #Training requirements
+  min_err_diff: 0.0001 # Required relative improvement of error before stopping training, e.g. 0.01% of best
+  warmup: 50 # Minimum number of epochs
+  patience: 50 # Epochs to wait after warmup with no sufficient improvement
+
+  #Others
+  single_channel_mode: 0 #Not implemented yet. Default autoencoder uses multiple channel where n channels = n resources in time series
 
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])
   #   or standardize (mean 0, variance 1) the input data.
-ScalingMethod: "S"
+ScalingMethod: "N"
 
   #   - MaxPeriods 
   #   The maximum number of periods - both clustered periods and extreme periods -
   #   that may be used to represent the input data. If IterativelyAddPeriods is on and the
   #   error threshold is never met, this will be the total number of periods.
-MaxPeriods: 1
+MaxPeriods: 5
 
   #   - MinPeriods
   #   The minimum number of periods used to represent the input data. If using
   #   UseExtremePeriods, this must be at least the number of extreme periods requests. If 
   #   IterativelyAddPeriods if off, this will be the total number of periods.
-MinPeriods: 1
+MinPeriods: 5
 
   #   - IterativelyAddPeriods
   #   Either 'yes' or 'no', this designates whether or not to add periods
   #   until the error threshold between input data and represented data is met or the maximum
   #   number of periods is reached.
 IterativelyAddPeriods: 1
+
+ #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
+ #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
+ClusterSubPeriodResults: 0
+
+#Assumed CO2 price for iterative CO2 emission cap method WORK IN PROGRESS
+ClusterSubPeriodAssumedCO2Price: 300
 
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to
@@ -119,14 +142,14 @@ ExtremePeriods:
             Min: 0
          Integral:   
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
             Min: 0
          Integral:
             Max: 0
-            Min: 0
+            Min: 1
    Wind:
       Zone:
          Absolute:
@@ -134,11 +157,11 @@ ExtremePeriods:
             Min: 0  
          Integral:
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
             Min: 0 
          Integral:
             Max: 0
-            Min: 0
+            Min: 1

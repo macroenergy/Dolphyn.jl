@@ -62,11 +62,12 @@ Remove and store the columns that do not vary during the period.
 
 """
 function RemoveConstCols(all_profiles, all_col_names, v=false)
+    tol = 1e-6
     ConstData = []
     ConstIdx = []
     ConstCols = []
     for c in 1:length(all_col_names)
-        Const = minimum(all_profiles[c]) == maximum(all_profiles[c])
+        Const = abs(maximum(all_profiles[c]) - minimum(all_profiles[c])) < tol
         if Const
             if v println(" -- Removing constant col: ", all_col_names[c]) end
             push!(ConstData, all_profiles[c])

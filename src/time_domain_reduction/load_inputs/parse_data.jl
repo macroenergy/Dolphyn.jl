@@ -31,8 +31,14 @@ function parse_data(myinputs, mysetup)
     subperiod_power_gen_col_names = String[]
     subperiod_h2_gen_col_names = String[]
 
+    subperiod_power_charge_col_names = String[]
+    subperiod_h2_charge_col_names = String[]
+
     subperiod_power_gen_profiles = Vector{Vector{Float64}}()
     subperiod_h2_gen_profiles = Vector{Vector{Float64}}()
+
+    subperiod_power_charge_profiles = Vector{Vector{Float64}}()
+    subperiod_h2_charge_profiles = Vector{Vector{Float64}}()
 
     # What does this mean? Is this default value
     AllHRVarConst = true
@@ -122,14 +128,18 @@ function parse_data(myinputs, mysetup)
             push!(subperiod_power_gen_col_names, "PowerGen_$(RESOURCES[r])")
             push!(subperiod_power_gen_profiles, myinputs["Subperiod_PowerGen"][r,:])
         end
-        
-        #println("Subperiod power gen column names: ", subperiod_power_gen_col_names)
 
-        #for (i, profile) in enumerate(subperiod_power_gen_profiles)
-        #    println("Power profile for $(subperiod_power_gen_col_names[i]):")
-        #    println("  First: ", profile[1])
-        #    println("  Last: ", profile[end])
-        #end
+        STOR_ALL = myinputs["STOR_ALL"]
+
+        if !isempty(STOR_ALL)
+            for r in 1:length(RESOURCES)
+                push!(subperiod_power_charge_col_names, "PowerCharge_$(RESOURCES[r])")
+                push!(subperiod_power_charge_profiles, myinputs["Subperiod_PowerCharge"][r,:])
+            end
+        end
+
+
+
 
         #Add subperiod H2 generation results
         if mysetup["ModelH2"] == 1
@@ -138,19 +148,20 @@ function parse_data(myinputs, mysetup)
                 push!(subperiod_h2_gen_profiles, myinputs["Subperiod_H2Gen"][r,:])
             end
 
-            #println("Subperiod H2 gen column names: ", subperiod_h2_gen_col_names)
+            H2_STOR_ALL = myinputs["H2_STOR_ALL"]
 
-            #for (i, profile) in enumerate(subperiod_h2_gen_profiles)
-            #    println("H2 profile for $(subperiod_h2_gen_col_names[i]):")
-            #    println("  First: ", profile[1])
-            #    println("  Last: ", profile[end])
-            #end
+            if !isempty(H2_STOR_ALL)
+                for r in 1:length(H2_RESOURCES)
+                    push!(subperiod_h2_charge_col_names, "H2Charge_$(H2_RESOURCES[r])")
+                    push!(subperiod_h2_charge_profiles, myinputs["Subperiod_H2Charge"][r,:])
+                end
+            end
         end
     end
 
 
-    all_col_names = [load_col_names; h2_load_col_names; h2_load_liq_col_names; var_col_names; h2_var_col_names; h2_g2p_var_col_names; fuel_col_names; subperiod_power_gen_col_names; subperiod_h2_gen_col_names]
-    all_profiles = [load_profiles..., h2_load_profiles..., h2_load_liq_profiles..., var_profiles..., h2_var_profiles..., h2_g2p_var_profiles..., fuel_profiles..., subperiod_power_gen_profiles..., subperiod_h2_gen_profiles...]
+    all_col_names = [load_col_names; h2_load_col_names; h2_load_liq_col_names; var_col_names; h2_var_col_names; h2_g2p_var_col_names; fuel_col_names; subperiod_power_gen_col_names; subperiod_h2_gen_col_names; subperiod_power_charge_col_names; subperiod_h2_charge_col_names]
+    all_profiles = [load_profiles..., h2_load_profiles..., h2_load_liq_profiles..., var_profiles..., h2_var_profiles..., h2_g2p_var_profiles..., fuel_profiles..., subperiod_power_gen_profiles..., subperiod_h2_gen_profiles..., subperiod_power_charge_profiles..., subperiod_h2_charge_profiles...]
 
     parsed_data = Dict(
         "load_col_names" => load_col_names,
@@ -174,6 +185,10 @@ function parse_data(myinputs, mysetup)
         "subperiod_power_gen_profiles" => subperiod_power_gen_profiles,
         "subperiod_h2_gen_col_names" => subperiod_h2_gen_col_names,
         "subperiod_h2_gen_profiles" => subperiod_h2_gen_profiles,
+        "subperiod_power_charge_col_names" => subperiod_power_charge_col_names,
+        "subperiod_power_charge_profiles" => subperiod_power_charge_profiles,
+        "subperiod_h2_charge_col_names" => subperiod_h2_charge_col_names,
+        "subperiod_h2_charge_profiles" => subperiod_h2_charge_profiles,
         "all_profiles" => all_profiles,
         "col_to_zone_map" => col_to_zone_map,
         "h2_col_to_zone_map" => h2_col_to_zone_map,
