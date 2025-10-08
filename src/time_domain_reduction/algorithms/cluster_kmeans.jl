@@ -8,38 +8,68 @@ function cluster_kmeans(ClusteringInputDF::DataFrame, NClusters::Int, nIters::In
 
     DistMatrix = pairwise(Euclidean(), Matrix(ClusteringInputDF), dims=2)
 
-    clustering_time = @elapsed begin
+    rng = MersenneTwister(42)   # local RNG
 
-        # Define seed
-        Random.seed!(42)
-        R = kmeans(Matrix(ClusteringInputDF), NClusters, init=:kmpp, maxiter=300)
+    clustering_time = @elapsed begin
+        R = kmeans(Matrix(ClusteringInputDF), NClusters; rng=rng, init=:kmpp)
+
+        best = nothing
+        best_cost = Inf
+        no_improve = 0
+        patience = 50   # stop if no improvement for 20 restarts
 
         for i in 1:nIters
-            R_i = kmeans(Matrix(ClusteringInputDF), NClusters, init=:kmpp, maxiter=300)
-
-            if R_i.totalcost < R.totalcost
-                R = R_i
+            rng_i = MersenneTwister(42 + i)
+            R_i = kmeans(Matrix(ClusteringInputDF), NClusters; rng=rng_i, init=:kmpp)
+        
+            if R_i.totalcost < best_cost - 1e-6   # small tolerance
+                best = R_i
+                best_cost = R_i.totalcost
+                no_improve = 0   # reset counter
+            else
+                no_improve += 1
             end
-            if (i % (nIters/10) == 0)
-                println(string(i) * " : " * string(round(R_i.totalcost, digits=3)) * " " * string(round(R.totalcost, digits=3)) )
+        
+            if v && (i % max(1, nIters ÷ 10) == 0)
+                println("Iter $i : cost=$(round(R_i.totalcost, digits=3))  best=$(round(best_cost, digits=3))")
+            end
+        
+            if v && no_improve ≥ patience
+                println("Stopping early at iteration $i (no improvement for $patience restarts), best=$(round(best_cost, digits=3))")
+                break
             end
         end
+        
+        R = best
+        A = R.assignments
+        W = R.counts
+        Centers = R.centers
 
-        A = R.assignments # get points to clusters mapping - A for Assignments
-        W = R.counts # get the cluster sizes - W for Weights
-        Centers = R.centers # get the cluster centers - M for Medoids
-
-        M = []
+        M = Int[]
+        chosen = Set{Int}()
+        
         for i in 1:NClusters
-            dists = [euclidean(Centers[:,i], ClusteringInputDF[!, j]) for j in 1:size(ClusteringInputDF, 2)]
-            push!(M,argmin(dists))
+            # sort candidates by distance to centroid i
+            dists = [euclidean(Centers[:, i], ClusteringInputDF[!, j]) for j in 1:size(ClusteringInputDF, 2)]
+            candidates = sortperm(dists)  # indices ordered from closest to farthest
+        
+            # pick first candidate not already chosen
+            rep = findfirst(idx -> !(idx in chosen), candidates)
+            if rep === nothing
+                error("Could not find a unique representative for cluster $i")
+            end
+        
+            push!(M, candidates[rep])
+            push!(chosen, candidates[rep])
         end
     end
 
-    println("Kmeans approach completed successfully.")
-    println("A:", A)
-    println("W:", W)
-    println("M:", M)
+    if v
+        println("Kmeans approach completed successfully.")
+        println("A:", A)
+        println("W:", W)
+        println("M:", M)
+    end
 
     return R, A, W, M, DistMatrix, clustering_time
 end

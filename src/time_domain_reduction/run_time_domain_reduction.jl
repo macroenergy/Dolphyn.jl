@@ -18,7 +18,7 @@ function run_time_domain_reduction(inpath, settings_path, mysetup, v=false)
     ##### Step 3: Prepare inputs for clustering: Normalize profiles, identify extreme periods, reshape for clustering
     InputData, Ncols, ConstData, ConstCols, col_to_zone_map, ExtremeWksList, 
     ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, 
-    ColumnNames, Flags = prepare_clustering_inputs(parsed_data, myinputs, mysetup, v)
+    ColumnNames, Flags = prepare_clustering_inputs(parsed_data, inpath, myinputs, mysetup, v)
     
     ##### Step 4: Clustering and iterative add periods of input dataframe to obtain A: Assignments, W: Weights, M: Medoids
     A, W, M, autoencoder_training_time, clustering_time = run_clustering(inpath, mysetup, ClusteringInputDF, NClusters, ColumnNames, ExtremeWksList, v)

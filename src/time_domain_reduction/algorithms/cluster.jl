@@ -10,13 +10,15 @@ function cluster(inpath::String, myTDRsetup::Dict, ClusterMethod::String, Cluste
     end
     
     if ClusterMethod == "kmeans"
-        R, A, W, M, DistMatrix, clustering_time = cluster_kmeans(ClusteringInputDF, NClusters, nIters, v)
+        R, A, W, M, DistMatrix, clustering_time = cluster_kmeans(ClusteringInputDF, NClusters, nIters, true)
         autoencoder_training_time = "NA"
     elseif ClusterMethod == "kmedoids"
         R, A, W, M, DistMatrix, clustering_time = cluster_kmedoids(ClusteringInputDF, NClusters, nIters, v)
         autoencoder_training_time = "NA"
-    elseif ClusterMethod == "autoencoder"
-        R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time = cluster_autoencoder(inpath, myTDRsetup, ClusteringInputDF, NClusters, nIters, v)
+    elseif ClusterMethod == "autoencoder_sequential"
+        R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time = cluster_autoencoder(inpath, myTDRsetup, ClusteringInputDF, NClusters, nIters, true)
+    elseif ClusterMethod == "autoencoder_simultaneous"
+        R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time = cluster_autoencoder_simultaneous(inpath, myTDRsetup, ClusteringInputDF, NClusters, nIters, true)
     else
         error(" -- ERROR: Clustering method $ClusterMethod is not implemented.")
     end

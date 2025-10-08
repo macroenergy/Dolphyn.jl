@@ -8,26 +8,48 @@ function cluster_kmedoids(ClusteringInputDF::DataFrame, NClusters::Int, nIters::
 
     DistMatrix = pairwise(Euclidean(), Matrix(ClusteringInputDF), dims=2)
 
-    clustering_time = @elapsed begin
+    rng = MersenneTwister(42)   # local RNG
 
-    R = kmedoids(DistMatrix, NClusters, init=:kmcen)
+    clustering_time = @elapsed begin
+        R = kmedoids(DistMatrix, NClusters; rng=rng, init=:kmcen)
+
+        best = nothing
+        best_cost = Inf
+        no_improve = 0
+        patience = 20   # stop if no improvement for 20 restarts
 
         for i in 1:nIters
-            R_i = kmedoids(DistMatrix, NClusters)
-            if R_i.totalcost < R.totalcost
-                R = R_i
+            rng_i = MersenneTwister(42 + i)
+            R_i = kmedoids(DistMatrix, NClusters; rng=rng_i, init=:kmcen)
+
+            if R_i.totalcost < best_cost - 1e-6   # small tolerance
+                best = R_i
+                best_cost = R_i.totalcost
+                no_improve = 0   # reset counter
+            else
+                no_improve += 1
             end
-            if v && (i % (nIters/10) == 0)
-                println(string(i) * " : " * string(round(R_i.totalcost, digits=3)) * " " * string(round(R.totalcost, digits=3)) )
+
+            if (i % max(1, nIters ÷ 10) == 0)
+                println("Iter $i : cost=$(round(R_i.totalcost, digits=3))  best=$(round(best_cost, digits=3))")
+            end
+
+            if no_improve ≥ patience
+                println("Stopping early at iteration $i (no improvement for $patience restarts), best=$(round(best_cost, digits=3))")
+                break
             end
         end
 
-        A = R.assignments # get points to clusters mapping - A for Assignments
-        W = R.counts # get the cluster sizes - W for Weights
-        M = R.medoids # get the cluster centers - M for Medoids
+        R = best
+        A = R.assignments
+        W = R.counts
+        M = R.medoids
     end
 
-    println("Kmedoids approach completed successfully.")
+    println("K-medoids approach completed successfully.")
+    println("A:", A)
+    println("W:", W)
+    println("M:", M)
 
     return R, A, W, M, DistMatrix, clustering_time
 

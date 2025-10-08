@@ -17,26 +17,43 @@
   #   the length of each representative period.
 TimestepsPerRepPeriod: 168
 
+ #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
+ #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
+ClusterSubPeriodResults: 0
+
   #   - ClusterMethod 
-  #   Either 'kmeans' or 'kmedoids', this designates the method used to cluster
+  #   Either 'kmeans', 'kmedoids', or 'autoencoder' this designates the method used to cluster
   #   periods and determine each point's representative period.
-ClusterMethod: 'autoencoder'
+ClusterMethod: 'kmeans'
 
 #For autoencoder based method only
 AutoEncoder:
-  n_filters: 32
+  n_filters: 96
   kernel_size: 12
   stride: 6
-  latent_dim: 64
-  epochs: 5000
+  latent_dim: 96
+  epochs: 50000
 
   #Training requirements
-  min_err_diff: 0.0001 # Required relative improvement of error before stopping training, e.g. 0.01% of best
+  min_err_diff: 0.00001 # Required relative improvement of error before stopping training, e.g. 0.01% of best
   warmup: 50 # Minimum number of epochs
   patience: 50 # Epochs to wait after warmup with no sufficient improvement
 
-  #Others
-  single_channel_mode: 0 #Not implemented yet. Default autoencoder uses multiple channel where n channels = n resources in time series
+AutoTuneAE: 0
+AutoTuneWeeks: [5]
+AutoTuneFilters: [96,112,128,160,192]
+AutoTuneLatents: [96,112,128,160,192]
+AutoTuneMetrics: ["EndCap"]
+
+#For automated multiple TDR runs
+RunMultipleTDR: 1
+UseThreads: 0
+#MaxPeriodsList: [7,13,15,16,17,18,19,20]
+#MinPeriodsList: [7,13,15,16,17,18,19,20]
+
+MaxPeriodsList: [5,7,9,11,13,15,17,19]
+MinPeriodsList: [5,7,9,11,13,15,17,19]
+
 
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])
@@ -60,10 +77,6 @@ MinPeriods: 5
   #   until the error threshold between input data and represented data is met or the maximum
   #   number of periods is reached.
 IterativelyAddPeriods: 1
-
- #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
- #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
-ClusterSubPeriodResults: 1
 
 #Assumed CO2 price for iterative CO2 emission cap method WORK IN PROGRESS
 ClusterSubPeriodAssumedCO2Price: 300

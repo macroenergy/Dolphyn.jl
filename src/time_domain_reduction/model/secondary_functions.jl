@@ -17,8 +17,9 @@ function rmse_score(y_true, y_pred)
     normalized_y_pred = y_pred ./ maximum(y_true)
     normalized_y_true = y_true ./ maximum(y_true)
     rmse_normalized = sqrt(mean((normalized_y_pred .- normalized_y_true) .^ 2))
-
+    
     println(rmse_normalized)
+
     return rmse
 end
 

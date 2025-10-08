@@ -1,9 +1,9 @@
 @doc raw"""
-    cluster_autoencoder(ClusteringInputDF, NClusters, nIters)
+    cluster_autoencoder_simultaneous(ClusteringInputDF, NClusters, nIters)
 
 Get representative periods using cluster centers from k means on autoencoder latent space
 """
-function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, nIters::Int, v::Bool=false)
+function cluster_autoencoder_simultaneous(inpath::String, myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, nIters::Int, v::Bool=false)
 
     #Compress multi-resource weekly time series with a 1D-convolutional autoencoder (AE), 
     #then cluster the latent representations with k-means to pick representative weeks.
@@ -21,13 +21,17 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
     n_filters = AE_params["n_filters"]
     latent_dim = AE_params["latent_dim"]
 
+    lambda = AE_params["lambda"]
+
+    # Load input DF of shape: (T * n resources, NWeeks)
+    InputDF = Float32.(Matrix(ClusteringInputDF))                 # (T * n, NWeeks)
+
     #Check if autoencoder latent space is already present as dataframe as folder
-    
-    latent_file = joinpath(inpath, "TDR_Autoencoder_Latent_Space_N$(n_filters)_D$(latent_dim).csv")
+    latent_file = joinpath(inpath, "TDR_Simultaneous_Autoencoder_Latent_Space_Lambda$(lambda)_W$(NClusters)_N$(n_filters)_D$(latent_dim).csv")
 
     if isfile(latent_file) && get(myTDRsetup, "ForceAutoencoderTraining", 0) != 1
         # Load latent space if available and skip training step
-        println("Found latent space for N=$(n_filters), D=$(latent_dim) — skipping autoencoder training.")
+        println("Found latent space for W=$(NClusters), N=$(n_filters), D=$(latent_dim) — skipping autoencoder training.")
         z_df = CSV.read(latent_file, DataFrame)
         z = Matrix(z_df) |> x -> Float32.(x)
 
@@ -46,14 +50,14 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
         end
 
         ################## Part 1 -- Prepare input dataframe for encoder input ##################
-        # Load input DF of shape: (T * n resources, NWeeks)
-        InputDF = Float32.(Matrix(ClusteringInputDF))                 # (T * n, NWeeks)
 
         #Define values used for reshaping into 3D tensor
         timesteps = Int(myTDRsetup["TimestepsPerRepPeriod"])    # T
         Nweeks = size(InputDF, 2)                                     # NWeeks
         n = size(InputDF,1) ÷ timesteps                               # n resources, which corresponds to the channels C in AE
         input_dim = n
+
+        
 
         # Reshape rows into tensor (T, C, NWeeks)
         #T = TimestepsPerRepPeriod, C = Channels (same as number of resources n), NWeeks = Weeks
@@ -101,7 +105,7 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
         autoencoder = Chain(encoder_net, decoder_net)
 
         println("Autoencoder parameters:")
-        println("input_dim:", input_dim, ", n_filters:", n_filters, ", kernel_size:", kernel_size, ", stride:", stride, ", latent_dim:", latent_dim, ", epochs:", epochs)
+        println("input_dim:", input_dim, ", lambda", lambda, ", n_filters:", n_filters, ", kernel_size:", kernel_size, ", stride:", stride, ", latent_dim:", latent_dim, ", epochs:", epochs)
 
 
         ################## Part 3 -- Autoencoder Training ##################
@@ -120,35 +124,62 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
 
         println("\nStarting Autoencoder Training...")
 
+        loss_log_file = joinpath(inpath, "TDR_Autoencoder_Loss_Curves_Lambda$(lambda)_W$(NClusters)_N$(n_filters)_D$(latent_dim).csv")
+
+        # initialize CSV file if not present
+        if !isfile(loss_log_file)
+            df_init = DataFrame(Epoch=Int[], Recon=Float64[], Cluster=Float64[], Combined=Float64[])
+            CSV.write(loss_log_file, df_init)
+        end
+
         autoencoder_training_time = @elapsed begin
 
             for epoch in 1:epochs
-                # forward + grads
+                # --- latent codes (raw and normalized) ---
+                z_raw = encoder_net(encoder_input)  # (latent_dim, Nweeks)
+                z_epoch = (z_raw .- mean(z_raw; dims=2)) ./ (std(z_raw; dims=2) .+ 1f-8)
+
+                # --- run KMeans on normalized latent space each epoch ---
+                R, A, W, M, _, _ = cluster_kmeans(DataFrame(z_epoch, :auto), NClusters, nIters, false)
+
+                # --- rebuild representative series in input space ---
+                rep_profiles = InputDF[:, M]  # columns of representative weeks
+                reconstructed_series = hcat([rep_profiles[:, A[j]] for j in 1:length(A)]...)
+                
+                # --- forward + grads with combined loss ---
+                recon_loss = 0.0f0
+                cluster_loss = 0.0f0
+                combined = 0.0f0
+                
+                # --- forward + grads ---
                 loss, grads = Flux.withgradient(autoencoder) do m
-                    decoder_output = m(encoder_input)
-                    mean((decoder_output .- InputDF).^2)
+                    decoded = m(encoder_input)
+                    # AE reconstruction loss
+                    recon_loss = mean((decoded .- InputDF).^2)
+                    # Rep-week approximation loss (RMSE in input space)
+                    cluster_loss = mean((InputDF .- reconstructed_series).^2)
+                    # Combined loss
+                    combined = recon_loss + lambda * cluster_loss
+                    combined
                 end
+                        
                 Flux.update!(opt_state, autoencoder, grads[1])
                 push!(losses, loss)
 
-                #Output for debugging purposes
-                #if epoch % 20 == 0
-                #    decoded_epoch = autoencoder(encoder_input)                 # (C*T, Nweeks)
-                #    decoded_df    = DataFrame(decoded_epoch, :auto)
-                #    outpath = "DecodedOutput_Epoch_$(lpad(epoch, 4, '0')).csv"
-                #    CSV.write(outpath, decoded_df)
-                #    if v
-                #        println("Saved reconstruction snapshot: ", outpath)
-                #    end
-                #end
+                # logging + CSV output
+                if epoch % 20 == 0
+                    println("Epoch $epoch/$epochs, Recon: $(round(recon_loss, digits=6)), ","Cluster: $(round(cluster_loss, digits=6)), ","Combined: $(round(loss, digits=6))")
 
-                # logging
-                if v || epoch % 200 == 0
-                    println("Epoch $epoch/$epochs, Loss: $loss")
+                    df_log = DataFrame(Epoch=[epoch],
+                                    Recon=[Float64(recon_loss)],
+                                    Cluster=[Float64(cluster_loss)],
+                                    Combined=[Float64(loss)])
+                    open(loss_log_file, "a") do io
+                        CSV.write(io, df_log; append=true, header=false)
+                    end
                 end
 
                 # improvement check vs best_loss (relative)
-                # epsilon keeps criterion sensible when best_loss is tiny
                 eps = 1f-12
                 required = max(min_err_diff * (best_loss < Inf32 ? best_loss : loss), eps)
 
@@ -156,14 +187,12 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
                     best_loss  = loss
                     best_epoch = epoch
                     wait = 0
-                    # snapshot best weights
                     best_encoder = deepcopy(encoder_net)
                     best_decoder = deepcopy(decoder_net)
                 elseif epoch > warmup
                     wait += 1
                     if wait >= patience
                         println("Early stopping at epoch $epoch. Best epoch=$best_epoch, best loss=$best_loss.")
-                        # restore best weights
                         encoder_net = best_encoder
                         decoder_net = best_decoder
                         autoencoder = Chain(encoder_net, decoder_net)
@@ -215,6 +244,7 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
         end
         CSV.write(stats_file, df_stats)
         println("Autoencoder stats written to: $stats_file")
+
     end
 
     ################## Part 6 -- Kmeans clustering on latent space ##################
@@ -223,7 +253,29 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
     R, A, W, M, DistMatrix, clustering_time =
     cluster_kmeans(DataFrame(z, :auto), NClusters, nIters, v)
 
-    println("Autoencoder approach completed successfully.")
+    rep_profiles = InputDF[:, M]  # columns of representative weeks
+    reconstructed_series = hcat([rep_profiles[:, A[j]] for j in 1:length(A)]...)
+
+    # Convert to DataFrames for saving
+    input_df  = DataFrame(InputDF, :auto)
+    recon_df  = DataFrame(reconstructed_series, :auto)
+
+    # Write to CSV
+    CSV.write(joinpath(inpath, "TDR_ClusteringInputDF_Reconstructed_Series.csv"), recon_df)
+
+    println("Saved reconstructed representative-week series to TDR_ClusteringInputDF_Reconstructed_Series.csv")
+
+    A_df = DataFrame(Mapping = A)
+    A_file = joinpath(inpath, "TDR_A_Results.csv")
+    CSV.write(A_file, A_df)
+    println("Saved representative weeks to $A_file")
+
+    M_df = DataFrame(Rep_Periods = M)
+    M_file = joinpath(inpath, "TDR_M_Results.csv")
+    CSV.write(M_file, M_df)
+    println("Saved representative weeks to $M_file")
+
+    println("Simultaneous autoencoder approach completed successfully.")
 
     return R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time
 end

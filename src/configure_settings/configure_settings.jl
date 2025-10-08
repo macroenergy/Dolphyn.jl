@@ -63,6 +63,11 @@ function configure_settings(settings::Dict{String, Any}) #! This function needs 
 
     ## Cluster weekly energy system results in TDR; 0 = not active; 1 = active
     set_default_if_absent!(settings, "ClusterSubPeriodResults", 0)
+
+    ## Other TDR settings
+    set_default_if_absent!(settings, "AutoTuneAE", 0)
+    set_default_if_absent!(settings, "RunMultipleTDR", 0)
+    set_default_if_absent!(settings, "UseThreads", 0)
     
     ###########################################
     ### GenX-specific settings 

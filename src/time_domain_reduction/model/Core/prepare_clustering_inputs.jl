@@ -1,8 +1,8 @@
 @doc raw"""
-    prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::Dict, v::Bool=false)
+    prepare_clustering_inputs(parsed_data::Dict, inpath::String, myinputs::Dict, mysetup::Dict, v::Bool=false)
 """
 
-function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::Dict, v::Bool=false)
+function prepare_clustering_inputs(parsed_data::Dict, inpath::String, myinputs::Dict, mysetup::Dict, v::Bool=false)
 
     # Accept model parameters from the settings file time_domain_reduction_settings.yml
     TimestepsPerRepPeriod = mysetup["TimestepsPerRepPeriod"]
@@ -191,11 +191,11 @@ function prepare_clustering_inputs(parsed_data::Dict, myinputs::Dict, mysetup::D
         "IncludeFuel" => IncludeFuel
     )
 
-    # For debugging purposes
-    #output_path = "ClusteringInputDF_$(MinPeriods)_Weeks.csv"
-    #CSV.write(output_path, ClusteringInputDF)
-    #println("Input dataframe successfully saved to: ", output_path)
+    CSV.write(joinpath(inpath, "TDR_OriginalInputSeries.csv"), ModifiedData)
+    println("Saved non-normalized Input series to TDR_OriginalInputSeries.csv")
 
+    CSV.write(joinpath(inpath, "TDR_ClusteringInputDF.csv"), ClusteringInputDF)
+    println("Saved normalized Input series to TDR_ClusteringInputDF.csv")
 
     return InputData, Ncols, ConstData, 
     ConstCols, col_to_zone_map, ExtremeWksList, ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, ColumnNames, Flags
