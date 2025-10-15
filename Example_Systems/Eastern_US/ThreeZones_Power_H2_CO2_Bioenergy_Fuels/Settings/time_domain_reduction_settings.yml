@@ -19,16 +19,18 @@ TimestepsPerRepPeriod: 168
 
  #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
  #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
-ClusterSubPeriodResults: 1
+ClusterSubPeriodResults: 0
 
-  #   - ClusterMethod 
-  #   Either 'kmeans', 'kmedoids', this designates the method used to cluster periods and determine each point's representative period.
+  #   - ClusterMethod - this designates the method used to cluster periods and determine each point's representative period.
+  ##  Simple methods:
+  #   1) "kmeans"
+  #   2) "kmedoids"
 
-  ##   Autoencoder methods utilizes kmeans clustering to obtain representative periods from the latent space of a trained autoencoder:
-  #   "autoencoder_sequential": Train autoenocoder to minimize only AE reconstruction loss
-  #   "autoencoder_simultaneous": Train autoenocder to simultaneously minimize 1) AE reconstruction loss and 2) Input dataframe reconstruction error using representative periods obtained from kmeans clustering on latent space.
+  ##  Autoencoder methods: utilizes kmeans clustering to obtain representative periods from the latent space of a trained autoencoder:
+  #   3) "autoencoder_sequential": Train autoenocoder to minimize only AE reconstruction loss
+  #   4) "autoencoder_simultaneous": Train autoenocder to simultaneously minimize 1) AE reconstruction loss and 2) Input dataframe reconstruction error using representative periods obtained from kmeans clustering on latent space.
 
-ClusterMethod: 'autoencoder_sequential'
+ClusterMethod: 'kmeans'
 
 #For autoencoder based method only
 AutoEncoder:

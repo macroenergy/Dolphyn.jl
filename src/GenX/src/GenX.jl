@@ -73,8 +73,6 @@ include_all_in_folder("load_inputs")
 include_all_in_folder("model")
 include_all_in_folder("write_outputs")
 
-include("time_domain_reduction/time_domain_reduction.jl")
-include("time_domain_reduction/precluster.jl")
 
 #Just for unit testing; Under active development
 include("simple_operation.jl")

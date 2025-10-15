@@ -68,7 +68,7 @@ using Statistics
 # HiGHS is the default solver, but there is an option to employ other optimizers
 using HiGHS
 
-#using MacroEnergyTimeReduction
+using MacroEnergyTimeReduction
 
 # Global scaling factor used when ParameterScale is on to shift values from MW to GW
 # DO NOT CHANGE THIS (Unless you do so very carefully)
@@ -130,7 +130,6 @@ genxsubmod_path = joinpath(@__DIR__,"GenX","src")
 genx_to_exclude = [
     joinpath(genxsubmod_path,"GenX.jl"),
     joinpath(genxsubmod_path,"simple_operation.jl"),
-    joinpath(genxsubmod_path,"time_domain_reduction","time_domain_reduction.jl"),
     joinpath(genxsubmod_path,"model","solve_model.jl"),
     joinpath(genxsubmod_path,"model","generate_model.jl"),
     joinpath(genxsubmod_path,"configure_solver"),
