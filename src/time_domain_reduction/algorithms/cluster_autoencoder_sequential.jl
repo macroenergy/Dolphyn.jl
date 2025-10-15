@@ -1,12 +1,13 @@
 @doc raw"""
-    cluster_autoencoder(ClusteringInputDF, NClusters, nIters)
+    cluster_autoencoder_sequential(ClusteringInputDF, NClusters, nIters)
 
 Get representative periods using cluster centers from k means on autoencoder latent space
 """
-function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, nIters::Int, v::Bool=false)
+function cluster_autoencoder_sequential(inpath::String, myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, nIters::Int, v::Bool=false)
 
-    #Compress multi-resource weekly time series with a 1D-convolutional autoencoder (AE), 
-    #then cluster the latent representations with k-means to pick representative weeks.
+    #Train autoencoder to minimize reconstruction error of ClusteringInputDF
+    #Perform k-means on latent space of trained autoencoder to obtain representative subperiods indexes
+
     
     # Load autoencoder hyperparameters from settings
     scaling_method = myTDRsetup["ScalingMethod"]
@@ -22,7 +23,6 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
     latent_dim = AE_params["latent_dim"]
 
     #Check if autoencoder latent space is already present as dataframe as folder
-    
     latent_file = joinpath(inpath, "TDR_Autoencoder_Latent_Space_N$(n_filters)_D$(latent_dim).csv")
 
     if isfile(latent_file) && get(myTDRsetup, "ForceAutoencoderTraining", 0) != 1
@@ -50,17 +50,13 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
         InputDF = Float32.(Matrix(ClusteringInputDF))                 # (T * n, NWeeks)
 
         #Define values used for reshaping into 3D tensor
-        timesteps = Int(myTDRsetup["TimestepsPerRepPeriod"])    # T
+        timesteps = Int(myTDRsetup["TimestepsPerRepPeriod"])          # T
         Nweeks = size(InputDF, 2)                                     # NWeeks
         n = size(InputDF,1) ÷ timesteps                               # n resources, which corresponds to the channels C in AE
         input_dim = n
 
         # Reshape rows into tensor (T, C, NWeeks)
         #T = TimestepsPerRepPeriod, C = Channels (same as number of resources n), NWeeks = Weeks
-
-        #Did not include this step in encoder because (not yet implemented) users can choose to use 
-        #one single channel for entire df instead of having each resource to one channel
-
         encoder_input = reshape(InputDF, timesteps, n, Nweeks)       # (T, C, NWeeks)
         println("Autoencoder Input (T, C, NWeeks) = ", size(encoder_input))
 
@@ -131,19 +127,7 @@ function cluster_autoencoder(inpath::String, myTDRsetup::Dict, ClusteringInputDF
                 Flux.update!(opt_state, autoencoder, grads[1])
                 push!(losses, loss)
 
-                #Output for debugging purposes
-                #if epoch % 20 == 0
-                #    decoded_epoch = autoencoder(encoder_input)                 # (C*T, Nweeks)
-                #    decoded_df    = DataFrame(decoded_epoch, :auto)
-                #    outpath = "DecodedOutput_Epoch_$(lpad(epoch, 4, '0')).csv"
-                #    CSV.write(outpath, decoded_df)
-                #    if v
-                #        println("Saved reconstruction snapshot: ", outpath)
-                #    end
-                #end
-
-                # logging
-                if v || epoch % 200 == 0
+                if epoch % 200 == 0
                     println("Epoch $epoch/$epochs, Loss: $loss")
                 end
 

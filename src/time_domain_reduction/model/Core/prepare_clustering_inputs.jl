@@ -191,12 +191,6 @@ function prepare_clustering_inputs(parsed_data::Dict, inpath::String, myinputs::
         "IncludeFuel" => IncludeFuel
     )
 
-    CSV.write(joinpath(inpath, "TDR_OriginalInputSeries.csv"), ModifiedData)
-    println("Saved non-normalized Input series to TDR_OriginalInputSeries.csv")
-
-    CSV.write(joinpath(inpath, "TDR_ClusteringInputDF.csv"), ClusteringInputDF)
-    println("Saved normalized Input series to TDR_ClusteringInputDF.csv")
-
     return InputData, Ncols, ConstData, 
     ConstCols, col_to_zone_map, ExtremeWksList, ModifiedData, ClusteringInputDF, NClusters, NumDataPoints, ColumnNames, Flags
 end

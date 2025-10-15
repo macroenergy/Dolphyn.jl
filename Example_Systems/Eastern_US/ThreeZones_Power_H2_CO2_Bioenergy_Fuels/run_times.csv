@@ -1,2 +1,0 @@
-Case,Rep_Periods,Clustering_Method,Subperiod_Run_Time,Subperiod_Parallel_Solve_Time,Subperiod_Total_Solve_Time,Autoencoder_Training_Time,TDR_Clustering_Time,Model_Solve_Time,Objval
-ThreeZones_Power_H2_CO2_Bioenergy_Fuels,5,kmeans,NA,NA,NA,NA,1.635439625,32.75548005104065,1.910229807999766e11

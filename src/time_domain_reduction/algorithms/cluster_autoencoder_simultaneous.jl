@@ -5,8 +5,9 @@ Get representative periods using cluster centers from k means on autoencoder lat
 """
 function cluster_autoencoder_simultaneous(inpath::String, myTDRsetup::Dict, ClusteringInputDF::DataFrame, NClusters::Int, nIters::Int, v::Bool=false)
 
-    #Compress multi-resource weekly time series with a 1D-convolutional autoencoder (AE), 
-    #then cluster the latent representations with k-means to pick representative weeks.
+    #Train autoencoder to minimize reconstruction error of ClusteringInputDF + clustering error on latent space
+    #Perform k-means on latent space of trained autoencoder to obtain representative subperiods indexes
+
     
     # Load autoencoder hyperparameters from settings
     scaling_method = myTDRsetup["ScalingMethod"]
@@ -52,7 +53,7 @@ function cluster_autoencoder_simultaneous(inpath::String, myTDRsetup::Dict, Clus
         ################## Part 1 -- Prepare input dataframe for encoder input ##################
 
         #Define values used for reshaping into 3D tensor
-        timesteps = Int(myTDRsetup["TimestepsPerRepPeriod"])    # T
+        timesteps = Int(myTDRsetup["TimestepsPerRepPeriod"])          # T
         Nweeks = size(InputDF, 2)                                     # NWeeks
         n = size(InputDF,1) ÷ timesteps                               # n resources, which corresponds to the channels C in AE
         input_dim = n
@@ -61,10 +62,6 @@ function cluster_autoencoder_simultaneous(inpath::String, myTDRsetup::Dict, Clus
 
         # Reshape rows into tensor (T, C, NWeeks)
         #T = TimestepsPerRepPeriod, C = Channels (same as number of resources n), NWeeks = Weeks
-
-        #Did not include this step in encoder because (not yet implemented) users can choose to use 
-        #one single channel for entire df instead of having each resource to one channel
-
         encoder_input = reshape(InputDF, timesteps, n, Nweeks)       # (T, C, NWeeks)
         println("Autoencoder Input (T, C, NWeeks) = ", size(encoder_input))
 
@@ -167,7 +164,7 @@ function cluster_autoencoder_simultaneous(inpath::String, myTDRsetup::Dict, Clus
                 push!(losses, loss)
 
                 # logging + CSV output
-                if epoch % 20 == 0
+                if epoch % 200 == 0
                     println("Epoch $epoch/$epochs, Recon: $(round(recon_loss, digits=6)), ","Cluster: $(round(cluster_loss, digits=6)), ","Combined: $(round(loss, digits=6))")
 
                     df_log = DataFrame(Epoch=[epoch],
@@ -255,25 +252,6 @@ function cluster_autoencoder_simultaneous(inpath::String, myTDRsetup::Dict, Clus
 
     rep_profiles = InputDF[:, M]  # columns of representative weeks
     reconstructed_series = hcat([rep_profiles[:, A[j]] for j in 1:length(A)]...)
-
-    # Convert to DataFrames for saving
-    input_df  = DataFrame(InputDF, :auto)
-    recon_df  = DataFrame(reconstructed_series, :auto)
-
-    # Write to CSV
-    CSV.write(joinpath(inpath, "TDR_ClusteringInputDF_Reconstructed_Series.csv"), recon_df)
-
-    println("Saved reconstructed representative-week series to TDR_ClusteringInputDF_Reconstructed_Series.csv")
-
-    A_df = DataFrame(Mapping = A)
-    A_file = joinpath(inpath, "TDR_A_Results.csv")
-    CSV.write(A_file, A_df)
-    println("Saved representative weeks to $A_file")
-
-    M_df = DataFrame(Rep_Periods = M)
-    M_file = joinpath(inpath, "TDR_M_Results.csv")
-    CSV.write(M_file, M_df)
-    println("Saved representative weeks to $M_file")
 
     println("Simultaneous autoencoder approach completed successfully.")
 

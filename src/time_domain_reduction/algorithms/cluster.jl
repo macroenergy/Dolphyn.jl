@@ -16,7 +16,7 @@ function cluster(inpath::String, myTDRsetup::Dict, ClusterMethod::String, Cluste
         R, A, W, M, DistMatrix, clustering_time = cluster_kmedoids(ClusteringInputDF, NClusters, nIters, v)
         autoencoder_training_time = "NA"
     elseif ClusterMethod == "autoencoder_sequential"
-        R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time = cluster_autoencoder(inpath, myTDRsetup, ClusteringInputDF, NClusters, nIters, true)
+        R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time = cluster_autoencoder_sequential(inpath, myTDRsetup, ClusteringInputDF, NClusters, nIters, true)
     elseif ClusterMethod == "autoencoder_simultaneous"
         R, A, W, M, DistMatrix, autoencoder_training_time, clustering_time = cluster_autoencoder_simultaneous(inpath, myTDRsetup, ClusteringInputDF, NClusters, nIters, true)
     else

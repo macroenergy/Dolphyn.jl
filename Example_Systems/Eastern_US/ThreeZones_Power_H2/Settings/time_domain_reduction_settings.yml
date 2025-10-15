@@ -19,41 +19,31 @@ TimestepsPerRepPeriod: 168
 
  #    - Run the energy system model for each subperiod of the year individually, where the subperiod length is defined by `mysetup["TimestepsPerRepPeriod"]
  #    The results of each subperiod would be combined together to be used as TDR inputs for clustering (Turn on - 1 or off - 0)
-ClusterSubPeriodResults: 0
+ClusterSubPeriodResults: 1
 
   #   - ClusterMethod 
-  #   Either 'kmeans', 'kmedoids', or 'autoencoder' this designates the method used to cluster
-  #   periods and determine each point's representative period.
-ClusterMethod: 'kmeans'
+  #   Either 'kmeans', 'kmedoids', this designates the method used to cluster periods and determine each point's representative period.
+
+  ##   Autoencoder methods utilizes kmeans clustering to obtain representative periods from the latent space of a trained autoencoder:
+  #   "autoencoder_sequential": Train autoenocoder to minimize only AE reconstruction loss
+  #   "autoencoder_simultaneous": Train autoenocder to simultaneously minimize 1) AE reconstruction loss and 2) Input dataframe reconstruction error using representative periods obtained from kmeans clustering on latent space.
+
+ClusterMethod: 'autoencoder_simultaneous'
 
 #For autoencoder based method only
 AutoEncoder:
-  n_filters: 96
+  n_filters: 16
   kernel_size: 12
   stride: 6
-  latent_dim: 96
+  latent_dim: 48 #Only if using old autoencoder method, the new autoencoder method sets latent_dim = NClusters
+  lstm_units: 50 #Only if using new autoencoder method
   epochs: 50000
+  lambda: 0.0075 #Only for simultaneous autoencoder to add lambda * clustering loss to reconstruction loss in AE training
 
   #Training requirements
   min_err_diff: 0.00001 # Required relative improvement of error before stopping training, e.g. 0.01% of best
-  warmup: 50 # Minimum number of epochs
-  patience: 50 # Epochs to wait after warmup with no sufficient improvement
-
-AutoTuneAE: 0
-AutoTuneWeeks: [5]
-AutoTuneFilters: [96,112,128,160,192]
-AutoTuneLatents: [96,112,128,160,192]
-AutoTuneMetrics: ["EndCap"]
-
-#For automated multiple TDR runs
-RunMultipleTDR: 1
-UseThreads: 0
-#MaxPeriodsList: [7,13,15,16,17,18,19,20]
-#MinPeriodsList: [7,13,15,16,17,18,19,20]
-
-MaxPeriodsList: [5,7,9,11,13,15,17,19]
-MinPeriodsList: [5,7,9,11,13,15,17,19]
-
+  warmup: 100 # Minimum number of epochs
+  patience: 100 # Epochs to wait after warmup with no sufficient improvement
 
   #   - ScalingMethod 
   #   Either 'N' or 'S', this designates directs the module to normalize ([0,1])
@@ -78,9 +68,6 @@ MinPeriods: 5
   #   number of periods is reached.
 IterativelyAddPeriods: 1
 
-#Assumed CO2 price for iterative CO2 emission cap method WORK IN PROGRESS
-ClusterSubPeriodAssumedCO2Price: 300
-
   #   - IterateMethod
   #   Either 'cluster' or 'extreme', this designates whether to add clusters to
   #   the kmeans/kmedoids method or to set aside the worst-fitting periods as a new extreme periods.
@@ -97,7 +84,7 @@ Threshold: 0.05
 
   #   - nReps
   #   The number of times to repeat each kmeans/kmedoids clustering at the same setting.
-nReps: 100
+nReps: 300
 
   #   - LoadWeight
   #   Default 1, this is an optional multiplier on load columns in order to prioritize

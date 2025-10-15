@@ -75,20 +75,5 @@ function run_clustering(inpath::String, mysetup::Dict, ClusteringInputDF::DataFr
     autoencoder_training_time = last(cluster_results)[6]
     clustering_time = last(cluster_results)[7]
 
-    # --- Reconstruct full time series using rep weeks ---
-    rep_profiles = Matrix(ClusteringInputDF)[:, M]  # pick representative weeks
-    reconstructed_series = hcat([rep_profiles[:, A[j]] for j in 1:length(A)]...)  # rebuild
-
-    # Convert to DataFrames for saving
-    input_df  = DataFrame(Matrix(ClusteringInputDF), :auto)
-    recon_df  = DataFrame(reconstructed_series, :auto)
-
-    # Write to CSV
-    CSV.write(joinpath(inpath, "TDR_Input_Series.csv"), input_df)
-    CSV.write(joinpath(inpath, "TDR_Reconstructed_Series_$(NClusters)_Weeks.csv"), recon_df)
-
-    println("Saved InputDF to TDR_Input_Series.csv")
-    println("Saved reconstructed series to TDR_Reconstructed_Series_$(NClusters)_Weeks.csv")
-
     return A, W, M, autoencoder_training_time, clustering_time
 end
