@@ -1,0 +1,10 @@
+﻿Biomass_Supply,Zone,Emissions_tonne_per_tonne,Cost_per_tonne,Max_tonne_per_hr
+CA_Energy_Crops_Herb,1,0,77.16,0.13
+NW_Energy_Crops_Herb,2,0,77.16,247.48
+SW_Energy_Crops_Herb,3,0,77.16,1775.25
+TX_Energy_Crops_Herb,4,0,77.16,15019.96
+NCEN_Energy_Crops_Herb,5,0,77.16,6503.51
+CEN_Energy_Crops_Herb,6,0,77.16,22269.54
+SE_Energy_Crops_Herb,7,0,77.16,7963.12
+MIDAT_Energy_Crops_Herb,8,0,77.16,1364.89
+NE_Energy_Crops_Herb,9,0,77.16,297.76
