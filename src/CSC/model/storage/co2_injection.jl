@@ -108,9 +108,9 @@ function co2_injection(EP::Model, inputs::Dict,setup::Dict)
 	@constraint(EP,cPower_Consumption_CO2_Storage[k=1:CO2_STOR_ALL, t = 1:T], EP[:vPower_CO2_Injection][k,t] == EP[:vCO2_Injected][k,t] * dfCO2Storage[!,:MWh_per_tonne][k])
 
 	#Injection rate limit
-	@constraint(EP,cMin_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL, t=1:T], EP[:vCO2_Injected][k,t] >=  dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Min_Output][k])
-	@constraint(EP,cMax_CO2_Injected_per_type_per_time[k=1:CO2_STOR_ALL, t=1:T], EP[:vCO2_Injected][k,t] <=  dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
-
+	@constraint(EP, cMin_CO2_Injected_per_type_per_time[k in intersect(dfCO2Storage[dfCO2Storage.Max_injection_rate_tonne_per_hr .>= 0, :R_ID], 1:CO2_STOR_ALL), t in 1:T], EP[:vCO2_Injected][k,t] >= dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Min_Output][k])
+	@constraint(EP, cMax_CO2_Injected_per_type_per_time[k in intersect(dfCO2Storage[dfCO2Storage.Max_injection_rate_tonne_per_hr .>= 0, :R_ID], 1:CO2_STOR_ALL), t in 1:T], EP[:vCO2_Injected][k,t] <= dfCO2Storage[!,:Max_injection_rate_tonne_per_hr][k] * dfCO2Storage[!,:CO2_Injection_Max_Output][k])
+	
 	###############################################################################################################################
 
 	##Max carbon injected into geological sequestration per resoruce type k 
