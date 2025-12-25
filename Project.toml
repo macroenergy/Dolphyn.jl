@@ -1,7 +1,7 @@
 name = "Dolphyn"
 uuid = "2a466132-4b02-429f-9994-5df6ddd3977f"
-authors = ["Guannan He <>", "Dharik Mallapragada <dharik@mit.edu>", "Ruaridh Macdonald <rmacd@mit.edu>", "Mary Bennett <>", "Shantanu Chakraborty <>", "Anna Cybulsky <>", "Michael Giovanniello <>", "Jun Wen Law <>", "Youssef Shaker <>", "Nicole Shi <>", "Yuheng Zhang <>"]
 version = "0.2.3"
+authors = ["Guannan He <>", "Dharik Mallapragada <dharik@mit.edu>", "Ruaridh Macdonald <rmacd@mit.edu>", "Mary Bennett <>", "Shantanu Chakraborty <>", "Anna Cybulsky <>", "Michael Giovanniello <>", "Jun Wen Law <>", "Youssef Shaker <>", "Nicole Shi <>", "Yuheng Zhang <>"]
 
 [deps]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
@@ -32,7 +32,7 @@ CSV = "0.10.0"
 Clustering = "0.14.0, 0.15"
 Combinatorics = "1.0.0"
 DataFrames = "1.3.5"
-DataStructures = "0.18.0"
+DataStructures = "0.18.0, 0.19"
 Dates = "1"
 Distances = "0.10.0"
 Glob = "1.3.0"
