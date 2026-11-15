@@ -31,7 +31,7 @@ ScalingMethod: "S"
   #   The maximum number of periods - both clustered periods and extreme periods -
   #   that may be used to represent the input data. If IterativelyAddPeriods is on and the
   #   error threshold is never met, this will be the total number of periods.
-MaxPeriods: 3
+MaxPeriods: 1
 
   #   - MinPeriods
   #   The minimum number of periods used to represent the input data. If using
@@ -119,14 +119,14 @@ ExtremePeriods:
             Min: 0
          Integral:   
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
             Min: 0
          Integral:
             Max: 0
-            Min: 0
+            Min: 1
    Wind:
       Zone:
          Absolute:
@@ -134,11 +134,11 @@ ExtremePeriods:
             Min: 0  
          Integral:
             Max: 0
-            Min: 1
+            Min: 0
       System:
          Absolute:
             Max: 0
             Min: 0 
          Integral:
             Max: 0
-            Min: 0
+            Min: 1

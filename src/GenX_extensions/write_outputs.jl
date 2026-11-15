@@ -106,12 +106,40 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	# Temporary! Suppress these outputs until we know that they are compatable with multi-stage modeling
 	if setup["MultiStage"] == 0
 		dfPrice = DataFrame()
+		dfPriceH2 = DataFrame()
+		dfPriceNG = DataFrame()
+		dfPriceCO2 = DataFrame()
+		dfPriceEthylene = DataFrame()
+		dfPriceHerbBiomass = DataFrame()
+		dfPriceWoodBiomass = DataFrame()
+		dfPriceAgriResBiomass = DataFrame()
 		dfEnergyRevenue = DataFrame()
 		dfChargingcost = DataFrame()
 		dfSubRevenue = DataFrame()
 		dfRegSubRevenue = DataFrame()
+		dfPriceEthanol = DataFrame()
+		dfPriceEthane = DataFrame()
+		# dfPriceGasoline = DataFrame()
 		if has_duals(EP) == 1
 			dfPrice = write_price(path, inputs, setup, EP)
+			dfPriceH2 = write_price_hydrogen(path, inputs, setup, EP)
+			dfPriceNG = write_price_naturalgas(path, inputs, setup, EP)
+			dfPriceCO2 = write_price_CO2_storage(path, inputs, setup, EP)
+			dfPriceHerbBiomass = write_price_HerbBiomass(path, inputs, setup, EP)
+			dfPriceWoodBiomass = write_price_WoodBiomass(path, inputs, setup, EP)
+			dfPriceAgriResBiomass = write_price_AgriResBiomass(path, inputs, setup, EP)
+			dfPriceEthylene = write_price_ethylene(path, inputs, setup, EP)
+			dfPricePropylene = write_price_propylene(path, inputs, setup, EP)
+			# dfPriceGasoline = write_price_gasoline(path, inputs, setup, EP)
+			dfPriceHerbBiomassSupply =  write_price_HerbBiomass_Supply(path, inputs, setup, EP)
+			dfPriceWoodBiomassSupply = write_price_WoodBiomass_Supply(path, inputs, setup, EP)
+			dfPriceAgriResSupply = write_price_AgriRes_Supply(path, inputs, setup, EP)
+			dfPriceCO2Injection = write_price_CO2Injected(path, inputs, setup, EP)
+			dfPriceGasoline = write_price_gasoline_new(path, inputs, setup, EP)
+			dfPricejetfuel = write_price_jetfuel(path, inputs, setup, EP)
+			dfPricediesel = write_price_diesel(path, inputs, setup, EP)
+			dfPriceEthanol = write_price_ethanol(path, inputs, setup, EP)
+			dfPriceEthane = write_price_ethane(path, inputs, setup, EP)
 			dfEnergyRevenue = write_energy_revenue(path, inputs, setup, EP)
 			dfChargingcost = write_charging_cost(path, inputs, setup, EP)
 			dfSubRevenue, dfRegSubRevenue = write_subsidy_revenue(path, inputs, setup, EP)
@@ -140,6 +168,7 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 		end
 		if setup["CO2Cap"]>0 && has_duals(EP) == 1
 			dfCO2Cap = write_co2_cap(path, inputs, setup, EP)
+			# dfDuals = write_duals(path, inputs, setup, EP)
 		end
 		if setup["MinCapReq"] == 1 && has_duals(EP) == 1
 			dfMinCapReq = write_minimum_capacity_requirement(path, inputs, setup, EP)
@@ -153,6 +182,14 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 		elapsed_time_net_rev = @elapsed write_net_revenue(path, inputs, setup, EP, dfCap, dfESRRev, dfResRevenue, dfChargingcost, dfPower, dfEnergyRevenue, dfSubRevenue, dfRegSubRevenue)
 	  println(" -- Time elapsed for writing net revenue is $(elapsed_time_net_rev)")
 	end
+<<<<<<< Updated upstream
+=======
+
+
+	write_co2_emission_balance_system(path, inputs, setup, EP)
+	write_Power_balance_zone(path, inputs, setup, EP)
+
+>>>>>>> Stashed changes
 	## Print confirmation
 	println("Wrote outputs to $path")
 

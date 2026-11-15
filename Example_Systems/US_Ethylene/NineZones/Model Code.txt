@@ -1,0 +1,85 @@
+using CSV, DataFrames, JuMP, GLPK
+
+# Load ethylene cracker data function
+def load_ethylene_data(ethylene_file::String, demand_file::String, new_plant_file::String)
+    # Load ethylene cracker data
+    ethylene_data = DataFrame(CSV.File(ethylene_file))
+
+    # Load hourly demand data
+    demand_data = DataFrame(CSV.File(demand_file))
+
+    # Load new plant costs data
+    new_plant_data = DataFrame(CSV.File(new_plant_file))
+
+    println(" -- Data successfully loaded!")
+
+    return ethylene_data, demand_data, new_plant_data
+end
+
+# Model the optimization problem
+function optimize_supply_demand(ethylene_data::DataFrame, demand_data::DataFrame, new_plant_data::DataFrame)
+    # Initialize the model
+    model = Model(GLPK.Optimizer)
+
+    # Define sets
+    zones = unique(demand_data.Zone)
+    plants = 1:size(ethylene_data, 1)
+
+    # Parameters
+    ethylene_capacity = ethylene_data.Ethylene_Capacity_t_p_hr
+    ramp_up = ethylene_data.Ethylene_RampUp
+    ramp_down = ethylene_data.Ethylene_RampDown
+    min_production = ethylene_data.Ethylene_Min_Production
+    decomm_cost = ethylene_data.Decomm_Cost_$MM
+    retro_cost = ethylene_data.Retro_ESC_Cost
+    storage_available = ethylene_data.Storage_avaliable
+
+    hourly_demand = Dict((d.Zone, d.Hour) => d.Demand for d in eachrow(demand_data))
+
+    # Decision variables
+    @variable(model, 0 <= production[p in plants, t in 1:24])
+    @variable(model, build_new[z in zones] >= 0)
+
+    # Objective function: Minimize costs
+    @objective(model, Min, 
+        sum(decomm_cost[p] for p in plants if ethylene_data.Retro_Possible[p] == 0) +
+        sum(retro_cost[p] for p in plants if ethylene_data.Retro_Possible[p] == 1) +
+        sum(build_new[z] * new_plant_data[z, :Cost] for z in zones))
+
+    # Constraints
+    # Meet hourly demand
+    @constraint(model, demand_constraint[t in 1:24, z in zones],
+        sum(production[p, t] for p in plants if ethylene_data.Zone[p] == z) +
+        build_new[z] >= hourly_demand[(z, t)])
+
+    # Production limits
+    @constraint(model, production_limit[p in plants, t in 1:24],
+        min_production[p] <= production[p, t] <= ethylene_capacity[p])
+
+    # Ramp-up and ramp-down constraints
+    @constraint(model, ramp_up_constraint[p in plants, t in 2:24],
+        production[p, t] - production[p, t-1] <= ramp_up[p])
+    @constraint(model, ramp_down_constraint[p in plants, t in 2:24],
+        production[p, t-1] - production[p, t] <= ramp_down[p])
+
+    # Solve the model
+    optimize!(model)
+
+    # Extract results
+    production_schedule = [value(production[p, t]) for p in plants, t in 1:24]
+    new_plants_built = [value(build_new[z]) for z in zones]
+
+    println(" -- Optimization completed!")
+    return production_schedule, new_plants_built
+end
+
+# Main
+ethylene_file = "path_to/Ethylene_Plants.csv"
+demand_file = "path_to/Hourly_Demand.csv"
+new_plant_file = "path_to/New_Plant_Costs.csv"
+
+ethylene_data, demand_data, new_plant_data = load_ethylene_data(ethylene_file, demand_file, new_plant_file)
+production_schedule, new_plants_built = optimize_supply_demand(ethylene_data, demand_data, new_plant_data)
+
+println("Production Schedule:", production_schedule)
+println("New Plants Built:", new_plants_built)

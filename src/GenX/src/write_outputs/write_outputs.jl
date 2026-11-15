@@ -103,12 +103,14 @@ function write_outputs(EP::Model, path::AbstractString, setup::Dict, inputs::Dic
 	# Temporary! Suppress these outputs until we know that they are compatable with multi-stage modeling
 	if setup["MultiStage"] == 0
 		dfPrice = DataFrame()
+		dfPriceH2 = DataFrame()
 		dfEnergyRevenue = DataFrame()
 		dfChargingcost = DataFrame()
 		dfSubRevenue = DataFrame()
 		dfRegSubRevenue = DataFrame()
 		if has_duals(EP) == 1
 			dfPrice = write_price(path, inputs, setup, EP)
+			dfPriceH2 = write_price_hydrogen(path, inputs, setup, EP)
 			dfEnergyRevenue = write_energy_revenue(path, inputs, setup, EP)
 			dfChargingcost = write_charging_cost(path, inputs, setup, EP)
 			dfSubRevenue, dfRegSubRevenue = write_subsidy_revenue(path, inputs, setup, EP)

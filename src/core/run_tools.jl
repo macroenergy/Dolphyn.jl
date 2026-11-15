@@ -35,6 +35,30 @@ function load_settings(settings_path::AbstractString)
         mysetup_lf = Dict{String,Any}()
     end 
 
+<<<<<<< Updated upstream
+=======
+    besc_settings_path = joinpath(settings_path, "besc_settings.yml") #Settings YAML file path for LF model
+    if isfile(besc_settings_path)
+        mysetup_besc = YAML.load(open(besc_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
+    else
+        mysetup_besc = Dict{String,Any}()
+    end 
+
+    ng_settings_path = joinpath(settings_path, "ng_settings.yml") #Settings YAML file path for LF model
+    if isfile(ng_settings_path)
+        mysetup_ng = YAML.load(open(ng_settings_path)) # mysetup dictionary stores CSC supply chain-specific parameters
+    else
+        mysetup_ng = Dict{String,Any}()
+    end 
+
+    ethylene_settings_path = joinpath(settings_path, "Chemical_settings.yml") #Settings YAML file path for Chemical model
+    if isfile(ethylene_settings_path)
+        mysetup_ethylene = YAML.load(open(ethylene_settings_path)) # mysetup dictionary stores Chemical supply chain-specific parameters
+    else
+        mysetup_ethylene = Dict{String,Any}()
+    end 
+
+>>>>>>> Stashed changes
     global_settings_path = joinpath(settings_path, "global_model_settings.yml") # Global settings for inte
     if isfile(global_settings_path)
         mysetup_global = YAML.load(open(global_settings_path)) # mysetup dictionary stores global settings
@@ -43,7 +67,11 @@ function load_settings(settings_path::AbstractString)
     end
 
     mysetup = Dict{String,Any}()
+<<<<<<< Updated upstream
     merge!(mysetup, mysetup_genx, mysetup_hsc, mysetup_csc, mysetup_lf, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+=======
+    merge!(mysetup, mysetup_genx, mysetup_hsc, mysetup_csc, mysetup_lf, mysetup_besc, mysetup_ng, mysetup_ethylene, mysetup_global) #Merge dictionary - value of common keys will be overwritten by value in global_model_settings
+>>>>>>> Stashed changes
     mysetup = configure_settings(mysetup)
 
     return mysetup
@@ -70,6 +98,36 @@ function load_all_inputs(mysetup::Dict{String, Any}, inputs_path::AbstractString
         myinputs = load_liquid_fuels_inputs(myinputs, mysetup, inputs_path)
     end
 
+<<<<<<< Updated upstream
+=======
+    ### Load BESC inputs if modeling the bioenergy  supply chain
+    if mysetup["ModelBESC"] == 1
+        myinputs = load_bio_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    ### Load BESC inputs if modeling the bioenergy  supply chain
+    if mysetup["ModelNGSC"] == 1
+        myinputs = load_ng_inputs(myinputs, mysetup, inputs_path)
+    end
+
+    ## Load Ethylene inputs if modeling the ethylene production
+    if mysetup["ModelChemicalProduction"] == 1
+        myinputs = load_ethylene_inputs(myinputs, mysetup, inputs_path)	    
+    end
+
+    if mysetup["ModelEthanol"] == 1
+        myinputs = load_ethanol_inputs(myinputs, mysetup, inputs_path)	    
+    end
+
+    if mysetup["ModelEthanePurchase"] == 1
+        myinputs = load_ethane_inputs(myinputs, mysetup, inputs_path)	    
+    end
+
+    if mysetup["ModelPropylenePurchase"] == 1
+        myinputs = load_propylene_inputs(myinputs, mysetup, inputs_path)	    
+    end
+
+>>>>>>> Stashed changes
     return myinputs
 
 end
@@ -106,6 +164,22 @@ function setup_TDR(inputs_path::AbstractString, settings_path::AbstractString, m
         if mysetup["ModelLiquidFuels"] == 1
             print_and_log("Liquid Fuels TDR not implemented.")
         end
+
+        if mysetup["ModelChemicalProduction"] == 1
+            print_and_log("Chemical Production TDR not implemented.")
+        end
+
+        if mysetup["ModelEthanol"] == 1
+            print_and_log("Ethanol Production TDR not implemented.")
+        end
+
+        if mysetup["ModelEthanePurchase"] == 1
+            print_and_log("Ethane Production TDR not implemented.")
+        end
+
+        if mysetup["ModelPropylenePurchase"] == 1
+            print_and_log("Propylene Production TDR not implemented.")
+        end
     end
 
     TDR_path = joinpath(inputs_path, mysetup["TimeDomainReductionFolder"])
@@ -141,6 +215,37 @@ function write_all_outputs(EP::Model, mysetup::Dict{String, Any}, myinputs::Dict
         write_liquid_fuels_outputs(EP, adjusted_outpath, mysetup, myinputs)
     end
 
+<<<<<<< Updated upstream
+=======
+    ### Write natural gas supply chain outputs
+    if mysetup["ModelNGSC"] == 1
+        write_ng_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+
+    ### Write bioenergy supply chain outputs
+    if mysetup["ModelBESC"] == 1
+        write_bio_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+
+    ### Ethylene outputs
+    if mysetup["ModelChemicalProduction"] == 1
+        write_ethylene_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+
+    ### Ethylene outputs
+    if mysetup["ModelEthanol"] == 1
+        write_ethanol_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+
+    if mysetup["ModelEthanePurchase"] == 1
+        write_ethane_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+
+    if mysetup["ModelPropylenePurchase"] == 1
+        write_propylene_outputs(EP, adjusted_outpath, mysetup, myinputs)
+    end
+    
+>>>>>>> Stashed changes
     return adjusted_outpath
 
 end

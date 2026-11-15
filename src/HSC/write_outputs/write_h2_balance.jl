@@ -35,7 +35,11 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 	dfH2Balance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
+<<<<<<< Updated upstream
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 16)
+=======
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 18)
+>>>>>>> Stashed changes
 	   	dfTemp1[1,1:size(dfTemp1,2)] = ["Generation", #1
 	           "Flexible_Demand_Defer", #2
 			   "Flexible_Demand_Satisfy", # 3
@@ -51,7 +55,13 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 			   "Liquid_Demand", #13
 			   "Evaporation",# 14 
 			   "Biohydrogen",#15 
+<<<<<<< Updated upstream
 			   "Synfuel Consumption"] # 16] 
+=======
+			   "Synfuel Consumption", #16
+			   "SynNG Consumption", # 17
+			   "Production from Ethylene Process"] # 18] 
+>>>>>>> Stashed changes
 
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
@@ -121,6 +131,17 @@ function write_h2_balance(path::AbstractString, sep::AbstractString, inputs::Dic
 				dfTemp1[t+rowoffset,16] = - value.(EP[:eSynFuelH2Cons][t,z])
 			else
 				dfTemp1[t+rowoffset,16] = 0
+			end
+
+			dfTemp1[t+rowoffset,18] = 0
+
+			if setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 1
+				dfTemp1[t+rowoffset,18] = value.(EP[:eEthylene_H2_RES][t,z]) + value.(EP[:eEthylene_H2_Plant][t,z]) - value.(EP[:eEthylene_H2in_RES][t,z]) - value.(EP[:eEthylene_H2in_Plant][t,z])
+			end
+
+			
+			if setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 0
+				dfTemp1[t+rowoffset,18] = value.(EP[:eEthylene_H2_RES][t,z]) - value.(EP[:eEthylene_H2in_RES][t,z]) 
 			end
 
 	   	end

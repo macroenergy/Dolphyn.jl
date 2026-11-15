@@ -18,10 +18,26 @@ function cap_reserve_margin!(EP::Model, inputs::Dict, setup::Dict)
 	NCRM = inputs["NCapacityReserveMargin"]
 	println(" -- Capacity Reserve Margin Policies Module")
 
+	#=
+
 	@constraint(EP, cCapacityResMargin[res=1:NCRM, t=1:T], EP[:eCapResMarBalance][res, t]
 				>= sum(inputs["pD"][t,z] * (1 + inputs["dfCapRes"][z,res])
 				for z=findall(x->x!=0,inputs["dfCapRes"][:,res])))
+	=#
 
+
+	if setup["CapacityReserveMarginFuelChemicals"] == 0
+		@constraint(EP, cCapacityResMargin[res=1:NCRM, t=1:T], EP[:eCapResMarBalance][res, t]
+					>= sum((inputs["pD"][t,z] ) * (1 + inputs["dfCapRes"][z,res])
+					for z=findall(x->x!=0,inputs["dfCapRes"][:,res])))
+
+	else
+
+		@constraint(EP, cCapacityResMargin[res=1:NCRM, t=1:T], EP[:eCapResMarBalance][res, t]
+					>= sum((inputs["pD"][t,z]+EP[:eEthylene_Power_RES][t,z]+EP[:eEthylene_Power_Plant][t,z]+EP[:eBio_H2_Plant_Power_consumption_per_time_per_zone][t,z]+EP[:eBio_LF_Plant_Power_consumption_per_time_per_zone]+EP[:eBio_NG_Plant_Power_consumption_per_time_per_zone]+EP[:eBio_Ethanol_Plant_Power_consumption_per_time_per_zone]+EP[:eSyn_Fuel_Power_Cons]+EP[:eSyn_NG_Power_Cons]) * (1 + inputs["dfCapRes"][z,res])
+					for z=findall(x->x!=0,inputs["dfCapRes"][:,res])))
+
+	end				
 	# if input files are present, add capacity reserve margin slack variables
 	if haskey(inputs, "dfCapRes_slack")
 		@variable(EP,vCapResSlack[res=1:NCRM, t=1:T]>=0)

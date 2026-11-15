@@ -34,7 +34,11 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 	T = inputs["T"]     # Number of time steps (hours)
 	Z = inputs["Z"]     # Number of zones
 	
+<<<<<<< Updated upstream
 	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Total"])
+=======
+	dfCost = DataFrame(Costs = ["Green_H2_Generation", "Blue_H2_Generation", "Grey_H2_Generation", "Bio_H2", "Storage_Discharging", "Storage_Charging", "Nonserved_Energy", "H2_Pipeline_Import_Export", "H2_Truck_Import_Export","Truck_Consumption","H2G2P","Demand","Synfuel_Consumption","Syn_NG_Consumption","H2_from_Ethylene","H2_to_Ethylene","Total"])
+>>>>>>> Stashed changes
 
 	#Try this form of summing otherwise just create z dimensions and sum later
 	
@@ -100,11 +104,45 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		Synfuel_Consumption = 0 
 	end
 
+<<<<<<< Updated upstream
 	# Define total costs
 	cTotal = Green_H2_Generation + Blue_H2_Generation + Grey_H2_Generation + Bio_H2 + Nonserved_Energy + H2_Pipeline_Import_Export + H2_Truck_Import_Export + Truck_Consumption + H2G2P + Demand + Synfuel_Consumption
 
 	# Define total column, i.e. column 2
 	dfCost[!,Symbol("Total")] = [Green_H2_Generation, Blue_H2_Generation, Grey_H2_Generation, Bio_H2, Storage_Discharging, Storage_Charging, Nonserved_Energy, H2_Pipeline_Import_Export, H2_Truck_Import_Export, Truck_Consumption, H2G2P, Demand, Synfuel_Consumption, cTotal]
+=======
+	if setup["ModelNGSC"] == 1 && setup["ModelSyntheticNG"] == 1
+		SynNG_Consumption = - sum(sum(inputs["omega"].* value.(EP[:eSyn_NG_H2_Cons])[:,z] for z in 1:Z))
+	else
+		SynNG_Consumption = 0 
+	end
+
+	if setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 1 && setup["ModelEthyleneRetrofitting"] == 0
+		H2_from_Ethylene =  sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2_RES])[:,z] for z in 1:Z)) + sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2_Plant])[:,z] for z in 1:Z)) 
+		H2_to_Ethylene = - sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2in_Plant])[:,z] for z in 1:Z)) - sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2in_RES])[:,z] for z in 1:Z))
+	elseif setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 1 && setup["ModelEthyleneRetrofitting"] == 1
+		H2_from_Ethylene =  sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2_RES])[:,z] for z in 1:Z)) + sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2_Plant])[:,z] for z in 1:Z)) + sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2_Retrofit])[:,z] for z in 1:Z)) 
+		H2_to_Ethylene = - sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2in_Plant])[:,z] for z in 1:Z)) - sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2in_RES])[:,z] for z in 1:Z)) - sum(sum(inputs["omega"].* value.(EP[:eEthylene_H2in_Retrofit])[:,z] for z in 1:Z))
+	else
+		H2_from_Ethylene = 0
+		H2_to_Ethylene = 0
+	end
+
+	#if setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 0
+
+	#else
+	#		H2_from_Ethylene = 0 
+	#		H2_to_Ethylene = 0
+	#	end
+
+
+	
+	# Define total costs
+	cTotal = Green_H2_Generation + Blue_H2_Generation + Grey_H2_Generation + Bio_H2 + Nonserved_Energy + H2_Pipeline_Import_Export + H2_Truck_Import_Export + Truck_Consumption + H2G2P + Demand + Synfuel_Consumption + SynNG_Consumption + H2_from_Ethylene + H2_to_Ethylene
+
+	# Define total column, i.e. column 2
+	dfCost[!,Symbol("Total")] = [Green_H2_Generation, Blue_H2_Generation, Grey_H2_Generation, Bio_H2, Storage_Discharging, Storage_Charging, Nonserved_Energy, H2_Pipeline_Import_Export, H2_Truck_Import_Export, Truck_Consumption, H2G2P, Demand, Synfuel_Consumption, SynNG_Consumption, H2_from_Ethylene, H2_to_Ethylene, cTotal]
+>>>>>>> Stashed changes
 
 	################################################################################################################################
 	# Computing zonal cost breakdown by cost category
@@ -118,6 +156,8 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 		tempNonserved_Energy = 0
 		tempH2_Pipeline_Import_Export = 0
 		tempH2_Truck_Import_Export = 0
+		tempH2_from_Ethylene = 0
+		tempH2_to_Ethylene = 0
 		tempTruck_Consumption = 0
 		tempH2G2P = 0
 		tempDemand = 0
@@ -168,10 +208,32 @@ function write_h2_balance_zone(path::AbstractString, sep::AbstractString, inputs
 			tempSynfuel_Consumption = tempSynfuel_Consumption - sum(inputs["omega"].* (value.(EP[:eSynFuelH2Cons])[:,z]))
 		end
 
+<<<<<<< Updated upstream
 		tempCTotal = tempGreen_H2_Generation + tempBlue_H2_Generation + tempGrey_H2_Generation + tempBio_H2 + tempNonserved_Energy + tempH2_Pipeline_Import_Export + tempH2_Truck_Import_Export + tempTruck_Consumption + tempH2G2P + tempDemand + tempSynfuel_Consumption
 
 
 		dfCost[!,Symbol("Zone$z")] = [tempGreen_H2_Generation, tempBlue_H2_Generation, tempGrey_H2_Generation, tempBio_H2, tempStorage_Discharging, tempStorage_Charging, tempNonserved_Energy, tempH2_Pipeline_Import_Export, tempH2_Truck_Import_Export, tempTruck_Consumption, tempH2G2P, tempDemand, tempSynfuel_Consumption, tempCTotal]
+=======
+		if setup["ModelNGSC"] == 1 && setup["ModelSyntheticNG"] == 1
+			tempSynNG_Consumption = tempSynNG_Consumption - sum(inputs["omega"].* (value.(EP[:eSyn_NG_H2_Cons])[:,z]))
+		end
+
+		if setup["ModelEthyleneProduction"] == 1  && setup["ModelEthylenePlants"] == 1 && setup["ModelEthyleneRetrofitting"] == 0
+			tempH2_from_Ethylene = tempH2_from_Ethylene + sum(inputs["omega"].* (value.(EP[:eEthylene_H2_RES])[:,z])) + sum(inputs["omega"].* (value.(EP[:eEthylene_H2_Plant])[:,z]))
+			tempH2_to_Ethylene = tempH2_to_Ethylene - sum(inputs["omega"].* (value.(EP[:eEthylene_H2in_RES])[:,z])) - sum(inputs["omega"].* (value.(EP[:eEthylene_H2in_Plant])[:,z]))
+		end
+
+		if setup["ModelEthyleneProduction"] == 1  && setup["ModelEthylenePlants"] == 1 && setup["ModelEthyleneRetrofitting"] == 1
+			tempH2_from_Ethylene = tempH2_from_Ethylene + sum(inputs["omega"].* (value.(EP[:eEthylene_H2_RES])[:,z])) + sum(inputs["omega"].* (value.(EP[:eEthylene_H2_Plant])[:,z])) + sum(inputs["omega"].* (value.(EP[:eEthylene_H2_Retrofit])[:,z]))
+			tempH2_to_Ethylene = tempH2_to_Ethylene - sum(inputs["omega"].* (value.(EP[:eEthylene_H2in_RES])[:,z])) - sum(inputs["omega"].* (value.(EP[:eEthylene_H2in_Plant])[:,z])) - sum(inputs["omega"].* (value.(EP[:eEthylene_H2in_Retrofit])[:,z]))
+		end
+
+
+		tempCTotal = tempGreen_H2_Generation + tempBlue_H2_Generation + tempGrey_H2_Generation + tempBio_H2 + tempNonserved_Energy + tempH2_Pipeline_Import_Export + tempH2_Truck_Import_Export + tempTruck_Consumption + tempH2G2P + tempDemand + tempSynfuel_Consumption + tempSynNG_Consumption + tempH2_from_Ethylene + tempH2_to_Ethylene 
+
+
+		dfCost[!,Symbol("Zone$z")] = [tempGreen_H2_Generation, tempBlue_H2_Generation, tempGrey_H2_Generation, tempBio_H2, tempStorage_Discharging, tempStorage_Charging, tempNonserved_Energy, tempH2_Pipeline_Import_Export, tempH2_Truck_Import_Export, tempTruck_Consumption, tempH2G2P, tempDemand, tempSynfuel_Consumption, tempSynNG_Consumption, tempH2_from_Ethylene, tempH2_to_Ethylene, tempCTotal]
+>>>>>>> Stashed changes
 	end
 
 	CSV.write(string(path,sep,"HSC_balance_zone.csv"), dfCost)

@@ -1,0 +1,26 @@
+ModelChemicalProduction: 1 #Flag to turn on or off Chemical Production modeling - 0 - No Chemicals, 1 - Chemical Production Modeled
+# Chemical Prodcution include: Ethylene and ammonia. "Only Ethylene is active for now" 
+GlobalChemicalProduction: 1
+ModelEthylenePurchase: 0 # Flag to turn on or off Ethylene Purchase modeling
+ModelEthyleneProduction: 1 #Flag to turn on or off Ethylene Prodcution modeling
+Conventional_Ethylene_Purchase_Share_Requirement: 0 # Specify Conventional Ethylene Purchase Share ; 0 = not active; 1 = active systemwide
+Conv_Ethylene_Purchase_Share: 0 # Enter a value between 0 and 1 to specify the maximum fraction of systemwide conventional ethylene purchase
+
+ModelProductionRamping: 1 # Flag to turn on or off Industrial Ramping limits of a plant
+ModelEthylenePlantsDecommissioning: 1 # Flag to turn on or off Ethylene Plants Decommissioning
+
+ModelEthyleneTechnologies: 1 # Flag to turn on or off Ethylene technology modeling
+ModelEthylenePlants: 1 # Flag to turn on or off modeling existing ethylene crackers
+
+ModelEthyleneEndOfLife: 0 # Flag to turn on or off modeling incineration at end of life
+ModelEthyleneRetrofitting: 1 # Flag to turn on or off modeling retrofitting options for ethylene production
+################################# Ethanol ##################################################
+ModelEthanol: 1 # Flag to tutn on or off Ethanol modelling
+ModelEthanolPurchase: 0 # Flag to turn on or off Ethanol Purchase modeling
+ModelEthanolProduction: 1 #Flag to turn on or off Ethanol Prodcution modeling
+Bio_Ethanol_On: 1 # Flag for biogenic ethanol production
+ModelExclusiveEmissions: 0 # Flag to model ethanol production emissions in exclusive terms
+
+################################# Ethane ####################################3
+Model_Ethane_production_constraint: 0 # Flag to turn on or off NG and NGL production constraint
+ModelEthanePurchase: 1

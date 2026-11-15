@@ -28,9 +28,15 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 	dfCO2StorBalance = Array{Any}
 	rowoffset=3
 	for z in 1:Z
+<<<<<<< Updated upstream
 	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 9)
 	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Biorefinery Capture","Synfuel Production Capture", "Synfuel Production Consumption", "CO2 Pipeline Import",
 	           "CO2 Storage"]
+=======
+	   	dfTemp1 = Array{Any}(nothing, T+rowoffset, 19)
+	   	dfTemp1[1,1:size(dfTemp1,2)] = [ "Power CCS", "H2 CCS", "DAC Capture", "DAC Fuel CCS", "Bio Elec Capture", "Bio H2 Capture", "Bio LF Capture", "Bio NG Capture", "Synfuel Plant Capture", "Synfuel Plant Consumption", "Syn NG Plant Capture", "Syn NG Plant Consumption", "NG Power CCS", "NG H2 CCS", "NG DAC CCS", "CO2 Pipeline Import",
+	           "CO2 Storage","Ethylene Production","Bio Ethanol Capture"]
+>>>>>>> Stashed changes
 	   	dfTemp1[2,1:size(dfTemp1,2)] = repeat([z],size(dfTemp1,2))
 	   	for t in 1:T
 
@@ -46,10 +52,46 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 
 			dfTemp1[t+rowoffset,4] = value(EP[:eDAC_Fuel_CO2_captured_per_zone_per_time][z,t])
 
+<<<<<<< Updated upstream
 			if setup["ModelBIO"] == 1
 				dfTemp1[t+rowoffset,5] = value(EP[:eBiorefinery_CO2_captured_per_zone_per_time][z,t])
 			else
 				dfTemp1[t+rowoffset,5] = 0
+=======
+			dfTemp1[t+rowoffset,5] = 0
+			dfTemp1[t+rowoffset,6] = 0
+			dfTemp1[t+rowoffset,7] = 0
+			dfTemp1[t+rowoffset,8] = 0
+			dfTemp1[t+rowoffset,19] = 0
+
+			if setup["ModelBESC"] == 1
+
+				if setup["Bio_ELEC_On"] == 1
+					dfTemp1[t+rowoffset,5] = value(EP[:eBio_ELEC_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["Bio_H2_On"] == 1
+					dfTemp1[t+rowoffset,6] = value(EP[:eBio_H2_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["Bio_LF_On"] == 1
+					dfTemp1[t+rowoffset,7] = value(EP[:eBio_LF_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["Bio_NG_On"] == 1
+					dfTemp1[t+rowoffset,8] = value(EP[:eBio_NG_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["Bio_Ethanol_On"] == 1
+					if setup["ModelExclusiveEmissions"] == 1
+						dfTemp1[t+rowoffset,19] = value(EP[:eEthanol_CO2_Capture_Per_Zone_Per_Time][z,t])
+					elseif setup["ModelExclusiveEmissions"] == 0
+						dfTemp1[t+rowoffset,19] = value(EP[:eBio_Ethanol_CO2_captured_per_zone_per_time][z,t])
+					end
+					
+				end
+				
+>>>>>>> Stashed changes
 			end
 			
 			if setup["ModelLiquidFuels"] == 1
@@ -60,6 +102,46 @@ function write_co2_storage_balance(path::AbstractString, sep::AbstractString, in
 				dfTemp1[t+rowoffset,7] = 0
 			end
 
+<<<<<<< Updated upstream
+=======
+			dfTemp1[t+rowoffset,11] = 0
+			dfTemp1[t+rowoffset,12] = 0
+			dfTemp1[t+rowoffset,13] = 0
+			dfTemp1[t+rowoffset,14] = 0
+			dfTemp1[t+rowoffset,15] = 0
+			dfTemp1[t+rowoffset,18] = 0
+
+			if setup["ModelNGSC"] == 1 
+				if setup["ModelSyntheticNG"] == 1
+					dfTemp1[t+rowoffset,11] = value(EP[:eSyn_NG_CO2_Capture_Per_Zone_Per_Time][z,t])
+					dfTemp1[t+rowoffset,12] = - value(EP[:eSyn_NG_CO2_Cons_Per_Zone_Per_Time][z,t])
+				end
+
+				dfTemp1[t+rowoffset,13] = value(EP[:ePower_NG_CO2_captured_per_zone_per_time][z,t])
+				
+				if setup["ModelH2"] == 1
+					dfTemp1[t+rowoffset,14] = value(EP[:eHydrogen_NG_CO2_captured_per_zone_per_time][z,t])
+				end
+
+				if setup["ModelCSC"] == 1
+					dfTemp1[t+rowoffset,15] = value(EP[:eDAC_NG_CO2_captured_per_zone_per_time][z,t])
+				end
+
+			end
+
+			
+			if setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 1
+				dfTemp1[t+rowoffset,18] = value(EP[:eEthylene_CO2_Capture_Per_Zone_Per_Time_EP][z,t])+value(EP[:eEthylene_CO2_Capture_Per_Zone_Per_Time_GF][z,t])-value(EP[:eEthylene_CO2in_RES_zone_per_time][z,t])-value(EP[:eEthylene_CO2in_Plantzone_per_time][z,t])# tempEthylene_Production_Capture = tempEthylene_Production_Capture + sum(inputs["omega"].* (value.(EP[:eEthylene_CO2_Capture_Per_Zone_Per_Time])[z,:]))	
+			end
+
+			if setup["ModelEthyleneProduction"] == 1 && setup["ModelEthylenePlants"] == 0
+				dfTemp1[t+rowoffset,18] = value(EP[:eEthylene_CO2_Capture_Per_Zone_Per_Time_GF][z,t])-value(EP[:eEthylene_CO2in_RES_zone_per_time][z,t])
+			end
+
+
+			dfTemp1[t+rowoffset,16] = 0
+
+>>>>>>> Stashed changes
 			if setup["ModelCO2Pipelines"] == 1
 				dfTemp1[t+rowoffset,8] = value(EP[:ePipeZoneCO2Demand][t,z])
 			else

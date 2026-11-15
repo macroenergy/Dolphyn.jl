@@ -121,6 +121,43 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 	    @expression(EP, eCaptured_CO2_Balance[t=1:T, z=1:Z], 0)
     end
 
+<<<<<<< Updated upstream
+=======
+    if setup["ModelBESC"] == 1
+        # Initialize Herb and Wood Biomass Supply Balance 
+        @expression(EP, eEnergy_Crops_Herb_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eEnergy_Crops_Wood_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eAgri_Res_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eAgri_Process_Waste_Biomass_Supply[t=1:T, z=1:Z], 0)
+        @expression(EP, eForest_Biomass_Supply[t=1:T, z=1:Z], 0)
+    end
+
+    if setup["ModelNGSC"] == 1
+        # Initialize NG Balance Expression
+	    @expression(EP, eNGBalance[t=1:T, z=1:Z], 0)
+    end
+
+    if setup["ModelChemicalProduction"] == 1
+        # Initialize Ethylene Balance Expression
+	    @expression(EP, eEthyleneBalance[t=1:T, z=1:Z], 0)
+    end
+
+    if setup["ModelEthanol"] == 1
+        # Initialize Ethylene Balance Expression
+	    @expression(EP, eEthanolBalance[t=1:T, z=1:Z], 0)
+    end
+
+    if setup["ModelEthanePurchase"] == 1
+        # Initialize Ethylene Balance Expression
+	    @expression(EP, eEthaneBalance[t=1:T, z=1:Z], 0)
+    end
+
+    if setup["ModelPropylenePurchase"] == 1
+        # Initialize Propylene Balance Expression
+	    @expression(EP, ePropyleneBalance[t=1:T, z=1:Z], 0)
+    end
+
+>>>>>>> Stashed changes
 
     # Initialize Objective Function Expression
     @expression(EP, eObj, 0)
@@ -388,6 +425,237 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		
 	end
 
+<<<<<<< Updated upstream
+=======
+        EP = ng_emissions(EP, inputs, setup)
+        
+        #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynNGRes]
+    end
+
+    ###### START OF ETHYLENE INFRASTRUCTURE MODEL ######
+    if setup["ModelChemicalProduction"] == 1
+
+    # Initialize 
+        @expression(EP, eConv_Ethylene_Balance[t=1:T, z=1:Z], 0) # Have to check
+
+        println("Generating Ethylene Supply Chain model")
+
+    # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, eEthyleneNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)  
+    
+        if setup["ModelEthylenePurchase"] == 1
+            EP = conventional_ethylene_demand(EP, inputs, setup) 
+        end
+
+        if setup["ModelEthyleneProduction"] == 1
+
+
+            EP = ethylene_production_investment(EP, inputs, setup) 
+            EP = ethylene_production_resources(EP, inputs, setup)
+                       
+            EP = ethylene_production_outputs(EP, inputs, setup)
+
+            if setup["ModelEthyleneEndOfLife"] == 1
+                EP = ethylene_end_of_life_emissions(EP, inputs, setup) 
+                EP = ethylene_end_of_life_power_and_investment(EP, inputs, setup) 
+            end
+            
+        end
+
+    #    if setup["ModelEthylenePlantsDecommissioning"] == 1
+    #        EP = ethylene_plants_decommissioning(EP, inputs, setup)
+    #    end
+
+
+        
+
+        
+        if setup["Model_Ethane_production_constraint"] == 1            
+            EP = ethane_NG_production(EP, inputs, setup)
+        end
+
+
+
+    
+        EP = ethylene_emissions(EP, inputs, setup)
+
+    end   
+    
+    ###### START OF ETHYLENE INFRASTRUCTURE MODEL ######
+    if setup["ModelEthanol"] == 1
+
+    # Initialize 
+        @expression(EP, eConv_Ethanol_Balance[t=1:T, z=1:Z], 0) # Have to check
+
+        println("Generating Ethanol Supply Chain model")
+
+    # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, eEthanolNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)  
+    
+        if setup["ModelEthanolPurchase"] == 1
+            EP = ethanol_purchase_demand(EP, inputs, setup) 
+        end
+
+        #if setup["ModelEthyleneProduction"] == 1
+        #    
+        #    EP = ethylene_production_investment(EP, inputs, setup)
+        #    EP = ethylene_production_resources(EP, inputs, setup)
+        #    EP = ethylene_production_outputs(EP, inputs, setup)
+        #end
+
+    
+        # EP = ethylene_emissions(EP, inputs, setup)
+    end
+
+    if setup["ModelEthanePurchase"] == 1
+
+        # Initialize 
+        @expression(EP, eConv_Ethane_Balance[t=1:T, z=1:Z], 0) # Have to check
+    
+        println("Generating Ethane Supply Chain model")
+    
+        # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, eEthaneNetpowerConsumptionByAll[t=1:T,z=1:Z], 0) 
+        EP = ethane_purchase_demand(EP, inputs, setup) 
+
+    end
+
+    if setup["ModelPropylenePurchase"] == 1
+
+        # Initialize 
+        @expression(EP, eConv_Propylene_Balance[t=1:T, z=1:Z], 0) # Have to check
+    
+        println("Generating Propylene Supply Chain model")
+    
+        # Net Power consumption by NGSC supply chain by z and timestep - used in emissions constraints
+        @expression(EP, ePropyleneNetpowerConsumptionByAll[t=1:T,z=1:Z], 0) 
+        EP = propylene_purchase_demand(EP, inputs, setup) 
+
+        if setup["ModelPropyleneEndOfLife"] == 1
+            EP = propylene_end_of_life_emissions(EP, inputs, setup) 
+
+        end
+
+    end
+    #EP[:eAdditionalDemandByZone] += EP[:ePowerBalanceSynNGRes]
+
+
+
+
+
+    ###### START OF BIOENERGY INFRASTRUCTURE MODEL ######
+    if setup["ModelBESC"] == 1
+
+        println("Generating Bioenergy Supply Chain model")
+
+        if setup["ModelNGSC"] == 1
+            @expression(EP, eBESCNetNGConsumptionByAll[t=1:T,z=1:Z], 0)    
+        end
+
+		# Net Power consumption
+		@expression(EP, eBioNetpowerConsumptionByAll[t=1:T,z=1:Z], 0)	
+
+		# Supply costs
+        if setup["Energy_Crops_Herb_Supply"] == 1
+		    EP = bio_herb_supply(EP, inputs, setup)
+        end
+
+        if setup["Energy_Crops_Wood_Supply"] == 1
+		    EP = bio_wood_supply(EP, inputs, setup)
+        end
+
+        if setup["Agri_Res_Supply"] == 1
+            EP = bio_agri_res_supply(EP, inputs, setup)
+        end
+        
+        if setup["Agri_Process_Waste_Supply"] == 1
+            EP = bio_agri_process_waste_supply(EP, inputs, setup)
+        end
+
+        if setup["Agri_Forest_Supply"] == 1
+            EP = bio_forest_supply(EP, inputs, setup)
+        end
+
+
+        if setup["Bio_ELEC_On"] == 1
+            # Variable costs
+            EP = bio_electricity_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_electricity_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_electricity(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_electricity_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_H2_On"] == 1
+            # Variable costs
+            EP = bio_hydrogen_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_hydrogen_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_hydrogen(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_hydrogen_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_LF_On"] == 1
+            # Variable costs
+            EP = bio_liquid_fuels_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_liquid_fuels_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_liquid_fuels(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_liquid_fuels_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_NG_On"] == 1
+            # Variable costs
+            EP = bio_natural_gas_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_natural_gas_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_natural_gas(EP, inputs, setup)
+
+            # Direct emissions
+            EP = bio_natural_gas_emissions(EP, inputs,setup)
+        end
+
+        if setup["Bio_Ethanol_On"] == 1
+            # Variable costs
+            EP = bio_ethanol_var_cost(EP, inputs, setup)
+
+            # Fixed costs
+            EP = bio_ethanol_investment(EP, inputs, setup)
+        
+            # Bioenergy resources
+            EP = bio_ethanol(EP, inputs, setup)
+
+            if setup["ModelExclusiveEmissions"] == 1
+                EP = bio_ethanol_emissions(EP, inputs,setup)
+            elseif setup["ModelExclusiveEmissions"] == 0
+                EP = bio_ethanol_emissions_biomodel(EP, inputs,setup)
+            end
+
+
+            # 
+        end
+
+        #EP[:eAdditionalDemandByZone] += EP[:eBioNetpowerConsumptionByAll]
+    end
+>>>>>>> Stashed changes
 
     ################  Policies #####################3
     # CO2 emissions limits for the power sector only
@@ -446,6 +714,103 @@ function generate_model(setup::Dict,inputs::Dict,OPTIMIZER::MOI.OptimizerWithAtt
 		@constraint(EP, cCapturedCO2Balance[t=1:T, z=1:Z], EP[:eCaptured_CO2_Balance][t,z] == 0)
 	end
     
+<<<<<<< Updated upstream
+=======
+        ##Gasoline
+        if setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+    
+            #Demand constraint for hourly regional liquid fuel demand[t,z]
+            @constraint(EP, cLFGasolineBalance_T_Z[t=1:T,z=1:Z], (EP[:eSBFGasolineBalance][t,z] + EP[:eCFGasolineBalance][t,z]) >= inputs["Liquid_Fuels_Gasoline_D"][t,z])
+            @constraint(EP, cLFJetfuelBalance_T_Z[t=1:T,z=1:Z], (EP[:eSBFJetfuelBalance][t,z] + EP[:eCFJetfuelBalance][t,z]) >= inputs["Liquid_Fuels_Jetfuel_D"][t,z])
+            @constraint(EP, cLFDieselBalance_T_Z[t=1:T,z=1:Z], (EP[:eSBFDieselBalance][t,z] + EP[:eCFDieselBalance][t,z]) >= inputs["Liquid_Fuels_Diesel_D"][t,z])
+    
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 1 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+    
+            #Demand constraint for annual regional liquid fuel demand[z]
+            @constraint(EP, cLFGasolineBalance_Z[z=1:Z], (sum(inputs["omega"][t] * EP[:eSBFGasolineBalance][t,z] for t = 1:T) + EP[:eCFGasolineBalance][z]) >= sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for t = 1:T))
+            @constraint(EP, cLFJetfuelBalance_Z[z=1:Z], (sum(inputs["omega"][t] * EP[:eSBFJetfuelBalance][t,z] for t = 1:T) + EP[:eCFJetfuelBalance][z]) >= sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for t = 1:T))
+            @constraint(EP, cLFDieselBalance_Z[z=1:Z], (sum(inputs["omega"][t] * EP[:eSBFDieselBalance][t,z] for t = 1:T) + EP[:eCFDieselBalance][z]) >= sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for t = 1:T))
+
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 1
+    
+            #Demand constraint for hourly global liquid fuel demand[t]
+            @constraint(EP, cLFGasolineBalance_T[t=1:T], (sum(EP[:eSBFGasolineBalance][t,z] for z = 1:Z) + EP[:eCFGasolineBalance][t]) >= sum(inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z))
+            @constraint(EP, cLFJetfuelBalance_T[t=1:T], (sum(EP[:eSBFJetfuelBalance][t,z] for z = 1:Z) + EP[:eCFJetfuelBalance][t]) >= sum(inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z))
+            @constraint(EP, cLFDieselBalance_T[t=1:T], (sum(EP[:eSBFDieselBalance][t,z] for z = 1:Z) + EP[:eCFDieselBalance][t]) >= sum(inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z))
+
+        elseif setup["Liquid_Fuels_Regional_Demand"] == 0 && setup["Liquid_Fuels_Hourly_Demand"] == 0
+    
+            #Demand constraint for annual global liquid fuel demand
+            @constraint(EP, cLFGasolineBalance, (sum(sum(inputs["omega"][t] * EP[:eSBFGasolineBalance][t,z] for z = 1:Z) for t = 1:T) + EP[:eCFGasolineBalance]) >= sum(sum(inputs["omega"][t] * inputs["Liquid_Fuels_Gasoline_D"][t,z] for z = 1:Z) for t = 1:T))
+            @constraint(EP, cLFJetfuelBalance, (sum(sum(inputs["omega"][t] * EP[:eSBFJetfuelBalance][t,z] for z = 1:Z) for t = 1:T) + EP[:eCFJetfuelBalance]) >= sum(sum(inputs["omega"][t] * inputs["Liquid_Fuels_Jetfuel_D"][t,z] for z = 1:Z) for t = 1:T))
+            @constraint(EP, cLFDieselBalance, (sum(sum(inputs["omega"][t] * EP[:eSBFDieselBalance][t,z] for z = 1:Z) for t = 1:T) + EP[:eCFDieselBalance]) >= sum(sum(inputs["omega"][t] * inputs["Liquid_Fuels_Diesel_D"][t,z] for z = 1:Z) for t = 1:T))
+        end
+        
+        # Conventional Fuels Share Policy
+        if setup["Conventional_Diesel_Share_Requirement"] == 1 || setup["Conventional_Jetfuel_Share_Requirement"] == 1 || setup["Conventional_Gasoline_Share_Requirement"] == 1 || setup["Conv_Jetfuel_to_Gasoline_ratio"] == 1 || setup["Conv_Diesel_to_Gasoline_ratio"] == 1
+            EP = conventional_fuel_share(EP, inputs, setup)
+        end
+
+    end
+
+    #########################################################################################
+    ###Natural Gas Balance constraints
+
+    if setup["ModelNGSC"] == 1
+        @constraint(EP, cNG_Balance_T_Z[t=1:T,z=1:Z], EP[:eNGBalance][t,z] == inputs["NG_D"][t,z])
+
+         # Conventional Fuels Share Policy
+         if setup["Conventional_NG_Share_Requirement"] == 1
+            EP = conventional_ng_share(EP, inputs, setup)
+        end
+    end
+
+    #########################################################################################
+    ### Ethylene Balance constraints
+
+    if setup["ModelChemicalProduction"] == 1
+        if setup["GlobalChemicalProduction"] == 1 && setup["ModelEthyleneEqual"] == 0
+            @constraint(EP, cEthylene_Balance_T[t=1:T], (sum(EP[:eEthyleneBalance][t,z] for z = 1:Z)) >= sum(inputs["Ethylene_Demand"][t,z] for z = 1:Z))
+        elseif setup["GlobalChemicalProduction"] == 1 && setup["ModelEthyleneEqual"] == 1
+            @constraint(EP, cEthylene_Balance_T[t=1:T], (sum(EP[:eEthyleneBalance][t,z] for z = 1:Z)) == sum(inputs["Ethylene_Demand"][t,z] for z = 1:Z))
+        else
+            @constraint(EP, cEthylene_Balance_T_Z[t=1:T,z=1:Z], EP[:eEthyleneBalance][t,z] == inputs["Ethylene_Demand"][t,z])
+        end
+
+        # Conventional Ethylene Purchase Share Policy
+        if setup["Conventional_Ethylene_Purchase_Share_Requirement"] == 1
+            EP = conventional_ethylene_purchase_share(EP, inputs, setup)
+        end
+    end
+
+        #########################################################################################
+    ### Ethanol Balance constraints
+
+    if setup["ModelEthanol"] == 1
+        @constraint(EP, cEthanol_Balance_T_Z[t=1:T,z=1:Z], EP[:eEthanolBalance][t,z] == inputs["Ethanol_Demand"][t,z])
+    end
+
+    if setup["ModelEthanePurchase"] == 1
+        @constraint(EP, cEthane_Balance_T_Z[t=1:T,z=1:Z], EP[:eEthaneBalance][t,z] == inputs["Ethane_Demand"][t,z])
+    end
+
+    if setup["ModelPropylenePurchase"] == 1 && setup["ModelPropyleneEqual"] == 0
+        @constraint(EP, cPropylene_Balance_T[t=1:T], (sum(EP[:ePropyleneBalance][t,z] for z = 1:Z)) >= sum(inputs["Propylene_Demand"][t,z] for z = 1:Z))
+
+    #    @constraint(EP, cPropylene_Balance_T[t=1:T], (sum(EP[:ePropyleneBalance][t,z] for z = 1:Z)) == sum(inputs["Propylene_Demand"][t,z] for z = 1:Z))
+        # @constraint(EP, cPropylene_Balance_T_Z[t=1:T,z=1:Z], EP[:ePropyleneBalance][t,z] == inputs["Propylene_Demand"][t,z])
+    end
+
+    if setup["ModelPropylenePurchase"] == 1 && setup["ModelPropyleneEqual"] == 1
+    #    @constraint(EP, cPropylene_Balance_T[t=1:T], (sum(EP[:ePropyleneBalance][t,z] for z = 1:Z)) >= sum(inputs["Propylene_Demand"][t,z] for z = 1:Z))
+
+        @constraint(EP, cPropylene_Balance_T[t=1:T], (sum(EP[:ePropyleneBalance][t,z] for z = 1:Z)) == sum(inputs["Propylene_Demand"][t,z] for z = 1:Z))
+        # @constraint(EP, cPropylene_Balance_T_Z[t=1:T,z=1:Z], EP[:ePropyleneBalance][t,z] == inputs["Propylene_Demand"][t,z])
+    end
+
+    #########################################################################################
+
+>>>>>>> Stashed changes
     ## Record pre-solver time
     presolver_time = time() - presolver_start_time
         #### Question - What do we do with this time now that we've split this function into 2?

@@ -28,6 +28,14 @@ export load_inputs
 export load_h2_inputs
 export load_co2_inputs
 export load_liquid_fuels_inputs
+<<<<<<< Updated upstream
+=======
+export load_bio_inputs
+export load_ng_inputs
+export load_ethylene_inputs
+export load_ethanol_inputs
+export load_ethane_inputs
+>>>>>>> Stashed changes
 export generate_model
 export solve_model
 export run_case
@@ -36,6 +44,14 @@ export write_outputs
 export write_HSC_outputs
 export write_CSC_outputs
 export write_liquid_fuels_outputs
+<<<<<<< Updated upstream
+=======
+export write_bio_outputs
+export write_ng_outputs
+export write_ethylene_outputs
+export write_ethanol_outputs
+export write_ethane_outputs
+>>>>>>> Stashed changes
 export cluster_inputs
 export mga
 export h2_inherit_clusters
@@ -71,6 +87,29 @@ const ModelScalingFactor = 1e+3
 # Lower heating value of Hydrogen
 # LHV is used when defining a system-wide CO2 constraint for the joint hydrogen and electricity infrastructures (SystemCO2Constraint =2)
 const H2_LHV = 33.33 # MWh per tonne
+<<<<<<< Updated upstream
+=======
+const H2_HHV = 39.39 # MWh per tonne
+const Ethanol_LHV = 6.56 # MWh per tonne
+const Ethanol_HHV = 8.25 # MWh per tonne
+
+# MMBtu to MWh conversion for bioenergy to electricity
+
+const MMBtu_to_MWh = 0.293071 # MWh per MMBtu
+const MMBtu_to_tonne_ethanol = 0.2825 # MMBtu to tonne of ethanol based on HHV
+const NG_MMBtu_to_ethane_tonne_max = 181.88 # amount of natural gas produced in mmbtu per tonne of ethane 
+# const NG_MMBtu_to_ethane_tonne_min = 65.21 # Bakken: Amount of natural gas produced in mmbtu per tonne of ethane 
+# const NG_MMBtu_to_ethane_tonne_min = 177.3 # Utica: Amount of natural gas produced in mmbtu per tonne of ethane 
+const NG_MMBtu_to_ethane_tonne_min = 702.1 # US Average 2023: Amount of natural gas produced in mmbtu per tonne of ethane 
+const EthanolFactor = 0.089141042
+const EthanolEmissionFactor = 1 # 1.55
+const tonne_to_mmbtu_NG = 52.3294 # to convert tonne of CH4 to mmbtu
+const tonne_to_mmbtu_Gasoline = 44.82 # to convert tonne of Gasoline to mmbtu
+const EthylenePlantRamping = 0.8 # Ratio limit of ethylene production in t+1 to t
+# 1 # 0.839843129
+# 1 # 0.108991089 # factor to convert biomass to ethanol
+
+>>>>>>> Stashed changes
 
 # Logging flag
 Log = true
@@ -159,6 +198,27 @@ include_from_dir(joinpath(@__DIR__,"HSC"), ".jl")
 # Load all .jl files from the LFSC directory
 include_from_dir(joinpath(@__DIR__,"LFSC"), ".jl")
 
+<<<<<<< Updated upstream
+=======
+# Load all .jl files from the BESC directory
+include_from_dir(joinpath(@__DIR__,"BESC"), ".jl")
+
+# Load all .jl files from the NGSC directory
+include_from_dir(joinpath(@__DIR__,"NGSC"), ".jl")
+
+# Load all .jl files from the Ethylene directory
+include_from_dir(joinpath(@__DIR__,"Ethylene"), ".jl")
+
+# Load all .jl files from the Ethanol directory
+include_from_dir(joinpath(@__DIR__,"Ethanol"), ".jl")
+
+# Load all .jl files from the Ethane directory
+include_from_dir(joinpath(@__DIR__,"Ethane"), ".jl")
+
+# Load all .jl files from the Ethane directory
+include_from_dir(joinpath(@__DIR__,"Propylene"), ".jl")
+
+>>>>>>> Stashed changes
 # Load all .jl files from the core directory
 include_from_dir(joinpath(@__DIR__,"core"), ".jl")
 
